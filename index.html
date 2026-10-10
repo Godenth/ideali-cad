@@ -1,0 +1,977 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ideali CAD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+html,body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+/* Layout: coluna única no celular; seções alternam texto e "peças" do sistema (cartão de pedido, QR Pix, barra de espaço). Azul de papel articular como acento, vermelho para urgente. */
+:root{
+  --bg:#F4F6F7;          /* porcelana fria */
+  --surface:#FFFFFF;
+  --ink:#14212B;
+  --muted:#5B6873;
+  --line:#DCE2E6;
+  --accent:#2B4FD8;      /* papel articular azul */
+  --accent-ink:#FFFFFF;
+  --accent-soft:#E6EBFC;
+  --urgent:#D2433A;      /* papel articular vermelho */
+  --ok:#1E8A5A;
+  --deep:#14212B;        /* faixa escura */
+  --deep-fg:#EEF2F5;
+  --f-display:"Plus Jakarta Sans",system-ui,"Segoe UI",Arial,sans-serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F161C; --surface:#17212A; --ink:#E7ECF0; --muted:#97A4AF; --line:#27333D;
+    --accent:#7D97FF; --accent-ink:#0F161C; --accent-soft:#1D2A4F; --urgent:#FF6E63; --ok:#4CC58A;
+    --deep:#0A1015; --deep-fg:#E7ECF0; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F161C; --surface:#17212A; --ink:#E7ECF0; --muted:#97A4AF; --line:#27333D;
+  --accent:#7D97FF; --accent-ink:#0F161C; --accent-soft:#1D2A4F; --urgent:#FF6E63; --ok:#4CC58A;
+  --deep:#0A1015; --deep-fg:#E7ECF0; color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.08;margin:0;text-wrap:balance;letter-spacing:-.025em}
+h2{font-size:clamp(1.9rem,4.6vw,3rem);font-weight:800}
+h3{font-size:1.15rem;font-weight:700;font-stretch:112%}
+p{margin:0}
+a{color:inherit}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lead{color:var(--muted);font-size:1.08rem;max-width:58ch}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;font:600 1rem/1 var(--f-body);text-decoration:none;padding:.95em 1.4em;border-radius:999px;border:1.5px solid transparent;transition:transform .15s ease, background .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{border-color:var(--line);background:var(--surface);color:var(--ink)}
+
+/* Topo */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-stretch:125%;font-weight:800;font-size:1.1rem;text-decoration:none}
+.logo svg{flex:none}
+.nav{display:flex;align-items:center;gap:22px}
+.nav a.link{text-decoration:none;color:var(--muted);font-weight:500;font-size:.95rem}
+.nav a.link:hover{color:var(--ink)}
+.nav .btn{padding:.7em 1.1em;font-size:.92rem}
+@media (max-width:760px){.nav a.link{display:none}}
+
+/* Hero */
+.hero{padding-block:56px 72px}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(2.6rem,7.4vw,5.2rem);font-weight:800;font-stretch:125%;margin-block:14px 20px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.fine{font-size:.88rem;color:var(--muted);margin-top:14px}
+@media (max-width:880px){.hero .wrap{grid-template-columns:1fr;gap:40px}}
+
+/* Cartão de pedido (peça do sistema) */
+.order{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 30px 60px -30px color-mix(in srgb,var(--ink) 35%,transparent);max-width:420px;width:100%;justify-self:center;position:relative}
+.order-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}
+.mono{font-family:var(--f-mono);font-size:.82rem;font-variant-numeric:tabular-nums}
+.tag{font-family:var(--f-mono);font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:.35em .7em;border-radius:999px}
+.tag.urgent{background:color-mix(in srgb,var(--urgent) 14%,transparent);color:var(--urgent)}
+.tag.stage{background:var(--accent-soft);color:var(--accent)}
+.tag.paid{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.order h3{font-size:1.25rem}
+.order .who{color:var(--muted);font-size:.95rem;margin-top:2px}
+.teeth{margin:18px 0 6px;overflow-x:auto}
+.teeth-row{display:grid;grid-template-columns:repeat(16,minmax(16px,1fr));gap:3px;min-width:300px}
+.tooth{font-family:var(--f-mono);font-size:.62rem;text-align:center;padding:6px 0;border-radius:5px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.tooth.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.teeth-cap{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:.68rem;color:var(--muted);margin-bottom:14px}
+.spec{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;border-top:1px dashed var(--line);padding-top:14px}
+.spec dt{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.spec dd{margin:2px 0 0;font-weight:600}
+.file{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.file .ico{width:34px;height:34px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:600 .62rem var(--f-mono);flex:none}
+.file div{min-width:0}
+.file b{display:block;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file span{font-size:.78rem;color:var(--muted)}
+.order-foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px}
+.price{font-family:var(--f-display);font-stretch:118%;font-weight:800;font-size:1.6rem;font-variant-numeric:tabular-nums}
+
+/* Dor */
+.pain{padding-block:72px;border-top:1px solid var(--line)}
+.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:36px}
+.pain-item{border-top:3px solid var(--ink);padding-top:16px}
+.pain-item .was{font-family:var(--f-mono);font-size:.8rem;color:var(--urgent);text-decoration:line-through;margin-bottom:8px}
+.pain-item p{color:var(--muted);margin-top:8px}
+@media (max-width:820px){.pain-grid{grid-template-columns:1fr}}
+
+/* Fluxo kanban */
+.flow{padding-block:80px;background:var(--deep);color:var(--deep-fg)}
+.flow .eyebrow{color:color-mix(in srgb,var(--accent) 70%,white)}
+.flow .lead{color:color-mix(in srgb,var(--deep-fg) 70%,transparent)}
+.lanes{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.lane{border:1px solid color-mix(in srgb,var(--deep-fg) 16%,transparent);border-radius:var(--r);padding:16px;min-width:0}
+.lane-h{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;color:color-mix(in srgb,var(--deep-fg) 75%,transparent)}
+.lane-h b{color:var(--deep-fg)}
+.mini{background:color-mix(in srgb,var(--deep-fg) 7%,transparent);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:.88rem}
+.mini .r{display:flex;justify-content:space-between;gap:8px}
+.mini small{color:color-mix(in srgb,var(--deep-fg) 60%,transparent);font-family:var(--f-mono);font-size:.72rem}
+.mini.u{box-shadow:inset 3px 0 0 var(--urgent)}
+.lane p{font-size:.88rem;color:color-mix(in srgb,var(--deep-fg) 65%,transparent);margin-top:14px}
+@media (max-width:900px){.lanes{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.lanes{grid-template-columns:1fr}}
+
+/* Funções */
+.feat{padding-block:80px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:40px;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.f{padding:26px 24px 30px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+.f svg{width:28px;height:28px;color:var(--accent);margin-bottom:16px}
+.f p{color:var(--muted);margin-top:8px;font-size:.98rem}
+@media (max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.feat-grid{grid-template-columns:1fr}}
+
+/* Pix e STL: duas colunas de destaque */
+.duo{padding-block:40px 80px}
+.duo .wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel h2{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+.panel .lead{font-size:1rem}
+@media (max-width:860px){.duo .wrap{grid-template-columns:1fr}}
+
+.pix{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.qr{width:148px;height:148px;background:#fff;border-radius:12px;padding:10px;border:1px solid var(--line);flex:none}
+.qr canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+.pix-info{flex:1;min-width:180px}
+.pix-info .amt{font-family:var(--f-display);font-stretch:118%;font-weight:800;font-size:1.8rem}
+.copyline{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:8px 10px;margin-top:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+.usage{margin-top:6px}
+.bar{height:14px;border-radius:999px;background:var(--bg);border:1px solid var(--line);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.bar .a{background:var(--accent);width:38%}
+.bar .b{background:color-mix(in srgb,var(--accent) 40%,transparent);width:9%}
+.usage-cap{display:flex;justify-content:space-between;margin-top:8px}
+.checks{list-style:none;padding:0;margin:4px 0 0;display:grid;gap:10px}
+.checks li{display:grid;grid-template-columns:20px 1fr;gap:10px;font-size:.98rem}
+.checks li::before{content:"";width:16px;height:16px;margin-top:4px;border-radius:50%;background:var(--accent-soft);box-shadow:inset 0 0 0 4px var(--accent-soft),inset 0 0 0 10px var(--accent)}
+
+/* Segurança */
+.safe{padding-block:72px;border-top:1px solid var(--line)}
+.safe .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:48px;align-items:start}
+.safe-list{display:grid;gap:22px}
+.safe-list div{display:grid;gap:4px}
+.safe-list b{font-family:var(--f-display);font-stretch:112%;font-size:1.1rem}
+.safe-list span{color:var(--muted)}
+@media (max-width:860px){.safe .wrap{grid-template-columns:1fr;gap:28px}}
+
+/* Preços */
+.plans{padding-block:80px;background:var(--surface);border-block:1px solid var(--line)}
+.plans-head{text-align:center;display:grid;gap:12px;justify-items:center}
+.plans-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:40px}
+.plan .val.tbd{font-size:1.6rem;color:var(--muted)}
+.plan .note{font-size:.85rem;color:var(--muted);margin-top:-8px}
+.plan .checks{flex:1}
+@media (max-width:1040px){.plans-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.plan{border:1.5px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px;background:var(--bg)}
+.plan.main{border-color:var(--accent);background:var(--surface);box-shadow:0 24px 50px -30px color-mix(in srgb,var(--accent) 60%,transparent)}
+.plan .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.plan .val{font-family:var(--f-display);font-stretch:118%;font-weight:800;font-size:2.8rem;line-height:1;font-variant-numeric:tabular-nums}
+.plan .val small{font-family:var(--f-body);font-size:1rem;font-weight:500;color:var(--muted)}
+.plan .btn{width:100%}
+.plan.soon{opacity:.85}
+@media (max-width:760px){.plans-grid{grid-template-columns:1fr}}
+
+/* FAQ */
+.faq{padding-block:80px}
+.faq .wrap{max-width:820px}
+details{border-bottom:1px solid var(--line);padding-block:18px}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;font-weight:600;font-size:1.05rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--f-mono);color:var(--accent);font-size:1.3rem;line-height:1}
+details[open] summary::after{content:"–"}
+details p{color:var(--muted);margin-top:10px;max-width:65ch}
+
+/* Chamada final */
+.final{padding-block:88px;background:var(--accent);color:var(--accent-ink);text-align:center}
+.final .wrap{display:grid;gap:18px;justify-items:center}
+.final h2{font-size:clamp(2.2rem,6vw,4rem);font-stretch:125%}
+.final p{max-width:52ch;opacity:.9}
+.final .ctas{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:10px}
+.final .btn-primary{background:var(--accent-ink);color:var(--accent)}
+.final .btn-ghost{background:transparent;color:var(--accent-ink);border-color:color-mix(in srgb,var(--accent-ink) 45%,transparent)}
+
+/* Rede de cadistas */
+.net{padding-block:88px;background:var(--accent-soft);border-block:1px solid var(--line)}
+.net-top{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.net h2{font-size:clamp(2.1rem,5.4vw,3.6rem)}
+.net .lead{margin-top:16px;color:var(--ink);opacity:.8}
+.net .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.offer{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 30px 60px -34px color-mix(in srgb,var(--accent) 70%,transparent);min-width:0}
+.offer h3{font-size:1.25rem;margin-top:6px}
+.offer .who{color:var(--muted);font-size:.92rem;margin-top:2px}
+.split{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.split div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}
+.split dt{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.split dd{margin:4px 0 0;font-family:var(--f-mono);font-weight:600;font-size:.9rem;font-variant-numeric:tabular-nums}
+.split .keep{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.split .keep dt{color:inherit;opacity:.8}
+.netviz{position:relative;width:100%;max-width:440px;margin:6px auto 28px;aspect-ratio:1/1.2}
+@media (max-width:520px){.nd .ent{display:none}.nd .ph{width:46px;height:46px}.nd{transform:translate(-50%,-23px)}.hub{width:100px}}
+.netviz .links{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.netviz .links line{stroke:var(--line);stroke-width:1.5;vector-effect:non-scaling-stroke;transition:stroke .4s ease,stroke-width .4s ease}
+.netviz .links line.live{stroke:color-mix(in srgb,var(--accent) 45%,transparent);stroke-dasharray:4 4;animation:dash 1s linear infinite}
+.netviz .links line.chosen{stroke:var(--accent);stroke-width:3;stroke-dasharray:none;animation:none}
+.netviz .links circle{fill:var(--accent)}
+@keyframes dash{to{stroke-dashoffset:-8}}
+.nd .nm,.nd .rt{background:var(--surface);padding-inline:4px;border-radius:4px}
+.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:112px;padding:10px 8px;border-radius:14px;background:var(--accent);color:var(--accent-ink);text-align:center;display:grid;gap:2px;z-index:2}
+.hub b{font-family:var(--f-display);font-size:.9rem}
+.hub span{font-size:.68rem;opacity:.85}
+.hub .pulse{position:absolute;inset:0;border-radius:14px;border:2px solid var(--accent);opacity:0;pointer-events:none}
+.netviz.publishing .hub .pulse{animation:pulse 1.2s ease-out infinite}
+@keyframes pulse{from{opacity:.8;transform:scale(1)}to{opacity:0;transform:scale(1.7)}}
+.nd{position:absolute;transform:translate(-50%,-26px);width:96px;display:grid;justify-items:center;gap:2px;text-align:center;background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;opacity:.35;transition:opacity .4s ease;z-index:1}
+.nd .ph{width:52px;height:52px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 3px var(--surface),0 0 0 4px var(--line);transition:box-shadow .3s ease,transform .3s ease}
+.nd .ph svg{width:100%;height:100%;display:block}
+.nd .nm{font-size:.74rem;font-weight:600;margin-top:4px;white-space:nowrap}
+.nd .rt{font-family:var(--f-mono);font-size:.64rem;color:var(--muted);white-space:nowrap}
+.nd .rt b{color:#E0A100}
+.nd .bd{font-family:var(--f-mono);font-size:.6rem;font-weight:600;letter-spacing:.03em;padding:.2em .55em;border-radius:999px;margin-top:2px;visibility:hidden;white-space:nowrap}
+.nd.seen{opacity:1}
+.nd.offer .bd{visibility:visible;background:var(--accent-soft);color:var(--accent)}
+.nd.busy{opacity:.45}
+.nd.busy .bd{visibility:visible;background:var(--bg);color:var(--muted)}
+.nd.sel .ph{box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--accent);transform:scale(1.08)}
+.nd.sel .bd{background:var(--accent);color:var(--accent-ink)}
+.nd:focus-visible{outline:none}
+.nd:focus-visible .ph{box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--accent)}
+.net-status{text-align:center;font-weight:600;min-height:2.6em;margin-top:6px;font-size:.95rem}
+.takers{margin-top:16px;display:grid;gap:8px}
+.taker{display:flex;align-items:center;gap:10px;font-size:.9rem}
+.taker .av{width:30px;height:30px;font-size:.72rem}
+.taker div{flex:1;min-width:0}
+.taker span{color:var(--muted);font-size:.8rem}
+.taker .mono{color:var(--muted)}
+.steps{list-style:none;padding:0;margin:56px 0 0;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s}
+.steps li{counter-increment:s;border-top:2px solid var(--accent);padding-top:14px;display:grid;gap:6px}
+.steps li::before{content:counter(s);font-family:var(--f-mono);font-size:.8rem;color:var(--accent);font-weight:600}
+.steps b{font-family:var(--f-display);font-size:1.05rem}
+.steps span{color:var(--muted);font-size:.95rem}
+.seal{margin-top:40px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.seal svg{width:40px;height:40px;color:var(--accent)}
+.seal ul{margin:8px 0 0;padding-left:1.1em;color:var(--muted);display:grid;gap:4px}
+@media (max-width:900px){.net-top{grid-template-columns:1fr;gap:36px}.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.steps{grid-template-columns:1fr}.split{grid-template-columns:1fr}.seal{grid-template-columns:1fr}}
+
+/* Vitrine */
+.vit{padding-block:88px}
+.vit .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.vit .checks{margin-top:22px}
+.prof{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 30px 60px -34px color-mix(in srgb,var(--ink) 40%,transparent);min-width:0}
+.prof-h{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center}
+.prof-h .ph{width:64px;height:64px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 3px var(--surface),0 0 0 4px var(--accent)}
+.prof-h .ph svg{width:100%;height:100%;display:block}
+.prof-h h3{font-size:1.2rem}
+.prof-h p{color:var(--muted);font-size:.88rem}
+.stars{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:.9rem}
+.stars b{color:#E0A100;letter-spacing:1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chip{font-size:.78rem;padding:.3em .7em;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
+.port{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.port figure{margin:0;aspect-ratio:1;max-width:100%;border-radius:10px;background:var(--bg);border:1px solid var(--line);display:grid;place-items:center;position:relative;overflow:hidden}
+.port svg{width:62%;height:62%;color:var(--accent)}
+.port figcaption{position:absolute;left:6px;bottom:4px;font-family:var(--f-mono);font-size:.6rem;color:var(--muted)}
+.prof-f{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}
+.prof-f .btn{padding:.7em 1.2em;font-size:.92rem}
+.review{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--bg);font-size:.88rem;color:var(--muted)}
+@media (max-width:880px){.vit .wrap{grid-template-columns:1fr;gap:36px}}
+
+/* Ranking */
+.rank{padding-block:80px;border-top:1px solid var(--line)}
+.rank .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:48px;align-items:center}
+.rank .checks{margin-top:22px}
+.board{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0}
+.board-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+.rk{display:grid;grid-template-columns:28px 1fr auto;gap:4px 12px;align-items:center;padding-block:12px;border-top:1px solid var(--line)}
+.rk .pos{font-family:var(--f-mono);font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.rk .nm{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk .tot{font-family:var(--f-mono);font-size:.85rem;font-variant-numeric:tabular-nums;text-align:right}
+.rk .meter{grid-column:2/3;height:6px;border-radius:999px;background:var(--bg);overflow:hidden}
+.rk .meter i{display:block;height:100%;background:var(--accent);border-radius:999px}
+.rk .tier{grid-column:3/4;justify-self:end}
+.tier{font-family:var(--f-mono);font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:.3em .6em;border-radius:6px;border:1px solid var(--line);color:var(--muted)}
+.tier.t1{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tier.t2{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+@media (max-width:860px){.rank .wrap{grid-template-columns:1fr;gap:32px}}
+
+/* Mais ferramentas */
+.tools{padding-block:0 80px}
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px}
+.tools .panel h3{font-size:1.3rem}
+.viewer{position:relative;aspect-ratio:4/3;max-width:100%;border-radius:12px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.viewer canvas{width:100%;height:100%;display:block}
+.viewer .hud{position:absolute;left:10px;bottom:8px;right:10px;display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:.68rem;color:var(--muted)}
+.handoff{display:grid;gap:10px}
+.hop{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.85rem;flex:none;background:var(--accent-soft);color:var(--accent)}
+.hop div{min-width:0;flex:1}
+.hop b{display:block;font-size:.92rem}
+.hop span{font-size:.8rem;color:var(--muted)}
+.arrow{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);padding-left:24px}
+.pay{display:grid;gap:10px}
+.pay-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg)}
+.pay-row.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--surface)}
+.pay-row b{font-size:.95rem}
+.pay-row span{font-size:.8rem;color:var(--muted)}
+@media (max-width:960px){.tools-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.tools-grid{grid-template-columns:1fr}}
+
+footer{padding-block:32px;color:var(--muted);font-size:.9rem}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#inicio" aria-label="Ideali CAD, início">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="var(--accent)"/><path d="M8 9c0-1.5 1.4-2.3 3-2 1.3.2 2 .9 3 .9s1.7-.7 3-.9c1.6-.3 3 .5 3 2 0 3-1 5-1.6 8.5-.4 2.3-1 3.5-1.9 3.5-1.2 0-1.2-4-2.5-4s-1.3 4-2.5 4c-.9 0-1.5-1.2-1.9-3.5C9 14 8 12 8 9z" fill="var(--accent-ink)"/></svg>
+      Ideali CAD
+    </a>
+    <nav class="nav" aria-label="Seções">
+      <a class="link" href="#funcoes">Funções</a>
+      <a class="link" href="#rede">Rede</a>
+      <a class="link" href="#vitrine">Vitrine</a>
+      <a class="link" href="#ferramentas">Ferramentas</a>
+      <a class="link" href="#precos">Preços</a>
+      <a class="link" href="#duvidas">Dúvidas</a>
+      <a class="link" href="app/">Entrar</a>
+      <a class="btn btn-primary" href="app/#criar">Testar grátis</a>
+    </nav>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Para cadistas odontológicos</span>
+        <h1>Desenhe.<br>Entregue.<br><em>Receba.</em></h1>
+        <p class="lead">Pedidos, arquivos STL e cobrança dos seus dentistas e laboratórios num lugar só, feito para usar no celular entre um desenho e outro.</p>
+        <div class="ctas">
+          <a class="btn btn-primary" href="app/#criar">Começar 14 dias grátis</a>
+          <a class="btn btn-ghost" href="#funcoes">Saiba mais</a>
+        </div>
+        <p class="fine">Sem cartão para testar. Depois, R$ 29,90 por mês.</p>
+      </div>
+
+      <article class="order" aria-label="Exemplo de pedido no sistema">
+        <div class="order-head">
+          <span class="mono">Pedido #0142</span>
+          <span class="tag urgent">Urgente</span>
+        </div>
+        <h3>Coroa em zircônia</h3>
+        <p class="who">Lab. Sorriso Pleno · Paciente: M.A.S.</p>
+        <div class="teeth" aria-label="Elementos 11 e 21 selecionados">
+          <div class="teeth-row">
+            <span class="tooth">18</span><span class="tooth">17</span><span class="tooth">16</span><span class="tooth">15</span><span class="tooth">14</span><span class="tooth">13</span><span class="tooth">12</span><span class="tooth on">11</span><span class="tooth on">21</span><span class="tooth">22</span><span class="tooth">23</span><span class="tooth">24</span><span class="tooth">25</span><span class="tooth">26</span><span class="tooth">27</span><span class="tooth">28</span>
+          </div>
+        </div>
+        <div class="teeth-cap"><span>direito</span><span>arcada superior</span><span>esquerdo</span></div>
+        <dl class="spec">
+          <div><dt>Cor</dt><dd>A2 Vita</dd></div>
+          <div><dt>Prazo</dt><dd class="mono">14/10 · 18h</dd></div>
+          <div><dt>Etapa</dt><dd><span class="tag stage">Em desenho</span></dd></div>
+          <div><dt>Elementos</dt><dd>2 × R$ 90</dd></div>
+        </dl>
+        <div class="file">
+          <span class="ico">ZIP</span>
+          <div><b>MAS_11-21_superior.zip</b><span>48,2 MB em STL → 11,6 MB compactado</span></div>
+        </div>
+        <div class="order-foot">
+          <span class="mono" style="color:var(--muted)">Exemplo</span>
+          <span class="price">R$ 180,00</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="pain">
+    <div class="wrap">
+      <span class="eyebrow">Hoje, no dia a dia</span>
+      <h2>O desenho é a parte fácil.</h2>
+      <div class="pain-grid">
+        <div class="pain-item">
+          <div class="was">pedido perdido no WhatsApp</div>
+          <h3>Cada pedido com ficha própria</h3>
+          <p>Cliente, paciente, elementos, cor, prazo e observações ficam juntos. Nada se perde no meio das conversas.</p>
+        </div>
+        <div class="pain-item">
+          <div class="was">STL espalhado em pastas e e-mails</div>
+          <h3>O arquivo fica no pedido</h3>
+          <p>Suba o STL compactado ou cole o link do Drive ou do WeTransfer. Você sempre sabe onde está.</p>
+        </div>
+        <div class="pain-item">
+          <div class="was">cobrança anotada no caderno</div>
+          <h3>Você sabe quem está devendo</h3>
+          <p>Extrato do mês por cliente, pagamentos com comprovante e a cobrança por Pix pronta para mandar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flow" id="como-funciona">
+    <div class="wrap">
+      <span class="eyebrow">Como funciona</span>
+      <h2>Do pedido ao Pix, em quatro colunas.</h2>
+      <p class="lead" style="margin-top:14px">Arraste o pedido de uma etapa para a outra. O painel mostra na hora o que está atrasado e quanto você tem a receber.</p>
+      <div class="lanes">
+        <div class="lane">
+          <div class="lane-h"><b>Recebido</b><span>3</span></div>
+          <div class="mini u"><div class="r"><span>Protocolo</span><small>hoje</small></div><small>Dr. Paulo R. · 4 elem.</small></div>
+          <div class="mini"><div class="r"><span>Faceta</span><small>amanhã</small></div><small>Lab. Odontoarte · 6 elem.</small></div>
+          <p>Chegou o pedido. Você cadastra em segundos e o valor sai da tabela do cliente.</p>
+        </div>
+        <div class="lane">
+          <div class="lane-h"><b>Em desenho</b><span>2</span></div>
+          <div class="mini u"><div class="r"><span>Coroa</span><small>14/10</small></div><small>Lab. Sorriso Pleno · 11, 21</small></div>
+          <div class="mini"><div class="r"><span>Inlay</span><small>16/10</small></div><small>Dra. Helena C. · 36</small></div>
+          <p>Está na sua tela. Urgentes aparecem sempre no topo.</p>
+        </div>
+        <div class="lane">
+          <div class="lane-h"><b>Entregue</b><span>5</span></div>
+          <div class="mini"><div class="r"><span>Coroa</span><small>R$ 90</small></div><small>Dr. Paulo R. · 46</small></div>
+          <div class="mini"><div class="r"><span>Ponte</span><small>R$ 270</small></div><small>Lab. Odontoarte · 3 elem.</small></div>
+          <p>Arquivo enviado. O valor entra em "a receber" do cliente.</p>
+        </div>
+        <div class="lane">
+          <div class="lane-h"><b>Pago</b><span>12</span></div>
+          <div class="mini"><div class="r"><span>Facetas</span><small>R$ 540</small></div><small>Dra. Helena C. · Pix</small></div>
+          <p>Registre o pagamento, anexe o comprovante e os pedidos quitados mudam sozinhos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feat" id="funcoes">
+    <div class="wrap">
+      <span class="eyebrow">Funções</span>
+      <h2>Só o que o cadista usa.</h2>
+      <p class="lead" style="margin-top:14px">Sem módulos de fresagem, sem comissão, sem telas que você nunca vai abrir.</p>
+      <div class="feat-grid">
+        <div class="f">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.6M18 14.5c1.6.6 2.7 2.2 3 4.5"/></svg>
+          <h3>Clientes e tabela de preços</h3>
+          <p>Dentistas e laboratórios, cada um com seu preço por elemento ou por tipo de trabalho.</p>
+        </div>
+        <div class="f">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>
+          <h3>Pedidos em kanban</h3>
+          <p>Recebido, em desenho, entregue e pago. Com elementos, cor, prazo e marcação de urgente.</p>
+        </div>
+        <div class="f">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg>
+          <h3>Arquivos STL no pedido</h3>
+          <p>Compactados automaticamente antes do envio, com o tamanho à mostra. Ou só o link externo.</p>
+        </div>
+        <div class="f">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          <h3>Financeiro por cliente</h3>
+          <p>Extrato do mês com total, pago e em aberto. Lista de quem está devendo, sem planilha.</p>
+        </div>
+        <div class="f">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M17 20h4v-3"/></svg>
+          <h3>Cobrança por Pix</h3>
+          <p>QR Code e código copia-e-cola com o valor em aberto, gerados com a sua chave Pix.</p>
+        </div>
+        <div class="f">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h3M8 16h6"/></svg>
+          <h3>Painel do dia</h3>
+          <p>Ao abrir: pedidos em aberto, urgentes e quanto você tem para receber.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="net" id="rede">
+    <div class="wrap">
+      <div class="net-top">
+        <div>
+          <span class="eyebrow">Rede Ideali CAD</span>
+          <h2 style="margin-top:12px">Lotado de trabalho? A rede desenha para você.</h2>
+          <p class="lead">Publique o pedido para os cadistas da rede. Um deles faz o desenho por um valor menor e entrega o arquivo só para você, em sigilo. Você confere e envia ao seu cliente como sempre. O caso urgente sai no prazo e você não perde o cliente por falta de tempo. Sem comissão: o valor vocês combinam entre si.</p>
+          <div class="ctas">
+            <a class="btn btn-primary" href="#precos">Quero usar a rede</a>
+            <a class="btn btn-ghost" href="#duvidas">Como funciona o sigilo</a>
+          </div>
+        </div>
+        <article class="offer" aria-label="Ilustração: pedido publicado na rede e cadistas aceitando">
+          <div class="order-head"><span class="mono">Ilustração</span><span class="tag urgent">Prazo 24h</span></div>
+          <div class="netviz" id="netviz">
+            <svg class="links" viewBox="0 0 100 120" preserveAspectRatio="none" aria-hidden="true"></svg>
+            <div class="hub"><span class="pulse"></span><b>Seu pedido</b><span>Protocolo · 12 elem.</span></div>
+          </div>
+          <p class="net-status" id="netStatus" aria-live="polite">Publicando seu pedido na rede…</p>
+          <dl class="split">
+            <div><dt>Você cobra</dt><dd>R$ 960</dd></div>
+            <div><dt>Paga ao cadista</dt><dd>R$ 540</dd></div>
+            <div class="keep"><dt>Fica com você</dt><dd>R$ 420</dd></div>
+          </dl>
+        </article>
+      </div>
+
+      <ol class="steps">
+        <li><b>Publique</b><span>Escolha o pedido, o prazo e quanto quer pagar. O nome do seu cliente não vai junto.</span></li>
+        <li><b>Um cadista aceita</b><span>Veja a nota e o número de entregas de quem aceitou antes de confirmar.</span></li>
+        <li><b>Receba o desenho</b><span>O arquivo chega só para você, dentro do pedido. Peça ajustes se precisar.</span></li>
+        <li><b>Aprove e entregue</b><span>Envie ao seu cliente com o seu nome. O valor vocês combinam direto, sem comissão do sistema.</span></li>
+      </ol>
+
+      <div class="seal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6l-7-3z"/><path d="m9 12 2 2 4-4"/></svg>
+        <div>
+          <b style="font-family:var(--f-display);font-size:1.1rem">Sigilo dos dois lados</b>
+          <ul>
+            <li>O cadista da rede não vê quem é o seu cliente, nem seus preços.</li>
+            <li>Seu cliente recebe o trabalho de você, como sempre.</li>
+            <li>Paciente só com iniciais, e todo cadista da rede aceita um termo de sigilo para participar.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="lead" style="margin-top:24px">Semana tranquila? Faça o contrário: pegue trabalhos da rede e preencha sua agenda.</p>
+    </div>
+  </section>
+
+  <section class="vit" id="vitrine">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Vitrine de cadistas</span>
+        <h2 style="margin-top:12px">Seja encontrado por dentistas e laboratórios.</h2>
+        <p class="lead" style="margin-top:14px">Dentistas e laboratórios procuram cadistas na Rede Ideali CAD. Com o plano Vitrine, seu perfil aparece para eles com portfólio, especialidades e as estrelas que você ganhou em cada entrega. Eles contratam você direto pelo sistema.</p>
+        <ul class="checks">
+          <li>Portfólio com seus melhores trabalhos, sem dados de paciente.</li>
+          <li>Avaliações só de quem contratou e recebeu o trabalho.</li>
+          <li>O pedido de quem te contrata já entra no seu kanban.</li>
+        </ul>
+      </div>
+      <article class="prof" aria-label="Ilustração de perfil na vitrine">
+        <div class="order-head"><span class="mono">Ilustração</span><span class="tag stage">Disponível</span></div>
+        <div class="prof-h">
+          <span class="ph"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="#FFD9CF"/><path d="M15 32Q14 9 32 9Q50 9 49 32L50 50Q32 54 14 50Z" fill="#6B3A1E"/><path d="M9 64Q11 46 32 46Q53 46 55 64Z" fill="#D2433A"/><rect x="28" y="39" width="8" height="9" rx="3" fill="#F1C6A5"/><ellipse cx="32" cy="30" rx="13" ry="15" fill="#F1C6A5"/><path d="M18 30Q18 12 32 12Q46 12 46 30Q40 18 30 20Q22 21 18 30Z" fill="#6B3A1E"/><circle cx="27" cy="31" r="1.5" fill="#1B1B1B"/><circle cx="37" cy="31" r="1.5" fill="#1B1B1B"/><path d="M28 37Q32 40 36 37" stroke="#1B1B1B" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></span>
+          <div><h3>Juliana M.</h3><p>Cadista · Belo Horizonte, MG · exocad</p></div>
+        </div>
+        <div class="stars"><b>★★★★★</b><span><strong>4,8</strong> · 97 avaliações</span></div>
+        <div class="chips"><span class="chip">Coroas em zircônia</span><span class="chip">Facetas</span><span class="chip">Protocolos</span><span class="chip">Responde em ~1h</span></div>
+        <div class="port">
+          <figure><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M8 18c0-6 4-9 7-9 2 0 3 2 5 2s3-2 5-2c3 0 7 3 7 9 0 5-2 7-3 12-.5 2.5-2 4-3 4-2 0-2-6-6-6s-4 6-6 6c-1 0-2.5-1.5-3-4C10 25 8 23 8 18z"/><path d="M14 14c2 2 4 2 6 0 2 2 4 2 6 0"/></svg><figcaption>coroa 36</figcaption></figure>
+          <figure><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M11 7h7c1 0 2 1 2 2v20c0 3-2 5-5 5s-5-2-5-5V9c0-1 0-2 1-2z"/><path d="M22 7h7c1 0 1 1 1 2v20c0 3-2 5-5 5s-5-2-5-5"/></svg><figcaption>facetas 11·21</figcaption></figure>
+          <figure><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M5 26C5 14 12 8 20 8s15 6 15 18"/><path d="M9 26c0-9 5-14 11-14s11 5 11 14"/><path d="M12 30v4M20 30v4M28 30v4"/></svg><figcaption>protocolo sup.</figcaption></figure>
+          <figure><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M6 17c0-5 3-7 5-7s3 2 4 2 2-2 4-2c2 0 3 2 3 2s1-2 3-2c2 0 3 2 4 2s2-2 4-2 3 2 3 7c0 4-2 6-3 11-1 3-2 4-3 4-2 0-2-5-5-5s-3 5-5 5-2-5-5-5-3 5-5 5c-1 0-2-1-3-4-1-5-3-7-3-11z"/></svg><figcaption>ponte 44–46</figcaption></figure>
+          <figure><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M10 16c0-5 3-8 6-8 2 0 3 1 4 1s2-1 4-1c3 0 6 3 6 8 0 4-1 6-2 8H12c-1-2-2-4-2-8z"/><path d="M14 24h12v3H14z"/><path d="M17 27v7h6v-7"/></svg><figcaption>coroa s/ implante</figcaption></figure>
+          <figure><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M12 12c0-3 3-5 8-5s8 2 8 5v6c0 6-3 14-8 14s-8-8-8-14z"/><path d="M15 13c3 1 7 1 10 0"/></svg><figcaption>inlay 26</figcaption></figure>
+        </div>
+        <div class="review">“Encaixe perfeito, entregou antes do prazo.” · Lab. de exemplo</div>
+        <div class="prof-f"><span class="mono" style="color:var(--muted)">a partir de R$ 70 por elemento</span><span class="btn btn-primary" aria-hidden="true">Contratar</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="rank" id="ranking">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Ranking de clientes</span>
+        <h2 style="margin-top:12px">Saiba quem mais compra e recompense.</h2>
+        <p class="lead" style="margin-top:14px">O sistema soma o que cada dentista e laboratório enviou no mês e monta o ranking sozinho. Você define as faixas de desconto e ele aplica nos próximos pedidos.</p>
+        <ul class="checks">
+          <li>Ranking por valor ou por número de elementos, no mês ou no ano.</li>
+          <li>Faixas de desconto que você escolhe, por exemplo 10% a partir de R$ 2.000 no mês.</li>
+          <li>Veja quem parou de mandar pedido e chame de volta.</li>
+        </ul>
+      </div>
+      <div class="board" aria-label="Exemplo de ranking de clientes">
+        <div class="board-h"><h3>Outubro</h3><span class="mono" style="color:var(--muted)">Exemplo</span></div>
+        <div class="rk"><span class="pos">1</span><span class="nm">Lab. Odontoarte</span><span class="tot">R$ 3.840</span><span></span><span class="meter"><i style="width:100%"></i></span><span class="tier t1">−10%</span></div>
+        <div class="rk"><span class="pos">2</span><span class="nm">Lab. Sorriso Pleno</span><span class="tot">R$ 2.310</span><span></span><span class="meter"><i style="width:60%"></i></span><span class="tier t1">−10%</span></div>
+        <div class="rk"><span class="pos">3</span><span class="nm">Dra. Helena C.</span><span class="tot">R$ 1.420</span><span></span><span class="meter"><i style="width:37%"></i></span><span class="tier t2">−5%</span></div>
+        <div class="rk"><span class="pos">4</span><span class="nm">Dr. Paulo R.</span><span class="tot">R$ 860</span><span></span><span class="meter"><i style="width:22%"></i></span><span class="tier">sem faixa</span></div>
+        <div class="rk"><span class="pos">5</span><span class="nm">Clínica Bem Sorrir</span><span class="tot">R$ 410</span><span></span><span class="meter"><i style="width:11%"></i></span><span class="tier">sem faixa</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tools" id="ferramentas">
+    <div class="wrap">
+      <span class="eyebrow">Mais ferramentas</span>
+      <h2 style="margin-top:12px">Veja o arquivo, divida o trabalho, receba no cartão.</h2>
+      <div class="tools-grid">
+        <div class="panel">
+          <div class="viewer"><canvas id="stl3d" aria-label="Pré-visualização 3D de exemplo"></canvas><div class="hud"><span>coroa_36.stl</span><span>arraste para girar</span></div></div>
+          <h3>Veja o STL no sistema</h3>
+          <p class="lead">Abra o arquivo direto no pedido, gire e dê zoom, sem baixar e sem abrir outro programa. Funciona no celular.</p>
+        </div>
+        <div class="panel">
+          <div class="handoff" aria-label="Exemplo de pedido delegado">
+            <div class="hop"><span class="av">VC</span><div><b>Você recebeu</b><span>Protocolo · 12 elem. · R$ 960</span></div></div>
+            <div class="arrow">↓ delegado em 10/10</div>
+            <div class="hop"><span class="av">RT</span><div><b>Rafael T., cadista parceiro</b><span>Em desenho · repasse R$ 600</span></div></div>
+          </div>
+          <h3>Delegue para um parceiro seu</h3>
+          <p class="lead">Já tem um cadista de confiança? Passe o pedido direto para ele. Ele vê só aquele pedido e o arquivo, e você acompanha o andamento e o repasse.</p>
+        </div>
+        <div class="panel">
+          <div class="pay" aria-label="Exemplo de formas de pagamento">
+            <div class="pay-row"><div><b>Pix</b><br><span>QR Code ou copia-e-cola</span></div><span class="mono">R$ 1.260,00</span></div>
+            <div class="pay-row sel"><div><b>Cartão de crédito</b><br><span>Link de pagamento, à vista ou parcelado</span></div><span class="mono">R$ 1.260,00</span></div>
+          </div>
+          <h3>Receba no cartão de crédito</h3>
+          <p class="lead">Mande um link de pagamento junto com o extrato. O cliente paga no cartão e o pedido é marcado como pago sozinho.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="duo" id="armazenamento">
+    <div class="wrap">
+      <div class="panel">
+        <span class="eyebrow">Cobrança</span>
+        <h2>Mande o Pix junto com o extrato.</h2>
+        <p class="lead">Escolha o cliente e o sistema soma o que está em aberto. O dentista paga lendo o QR Code ou colando o código.</p>
+        <div class="pix">
+          <div class="qr"><canvas id="qr" width="29" height="29" aria-label="QR Code de exemplo"></canvas></div>
+          <div class="pix-info">
+            <span class="mono" style="color:var(--muted)">Lab. Odontoarte · outubro</span>
+            <div class="amt">R$ 1.260,00</div>
+            <span class="mono" style="color:var(--muted)">14 pedidos entregues</span>
+            <div class="copyline">00020126580014BR.GOV.BCB.PIX0136…5204000053039865407 1260.00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <span class="eyebrow">Arquivos STL</span>
+        <h2>Espaço sob controle, sem surpresa.</h2>
+        <p class="lead">Você vê quanto já usou e o sistema faz a limpeza por você.</p>
+        <div class="usage">
+          <div class="bar" role="img" aria-label="2,4 GB usados de 5 GB"><i class="a"></i><i class="b"></i></div>
+          <div class="usage-cap mono"><span>2,4 GB de 5 GB</span><span style="color:var(--muted)">0,4 GB expiram em 7 dias</span></div>
+        </div>
+        <ul class="checks">
+          <li>STL compactado em zip antes de subir, muitas vezes com um quarto do tamanho.</li>
+          <li>Arquivos apagados 60 dias depois da entrega, com aviso antes e opção de baixar tudo.</li>
+          <li>Prefere guardar fora? Cole o link do Drive ou do WeTransfer no pedido.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="safe">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Segurança e LGPD</span>
+        <h2 style="margin-top:12px">Seus clientes são só seus.</h2>
+      </div>
+      <div class="safe-list">
+        <div><b>Cada conta vê apenas os próprios dados</b><span>O banco de dados bloqueia o acesso entre contas. Outro cadista não enxerga seus clientes, valores ou arquivos.</span></div>
+        <div><b>Arquivos privados</b><span>STL e comprovantes ficam em pastas fechadas e só abrem por links temporários, gerados para você.</span></div>
+        <div><b>Paciente só com iniciais</b><span>Guardamos o mínimo necessário. Você pode exportar tudo ou excluir sua conta e seus dados quando quiser.</span></div>
+        <div><b>Excluiu sem querer? Dá para desfazer</b><span>Itens apagados vão para a lixeira e podem ser restaurados.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="plans" id="precos">
+    <div class="wrap">
+      <div class="plans-head">
+        <span class="eyebrow">Preços</span>
+        <h2>Um plano para cada fase do seu trabalho.</h2>
+        <p class="lead">Se a assinatura vencer, nada é apagado. Você continua vendo e exportando tudo.</p>
+      </div>
+      <div class="plans-grid">
+        <div class="plan main">
+          <div class="row"><h3>Básico</h3><span class="tag stage">Lançamento</span></div>
+          <div class="val">R$ 29,90 <small>/mês</small></div>
+          <p class="note">Para organizar o trabalho e a cobrança.</p>
+          <ul class="checks">
+            <li>Clientes e pedidos sem limite</li>
+            <li>5 GB para arquivos STL</li>
+            <li>Financeiro, Pix e cartão</li>
+            <li>Ranking e descontos por cliente</li>
+            <li>Visualizador de STL</li>
+          </ul>
+          <a class="btn btn-primary" href="app/#criar">Começar teste grátis</a>
+        </div>
+        <div class="plan">
+          <div class="row"><h3>Plus</h3></div>
+          <div class="val">R$ 59,90 <small>/mês</small></div>
+          <p class="note">Para quem desenha em volume.</p>
+          <ul class="checks">
+            <li>Tudo do Básico</li>
+            <li>Mais espaço para arquivos STL</li>
+          </ul>
+          <a class="btn btn-ghost" href="app/#criar">Começar teste grátis</a>
+        </div>
+        <div class="plan">
+          <div class="row"><h3>Rede</h3><span class="tag urgent">Novo</span></div>
+          <div class="val tbd">Preço em breve</div>
+          <p class="note">Para não recusar pedido por falta de tempo.</p>
+          <ul class="checks">
+            <li>Tudo do Plus</li>
+            <li>Delegar desenhos para a Rede Ideali CAD</li>
+            <li>Delegar para parceiros seus</li>
+            <li>Sigilo do seu cliente e nenhuma comissão por trabalho</li>
+          </ul>
+          <a class="btn btn-ghost" href="#rede">Ver como funciona</a>
+        </div>
+        <div class="plan">
+          <div class="row"><h3>Vitrine</h3><span class="tag paid">Novo</span></div>
+          <div class="val tbd">Preço em breve</div>
+          <p class="note">Para ganhar clientes novos.</p>
+          <ul class="checks">
+            <li>Tudo do Rede</li>
+            <li>Perfil visível para dentistas e laboratórios</li>
+            <li>Portfólio e avaliações com estrelas</li>
+            <li>Contratação direto pelo sistema</li>
+          </ul>
+          <a class="btn btn-ghost" href="#vitrine">Ver a vitrine</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq" id="duvidas">
+    <div class="wrap">
+      <span class="eyebrow">Dúvidas</span>
+      <h2 style="margin-bottom:20px">Perguntas frequentes</h2>
+      <details>
+        <summary>Preciso instalar alguma coisa?</summary>
+        <p>Não. O Ideali CAD funciona no navegador do celular ou do computador. No celular, dá para adicionar um atalho na tela inicial.</p>
+      </details>
+      <details>
+        <summary>O que acontece quando acaba o teste?</summary>
+        <p>Você escolhe se quer assinar. Se não assinar, a conta fica só para consulta: você vê e exporta tudo, mas não cria pedidos novos. Nada é apagado.</p>
+      </details>
+      <details>
+        <summary>E se meus 5 GB acabarem?</summary>
+        <p>A barra de uso avisa antes. Os arquivos de pedidos entregues há mais de 60 dias são apagados automaticamente, e você ainda pode usar links externos em vez de subir o arquivo.</p>
+      </details>
+      <details>
+        <summary>O Pix cai na minha conta?</summary>
+        <p>Sim. O QR Code é gerado com a sua chave Pix, e o pagamento vai direto para você. O sistema não fica com nenhuma parte.</p>
+      </details>
+      <details>
+        <summary>Meu cliente pode pagar com cartão?</summary>
+        <p>Pode. Você gera um link de pagamento e manda junto com o extrato. A operadora do cartão cobra a taxa dela sobre cada pagamento, e o valor cai na sua conta.</p>
+      </details>
+      <details>
+        <summary>Como funciona o sigilo na rede?</summary>
+        <p>Quando você publica um pedido na rede, o nome do seu cliente e seus preços ficam escondidos. O cadista que aceita vê só o que precisa para desenhar e entrega o arquivo apenas para você. Seu cliente continua recebendo o trabalho de você.</p>
+      </details>
+      <details>
+        <summary>E se o desenho da rede vier com problema?</summary>
+        <p>Você pede ajuste dentro do pedido e só aprova quando estiver bom. Depois da entrega, você avalia o cadista, e a nota dele fica visível para toda a rede.</p>
+      </details>
+      <details>
+        <summary>O sistema cobra comissão na rede ou na vitrine?</summary>
+        <p>Não. Você paga só a assinatura. O valor de cada trabalho e a forma de pagamento são combinados direto entre vocês, e tudo o que você recebe é seu.</p>
+      </details>
+      <details>
+        <summary>Meu cliente vê o sistema?</summary>
+        <p>Não. O sistema é só seu. Para o cliente, você manda o extrato e o Pix pelo canal que já usa.</p>
+      </details>
+      <details>
+        <summary>Posso cancelar quando quiser?</summary>
+        <p>Pode. Sem multa e sem fidelidade. Antes de sair, você exporta seus dados.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="final" id="comecar">
+    <div class="wrap">
+      <h2>Seu próximo pedido já pode entrar aqui.</h2>
+      <p>Crie a conta, cadastre seus clientes com a tabela de preços e organize a semana. São 14 dias grátis.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="app/#criar">Criar minha conta grátis</a>
+        <a class="btn btn-ghost" href="#funcoes">Ver as funções</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Ideali CAD</span>
+    <span>Feito para cadistas odontológicos</span>
+  </div>
+</footer>
+
+<script>
+/* QR ilustrativo (não é um Pix válido): padrão fixo com os três quadrados de posição. */
+(function(){
+  var c=document.getElementById('qr'); if(!c) return;
+  var x=c.getContext('2d'), n=29, s=7;
+  x.fillStyle='#fff'; x.fillRect(0,0,n,n);
+  x.fillStyle='#14212B';
+  var seed=142; function r(){seed=(seed*16807)%2147483647;return seed/2147483647;}
+  function inFinder(i,j){return (i<8&&j<8)||(i>n-9&&j<8)||(i<8&&j>n-9);}
+  for(var i=0;i<n;i++)for(var j=0;j<n;j++){ if(!inFinder(i,j)&&r()>.52) x.fillRect(i,j,1,1); }
+  function finder(a,b){x.fillRect(a,b,s,s);x.fillStyle='#fff';x.fillRect(a+1,b+1,s-2,s-2);x.fillStyle='#14212B';x.fillRect(a+2,b+2,s-4,s-4);}
+  finder(0,0);finder(n-s,0);finder(0,n-s);
+})();
+
+/* Rede: cadistas ilustrados ao redor do pedido; animação de publicar, receber ofertas e escolher. */
+(function(){
+  var box=document.getElementById('netviz'), st=document.getElementById('netStatus'); if(!box) return;
+  var svg=box.querySelector('.links');
+  var people=[
+    {n:'Rafael T.',r:'4,9',e:212,bg:'#C9D6FF',sk:'#E0AC82',hc:'#2B1D14',h:'short',sh:'#2B4FD8',off:'18h'},
+    {n:'Juliana M.',r:'4,8',e:97,bg:'#FFD9CF',sk:'#F1C6A5',hc:'#6B3A1E',h:'long',sh:'#D2433A',off:'20h'},
+    {n:'Bruno S.',r:'4,7',e:154,bg:'#D4F0E2',sk:'#8D5A3B',hc:'#1A1A1A',h:'buzz',sh:'#1E8A5A',off:null},
+    {n:'Camila R.',r:'5,0',e:41,bg:'#FCE9B8',sk:'#C68A62',hc:'#2A1A12',h:'curly',sh:'#14212B',off:'22h'},
+    {n:'Diego A.',r:'4,6',e:63,bg:'#E3DEFF',sk:'#F3D0B5',hc:'#B9772E',h:'short',sh:'#5B6873',off:null},
+    {n:'Larissa P.',r:'4,9',e:180,bg:'#D8EEF6',sk:'#6E4630',hc:'#120C08',h:'bun',sh:'#7A3FB0',off:null}
+  ];
+  function face(p){
+    var back=p.h==='long'?'<path d="M15 32Q14 9 32 9Q50 9 49 32L50 50Q32 54 14 50Z" fill="'+p.hc+'"/>':'';
+    var front={
+      short:'<path d="M18 29Q17 11 32 11Q47 11 46 29Q44 19 32 18Q21 18 18 29Z" fill="'+p.hc+'"/>',
+      long:'<path d="M18 30Q18 12 32 12Q46 12 46 30Q40 18 30 20Q22 21 18 30Z" fill="'+p.hc+'"/>',
+      buzz:'<path d="M19 26Q19 14 32 14Q45 14 45 26Q40 19 32 19Q24 19 19 26Z" fill="'+p.hc+'" opacity=".85"/>',
+      curly:'<g fill="'+p.hc+'"><circle cx="20" cy="22" r="6"/><circle cx="26" cy="15" r="6.5"/><circle cx="34" cy="13" r="6.5"/><circle cx="42" cy="17" r="6"/><circle cx="45" cy="25" r="5"/><circle cx="18" cy="29" r="4"/></g>',
+      bun:'<g fill="'+p.hc+'"><circle cx="32" cy="8" r="6"/><path d="M18 29Q17 12 32 12Q47 12 46 29Q43 18 32 18Q21 18 18 29Z"/></g>'
+    }[p.h];
+    return '<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="'+p.bg+'"/>'+back+
+      '<path d="M9 64Q11 46 32 46Q53 46 55 64Z" fill="'+p.sh+'"/><rect x="28" y="39" width="8" height="9" rx="3" fill="'+p.sk+'"/>'+
+      '<ellipse cx="32" cy="30" rx="13" ry="15" fill="'+p.sk+'"/>'+front+
+      '<circle cx="27" cy="31" r="1.5" fill="#1B1B1B"/><circle cx="37" cy="31" r="1.5" fill="#1B1B1B"/>'+
+      '<path d="M28 37Q32 40 36 37" stroke="#1B1B1B" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>';
+  }
+  var CX=50, CY=60, RX=37, RY=44, nodes=[], lines=[];
+  var NS='http://www.w3.org/2000/svg';
+  people.forEach(function(p,i){
+    var a=(-90+60*i)*Math.PI/180, x=CX+RX*Math.cos(a), y=CY+RY*Math.sin(a);
+    var ln=document.createElementNS(NS,'line');
+    ln.setAttribute('x1',CX);ln.setAttribute('y1',CY);ln.setAttribute('x2',x);ln.setAttribute('y2',y);
+    svg.appendChild(ln); lines.push(ln);
+    var b=document.createElement('button');
+    b.type='button'; b.className='nd'; b.id='nd'+i;
+    b.style.left=x+'%'; b.style.top=(y/120*100)+'%';
+    b.setAttribute('aria-label',p.n+', nota '+p.r);
+    b.innerHTML='<span class="ph">'+face(p)+'</span><span class="nm">'+p.n+'</span><span class="rt"><b>★</b> '+p.r+'<span class="ent"> · '+p.e+' entregas</span></span><span class="bd"></span>';
+    b.addEventListener('click',function(){ if(phase>=2&&p.off){ manual=true; choose(i); } });
+    box.appendChild(b); nodes.push({el:b,p:p,x:x,y:y});
+  });
+  var dot=document.createElementNS(NS,'circle'); dot.setAttribute('r','1.6'); dot.style.display='none'; svg.appendChild(dot);
+  var phase=0, timers=[], manual=false, raf=null;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function later(fn,ms){timers.push(setTimeout(fn,ms));}
+  function clear(){timers.forEach(clearTimeout);timers=[];if(raf)cancelAnimationFrame(raf);raf=null;dot.style.display='none';}
+  function reset(){
+    clear(); phase=0; manual=false;
+    nodes.forEach(function(n,i){n.el.className='nd';n.el.style.opacity='';n.el.querySelector('.bd').textContent='';lines[i].setAttribute('class','');});
+    box.classList.add('publishing'); st.textContent='Publicando seu pedido na rede…';
+  }
+  function reveal(){
+    phase=1; st.textContent='6 cadistas da rede estão vendo seu pedido';
+    nodes.forEach(function(n,i){ later(function(){n.el.classList.add('seen');lines[i].setAttribute('class','live');}, i*180); });
+  }
+  function offers(){
+    phase=2; box.classList.remove('publishing');
+    var c=0;
+    nodes.forEach(function(n,i){
+      var bd=n.el.querySelector('.bd');
+      if(n.p.off){c++;n.el.classList.add('offer');bd.textContent='aceita · '+n.p.off;}
+      else{n.el.classList.add('busy');bd.textContent='ocupado';lines[i].setAttribute('class','');}
+    });
+    st.textContent=c+' cadistas querem fazer. Toque em um para escolher.';
+  }
+  function choose(i){
+    clear(); phase=3;
+    var n=nodes[i];
+    nodes.forEach(function(m,j){ if(j!==i){m.el.classList.remove('sel'); if(m.p.off){m.el.style.opacity='.45';lines[j].setAttribute('class','');}} });
+    n.el.style.opacity=''; n.el.classList.add('sel'); n.el.querySelector('.bd').textContent='escolhido';
+    lines[i].setAttribute('class','chosen');
+    st.textContent='Você escolheu '+n.p.n+' (★ '+n.p.r+').';
+    later(function(){ accepted(i); }, reduce?0:1300);
+  }
+  function accepted(i){
+    phase=4; var n=nodes[i];
+    n.el.querySelector('.bd').textContent='aceitou ✓';
+    st.textContent=n.p.n.split(' ')[0]+' aceitou. Entrega em '+n.p.off+', só para você.';
+    if(reduce) return;
+    dot.style.display=''; var t0=null;
+    function step(ts){
+      if(!t0)t0=ts; var k=((ts-t0)/1600)%1;
+      dot.setAttribute('cx',n.x+(CX-n.x)*k); dot.setAttribute('cy',n.y+(CY-n.y)*k);
+      raf=requestAnimationFrame(step);
+    }
+    raf=requestAnimationFrame(step);
+    later(function(){ nodes.forEach(function(m){m.el.style.opacity='';}); cycle(); }, manual?7000:4200);
+  }
+  function cycle(){
+    reset();
+    later(reveal,1300);
+    later(offers,3200);
+    later(function(){ choose(0); },5600);
+  }
+  if(reduce){ nodes.forEach(function(n,i){n.el.classList.add('seen');}); offers(); choose(0); }
+  else cycle();
+})();
+
+/* Visualizador 3D ilustrativo: malha em arame de uma coroa de molar, girando. */
+(function(){
+  var cv=document.getElementById('stl3d'); if(!cv) return;
+  var ctx=cv.getContext('2d');
+  var U=14,V=28,pts=[];
+  for(var i=0;i<=U;i++){
+    var u=i/U*Math.PI; var row=[];
+    for(var j=0;j<V;j++){
+      var v=j/V*Math.PI*2;
+      var x=Math.sin(u)*Math.cos(v), z=Math.sin(u)*Math.sin(v)*0.88, y=Math.cos(u);
+      var top=Math.max(0,Math.cos(u));
+      // achata a base, cria 4 cúspides em cima e o sulco central
+      y = y>0 ? y*0.55 + top*top*0.22*Math.cos(2*v)*Math.cos(2*v) - top*top*top*0.18 : y*0.85;
+      var bulge=1+0.06*Math.sin(u)*Math.cos(4*v);
+      row.push([x*bulge,y,z*bulge]);
+    }
+    pts.push(row);
+  }
+  var ang=0.6, tilt=-0.45, drag=null;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function size(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=Math.max(1,r.width*d);cv.height=Math.max(1,r.height*d);}
+  function proj(p,w,h){
+    var c=Math.cos(ang),s=Math.sin(ang),x=p[0]*c-p[2]*s,z=p[0]*s+p[2]*c,y=p[1];
+    var ct=Math.cos(tilt),st=Math.sin(tilt),y2=y*ct-z*st,z2=y*st+z*ct;
+    var k=Math.min(w,h)*0.36, f=3/(3+z2);
+    return [w/2+x*k*f, h/2-y2*k*f+h*0.04, z2];
+  }
+  function draw(){
+    var w=cv.width,h=cv.height; ctx.clearRect(0,0,w,h);
+    var col=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#2B4FD8';
+    ctx.strokeStyle=col; ctx.lineWidth=Math.max(1,(window.devicePixelRatio||1)*0.8);
+    var P=pts.map(function(r){return r.map(function(p){return proj(p,w,h);});});
+    for(var i=0;i<=U;i++)for(var j=0;j<V;j++){
+      var a=P[i][j], b=P[i][(j+1)%V];
+      ctx.globalAlpha=(a[2]+b[2])/2>0?0.25:0.85;
+      ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();
+      if(i<U){var c=P[i+1][j];ctx.globalAlpha=(a[2]+c[2])/2>0?0.25:0.85;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(c[0],c[1]);ctx.stroke();}
+    }
+    ctx.globalAlpha=1;
+  }
+  function loop(){ if(!drag) ang+=0.008; draw(); requestAnimationFrame(loop); }
+  cv.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',function(e){if(!drag)return;ang+=(e.clientX-drag.x)*0.01;tilt=Math.max(-1.3,Math.min(0.6,tilt+(e.clientY-drag.y)*0.01));drag={x:e.clientX,y:e.clientY};if(reduce)draw();});
+  cv.addEventListener('pointerup',function(){drag=null;});
+  cv.style.touchAction='none'; cv.style.cursor='grab';
+  size(); draw();
+  window.addEventListener('resize',function(){size();draw();});
+  if(!reduce) requestAnimationFrame(loop);
+})();
+</script>
