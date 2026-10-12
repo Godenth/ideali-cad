@@ -652,7 +652,7 @@ function render(){
     '<h1 class="mb">'+titulo+'</h1><span class="spacer dk"></span>'+
     '<input class="search dk" id="busca-top" type="search" placeholder="Buscar pedido, paciente, cliente…" value="'+(ui.tab==='pedidos'?'':esc(ui.busca))+'">'+
     '<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
-    (ui.tab==='clientes'&&!ui.sub?'<button class="btn pri dk" data-a="novoCliente" '+(w?'':'disabled')+'>+ Novo cliente</button>':'<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>')+
+    '<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>'+
     contaMenu(nome,lix)+
     '<span class="menu-btn">'+chip+'</span></div>'+
     '<nav class="tnav" aria-label="Menu principal"><div class="tnav-in">'+flat.map(function(it){
@@ -660,7 +660,7 @@ function render(){
       return '<button class="'+(ui.tab===it[0]?'on':'')+'" data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+it[1]+'</span>'+badge+'</button>';}).join('')+'</div></nav></header>';
   var bnav='<nav class="bnav" aria-label="Navegação">'+
     bn('dashboard','Início')+bn('pedidos','Produção')+
-    '<button data-a="'+(ui.tab==='clientes'&&!ui.sub?'novoCliente':'novoPedido')+'" aria-label="Novo" '+(w?'':'disabled')+'><span class="plus">+</span></button>'+
+    '<button data-a="novoPedido" aria-label="Novo pedido" '+(w?'':'disabled')+'><span class="plus">+</span></button>'+
     bn('financeiro','Financeiro')+
     '<button data-a="drawer" class="'+(['dashboard','pedidos','financeiro'].indexOf(ui.tab)<0?'on':'')+'">'+ICON.menu+'<span>Menu</span></button></nav>';
   app.innerHTML='<div class="shell '+(ui.drawer?'open':'')+'">'+side+'<div class="scrim" data-a="drawer"></div>'+
@@ -1097,7 +1097,7 @@ function rClientes(){
   };
   cs.sort(by[ord]);
   var ORD=[['az','A a Z'],['recentes','Últimos adicionados'],['antigos','Mais antigos'],['mais','Que mais pedem'],['menos','Que menos pedem'],['inativos','Inativos'+(nIn?' '+nIn:'')]];
-  return painelClientes()+'<div class="stack" style="gap:10px"><h2>Lista de clientes</h2>'+
+  return painelClientes()+'<div class="stack" style="gap:10px"><div class="between wrap" style="gap:10px"><h2>Lista de clientes</h2><button class="btn pri" data-a="novoCliente" '+(canWrite()?'':'disabled')+'>+ Cadastrar cliente</button></div>'+
     '<div class="row wrap"><input class="search" id="cli-busca" type="search" placeholder="Buscar cliente por nome, WhatsApp ou e-mail" value="'+esc(ui.cliBusca||'')+'" style="flex:1;min-width:220px;max-width:420px">'+
     dd('cliTipo')+dd('cliOrd')+'</div>'+
     '<p class="small muted">'+cs.length+' cliente(s)'+(ord==='inativos'?' sem pedidos há mais de '+INATIVO_DIAS+' dias':'')+(q?' para “'+esc(ui.cliBusca)+'”':'')+'</p></div>'+
@@ -1107,7 +1107,7 @@ function rClientes(){
       return '<button class="li" data-a="verCliente" data-id="'+c.id+'"><span class="row" style="min-width:0;gap:12px"><span class="av" style="background:color-mix(in srgb,var(--p'+(1+hashN(c.nome)%6)+') 26%,var(--surface));color:var(--ink)">'+esc(c.nome.replace(/^(Dra?\.|Lab\.|Clínica)\s*/i,'').charAt(0).toUpperCase())+'</span>'+
         '<span class="t"><b>'+esc(c.nome)+'</b><span>'+(c.tipo==='laboratorio'?'Laboratório':'Dentista')+' · '+info+'</span></span></span>'+
         '<span class="row" style="gap:6px">'+(x.inativo?'<span class="tag w">Inativo</span>':'')+(ab?'<span class="mono small" style="color:var(--urgent)">'+brl(ab)+'</span>':'')+'</span></button>';}).join('')+'</div></div>'
-      :'<div class="card empty">'+(all.length?'Nenhum cliente encontrado com esse filtro.':'Cadastre seu primeiro cliente no botão + Novo cliente.')+'</div>');
+      :'<div class="card empty">'+(all.length?'Nenhum cliente encontrado com esse filtro.':'Cadastre seu primeiro cliente no botão + Cadastrar cliente.')+'</div>');
 }
 function rCliente(id){
   var c=cliente(id); if(!c){ui.sub=null;return rClientes();}
