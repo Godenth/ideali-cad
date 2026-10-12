@@ -12,18 +12,13 @@ html,body{margin:0}
 img{max-width:100%}
 /* Layout: coluna única no celular; seções alternam texto e "peças" do sistema (cartão de pedido, QR Pix, barra de espaço). Azul de papel articular como acento, vermelho para urgente. */
 :root{
-  --bg:#F4F6F7;          /* porcelana fria */
-  --surface:#FFFFFF;
-  --ink:#14212B;
-  --muted:#5B6873;
-  --line:#DCE2E6;
-  --accent:#2B4FD8;      /* papel articular azul */
-  --accent-ink:#FFFFFF;
-  --accent-soft:#E6EBFC;
-  --urgent:#D2433A;      /* papel articular vermelho */
-  --ok:#1E8A5A;
-  --deep:#14212B;        /* faixa escura */
-  --deep-fg:#EEF2F5;
+  /* mesma paleta do sistema: violeta + pigmentos em pouca quantidade */
+  --bg:#F6F5F8; --surface:#FFFFFF; --ink:#1B1830; --muted:#625E75; --line:#E2DFEA;
+  --accent:#5B45E0; --accent-ink:#FFFFFF; --accent-soft:#EEEBFD;
+  --urgent:#D2433A; --ok:#1E8A5A;
+  --deep:#1B1830; --deep-fg:#ECEAF4;
+  --p1:#EF5F5A; --p2:#F0A53A; --p3:#1DAE8A; --p4:#3A96EC; --p5:#7B5CF2; --p6:#DD5A9E;
+  --paint:linear-gradient(90deg,var(--p1),var(--p2),var(--p3),var(--p4),var(--p5),var(--p6));
   --f-display:"Plus Jakarta Sans",system-ui,"Segoe UI",Arial,sans-serif;
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
@@ -31,21 +26,23 @@ img{max-width:100%}
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0F161C; --surface:#17212A; --ink:#E7ECF0; --muted:#97A4AF; --line:#27333D;
-    --accent:#7D97FF; --accent-ink:#0F161C; --accent-soft:#1D2A4F; --urgent:#FF6E63; --ok:#4CC58A;
-    --deep:#0A1015; --deep-fg:#E7ECF0; color-scheme:dark;
+    --bg:#121019; --surface:#1B1826; --ink:#ECEAF4; --muted:#A39FB6; --line:#2D2940;
+    --accent:#9E8CFF; --accent-ink:#121019; --accent-soft:#2A2450; --urgent:#FF6E63; --ok:#4CC58A;
+    --deep:#0D0B14; --deep-fg:#ECEAF4;
+    --p1:#FF7B74; --p2:#F7BC5C; --p3:#3CCFA6; --p4:#62B0FF; --p5:#9E86FF; --p6:#F27AB8; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0F161C; --surface:#17212A; --ink:#E7ECF0; --muted:#97A4AF; --line:#27333D;
-  --accent:#7D97FF; --accent-ink:#0F161C; --accent-soft:#1D2A4F; --urgent:#FF6E63; --ok:#4CC58A;
-  --deep:#0A1015; --deep-fg:#E7ECF0; color-scheme:dark;
+  --bg:#121019; --surface:#1B1826; --ink:#ECEAF4; --muted:#A39FB6; --line:#2D2940;
+  --accent:#9E8CFF; --accent-ink:#121019; --accent-soft:#2A2450; --urgent:#FF6E63; --ok:#4CC58A;
+  --deep:#0D0B14; --deep-fg:#ECEAF4;
+  --p1:#FF7B74; --p2:#F7BC5C; --p3:#3CCFA6; --p4:#62B0FF; --p5:#9E86FF; --p6:#F27AB8; color-scheme:dark;
 }
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
+body{background:radial-gradient(38rem 28rem at -5% -5%,color-mix(in srgb,var(--p6) 10%,transparent),transparent 70%),radial-gradient(34rem 26rem at 105% 8%,color-mix(in srgb,var(--p4) 10%,transparent),transparent 70%),radial-gradient(40rem 30rem at 85% 105%,color-mix(in srgb,var(--p2) 9%,transparent),transparent 70%),radial-gradient(32rem 26rem at 5% 100%,color-mix(in srgb,var(--p3) 8%,transparent),transparent 70%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55}
 .wrap{max-width:1120px;margin-inline:auto;padding-inline:20px}
 h1,h2,h3{font-family:var(--f-display);line-height:1.08;margin:0;text-wrap:balance;letter-spacing:-.025em}
 h2{font-size:clamp(1.9rem,4.6vw,3rem);font-weight:800}
@@ -62,6 +59,7 @@ a{color:inherit}
 .btn-ghost{border-color:var(--line);background:var(--surface);color:var(--ink)}
 
 /* Topo */
+.top::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--paint);opacity:.85}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
 .logo{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-stretch:125%;font-weight:800;font-size:1.1rem;text-decoration:none}
@@ -120,13 +118,14 @@ a{color:inherit}
 .flow .eyebrow{color:color-mix(in srgb,var(--accent) 70%,white)}
 .flow .lead{color:color-mix(in srgb,var(--deep-fg) 70%,transparent)}
 .lanes{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
-.lane{border:1px solid color-mix(in srgb,var(--deep-fg) 16%,transparent);border-radius:var(--r);padding:16px;min-width:0}
+.lane{border-top:3px solid var(--lc,var(--accent));border-left:1px solid color-mix(in srgb,var(--deep-fg) 16%,transparent);border-right:1px solid color-mix(in srgb,var(--deep-fg) 16%,transparent);border-bottom:1px solid color-mix(in srgb,var(--deep-fg) 16%,transparent);border-radius:var(--r);padding:16px;min-width:0}
 .lane-h{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px;color:color-mix(in srgb,var(--deep-fg) 75%,transparent)}
 .lane-h b{color:var(--deep-fg)}
 .mini{background:color-mix(in srgb,var(--deep-fg) 7%,transparent);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:.88rem}
 .mini .r{display:flex;justify-content:space-between;gap:8px}
 .mini small{color:color-mix(in srgb,var(--deep-fg) 60%,transparent);font-family:var(--f-mono);font-size:.72rem}
 .mini.u{box-shadow:inset 3px 0 0 var(--urgent)}
+.lanes .lane:nth-child(1){--lc:var(--p4)}.lanes .lane:nth-child(2){--lc:var(--p2)}.lanes .lane:nth-child(3){--lc:var(--p5)}.lanes .lane:nth-child(4){--lc:var(--p3)}
 .lane p{font-size:.88rem;color:color-mix(in srgb,var(--deep-fg) 65%,transparent);margin-top:14px}
 @media (max-width:900px){.lanes{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:520px){.lanes{grid-template-columns:1fr}}
@@ -343,7 +342,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 <header class="top">
   <div class="wrap">
     <a class="logo" href="#inicio" aria-label="Ideali CAD, início">
-      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="var(--accent)"/><path d="M8 9c0-1.5 1.4-2.3 3-2 1.3.2 2 .9 3 .9s1.7-.7 3-.9c1.6-.3 3 .5 3 2 0 3-1 5-1.6 8.5-.4 2.3-1 3.5-1.9 3.5-1.2 0-1.2-4-2.5-4s-1.3 4-2.5 4c-.9 0-1.5-1.2-1.9-3.5C9 14 8 12 8 9z" fill="var(--accent-ink)"/></svg>
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><defs><linearGradient id="lgP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--p6)"/><stop offset=".5" stop-color="var(--p5)"/><stop offset="1" stop-color="var(--p4)"/></linearGradient></defs><rect width="28" height="28" rx="8" fill="url(#lgP)"/><path d="M8 9c0-1.5 1.4-2.3 3-2 1.3.2 2 .9 3 .9s1.7-.7 3-.9c1.6-.3 3 .5 3 2 0 3-1 5-1.6 8.5-.4 2.3-1 3.5-1.9 3.5-1.2 0-1.2-4-2.5-4s-1.3 4-2.5 4c-.9 0-1.5-1.2-1.9-3.5C9 14 8 12 8 9z" fill="#fff"/></svg>
       Ideali CAD
     </a>
     <nav class="nav" aria-label="Seções">
