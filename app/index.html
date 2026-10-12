@@ -477,13 +477,16 @@ async function sincroniza(){
   }
 }
 function traduzErro(e){var m=(e&&(e.message||e.error_description))||String(e);
+  if(/tipos_nome_unico/.test(m))return 'Já existe um trabalho com esse nome.';
   if(/row-level security|violates row-level|permission denied/i.test(m))return canWrite()?'Sem permissão para essa alteração.':'Assinatura vencida: não foi possível salvar.';
   if(/Failed to fetch|NetworkError|network/i.test(m))return 'Sem conexão com a internet.';
   if(/duplicate key/i.test(m))return 'Esse registro já existe.';
   return 'Não foi possível salvar ('+m+').';}
-async function todos(t){var out=[],de=0;for(;;){var r=await sb.from(t).select('*').range(de,de+999);if(r.error)throw r.error;out=out.concat(r.data||[]);if(!r.data||r.data.length<1000)break;de+=1000;}return out;}
+async function todos(t){var out=[],de=0;for(;;){var r=await sb.from(t).select('*').order('criado_em').order('id').range(de,de+999);if(r.error)throw r.error;out=out.concat(r.data||[]);if(!r.data||r.data.length<1000)break;de+=1000;}return out;}
 async function carregar(){
-  if(!sb||!S.sessao)return;
+  if(!sb||!S.sessao||carregar.rodando)return;carregar.rodando=true;try{await carregar2();}finally{carregar.rodando=false;}
+}
+async function carregar2(){
   S.carregando=true;render();
   try{
     var uidAtual=S.sessao.id;
@@ -502,7 +505,6 @@ async function carregar(){
     novo.seq=novo.pedidos.reduce(function(m,x){return Math.max(m,x.num||0);},0);
     S=novo;tiraFoto();
     try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
-    if(!S.tipos.length&&canWrite())criaTiposPadrao();
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
   S.carregando=false;render();
 }
@@ -510,10 +512,6 @@ var TRAB_REF=[['Coroa sobre dente','elemento'],['Coroa sobre implante','elemento
   ['Provisório com aleta','elemento'],['Enceramento digital (planejamento)','elemento'],['Placa de bruxismo','trabalho'],
   ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo adicional','trabalho']];
 function refFaltando(){var tem={};S.tipos.forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
-function criaTiposPadrao(){
-  TRAB_REF.forEach(function(t){S.tipos.push({id:uid(),nome:t[0],forma:t[1],valor:0,ativo:true});});
-  save();
-}
 function toast(t){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){el.hidden=true;},2800);}
 function save(){agendaSync();}
 

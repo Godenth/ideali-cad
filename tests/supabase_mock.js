@@ -7,7 +7,7 @@
   function Q(t){this.t=t;this.f=[];}
   Q.prototype.select=function(){this.op='select';return this;};
   Q.prototype.eq=function(c,v){this.f.push([c,v]);return this;};
-  Q.prototype.range=function(){return this;};
+  Q.prototype.range=function(){return this;};Q.prototype.order=function(){return this;};
   Q.prototype.maybeSingle=function(){this.single=true;return this;};
   Q.prototype.insert=function(r){this.op='insert';this.row=r;return this;};
   Q.prototype.update=function(r){this.op='update';this.row=r;return this;};
