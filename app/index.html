@@ -100,14 +100,17 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .cid-uf{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:12px;align-items:start}
 .tp-grid{display:grid;gap:16px;align-items:start}
 .tp-list{display:grid;gap:8px}
-.tp-li{display:grid;grid-template-columns:minmax(0,1fr) 170px 160px auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.tp-li{display:grid;grid-template-columns:minmax(0,1fr) 170px 160px auto 36px;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
 .tp-li.off{opacity:.6}
 .tp-li input,.tp-li select{min-width:0;width:100%}
 .tp-val{display:flex;align-items:center;gap:6px}
 .tp-val span{color:var(--muted);font:600 .8rem var(--f-mono)}
 .tp-val input{text-align:right;font-family:var(--f-mono)}
 .tp-at{font-size:.85rem;white-space:nowrap}
-@media (max-width:699px){.tp-li{grid-template-columns:minmax(0,1fr) 86px auto;gap:6px}.tp-li select{padding-left:.5em;padding-right:.1em;font-size:.9rem}.tp-at{font-size:.78rem;gap:4px}.tp-li .tp-val input{padding-inline:.5em}.tp-nome{grid-column:1/-1}.tp-val span{display:none}}
+.tp-x{width:36px;height:36px;border-radius:10px;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;font-size:1rem;display:grid;place-items:center}
+.tp-x:hover{color:var(--urgent);background:color-mix(in srgb,var(--urgent) 10%,transparent);border-color:color-mix(in srgb,var(--urgent) 25%,transparent)}
+.tp-x:disabled{opacity:.4;cursor:default}
+@media (max-width:699px){.tp-li{grid-template-columns:minmax(0,1fr) 86px auto;gap:6px;position:relative;padding-top:8px}.tp-li input.tp-nome:not([type=checkbox]){width:calc(100% - 42px)}.tp-x{position:absolute;top:10px;right:8px}.tp-li select{padding-left:.5em;padding-right:.1em;font-size:.9rem}.tp-at{font-size:.78rem;gap:4px}.tp-li .tp-val input{padding-inline:.5em}.tp-nome{grid-column:1/-1}.tp-val span{display:none}}
 .cfg{max-width:1180px;margin-inline:auto;display:grid;gap:16px}
 .cfg-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);scrollbar-width:none}
 .cfg-tabs::-webkit-scrollbar{display:none}
@@ -506,7 +509,7 @@ async function carregar(){
 var TRAB_REF=[['Coroa sobre dente','elemento'],['Coroa sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
   ['Provisório com aleta','elemento'],['Enceramento digital (planejamento)','elemento'],['Placa de bruxismo','trabalho'],
   ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo adicional','trabalho']];
-function refFaltando(){var tem={};alive(S.tipos).forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
+function refFaltando(){var tem={};S.tipos.forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
 function criaTiposPadrao(){
   TRAB_REF.forEach(function(t){S.tipos.push({id:uid(),nome:t[0],forma:t[1],valor:0,ativo:true});});
   save();
@@ -1310,7 +1313,8 @@ function rTabela(){
       '<input class="tp-nome" name="n_'+t.id+'" maxlength="60" required value="'+esc(t.nome)+'" aria-label="Nome do trabalho" '+dis+'>'+
       '<select name="f_'+t.id+'" aria-label="Forma de cobrança" '+dis+'><option value="elemento" '+(t.forma==='elemento'?'selected':'')+'>por elemento</option><option value="trabalho" '+(t.forma==='trabalho'?'selected':'')+'>por trabalho</option></select>'+
       '<label class="tp-val"><span>R$</span><input name="v_'+t.id+'" type="number" step="0.01" min="0" inputmode="decimal" value="'+(+t.valor||0).toFixed(2)+'" aria-label="Valor" '+dis+'></label>'+
-      '<label class="check tp-at" title="Desmarque para não aparecer no novo pedido"><input type="checkbox" name="a_'+t.id+'" '+(t.ativo?'checked':'')+' '+dis+'> Ativo</label></div>';}).join('');}
+      '<label class="check tp-at" title="Desmarque para não aparecer no novo pedido"><input type="checkbox" name="a_'+t.id+'" '+(t.ativo?'checked':'')+' '+dis+'> Ativo</label>'+
+      '<button type="button" class="tp-x" data-a="delTab" data-id="'+t.id+'" aria-label="Excluir '+esc(t.nome)+'" title="Excluir" '+dis+'>✕</button></div>';}).join('');}
   return '<form class="stack" data-form="tabela">'+
     '<div class="banner"><span>Este é o seu <b>preço padrão</b> para cada trabalho. Os valores começam em R$ 0,00: preencha como quiser. Preço diferente para um cliente específico fica na ficha do cliente.</span></div>'+
     (falta.length?'<div class="banner"><span>Faltam '+falta.length+' trabalho(s) da lista de referência: '+falta.map(function(r){return esc(r[0]);}).join(', ')+'.</span><button type="button" class="btn sm" data-a="addRef" '+dis+'>Adicionar com R$ 0,00</button></div>':'')+
@@ -1695,6 +1699,9 @@ function excluirPagamento(g){softDel(g);g.pedidos.forEach(function(pid){var p=by
 function restaurarPagamento(g){delete g.deleted;g.pedidos.forEach(function(pid){var p=byId(S.pedidos,pid);if(p){p.pago=g.data;p.pagamentoId=g.id;}});}
 
 var A={
+  delTab:function(d,el){if(!guard())return;var t=tipo(d.id);if(!t)return;softDel(t);save();
+    var li=el.closest('.tp-li'),lst=li&&li.parentNode;if(li)li.remove();if(lst&&!lst.querySelector('.tp-li'))lst.innerHTML='<p class="small muted" style="padding:6px 2px">Nenhum trabalho aqui.</p>';
+    toast('“'+t.nome+'” foi para a lixeira. Dá para restaurar em Configurações › Lixeira.');},
   addRef:function(){if(!guard())return;var f=refFaltando();f.forEach(function(r){S.tipos.push({id:uid(),nome:r[0],forma:r[1],valor:0,ativo:true});});save();render();toast(f.length+' trabalho(s) adicionado(s) com R$ 0,00.');},
   contaIr:function(d){ui.ddOpen=null;A.tab(d);},
   tab:function(d){ui.tab=d.v;ui.sub=d.sub||null;ui.drawer=false;if('f' in d)ui.filtro=d.f==='urg'?'urg':'todos';closeSheet();render();window.scrollTo(0,0);},
