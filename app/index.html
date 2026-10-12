@@ -100,6 +100,8 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .cid-uf{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:12px;align-items:start}
 .tp-grid{display:grid;gap:16px;align-items:start}
 .tp-list{display:grid;gap:8px}
+.tp-extra{display:grid;gap:16px;align-items:start}
+@media (min-width:960px){.tp-extra{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}}
 .tp-li{display:grid;grid-template-columns:minmax(0,1fr) 170px 160px auto 36px;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
 .tp-li.off{opacity:.6}
 .tp-li input,.tp-li select{min-width:0;width:100%}
@@ -444,7 +446,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -496,7 +498,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on'};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{}};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -509,7 +511,7 @@ async function carregar2(){
   S.carregando=false;render();
 }
 var TRAB_REF=[['Coroa sobre dente','elemento'],['Coroa sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
-  ['Provisório com aleta','elemento'],['Enceramento digital (planejamento)','elemento'],['Placa de bruxismo','trabalho'],
+  ['Provisório com aleta','elemento'],['Placa de bruxismo','elemento'],['Enceramento digital (planejamento)','elemento'],
   ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo adicional','trabalho']];
 function refFaltando(){var tem={};S.tipos.forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
 function toast(t){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){el.hidden=true;},2800);}
@@ -1304,7 +1306,7 @@ function rTipos(){
 
 /* ---------- Tabela de preços (Configurações) ---------- */
 function rTabela(){
-  var w=canWrite(),dis=w?'':'disabled',ts=alive(S.tipos),falta=refFaltando();
+  var w=canWrite(),dis=w?'':'disabled',ts=alive(S.tipos),falta=refFaltando(),tb=(S.prefs&&S.prefs.tab)||{};
   function linhas(forma){var l=ts.filter(function(t){return t.forma===forma;});
     if(!l.length)return '<p class="small muted" style="padding:6px 2px">Nenhum trabalho cobrado '+(forma==='elemento'?'por elemento':'por trabalho')+'.</p>';
     return l.map(function(t){return '<div class="tp-li'+(t.ativo?'':' off')+'">'+
@@ -1318,7 +1320,15 @@ function rTabela(){
     (falta.length?'<div class="banner"><span>Faltam '+falta.length+' trabalho(s) da lista de referência: '+falta.map(function(r){return esc(r[0]);}).join(', ')+'.</span><button type="button" class="btn sm" data-a="addRef" '+dis+'>Adicionar com R$ 0,00</button></div>':'')+
     '<div class="tp-grid">'+
       '<section class="card stack"><div><h2>Por elemento</h2><p class="small muted">O valor é multiplicado pelos dentes marcados no pedido.</p></div><div class="tp-list">'+linhas('elemento')+'</div></section>'+
-      '<section class="card stack"><div><h2>Por trabalho</h2><p class="small muted">Valor fechado por pedido (arcada, placa, modelo…).</p></div><div class="tp-list">'+linhas('trabalho')+'</div></section>'+
+      '<section class="card stack"><div><h2>Por trabalho</h2><p class="small muted">Valor fechado por pedido (protocolo, modelo adicional…).</p></div><div class="tp-list">'+linhas('trabalho')+'</div></section>'+
+      '<div class="tp-extra">'+
+        '<section class="card stack"><div><h2>Modelos</h2><p class="small muted">Quantos modelos já estão inclusos no valor de cada pedido. O valor do modelo adicional fica em “Por trabalho”.</p></div>'+
+          '<label class="fld"><span>Modelos inclusos por pedido</span><input id="tb-mod" name="modelos" type="number" min="0" max="20" step="1" inputmode="numeric" placeholder="Ex.: 2" value="'+esc(tb.modelos==null?'':tb.modelos)+'" '+dis+'></label></section>'+
+        '<section class="card stack"><div><h2>Informações</h2><p class="small muted">Condições do seu serviço, para você ter à mão e mandar ao cliente.</p></div>'+
+          '<label class="fld"><span>Prazo médio</span><input id="tb-prazo" name="prazo" maxlength="120" placeholder="Ex.: 1 a 2 dias úteis, conforme a demanda e a complexidade" value="'+esc(tb.prazo||'')+'" '+dis+'></label>'+
+          '<label class="fld"><span>Formas de pagamento</span><input id="tb-pag" name="pagamento" maxlength="120" placeholder="Ex.: Pix ou cartão de crédito (link de pagamento)" value="'+esc(tb.pagamento||'')+'" '+dis+'></label>'+
+          '<label class="fld"><span>Outras informações</span><textarea id="tb-info" name="info" maxlength="400" placeholder="Ex.: Todos os projetos são feitos no fluxo 100% digital" '+dis+'>'+esc(tb.info||'')+'</textarea></label></section>'+
+      '</div>'+
     '</div>'+
     '<div class="row wrap"><button class="btn pri" type="submit" '+dis+'>Salvar tabela</button><button type="button" class="btn" data-a="editTipo" '+dis+'>+ Novo trabalho</button></div></form>';
 }
@@ -1825,6 +1835,8 @@ var F={
       var o={nome:nome,forma:fd.get('f_'+t.id)==='trabalho'?'trabalho':'elemento',valor:Math.round(v*100)/100,ativo:!!fd.get('a_'+t.id)};
       if(o.nome!==t.nome||o.forma!==t.forma||o.valor!==+t.valor||o.ativo!==!!t.ativo){Object.assign(t,o);n++;}});
     if(bad){toast('Confira: todo trabalho precisa de nome e valor (pode ser 0).');return;}
+    var md=String(fd.get('modelos')||'').trim(),tb={modelos:md===''?null:Math.max(0,Math.min(20,parseInt(md,10)||0)),prazo:(fd.get('prazo')||'').trim(),pagamento:(fd.get('pagamento')||'').trim(),info:(fd.get('info')||'').trim()};
+    S.prefs=S.prefs||{};if(JSON.stringify(tb)!==JSON.stringify(S.prefs.tab||{})){S.prefs.tab=tb;n++;}
     save();render();toast(n?'Tabela salva ('+n+' alteração(ões)).':'Nada mudou na tabela.');
   },
   tipo:function(fd,f){
