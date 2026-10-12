@@ -98,6 +98,16 @@ body.sem-anim *{transition:none!important;animation:none!important}
 
 /* Dashboard */
 .cid-uf{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:12px;align-items:start}
+.tp-grid{display:grid;gap:16px;align-items:start}
+.tp-list{display:grid;gap:8px}
+.tp-li{display:grid;grid-template-columns:minmax(0,1fr) 170px 160px auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.tp-li.off{opacity:.6}
+.tp-li input,.tp-li select{min-width:0;width:100%}
+.tp-val{display:flex;align-items:center;gap:6px}
+.tp-val span{color:var(--muted);font:600 .8rem var(--f-mono)}
+.tp-val input{text-align:right;font-family:var(--f-mono)}
+.tp-at{font-size:.85rem;white-space:nowrap}
+@media (max-width:699px){.tp-li{grid-template-columns:minmax(0,1fr) 86px auto;gap:6px}.tp-li select{padding-left:.5em;padding-right:.1em;font-size:.9rem}.tp-at{font-size:.78rem;gap:4px}.tp-li .tp-val input{padding-inline:.5em}.tp-nome{grid-column:1/-1}.tp-val span{display:none}}
 .cfg{max-width:1180px;margin-inline:auto;display:grid;gap:16px}
 .cfg-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);scrollbar-width:none}
 .cfg-tabs::-webkit-scrollbar{display:none}
@@ -105,6 +115,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .cfg-tabs button svg{width:17px;height:17px}
 .cfg-tabs button:hover{color:var(--ink);background:var(--soft)}
 .cfg-tabs button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.cfg-tabs .sm{display:none}
 .cfg-tabs .n{font:600 .68rem var(--f-mono);background:var(--muted);color:#fff;border-radius:99px;padding:1px 6px}
 .cfg-grid{display:grid;gap:16px;align-items:start}
 .cfg-grid .g2{display:grid;gap:12px}
@@ -115,7 +126,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
   .cfg-grid .g2 .cid-uf{grid-column:1/-1}
 }
 @media (max-width:959px){.cfg-grid .cfg-perfil .row .btn{width:100%}}
-@media (max-width:699px){.cfg-tabs{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px}.cfg-tabs button{flex-direction:column;gap:3px;padding:8px 2px;font-size:.72rem;position:relative;justify-content:center}.cfg-tabs button svg{width:19px;height:19px}.cfg-tabs .n{position:absolute;top:3px;right:calc(50% - 22px)}}
+@media (max-width:699px){.cfg-tabs .lg{display:none}.cfg-tabs .sm{display:inline}.cfg-tabs{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px}.cfg-tabs button{flex-direction:column;gap:3px;padding:8px 2px;font-size:.72rem;position:relative;justify-content:center}.cfg-tabs button svg{width:19px;height:19px}.cfg-tabs .n{position:absolute;top:3px;right:calc(50% - 22px)}}
 .dash{display:grid;gap:16px;grid-template-columns:repeat(12,minmax(0,1fr))}
 .dash>*{grid-column:span 12;min-width:0}
 @media (min-width:700px){.dash .kpi{grid-column:span 6}.dash .half{grid-column:span 6}}
@@ -311,7 +322,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 /* Formulários */
 .fld{display:grid;gap:6px;min-width:0}
 .fld>span{font-size:.82rem;font-weight:600;color:var(--muted)}
-.fld input,.fld select,.fld textarea{width:100%;padding:.7em .85em;border-radius:12px;border:1px solid var(--line);background:var(--bg);min-width:0}
+.tp-li input:not([type=checkbox]),.tp-li select,.fld input,.fld select,.fld textarea{width:100%;padding:.7em .85em;border-radius:12px;border:1px solid var(--line);background:var(--bg);min-width:0}
 .fld textarea{min-height:76px;resize:vertical}
 .fld small{color:var(--muted);font-size:.78rem}
 .check{display:flex;gap:10px;align-items:center;cursor:pointer}
@@ -492,9 +503,12 @@ async function carregar(){
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
   S.carregando=false;render();
 }
+var TRAB_REF=[['Coroa sobre dente','elemento'],['Coroa sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
+  ['Provisório com aleta','elemento'],['Enceramento digital (planejamento)','elemento'],['Placa de bruxismo','trabalho'],
+  ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo adicional','trabalho']];
+function refFaltando(){var tem={};alive(S.tipos).forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
 function criaTiposPadrao(){
-  [['Coroa','elemento',90],['Faceta','elemento',80],['Inlay / Onlay','elemento',70],['Ponte','elemento',90],['Coroa sobre implante','elemento',110],['Protocolo','trabalho',480]].forEach(function(t){
-    S.tipos.push({id:uid(),nome:t[0],forma:t[1],valor:t[2],ativo:true});});
+  TRAB_REF.forEach(function(t){S.tipos.push({id:uid(),nome:t[0],forma:t[1],valor:0,ativo:true});});
   save();
 }
 function toast(t){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){el.hidden=true;},2800);}
@@ -605,6 +619,7 @@ var ICON={
   ranking:ic('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>'),
   arquivos:ic('<path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/>'),
   tipos:ic('<path d="M4 6h16M4 12h16M4 18h10"/>'),
+  tabela:ic('<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 12h6M10 16h6"/>'),
   lixeira:ic('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
   config:ic('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
   menu:ic('<path d="M4 7h16M4 12h16M4 17h16"/>'),
@@ -616,9 +631,9 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho']]],
   ['Conta',[['config','Configurações']]]
 ];
-var CFG=['config','arquivos','lixeira','admin'];
+var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
-var TITULOS={admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',config:'Configurações'};
+var TITULOS={admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){
@@ -630,7 +645,7 @@ function render(){
   else if(a.status==='teste') chip='<span class="tag a">Teste · '+Math.max(0,daysBetween(today(),a.testeAte))+' dias</span>';
   else chip='<span class="tag ok">Ativa</span>';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
-    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,config:rConfig,admin:rAdmin};
+    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,config:rConfig,admin:rAdmin};
   var body=(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
@@ -670,16 +685,16 @@ function render(){
     (emCfg()?'<div class="cfg">'+cfgTabs(lix)+body+'</div>':body)+'</main></div>'+bnav+'</div>';
 }
 function contaMenu(nome,lix){
-  var it=[['config','Perfil e conta'],['arquivos','Arquivos STL'],['lixeira','Lixeira']];if(S.admin)it.push(['admin','Administração']);
+  var it=[['config','Perfil e conta'],['tabela','Tabela de preços'],['arquivos','Arquivos STL'],['lixeira','Lixeira']];if(S.admin)it.push(['admin','Administração']);
   return '<div class="dd conta dk"><button class="av'+(emCfg()?' on':'')+'" data-a="ddOpen" data-k="conta" title="Minha conta" aria-label="Minha conta" aria-expanded="'+(ui.ddOpen==='conta')+'">'+esc((nome[0]||'?').toUpperCase())+'</button>'+
     (ui.ddOpen==='conta'?'<div class="dd-menu" role="menu"><div class="conta-h"><b>'+esc(S.perfil.nome||'Minha conta')+'</b><span>'+esc(S.sessao.email||'')+'</span></div>'+
       it.map(function(x){return '<button role="menuitem" class="'+(ui.tab===x[0]?'on':'')+'" data-a="contaIr" data-v="'+x[0]+'"><span class="ci">'+ICON[x[0]]+x[1]+'</span>'+(x[0]==='lixeira'&&lix?'<span class="muted mono small">'+lix+'</span>':'')+'</button>';}).join('')+
       '<hr><button role="menuitem" data-a="sair"><span class="ci">'+ICON.sair+'Sair</span></button></div>':'')+'</div>';
 }
 function cfgTabs(lix){
-  var t=[['config','Perfil e conta'],['arquivos','Arquivos STL'],['lixeira','Lixeira']];if(S.admin)t.push(['admin','Administração']);
+  var t=[['config','Perfil e conta','Perfil'],['tabela','Tabela de preços','Preços'],['arquivos','Arquivos STL','STL'],['lixeira','Lixeira','Lixeira']];if(S.admin)t.push(['admin','Administração','Admin']);
   return '<nav class="cfg-tabs" aria-label="Configurações">'+t.map(function(x){
-    return '<button class="'+(ui.tab===x[0]?'on':'')+'" data-a="tab" data-v="'+x[0]+'">'+ICON[x[0]]+'<span>'+x[1]+'</span>'+(x[0]==='lixeira'&&lix?'<span class="n">'+lix+'</span>':'')+'</button>';}).join('')+'</nav>';
+    return '<button class="'+(ui.tab===x[0]?'on':'')+'" data-a="tab" data-v="'+x[0]+'">'+ICON[x[0]]+'<span class="lg">'+x[1]+'</span><span class="sm">'+x[2]+'</span>'+(x[0]==='lixeira'&&lix?'<span class="n">'+lix+'</span>':'')+'</button>';}).join('')+'</nav>';
 }
 function logo(s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 28 28" aria-hidden="true"><defs><linearGradient id="lgP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--p6)"/><stop offset=".5" stop-color="var(--p5)"/><stop offset="1" stop-color="var(--p4)"/></linearGradient></defs><rect width="28" height="28" rx="8" fill="url(#lgP)"/><path d="M8 9c0-1.5 1.4-2.3 3-2 1.3.2 2 .9 3 .9s1.7-.7 3-.9c1.6-.3 3 .5 3 2 0 3-1 5-1.6 8.5-.4 2.3-1 3.5-1.9 3.5-1.2 0-1.2-4-2.5-4s-1.3 4-2.5 4c-.9 0-1.5-1.2-1.9-3.5C9 14 8 12 8 9z" fill="#fff"/></svg>';}
 function bn(v,l){return '<button data-a="tab" data-v="'+v+'" class="'+(ui.tab===v?'on':'')+'">'+ICON[v]+'<span>'+l+'</span></button>';}
@@ -1286,6 +1301,26 @@ function rTipos(){
       return '<button class="li" data-a="editTipo" data-id="'+t.id+'"><span class="t"><b>'+esc(t.nome)+(t.ativo?'':' (inativo)')+'</b><span>'+(t.forma==='elemento'?'Por elemento':'Por trabalho')+'</span></span><span class="mono">'+brl(t.valor)+'</span></button>';}).join('')+'</div></section>';
 }
 
+/* ---------- Tabela de preços (Configurações) ---------- */
+function rTabela(){
+  var w=canWrite(),dis=w?'':'disabled',ts=alive(S.tipos),falta=refFaltando();
+  function linhas(forma){var l=ts.filter(function(t){return t.forma===forma;});
+    if(!l.length)return '<p class="small muted" style="padding:6px 2px">Nenhum trabalho cobrado '+(forma==='elemento'?'por elemento':'por trabalho')+'.</p>';
+    return l.map(function(t){return '<div class="tp-li'+(t.ativo?'':' off')+'">'+
+      '<input class="tp-nome" name="n_'+t.id+'" maxlength="60" required value="'+esc(t.nome)+'" aria-label="Nome do trabalho" '+dis+'>'+
+      '<select name="f_'+t.id+'" aria-label="Forma de cobrança" '+dis+'><option value="elemento" '+(t.forma==='elemento'?'selected':'')+'>por elemento</option><option value="trabalho" '+(t.forma==='trabalho'?'selected':'')+'>por trabalho</option></select>'+
+      '<label class="tp-val"><span>R$</span><input name="v_'+t.id+'" type="number" step="0.01" min="0" inputmode="decimal" value="'+(+t.valor||0).toFixed(2)+'" aria-label="Valor" '+dis+'></label>'+
+      '<label class="check tp-at" title="Desmarque para não aparecer no novo pedido"><input type="checkbox" name="a_'+t.id+'" '+(t.ativo?'checked':'')+' '+dis+'> Ativo</label></div>';}).join('');}
+  return '<form class="stack" data-form="tabela">'+
+    '<div class="banner"><span>Este é o seu <b>preço padrão</b> para cada trabalho. Os valores começam em R$ 0,00: preencha como quiser. Preço diferente para um cliente específico fica na ficha do cliente.</span></div>'+
+    (falta.length?'<div class="banner"><span>Faltam '+falta.length+' trabalho(s) da lista de referência: '+falta.map(function(r){return esc(r[0]);}).join(', ')+'.</span><button type="button" class="btn sm" data-a="addRef" '+dis+'>Adicionar com R$ 0,00</button></div>':'')+
+    '<div class="tp-grid">'+
+      '<section class="card stack"><div><h2>Por elemento</h2><p class="small muted">O valor é multiplicado pelos dentes marcados no pedido.</p></div><div class="tp-list">'+linhas('elemento')+'</div></section>'+
+      '<section class="card stack"><div><h2>Por trabalho</h2><p class="small muted">Valor fechado por pedido (arcada, placa, modelo…).</p></div><div class="tp-list">'+linhas('trabalho')+'</div></section>'+
+    '</div>'+
+    '<div class="row wrap"><button class="btn pri" type="submit" '+dis+'>Salvar tabela</button><button type="button" class="btn" data-a="editTipo" '+dis+'>+ Novo trabalho</button></div></form>';
+}
+
 /* ---------- Administração (conta mestre) ---------- */
 var PRECO_PLANO={basico:29.90,plus:59.90};
 var NOME_PLANO={basico:'Básico',plus:'Plus',rede:'Rede',vitrine:'Vitrine'};
@@ -1660,6 +1695,7 @@ function excluirPagamento(g){softDel(g);g.pedidos.forEach(function(pid){var p=by
 function restaurarPagamento(g){delete g.deleted;g.pedidos.forEach(function(pid){var p=byId(S.pedidos,pid);if(p){p.pago=g.data;p.pagamentoId=g.id;}});}
 
 var A={
+  addRef:function(){if(!guard())return;var f=refFaltando();f.forEach(function(r){S.tipos.push({id:uid(),nome:r[0],forma:r[1],valor:0,ativo:true});});save();render();toast(f.length+' trabalho(s) adicionado(s) com R$ 0,00.');},
   contaIr:function(d){ui.ddOpen=null;A.tab(d);},
   tab:function(d){ui.tab=d.v;ui.sub=d.sub||null;ui.drawer=false;if('f' in d)ui.filtro=d.f==='urg'?'urg':'todos';closeSheet();render();window.scrollTo(0,0);},
   sub:function(d){ui.sub=d.v||null;render();window.scrollTo(0,0);},
@@ -1777,6 +1813,15 @@ var F={
       if(v===''){if(pr&&!pr.deleted)pr.deleted=today();}else if(pr){pr.valor=+v;pr.deleted=null;}else S.precos.push({id:uid(),clienteId:cid,tipoId:t.id,valor:+v});});
     save();render();toast('Tabela de preços salva.');
   },
+  tabela:function(fd){
+    if(!guard())return;var n=0,bad=false;
+    alive(S.tipos).forEach(function(t){if(fd.get('v_'+t.id)==null)return;
+      var nome=(fd.get('n_'+t.id)||'').trim(),v=parseFloat(fd.get('v_'+t.id));if(!nome||!(v>=0)){bad=true;return;}
+      var o={nome:nome,forma:fd.get('f_'+t.id)==='trabalho'?'trabalho':'elemento',valor:Math.round(v*100)/100,ativo:!!fd.get('a_'+t.id)};
+      if(o.nome!==t.nome||o.forma!==t.forma||o.valor!==+t.valor||o.ativo!==!!t.ativo){Object.assign(t,o);n++;}});
+    if(bad){toast('Confira: todo trabalho precisa de nome e valor (pode ser 0).');return;}
+    save();render();toast(n?'Tabela salva ('+n+' alteração(ões)).':'Nada mudou na tabela.');
+  },
   tipo:function(fd,f){
     if(!guard())return;var o={nome:fd.get('nome').trim(),forma:fd.get('forma'),valor:+fd.get('valor')||0,ativo:!!fd.get('ativo')};
     var id=f.dataset.id;if(id)Object.assign(tipo(id),o);else S.tipos.push(Object.assign({id:uid()},o));save();closeSheet();render();toast('Tipo de trabalho salvo.');
@@ -1864,7 +1909,10 @@ document.addEventListener('change',function(e){
   if(t.closest&&t.closest('form[data-form="pedido"]')&&(t.id==='pd-cli'||t.id==='pd-tipo'||t.id==='pd-rec')){var v=document.getElementById('pd-valor');if(v&&t.id!=='pd-rec'&&!t.form.dataset.id)v.dataset.manual='';atualizaCalc();}
 });
 
-var _rz;window.addEventListener('resize',function(){clearTimeout(_rz);_rz=setTimeout(function(){if(S.sessao&&!ui.sheet)render();},250);});
+// Redesenha só quando a LARGURA muda (o teclado do celular muda só a altura) e nunca no meio de um formulário sendo preenchido.
+var _rz,_rzW=window.innerWidth;window.addEventListener('resize',function(){clearTimeout(_rz);_rz=setTimeout(function(){
+  if(window.innerWidth===_rzW)return;var ae=document.activeElement;if(ae&&/^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName))return;
+  _rzW=window.innerWidth;if(S.sessao&&!ui.sheet)render();},250);});
 function msgAuth(e){var m=(e&&e.message)||'';
   if(/Invalid login credentials/i.test(m))return 'E-mail ou senha incorretos.';
   if(/Email not confirmed/i.test(m))return 'Confirme seu e-mail antes de entrar. Procure a mensagem do Ideali CAD na caixa de entrada e no spam.';
