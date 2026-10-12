@@ -1307,22 +1307,15 @@ function rTipos(){
 /* ---------- Tabela de preços (Configurações) ---------- */
 function rTabela(){
   var w=canWrite(),dis=w?'':'disabled',ts=alive(S.tipos),falta=refFaltando(),tb=(S.prefs&&S.prefs.tab)||{};
-  function linhas(forma){var l=ts.filter(function(t){return t.forma===forma;});
-    if(!l.length)return '<p class="small muted" style="padding:6px 2px">Nenhum trabalho cobrado '+(forma==='elemento'?'por elemento':'por trabalho')+'.</p>';
-    return l.map(function(t){return '<div class="tp-li'+(t.ativo?'':' off')+'">'+
-      '<input class="tp-nome" name="n_'+t.id+'" maxlength="60" required value="'+esc(t.nome)+'" aria-label="Nome do trabalho" '+dis+'>'+
-      '<select name="f_'+t.id+'" aria-label="Forma de cobrança" '+dis+'><option value="elemento" '+(t.forma==='elemento'?'selected':'')+'>por elemento</option><option value="trabalho" '+(t.forma==='trabalho'?'selected':'')+'>por trabalho</option></select>'+
-      '<label class="tp-val"><span>R$</span><input name="v_'+t.id+'" type="number" step="0.01" min="0" inputmode="decimal" value="'+(+t.valor||0).toFixed(2)+'" aria-label="Valor" '+dis+'></label>'+
-      '<label class="check tp-at" title="Desmarque para não aparecer no novo pedido"><input type="checkbox" name="a_'+t.id+'" '+(t.ativo?'checked':'')+' '+dis+'> Ativo</label>'+
-      '<button type="button" class="tp-x" data-a="delTab" data-id="'+t.id+'" aria-label="Excluir '+esc(t.nome)+'" title="Excluir" '+dis+'>✕</button></div>';}).join('');}
+  var lista=ts.length?ts.map(function(t){return linhaTabela(t,dis);}).join(''):'<p class="small muted tp-vazio" style="padding:6px 2px">Nenhum item. Use “+ Adicionar item”.</p>';
   return '<form class="stack" data-form="tabela">'+
     '<div class="banner"><span>Este é o seu <b>preço padrão</b> para cada trabalho. Os valores começam em R$ 0,00: preencha como quiser. Preço diferente para um cliente específico fica na ficha do cliente.</span></div>'+
     (falta.length?'<div class="banner"><span>Faltam '+falta.length+' trabalho(s) da lista de referência: '+falta.map(function(r){return esc(r[0]);}).join(', ')+'.</span><button type="button" class="btn sm" data-a="addRef" '+dis+'>Adicionar com R$ 0,00</button></div>':'')+
     '<div class="tp-grid">'+
-      '<section class="card stack"><div><h2>Por elemento</h2><p class="small muted">O valor é multiplicado pelos dentes marcados no pedido.</p></div><div class="tp-list">'+linhas('elemento')+'</div></section>'+
-      '<section class="card stack"><div><h2>Por trabalho</h2><p class="small muted">Valor fechado por pedido (protocolo, modelo 3D…).</p></div><div class="tp-list">'+linhas('trabalho')+'</div></section>'+
+      '<section class="card stack"><div><h2>Trabalhos e preços</h2><p class="small muted">“Por elemento” multiplica pelos dentes marcados no pedido; “por trabalho” é valor fechado.</p></div><div class="tp-list" id="tp-list">'+lista+'</div>'+
+        '<div><button type="button" class="btn" data-a="addItem" '+dis+'>+ Adicionar item</button></div></section>'+
       '<div class="tp-extra">'+
-        '<section class="card stack"><div><h2>Modelos</h2><p class="small muted">Quantos modelos já estão inclusos no valor de cada pedido. O valor de cada modelo 3D a mais fica em “Por trabalho”.</p></div>'+
+        '<section class="card stack"><div><h2>Modelos</h2><p class="small muted">Quantos modelos já estão inclusos no valor de cada pedido. O valor de cada modelo 3D a mais fica na lista acima.</p></div>'+
           '<label class="fld"><span>Modelos inclusos por pedido</span><input id="tb-mod" name="modelos" type="number" min="0" max="20" step="1" inputmode="numeric" placeholder="Ex.: 2" value="'+esc(tb.modelos==null?'':tb.modelos)+'" '+dis+'></label></section>'+
         '<section class="card stack"><div><h2>Informações</h2><p class="small muted">Condições do seu serviço, para você ter à mão e mandar ao cliente.</p></div>'+
           '<label class="fld"><span>Prazo médio</span><input id="tb-prazo" name="prazo" maxlength="120" placeholder="Ex.: 1 a 2 dias úteis, conforme a demanda e a complexidade" value="'+esc(tb.prazo||'')+'" '+dis+'></label>'+
@@ -1330,7 +1323,15 @@ function rTabela(){
           '<label class="fld"><span>Outras informações</span><textarea id="tb-info" name="info" maxlength="400" placeholder="Ex.: Todos os projetos são feitos no fluxo 100% digital" '+dis+'>'+esc(tb.info||'')+'</textarea></label></section>'+
       '</div>'+
     '</div>'+
-    '<div class="row wrap"><button class="btn pri" type="submit" '+dis+'>Salvar tabela</button><button type="button" class="btn" data-a="editTipo" '+dis+'>+ Novo trabalho</button></div></form>';
+    '<div class="row wrap"><button class="btn pri" type="submit" '+dis+'>Salvar tabela</button></div></form>';
+}
+function linhaTabela(t,dis){var novo=!t.id,id=t.id||('novo'+uid().replace(/-/g,''));
+  return '<div class="tp-li'+(t.ativo===false?' off':'')+'">'+
+    '<input class="tp-nome" name="n_'+id+'" maxlength="60" required value="'+esc(t.nome||'')+'" placeholder="Nome do item" aria-label="Nome do trabalho" '+dis+'>'+
+    '<select name="f_'+id+'" aria-label="Forma de cobrança" '+dis+'><option value="elemento" '+(t.forma!=='trabalho'?'selected':'')+'>por elemento</option><option value="trabalho" '+(t.forma==='trabalho'?'selected':'')+'>por trabalho</option></select>'+
+    '<label class="tp-val"><span>R$</span><input name="v_'+id+'" type="number" step="0.01" min="0" inputmode="decimal" value="'+(+t.valor||0).toFixed(2)+'" aria-label="Valor" '+dis+'></label>'+
+    '<label class="check tp-at" title="Desmarque para não aparecer no novo pedido"><input type="checkbox" name="a_'+id+'" '+(t.ativo===false?'':'checked')+' '+dis+'> Ativo</label>'+
+    '<button type="button" class="tp-x" data-a="'+(novo?'delNovo':'delTab')+'" data-id="'+id+'" aria-label="Excluir" title="Excluir" '+dis+'>✕</button></div>';
 }
 
 /* ---------- Administração (conta mestre) ---------- */
@@ -1710,6 +1711,9 @@ var A={
   delTab:function(d,el){if(!guard())return;var t=tipo(d.id);if(!t)return;softDel(t);save();
     var li=el.closest('.tp-li'),lst=li&&li.parentNode;if(li)li.remove();if(lst&&!lst.querySelector('.tp-li'))lst.innerHTML='<p class="small muted" style="padding:6px 2px">Nenhum trabalho aqui.</p>';
     toast('“'+t.nome+'” foi para a lixeira. Dá para restaurar em Configurações › Lixeira.');},
+  addItem:function(){if(!guard())return;var l=document.getElementById('tp-list');if(!l)return;var v=l.querySelector('.tp-vazio');if(v)v.remove();
+    l.insertAdjacentHTML('beforeend',linhaTabela({nome:'',forma:'elemento',valor:0,ativo:true},''));var n=l.lastElementChild.querySelector('.tp-nome');n.focus();n.scrollIntoView({block:'center',behavior:'smooth'});},
+  delNovo:function(d,el){var li=el.closest('.tp-li');if(li)li.remove();},
   addRef:function(){if(!guard())return;var f=refFaltando();f.forEach(function(r){S.tipos.push({id:uid(),nome:r[0],forma:r[1],valor:0,ativo:true});});save();render();toast(f.length+' trabalho(s) adicionado(s) com R$ 0,00.');},
   contaIr:function(d){ui.ddOpen=null;A.tab(d);},
   tab:function(d){ui.tab=d.v;ui.sub=d.sub||null;ui.drawer=false;if('f' in d)ui.filtro=d.f==='urg'?'urg':'todos';closeSheet();render();window.scrollTo(0,0);},
@@ -1834,9 +1838,15 @@ var F={
       var nome=(fd.get('n_'+t.id)||'').trim(),v=parseFloat(fd.get('v_'+t.id));if(!nome||!(v>=0)){bad=true;return;}
       var o={nome:nome,forma:fd.get('f_'+t.id)==='trabalho'?'trabalho':'elemento',valor:Math.round(v*100)/100,ativo:!!fd.get('a_'+t.id)};
       if(o.nome!==t.nome||o.forma!==t.forma||o.valor!==+t.valor||o.ativo!==!!t.ativo){Object.assign(t,o);n++;}});
-    if(bad){toast('Confira: todo trabalho precisa de nome e valor (pode ser 0).');return;}
+    var novos=[];
+    fd.forEach(function(v,k){if(!/^n_novo/.test(k))return;var id=k.slice(2),nome=String(v).trim(),val=parseFloat(fd.get('v_'+id));
+      if(!nome||!(val>=0)){bad=true;return;}novos.push({id:uid(),nome:nome,forma:fd.get('f_'+id)==='trabalho'?'trabalho':'elemento',valor:Math.round(val*100)/100,ativo:!!fd.get('a_'+id)});});
+    if(bad){toast('Confira: todo item precisa de nome e valor (pode ser 0).');return;}
+    var nomes={};alive(S.tipos).forEach(function(t){nomes[semAcento(t.nome)]=1;});
+    for(var i=0;i<novos.length;i++){var kk=semAcento(novos[i].nome);if(nomes[kk]){toast('Já existe um item chamado “'+novos[i].nome+'”.');return;}nomes[kk]=1;}
+    novos.forEach(function(t){S.tipos.push(t);n++;});
     var md=String(fd.get('modelos')||'').trim(),tb={modelos:md===''?null:Math.max(0,Math.min(20,parseInt(md,10)||0)),prazo:(fd.get('prazo')||'').trim(),pagamento:(fd.get('pagamento')||'').trim(),info:(fd.get('info')||'').trim()};
-    S.prefs=S.prefs||{};if(JSON.stringify(tb)!==JSON.stringify(S.prefs.tab||{})){S.prefs.tab=tb;n++;}
+    S.prefs=S.prefs||{};var pv=S.prefs.tab||{};if(JSON.stringify(tb)!==JSON.stringify({modelos:pv.modelos==null?null:pv.modelos,prazo:pv.prazo||'',pagamento:pv.pagamento||'',info:pv.info||''})){S.prefs.tab=tb;n++;}
     save();render();toast(n?'Tabela salva ('+n+' alteração(ões)).':'Nada mudou na tabela.');
   },
   tipo:function(fd,f){
