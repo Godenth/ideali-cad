@@ -36,7 +36,7 @@
         {user_id:'eeee',email:'ana@lab.com',nome:'Ana Cadista',telefone:'(31) 9999-0000',cidade:'BH',plano:'basico',status:'teste',teste_ate:new Date(Date.now()+5*864e5).toISOString(),vence_em:null,limite_bytes:5368709120,bytes_usados:120000000,cadastro:new Date(Date.now()-9*864e5).toISOString(),ultimo_acesso:new Date().toISOString(),admin:false},
         {user_id:'ffff',email:'beto@cad.com',nome:'Beto',telefone:'',cidade:'',plano:'basico',status:'teste',teste_ate:new Date(Date.now()-2*864e5).toISOString(),vence_em:null,limite_bytes:5368709120,bytes_usados:0,cadastro:new Date(Date.now()-16*864e5).toISOString(),ultimo_acesso:null,admin:false}],error:null});
       return Promise.resolve({data:null,error:null});},
-    functions:{invoke:function(n,o){window.__ops.push({op:'fn',name:n,body:o.body});return Promise.resolve({data:{ok:true},error:null});}}
+    functions:{invoke:function(n,o){window.__ops.push({op:'fn',name:n,body:o.body});if(n==='clima')return Promise.resolve({data:{temp:24.6,simbolo:window.__simbolo||'partlycloudy_day',min:17.2,max:28.9,atualizado:new Date().toISOString(),fonte:'MET Norway'},error:null});return Promise.resolve({data:{ok:true},error:null});}}
   };
   window.supabase={createClient:function(){return client;}};
   window.__U=U;

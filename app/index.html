@@ -96,6 +96,24 @@ body.sem-anim *{transition:none!important;animation:none!important}
 }
 
 /* Dashboard */
+.cfg{max-width:1180px;margin-inline:auto;display:grid;gap:16px}
+.cfg-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);scrollbar-width:none}
+.cfg-tabs::-webkit-scrollbar{display:none}
+.cfg-tabs button{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;border:0;background:none;color:var(--muted);font:inherit;font-weight:500;white-space:nowrap;cursor:pointer}
+.cfg-tabs button svg{width:17px;height:17px}
+.cfg-tabs button:hover{color:var(--ink);background:var(--soft)}
+.cfg-tabs button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.cfg-tabs .n{font:600 .68rem var(--f-mono);background:var(--muted);color:#fff;border-radius:99px;padding:1px 6px}
+.cfg-grid{display:grid;gap:16px;align-items:start}
+.cfg-grid .g2{display:grid;gap:12px}
+.cfg-grid .cfg-perfil .row .btn{min-width:200px}
+@media (min-width:960px){
+  .cfg-grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+  .cfg-grid .g2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
+  .cfg-grid .g2 .ac{grid-column:1/-1}
+}
+@media (max-width:959px){.cfg-grid .cfg-perfil .row .btn{width:100%}}
+@media (max-width:699px){.cfg-tabs{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px}.cfg-tabs button{flex-direction:column;gap:3px;padding:8px 2px;font-size:.72rem;position:relative;justify-content:center}.cfg-tabs button svg{width:19px;height:19px}.cfg-tabs .n{position:absolute;top:3px;right:calc(50% - 22px)}}
 .dash{display:grid;gap:16px;grid-template-columns:repeat(12,minmax(0,1fr))}
 .dash>*{grid-column:span 12;min-width:0}
 @media (min-width:700px){.dash .kpi{grid-column:span 6}.dash .half{grid-column:span 6}}
@@ -151,6 +169,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .btn.block{width:100%}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn.on{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 35%,transparent)}
 .icon-btn svg{width:18px;height:18px}
 .icon-btn:disabled{opacity:.35;cursor:not-allowed}
 .fab-old{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:25;width:56px;height:56px;border-radius:18px;background:var(--accent);color:var(--accent-ink);border:0;box-shadow:0 10px 24px -8px color-mix(in srgb,var(--accent) 70%,transparent);font-size:1.8rem;cursor:pointer}
@@ -400,7 +419,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),
-  cidade_cptec_id:p.cidadeGeo&&p.cidadeGeo.id?+p.cidadeGeo.id:null,preferencias:{anim:(S.prefs||{}).anim||'on',cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -583,10 +602,12 @@ var ICON={
 };
 var MENU=[
   ['Principal',[['dashboard','Dashboard'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
-  ['Ferramentas',[['ranking','Ranking'],['arquivos','Arquivos STL'],['tipos','Tipos de trabalho'],['lixeira','Lixeira']]],
-  ['Conta',[['config','Configurações'],['admin','Administração']]]
+  ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho']]],
+  ['Conta',[['config','Configurações']]]
 ];
-var TITULOS={admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Arquivos STL',tipos:'Tipos de trabalho',lixeira:'Lixeira',config:'Configurações'};
+var CFG=['config','arquivos','lixeira','admin'];
+function emCfg(){return CFG.indexOf(ui.tab)>=0;}
+var TITULOS={admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){
@@ -606,15 +627,15 @@ function render(){
   var nome=S.perfil.nome||S.sessao.email||'';
   var side='<aside class="side" aria-label="Menu"><div class="brand">'+logo(30)+'<span>Ideali CAD</span></div>'+
     MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return it[0]!=='admin'||S.admin;}).map(function(it){
-      var badge=it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':it[0]==='lixeira'&&lix?'<span class="badge" style="background:var(--muted)">'+lix+'</span>':'';
-      return '<button class="it '+(ui.tab===it[0]?'on':'')+'" data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+it[1]+'</span>'+badge+'</button>';}).join('');}).join('')+
+      var badge=it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':it[0]==='config'&&lix?'<span class="badge" style="background:var(--muted)">'+lix+'</span>':'';
+      return '<button class="it '+(ui.tab===it[0]||(it[0]==='config'&&emCfg())?'on':'')+'" data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+it[1]+'</span>'+badge+'</button>';}).join('');}).join('')+
     '<div class="plan"><div class="between"><b>Plano '+a.plano+'</b>'+chip+'</div>'+
       '<div class="bar '+(pct>90?'full':pct>75?'warn':'')+'" style="height:8px"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
       '<span class="muted mono" style="font-size:.75rem">'+bytes(u)+' de '+bytes(lim)+'</span>'+
       (a.status==='teste'&&w?'<button class="btn sm pri" data-a="tab" data-v="config">Assinar</button>':'')+'</div>'+
     '<div class="me"><span class="av">'+esc((nome[0]||'?').toUpperCase())+'</span><span class="nm">'+esc(nome)+'</span><button class="icon-btn" data-a="sair" aria-label="Sair" title="Sair" style="width:32px;height:32px">'+ICON.sair+'</button></div></aside>';
   var titulo=TITULOS[ui.tab]||'';
-  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config'&&(it[0]!=='admin'||S.admin))flat.push(it);});});
+  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config')flat.push(it);});});
   var top='<header class="top"><div class="top-in">'+
     '<button class="icon-btn menu-btn" data-a="drawer" aria-label="Abrir menu">'+ICON.menu+'</button>'+
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
@@ -622,7 +643,7 @@ function render(){
     '<input class="search dk" id="busca-top" type="search" placeholder="Buscar pedido, paciente, cliente…" value="'+(ui.tab==='pedidos'?'':esc(ui.busca))+'">'+
     '<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
     (ui.tab==='clientes'&&!ui.sub?'<button class="btn pri dk" data-a="novoCliente" '+(w?'':'disabled')+'>+ Novo cliente</button>':'<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>')+
-    '<button class="icon-btn dk" data-a="tab" data-v="config" aria-label="Configurações" title="Configurações">'+ICON.config+'</button><button class="av dk" data-a="tab" data-v="config" title="'+esc(nome)+'" aria-label="Minha conta" style="border:0;cursor:pointer">'+esc((nome[0]||'?').toUpperCase())+'</button>'+
+    '<button class="icon-btn dk'+(emCfg()?' on':'')+'" data-a="tab" data-v="config" aria-label="Configurações" title="Configurações">'+ICON.config+'</button><button class="av dk" data-a="tab" data-v="config" title="'+esc(nome)+'" aria-label="Minha conta" style="border:0;cursor:pointer">'+esc((nome[0]||'?').toUpperCase())+'</button>'+
     '<span class="menu-btn">'+chip+'</span></div>'+
     '<nav class="tnav" aria-label="Menu principal"><div class="tnav-in">'+flat.map(function(it){
       var badge=it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':'';
@@ -635,7 +656,12 @@ function render(){
   app.innerHTML='<div class="shell '+(ui.drawer?'open':'')+'">'+side+'<div class="scrim" data-a="drawer"></div>'+
     '<div class="content">'+top+'<main class="main">'+
     (w?'':'<div class="banner bad"><span><b>Assinatura vencida.</b> Seus dados estão guardados. Você pode ver e exportar, mas não pode criar nem alterar.</span><button class="btn sm" data-a="tab" data-v="config">Ver assinatura</button></div>')+
-    body+'</main></div>'+bnav+'</div>';
+    (emCfg()?'<div class="cfg">'+cfgTabs(lix)+body+'</div>':body)+'</main></div>'+bnav+'</div>';
+}
+function cfgTabs(lix){
+  var t=[['config','Perfil e conta'],['arquivos','Arquivos STL'],['lixeira','Lixeira']];if(S.admin)t.push(['admin','Administração']);
+  return '<nav class="cfg-tabs" aria-label="Configurações">'+t.map(function(x){
+    return '<button class="'+(ui.tab===x[0]?'on':'')+'" data-a="tab" data-v="'+x[0]+'">'+ICON[x[0]]+'<span>'+x[1]+'</span>'+(x[0]==='lixeira'&&lix?'<span class="n">'+lix+'</span>':'')+'</button>';}).join('')+'</nav>';
 }
 function logo(s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 28 28" aria-hidden="true"><defs><linearGradient id="lgP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--p6)"/><stop offset=".5" stop-color="var(--p5)"/><stop offset="1" stop-color="var(--p4)"/></linearGradient></defs><rect width="28" height="28" rx="8" fill="url(#lgP)"/><path d="M8 9c0-1.5 1.4-2.3 3-2 1.3.2 2 .9 3 .9s1.7-.7 3-.9c1.6-.3 3 .5 3 2 0 3-1 5-1.6 8.5-.4 2.3-1 3.5-1.9 3.5-1.2 0-1.2-4-2.5-4s-1.3 4-2.5 4c-.9 0-1.5-1.2-1.9-3.5C9 14 8 12 8 9z" fill="#fff"/></svg>';}
 function bn(v,l){return '<button data-a="tab" data-v="'+v+'" class="'+(ui.tab===v?'on':'')+'">'+ICON[v]+'<span>'+l+'</span></button>';}
@@ -799,56 +825,92 @@ function saudacao(){
 }
 var DIAS=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
 function dataExtenso(){var d=new Date();var t=DIAS[d.getDay()]+', '+d.getDate()+' de '+MESES[d.getMonth()];return t.charAt(0).toUpperCase()+t.slice(1);}
-/* Clima: dados públicos do CPTEC/INPE via BrasilAPI (gratuito, sem chave) */
-var COND={limpo:['cl','ps'],nuvens:['pn','n','vn','e'],tempestade:['t'],neblina:['nv'],neve:['ne','g']};
-function grupoCond(c){for(var k in COND)if(COND[k].indexOf(c)>=0)return k;return c&&c!=='nd'?'chuva':'nuvens';}
-function iconeCond(c,dia){var g=grupoCond(c);if(g==='limpo')return dia?(c==='ps'?'🌤️':'☀️'):'🌙';if(g==='nuvens')return c==='n'||c==='e'?'☁️':(dia?'⛅':'☁️');if(g==='tempestade')return '⛈️';if(g==='neblina')return '🌫️';if(g==='neve')return '❄️';return /^(pp|psc|pc|pm|pt|pn|pcm|pct|pcn|ppn|ppt|ppm)/.test(c)?'🌦️':'🌧️';}
+/* Clima: previsão da MET Norway (licença CC BY 4.0, uso comercial permitido com crédito), via função "clima" do servidor.
+   Lista de cidades: arquivo local municipios.json (IBGE, 5.571 municípios), sem depender de API externa. */
+var CREDITO_CLIMA='Previsão do tempo: dados de MET Norway (CC BY 4.0)';
+function baseSimb(s){return String(s||'').replace(/_(day|night|polartwilight)$/,'');}
+function grupoCond(s){var b=baseSimb(s);if(!b)return 'nuvens';if(/thunder/.test(b))return 'tempestade';if(/snow/.test(b))return 'neve';if(/rain|sleet/.test(b))return 'chuva';if(b==='fog')return 'neblina';if(b==='clearsky'||b==='fair')return 'limpo';return 'nuvens';}
+function iconeCond(s,dia){var b=baseSimb(s),g=grupoCond(s);
+  if(g==='limpo')return dia?(b==='fair'?'🌤️':'☀️'):'🌙';
+  if(g==='nuvens')return b==='cloudy'?'☁️':(dia?'⛅':'☁️');
+  if(g==='tempestade')return '⛈️';if(g==='neblina')return '🌫️';if(g==='neve')return /sleet/.test(b)?'🌨️':'❄️';
+  return /showers/.test(b)?'🌦️':'🌧️';}
+function descCond(s){var b=baseSimb(s),n=/^heavy/.test(b)?' forte':/^light/.test(b)?' fraca':'';
+  if(b==='clearsky')return 'Céu limpo';if(b==='fair')return 'Poucas nuvens';if(b==='partlycloudy')return 'Parcialmente nublado';if(b==='cloudy')return 'Nublado';if(b==='fog')return 'Neblina';
+  if(/thunder/.test(b))return /showers/.test(b)?'Pancadas com trovoadas':'Chuva com trovoadas';
+  if(/sleet/.test(b))return 'Chuva com granizo';if(/snow/.test(b))return 'Neve';
+  if(/rainshowers/.test(b))return 'Pancadas de chuva'+n;if(/rain/.test(b))return 'Chuva'+n;return 'Nublado';}
 function ehDia(){var h=new Date().getHours();return h>=6&&h<18;}
 function infoDia(){
   var cid=(S.perfil.cidade||'').trim(),c=ui.clima,h='<div class="dia-info"><span class="chip-i">📅 '+dataExtenso()+'</span>';
   if(!cid)h+='<button class="chip-i lk" data-a="cidadeClima">🌤️ Informe sua cidade para ver o clima</button>';
-  else if(c&&c.cidade===cid)h+='<button class="chip-i lk2" data-a="cidadeClima" title="Previsão de hoje · fonte: CPTEC/INPE"><span style="font-size:1.1rem">'+iconeCond(c.cond,ehDia())+'</span> '+esc(c.desc)+' · '+esc(c.nome)+(c.uf?'/'+esc(c.uf):'')+' <span class="muted">mín <b class="mono">'+c.min+'°</b> · máx <b class="mono">'+c.max+'°</b></span></button>';
+  else if(c&&c.cidade===cid)h+='<button class="chip-i lk2" data-a="cidadeClima" title="'+CREDITO_CLIMA+'"><span style="font-size:1.1rem">'+iconeCond(c.cond,ehDia())+'</span> <b class="mono">'+Math.round(c.temp)+'°C</b> · '+esc(descCond(c.cond))+' · '+esc(c.nome)+(c.uf?'/'+esc(c.uf):'')+' <span class="muted">mín <b class="mono">'+Math.round(c.min)+'°</b> · máx <b class="mono">'+Math.round(c.max)+'°</b></span></button>';
   else if(ui.climaErr===cid)h+='<button class="chip-i lk2 muted" data-a="cidadeClima">🌤️ Clima indisponível para '+esc(cid)+' · trocar cidade</button>';
   else{h+='<span class="chip-i muted">🌤️ Buscando o clima…</span>';setTimeout(loadClima,0);}
   return h+'</div>';
 }
-var climaBusy=false,API_CLIMA='https://brasilapi.com.br/api/cptec/v1';
-function getJSON(u){return fetch(u).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});}
+var MUN=null,munP=null;
+function semAcento(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();}
+function municipios(){
+  if(MUN)return Promise.resolve(MUN);
+  if(!munP)munP=fetch('municipios.json',{cache:'force-cache'}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(function(l){MUN=l.map(function(x){return {n:x[0],uf:x[1],lat:x[2],lon:x[3],cap:x[4],k:semAcento(x[0])};});return MUN;})
+    .catch(function(e){munP=null;throw e;});
+  return munP;
+}
+function procuraCidades(q,max){
+  var k=semAcento(q),uf=null,m=k.match(/^(.*?)[\s,\/-]+([a-z]{2})$/);
+  if(m&&m[1].length>=2){k=m[1].trim();uf=m[2].toUpperCase();}
+  return municipios().then(function(L){
+    var ini=[],meio=[],kq=k;
+    L.forEach(function(c){if(uf&&c.uf!==uf)return;if(c.k.indexOf(k)===0)ini.push(c);else if(k.length>=3&&c.k.indexOf(' '+k)>0)meio.push(c);});
+    var ord=function(a,b){return (b.cap-a.cap)||(a.k===kq?-1:b.k===kq?1:0)||a.k.localeCompare(b.k);};
+    return ini.sort(ord).concat(meio.sort(ord)).slice(0,max||8);
+  });
+}
+function geoDaCidade(){
+  var cid=(S.perfil.cidade||'').trim(),g=S.perfil.cidadeGeo;
+  if(g&&g.nome===cid&&isFinite(g.lat)&&isFinite(g.lon))return Promise.resolve(g);
+  return procuraCidades(cid,50).then(function(rs){var k=semAcento(cid),x=rs.filter(function(c){return c.k===k&&(!g||!g.uf||c.uf===g.uf);})[0]||rs[0];
+    if(!x)throw new Error('cidade');S.perfil.cidadeGeo={nome:cid,uf:x.uf,lat:x.lat,lon:x.lon};save();return S.perfil.cidadeGeo;});
+}
+var climaBusy=false;
 function loadClima(){
   var cid=(S.perfil.cidade||'').trim();if(!cid||climaBusy)return;
-  var key='idealicad_clima2_'+cid.toLowerCase();
-  try{var c=JSON.parse(localStorage.getItem(key)||'null');if(c&&Date.now()-c.ts<2*60*60*1000&&c.dia===today()){ui.clima=c;if(ui.tab==='dashboard'&&!ui.sheet)render();return;}}catch(e){}
-  if(!window.fetch){ui.climaErr=cid;return;}
   climaBusy=true;
-  var g=S.perfil.cidadeGeo&&S.perfil.cidadeGeo.nome===cid&&S.perfil.cidadeGeo.id?Promise.resolve(S.perfil.cidadeGeo):
-    getJSON(API_CLIMA+'/cidade/'+encodeURIComponent(cid)).then(function(l){var x=l&&l[0];if(!x)throw new Error('cidade');return {nome:x.nome,uf:x.estado,id:x.id};});
-  g.then(function(geo){return getJSON(API_CLIMA+'/clima/previsao/'+geo.id).then(function(f){var d=f.clima&&f.clima[0];if(!d)throw new Error('prev');
-      return {cidade:cid,nome:geo.nome||f.cidade,uf:geo.uf||f.estado,cond:d.condicao,desc:d.condicao_desc||'',min:d.min,max:d.max,dia:today(),ts:Date.now()};});})
-  .then(function(c){ui.clima=c;try{localStorage.setItem(key,JSON.stringify(c));}catch(e){}})
+  geoDaCidade().then(function(geo){
+    var key='idealicad_clima3_'+geo.lat.toFixed(2)+','+geo.lon.toFixed(2);
+    try{var c=JSON.parse(localStorage.getItem(key)||'null');if(c&&Date.now()-c.ts<60*60*1000){c.cidade=cid;return c;}}catch(e){}
+    return sb.functions.invoke('clima',{body:{lat:geo.lat,lon:geo.lon}}).then(function(r){
+      if(r.error||!r.data||r.data.erro)throw new Error('clima');var d=r.data;
+      var c={cidade:cid,nome:cid,uf:geo.uf,cond:d.simbolo,temp:d.temp,min:d.min,max:d.max,ts:Date.now()};
+      try{localStorage.setItem(key,JSON.stringify(c));}catch(e){}return c;});
+  })
+  .then(function(c){ui.clima=c;ui.climaErr=null;})
   .catch(function(){ui.climaErr=cid;})
   .then(function(){climaBusy=false;if(ui.tab==='dashboard'&&!ui.sheet)render();});
 }
 var cidTimer=null,cidSeq=0;
 function buscaCidades(inp){
   var box=inp.parentNode.querySelector('.cid-sug'),q=inp.value.trim();clearTimeout(cidTimer);
-  if(q.length<3){box.hidden=q.length===0;if(q.length)box.innerHTML='<p class="small muted" style="padding:8px 10px">Digite pelo menos 3 letras…</p>';return;}
-  box.hidden=false;box.innerHTML='<p class="small muted" style="padding:8px 10px">Buscando…</p>';
+  if(q.length<2){box.hidden=true;box.innerHTML='';return;}
+  box.hidden=false;if(!MUN)box.innerHTML='<p class="small muted" style="padding:8px 10px">Carregando cidades…</p>';
   cidTimer=setTimeout(function(){var my=++cidSeq;
-    fetch(API_CLIMA+'/cidade/'+encodeURIComponent(q)).then(function(r){return r.status===404?[]:r.ok?r.json():Promise.reject(r.status);}).then(function(rs){
-      if(my!==cidSeq)return;rs=(rs||[]).slice(0,8);
+    procuraCidades(q,8).then(function(rs){
+      if(my!==cidSeq)return;
       if(window.innerWidth<700)setTimeout(function(){inp.scrollIntoView({block:'start',behavior:'smooth'});},50);
-      box.innerHTML=rs.length?rs.map(function(c){return '<button type="button" data-a="pickCidade" data-n="'+esc(c.nome)+'" data-uf="'+esc(c.estado||'')+'" data-id="'+c.id+'"><b>'+esc(c.nome)+'</b><span>'+esc(c.estado||'')+'</span></button>';}).join(''):'<p class="small muted" style="padding:8px 10px">Nenhuma cidade encontrada.</p>';
-    }).catch(function(){if(my===cidSeq)box.innerHTML='<p class="small muted" style="padding:8px 10px">Não consegui consultar a lista de cidades agora (sem internet ou bloqueado nesta página).</p><button type="button" data-a="pickCidade" data-n="'+esc(q)+'" data-uf="" data-id=""><b>Usar “'+esc(q)+'” mesmo assim</b><span>sem lista</span></button>';});
-  },350);
+      box.innerHTML=rs.length?rs.map(function(c){return '<button type="button" data-a="pickCidade" data-n="'+esc(c.n)+'" data-uf="'+c.uf+'" data-lat="'+c.lat+'" data-lon="'+c.lon+'"><b>'+esc(c.n)+'</b><span>'+c.uf+'</span></button>';}).join(''):'<p class="small muted" style="padding:8px 10px">Nenhuma cidade encontrada. Confira a grafia.</p>';
+    }).catch(function(){if(my===cidSeq)box.innerHTML='<p class="small muted" style="padding:8px 10px">Não consegui carregar a lista de cidades. Verifique sua internet e tente de novo.</p>';});
+  },MUN?60:150);
 }
 function fCidade(){
   return head('Cidade do clima')+'<p class="muted">Digite e escolha sua cidade na lista.</p>'+
     '<div class="fld ac"><span>Cidade</span><input id="cid-busca" class="cid-ac" autocomplete="off" placeholder="Ex.: São Paulo" value="'+esc(S.perfil.cidade||'')+'"><div class="cid-sug" hidden></div></div>'+
-    '<p class="small muted">A mesma cidade aparece no seu Pix (Configurações).</p>';
+    '<p class="small muted">A mesma cidade aparece no seu Pix (Configurações).</p><p class="small muted">'+CREDITO_CLIMA+'.</p>';
 }
 function cenaClima(){
   var c=ui.clima,h=new Date().getHours(),dia=h>=6&&h<18,tarde=dia&&h>=16,tipo=c?grupoCond(c.cond):'limpo';
-  return {tipo:tipo+' '+(dia?(tarde?'tarde':'dia'):'noite'),chuva:tipo==='chuva'||tipo==='tempestade',raio:tipo==='tempestade',nuvens:tipo==='nuvens'?(c&&(c.cond==='n'||c.cond==='e')?7:4):tipo==='chuva'||tipo==='tempestade'?6:tipo==='neblina'?2:1,neve:tipo==='neve',nevoa:tipo==='neblina',estrelas:!dia&&(tipo==='limpo'||tipo==='nuvens'),sol:dia&&(tipo==='limpo'||tipo==='nuvens'),dia:dia,tarde:tarde};
+  return {tipo:tipo+' '+(dia?(tarde?'tarde':'dia'):'noite'),chuva:tipo==='chuva'||tipo==='tempestade',raio:tipo==='tempestade',nuvens:tipo==='nuvens'?(c&&baseSimb(c.cond)==='cloudy'?7:4):tipo==='chuva'||tipo==='tempestade'?6:tipo==='neblina'?2:1,neve:tipo==='neve',nevoa:tipo==='neblina',estrelas:!dia&&(tipo==='limpo'||tipo==='nuvens'),sol:dia&&(tipo==='limpo'||tipo==='nuvens'),dia:dia,tarde:tarde};
 }
 var CEU={cv:null,parts:null,sig:''};
 function ceuLoop(t){
@@ -1272,23 +1334,24 @@ function rLixeira(){
   S.arquivos.forEach(function(x){if(x.deleted)itens.push({k:'arquivos',x:x,l:'Arquivo',d:x.nome});});
   S.tipos.forEach(function(x){if(x.deleted)itens.push({k:'tipos',x:x,l:'Tipo de trabalho',d:x.nome});});
   itens.sort(function(a,b){return b.x.deleted<a.x.deleted?-1:1;});
-  return voltar('Lixeira')+'<p class="muted small">Itens excluídos ficam aqui por 30 dias e podem ser restaurados.</p>'+
+  return '<p class="muted small">Itens excluídos ficam aqui por 30 dias e podem ser restaurados.</p>'+
     '<div class="card">'+(itens.length?'<div class="list">'+itens.map(function(i){var d=30-daysBetween(i.x.deleted,today());
       return '<div class="li" style="cursor:default"><span class="t"><b>'+i.l+'</b><span>'+esc(i.d)+' · some em '+Math.max(0,d)+' dias</span></span><button class="btn sm" data-a="restaurar" data-k="'+i.k+'" data-id="'+i.x.id+'" '+(canWrite()?'':'disabled')+'>Restaurar</button></div>';}).join('')+'</div>':'<p class="empty">A lixeira está vazia.</p>')+'</div>';
 }
 function rConfig(){
   var p=S.perfil,a=S.assinatura,dis=canWrite()?'':'disabled';
-  return voltar('Configurações')+
-    '<form class="card stack" data-form="perfil"><h2>Seu perfil</h2>'+
+  return '<div class="cfg-grid">'+
+    '<form class="card stack cfg-perfil" data-form="perfil"><h2>Seu perfil</h2><div class="g2">'+
       '<label class="fld"><span>Nome</span><input id="cf-nome" name="nome" value="'+esc(p.nome)+'" '+dis+'></label>'+
-      '<label class="fld"><span>WhatsApp</span><input id="cf-tel" name="telefone" inputmode="tel" value="'+esc(p.telefone)+'" '+dis+'></label>'+
-      '<h2 style="margin-top:6px">Chave Pix</h2><p class="small muted">Usada para gerar o QR Code de cobrança. O dinheiro cai direto na sua conta.</p>'+
+      '<label class="fld"><span>WhatsApp</span><input id="cf-tel" name="telefone" inputmode="tel" value="'+esc(p.telefone)+'" '+dis+'></label></div>'+
+      '<h2 style="margin-top:6px">Chave Pix</h2><p class="small muted">Usada para gerar o QR Code de cobrança. O dinheiro cai direto na sua conta.</p><div class="g2">'+
       '<label class="fld"><span>Tipo de chave</span><select id="cf-tipo" name="tipoChave" '+dis+'>'+[['cpf','CPF'],['cnpj','CNPJ'],['email','E-mail'],['telefone','Celular'],['aleatoria','Chave aleatória']].map(function(o){return '<option value="'+o[0]+'" '+(p.tipoChave===o[0]?'selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label>'+
       '<label class="fld"><span>Chave</span><input id="cf-chave" name="chave" value="'+esc(p.chave)+'" '+dis+'></label>'+
       '<label class="fld"><span>Nome de quem recebe</span><input id="cf-rec" name="recebedor" maxlength="25" value="'+esc(p.recebedor)+'" '+dis+'><small>Como aparece no banco. Até 25 letras.</small></label>'+
-      '<div class="fld ac"><span>Cidade</span><input id="cf-cid" class="cid-ac" name="cidade" autocomplete="off" placeholder="Comece a digitar: São Pa…" value="'+esc(p.cidade)+'" '+dis+'><div class="cid-sug" hidden></div><small>Usada no Pix e no clima do Dashboard.</small></div>'+
-      '<button class="btn pri" type="submit" '+dis+'>Salvar</button></form>'+
-    '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p></section>'+
+      '<div class="fld ac"><span>Cidade</span><input id="cf-cid" class="cid-ac" name="cidade" autocomplete="off" placeholder="Comece a digitar: São Pa…" value="'+esc(p.cidade)+'" '+dis+'><div class="cid-sug" hidden></div><small>Usada no Pix e no clima do Dashboard.</small></div></div>'+
+      '<div class="row"><button class="btn pri" type="submit" '+dis+'>Salvar alterações</button></div></form>'+
+    '<div class="stack cfg-lado">'+
+    '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Assinatura</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
       '<div class="between"><span>Plano</span><b>'+esc((typeof NOME_PLANO!=='undefined'&&NOME_PLANO[a.plano])||a.plano)+(a.plano==='plus'?' · R$ 59,90/mês':a.plano==='basico'?' · R$ 29,90/mês':'')+'</b></div>'+
@@ -1297,7 +1360,7 @@ function rConfig(){
       '<button class="btn pri" data-a="assinar">Assinar agora</button></section>'+
     '<section class="card stack"><h2>Seus dados</h2><p class="small muted">Você pode levar seus dados ou apagar tudo quando quiser.</p>'+
       '<div class="row wrap"><button class="btn" data-a="exportar">Exportar meus dados</button><button class="btn danger" data-a="excluirConta">Excluir minha conta</button></div></section>'+
-    '<button class="btn" data-a="sair">Sair</button>';
+    '<button class="btn" data-a="sair">Sair da conta</button></div></div>';
 }
 
 /* ===================== Folhas (modais) ===================== */
@@ -1581,7 +1644,7 @@ var A={
   cliOrd:function(d){ui.cliOrd=d.v;render();if(d.v==='inativos'){var l=document.getElementById('cli-busca');if(l)l.scrollIntoView({block:'start',behavior:'smooth'});}},
   per:function(d){ui.per=d.v;render();},
   cidadeClima:function(){openSheet(fCidade);setTimeout(function(){var i=document.getElementById('cid-busca');if(i){i.focus();i.select();}},50);},
-  pickCidade:function(d){S.perfil.cidade=d.n;S.perfil.cidadeGeo=d.id?{nome:d.n,uf:d.uf,id:d.id}:null;ui.clima=null;ui.climaErr=null;save();
+  pickCidade:function(d){S.perfil.cidade=d.n;S.perfil.cidadeGeo=d.lat?{nome:d.n,uf:d.uf,lat:+d.lat,lon:+d.lon}:null;ui.clima=null;ui.climaErr=null;save();
     var inp=document.querySelector('.cid-ac');if(inp){inp.value=d.n;var bx=inp.parentNode.querySelector('.cid-sug');if(bx)bx.hidden=true;}
     if(ui.sheet&&ui.sheet.fn===fCidade)closeSheet();render();toast('Cidade definida: '+d.n+(d.uf?' ('+d.uf+')':'')+'.');},
   admRecarregar:function(){ui.admLista=null;ui.admErro=null;render();},
