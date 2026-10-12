@@ -73,7 +73,8 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .top .spacer{flex:1}
 .top .search{max-width:320px}
 .tnav{display:none;border-top:1px solid var(--line)}
-.tnav-in{display:flex;gap:4px;overflow-x:auto;max-width:none;margin-inline:auto;padding:8px 22px}
+.tnav-in{display:flex;gap:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;max-width:none;margin-inline:auto;padding:8px 22px}
+.tnav-in::-webkit-scrollbar,.seg::-webkit-scrollbar{display:none}
 .tnav button{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border-radius:10px;border:0;background:none;color:var(--muted);font-weight:500;white-space:nowrap;cursor:pointer}
 .tnav button svg{width:18px;height:18px}
 .tnav button:hover{color:var(--ink);background:var(--soft)}
@@ -191,7 +192,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .bar.warn i{background:var(--warn)}.bar.full i{background:var(--urgent)}
 .banner{border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--accent-soft);color:var(--ink)}
 .banner.bad{background:color-mix(in srgb,var(--urgent) 14%,var(--surface))}
-.seg{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.seg{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding-bottom:2px}
 .seg button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.4em .9em;font-size:.88rem;cursor:pointer;white-space:nowrap}
 .seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .search{width:100%;padding:.7em 1em;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
@@ -331,7 +332,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 /* Login */
 .top::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--paint);opacity:.85}
 .tnav button{position:relative}
-.tnav button.on::after{content:"";position:absolute;left:12px;right:12px;bottom:-9px;height:3px;border-radius:3px;background:var(--paint)}
+.tnav button.on::after{content:"";position:absolute;left:12px;right:12px;bottom:-8px;height:3px;border-radius:3px;background:var(--paint)}
 .card,.kpi,.kcol{box-shadow:0 1px 2px color-mix(in srgb,var(--ink) 5%,transparent)}
 .dash .kpi{position:relative;overflow:hidden;--pig:var(--accent)}
 .dash .kpi::after{content:"";position:absolute;width:140px;height:140px;right:-55px;top:-55px;border-radius:50%;background:var(--pig);opacity:.13;filter:blur(10px);pointer-events:none}
