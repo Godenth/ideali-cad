@@ -512,7 +512,7 @@ async function carregar2(){
 }
 var TRAB_REF=[['Coroa sobre dente','elemento'],['Coroa sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
   ['Provisório com aleta','elemento'],['Placa de bruxismo','elemento'],['Enceramento digital (planejamento)','elemento'],
-  ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo adicional','trabalho']];
+  ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo 3D','trabalho']];
 function refFaltando(){var tem={};S.tipos.forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
 function toast(t){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){el.hidden=true;},2800);}
 function save(){agendaSync();}
@@ -1320,9 +1320,9 @@ function rTabela(){
     (falta.length?'<div class="banner"><span>Faltam '+falta.length+' trabalho(s) da lista de referência: '+falta.map(function(r){return esc(r[0]);}).join(', ')+'.</span><button type="button" class="btn sm" data-a="addRef" '+dis+'>Adicionar com R$ 0,00</button></div>':'')+
     '<div class="tp-grid">'+
       '<section class="card stack"><div><h2>Por elemento</h2><p class="small muted">O valor é multiplicado pelos dentes marcados no pedido.</p></div><div class="tp-list">'+linhas('elemento')+'</div></section>'+
-      '<section class="card stack"><div><h2>Por trabalho</h2><p class="small muted">Valor fechado por pedido (protocolo, modelo adicional…).</p></div><div class="tp-list">'+linhas('trabalho')+'</div></section>'+
+      '<section class="card stack"><div><h2>Por trabalho</h2><p class="small muted">Valor fechado por pedido (protocolo, modelo 3D…).</p></div><div class="tp-list">'+linhas('trabalho')+'</div></section>'+
       '<div class="tp-extra">'+
-        '<section class="card stack"><div><h2>Modelos</h2><p class="small muted">Quantos modelos já estão inclusos no valor de cada pedido. O valor do modelo adicional fica em “Por trabalho”.</p></div>'+
+        '<section class="card stack"><div><h2>Modelos</h2><p class="small muted">Quantos modelos já estão inclusos no valor de cada pedido. O valor de cada modelo 3D a mais fica em “Por trabalho”.</p></div>'+
           '<label class="fld"><span>Modelos inclusos por pedido</span><input id="tb-mod" name="modelos" type="number" min="0" max="20" step="1" inputmode="numeric" placeholder="Ex.: 2" value="'+esc(tb.modelos==null?'':tb.modelos)+'" '+dis+'></label></section>'+
         '<section class="card stack"><div><h2>Informações</h2><p class="small muted">Condições do seu serviço, para você ter à mão e mandar ao cliente.</p></div>'+
           '<label class="fld"><span>Prazo médio</span><input id="tb-prazo" name="prazo" maxlength="120" placeholder="Ex.: 1 a 2 dias úteis, conforme a demanda e a complexidade" value="'+esc(tb.prazo||'')+'" '+dis+'></label>'+
