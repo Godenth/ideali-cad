@@ -113,6 +113,21 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .tp-x:hover{color:var(--urgent);background:color-mix(in srgb,var(--urgent) 10%,transparent);border-color:color-mix(in srgb,var(--urgent) 25%,transparent)}
 .tp-x:disabled{opacity:.4;cursor:default}
 @media (max-width:699px){.tp-li{grid-template-columns:minmax(0,1fr) 86px auto;gap:6px;position:relative;padding-top:8px}.tp-li input.tp-nome:not([type=checkbox]){width:calc(100% - 42px)}.tp-x{position:absolute;top:10px;right:8px}.tp-li select{padding-left:.5em;padding-right:.1em;font-size:.9rem}.tp-at{font-size:.78rem;gap:4px}.tp-li .tp-val input{padding-inline:.5em}.tp-nome{grid-column:1/-1}.tp-val span{display:none}}
+.msg-cta{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;border:1px solid var(--line);font:inherit;color:inherit;background:linear-gradient(100deg,color-mix(in srgb,var(--p3) 10%,var(--surface)),var(--surface) 60%)}
+.msg-cta:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.msg-cta .t{display:grid;gap:2px;flex:1;min-width:0}.msg-cta .t span{color:var(--muted);font-size:.85rem}
+.msg-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;background:color-mix(in srgb,var(--p3) 18%,var(--surface));flex:none}
+.msg-tabs{max-width:none}
+@media (max-width:699px){.cfg-tabs.msg-tabs{display:flex;overflow-x:auto}.cfg-tabs.msg-tabs button{flex-direction:row;padding:8px 12px;font-size:.82rem;flex:0 0 auto}}
+.msg-grid{display:grid;gap:12px}
+@media (min-width:960px){.msg-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.msg-card{display:grid;gap:10px;align-content:start;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.msg-tit{display:grid;gap:2px;font-weight:600;font-size:.92rem}
+.msg-txt{white-space:pre-wrap;font-size:.93rem;line-height:1.5;background:color-mix(in srgb,#25D366 7%,var(--bg));border:1px solid color-mix(in srgb,#25D366 18%,var(--line));border-radius:12px 12px 12px 4px;padding:10px 12px}
+.msg-acts{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.msg-var{display:inline-flex;align-items:center;gap:6px}.msg-var .icon-btn{width:32px;height:32px}
+.msg-ev h2{margin:0}
+.banner.lemb .icon-btn{width:30px;height:30px}
 .cfg{max-width:1180px;margin-inline:auto;display:grid;gap:16px}
 .cfg-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);scrollbar-width:none}
 .cfg-tabs::-webkit-scrollbar{display:none}
@@ -647,7 +662,7 @@ function render(){
   if(!w) chip='<span class="tag u">Assinatura vencida</span>';
   else if(a.status==='teste') chip='<span class="tag a">Teste · '+Math.max(0,daysBetween(today(),a.testeAte))+' dias</span>';
   else chip='<span class="tag ok">Ativa</span>';
-  var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
+  var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
     ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,config:rConfig,admin:rAdmin};
   var body=(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
@@ -814,6 +829,7 @@ function rDashboard(){
   var fv=meses.map(fatMes),pv=meses.map(pagoMes);
   return '<section class="hero-clima '+cenaClima().tipo+'"><canvas id="ceu" aria-hidden="true"></canvas><div class="stack hero-in" style="gap:12px"><div class="between wrap"><div class="row wrap" style="gap:14px">'+saud.ic+'<div><h2 style="font-size:1.5rem">'+saud.t+(nome?', '+esc(nome):'')+'</h2><p class="muted small">Resumo de '+perNome()+'</p></div>'+infoDia()+'</div>'+
       '<div class="row wrap">'+(urg.length?'<span class="tag u">'+urg.length+' urgente(s)</span>':'')+(atr.length?'<span class="tag u">'+atr.length+' atrasado(s)</span>':'')+'</div></div>'+perPicker()+'</div></section>'+
+    lembretes()+
     (!S.perfil.chave?'<div class="banner"><span>Cadastre sua chave Pix para cobrar seus clientes pelo QR Code.</span><button class="btn sm" data-a="tab" data-v="config">Cadastrar chave</button></div>':'')+
     '<div class="dash">'+
       kpi(G?'Faturamento total':'Faturamento do mês',brl(fat),G?'<span>'+ps.length+' pedidos</span>':delta(fat,soma(prevPs)),spark(sparkM.map(fatMes)),'financeiro')+
@@ -1116,7 +1132,8 @@ function rClientes(){
   };
   cs.sort(by[ord]);
   var ORD=[['az','A a Z'],['recentes','Últimos adicionados'],['antigos','Mais antigos'],['mais','Que mais pedem'],['menos','Que menos pedem'],['inativos','Inativos'+(nIn?' '+nIn:'')]];
-  return painelClientes()+'<div class="stack" style="gap:10px"><div class="between wrap" style="gap:10px"><h2>Lista de clientes</h2><button class="btn pri" data-a="novoCliente" '+(canWrite()?'':'disabled')+'>+ Cadastrar cliente</button></div>'+
+  var ev1=proximosEventos(30)[0];
+  return '<button class="card msg-cta" data-a="msgAbrir" data-v="'+(nIn?'inativos':'datas')+'"><span class="msg-ic">💬</span><span class="t"><b>Mensagens prontas para o WhatsApp</b><span>'+(nIn?nIn+' cliente(s) inativo(s) para reativar':'Nenhum cliente inativo')+(ev1?' · '+esc(ev1.nome)+' em '+dmy(ev1.d).slice(0,5):'')+' · feriados, fim de semana e divulgação</span></span><span class="muted">›</span></button>'+painelClientes()+'<div class="stack" style="gap:10px"><div class="between wrap" style="gap:10px"><h2>Lista de clientes</h2><span class="row" style="gap:8px"><button class="btn" data-a="msgAbrir">💬 Mensagens</button><button class="btn pri" data-a="novoCliente" '+(canWrite()?'':'disabled')+'>+ Cadastrar cliente</button></span></div>'+
     '<div class="row wrap"><input class="search" id="cli-busca" type="search" placeholder="Buscar cliente por nome, WhatsApp ou e-mail" value="'+esc(ui.cliBusca||'')+'" style="flex:1;min-width:220px;max-width:420px">'+
     dd('cliTipo')+dd('cliOrd')+'</div>'+
     '<p class="small muted">'+cs.length+' cliente(s)'+(ord==='inativos'?' sem pedidos há mais de '+INATIVO_DIAS+' dias':'')+(q?' para “'+esc(ui.cliBusca)+'”':'')+'</p></div>'+
@@ -1302,6 +1319,137 @@ function rTipos(){
     '</div>'+
     '<section class="card stack"><div class="between"><h2>Seus tipos de trabalho</h2><button class="btn sm pri" data-a="editTipo" '+(canWrite()?'':'disabled')+'>+ Novo tipo</button></div><div class="list">'+alive(S.tipos).map(function(t){
       return '<button class="li" data-a="editTipo" data-id="'+t.id+'"><span class="t"><b>'+esc(t.nome)+(t.ativo?'':' (inativo)')+'</b><span>'+(t.forma==='elemento'?'Por elemento':'Por trabalho')+'</span></span><span class="mono">'+brl(t.valor)+'</span></button>';}).join('')+'</div></section>';
+}
+
+/* ---------- Mensagens prontas para o WhatsApp ---------- */
+var MSG={
+  inativo:[
+    'Oi, {nome}! Tudo bem? Aqui é {eu}. Faz um tempinho que não fazemos trabalhos juntos e senti sua falta! 😊\nNossa agenda está tranquila esta semana, então consigo entregar seus casos com prazo bem rápido. Se tiver algo para desenhar, é só mandar os arquivos por aqui.',
+    '{saudacao}, {nome}! Passando para lembrar que continuo à disposição para seus projetos digitais: coroas, facetas, protocolos, placas e muito mais.\nEstou com horários livres para novos trabalhos nos próximos dias. Posso te ajudar com algum caso?',
+    'Oi, {nome}! Como estão as coisas por aí? 🦷\nEstou com a agenda aberta para novos casos. Se quiser, te mando minha tabela atualizada. Conte comigo!',
+    '{saudacao}, {nome}! Faz um tempo que não recebo seus casos e queria saber se posso melhorar algo no meu atendimento. Qualquer retorno é muito bem-vindo! 🙏\nE se tiver trabalho chegando, minha agenda está livre para entregar rapidinho.',
+    'Oi, {nome}! Para retomarmos nossa parceria, seu próximo caso entra com prioridade na fila: entrego no prazo mais curto que eu tiver. ⚡\nÉ só me mandar os arquivos quando precisar!'
+  ],
+  fds:[
+    '{saudacao}! 📅 Sexta-feira chegou e vamos estar online no fim de semana.\nMande seus trabalhos hoje que na segunda-feira já estão prontos para você começar a semana adiantado!',
+    'Oi! Vai escanear no sábado? Pode mandar os arquivos: vou estar trabalhando no fim de semana e te devolvo os projetos rapidinho. 💻🦷',
+    'Bom fim de semana! 😊 Lembrando que o atendimento continua no sábado.\nEnvie seus casos e garanta a entrega logo no início da semana.',
+    '{saudacao}! Agenda livre para o fim de semana. 🗓️ Quem mandar os casos até sábado recebe os projetos prontos para a produção de segunda. Pode enviar!'
+  ],
+  feriado:[
+    'Oi! 📅 O feriado de {feriado} ({diaSemana}, {data}) está chegando.\nFique tranquilo: vamos estar trabalhando normalmente. Pode mandar seus casos que os projetos seguem no prazo! 🦷',
+    '{saudacao}! Feriado de {feriado} chegando ({data}). Aproveite para adiantar: envie seus trabalhos que eu entrego tudo pronto para você voltar com a produção em dia. 💪',
+    'Aviso de feriado: {feriado}, {diaSemana} ({data}). Nossa equipe vai estar online! Mande seus casos normalmente. 😉'
+  ],
+  feriadoHoje:[
+    '{saudacao}! Hoje é feriado de {feriado}, mas estamos trabalhando normalmente. 💻 Pode mandar seus casos que os projetos seguem no prazo!',
+    'Oi! Feriado de {feriado} e a gente está online. 😉 Precisa de algum projeto? É só enviar os arquivos por aqui.'
+  ],
+  folga:[
+    'Aviso: no feriado de {feriado} ({diaSemana}, {data}) não vamos ter atendimento.\nPara não atrasar seus casos, envie os trabalhos até {vespera}. Obrigado pela parceria! 🙏',
+    '{saudacao}! Vamos fazer uma pausa no feriado de {feriado} ({data}). Os casos que chegarem até {vespera} saem antes do feriado. Depois disso, retomamos no dia seguinte. 😊'
+  ],
+  divulga:[
+    '{saudacao}! 🦷 Estamos com a agenda tranquila para novos trabalhos esta semana.\nCoroas, facetas, protocolos, placas e planejamentos com entrega rápida, tudo no fluxo 100% digital. Manda seu caso!',
+    'Oi! Novidade por aqui: abrimos novos horários para projetos digitais. ✨ Se tiver casos parados esperando desenho, é só enviar que eu priorizo.',
+    '{saudacao}! Precisa de um projeto para ontem? ⚡ Estou com encaixe para casos urgentes hoje. Me chama aqui!'
+  ]
+};
+var MSG_DATAS={
+  mulher:['Feliz Dia Internacional da Mulher! 💐 Um carinho especial a todas as mulheres da sua equipe, que fazem a odontologia acontecer todos os dias. — {eu}'],
+  pascoa:['Feliz Páscoa! 🐣 Que seja um tempo de renovação e muita paz para você e sua família. Obrigado pela parceria! — {eu}'],
+  maes:['Feliz Dia das Mães! 💐 Um abraço carinhoso para todas as mães da sua equipe. — {eu}'],
+  pais:['Feliz Dia dos Pais! 👔 Um abraço para todos os pais da sua equipe. — {eu}'],
+  cliente:['Hoje é Dia do Cliente e eu não podia deixar de agradecer: obrigado por confiar seus casos ao meu trabalho! 💜 — {eu}'],
+  secretaria:['Hoje é Dia da Secretária! 💐 Um agradecimento especial a quem organiza tudo aí, envia os casos e cuida de cada detalhe. Obrigado pela parceria de sempre! — {eu}'],
+  dentista:['Feliz Dia do Dentista! 🦷 Obrigado pela confiança em cada caso que fazemos juntos. Que seu trabalho continue transformando sorrisos! — {eu}'],
+  natal:['Feliz Natal! 🎄 Que a sua noite seja cheia de paz e alegria. Obrigado por cada caso confiado a mim neste ano. Boas festas! — {eu}'],
+  anonovo:['Feliz Ano Novo! 🎆 Obrigado pela parceria em {ano}. Que {anoSeg} venha com muitos sorrisos, saúde e trabalhos lindos juntos! — {eu}']
+};
+function pascoa(y){var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;return y+'-'+pad(mes)+'-'+pad(dia);}
+function nDomingo(y,mes,n){var d=new Date(y,mes-1,1);while(d.getDay()!==0)d.setDate(d.getDate()+1);d.setDate(d.getDate()+7*(n-1));return iso(d);}
+function eventosAno(y){var P=pascoa(y),F=function(m,d){return y+'-'+pad(m)+'-'+pad(d);};
+  return [
+    {id:'anonovo',nome:'Ano Novo',d:F(1,1),fer:true,com:'anonovo'},
+    {id:'carnaval',nome:'Carnaval',d:addDays(P,-47),fer:true},
+    {id:'mulher',nome:'Dia da Mulher',d:F(3,8),com:'mulher'},
+    {id:'sexta-santa',nome:'Sexta-feira Santa',d:addDays(P,-2),fer:true},
+    {id:'pascoa',nome:'Páscoa',d:P,com:'pascoa'},
+    {id:'tiradentes',nome:'Tiradentes',d:F(4,21),fer:true},
+    {id:'trabalho',nome:'Dia do Trabalho',d:F(5,1),fer:true},
+    {id:'maes',nome:'Dia das Mães',d:nDomingo(y,5,2),com:'maes'},
+    {id:'corpus',nome:'Corpus Christi',d:addDays(P,60),fer:true},
+    {id:'pais',nome:'Dia dos Pais',d:nDomingo(y,8,2),com:'pais'},
+    {id:'independencia',nome:'Independência do Brasil',d:F(9,7),fer:true},
+    {id:'cliente',nome:'Dia do Cliente',d:F(9,15),com:'cliente'},
+    {id:'secretaria',nome:'Dia da Secretária',d:F(9,30),com:'secretaria'},
+    {id:'aparecida',nome:'Nossa Senhora Aparecida',d:F(10,12),fer:true},
+    {id:'dentista',nome:'Dia do Dentista',d:F(10,25),com:'dentista'},
+    {id:'finados',nome:'Finados',d:F(11,2),fer:true},
+    {id:'republica',nome:'Proclamação da República',d:F(11,15),fer:true},
+    {id:'consciencia',nome:'Dia da Consciência Negra',d:F(11,20),fer:true},
+    {id:'natal',nome:'Natal',d:F(12,25),fer:true,com:'natal'}
+  ];
+}
+function proximosEventos(dias){var t=today(),fim=addDays(t,dias),y=+t.slice(0,4);
+  return eventosAno(y).concat(eventosAno(y+1)).filter(function(e){return e.d>=t&&e.d<=fim;}).sort(function(a,b){return a.d<b.d?-1:1;});}
+function saudTxt(){var h=new Date().getHours();return h>=5&&h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';}
+function nomeContato(c){var n=(c.pnome||c.nome||'').trim().split(/\s+/)[0]||'';return n.replace(/^(Dra?\.?|Lab\.?)$/i,'')||n;}
+function preenche(t,x){x=x||{};var eu=(S.perfil.nome||'').trim()||'seu cadista';
+  var ev=x.ev,dsem=ev?DIAS[new Date(ev.d+'T12:00:00').getDay()]:'',ano=ev?+ev.d.slice(0,4):new Date().getFullYear();
+  if(ev&&ev.id==='anonovo')ano=ano-1;
+  var r={nome:x.nome||'',eu:eu,saudacao:saudTxt(),feriado:ev?ev.nome:'',data:ev?dmy(ev.d).slice(0,5):'',diaSemana:dsem,vespera:ev?dmy(addDays(ev.d,-1)).slice(0,5):'',ano:ano,anoSeg:ano+1};
+  var s=t.replace(/\{(\w+)\}/g,function(m,k){return k in r?r[k]:m;});
+  if(!x.nome)s=s.replace(/^(Oi|Olá|Bom dia|Boa tarde|Boa noite), !/,'$1!');
+  return s;
+}
+function tabelaTexto(){var ts=alive(S.tipos).filter(function(t){return t.ativo&&+t.valor>0;}),tb=(S.prefs&&S.prefs.tab)||{};
+  var s=saudTxt()+'! Segue minha tabela de valores atualizada: 🦷\n\n'+(ts.length?ts.map(function(t){return '• '+t.nome+': '+brl(+t.valor)+(t.forma==='elemento'?' por elemento':'');}).join('\n'):'(preencha seus valores em Configurações › Tabela de preços)');
+  if(tb.modelos!=null&&tb.modelos!=='')s+='\n\nModelos: até '+tb.modelos+' inclusos no valor.';
+  if(tb.prazo)s+='\nPrazo médio: '+tb.prazo+'.';
+  if(tb.pagamento)s+='\nPagamento: '+tb.pagamento+'.';
+  if(tb.info)s+='\n\n'+tb.info;
+  return s+'\n\nQualquer dúvida, é só chamar! — '+((S.perfil.nome||'').trim()||'seu cadista');
+}
+function waLink(texto,tel){var d=soDig(tel);if(d&&d.length>=10&&d.length<=11)d='55'+d;else if(!(d&&/^55\d{10,11}$/.test(d)))d='';return 'https://wa.me/'+d+'?text='+encodeURIComponent(texto);}
+function cartaoMsg(chave,lista,ctx,tel,titulo){
+  ui.msgIdx=ui.msgIdx||{};var i=(ui.msgIdx[chave]||0)%lista.length,txt=preenche(lista[i],ctx);
+  return '<div class="msg-card">'+(titulo?'<div class="msg-tit">'+titulo+'</div>':'')+'<div class="msg-txt">'+esc(txt)+'</div><div class="msg-acts">'+
+    (lista.length>1?'<span class="msg-var"><button type="button" class="icon-btn" data-a="msgVar" data-k="'+chave+'" data-d="-1" aria-label="Mensagem anterior">‹</button><span class="mono small muted">'+(i+1)+'/'+lista.length+'</span><button type="button" class="icon-btn" data-a="msgVar" data-k="'+chave+'" data-d="1" aria-label="Outra mensagem">›</button></span>':'<span></span>')+
+    '<span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><a class="btn sm pri" href="'+esc(waLink(txt,tel))+'" target="_blank" rel="noopener">WhatsApp</a></span></div></div>';
+}
+function inativosLista(){return alive(S.clientes).map(function(c){var s=statsCli(c.id);return {c:c,dias:s.dias,n:s.n};}).filter(function(x){return x.dias===null||x.dias>INATIVO_DIAS;}).sort(function(a,b){return (b.dias===null?1e9:b.dias)-(a.dias===null?1e9:a.dias);});}
+function rMensagens(){
+  var tab=ui.msgTab||'inativos',evs=proximosEventos(60),inat=inativosLista();
+  var abas=[['inativos','Inativos'+(inat.length?' '+inat.length:'')],['datas','Datas e feriados'],['fds','Fim de semana'],['divulga','Divulgação']];
+  var h='<div class="row"><button class="icon-btn" data-a="msgFechar" aria-label="Voltar">‹</button><div style="flex:1;min-width:0"><h1>Mensagens prontas</h1><p class="small muted" style="margin:2px 0 0">Escolha, copie e mande no WhatsApp. Use ‹ › para ver outras opções de texto.</p></div></div>'+
+    '<nav class="cfg-tabs msg-tabs">'+abas.map(function(a){return '<button class="'+(tab===a[0]?'on':'')+'" data-a="msgTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
+  if(tab==='inativos'){
+    h+='<p class="small muted">Clientes sem pedido há mais de '+INATIVO_DIAS+' dias. A mensagem já vem com o nome de cada um; o botão WhatsApp abre a conversa com o número cadastrado.</p>';
+    h+=inat.length?'<div class="msg-grid">'+inat.map(function(x){var c=x.c;
+      return cartaoMsg('inativo',MSG.inativo,{nome:nomeContato(c)},c.telefone,'<b>'+esc(c.nome)+'</b><span class="small muted">'+(x.dias===null?'nunca fez pedido':'último pedido há '+x.dias+' dias')+(c.telefone?' · '+esc(c.telefone):' · sem WhatsApp cadastrado')+'</span>');}).join('')+'</div>'
+      :'<div class="card empty">Nenhum cliente inativo. 🎉 Todos fizeram pedido nos últimos '+INATIVO_DIAS+' dias.</div>';
+  }
+  if(tab==='datas'){
+    h+='<p class="small muted">Feriados nacionais e datas especiais dos próximos 60 dias. Para cada feriado há dois tipos de aviso: “vamos trabalhar” e “não vamos ter atendimento”.</p>';
+    h+=evs.length?'<div class="stack">'+evs.map(function(e){var dd=daysBetween(today(),e.d),q=dd===0?'hoje':dd===1?'amanhã':'em '+dd+' dias';
+      var cab='<div class="between wrap msg-ev"><div><h2>'+esc(e.nome)+'</h2><span class="small muted">'+DIAS[new Date(e.d+'T12:00:00').getDay()]+', '+dmy(e.d)+'</span></div><span class="tag '+(dd<=7?'a':'')+'">'+q+'</span></div>';
+      var cs='';
+      if(e.com)cs+=cartaoMsg('com-'+e.id,MSG_DATAS[e.com],{ev:e},'', 'Mensagem do dia');
+      if(e.fer){if(dd===0)cs+=cartaoMsg('ferHoje',MSG.feriadoHoje,{ev:e},'','Estamos trabalhando hoje');else{cs+=cartaoMsg('fer',MSG.feriado,{ev:e},'','Vamos trabalhar no feriado');cs+=cartaoMsg('folga',MSG.folga,{ev:e},'','Não vamos ter atendimento');}}
+      return '<section class="card stack">'+cab+'<div class="msg-grid">'+cs+'</div></section>';}).join('')+'</div>':'<div class="card empty">Nenhuma data especial nos próximos 60 dias.</div>';
+  }
+  if(tab==='fds')h+='<p class="small muted">Ideal para mandar na quinta ou na sexta-feira.</p><div class="msg-grid">'+cartaoMsg('fds',MSG.fds,{},'')+'</div>';
+  if(tab==='divulga')h+='<p class="small muted">Para chamar novos trabalhos quando a agenda estiver tranquila.</p><div class="msg-grid">'+cartaoMsg('divulga',MSG.divulga,{},'','Agenda e novidades')+
+    '<div class="msg-card"><div class="msg-tit">Sua tabela de preços</div><div class="msg-txt">'+esc(tabelaTexto())+'</div><div class="msg-acts"><button type="button" class="btn sm" data-a="tab" data-v="tabela">Editar tabela</button><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><a class="btn sm pri" href="'+esc(waLink(tabelaTexto(),''))+'" target="_blank" rel="noopener">WhatsApp</a></span></div></div></div>';
+  return '<div class="stack" style="gap:14px">'+h+'</div>';
+}
+/* Lembretes no Dashboard: datas dos próximos 7 dias e sexta-feira */
+function lembretes(){var out=[],t=today(),dow=new Date().getDay(),fora=function(k){try{return localStorage.getItem('idealicad_lemb_'+k)==='1';}catch(e){return false;}};
+  proximosEventos(7).forEach(function(e){var k=e.id+'_'+e.d;if(fora(k))return;var dd=daysBetween(t,e.d),q=dd===0?'é hoje':dd===1?'é amanhã':'em '+dd+' dias';
+    out.push('<div class="banner lemb"><span>'+(e.fer?'📅 Feriado: ':'💐 ')+'<b>'+esc(e.nome)+'</b> '+q+' ('+dmy(e.d).slice(0,5)+'). '+(e.fer?'Avise seus clientes se vai trabalhar.':'Que tal mandar uma mensagem?')+'</span><span class="row" style="gap:6px"><button class="btn sm pri" data-a="msgAbrir" data-v="datas">Ver mensagens</button><button class="icon-btn" data-a="lembFora" data-k="'+k+'" aria-label="Dispensar" title="Dispensar">✕</button></span></div>');});
+  if((dow===4||dow===5)&&!fora('fds_'+t))out.push('<div class="banner lemb"><span>🗓️ '+(dow===5?'Sexta-feira':'Quinta-feira')+': bom momento para avisar que você recebe trabalhos no fim de semana.</span><span class="row" style="gap:6px"><button class="btn sm pri" data-a="msgAbrir" data-v="fds">Ver mensagem</button><button class="icon-btn" data-a="lembFora" data-k="fds_'+t+'" aria-label="Dispensar" title="Dispensar">✕</button></span></div>');
+  return out.join('');
 }
 
 /* ---------- Tabela de preços (Configurações) ---------- */
@@ -1711,12 +1859,19 @@ var A={
   delTab:function(d,el){if(!guard())return;var t=tipo(d.id);if(!t)return;softDel(t);save();
     var li=el.closest('.tp-li'),lst=li&&li.parentNode;if(li)li.remove();if(lst&&!lst.querySelector('.tp-li'))lst.innerHTML='<p class="small muted" style="padding:6px 2px">Nenhum trabalho aqui.</p>';
     toast('“'+t.nome+'” foi para a lixeira. Dá para restaurar em Configurações › Lixeira.');},
+  msgAbrir:function(d){ui.tab='clientes';ui.sub=null;ui.msgs=true;if(d&&d.v)ui.msgTab=d.v;closeSheet();render();window.scrollTo(0,0);},
+  msgFechar:function(){ui.msgs=false;render();window.scrollTo(0,0);},
+  msgTab:function(d){ui.msgTab=d.v;render();},
+  msgVar:function(d){ui.msgIdx=ui.msgIdx||{};ui.msgIdx[d.k]=((ui.msgIdx[d.k]||0)+(+d.d)+50)%50;var y=window.scrollY;render();window.scrollTo(0,y);},
+  msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
+    try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
+  lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
   addItem:function(){if(!guard())return;var l=document.getElementById('tp-list');if(!l)return;var v=l.querySelector('.tp-vazio');if(v)v.remove();
     l.insertAdjacentHTML('beforeend',linhaTabela({nome:'',forma:'elemento',valor:0,ativo:true},''));var n=l.lastElementChild.querySelector('.tp-nome');n.focus();n.scrollIntoView({block:'center',behavior:'smooth'});},
   delNovo:function(d,el){var li=el.closest('.tp-li');if(li)li.remove();},
   addRef:function(){if(!guard())return;var f=refFaltando();f.forEach(function(r){S.tipos.push({id:uid(),nome:r[0],forma:r[1],valor:0,ativo:true});});save();render();toast(f.length+' trabalho(s) adicionado(s) com R$ 0,00.');},
   contaIr:function(d){ui.ddOpen=null;A.tab(d);},
-  tab:function(d){ui.tab=d.v;ui.sub=d.sub||null;ui.drawer=false;if('f' in d)ui.filtro=d.f==='urg'?'urg':'todos';closeSheet();render();window.scrollTo(0,0);},
+  tab:function(d){ui.tab=d.v;ui.msgs=false;ui.sub=d.sub||null;ui.drawer=false;if('f' in d)ui.filtro=d.f==='urg'?'urg':'todos';closeSheet();render();window.scrollTo(0,0);},
   sub:function(d){ui.sub=d.v||null;render();window.scrollTo(0,0);},
   filtro:function(d){ui.filtro=d.v;render();},
   mes:function(d){ui.mes=d.d==='1'?nextMonth(ui.mes):prevMonth(ui.mes);render();},
@@ -1763,7 +1918,7 @@ var A={
   delPedido:function(d){if(!guard())return;var p=byId(S.pedidos,d.id);if(p.pagamentoId&&byId(S.pagamentos,p.pagamentoId)&&!byId(S.pagamentos,p.pagamentoId).deleted){toast('Exclua antes o pagamento ligado a este pedido.');return;}softDel(p);save();closeSheet();render();toast('Pedido #'+p.num+' foi para a lixeira.');},
   novoCliente:function(){if(!guard())return;openSheet(fCliente);},
   editCliente:function(d){if(!guard())return;openSheet(fCliente,d.id);},
-  verCliente:function(d){ui.tab='clientes';ui.sub=d.id;ui.drawer=false;closeSheet();render();window.scrollTo(0,0);},
+  verCliente:function(d){ui.msgs=false;ui.tab='clientes';ui.sub=d.id;ui.drawer=false;closeSheet();render();window.scrollTo(0,0);},
   voltarClientes:function(){ui.sub=null;render();},
   delCliente:function(d){if(!guard())return;var c=cliente(d.id);softDel(c);save();ui.sub=null;render();toast(c.nome+' foi para a lixeira.');},
   editTipo:function(d){openSheet(fTipo,d.id||null);},
