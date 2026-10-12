@@ -276,6 +276,8 @@ body.sem-anim *{transition:none!important;animation:none!important}
 
 .sync{font-size:.75rem;color:var(--muted);white-space:nowrap}.sync.erro{color:var(--urgent);font-weight:600}.sync.salvando{color:var(--accent)}
 
+.adm{width:100%;border-collapse:collapse;font-size:.9rem;min-width:760px}.adm th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:6px 8px;font-weight:600}.adm td{padding:10px 8px;border-top:1px solid var(--line);vertical-align:middle}
+
 /* Formulários */
 .fld{display:grid;gap:6px;min-width:0}
 .fld>span{font-size:.82rem;font-weight:600;color:var(--muted)}
@@ -455,6 +457,7 @@ async function carregar(){
     novo.pagamentos.forEach(function(g){g.pedidos=novo.pedidos.filter(function(x){return x.pagamentoId===g.id;}).map(function(x){return x.id;});});
     novo.seq=novo.pedidos.reduce(function(m,x){return Math.max(m,x.num||0);},0);
     S=novo;tiraFoto();
+    try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
     if(!S.tipos.length&&canWrite())criaTiposPadrao();
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
   S.carregando=false;render();
@@ -575,14 +578,15 @@ var ICON={
   lixeira:ic('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
   config:ic('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
   menu:ic('<path d="M4 7h16M4 12h16M4 17h16"/>'),
-  sair:ic('<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>')
+  sair:ic('<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>'),
+  admin:ic('<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>')
 };
 var MENU=[
   ['Principal',[['dashboard','Dashboard'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
   ['Ferramentas',[['ranking','Ranking'],['arquivos','Arquivos STL'],['tipos','Tipos de trabalho'],['lixeira','Lixeira']]],
-  ['Conta',[['config','Configurações']]]
+  ['Conta',[['config','Configurações'],['admin','Administração']]]
 ];
-var TITULOS={dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Arquivos STL',tipos:'Tipos de trabalho',lixeira:'Lixeira',config:'Configurações'};
+var TITULOS={admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Arquivos STL',tipos:'Tipos de trabalho',lixeira:'Lixeira',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){
@@ -594,14 +598,14 @@ function render(){
   else if(a.status==='teste') chip='<span class="tag a">Teste · '+Math.max(0,daysBetween(today(),a.testeAte))+' dias</span>';
   else chip='<span class="tag ok">Ativa</span>';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
-    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,config:rConfig};
+    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,config:rConfig,admin:rAdmin};
   var body=(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
   var u=usado(),lim=a.limite,pct=Math.min(100,u/lim*100);
   var nome=S.perfil.nome||S.sessao.email||'';
   var side='<aside class="side" aria-label="Menu"><div class="brand">'+logo(30)+'<span>Ideali CAD</span></div>'+
-    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].map(function(it){
+    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return it[0]!=='admin'||S.admin;}).map(function(it){
       var badge=it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':it[0]==='lixeira'&&lix?'<span class="badge" style="background:var(--muted)">'+lix+'</span>':'';
       return '<button class="it '+(ui.tab===it[0]?'on':'')+'" data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+it[1]+'</span>'+badge+'</button>';}).join('');}).join('')+
     '<div class="plan"><div class="between"><b>Plano '+a.plano+'</b>'+chip+'</div>'+
@@ -610,7 +614,7 @@ function render(){
       (a.status==='teste'&&w?'<button class="btn sm pri" data-a="tab" data-v="config">Assinar</button>':'')+'</div>'+
     '<div class="me"><span class="av">'+esc((nome[0]||'?').toUpperCase())+'</span><span class="nm">'+esc(nome)+'</span><button class="icon-btn" data-a="sair" aria-label="Sair" title="Sair" style="width:32px;height:32px">'+ICON.sair+'</button></div></aside>';
   var titulo=TITULOS[ui.tab]||'';
-  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config')flat.push(it);});});
+  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config'&&(it[0]!=='admin'||S.admin))flat.push(it);});});
   var top='<header class="top"><div class="top-in">'+
     '<button class="icon-btn menu-btn" data-a="drawer" aria-label="Abrir menu">'+ICON.menu+'</button>'+
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
@@ -676,6 +680,7 @@ var DD={
   cliOrd:{label:'Ordenar',get:function(){return ui.cliOrd||'az';},set:function(v){ui.cliOrd=v;},
     opts:function(){var n=alive(S.clientes).filter(function(c){var s=statsCli(c.id);return s.dias===null||s.dias>INATIVO_DIAS;}).length;return [['az','A a Z'],['recentes','Últimos adicionados'],['antigos','Mais antigos'],['mais','Que mais pedem'],['menos','Que menos pedem'],['inativos','Inativos ('+n+')']];}},
   cliTipo:{label:'Tipo',get:function(){return ui.cliTipo||'todos';},set:function(v){ui.cliTipo=v;},opts:function(){return [['todos','Todos'],['laboratorio','Laboratórios'],['dentista','Dentistas']];}},
+  admFiltro:{label:'Mostrar',get:function(){return ui.admFiltro||'todos';},set:function(v){ui.admFiltro=v;},opts:function(){return [['todos','Todos'],['teste','Em teste'],['ativa','Ativos'],['vencida','Vencidos / teste acabou']];}},
   arqOrd:{label:'Ordenar',get:function(){return ui.arqOrd||'maiores';},set:function(v){ui.arqOrd=v;},opts:function(){return [['maiores','Maiores primeiro'],['expira','Expiram antes'],['recentes','Mais recentes'],['antigos','Mais antigos']];}},
   tipoMet:{label:'Medir por',get:function(){return ui.tipoMet||'n';},set:function(v){ui.tipoMet=v;},opts:function(){return [['n','Pedidos'],['el','Elementos'],['v','Faturamento']];}},
   vista:{label:'Mostrar',get:function(){return ui.vista==='arq'?'arq':'kanban';},set:function(v){ui.vista=v;},
@@ -1201,6 +1206,64 @@ function rTipos(){
       return '<button class="li" data-a="editTipo" data-id="'+t.id+'"><span class="t"><b>'+esc(t.nome)+(t.ativo?'':' (inativo)')+'</b><span>'+(t.forma==='elemento'?'Por elemento':'Por trabalho')+'</span></span><span class="mono">'+brl(t.valor)+'</span></button>';}).join('')+'</div></section>';
 }
 
+/* ---------- Administração (conta mestre) ---------- */
+var PRECO_PLANO={basico:29.90,plus:59.90};
+var NOME_PLANO={basico:'Básico',plus:'Plus',rede:'Rede',vitrine:'Vitrine'};
+function sitAss(a){var agora=new Date();if(a.status==='ativa'&&(!a.vence_em||new Date(a.vence_em)>agora))return 'ativa';if(a.status==='teste'&&a.teste_ate&&new Date(a.teste_ate)>agora)return 'teste';return 'vencida';}
+function carregaAdmin(){ui.admBusy=true;sb.rpc('admin_assinantes').then(function(r){ui.admBusy=false;if(r.error){ui.admErro=r.error.message;}else{ui.admLista=r.data||[];ui.admErro=null;ui.admT=Date.now();}if(ui.tab==='admin'&&!ui.sheet)render();else if(ui.sheet&&ui.sheet.fn===fAdmin)renderSheet();});}
+function rAdmin(){
+  if(!S.admin)return '<div class="card empty">Esta área é só para o administrador do sistema.</div>';
+  if(!ui.admLista&&!ui.admBusy&&!ui.admErro){setTimeout(carregaAdmin,0);}
+  if(ui.admErro)return '<div class="banner bad">Não foi possível carregar os assinantes: '+esc(ui.admErro)+'</div><button class="btn" data-a="admRecarregar">Tentar de novo</button>';
+  if(!ui.admLista)return '<div class="card empty">Carregando assinantes…</div>';
+  var L=ui.admLista,q=(ui.admBusca||'').trim().toLowerCase(),f=ui.admFiltro||'todos';
+  var por={teste:0,ativa:0,vencida:0},receita=0;
+  L.forEach(function(a){var s=sitAss(a);por[s]++;if(s==='ativa'&&!a.admin)receita+=PRECO_PLANO[a.plano]||29.90;});
+  var novos30=L.filter(function(a){return a.cadastro&&new Date(a.cadastro)>new Date(Date.now()-30*864e5);}).length;
+  var lista=L.filter(function(a){if(f!=='todos'&&sitAss(a)!==f)return false;if(q&&((a.nome||'')+' '+(a.email||'')+' '+(a.telefone||'')+' '+(a.cidade||'')).toLowerCase().indexOf(q)<0)return false;return true;});
+  return '<div class="banner"><span>🛡️ Você está na conta mestre. Aqui aparecem só <b>cadastro e assinatura</b> dos cadistas. Clientes, pedidos e pacientes deles continuam privados.</span><button class="btn sm" data-a="admRecarregar">Atualizar</button></div>'+
+    '<div class="dash">'+
+      kpi('Assinantes',L.length,'<span>'+novos30+' novo(s) nos últimos 30 dias</span>')+
+      kpi('Em teste',por.teste,'<span>14 dias grátis</span>')+
+      kpi('Ativos',por.ativa,'<span>'+por.vencida+' vencido(s)</span>')+
+      kpi('Receita mensal estimada',brl(receita),'<span>assinaturas ativas</span>')+
+    '</div>'+
+    '<div class="row wrap"><input class="search" id="adm-busca" type="search" placeholder="Buscar por nome, e-mail, WhatsApp ou cidade" value="'+esc(ui.admBusca||'')+'" style="flex:1;min-width:220px;max-width:420px">'+dd('admFiltro')+'</div>'+
+    '<section class="card"><div style="overflow-x:auto"><table class="adm"><thead><tr><th>Cadista</th><th>Plano</th><th>Situação</th><th>Vence / teste até</th><th>Espaço</th><th>Último acesso</th><th></th></tr></thead><tbody>'+
+    (lista.length?lista.map(function(a){var s=sitAss(a),lim=+a.limite_bytes||0,us=+a.bytes_usados||0;
+      return '<tr><td><b>'+esc(a.nome||'(sem nome)')+(a.admin?' <span class="tag a">mestre</span>':'')+'</b><br><span class="muted small">'+esc(a.email||'')+(a.telefone?' · '+esc(a.telefone):'')+'</span></td>'+
+        '<td>'+esc(NOME_PLANO[a.plano]||a.plano||'')+'</td>'+
+        '<td><span class="tag '+(s==='ativa'?'ok':s==='teste'?'a':'u')+'">'+(s==='ativa'?'Ativa':s==='teste'?'Teste':'Vencida')+'</span></td>'+
+        '<td class="mono small">'+(s==='teste'?dmy(dia(a.teste_ate)):a.vence_em?dmy(dia(a.vence_em)):a.status==='ativa'?'sem vencimento':'—')+'</td>'+
+        '<td class="mono small">'+bytes(us)+' / '+bytes(lim)+'</td>'+
+        '<td class="small muted">'+(a.ultimo_acesso?dmy(dia(a.ultimo_acesso)):'nunca')+'</td>'+
+        '<td><button class="btn sm" data-a="admAbrir" data-id="'+a.user_id+'">Gerenciar</button></td></tr>';}).join(''):'<tr><td colspan="7" class="empty">Nenhum assinante encontrado.</td></tr>')+
+    '</tbody></table></div></section>';
+}
+function fAdmin(uidAlvo){
+  var a=(ui.admLista||[]).filter(function(x){return x.user_id===uidAlvo;})[0];if(!a)return head('Assinante')+'<p class="empty">Não encontrado.</p>';
+  var s=sitAss(a);
+  return head(esc(a.nome||a.email))+
+    '<div class="grid2 small">'+kv('E-mail',esc(a.email))+kv('WhatsApp',esc(a.telefone||'—'))+kv('Cidade',esc(a.cidade||'—'))+kv('Cadastro',dmy(dia(a.cadastro)))+
+      kv('Situação','<span class="tag '+(s==='ativa'?'ok':s==='teste'?'a':'u')+'">'+(s==='ativa'?'Ativa':s==='teste'?'Teste':'Vencida')+'</span>')+
+      kv(s==='teste'?'Teste até':'Vence em',s==='teste'?dmy(dia(a.teste_ate)):a.vence_em?dmy(dia(a.vence_em)):(a.status==='ativa'?'sem vencimento':'—'))+'</div>'+
+    '<h3>Ações rápidas</h3><div class="row wrap">'+
+      '<button class="btn pri" data-a="admAcao" data-k="mes" data-id="'+a.user_id+'">Ativar +30 dias</button>'+
+      '<button class="btn" data-a="admAcao" data-k="ano" data-id="'+a.user_id+'">Ativar +1 ano</button>'+
+      '<button class="btn" data-a="admAcao" data-k="sempre" data-id="'+a.user_id+'">Ativar sem vencimento</button>'+
+      '<button class="btn" data-a="admAcao" data-k="teste7" data-id="'+a.user_id+'">+7 dias de teste</button>'+
+      '<button class="btn danger" data-a="admAcao" data-k="bloquear" data-id="'+a.user_id+'">Bloquear (vencida)</button></div>'+
+    '<form data-form="admPlano" data-id="'+a.user_id+'" class="stack"><h3>Plano e espaço</h3><div class="grid2">'+
+      '<label class="fld"><span>Plano</span><select id="ad-plano" name="plano">'+[['basico','Básico'],['plus','Plus'],['rede','Rede'],['vitrine','Vitrine']].map(function(o){return '<option value="'+o[0]+'" '+(a.plano===o[0]?'selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label>'+
+      '<label class="fld"><span>Espaço (GB)</span><input id="ad-gb" name="gb" type="number" min="1" max="1000" step="1" value="'+Math.round((+a.limite_bytes||0)/GB)+'"></label></div>'+
+      '<button class="btn pri" type="submit">Salvar plano e espaço</button></form>'+
+    '<p class="small muted">Toda alteração fica registrada no histórico do administrador.</p>';
+}
+function admAltera(alvo,args,msg){
+  args=Object.assign({alvo:alvo},args);
+  sb.rpc('admin_altera_assinatura',args).then(function(r){if(r.error){toast('Não foi possível alterar: '+r.error.message);return;}toast(msg);
+    if(alvo===S.sessao.id)carregar();carregaAdmin();});
+}
 function rLixeira(){
   var itens=[];
   S.pedidos.forEach(function(x){if(x.deleted){var t=tipo(x.tipoId);itens.push({k:'pedidos',x:x,l:'Pedido #'+x.num,d:(t?t.nome:'')+' · '+x.paciente});}});
@@ -1228,7 +1291,7 @@ function rConfig(){
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p></section>'+
     '<section class="card stack"><h2>Assinatura</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
-      '<div class="between"><span>Plano</span><b style="text-transform:capitalize">'+esc(a.plano)+' · R$ 29,90/mês</b></div>'+
+      '<div class="between"><span>Plano</span><b>'+esc((typeof NOME_PLANO!=='undefined'&&NOME_PLANO[a.plano])||a.plano)+(a.plano==='plus'?' · R$ 59,90/mês':a.plano==='basico'?' · R$ 29,90/mês':'')+'</b></div>'+
       '<div class="between"><span>Situação</span>'+(!canWrite()?'<span class="tag u">Vencida</span>':a.status==='teste'?'<span class="tag a">Teste até '+dmy(a.testeAte)+'</span>':'<span class="tag ok">Ativa</span>')+'</div>'+
       '<div class="between"><span>Espaço</span><b>'+bytes(a.limite)+'</b></div>'+
       '<button class="btn pri" data-a="assinar">Assinar agora</button></section>'+
@@ -1521,6 +1584,15 @@ var A={
   pickCidade:function(d){S.perfil.cidade=d.n;S.perfil.cidadeGeo=d.id?{nome:d.n,uf:d.uf,id:d.id}:null;ui.clima=null;ui.climaErr=null;save();
     var inp=document.querySelector('.cid-ac');if(inp){inp.value=d.n;var bx=inp.parentNode.querySelector('.cid-sug');if(bx)bx.hidden=true;}
     if(ui.sheet&&ui.sheet.fn===fCidade)closeSheet();render();toast('Cidade definida: '+d.n+(d.uf?' ('+d.uf+')':'')+'.');},
+  admRecarregar:function(){ui.admLista=null;ui.admErro=null;render();},
+  admAbrir:function(d){openSheet(fAdmin,d.id);},
+  admAcao:function(d){var a=(ui.admLista||[]).filter(function(x){return x.user_id===d.id;})[0];if(!a)return;
+    var agora=new Date(),base=a.vence_em&&new Date(a.vence_em)>agora?new Date(a.vence_em):agora,bt=a.teste_ate&&new Date(a.teste_ate)>agora?new Date(a.teste_ate):agora;
+    if(d.k==='mes'){base.setDate(base.getDate()+30);admAltera(d.id,{novo_status:'ativa',novo_vence_em:base.toISOString()},'Assinatura ativa até '+dmy(iso(base))+'.');}
+    if(d.k==='ano'){base.setFullYear(base.getFullYear()+1);admAltera(d.id,{novo_status:'ativa',novo_vence_em:base.toISOString()},'Assinatura ativa até '+dmy(iso(base))+'.');}
+    if(d.k==='sempre')admAltera(d.id,{novo_status:'ativa',limpar_vencimento:true},'Assinatura ativa sem vencimento.');
+    if(d.k==='teste7'){bt.setDate(bt.getDate()+7);admAltera(d.id,{novo_status:'teste',novo_teste_ate:bt.toISOString()},'Teste estendido até '+dmy(iso(bt))+'.');}
+    if(d.k==='bloquear')admAltera(d.id,{novo_status:'vencida'},'Assinatura bloqueada. Os dados continuam guardados.');},
   ddOpen:function(d){ui.ddOpen=ui.ddOpen===d.k?null:d.k;render();var m=document.querySelector('.dd-menu .on');if(m)m.scrollIntoView({block:'nearest'});},
   ddPick:function(d){DD[d.k].set(d.v);ui.ddOpen=null;render();if(d.k==='cliOrd'&&d.v==='inativos'){var l=document.getElementById('cli-busca');if(l)l.scrollIntoView({block:'start',behavior:'smooth'});}},
   ddStep:function(d){var o=DD[d.k],ops=o.opts(),v=o.get(),i=0;for(var j=0;j<ops.length;j++)if(ops[j][0]===v)i=j;i=Math.max(0,Math.min(ops.length-1,i+(+d.d)));o.set(ops[i][0]);ui.ddOpen=null;render();},
@@ -1619,6 +1691,7 @@ var F={
     if(!m.length&&!o){toast('Marque o que está faltando ou escreva nos detalhes.');return;}
     p.pendencia={motivos:m,obs:o,desde:(p.pendencia&&p.pendencia.desde)||today()};p.status='pendente';p.entregue=null;save();closeSheet();render();toast('#'+p.num+' → Pendência. Use "Copiar aviso" para avisar o cliente.');
   },
+  admPlano:function(fd,f){var gb=Math.max(1,Math.min(1000,parseInt(fd.get('gb'),10)||5));admAltera(f.dataset.id,{novo_plano:fd.get('plano'),novo_limite_bytes:gb*GB},'Plano e espaço atualizados.');},
   link:function(fd,f){
     if(!guard())return;var u=(fd.get('url')||'').trim();if(!/^https?:\/\//i.test(u)){toast('Cole um link que comece com https://');return;}
     var host;try{host=new URL(u).hostname.replace(/^www\./,'');}catch(e){toast('Link inválido.');return;}
@@ -1669,6 +1742,7 @@ document.addEventListener('submit',function(e){var f=e.target;if(!f.dataset.form
 document.addEventListener('input',function(e){
   var t=e.target;
   if(t.classList&&t.classList.contains('cid-ac'))buscaCidades(t);
+  if(t.id==='adm-busca'){ui.admBusca=t.value;var pa=t.selectionStart;render();var ab=document.getElementById('adm-busca');ab.focus();try{ab.setSelectionRange(pa,pa);}catch(x){}}
   if(t.id==='cli-busca'){ui.cliBusca=t.value;var ps=t.selectionStart;render();var cb=document.getElementById('cli-busca');cb.focus();try{cb.setSelectionRange(ps,ps);}catch(x){}}
   if(t.id==='busca'){ui.busca=t.value;var pos=t.selectionStart;render();var b=document.getElementById('busca');b.focus();try{b.setSelectionRange(pos,pos);}catch(x){}}
   if(t.closest&&t.closest('form[data-form="pedido"]')){if(t.id==='pd-valor')t.dataset.manual='1';else atualizaCalc();}
