@@ -247,6 +247,15 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .dd-menu{position:absolute;top:calc(100% + 6px);left:38px;z-index:45;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px -12px color-mix(in srgb,#000 35%,transparent);padding:6px;min-width:230px;max-width:80vw;max-height:340px;overflow:auto;display:grid;gap:2px}
 .dd-menu button{text-align:left;border:0;background:none;padding:.6em .8em;border-radius:9px;cursor:pointer;font:inherit;color:inherit;display:flex;justify-content:space-between;gap:12px;white-space:nowrap}
 .dd-menu button:hover{background:var(--soft)}
+.dd.conta{position:relative}
+.dd.conta>.av{border:0;cursor:pointer;width:36px;height:36px;font-size:.85rem;box-shadow:0 0 0 0 var(--accent-soft);transition:box-shadow .15s}
+.dd.conta>.av:hover,.dd.conta>.av.on{box-shadow:0 0 0 4px var(--accent-soft)}
+.dd.conta .dd-menu{left:auto;right:0;min-width:250px;max-height:none}
+.dd.conta .conta-h{display:grid;gap:2px;padding:.6em .8em .7em;border-bottom:1px solid var(--line);margin-bottom:4px}
+.dd.conta .conta-h span{color:var(--muted);font-size:.8rem;overflow:hidden;text-overflow:ellipsis}
+.dd.conta .ci{display:inline-flex;align-items:center;gap:9px}
+.dd.conta .ci svg{width:17px;height:17px}
+.dd.conta hr{border:0;border-top:1px solid var(--line);margin:4px 0;width:100%}
 .dd-menu button.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
 
 .sau{width:52px;height:52px;flex:none;padding:3px;border-radius:16px;border:1px solid var(--line);overflow:hidden}
@@ -644,7 +653,7 @@ function render(){
     '<input class="search dk" id="busca-top" type="search" placeholder="Buscar pedido, paciente, cliente…" value="'+(ui.tab==='pedidos'?'':esc(ui.busca))+'">'+
     '<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
     (ui.tab==='clientes'&&!ui.sub?'<button class="btn pri dk" data-a="novoCliente" '+(w?'':'disabled')+'>+ Novo cliente</button>':'<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>')+
-    '<button class="icon-btn dk'+(emCfg()?' on':'')+'" data-a="tab" data-v="config" aria-label="Configurações" title="Configurações">'+ICON.config+'</button><button class="av dk" data-a="tab" data-v="config" title="'+esc(nome)+'" aria-label="Minha conta" style="border:0;cursor:pointer">'+esc((nome[0]||'?').toUpperCase())+'</button>'+
+    contaMenu(nome,lix)+
     '<span class="menu-btn">'+chip+'</span></div>'+
     '<nav class="tnav" aria-label="Menu principal"><div class="tnav-in">'+flat.map(function(it){
       var badge=it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':'';
@@ -658,6 +667,13 @@ function render(){
     '<div class="content">'+top+'<main class="main">'+
     (w?'':'<div class="banner bad"><span><b>Assinatura vencida.</b> Seus dados estão guardados. Você pode ver e exportar, mas não pode criar nem alterar.</span><button class="btn sm" data-a="tab" data-v="config">Ver assinatura</button></div>')+
     (emCfg()?'<div class="cfg">'+cfgTabs(lix)+body+'</div>':body)+'</main></div>'+bnav+'</div>';
+}
+function contaMenu(nome,lix){
+  var it=[['config','Perfil e conta'],['arquivos','Arquivos STL'],['lixeira','Lixeira']];if(S.admin)it.push(['admin','Administração']);
+  return '<div class="dd conta dk"><button class="av'+(emCfg()?' on':'')+'" data-a="ddOpen" data-k="conta" title="Minha conta" aria-label="Minha conta" aria-expanded="'+(ui.ddOpen==='conta')+'">'+esc((nome[0]||'?').toUpperCase())+'</button>'+
+    (ui.ddOpen==='conta'?'<div class="dd-menu" role="menu"><div class="conta-h"><b>'+esc(S.perfil.nome||'Minha conta')+'</b><span>'+esc(S.sessao.email||'')+'</span></div>'+
+      it.map(function(x){return '<button role="menuitem" class="'+(ui.tab===x[0]?'on':'')+'" data-a="contaIr" data-v="'+x[0]+'"><span class="ci">'+ICON[x[0]]+x[1]+'</span>'+(x[0]==='lixeira'&&lix?'<span class="muted mono small">'+lix+'</span>':'')+'</button>';}).join('')+
+      '<hr><button role="menuitem" data-a="sair"><span class="ci">'+ICON.sair+'Sair</span></button></div>':'')+'</div>';
 }
 function cfgTabs(lix){
   var t=[['config','Perfil e conta'],['arquivos','Arquivos STL'],['lixeira','Lixeira']];if(S.admin)t.push(['admin','Administração']);
@@ -1626,6 +1642,7 @@ function excluirPagamento(g){softDel(g);g.pedidos.forEach(function(pid){var p=by
 function restaurarPagamento(g){delete g.deleted;g.pedidos.forEach(function(pid){var p=byId(S.pedidos,pid);if(p){p.pago=g.data;p.pagamentoId=g.id;}});}
 
 var A={
+  contaIr:function(d){ui.ddOpen=null;A.tab(d);},
   tab:function(d){ui.tab=d.v;ui.sub=d.sub||null;ui.drawer=false;if('f' in d)ui.filtro=d.f==='urg'?'urg':'todos';closeSheet();render();window.scrollTo(0,0);},
   sub:function(d){ui.sub=d.v||null;render();window.scrollTo(0,0);},
   filtro:function(d){ui.filtro=d.v;render();},
