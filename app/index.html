@@ -97,6 +97,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 }
 
 /* Dashboard */
+.cid-uf{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:12px;align-items:start}
 .cfg{max-width:1180px;margin-inline:auto;display:grid;gap:16px}
 .cfg-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);scrollbar-width:none}
 .cfg-tabs::-webkit-scrollbar{display:none}
@@ -111,7 +112,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 @media (min-width:960px){
   .cfg-grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
   .cfg-grid .g2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
-  .cfg-grid .g2 .ac{grid-column:1/-1}
+  .cfg-grid .g2 .cid-uf{grid-column:1/-1}
 }
 @media (max-width:959px){.cfg-grid .cfg-perfil .row .btn{width:100%}}
 @media (max-width:699px){.cfg-tabs{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px}.cfg-tabs button{flex-direction:column;gap:3px;padding:8px 2px;font-size:.72rem;position:relative;justify-content:center}.cfg-tabs button svg{width:19px;height:19px}.cfg-tabs .n{position:absolute;top:3px;right:calc(50% - 22px)}}
@@ -393,7 +394,7 @@ var SUPA_URL='https://qxspiaqaigjkmilxxfri.supabase.co';
 var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4c3BpYXFhaWdqa21pbHh4ZnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjYwMzMsImV4cCI6MjEwNzIwMjAzM30.TeIHiEvHx1PmvS5PQ3lzvByYP9ppYuq5GLZURtutXc0';
 var sb=window.supabase?window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
 function estadoVazio(){return {versao:2,sessao:null,carregando:false,prefs:{},
-  perfil:{nome:'',telefone:'',tipoChave:'email',chave:'',recebedor:'',cidade:'',cidadeGeo:null},
+  perfil:{nome:'',telefone:'',tipoChave:'email',chave:'',recebedor:'',cidade:'',uf:'',cidadeGeo:null},
   assinatura:{plano:'basico',status:'teste',testeAte:null,venceEm:null,limite:5*GB,usadoServidor:0},
   faixas:[],clientes:[],tipos:[],precos:[],pedidos:[],pagamentos:[],arquivos:[],seq:0};}
 function dia(v){return v?String(v).slice(0,10):null;}
@@ -401,8 +402,8 @@ function ts(d){return d?(String(d).length===10?d+'T12:00:00Z':d):null;}
 function nn(v){return v===''||v===undefined?null:v;}
 var MAP={
   clientes:{t:'clientes',
-    to:function(x){return {nome:x.nome,tipo:x.tipo,telefone:nn(x.telefone),email:nn(x.email),observacoes:nn(x.obs),deleted_at:ts(x.deleted)};},
-    from:function(r){return {id:r.id,nome:r.nome,tipo:r.tipo,telefone:r.telefone||'',email:r.email||'',obs:r.observacoes||'',criado:dia(r.criado_em),deleted:dia(r.deleted_at)};}},
+    to:function(x){return {nome:x.pnome,sobrenome:nn(x.sobrenome),empresa:nn(x.empresa),documento:nn(x.doc),cidade:nn(x.cidade),uf:nn(x.uf),tipo:x.tipo,telefone:nn(x.telefone),email:nn(x.email),observacoes:nn(x.obs),deleted_at:ts(x.deleted)};},
+    from:function(r){return nomeia({id:r.id,pnome:r.nome,sobrenome:r.sobrenome||'',empresa:r.empresa||'',doc:r.documento||'',cidade:r.cidade||'',uf:r.uf||'',tipo:r.tipo,telefone:r.telefone||'',email:r.email||'',obs:r.observacoes||'',criado:dia(r.criado_em),deleted:dia(r.deleted_at)});}},
   tipos:{t:'tipos_trabalho',
     to:function(x){return {nome:x.nome,forma:x.forma,valor_padrao:+x.valor||0,ativo:!!x.ativo,deleted_at:ts(x.deleted)};},
     from:function(r){return {id:r.id,nome:r.nome,forma:r.forma,valor:+r.valor_padrao,ativo:r.ativo,deleted:dia(r.deleted_at)};}},
@@ -428,7 +429,7 @@ var MAP={
 };
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
-function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),
+function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
   cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
@@ -477,7 +478,7 @@ async function carregar(){
     var dados=await Promise.all(ORDEM.map(function(k){return todos(MAP[k].t);}));
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
-    novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',cidadeGeo:pref.cidadeGeo||null};
+    novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
     novo.prefs={anim:pref.anim||'on'};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
@@ -511,12 +512,12 @@ function seed(){
   var t=today(), pm=prevMonth(monthOf(t));
   var st={
     versao:1, sessao:null,
-    perfil:{nome:'',telefone:'',tipoChave:'email',chave:'',recebedor:'',cidade:''},
+    perfil:{nome:'',telefone:'',tipoChave:'email',chave:'',recebedor:'',cidade:'',uf:''},
     assinatura:{plano:'Básico',status:'teste',testeAte:addDays(t,14),limite:5*GB,simularVencida:false},
     faixas:[{min:2000,pct:10},{min:1000,pct:5}],
     clientes:[], tipos:[], precos:[], pedidos:[], pagamentos:[], arquivos:[], seq:0
   };
-  function cli(n,tp,tel,cr){var c={id:uid(),nome:n,tipo:tp,telefone:tel||'',email:'',obs:'',criado:cr||addDays(t,-200),exemplo:true};st.clientes.push(c);return c;}
+  function cli(n,tp,tel,cr){var c={id:uid(),nome:n,pnome:n,sobrenome:'',empresa:'',doc:'',cidade:'',uf:'',tipo:tp,telefone:tel||'',email:'',obs:'',criado:cr||addDays(t,-200),exemplo:true};st.clientes.push(c);return c;}
   var odo=cli('Lab. Odontoarte','laboratorio','(31) 90000-0001',addDays(t,-320)),
       sor=cli('Lab. Sorriso Pleno','laboratorio','(31) 90000-0002',addDays(t,-150)),
       hel=cli('Dra. Helena C.','dentista','(31) 90000-0003',addDays(t,-90)),
@@ -722,7 +723,7 @@ var DD={
     opts:function(){return ultimosMeses(24).map(function(m){return [m,capMes(m)];}).concat([['geral','Geral (todo o período)']]);}},
   cliOrd:{label:'Ordenar',get:function(){return ui.cliOrd||'az';},set:function(v){ui.cliOrd=v;},
     opts:function(){var n=alive(S.clientes).filter(function(c){var s=statsCli(c.id);return s.dias===null||s.dias>INATIVO_DIAS;}).length;return [['az','A a Z'],['recentes','Últimos adicionados'],['antigos','Mais antigos'],['mais','Que mais pedem'],['menos','Que menos pedem'],['inativos','Inativos ('+n+')']];}},
-  cliTipo:{label:'Tipo',get:function(){return ui.cliTipo||'todos';},set:function(v){ui.cliTipo=v;},opts:function(){return [['todos','Todos'],['laboratorio','Laboratórios'],['dentista','Dentistas']];}},
+  cliTipo:{label:'Tipo',get:function(){return ui.cliTipo||'todos';},set:function(v){ui.cliTipo=v;},opts:function(){return [['todos','Todos'],['laboratorio','Laboratórios'],['dentista','Clínicas / consultórios']];}},
   admFiltro:{label:'Mostrar',get:function(){return ui.admFiltro||'todos';},set:function(v){ui.admFiltro=v;},opts:function(){return [['todos','Todos'],['teste','Em teste'],['ativa','Ativos'],['vencida','Vencidos / teste acabou']];}},
   arqOrd:{label:'Ordenar',get:function(){return ui.arqOrd||'maiores';},set:function(v){ui.arqOrd=v;},opts:function(){return [['maiores','Maiores primeiro'],['expira','Expiram antes'],['recentes','Mais recentes'],['antigos','Mais antigos']];}},
   tipoMet:{label:'Medir por',get:function(){return ui.tipoMet||'n';},set:function(v){ui.tipoMet=v;},opts:function(){return [['n','Pedidos'],['el','Elementos'],['v','Faturamento']];}},
@@ -875,8 +876,8 @@ function municipios(){
     .catch(function(e){munP=null;throw e;});
   return munP;
 }
-function procuraCidades(q,max){
-  var k=semAcento(q),uf=null,m=k.match(/^(.*?)[\s,\/-]+([a-z]{2})$/);
+function procuraCidades(q,max,ufF){
+  var k=semAcento(q),uf=ufF||null,m=k.match(/^(.*?)[\s,\/-]+([a-z]{2})$/);
   if(m&&m[1].length>=2){k=m[1].trim();uf=m[2].toUpperCase();}
   return municipios().then(function(L){
     var ini=[],meio=[],kq=k;
@@ -888,8 +889,8 @@ function procuraCidades(q,max){
 function geoDaCidade(){
   var cid=(S.perfil.cidade||'').trim(),g=S.perfil.cidadeGeo;
   if(g&&g.nome===cid&&isFinite(g.lat)&&isFinite(g.lon))return Promise.resolve(g);
-  return procuraCidades(cid,50).then(function(rs){var k=semAcento(cid),x=rs.filter(function(c){return c.k===k&&(!g||!g.uf||c.uf===g.uf);})[0]||rs[0];
-    if(!x)throw new Error('cidade');S.perfil.cidadeGeo={nome:cid,uf:x.uf,lat:x.lat,lon:x.lon};save();return S.perfil.cidadeGeo;});
+  return procuraCidades(cid,50).then(function(rs){var k=semAcento(cid),uf=S.perfil.uf||(g&&g.uf),x=rs.filter(function(c){return c.k===k&&(!uf||c.uf===uf);})[0]||rs[0];
+    if(!x)throw new Error('cidade');if(!S.perfil.uf)S.perfil.uf=x.uf;S.perfil.cidadeGeo={nome:cid,uf:x.uf,lat:x.lat,lon:x.lon};save();return S.perfil.cidadeGeo;});
 }
 var climaBusy=false;
 function loadClima(){
@@ -1085,7 +1086,7 @@ function rClientes(){
   var cs=all.filter(function(x){
     if(tp!=='todos'&&x.c.tipo!==tp)return false;
     if(ord==='inativos'&&!x.inativo)return false;
-    if(q){var hay=(x.c.nome+' '+(x.c.email||'')+' '+(x.c.obs||'')).toLowerCase();var tel=(x.c.telefone||'').replace(/\D/g,'');if(hay.indexOf(q)<0&&!(qd.length>=3&&tel.indexOf(qd)>=0))return false;}
+    if(q){var hay=(x.c.nome+' '+pessoaCli(x.c)+' '+(x.c.cidade||'')+' '+(x.c.email||'')+' '+(x.c.obs||'')).toLowerCase();var tel=(x.c.telefone||'').replace(/\D/g,'');if(hay.indexOf(q)<0&&!(qd.length>=3&&(tel.indexOf(qd)>=0||(x.c.doc||'').indexOf(qd)>=0)))return false;}
     return true;});
   var by={
     az:function(a,b){return a.c.nome.localeCompare(b.c.nome,'pt-BR');},
@@ -1105,7 +1106,7 @@ function rClientes(){
       var info=ord==='recentes'||ord==='antigos'?(c.criado?'cadastrado em '+dmy(c.criado):'sem data de cadastro'):
         x.n?(geral()?x.n+' pedido(s)':x.np+' pedido(s) '+perCurto())+' · último '+(x.dias===0?'hoje':'há '+x.dias+' dia(s)'):'nenhum pedido ainda';
       return '<button class="li" data-a="verCliente" data-id="'+c.id+'"><span class="row" style="min-width:0;gap:12px"><span class="av" style="background:color-mix(in srgb,var(--p'+(1+hashN(c.nome)%6)+') 26%,var(--surface));color:var(--ink)">'+esc(c.nome.replace(/^(Dra?\.|Lab\.|Clínica)\s*/i,'').charAt(0).toUpperCase())+'</span>'+
-        '<span class="t"><b>'+esc(c.nome)+'</b><span>'+(c.tipo==='laboratorio'?'Laboratório':'Dentista')+' · '+info+'</span></span></span>'+
+        '<span class="t"><b>'+esc(c.nome)+'</b><span>'+TIPO_CLI[c.tipo]+(c.empresa&&pessoaCli(c)?' · '+esc(pessoaCli(c)):'')+(c.cidade||c.uf?' · '+cidUF(c):'')+' · '+info+'</span></span></span>'+
         '<span class="row" style="gap:6px">'+(x.inativo?'<span class="tag w">Inativo</span>':'')+(ab?'<span class="mono small" style="color:var(--urgent)">'+brl(ab)+'</span>':'')+'</span></button>';}).join('')+'</div></div>'
       :'<div class="card empty">'+(all.length?'Nenhum cliente encontrado com esse filtro.':'Cadastre seu primeiro cliente no botão + Cadastrar cliente.')+'</div>');
 }
@@ -1113,7 +1114,7 @@ function rCliente(id){
   var c=cliente(id); if(!c){ui.sub=null;return rClientes();}
   var ps=alive(S.pedidos).filter(function(p){return p.clienteId===id;}).sort(function(a,b){return b.recebido<a.recebido?-1:1;});
   var ab=soma(aReceber(id)), mes=totalMes(id,monthOf(today())), f=faixaDe(totalMes(id,prevMonth(monthOf(today()))));
-  return '<div class="row"><button class="icon-btn" data-a="voltarClientes" aria-label="Voltar">‹</button><h1 style="flex:1;min-width:0">'+esc(c.nome)+'</h1></div>'+
+  return '<div class="row"><button class="icon-btn" data-a="voltarClientes" aria-label="Voltar">‹</button><div style="flex:1;min-width:0"><h1>'+esc(c.nome)+'</h1><p class="small muted" style="margin:2px 0 0">'+TIPO_CLI[c.tipo]+(c.empresa&&pessoaCli(c)?' · '+esc(pessoaCli(c)):'')+(c.cidade||c.uf?' · '+cidUF(c):'')+(c.doc?' · '+(c.doc.length===11?'CPF ':'CNPJ ')+fmtDoc(c.doc):'')+(c.telefone?' · '+esc(c.telefone):'')+'</p></div></div>'+
     '<div class="grid2"><div class="stat" style="cursor:default"><span class="lbl">A receber</span><span class="v" style="color:'+(ab?'var(--urgent)':'inherit')+'">'+brl(ab)+'</span></div>'+
     '<div class="stat" style="cursor:default"><span class="lbl">Este mês</span><span class="v">'+brl(mes)+'</span></div></div>'+
     (f?'<div class="banner"><span>Este cliente tem <b>'+f.pct+'% de desconto</b> nos pedidos deste mês pelo volume do mês passado.</span></div>':'')+
@@ -1155,7 +1156,7 @@ function painelClientes(){
   var meses=chartMeses(),nv=meses.map(function(m){return cs.filter(function(c){return monthOf(c.criado)===m;}).length;});
   var lab=ps.filter(function(p){var c=cliente(p.clienteId);return c&&c.tipo==='laboratorio';}),den=ps.filter(function(p){var c=cliente(p.clienteId);return c&&c.tipo==='dentista';});
   return '<div class="stack" style="gap:12px">'+perPicker()+'<div class="dash">'+
-    kpi('Clientes cadastrados',cs.length,'<span>'+cs.filter(function(c){return c.tipo==='laboratorio';}).length+' laboratórios · '+cs.filter(function(c){return c.tipo==='dentista';}).length+' dentistas</span>')+
+    kpi('Clientes cadastrados',cs.length,'<span>'+cs.filter(function(c){return c.tipo==='laboratorio';}).length+' laboratórios · '+cs.filter(function(c){return c.tipo==='dentista';}).length+' clínicas</span>')+
     kpi(G?'Já pediram':'Pediram '+perCurto(),nAt,'<span>'+(cs.length?Math.round(nAt/cs.length*100):0)+'% da carteira</span>')+
     kpi(G?'Novos (12 meses)':'Novos '+perCurto(),G?cs.filter(function(c){return c.criado&&c.criado>=addDays(today(),-365);}).length:novos,'<span>cadastrados no período</span>')+
     '<button class="kpi" data-a="cliOrd" data-v="inativos"><span class="lbl">Inativos</span><span class="v" style="color:'+(inat?'var(--warn)':'inherit')+'">'+inat+'</span><span class="foot"><span>sem pedido há +'+INATIVO_DIAS+' dias · ver lista</span></span></button>'+
@@ -1163,7 +1164,7 @@ function painelClientes(){
       svgBars(meses,[{v:nv,cls:'pago'}],{sel:G?null:meses.length-1,int:true,fmt:function(v){return String(Math.round(v));},label:'Novos clientes por mês',tip:function(i){return '<b>'+capMes(meses[i])+'</b><br>'+nv[i]+' cliente(s) novo(s)';}})+'</section>'+
     '<section class="card stack half"><div><h2>Quem mais pede '+perCurto()+'</h2><p class="small muted">Faturamento por cliente</p></div>'+
       hbars(rankCli(5).map(function(x){return {l:esc(x.c.nome),r:brl(x.v)+' · '+x.n+' ped.',v:x.v,a:'verCliente',id:x.c.id};}))+
-      '<div class="between small muted" style="border-top:1px solid var(--line);padding-top:10px"><span>Laboratórios: <b class="mono">'+brl(soma(lab))+'</b></span><span>Dentistas: <b class="mono">'+brl(soma(den))+'</b></span></div></section>'+
+      '<div class="between small muted" style="border-top:1px solid var(--line);padding-top:10px"><span>Laboratórios: <b class="mono">'+brl(soma(lab))+'</b></span><span>Clínicas: <b class="mono">'+brl(soma(den))+'</b></span></div></section>'+
   '</div></div>';
 }
 
@@ -1365,7 +1366,7 @@ function rConfig(){
       '<label class="fld"><span>Tipo de chave</span><select id="cf-tipo" name="tipoChave" '+dis+'>'+[['cpf','CPF'],['cnpj','CNPJ'],['email','E-mail'],['telefone','Celular'],['aleatoria','Chave aleatória']].map(function(o){return '<option value="'+o[0]+'" '+(p.tipoChave===o[0]?'selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label>'+
       '<label class="fld"><span>Chave</span><input id="cf-chave" name="chave" value="'+esc(p.chave)+'" '+dis+'></label>'+
       '<label class="fld"><span>Nome de quem recebe</span><input id="cf-rec" name="recebedor" maxlength="25" value="'+esc(p.recebedor)+'" '+dis+'><small>Como aparece no banco. Até 25 letras.</small></label>'+
-      '<div class="fld ac"><span>Cidade</span><input id="cf-cid" class="cid-ac" name="cidade" autocomplete="off" placeholder="Comece a digitar: São Pa…" value="'+esc(p.cidade)+'" '+dis+'><div class="cid-sug" hidden></div><small>Usada no Pix e no clima do Dashboard.</small></div></div>'+
+      campoCidadeUF('cf','perfil',p.cidade,p.uf,dis,'Usada no Pix e no clima do Dashboard.')+'</div>'+
       '<div class="row"><button class="btn pri" type="submit" '+dis+'>Salvar alterações</button></div></form>'+
     '<div class="stack cfg-lado">'+
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
@@ -1461,11 +1462,28 @@ function liArq(a,w){
 }
 
 /* Cliente */
+var UFS=['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'];
+function campoCidadeUF(pre,ctx,cid,uf,dis,dica){
+  return '<div class="cid-uf"><div class="fld ac"><span>Cidade</span><input id="'+pre+'-cid" class="cid-ac" data-ctx="'+ctx+'" data-uf-sel="'+pre+'-uf" name="cidade" maxlength="60" autocomplete="off" placeholder="Comece a digitar: São Pa…" value="'+esc(cid||'')+'" '+(dis||'')+'><div class="cid-sug" hidden></div>'+(dica?'<small>'+dica+'</small>':'')+'</div>'+
+    '<label class="fld"><span>Estado</span><select id="'+pre+'-uf" name="uf" '+(dis||'')+'><option value="">UF</option>'+UFS.map(function(u){return '<option '+(uf===u?'selected':'')+'>'+u+'</option>';}).join('')+'</select></label></div>';
+}
+function cidUF(c){return c.cidade?esc(c.cidade)+(c.uf?'/'+c.uf:''):(c.uf||'');}
+var TIPO_CLI={laboratorio:'Laboratório',dentista:'Clínica / consultório'};
+function pessoaCli(c){return ((c.pnome||'')+' '+(c.sobrenome||'')).trim();}
+function nomeia(c){c.nome=(c.empresa||'').trim()||pessoaCli(c)||'(sem nome)';return c;}
+function soDig(v){return String(v||'').replace(/\D/g,'');}
+function cpfOk(d){if(!/^\d{11}$/.test(d)||/^(\d)\1{10}$/.test(d))return false;for(var t=9;t<11;t++){var s=0;for(var i=0;i<t;i++)s+=+d[i]*(t+1-i);if(((s*10)%11)%10!==+d[t])return false;}return true;}
+function cnpjOk(d){if(!/^\d{14}$/.test(d)||/^(\d)\1{13}$/.test(d))return false;var w=[6,5,4,3,2,9,8,7,6,5,4,3,2];for(var t=12;t<14;t++){var s=0;for(var i=0;i<t;i++)s+=+d[i]*w[i+13-t];var r=s%11;if((r<2?0:11-r)!==+d[t])return false;}return true;}
+function fmtDoc(d){d=soDig(d);if(d.length===11)return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');if(d.length===14)return d.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,'$1.$2.$3/$4-$5');return d;}
 function fCliente(id){
   var c=id?cliente(id):null;
   return head(c?'Editar cliente':'Novo cliente')+'<form data-form="cliente" data-id="'+(id||'')+'" class="stack">'+
-    '<label class="fld"><span>Nome</span><input id="cl-nome" name="nome" required maxlength="80" value="'+esc(c?c.nome:'')+'" placeholder="Lab. Exemplo ou Dra. Ana"></label>'+
-    '<div class="seg" role="radiogroup">'+[['laboratorio','Laboratório'],['dentista','Dentista']].map(function(o){return '<label class="check"><input type="radio" name="tipo" value="'+o[0]+'" '+((c?c.tipo:'laboratorio')===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('<span style="width:14px"></span>')+'</div>'+
+    '<div class="fld"><span>Tipo de cliente</span><div class="seg" role="radiogroup">'+[['laboratorio','Laboratório'],['dentista','Clínica / consultório']].map(function(o){return '<label class="check"><input type="radio" name="tipo" value="'+o[0]+'" '+((c?c.tipo:'laboratorio')===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('<span style="width:14px"></span>')+'</div></div>'+
+    '<div class="grid2"><label class="fld"><span>Nome *</span><input id="cl-nome" name="pnome" required maxlength="80" autocomplete="off" value="'+esc(c?c.pnome:'')+'" placeholder="Ana"></label>'+
+    '<label class="fld"><span>Sobrenome *</span><input id="cl-sobrenome" name="sobrenome" required maxlength="80" autocomplete="off" value="'+esc(c?c.sobrenome:'')+'" placeholder="Souza"></label></div>'+
+    '<label class="fld"><span>Nome da empresa <i class="muted" style="font-style:normal;font-weight:400">(opcional)</i></span><input id="cl-empresa" name="empresa" maxlength="100" value="'+esc(c?c.empresa:'')+'" placeholder="Lab. Exemplo ou Clínica Sorriso"><small>Se preencher, é esse nome que aparece na lista de clientes.</small></label>'+
+    '<label class="fld"><span>CPF ou CNPJ <i class="muted" style="font-style:normal;font-weight:400">(opcional)</i></span><input id="cl-doc" name="doc" inputmode="numeric" maxlength="18" value="'+esc(c&&c.doc?fmtDoc(c.doc):'')+'" placeholder="000.000.000-00 ou 00.000.000/0000-00"></label>'+
+    campoCidadeUF('cl','cliente',c?c.cidade:'',c?c.uf:'','')+
     '<label class="fld"><span>WhatsApp</span><input id="cl-tel" name="telefone" inputmode="tel" value="'+esc(c?c.telefone:'')+'"></label>'+
     '<label class="fld"><span>E-mail</span><input id="cl-email" name="email" type="email" value="'+esc(c?c.email:'')+'"></label>'+
     '<label class="fld"><span>Observações</span><textarea id="cl-obs" name="obs" maxlength="500">'+esc(c?c.obs:'')+'</textarea></label>'+
@@ -1662,8 +1680,12 @@ var A={
   cliOrd:function(d){ui.cliOrd=d.v;render();if(d.v==='inativos'){var l=document.getElementById('cli-busca');if(l)l.scrollIntoView({block:'start',behavior:'smooth'});}},
   per:function(d){ui.per=d.v;render();},
   cidadeClima:function(){openSheet(fCidade);setTimeout(function(){var i=document.getElementById('cid-busca');if(i){i.focus();i.select();}},50);},
-  pickCidade:function(d){S.perfil.cidade=d.n;S.perfil.cidadeGeo=d.lat?{nome:d.n,uf:d.uf,lat:+d.lat,lon:+d.lon}:null;ui.clima=null;ui.climaErr=null;save();
-    var inp=document.querySelector('.cid-ac');if(inp){inp.value=d.n;var bx=inp.parentNode.querySelector('.cid-sug');if(bx)bx.hidden=true;}
+  pickCidade:function(d,el){
+    var box=el.closest('.ac'),inp=box&&box.querySelector('.cid-ac'),ctx=inp?inp.dataset.ctx:'';
+    if(inp){inp.value=d.n;var bx=box.querySelector('.cid-sug');if(bx)bx.hidden=true;var us=inp.dataset.ufSel&&document.getElementById(inp.dataset.ufSel);if(us)us.value=d.uf;}
+    if(ctx==='cliente')return;
+    S.perfil.cidade=d.n;S.perfil.uf=d.uf||'';S.perfil.cidadeGeo=d.lat?{nome:d.n,uf:d.uf,lat:+d.lat,lon:+d.lon}:null;ui.clima=null;ui.climaErr=null;save();
+    if(ctx==='perfil'){toast('Cidade definida: '+d.n+(d.uf?' ('+d.uf+')':'')+'.');return;}
     if(ui.sheet&&ui.sheet.fn===fCidade)closeSheet();render();toast('Cidade definida: '+d.n+(d.uf?' ('+d.uf+')':'')+'.');},
   admRecarregar:function(){ui.admLista=null;ui.admErro=null;render();},
   admAbrir:function(d){openSheet(fAdmin,d.id);},
@@ -1743,8 +1765,10 @@ var F={
   },
   cliente:function(fd,f){
     if(!guard())return;
-    var o={nome:fd.get('nome').trim(),tipo:fd.get('tipo'),telefone:fd.get('telefone').trim(),email:fd.get('email').trim(),obs:fd.get('obs').trim()};
-    var id=f.dataset.id;if(id)Object.assign(cliente(id),o);else{var c=Object.assign({id:uid(),criado:today()},o);S.clientes.push(c);id=c.id;}
+    var o={pnome:(fd.get('pnome')||'').trim(),sobrenome:(fd.get('sobrenome')||'').trim(),empresa:(fd.get('empresa')||'').trim(),doc:soDig(fd.get('doc')),cidade:(fd.get('cidade')||'').trim(),uf:fd.get('uf')||'',tipo:fd.get('tipo'),telefone:fd.get('telefone').trim(),email:fd.get('email').trim(),obs:fd.get('obs').trim()};
+    if(!o.pnome||!o.sobrenome){toast('Preencha o nome e o sobrenome.');return;}
+    if(o.doc&&!(o.doc.length===11?cpfOk(o.doc):o.doc.length===14?cnpjOk(o.doc):false)){toast(o.doc.length===11?'CPF inválido. Confira os números.':o.doc.length===14?'CNPJ inválido. Confira os números.':'CPF tem 11 números e CNPJ tem 14.');var di=document.getElementById('cl-doc');if(di)di.focus();return;}
+    var id=f.dataset.id;if(id)nomeia(Object.assign(cliente(id),o));else{var c=nomeia(Object.assign({id:uid(),criado:today()},o));S.clientes.push(c);id=c.id;}
     save();closeSheet();ui.tab='clientes';ui.sub=id;render();toast('Cliente salvo.');
   },
   precos:function(fd,f){
@@ -1779,7 +1803,7 @@ var F={
     S.arquivos.push({id:uid(),pedidoId:f.dataset.id,origem:'link',nome:host,url:u,criado:today()});save();renderSheet();render();toast('Link salvo no pedido.');
   },
   perfil:function(fd){
-    if(!guard())return;['nome','telefone','tipoChave','chave','recebedor','cidade'].forEach(function(k){S.perfil[k]=(fd.get(k)||'').trim();});
+    if(!guard())return;['nome','telefone','tipoChave','chave','recebedor','cidade','uf'].forEach(function(k){S.perfil[k]=(fd.get(k)||'').trim();});
     if(S.perfil.cidadeGeo&&S.perfil.cidadeGeo.nome!==S.perfil.cidade)S.perfil.cidadeGeo=null;ui.clima=null;ui.climaErr=null;
     var c=S.perfil.chave,t=S.perfil.tipoChave,d=c.replace(/\D/g,'');
     var ok=!c||(t==='cpf'&&d.length===11)||(t==='cnpj'&&d.length===14)||(t==='email'&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c))||(t==='telefone'&&(d.length>=10&&d.length<=13))||(t==='aleatoria'&&c.length>=32);
@@ -1824,6 +1848,7 @@ document.addEventListener('input',function(e){
   var t=e.target;
   if(t.classList&&t.classList.contains('cid-ac'))buscaCidades(t);
   if(t.id==='adm-busca'){ui.admBusca=t.value;var pa=t.selectionStart;render();var ab=document.getElementById('adm-busca');ab.focus();try{ab.setSelectionRange(pa,pa);}catch(x){}}
+  if(t.id==='cl-doc'){var d=soDig(t.value).slice(0,14),v=d;if(d.length>11)v=d.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})(\d{0,2}).*/,function(m,a,b,c,e,f){return a+'.'+b+'.'+c+'/'+e+(f?'-'+f:'');});else if(d.length>9)v=d.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');else if(d.length>6)v=d.replace(/^(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');else if(d.length>3)v=d.replace(/^(\d{3})(\d{0,3})/,'$1.$2');if(v!==t.value)t.value=v;}
   if(t.id==='cli-busca'){ui.cliBusca=t.value;var ps=t.selectionStart;render();var cb=document.getElementById('cli-busca');cb.focus();try{cb.setSelectionRange(ps,ps);}catch(x){}}
   if(t.id==='busca'){ui.busca=t.value;var pos=t.selectionStart;render();var b=document.getElementById('busca');b.focus();try{b.setSelectionRange(pos,pos);}catch(x){}}
   if(t.closest&&t.closest('form[data-form="pedido"]')){if(t.id==='pd-valor')t.dataset.manual='1';else atualizaCalc();}
