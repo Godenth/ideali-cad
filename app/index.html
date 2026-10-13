@@ -540,7 +540,7 @@ async function carregar2(){
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
   S.carregando=false;render();
 }
-var TRAB_REF=[['Coroa sobre dente','elemento'],['Coroa sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
+var TRAB_REF=[['Elemento sobre dente','elemento'],['Elemento sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
   ['Provisório com aleta','elemento'],['Placa de bruxismo','elemento'],['Enceramento digital (planejamento)','elemento'],
   ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo 3D','trabalho']];
 function refFaltando(){var tem={};S.tipos.forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
@@ -574,7 +574,7 @@ function seed(){
       pro=cli('Lab. Prótese Viva','laboratorio','(31) 90000-0007',addDays(t,-260));
   function tp(n,f,v){var x={id:uid(),nome:n,forma:f,valor:v,ativo:true};st.tipos.push(x);return x;}
   var coroa=tp('Coroa','elemento',90), faceta=tp('Faceta','elemento',80), inlay=tp('Inlay / Onlay','elemento',70),
-      proto=tp('Protocolo','trabalho',480), ponte=tp('Ponte','elemento',90), impl=tp('Coroa sobre implante','elemento',110);
+      proto=tp('Protocolo','trabalho',480), ponte=tp('Ponte','elemento',90), impl=tp('Elemento sobre implante','elemento',110);
   st.precos.push({id:uid(),clienteId:odo.id,tipoId:coroa.id,valor:80},{id:uid(),clienteId:odo.id,tipoId:faceta.id,valor:75});
   S=st; // calcValor usa S
   function ped(c,pac,el,tip,cor,rec,prazo,status,o){
