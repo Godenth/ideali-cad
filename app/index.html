@@ -3,6 +3,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ideali CAD</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#5B45E0">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ideali CAD">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -1619,6 +1625,8 @@ function rConfig(){
       campoCidadeUF('cf','perfil',p.cidade,p.uf,dis,'Usada no Pix e no clima do Dashboard.')+'</div>'+
       '<div class="row"><button class="btn pri" type="submit" '+dis+'>Salvar alterações</button></div></form>'+
     '<div class="stack cfg-lado">'+
+    '<section class="card stack"><h2>Use como aplicativo</h2>'+(window._instalar?'<p class="small muted">Coloque o Ideali CAD na tela inicial e abra como um app, sem a barra do navegador.</p><button class="btn pri" data-a="instalarApp">Instalar no celular / computador</button>':
+      (window.matchMedia&&matchMedia('(display-mode: standalone)').matches?'<p class="small muted">Você já está usando como aplicativo. ✓</p>':'<p class="small muted"><b>Android (Chrome):</b> menu ⋮ → <b>Adicionar à tela inicial</b>.<br><b>iPhone (Safari):</b> botão Compartilhar → <b>Adicionar à Tela de Início</b>.</p>'))+'</section>'+
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Assinatura</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
@@ -2013,6 +2021,7 @@ var A={
   addItem:function(){if(!guard())return;var l=document.getElementById('tp-list');if(!l)return;var v=l.querySelector('.tp-vazio');if(v)v.remove();
     l.insertAdjacentHTML('beforeend',linhaTabela({nome:'',forma:'elemento',valor:0,ativo:true},''));var n=l.lastElementChild.querySelector('.tp-nome');n.focus();n.scrollIntoView({block:'center',behavior:'smooth'});},
   delNovo:function(d,el){var li=el.closest('.tp-li');if(li)li.remove();},
+  instalarApp:function(){var e=window._instalar;if(!e)return;e.prompt();e.userChoice.then(function(r){window._instalar=null;render();toast(r.outcome==='accepted'?'Pronto! O Ideali CAD está na sua tela inicial.':'Tudo bem, dá para instalar depois.');});},
   addRef:function(){if(!guard())return;var f=refFaltando();f.forEach(function(r){S.tipos.push({id:uid(),nome:r[0],forma:r[1],valor:0,ativo:true});});save();render();toast(f.length+' trabalho(s) adicionado(s) com R$ 0,00.');},
   contaIr:function(d){ui.ddOpen=null;A.tab(d);},
   tab:function(d){ui.tab=d.v;ui.msgs=false;ui.sub=d.sub||null;ui.drawer=false;if('f' in d)ui.filtro=d.f==='urg'?'urg':'todos';closeSheet();render();window.scrollTo(0,0);},
@@ -2210,6 +2219,7 @@ var F={
 // Fechar a janela só com um clique "limpo" no fundo: apertou E soltou no fundo, sem texto selecionado.
 // (Evita fechar ao arrastar uma seleção de texto para fora da janela ou do navegador.)
 function ehFundo(t){return t&&t.classList&&t.classList.contains('sheet-bg')?t:null;}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window._instalar=e;if(ui.tab==='config')render();});
 document.addEventListener('pointerdown',function(e){window._downBg=ehFundo(e.target);window._upBg=null;},true);
 document.addEventListener('mousedown',function(e){window._downBg=ehFundo(e.target);window._upBg=null;},true);
 document.addEventListener('pointerup',function(e){window._upBg=ehFundo(e.target);},true);

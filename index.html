@@ -115,6 +115,38 @@ a{color:inherit}
 
 /* Dor */
 .pain{padding-block:72px;border-top:1px solid var(--line)}
+.cel{padding-block:80px;border-top:1px solid var(--line);background:radial-gradient(700px 420px at 80% 40%,color-mix(in srgb,var(--p5) 12%,transparent),transparent 70%)}
+.cel .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.cel .checks{margin-top:22px}
+.cel-art{position:relative;display:grid;place-items:center;padding:20px 0}
+.phone{width:min(300px,78vw);aspect-ratio:9/18.5;border-radius:42px;background:#15122B;padding:12px;box-shadow:0 40px 80px -30px color-mix(in srgb,var(--p5) 60%,transparent),0 0 0 1px color-mix(in srgb,var(--ink) 12%,transparent);transform:rotate(-3deg)}
+.ph-scr{height:100%;border-radius:32px;background:var(--bg);overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:18px 14px 0;font-size:.8rem;color:var(--ink)}
+.ph-top{display:grid;gap:2px}.ph-top b{font-size:1.05rem}.ph-top span{color:var(--muted);font-size:.72rem}
+.ph-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ph-kpis div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 10px;display:grid;gap:2px}
+.ph-kpis small{color:var(--muted);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em}.ph-kpis b{font-family:var(--f-mono);font-size:.92rem}
+.ph-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:11px;display:grid;gap:6px}
+.ph-card small{color:var(--muted);font-size:.68rem}
+.ph-row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.ph-tag{background:var(--urgent);color:#fff;font:700 .58rem var(--f-mono);padding:3px 7px;border-radius:999px;text-transform:uppercase}
+.ph-teeth{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
+.ph-teeth span{border:1px solid var(--line);border-radius:5px;text-align:center;font:600 .6rem var(--f-mono);padding:5px 0;color:var(--muted)}
+.ph-teeth span.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ph-teeth span.imp{box-shadow:inset 0 -3px 0 var(--p3)}
+.ph-file{display:flex;align-items:center;gap:6px;font-size:.66rem;color:var(--muted)}
+.ph-file span{background:var(--accent-soft);color:var(--accent);font:700 .58rem var(--f-mono);padding:3px 5px;border-radius:5px}
+.ph-btn{background:var(--accent);color:var(--accent-ink);border-radius:999px;text-align:center;font-weight:700;padding:10px}
+.ph-msg{display:grid;gap:4px;background:color-mix(in srgb,#25D366 9%,var(--surface));border:1px solid color-mix(in srgb,#25D366 25%,var(--line));border-radius:14px 14px 14px 4px;padding:9px 10px;font-size:.7rem;line-height:1.35}
+.ph-msg small{color:var(--muted);font-size:.6rem;font-weight:600}
+.ph-msg span{justify-self:end;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.6rem;padding:3px 9px;border-radius:999px}
+.ph-list{display:grid;gap:5px;font-size:.72rem}.ph-list small{color:var(--muted);font-size:.6rem;text-transform:uppercase;letter-spacing:.05em}
+.ph-list div{display:flex;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 9px}.ph-list span{font-family:var(--f-mono);color:var(--muted)}
+.ph-nav{margin-top:auto;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;text-align:center;font-size:.6rem;color:var(--muted);border-top:1px solid var(--line);padding:8px 0 14px;background:var(--surface);margin-inline:-14px}
+.ph-nav .on{color:var(--accent);font-weight:700}
+.ph-nav i{font-style:normal;width:34px;height:34px;border-radius:11px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;margin:-14px auto 0;font-size:1.2rem}
+.cel-float{position:absolute;right:max(0px,calc(50% - 240px));bottom:105px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-size:.82rem;font-weight:600;box-shadow:0 16px 32px -16px color-mix(in srgb,var(--ink) 40%,transparent)}
+.cel-float .dot{width:9px;height:9px;border-radius:50%;background:var(--p3);box-shadow:0 0 0 4px color-mix(in srgb,var(--p3) 25%,transparent)}
+@media (max-width:860px){.cel .wrap{grid-template-columns:1fr;gap:28px}.cel-float{right:8px;bottom:40px}}
 .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:36px}
 .pain-item{border-top:3px solid var(--ink);padding-top:16px}
 .pain-item .was{font-family:var(--f-mono);font-size:.8rem;color:var(--urgent);text-decoration:line-through;margin-bottom:8px}
@@ -368,6 +400,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
       Ideali CAD
     </a>
     <nav class="nav" aria-label="Seções">
+      <a class="link" href="#celular">No celular</a>
       <a class="link" href="#funcoes">Funções</a>
       <a class="link" href="#mensagens">Mensagens</a>
       <a class="link" href="#rede">Rede</a>
@@ -380,6 +413,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
     </nav>
   </div>
   <nav class="nav-m" aria-label="Seções">
+    <a href="#celular">No celular</a>
     <a href="#funcoes">Funções</a>
     <a href="#mensagens">Mensagens</a>
     <a href="#rede">Rede</a>
@@ -402,7 +436,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
           <a class="btn btn-primary" href="app/#criar">Começar 14 dias grátis</a>
           <a class="btn btn-ghost" href="#funcoes">Saiba mais</a>
         </div>
-        <p class="fine">Sem cartão para testar. Depois, R$ 29,90 por mês.</p>
+        <p class="fine">Sem cartão para testar. Depois, R$ 29,90 por mês. Funciona no celular e no computador.</p>
       </div>
 
       <article class="order" aria-label="Exemplo de pedido no sistema">
@@ -433,6 +467,43 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
           <span class="price">R$ 180,00</span>
         </div>
       </article>
+    </div>
+  </section>
+
+  <section class="cel" id="celular">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">No celular, onde você estiver</span>
+        <h2 style="margin-top:12px">Seu escritório inteiro no bolso.</h2>
+        <p class="lead" style="margin-top:14px">Chegou caso no meio da rua? Cadastre na hora. O cliente pediu o valor? Mande o Pix em um toque. O que você salva no celular já está no computador quando você sentar para desenhar, e o contrário também.</p>
+        <ul class="checks">
+          <li><span><b>Sem baixar nada.</b> Abre no navegador do celular. Adicione à tela inicial e use como aplicativo.</span></li>
+          <li><span><b>Pedido na mão:</b> marque os dentes, o trabalho de cada um e anexe o escaneamento ali mesmo.</span></li>
+          <li><span><b>Cobrança na rua:</b> QR Code Pix e extrato do cliente prontos para mandar no WhatsApp.</span></li>
+          <li><span><b>Mensagens prontas</b> para cliente sumido, feriado e fim de semana, direto no WhatsApp.</span></li>
+          <li><span><b>STL em 3D</b> na tela do celular: gire e dê zoom com os dedos.</span></li>
+        </ul>
+        <div class="ctas" style="margin-top:26px"><a class="btn btn-primary" href="app/#criar">Testar no celular, grátis</a></div>
+      </div>
+      <div class="cel-art" aria-label="Exemplo do sistema no celular">
+        <div class="phone">
+          <div class="ph-scr">
+            <div class="ph-top"><b>Boa tarde, Danilo</b><span>Terça, 13 de outubro</span></div>
+            <div class="ph-kpis"><div><small>A receber</small><b>R$ 1.260</b></div><div><small>Em aberto</small><b>5 pedidos</b></div></div>
+            <div class="ph-card">
+              <div class="ph-row"><b>Novo pedido · M.A.S.</b><span class="ph-tag">Urgente</span></div>
+              <div class="ph-teeth"><span>16</span><span>15</span><span class="on imp">14</span><span>13</span><span class="on">12</span><span>11</span><span>21</span><span>22</span></div>
+              <small>14 · Elemento sobre implante · Neodent · Cone Morse</small>
+              <small>12 · Elemento sobre dente</small>
+              <div class="ph-file"><span>ZIP</span>Escaneamento M.A.S..zip · 11,6 MB</div>
+            </div>
+            <div class="ph-btn">Cobrar por Pix · R$ 420,00</div>
+            <div class="ph-msg"><small>Mensagem pronta · Dra. Helena</small>Oi, Helena! Faz um tempinho que não fazemos trabalhos juntos. Minha agenda está tranquila esta semana. 😊<span>WhatsApp</span></div>
+            <div class="ph-nav"><span class="on">Início</span><span>Produção</span><i>+</i><span>Financeiro</span><span>Menu</span></div>
+          </div>
+        </div>
+        <div class="cel-float"><span class="dot"></span>Salvo · já aparece no computador</div>
+      </div>
     </div>
   </section>
 
