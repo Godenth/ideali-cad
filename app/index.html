@@ -1641,6 +1641,7 @@ function fPedido(id,preCli){
     '<div class="grid2"><label class="fld"><span>Recebido em</span><input id="pd-rec" name="recebido" type="date" required value="'+(p?p.recebido:today())+'"></label>'+
     '<label class="check" style="align-self:end;padding-bottom:10px"><input type="checkbox" id="pd-urg" name="urgente" '+(p&&p.urgente?'checked':'')+'> Urgente</label></div>'+
     '<label class="fld"><span>Observações</span><textarea id="pd-obs" name="obs" maxlength="500">'+esc(p?p.obs:'')+'</textarea></label>'+
+    (p?'':'<div class="fld"><span>Escaneamento</span><input id="pd-scan" name="scanLink" type="url" inputmode="url" placeholder="Cole o link (Drive, WeTransfer, Dropbox…)"><small>Opcional. O link fica salvo no pedido, em Arquivos.</small></div>')+
     '<div class="calc" id="pd-calc"></div>'+
     '<label class="fld"><span>Valor do pedido (R$)</span><input id="pd-valor" name="valor" type="number" step="0.01" min="0" inputmode="decimal" value="'+(p?p.valor:'')+'" data-manual="'+(p?'1':'')+'"><small>Calculado pela tabela do cliente. Pode ajustar.</small></label>'+
     '<button class="btn pri block" type="submit">'+(p?'Salvar':'Criar pedido')+'</button>'+
@@ -2011,7 +2012,10 @@ var F={
     var o={clienteId:fd.get('clienteId'),paciente:fd.get('paciente').trim(),tipoId:fd.get('tipoId'),elementos:el,cor:fd.get('cor').trim(),prazo:fd.get('prazo')||null,
       recebido:fd.get('recebido'),urgente:!!fd.get('urgente'),obs:fd.get('obs').trim(),valor:Math.max(0,parseFloat(fd.get('valor'))||0)};
     var id=f.dataset.id,p;
+    var sl=String(fd.get('scanLink')||'').trim(),host='';
+    if(sl){if(!/^https:\/\//i.test(sl)){toast('O link do escaneamento precisa começar com https://');var si=document.getElementById('pd-scan');if(si)si.focus();return;}try{host=new URL(sl).hostname.replace(/^www\./,'');}catch(x){toast('Link do escaneamento inválido.');return;}}
     if(id){p=byId(S.pedidos,id);Object.assign(p,o);}else{p=Object.assign({id:uid(),num:++S.seq,status:'entrada',entregue:null,pago:null,pagamentoId:null},o);S.pedidos.push(p);}
+    if(sl)S.arquivos.push({id:uid(),pedidoId:p.id,origem:'link',nome:'Escaneamento · '+host,url:sl,criado:today()});
     save();render();openSheet(fPedidoDet,p.id);toast(id?'Pedido salvo.':'Pedido #'+p.num+' criado.');
   },
   cliente:function(fd,f){
@@ -2089,11 +2093,12 @@ var F={
   }
 };
 
+document.addEventListener('pointerdown',function(e){window._downBg=e.target&&e.target.classList&&e.target.classList.contains('sheet-bg')?e.target:null;},true);
 document.addEventListener('click',function(e){
   if(ui.ddOpen&&!(e.target.closest&&e.target.closest('.dd'))&&!(e.target.closest&&e.target.closest('[data-a]'))){ui.ddOpen=null;render();return;}
   var el=e.target.closest('[data-a]');if(!el)return;
   if(ui.ddOpen&&!e.target.closest('.dd')){ui.ddOpen=null;render();}
-  if(el.dataset.a==='bg'){if(e.target===el)closeSheet();return;}
+  if(el.dataset.a==='bg'){if(e.target===el&&window._downBg===el)closeSheet();window._downBg=null;return;}
   if(el.tagName==='INPUT'&&el.type==='checkbox'){A[el.dataset.a]&&A[el.dataset.a](el.dataset,el,e);return;}
   if(el.disabled)return;
   var f=A[el.dataset.a];if(f){if(el.tagName!=='A')e.preventDefault();f(el.dataset,el,e);}
