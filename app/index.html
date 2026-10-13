@@ -141,6 +141,8 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .mm-var{font:500 .75rem var(--f-mono);padding:.3em .6em;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--accent);cursor:pointer}
 .mm-hr{border:0;border-top:1px solid var(--line);margin:4px 0;width:100%}
 .banner.lemb .icon-btn{width:30px;height:30px}
+.imp-box{padding:12px;border-radius:12px;border:1px dashed var(--line);background:var(--bg)}
+.imp-box .grid2{align-items:start}.imp-box .fld{align-content:start}
 .cfg{max-width:1180px;margin-inline:auto;display:grid;gap:16px}
 .cfg-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);scrollbar-width:none}
 .cfg-tabs::-webkit-scrollbar{display:none}
@@ -463,10 +465,10 @@ var MAP={
   pedidos:{t:'pedidos',
     to:function(x){var p=x.pendencia||{};return {numero:x.num,cliente_id:x.clienteId,paciente:x.paciente,elementos:x.elementos||[],tipo_trabalho_id:nn(x.tipoId),cor:nn(x.cor),observacoes:nn(x.obs),
       valor:+x.valor||0,urgente:!!x.urgente,status:x.status,pendencia_motivos:p.motivos||[],pendencia_obs:nn(p.obs),pendencia_desde:x.pendencia?nn(p.desde):null,aprovacao_desde:nn(x.aprovDesde),
-      ajustes:x.ajustes||0,recebido_em:x.recebido,prazo:nn(x.prazo),enviado_em:nn(x.entregue),pago_em:nn(x.pago),pagamento_id:nn(x.pagamentoId),deleted_at:ts(x.deleted)};},
+      ajustes:x.ajustes||0,recebido_em:x.recebido,prazo:nn(x.prazo),enviado_em:nn(x.entregue),pago_em:nn(x.pago),pagamento_id:nn(x.pagamentoId),implante_marca:nn(x.impMarca),implante_tipo:nn(x.impTipo),deleted_at:ts(x.deleted)};},
     from:function(r){return {id:r.id,num:r.numero,clienteId:r.cliente_id,paciente:r.paciente,elementos:r.elementos||[],tipoId:r.tipo_trabalho_id,cor:r.cor||'',obs:r.observacoes||'',
       valor:+r.valor,urgente:r.urgente,status:r.status,pendencia:r.status==='pendente'?{motivos:r.pendencia_motivos||[],obs:r.pendencia_obs||'',desde:dia(r.pendencia_desde)}:null,
-      aprovDesde:dia(r.aprovacao_desde),ajustes:r.ajustes,recebido:dia(r.recebido_em),prazo:dia(r.prazo),entregue:dia(r.enviado_em),pago:dia(r.pago_em),pagamentoId:r.pagamento_id,deleted:dia(r.deleted_at)};}},
+      aprovDesde:dia(r.aprovacao_desde),ajustes:r.ajustes,recebido:dia(r.recebido_em),prazo:dia(r.prazo),entregue:dia(r.enviado_em),pago:dia(r.pago_em),pagamentoId:r.pagamento_id,impMarca:r.implante_marca||'',impTipo:r.implante_tipo||'',deleted:dia(r.deleted_at)};}},
   arquivos:{t:'arquivos',
     to:function(x){return x.origem==='link'?{pedido_id:x.pedidoId,origem:'link',nome:x.nome,url_externa:x.url,deleted_at:ts(x.deleted)}:{deleted_at:ts(x.deleted)};},
     from:function(r){return {id:r.id,pedidoId:r.pedido_id,origem:r.origem,nome:r.nome,url:r.url_externa,tamOrig:+r.tamanho_original||0,tamZip:+r.tamanho_zip||0,criado:dia(r.criado_em),removido:dia(r.removido_em),deleted:dia(r.deleted_at)};}}
@@ -1624,6 +1626,11 @@ function renderSheet(){
 function closeSheet(){if(viewer)viewer.stop();ui.sheet=null;renderSheet();}
 function head(t){return '<div class="sheet-h"><h2>'+t+'</h2><button class="icon-btn" data-a="fechar" aria-label="Fechar">✕</button></div>';}
 
+var MARCAS_IMP=['Neodent','SIN','Implacil'],CONEX_IMP=['Cone Morse','Grand Morse','HE (hexágono externo)','HI (hexágono interno)','Mini pilar','Pilar Ideali'];
+function selOutro(nm,lista,val,ph){var outro=!!val&&lista.indexOf(val)<0;
+  return '<select id="pd-'+nm+'" name="'+nm+'" data-outro="pd-'+nm+'-o"><option value="">Escolha…</option>'+lista.map(function(o){return '<option '+(val===o?'selected':'')+'>'+esc(o)+'</option>';}).join('')+'<option value="__outro" '+(outro?'selected':'')+'>Outros</option></select>'+
+    '<input id="pd-'+nm+'-o" name="'+nm+'Outro" maxlength="60" placeholder="'+ph+'" value="'+(outro?esc(val):'')+'" '+(outro?'':'hidden')+' style="margin-top:6px">';}
+function valOutro(fd,nm){var v=String(fd.get(nm)||'');return (v==='__outro'?String(fd.get(nm+'Outro')||''):v).trim().slice(0,60);}
 /* Pedido: formulário */
 function fPedido(id,preCli){
   var p=id?byId(S.pedidos,id):null, cs=alive(S.clientes).sort(function(a,b){return a.nome.localeCompare(b.nome);}), ts=alive(S.tipos).filter(function(t){return t.ativo||(p&&p.tipoId===t.id);});
@@ -1634,6 +1641,11 @@ function fPedido(id,preCli){
     '<label class="fld"><span>Cliente</span><select id="pd-cli" name="clienteId" required><option value="">Escolha…</option>'+cs.map(function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select>'+(cs.length?'':'<small>Cadastre um cliente primeiro.</small>')+'</label>'+
     '<label class="fld"><span>Paciente</span><input id="pd-pac" name="paciente" required maxlength="40" placeholder="Iniciais, ex.: M.A.S." value="'+esc(p?p.paciente:'')+'"><small>Guarde só as iniciais ou o primeiro nome (LGPD).</small></label>'+
     '<label class="fld"><span>Tipo de trabalho</span><select id="pd-tipo" name="tipoId" required><option value="">Escolha…</option>'+ts.map(function(t){return '<option value="'+t.id+'" '+(t.id===tid?'selected':'')+'>'+esc(t.nome)+'</option>';}).join('')+'</select></label>'+
+    (function(){var tt=p?tipo(p.tipoId):null,on=!!(p&&(p.impMarca||p.impTipo))||!!(tt&&/implante|protocolo/i.test(tt.nome));
+      return '<label class="check"><input type="checkbox" id="pd-impl" name="implante" '+(on?'checked':'')+'> Sobre implante (scanbody)</label>'+
+      '<div id="pd-imp" class="imp-box" '+(on?'':'hidden')+'><div class="grid2">'+
+        '<div class="fld"><span>Marca do implante</span>'+selOutro('impMarca',MARCAS_IMP,p?p.impMarca:'','Digite a marca')+'</div>'+
+        '<div class="fld"><span>Conexão / scanbody</span>'+selOutro('impTipo',CONEX_IMP,p?p.impTipo:'','Digite o tipo')+'</div></div></div>';})()+
     '<div class="fld"><span>Elementos <b id="pd-qtd" class="mono">('+sel.length+')</b></span><div class="teeth">'+arch(UP)+arch(LO)+'</div><input type="hidden" id="pd-el" name="elementos" value="'+sel.join(',')+'"><small>Toque nos dentes. Numeração FDI.</small></div>'+
     '<div class="grid2"><label class="fld"><span>Cor</span><input id="pd-cor" name="cor" list="cores" value="'+esc(p?p.cor:'')+'" placeholder="A2"></label>'+
     '<label class="fld"><span>Prazo</span><input id="pd-prazo" name="prazo" type="date" value="'+(p?p.prazo||'':addDays(today(),2))+'"></label></div>'+
@@ -1641,7 +1653,10 @@ function fPedido(id,preCli){
     '<div class="grid2"><label class="fld"><span>Recebido em</span><input id="pd-rec" name="recebido" type="date" required value="'+(p?p.recebido:today())+'"></label>'+
     '<label class="check" style="align-self:end;padding-bottom:10px"><input type="checkbox" id="pd-urg" name="urgente" '+(p&&p.urgente?'checked':'')+'> Urgente</label></div>'+
     '<label class="fld"><span>Observações</span><textarea id="pd-obs" name="obs" maxlength="500">'+esc(p?p.obs:'')+'</textarea></label>'+
-    (p?'':'<div class="fld"><span>Escaneamento</span><input id="pd-scan" name="scanLink" type="url" inputmode="url" placeholder="Cole o link (Drive, WeTransfer, Dropbox…)"><small>Opcional. O link fica salvo no pedido, em Arquivos.</small></div>')+
+    (p?'':'<div class="fld"><span>Escaneamento</span>'+
+      '<label class="btn block" style="position:relative">Anexar arquivos (viram zip)<input id="pd-files" type="file" multiple accept=".stl,.ply,.obj,.zip" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
+      '<small id="pd-files-info">STL, PLY, OBJ ou ZIP. Vários arquivos viram um zip só.</small>'+
+      '<input id="pd-scan" name="scanLink" type="url" inputmode="url" placeholder="Ou cole um link (Drive, WeTransfer, Dropbox…)" style="margin-top:6px"></div>')+
     '<div class="calc" id="pd-calc"></div>'+
     '<label class="fld"><span>Valor do pedido (R$)</span><input id="pd-valor" name="valor" type="number" step="0.01" min="0" inputmode="decimal" value="'+(p?p.valor:'')+'" data-manual="'+(p?'1':'')+'"><small>Calculado pela tabela do cliente. Pode ajustar.</small></label>'+
     '<button class="btn pri block" type="submit">'+(p?'Salvar':'Criar pedido')+'</button>'+
@@ -1669,7 +1684,7 @@ function fPedidoDet(id){
     '<div class="row wrap"><span class="tag a">'+stLabel(p.status)+'</span>'+(p.pago?'<span class="tag ok">Pago</span>':!aberto(p)?'<span class="tag w">A receber</span>':'')+(p.urgente?'<span class="tag u">Urgente</span>':'')+'</div>'+
     '<div><h2>'+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</h2><p class="muted">'+esc(c?c.nome:'(cliente excluído)')+'</p></div>'+
     '<div class="grid2 small">'+
-      kv('Elementos',p.elementos.length?p.elementos.join(', '):'—')+kv('Cor',p.cor||'—')+
+      kv('Elementos',p.elementos.length?p.elementos.join(', '):'—')+kv('Cor',p.cor||'—')+((p.impMarca||p.impTipo)?kv('Scanbody',esc([p.impMarca,p.impTipo].filter(Boolean).join(' · '))):'')+
       kv('Recebido',dmy(p.recebido))+kv('Prazo',p.prazo?dmy(p.prazo):'—')+
       (p.entregue?kv('Enviado ao cliente',dmy(p.entregue)):'')+(p.pago?kv('Pago',dmy(p.pago)):'')+
       kv('Valor','<span class="mono" style="font-size:1.1rem"><b>'+brl(p.valor)+'</b></span>')+(g?kv('Pagamento',formaNome(g.forma)+' de '+dmy(g.data)):'')+
@@ -1680,8 +1695,8 @@ function fPedidoDet(id){
     '<label class="fld"><span>Mover para</span><select id="pd-mover" data-id="'+id+'" '+(w?'':'disabled')+'>'+STATUS.concat([['arquivado','Arquivado (enviado ao cliente)']]).map(function(s){return '<option value="'+s[0]+'" '+(p.status===s[0]?'selected':'')+'>'+s[1]+'</option>';}).join('')+'</select></label>'+
     '<section class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div class="between"><h3>Arquivos</h3><span class="small muted">'+bytes(usado())+' de '+bytes(S.assinatura.limite)+'</span></div>'+
       (arqs.length?'<div class="list">'+arqs.map(function(a){return liArq(a,w);}).join('')+'</div>':'<p class="small muted">Nenhum arquivo. Envie o STL ou cole um link.</p>')+
-      '<label class="btn block" style="position:relative;'+(w?'':'opacity:.45;pointer-events:none')+'">Enviar STL (vira zip)<input id="up-file" type="file" accept=".stl,.zip,model/stl,application/zip" data-id="'+id+'" style="position:absolute;inset:0;opacity:0;cursor:pointer" '+(w?'':'disabled')+'></label>'+
-      '<div id="up-st" hidden class="stack" style="gap:6px"><div class="prog"><i id="up-bar"></i></div><span class="small muted" id="up-txt"></span></div>'+
+      '<label class="btn block" style="position:relative;'+(w?'':'opacity:.45;pointer-events:none')+'">Enviar arquivos (viram zip)<input id="up-file" type="file" multiple accept=".stl,.ply,.obj,.zip" data-id="'+id+'" style="position:absolute;inset:0;opacity:0;cursor:pointer" '+(w?'':'disabled')+'></label>'+
+      '<div id="up-st" '+(ui.up&&ui.up.pid===id?'':'hidden')+' class="stack" style="gap:6px"><div class="prog"><i id="up-bar" style="width:'+(ui.up&&ui.up.pid===id?ui.up.pct:0)+'%"></i></div><span class="small muted" id="up-txt">'+(ui.up&&ui.up.pid===id?esc(ui.up.txt):'')+'</span></div>'+
       '<form data-form="link" data-id="'+id+'" class="row"><input class="search" id="lk-url" name="url" type="url" placeholder="Ou cole o link do Drive / WeTransfer" required '+(w?'':'disabled')+'><button class="btn" type="submit" '+(w?'':'disabled')+'>Salvar</button></form>'+
     '</section>'+
     '<div class="row wrap" style="border-top:1px solid var(--line);padding-top:14px"><button class="btn" data-a="editPedido" data-id="'+id+'" '+(w?'':'disabled')+'>Editar</button><button class="btn" data-a="duplicar" data-id="'+id+'" '+(w?'':'disabled')+'>Duplicar</button><button class="btn danger" data-a="delPedido" data-id="'+id+'" '+(w?'':'disabled')+'>Excluir</button></div>';
@@ -1691,7 +1706,7 @@ function liArq(a,w){
   if(a.origem==='link')return '<div class="li" style="cursor:default"><span class="t"><b>🔗 '+esc(a.nome)+'</b><span>Link externo · não ocupa espaço</span></span><span class="row"><a class="btn sm" href="'+esc(a.url)+'" target="_blank" rel="noopener">Abrir</a><button class="icon-btn" data-a="delArq" data-id="'+a.id+'" aria-label="Excluir" '+(w?'':'disabled')+'>🗑</button></span></div>';
   if(a.removido)return '<div class="li" style="cursor:default"><span class="t"><b>'+esc(a.nome)+'</b><span>Apagado automaticamente em '+dmy(a.removido)+'</span></span></div>';
   var e=expira(a);
-  return '<div class="li" style="cursor:default"><span class="t"><b>'+esc(a.nome)+'</b><span>'+bytes(a.tamOrig)+' → '+bytes(a.tamZip)+' zip'+(e?' · expira '+dmy(e):'')+'</span></span><span class="row"><button class="btn sm" data-a="ver3d" data-id="'+a.id+'">Ver 3D</button><button class="icon-btn" data-a="delArq" data-id="'+a.id+'" aria-label="Excluir" '+(w?'':'disabled')+'>🗑</button></span></div>';
+  return '<div class="li" style="cursor:default"><span class="t"><b>'+esc(a.nome)+'</b><span>'+bytes(a.tamOrig)+' → '+bytes(a.tamZip)+' zip'+(e?' · expira '+dmy(e):'')+'</span></span><span class="row"><button class="btn sm" data-a="ver3d" data-id="'+a.id+'">Ver 3D</button><button class="btn sm" data-a="baixarArq" data-id="'+a.id+'">Baixar</button><button class="icon-btn" data-a="delArq" data-id="'+a.id+'" aria-label="Excluir" '+(w?'':'disabled')+'>🗑</button></span></div>';
 }
 
 /* Cliente */
@@ -1811,7 +1826,11 @@ function parseSTL(buf){
 function abreViewer(id){
   var a=byId(S.arquivos,id),msg=document.getElementById('v3m');
   var b=blobs.get(id);
-  if(!b){msg.textContent=a&&a.exemplo?'Este é um arquivo de exemplo, sem conteúdo. Envie um STL seu no pedido para ver em 3D.':'No protótipo, o arquivo só fica disponível até recarregar a página. Envie de novo para ver em 3D.';return;}
+  if(!b){if(a&&a.exemplo){msg.textContent='Este é um arquivo de exemplo, sem conteúdo. Envie um STL seu no pedido para ver em 3D.';return;}
+    msg.textContent='Baixando o arquivo…';
+    fnArq('baixar',{arquivo_id:id}).then(function(r){return fetch(r.url);}).then(function(res){if(!res.ok)throw new Error('download recusado');return res.blob();})
+      .then(function(bl){blobs.set(id,bl);if(document.getElementById('v3m'))abreViewer(id);}).catch(function(e){var m=document.getElementById('v3m');if(m)m.textContent='Não consegui abrir: '+e.message+'.';});
+    return;}
   if(!window.THREE||!window.JSZip){msg.textContent='Não foi possível carregar o visualizador.';return;}
   JSZip.loadAsync(b).then(function(z){
     var f=Object.keys(z.files).filter(function(n){return /\.stl$/i.test(n)&&!z.files[n].dir;})[0];
@@ -1849,24 +1868,42 @@ function montaViewer(pos){
   return {stop:function(){run=false;if(ro)ro.disconnect();g.dispose();r.dispose();viewer=null;}};
 }
 
-/* Upload com zip */
-function enviaArquivo(pid,file){
-  if(!guard())return;
-  toast('O envio de STL será liberado em breve. Por enquanto, cole o link do Drive ou WeTransfer no pedido.');var fi=document.getElementById('up-file');if(fi)fi.value='';return;
-  var nome=file.name, isZip=/\.zip$/i.test(nome);
-  if(!/\.(stl|zip)$/i.test(nome)){toast('Envie um arquivo .stl ou .zip.');return;}
-  if(file.size>300*MB){toast('Arquivo maior que 300 MB. Use um link externo.');return;}
-  var st=document.getElementById('up-st'),bar=document.getElementById('up-bar'),txt=document.getElementById('up-txt');
-  st.hidden=false;txt.textContent=isZip?'Conferindo o zip…':'Compactando '+nome+' ('+bytes(file.size)+')…';
-  var p=isZip?Promise.resolve(file):(window.JSZip?(function(){var z=new JSZip();z.file(nome,file);return z.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}},function(m){bar.style.width=m.percent.toFixed(0)+'%';});})():Promise.reject(new Error('compactador não carregou')));
-  p.then(function(blob){
-    var livre=S.assinatura.limite-usado();
-    if(blob.size>livre){st.hidden=true;toast('Sem espaço: faltam '+bytes(blob.size-livre)+'. Apague arquivos ou use um link.');return;}
-    var a={id:uid(),pedidoId:pid,origem:'upload',nome:isZip?nome:nome.replace(/\.stl$/i,'')+'.zip',tamOrig:file.size,tamZip:blob.size,criado:today()};
-    S.arquivos.push(a);blobs.set(a.id,blob);save();
-    toast(isZip?'Zip enviado: '+bytes(blob.size):'Enviado: '+bytes(file.size)+' → '+bytes(blob.size)+' ('+Math.round((1-blob.size/file.size)*100)+'% menor)');
-    renderSheet();render();
-  }).catch(function(e){st.hidden=true;toast('Não deu para enviar: '+e.message);});
+/* Envio de arquivos: compacta em zip no navegador e manda direto para o armazenamento (Cloudflare R2).
+   O servidor (função "arquivos") confere dono, assinatura e espaço e devolve um link que vale por pouco tempo. */
+async function fnArq(acao,body){
+  var r=await sb.functions.invoke('arquivos',{body:Object.assign({acao:acao},body)});
+  if(r.error){var m='';try{m=(await r.error.context.json()).erro;}catch(x){}throw new Error(m||'sem conexão com o servidor');}
+  if(r.data&&r.data.erro)throw new Error(r.data.erro);return r.data;
+}
+function upProg(pid,txt,pct){ui.up=txt==null?null:{pid:pid,txt:txt,pct:pct||0};var st=document.getElementById('up-st');if(!st)return;
+  if(!ui.up){st.hidden=true;return;}st.hidden=false;var tx=document.getElementById('up-txt'),br=document.getElementById('up-bar');if(tx)tx.textContent=txt;if(br)br.style.width=(pct||0).toFixed(0)+'%';}
+function putComProgresso(url,blob,onp){return new Promise(function(ok,ko){var x=new XMLHttpRequest();x.open('PUT',url);x.setRequestHeader('Content-Type','application/zip');
+  x.upload.onprogress=function(e){if(e.lengthComputable)onp(e.loaded/e.total);};x.onload=function(){x.status>=200&&x.status<300?ok():ko(new Error('o armazenamento recusou o envio ('+x.status+')'));};
+  x.onerror=function(){ko(new Error('sem conexão com o armazenamento'));};x.send(blob);});}
+async function enviaArquivo(pid,files){
+  if(!guard())return;files=[].slice.call(files||[]).filter(Boolean);var fi=document.getElementById('up-file');if(fi)fi.value='';if(!files.length)return;
+  if(ui.up){toast('Espere o envio atual terminar.');return;}
+  if(files.some(function(f){return !/\.(stl|ply|obj|zip)$/i.test(f.name);})){toast('Envie arquivos .stl, .ply, .obj ou .zip.');return;}
+  var tot=files.reduce(function(s,f){return s+f.size;},0);if(tot>2*GB){toast('Os arquivos passam de 2 GB. Use um link externo.');return;}
+  var p=byId(S.pedidos,pid),umZip=files.length===1&&/\.zip$/i.test(files[0].name);
+  var nome=umZip?files[0].name:files.length===1?files[0].name.replace(/\.[^.]+$/,'')+'.zip':('Escaneamento '+(p?p.paciente+' #'+p.num:'')).trim()+'.zip';
+  try{
+    var blob;
+    if(umZip)blob=files[0];
+    else{if(!window.JSZip)throw new Error('o compactador não carregou');upProg(pid,'Compactando '+files.length+' arquivo(s) de '+bytes(tot)+'…',0);
+      var z=new JSZip();files.forEach(function(f){z.file(f.name,f);});
+      blob=await z.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}},function(m){upProg(pid,'Compactando… '+m.percent.toFixed(0)+'%',m.percent);});}
+    var livre=S.assinatura.limite-usado();if(blob.size>livre)throw new Error('sem espaço: faltam '+bytes(blob.size-livre)+'. Apague arquivos ou use um link');
+    upProg(pid,'Preparando o envio…',0);
+    clearTimeout(syncTimer);syncFila=syncFila.then(sincroniza);await syncFila; // o pedido precisa estar salvo antes
+    var pr=await fnArq('preparar',{pedido_id:pid,tamanho:blob.size});
+    await putComProgresso(pr.url,blob,function(f){upProg(pid,'Enviando '+bytes(blob.size)+'… '+Math.round(f*100)+'%',f*100);});
+    upProg(pid,'Conferindo…',100);
+    var r=await fnArq('confirmar',{pedido_id:pid,key:pr.key,nome:nome,tamanho_original:tot});
+    var a=MAP.arquivos.from(r);S.arquivos.push(a);SNAP.arquivos=SNAP.arquivos||{};SNAP.arquivos[a.id]=JSON.stringify(MAP.arquivos.to(a));blobs.set(a.id,blob);
+    upProg(pid,null);toast(umZip?'Zip enviado: '+bytes(blob.size)+'.':'Enviado: '+bytes(tot)+' → '+bytes(blob.size)+' ('+Math.max(0,Math.round((1-blob.size/tot)*100))+'% menor).');
+  }catch(e){upProg(pid,null);toast('Não deu para enviar: '+e.message+'.');}
+  if(ui.sheet)renderSheet();render();
 }
 
 /* Confirmar */
@@ -1976,6 +2013,8 @@ var A={
     try{navigator.clipboard.writeText(t).then(ok,fail);}catch(e){fail();}},
   ver3d:function(d){openSheet(fViewer,d.id);ui.sheet.after=function(){abreViewer(d.id);};abreViewer(d.id);},
   delArq:function(d){if(!guard())return;var a=byId(S.arquivos,d.id);softDel(a);save();renderSheet();render();toast('Arquivo foi para a lixeira.');},
+  baixarArq:function(d){if(blobs.has(d.id)&&byId(S.arquivos,d.id)){var a=byId(S.arquivos,d.id),u=URL.createObjectURL(blobs.get(d.id)),l=document.createElement('a');l.href=u;l.download=a.nome;document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u);},5000);return;}
+    toast('Preparando o download…');fnArq('baixar',{arquivo_id:d.id,salvar:true}).then(function(r){location.href=r.url;}).catch(function(e){toast('Não deu para baixar: '+e.message+'.');});},
   baixarTudo:function(){toast('No sistema final, este botão baixa um zip com todos os seus arquivos.');},
   restaurar:function(d){if(!guard())return;var x=byId(S[d.k],d.id);if(d.k==='pagamentos')restaurarPagamento(x);else delete x.deleted;save();render();toast('Restaurado.');},
   assinar:function(){toast('A assinatura pelo Mercado Pago será liberada em breve. Seu teste grátis continua valendo.');},
@@ -2010,13 +2049,16 @@ var F={
     var el=(fd.get('elementos')||'').split(',').filter(Boolean).map(Number), t=tipo(fd.get('tipoId'));
     if(t&&t.forma==='elemento'&&!el.length){toast('Marque pelo menos um elemento.');return;}
     var o={clienteId:fd.get('clienteId'),paciente:fd.get('paciente').trim(),tipoId:fd.get('tipoId'),elementos:el,cor:fd.get('cor').trim(),prazo:fd.get('prazo')||null,
-      recebido:fd.get('recebido'),urgente:!!fd.get('urgente'),obs:fd.get('obs').trim(),valor:Math.max(0,parseFloat(fd.get('valor'))||0)};
+      recebido:fd.get('recebido'),urgente:!!fd.get('urgente'),obs:fd.get('obs').trim(),valor:Math.max(0,parseFloat(fd.get('valor'))||0),
+      impMarca:fd.get('implante')?valOutro(fd,'impMarca'):'',impTipo:fd.get('implante')?valOutro(fd,'impTipo'):''};
+    var anexos=[].slice.call((document.getElementById('pd-files')||{}).files||[]);
     var id=f.dataset.id,p;
     var sl=String(fd.get('scanLink')||'').trim(),host='';
     if(sl){if(!/^https:\/\//i.test(sl)){toast('O link do escaneamento precisa começar com https://');var si=document.getElementById('pd-scan');if(si)si.focus();return;}try{host=new URL(sl).hostname.replace(/^www\./,'');}catch(x){toast('Link do escaneamento inválido.');return;}}
     if(id){p=byId(S.pedidos,id);Object.assign(p,o);}else{p=Object.assign({id:uid(),num:++S.seq,status:'entrada',entregue:null,pago:null,pagamentoId:null},o);S.pedidos.push(p);}
     if(sl)S.arquivos.push({id:uid(),pedidoId:p.id,origem:'link',nome:'Escaneamento · '+host,url:sl,criado:today()});
     save();render();openSheet(fPedidoDet,p.id);toast(id?'Pedido salvo.':'Pedido #'+p.num+' criado.');
+    if(anexos.length)enviaArquivo(p.id,anexos);
   },
   cliente:function(fd,f){
     if(!guard())return;
@@ -2138,7 +2180,11 @@ document.addEventListener('input',function(e){
 document.addEventListener('change',function(e){
   var t=e.target;
   if(t.classList&&t.classList.contains('arqck')){ui.arqSel=ui.arqSel||{};if(t.checked)ui.arqSel[t.dataset.id]=1;else delete ui.arqSel[t.dataset.id];render();}
-  if(t.id==='up-file'&&t.files[0])enviaArquivo(t.dataset.id,t.files[0]);
+  if(t.id==='up-file'&&t.files.length)enviaArquivo(t.dataset.id,t.files);
+  if(t.id==='pd-files'){var inf=document.getElementById('pd-files-info');if(inf)inf.textContent=t.files.length?t.files.length+' arquivo(s) · '+bytes([].reduce.call(t.files,function(s,f){return s+f.size;},0))+' · vão ser compactados e enviados ao salvar':'STL, PLY, OBJ ou ZIP. Vários arquivos viram um zip só.';}
+  if(t.id==='pd-impl'){var bx=document.getElementById('pd-imp');if(bx)bx.hidden=!t.checked;}
+  if(t.id==='pd-tipo'){var tt=tipo(t.value),cb=document.getElementById('pd-impl');if(cb&&tt&&/implante|protocolo/i.test(tt.nome)&&!cb.checked){cb.checked=true;document.getElementById('pd-imp').hidden=false;}}
+  if(t.dataset&&t.dataset.outro){var oi=document.getElementById(t.dataset.outro);if(oi){oi.hidden=t.value!=='__outro';if(!oi.hidden)oi.focus();}}
   if(t.id==='pd-mover'){setStatus(t.dataset.id,t.value);}
   if(t.id==='pg-cli'){openSheet(fPagamento,t.value||null);}
   if(t.closest&&t.closest('form[data-form="pedido"]')&&(t.id==='pd-cli'||t.id==='pd-tipo'||t.id==='pd-rec')){var v=document.getElementById('pd-valor');if(v&&t.id!=='pd-rec'&&!t.form.dataset.id)v.dataset.manual='';atualizaCalc();}
