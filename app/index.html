@@ -127,6 +127,19 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .msg-acts{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .msg-var{display:inline-flex;align-items:center;gap:6px}.msg-var .icon-btn{width:32px;height:32px}
 .msg-ev h2{margin:0}
+.msg-txt.minha{background:color-mix(in srgb,var(--accent) 7%,var(--bg));border-color:color-mix(in srgb,var(--accent) 22%,var(--line))}
+.msg-var .tag{margin-left:4px}
+details.mm>summary{display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none}
+details.mm>summary::-webkit-details-marker{display:none}
+details.mm>summary .t{display:grid;gap:2px;flex:1;min-width:0}
+details.mm>summary::after{content:"▾";color:var(--muted);transition:transform .2s}
+details.mm[open]>summary::after{transform:rotate(180deg)}
+.mm-list{display:grid;gap:8px}
+.mm-li{display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:6px;align-items:start}
+.mm-li textarea{width:100%;padding:.7em .85em;border-radius:12px;border:1px solid var(--line);background:var(--bg);min-height:76px;resize:vertical;font:inherit;color:inherit}
+.mm-vars{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.mm-var{font:500 .75rem var(--f-mono);padding:.3em .6em;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--accent);cursor:pointer}
+.mm-hr{border:0;border-top:1px solid var(--line);margin:4px 0;width:100%}
 .banner.lemb .icon-btn{width:30px;height:30px}
 .cfg{max-width:1180px;margin-inline:auto;display:grid;gap:16px}
 .cfg-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);scrollbar-width:none}
@@ -461,7 +474,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -513,7 +526,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{}};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{}};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -1412,12 +1425,31 @@ function tabelaTexto(){var ts=alive(S.tipos).filter(function(t){return t.ativo&&
   return s+'\n\nQualquer dúvida, é só chamar! — '+((S.perfil.nome||'').trim()||'seu cadista');
 }
 function waLink(texto,tel){var d=soDig(tel);if(d&&d.length>=10&&d.length<=11)d='55'+d;else if(!(d&&/^55\d{10,11}$/.test(d)))d='';return 'https://wa.me/'+d+'?text='+encodeURIComponent(texto);}
-function cartaoMsg(chave,lista,ctx,tel,titulo){
-  ui.msgIdx=ui.msgIdx||{};var i=(ui.msgIdx[chave]||0)%lista.length,txt=preenche(lista[i],ctx);
-  return '<div class="msg-card">'+(titulo?'<div class="msg-tit">'+titulo+'</div>':'')+'<div class="msg-txt">'+esc(txt)+'</div><div class="msg-acts">'+
-    (lista.length>1?'<span class="msg-var"><button type="button" class="icon-btn" data-a="msgVar" data-k="'+chave+'" data-d="-1" aria-label="Mensagem anterior">‹</button><span class="mono small muted">'+(i+1)+'/'+lista.length+'</span><button type="button" class="icon-btn" data-a="msgVar" data-k="'+chave+'" data-d="1" aria-label="Outra mensagem">›</button></span>':'<span></span>')+
+/* Mensagens próprias do cadista: ficam salvas no perfil (preferências) e aparecem primeiro */
+var CAT_MSG={inativo:'Clientes inativos',feriado:'Feriado: vamos trabalhar',folga:'Feriado: sem atendimento',datas:'Datas especiais (Natal, Dia do Dentista…)',fds:'Fim de semana',divulga:'Divulgação'};
+var VARS_MSG={inativo:['{nome}','{saudacao}','{eu}'],feriado:['{feriado}','{diaSemana}','{data}','{saudacao}','{eu}'],folga:['{feriado}','{diaSemana}','{data}','{vespera}','{saudacao}','{eu}'],datas:['{saudacao}','{eu}'],fds:['{saudacao}','{eu}'],divulga:['{saudacao}','{eu}']};
+function minhas(cat){var m=S.prefs&&S.prefs.msgs;return (m&&m[cat])||[];}
+function comMinhas(cat,base){return minhas(cat).concat(base);}
+var MSGCARD={};
+function cartaoMsg(chave,lista,ctx,tel,titulo,nMinhas){
+  MSGCARD[chave]={lista:lista,ctx:ctx,tel:tel,titulo:titulo,n:nMinhas||0};
+  ui.msgIdx=ui.msgIdx||{};var i=(ui.msgIdx[chave]||0)%lista.length,txt=preenche(lista[i],ctx),minha=i<(nMinhas||0);
+  return '<div class="msg-card" data-k="'+esc(chave)+'">'+(titulo?'<div class="msg-tit">'+titulo+'</div>':'')+'<div class="msg-txt'+(minha?' minha':'')+'">'+esc(txt)+'</div><div class="msg-acts">'+
+    (lista.length>1?'<span class="msg-var"><button type="button" class="icon-btn" data-a="msgVar" data-k="'+esc(chave)+'" data-d="-1" aria-label="Mensagem anterior">‹</button><span class="mono small muted">'+(i+1)+'/'+lista.length+'</span><button type="button" class="icon-btn" data-a="msgVar" data-k="'+esc(chave)+'" data-d="1" aria-label="Outra mensagem">›</button>'+(minha?'<span class="tag a">minha</span>':'')+'</span>':(minha?'<span class="tag a">minha</span>':'<span></span>'))+
     '<span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><a class="btn sm pri" href="'+esc(waLink(txt,tel))+'" target="_blank" rel="noopener">WhatsApp</a></span></div></div>';
 }
+function editorMinhas(cats){
+  var dis=canWrite()?'':'disabled';
+  return '<details class="card mm"'+(ui.mmAberto?' open':'')+'><summary><span class="msg-ic" style="width:34px;height:34px;font-size:1rem">✏️</span><span class="t"><b>Minhas mensagens</b><span class="small muted">Escreva os seus próprios textos. Eles aparecem primeiro, marcados como “minha”.</span></span></summary>'+
+    '<form data-form="minhasMsgs" data-cats="'+cats.join(',')+'" class="stack" style="margin-top:12px">'+cats.map(function(c){
+      return '<div class="stack mm-cat" style="gap:8px"><b>'+CAT_MSG[c]+'</b>'+
+        '<div class="mm-vars small muted">Toque para inserir: '+VARS_MSG[c].map(function(v){return '<button type="button" class="mm-var" data-a="insVar" data-v="'+v+'">'+v+'</button>';}).join('')+'</div>'+
+        '<div class="mm-list" data-c="'+c+'">'+minhas(c).map(function(t){return linhaMinha(c,t,dis);}).join('')+'</div>'+
+        '<div><button type="button" class="btn sm" data-a="mmNova" data-c="'+c+'" '+dis+'>+ Nova mensagem</button></div></div>';}).join('<hr class="mm-hr">')+
+    '<p class="small muted">{nome} vira o primeiro nome do cliente, {saudacao} vira Bom dia/Boa tarde/Boa noite e {eu} vira o seu nome (de Configurações).</p>'+
+    '<div><button class="btn pri" type="submit" '+dis+'>Salvar minhas mensagens</button></div></form></details>';
+}
+function linhaMinha(c,t,dis){return '<div class="mm-li"><textarea name="m_'+c+'" maxlength="1000" rows="3" placeholder="Digite sua mensagem…" '+(dis||'')+'>'+esc(t||'')+'</textarea><button type="button" class="tp-x" data-a="mmDel" aria-label="Apagar mensagem" title="Apagar" '+(dis||'')+'>✕</button></div>';}
 function inativosLista(){return alive(S.clientes).map(function(c){var s=statsCli(c.id);return {c:c,dias:s.dias,n:s.n};}).filter(function(x){return x.dias===null||x.dias>INATIVO_DIAS;}).sort(function(a,b){return (b.dias===null?1e9:b.dias)-(a.dias===null?1e9:a.dias);});}
 function rMensagens(){
   var tab=ui.msgTab||'inativos',evs=proximosEventos(60),inat=inativosLista();
@@ -1425,23 +1457,27 @@ function rMensagens(){
   var h='<div class="row"><button class="icon-btn" data-a="msgFechar" aria-label="Voltar">‹</button><div style="flex:1;min-width:0"><h1>Mensagens prontas</h1><p class="small muted" style="margin:2px 0 0">Escolha, copie e mande no WhatsApp. Use ‹ › para ver outras opções de texto.</p></div></div>'+
     '<nav class="cfg-tabs msg-tabs">'+abas.map(function(a){return '<button class="'+(tab===a[0]?'on':'')+'" data-a="msgTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
   if(tab==='inativos'){
+    var Li=comMinhas('inativo',MSG.inativo),ni=minhas('inativo').length;
     h+='<p class="small muted">Clientes sem pedido há mais de '+INATIVO_DIAS+' dias. A mensagem já vem com o nome de cada um; o botão WhatsApp abre a conversa com o número cadastrado.</p>';
     h+=inat.length?'<div class="msg-grid">'+inat.map(function(x){var c=x.c;
-      return cartaoMsg('inativo',MSG.inativo,{nome:nomeContato(c)},c.telefone,'<b>'+esc(c.nome)+'</b><span class="small muted">'+(x.dias===null?'nunca fez pedido':'último pedido há '+x.dias+' dias')+(c.telefone?' · '+esc(c.telefone):' · sem WhatsApp cadastrado')+'</span>');}).join('')+'</div>'
+      return cartaoMsg('inativo-'+c.id,Li,{nome:nomeContato(c)},c.telefone,'<b>'+esc(c.nome)+'</b><span class="small muted">'+(x.dias===null?'nunca fez pedido':'último pedido há '+x.dias+' dias')+(c.telefone?' · '+esc(c.telefone):' · sem WhatsApp cadastrado')+'</span>',ni);}).join('')+'</div>'
       :'<div class="card empty">Nenhum cliente inativo. 🎉 Todos fizeram pedido nos últimos '+INATIVO_DIAS+' dias.</div>';
+    h+=editorMinhas(['inativo']);
   }
   if(tab==='datas'){
     h+='<p class="small muted">Feriados nacionais e datas especiais dos próximos 60 dias. Para cada feriado há dois tipos de aviso: “vamos trabalhar” e “não vamos ter atendimento”.</p>';
     h+=evs.length?'<div class="stack">'+evs.map(function(e){var dd=daysBetween(today(),e.d),q=dd===0?'hoje':dd===1?'amanhã':'em '+dd+' dias';
       var cab='<div class="between wrap msg-ev"><div><h2>'+esc(e.nome)+'</h2><span class="small muted">'+DIAS[new Date(e.d+'T12:00:00').getDay()]+', '+dmy(e.d)+'</span></div><span class="tag '+(dd<=7?'a':'')+'">'+q+'</span></div>';
       var cs='';
-      if(e.com)cs+=cartaoMsg('com-'+e.id,MSG_DATAS[e.com],{ev:e},'', 'Mensagem do dia');
-      if(e.fer){if(dd===0)cs+=cartaoMsg('ferHoje',MSG.feriadoHoje,{ev:e},'','Estamos trabalhando hoje');else{cs+=cartaoMsg('fer',MSG.feriado,{ev:e},'','Vamos trabalhar no feriado');cs+=cartaoMsg('folga',MSG.folga,{ev:e},'','Não vamos ter atendimento');}}
+      if(e.com)cs+=cartaoMsg('com-'+e.id+e.d,comMinhas('datas',MSG_DATAS[e.com]),{ev:e},'','Mensagem do dia',minhas('datas').length);
+      if(e.fer){if(dd===0)cs+=cartaoMsg('ferHoje-'+e.d,comMinhas('feriado',MSG.feriadoHoje),{ev:e},'','Estamos trabalhando hoje',minhas('feriado').length);
+        else{cs+=cartaoMsg('fer-'+e.id+e.d,comMinhas('feriado',MSG.feriado),{ev:e},'','Vamos trabalhar no feriado',minhas('feriado').length);cs+=cartaoMsg('folga-'+e.id+e.d,comMinhas('folga',MSG.folga),{ev:e},'','Não vamos ter atendimento',minhas('folga').length);}}
       return '<section class="card stack">'+cab+'<div class="msg-grid">'+cs+'</div></section>';}).join('')+'</div>':'<div class="card empty">Nenhuma data especial nos próximos 60 dias.</div>';
+    h+=editorMinhas(['feriado','folga','datas']);
   }
-  if(tab==='fds')h+='<p class="small muted">Ideal para mandar na quinta ou na sexta-feira.</p><div class="msg-grid">'+cartaoMsg('fds',MSG.fds,{},'')+'</div>';
-  if(tab==='divulga')h+='<p class="small muted">Para chamar novos trabalhos quando a agenda estiver tranquila.</p><div class="msg-grid">'+cartaoMsg('divulga',MSG.divulga,{},'','Agenda e novidades')+
-    '<div class="msg-card"><div class="msg-tit">Sua tabela de preços</div><div class="msg-txt">'+esc(tabelaTexto())+'</div><div class="msg-acts"><button type="button" class="btn sm" data-a="tab" data-v="tabela">Editar tabela</button><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><a class="btn sm pri" href="'+esc(waLink(tabelaTexto(),''))+'" target="_blank" rel="noopener">WhatsApp</a></span></div></div></div>';
+  if(tab==='fds')h+='<p class="small muted">Ideal para mandar na quinta ou na sexta-feira.</p><div class="msg-grid">'+cartaoMsg('fds',comMinhas('fds',MSG.fds),{},'','',minhas('fds').length)+'</div>'+editorMinhas(['fds']);
+  if(tab==='divulga')h+='<p class="small muted">Para chamar novos trabalhos quando a agenda estiver tranquila.</p><div class="msg-grid">'+cartaoMsg('divulga',comMinhas('divulga',MSG.divulga),{},'','Agenda e novidades',minhas('divulga').length)+
+    '<div class="msg-card"><div class="msg-tit">Sua tabela de preços</div><div class="msg-txt">'+esc(tabelaTexto())+'</div><div class="msg-acts"><button type="button" class="btn sm" data-a="tab" data-v="tabela">Editar tabela</button><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><a class="btn sm pri" href="'+esc(waLink(tabelaTexto(),''))+'" target="_blank" rel="noopener">WhatsApp</a></span></div></div></div>'+editorMinhas(['divulga']);
   return '<div class="stack" style="gap:14px">'+h+'</div>';
 }
 /* Lembretes no Dashboard: datas dos próximos 7 dias e sexta-feira */
@@ -1862,7 +1898,12 @@ var A={
   msgAbrir:function(d){ui.tab='clientes';ui.sub=null;ui.msgs=true;if(d&&d.v)ui.msgTab=d.v;closeSheet();render();window.scrollTo(0,0);},
   msgFechar:function(){ui.msgs=false;render();window.scrollTo(0,0);},
   msgTab:function(d){ui.msgTab=d.v;render();},
-  msgVar:function(d){ui.msgIdx=ui.msgIdx||{};ui.msgIdx[d.k]=((ui.msgIdx[d.k]||0)+(+d.d)+50)%50;var y=window.scrollY;render();window.scrollTo(0,y);},
+  msgVar:function(d,el){ui.msgIdx=ui.msgIdx||{};var m=MSGCARD[d.k];if(!m)return;ui.msgIdx[d.k]=((ui.msgIdx[d.k]||0)+(+d.d)+m.lista.length*10)%m.lista.length;
+    var card=el.closest('.msg-card');if(card)card.outerHTML=cartaoMsg(d.k,m.lista,m.ctx,m.tel,m.titulo,m.n);},
+  insVar:function(d){var ta=window._mmTa;if(!ta||!document.body.contains(ta)){toast('Toque primeiro dentro da mensagem que está escrevendo.');return;}
+    var a=ta.selectionStart||0,b=ta.selectionEnd||0;ta.value=ta.value.slice(0,a)+d.v+ta.value.slice(b);ta.focus();ta.setSelectionRange(a+d.v.length,a+d.v.length);},
+  mmNova:function(d){if(!guard())return;var l=document.querySelector('.mm-list[data-c="'+d.c+'"]');if(!l)return;l.insertAdjacentHTML('beforeend',linhaMinha(d.c,'',''));var t=l.lastElementChild.querySelector('textarea');window._mmTa=t;t.focus();},
+  mmDel:function(d,el){var li=el.closest('.mm-li');if(li)li.remove();toast('Mensagem removida. Clique em “Salvar minhas mensagens” para confirmar.');},
   msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
@@ -1987,6 +2028,11 @@ var F={
       if(v===''){if(pr&&!pr.deleted)pr.deleted=today();}else if(pr){pr.valor=+v;pr.deleted=null;}else S.precos.push({id:uid(),clienteId:cid,tipoId:t.id,valor:+v});});
     save();render();toast('Tabela de preços salva.');
   },
+  minhasMsgs:function(fd,f){
+    if(!guard())return;S.prefs=S.prefs||{};var m=Object.assign({},S.prefs.msgs||{});
+    f.dataset.cats.split(',').forEach(function(c){m[c]=fd.getAll('m_'+c).map(function(t){return String(t).trim().slice(0,1000);}).filter(Boolean).slice(0,20);});
+    S.prefs.msgs=m;ui.mmAberto=true;save();render();toast('Suas mensagens foram salvas.');
+  },
   tabela:function(fd){
     if(!guard())return;var n=0,bad=false;
     alive(S.tipos).forEach(function(t){if(fd.get('v_'+t.id)==null)return;
@@ -2071,6 +2117,8 @@ document.addEventListener('dragend',function(e){dragId=null;[].forEach.call(docu
 document.addEventListener('dragover',function(e){var col=e.target.closest&&e.target.closest('.kcol');if(!col||!dragId)return;e.preventDefault();[].forEach.call(document.querySelectorAll('.kcol.over'),function(x){if(x!==col)x.classList.remove('over');});col.classList.add('over');});
 document.addEventListener('drop',function(e){var col=e.target.closest&&e.target.closest('.kcol');if(!col||!dragId)return;e.preventDefault();var id=dragId;dragId=null;col.classList.remove('over');setStatus(id,col.dataset.st);});
 document.addEventListener('submit',function(e){var f=e.target;if(!f.dataset.form)return;e.preventDefault();F[f.dataset.form](new FormData(f),f);});
+document.addEventListener('toggle',function(e){if(e.target.classList&&e.target.classList.contains('mm'))ui.mmAberto=e.target.open;},true);
+document.addEventListener('focusin',function(e){if(e.target.closest&&e.target.closest('.mm-li'))window._mmTa=e.target;});
 document.addEventListener('input',function(e){
   var t=e.target;
   if(t.classList&&t.classList.contains('cid-ac'))buscaCidades(t);
