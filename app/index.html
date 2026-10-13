@@ -664,6 +664,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho']]],
   ['Conta',[['config','Configurações']]]
 ];
+var VERSAO='13/10 · 14h45';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1612,7 +1613,7 @@ function rConfig(){
       '<button class="btn pri" data-a="assinar">Assinar agora</button></section>'+
     '<section class="card stack"><h2>Seus dados</h2><p class="small muted">Você pode levar seus dados ou apagar tudo quando quiser.</p>'+
       '<div class="row wrap"><button class="btn" data-a="exportar">Exportar meus dados</button><button class="btn danger" data-a="excluirConta">Excluir minha conta</button></div></section>'+
-    '<button class="btn" data-a="sair">Sair da conta</button></div></div>';
+    '<button class="btn" data-a="sair">Sair da conta</button><p class="small muted" style="text-align:center">Versão '+VERSAO+'</p></div></div>';
 }
 
 /* ===================== Folhas (modais) ===================== */
@@ -2135,12 +2136,18 @@ var F={
   }
 };
 
-document.addEventListener('pointerdown',function(e){window._downBg=e.target&&e.target.classList&&e.target.classList.contains('sheet-bg')?e.target:null;},true);
+// Fechar a janela só com um clique "limpo" no fundo: apertou E soltou no fundo, sem texto selecionado.
+// (Evita fechar ao arrastar uma seleção de texto para fora da janela ou do navegador.)
+function ehFundo(t){return t&&t.classList&&t.classList.contains('sheet-bg')?t:null;}
+document.addEventListener('pointerdown',function(e){window._downBg=ehFundo(e.target);window._upBg=null;},true);
+document.addEventListener('mousedown',function(e){window._downBg=ehFundo(e.target);window._upBg=null;},true);
+document.addEventListener('pointerup',function(e){window._upBg=ehFundo(e.target);},true);
+document.addEventListener('mouseup',function(e){window._upBg=ehFundo(e.target);},true);
 document.addEventListener('click',function(e){
   if(ui.ddOpen&&!(e.target.closest&&e.target.closest('.dd'))&&!(e.target.closest&&e.target.closest('[data-a]'))){ui.ddOpen=null;render();return;}
   var el=e.target.closest('[data-a]');if(!el)return;
   if(ui.ddOpen&&!e.target.closest('.dd')){ui.ddOpen=null;render();}
-  if(el.dataset.a==='bg'){if(e.target===el&&window._downBg===el)closeSheet();window._downBg=null;return;}
+  if(el.dataset.a==='bg'){var sel=window.getSelection?String(window.getSelection()):'';if(e.target===el&&window._downBg===el&&window._upBg===el&&!sel)closeSheet();window._downBg=window._upBg=null;return;}
   if(el.tagName==='INPUT'&&el.type==='checkbox'){A[el.dataset.a]&&A[el.dataset.a](el.dataset,el,e);return;}
   if(el.disabled)return;
   var f=A[el.dataset.a];if(f){if(el.tagName!=='A')e.preventDefault();f(el.dataset,el,e);}
