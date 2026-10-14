@@ -28,14 +28,16 @@ img{max-width:100%}
   --p1:#EF5F5A; --p2:#F0A53A; --p3:#1DAE8A; --p4:#3A96EC; --p5:#7B5CF2; --p6:#DD5A9E;
   --paint:linear-gradient(90deg,var(--p1),var(--p2),var(--p3),var(--p4),var(--p5),var(--p6));
   --urgent:#D2433A; --ok:#1E8A5A; --warn:#B7791F; --soft:#EEF1F3;
+  --c-pac:#B0236F; --c-cli:#1F66B8; --c-val:#13804F;
   --c1:var(--p4); --c2:var(--p2); --c2t:#9A5A00; --c3:var(--p5); --c4:var(--p3);
   --f-display:"Plus Jakarta Sans",system-ui,"Segoe UI",Arial,sans-serif;
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --c-pac:#F48CC4; --c-cli:#7BBEFF; --c-val:#4FD99A;
   --bg:#121019; --surface:#1B1826; --ink:#ECEAF4; --muted:#A39FB6; --line:#2D2940; --accent:#9E8CFF; --accent-ink:#121019; --accent-soft:#2A2450; --urgent:#FF6E63; --ok:#4CC58A; --warn:#E8B04A; --soft:#221F31; --p1:#FF7B74; --p2:#F7BC5C; --p3:#3CCFA6; --p4:#62B0FF; --p5:#9E86FF; --p6:#F27AB8; --c1:var(--p4); --c2:var(--p2); --c2t:#F7BC5C; --c3:var(--p5); --c4:var(--p3); color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#121019; --surface:#1B1826; --ink:#ECEAF4; --muted:#A39FB6; --line:#2D2940; --accent:#9E8CFF; --accent-ink:#121019; --accent-soft:#2A2450; --urgent:#FF6E63; --ok:#4CC58A; --warn:#E8B04A; --soft:#221F31; --p1:#FF7B74; --p2:#F7BC5C; --p3:#3CCFA6; --p4:#62B0FF; --p5:#9E86FF; --p6:#F27AB8; --c1:var(--p4); --c2:var(--p2); --c2t:#F7BC5C; --c3:var(--p5); --c4:var(--p3); color-scheme:dark}
+:root[data-theme="dark"]{--c-pac:#F48CC4; --c-cli:#7BBEFF; --c-val:#4FD99A; --bg:#121019; --surface:#1B1826; --ink:#ECEAF4; --muted:#A39FB6; --line:#2D2940; --accent:#9E8CFF; --accent-ink:#121019; --accent-soft:#2A2450; --urgent:#FF6E63; --ok:#4CC58A; --warn:#E8B04A; --soft:#221F31; --p1:#FF7B74; --p2:#F7BC5C; --p3:#3CCFA6; --p4:#62B0FF; --p5:#9E86FF; --p6:#F27AB8; --c1:var(--p4); --c2:var(--p2); --c2t:#F7BC5C; --c3:var(--p5); --c4:var(--p3); color-scheme:dark}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -260,6 +262,13 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .kcard.u{box-shadow:inset 3px 0 0 var(--urgent)}
 .kcard .r{display:flex;justify-content:space-between;gap:8px;align-items:center}
 .kcard .who{font-size:.85rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kcard .pac{display:flex;align-items:center;gap:6px;font-weight:800;font-size:1.08rem;color:var(--c-pac);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kcard .pac svg,.kcard .cli svg{flex:none}
+.kcard .who.cli{display:flex;align-items:center;gap:6px;color:var(--c-cli);font-weight:700;font-size:.9rem}
+.kcard .trab{font-size:.82rem;color:var(--muted);line-height:1.3}
+.val{color:var(--c-val)!important;font-weight:800}
+.kcard .val{font-size:1rem}
+.pac-i{color:var(--c-pac);font-weight:800}.cli-i{color:var(--c-cli);font-weight:600}
 .kcard .mv{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:2px}
 .late{color:var(--urgent);font-weight:600}
 
@@ -685,7 +694,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='13/10 · 14h45';
+var VERSAO='14/10 · 13h00';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1065,10 +1074,12 @@ function statsTipos(){
 }
 function etapas(){return '';}
 function topClientes(){return '';}
+var ICO_PAC='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.6 3.6-5.6 7-5.6s6.2 2 7 5.6"/></svg>';
+var ICO_CLI='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V6l8-3 8 3v14"/><path d="M9 20v-5h6v5M8 9h.01M12 9h.01M16 9h.01M8 12h.01M16 12h.01"/></svg>';
 function liPedido(p){
   var c=cliente(p.clienteId),t=tipoPed(p),late=p.prazo&&p.prazo<today()&&aberto(p);
-  return '<button class="li" data-a="verPedido" data-id="'+p.id+'"><span class="t"><b>'+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</b><span>'+esc(c?c.nome:'')+' · '+stLabel(p.status)+'</span></span>'+
-    '<span class="row">'+(p.urgente?'<span class="tag u">Urgente</span>':'')+'<span class="mono small '+(late?'late':'')+'">'+(!aberto(p)?brl(p.valor):(p.prazo?dm(p.prazo):''))+'</span></span></button>';
+  return '<button class="li" data-a="verPedido" data-id="'+p.id+'"><span class="t"><b><span class="pac-i">'+esc(p.paciente)+'</span> · '+esc(t?t.nome:'')+'</b><span><span class="cli-i">'+esc(c?c.nome:'')+'</span> · '+stLabel(p.status)+'</span></span>'+
+    '<span class="row">'+(p.urgente?'<span class="tag u">Urgente</span>':'')+'<span class="mono small '+(late?'late':!aberto(p)?'val':'')+'">'+(!aberto(p)?brl(p.valor):(p.prazo?dm(p.prazo):''))+'</span></span></button>';
 }
 function devedores(){var m={};aReceber().forEach(function(p){m[p.clienteId]=(m[p.clienteId]||0)+(+p.valor||0);});
   return Object.keys(m).map(function(k){return {c:cliente(k),v:m[k],n:aReceber(k).length};}).filter(function(x){return x.c;}).sort(function(a,b){return b.v-a.v;});}
@@ -1109,9 +1120,10 @@ function kcard(p){
   var x=acoes(p),extra=x.extra,acts=x.acts;
   return '<div class="kcard '+(p.urgente?'u':'')+'" data-a="verPedido" data-id="'+p.id+'" role="button" tabindex="0" draggable="'+(w?'true':'false')+'">'+
     '<div class="r"><span class="mono small muted">#'+p.num+'</span><span class="row" style="gap:4px">'+(p.urgente?'<span class="tag u">Urgente</span>':'')+(p.pago?'<span class="tag ok">Pago</span>':'')+'</span></div>'+
-    '<b>'+esc(t?t.nome:'—')+' · '+esc(p.paciente)+'</b>'+
-    '<span class="who">'+esc(c?c.nome:'(cliente excluído)')+'</span>'+
-    '<div class="r small"><span class="mono">'+elTxt(p.elementos)+'</span><span class="mono">'+brl(p.valor)+'</span></div>'+
+    '<span class="pac" title="Paciente">'+ICO_PAC+esc(p.paciente)+'</span>'+
+    '<span class="who cli" title="Cliente">'+ICO_CLI+esc(c?c.nome:'(cliente excluído)')+'</span>'+
+    '<span class="trab">'+esc(t?t.nome:'—')+'</span>'+
+    '<div class="r small"><span class="mono">'+elTxt(p.elementos)+'</span><span class="mono val">'+brl(p.valor)+'</span></div>'+
     '<div class="r small"><span class="'+(late?'late':'muted')+'">prazo '+(p.prazo?dm(p.prazo):'—')+'</span>'+(nf?'<span class="muted">📎 '+nf+'</span>':'')+'</div>'+
     extra+(acts?'<div class="acts">'+acts+'</div>':'')+'</div>';
 }
