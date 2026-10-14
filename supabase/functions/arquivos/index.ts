@@ -54,7 +54,7 @@ Deno.serve(async (req: Request) => {
     return !!data;
   };
   const podeGravar = async () => {
-    const { data } = await userClient.rpc("pode_escrever");
+    const { data } = await userClient.rpc("pode_arquivar");
     return data === true;
   };
   const espaco = async () => {
@@ -67,7 +67,7 @@ Deno.serve(async (req: Request) => {
     if (!Number.isFinite(tamanho) || tamanho <= 0) return json(400, { erro: "Tamanho inválido" });
     if (tamanho > MAX_ARQUIVO) return json(413, { erro: "Arquivo maior que 2 GB. Use um link externo." });
     if (!(await pedidoDoUsuario(body.pedido_id))) return json(404, { erro: "Pedido não encontrado" });
-    if (!(await podeGravar())) return json(403, { erro: "Assinatura vencida: não é possível enviar arquivos." });
+    if (!(await podeGravar())) return json(403, { erro: "No plano grátis não é possível guardar arquivos. Assine para enviar." });
     const e = await espaco();
     if (e.usado + tamanho > e.limite) return json(413, { erro: "Sem espaço livre para este arquivo." });
     const key = `${user.id}/${body.pedido_id}/${crypto.randomUUID()}.zip`;
@@ -85,7 +85,7 @@ Deno.serve(async (req: Request) => {
     if (!head.ok) return json(400, { erro: "O arquivo não chegou ao armazenamento. Tente enviar de novo." });
     const tamanho = Number(head.headers.get("content-length") ?? 0);
     const apaga = () => r2.fetch(objUrl(key), { method: "DELETE" });
-    if (!(await podeGravar())) { await apaga(); return json(403, { erro: "Assinatura vencida: não é possível enviar arquivos." }); }
+    if (!(await podeGravar())) { await apaga(); return json(403, { erro: "No plano grátis não é possível guardar arquivos. Assine para enviar." }); }
     const e = await espaco();
     if (tamanho > MAX_ARQUIVO || e.usado + tamanho > e.limite) { await apaga(); return json(413, { erro: "Sem espaço livre para este arquivo." }); }
     const orig = Number(body.tamanho_original);
