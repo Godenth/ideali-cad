@@ -756,7 +756,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 18h45';
+var VERSAO='14/10 · 19h00';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1769,7 +1769,6 @@ function fPerfilCad(id){
     '<div class="rd-kpis"><div><b>'+tot+'</b><span>trabalhos feitos</span></div><div><b>'+(x.elementos||0)+'</b><span>elementos</span></div><div><b>'+(x.noPrazo||0)+'%</b><span>entregues no prazo</span></div><div><b>'+(x.prazo||'—')+'</b><span>prazo médio</span></div></div>'+
     '<div class="stack" style="gap:6px"><h3 style="margin:6px 0 0">Trabalhos feitos pela rede</h3><p class="small muted" style="margin:0">Contados a cada trabalho delegado e aprovado.</p>'+
       hbars(tipos.map(function(k){return {l:esc(k),r:pt[k]+'',v:pt[k]};}),'Ainda sem trabalhos pela rede.')+'</div>'+
-    ((x.coment||[]).length?'<div class="stack" style="gap:8px"><h3 style="margin:6px 0 0">Avaliações recentes</h3>'+x.coment.map(function(c){return '<div class="rd-oferta"><div class="between small">'+estrelas(c[0])+'<span class="muted">'+esc(c[2])+'</span></div><span class="small">“'+esc(c[1])+'”</span></div>';}).join('')+'</div>':'')+
     (id!=='eu'?rdChat(R,x):'')+
     (id!=='eu'?'<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="rdDelegarPara" data-id="'+x.id+'">Delegar um pedido para '+esc(x.nome.split(' ')[0])+'</button><button class="btn" data-a="rdFav" data-id="'+x.id+'">'+(x.fav?'★ Tirar dos favoritos':'☆ Favoritar')+'</button></div>':'');
 }
