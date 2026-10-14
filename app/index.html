@@ -198,6 +198,24 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .rd-lb p{color:#fff;margin:0;text-align:center}
 .rd-lb .fecha{position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;font-size:20px;cursor:pointer}
 .rd-lb .nav{display:flex;gap:10px}
+.rd-fab{position:fixed;right:20px;bottom:20px;z-index:42;width:58px;height:58px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 14px 30px -10px color-mix(in srgb,var(--accent) 75%,transparent)}
+.rd-fab .n{position:absolute;top:-2px;right:-2px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--urgent);color:#fff;font:700 .75rem/22px var(--f-mono);border:2px solid var(--bg)}
+.rd-pan{position:fixed;right:20px;bottom:90px;z-index:41;width:380px;height:min(560px,calc(100vh - 120px));background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 70px -20px rgba(0,0,0,.4);display:flex;flex-direction:column;overflow:hidden}
+.rd-ph{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 14px;border-bottom:1px solid var(--line)}
+.rd-ph .t{flex:1;min-width:0;display:grid}.rd-ph .t b{font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rd-ph .t span{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rd-ib{width:34px;height:34px;flex:none;border-radius:50%;border:0;background:var(--bg);color:var(--ink);font-size:22px;line-height:1;cursor:pointer}
+.rd-lista{flex:1;overflow-y:auto;padding:6px}
+.rd-ci{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;border-radius:12px;background:none;text-align:left;cursor:pointer;color:var(--ink);font:inherit}
+.rd-ci:hover{background:var(--bg)}
+.rd-ci .t{flex:1;min-width:0;display:grid}.rd-ci .t b{font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rd-ci .t span{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rd-ci .n{min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font:700 .72rem/22px var(--f-mono);text-align:center}
+.rd-ci .h{font-size:.72rem;color:var(--muted)}
+.rd-ci.trava{cursor:default;opacity:.75}.rd-ci.trava:hover{background:none}.rd-ci.trava .t span{white-space:normal}
+.rd-cav{width:40px;height:40px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);border:1px dashed var(--line)}
+.rd-pan .rd-msgs{flex:1;max-height:none;padding:12px;background:var(--bg)}
+.rd-pan .rd-envia{padding:10px;border-top:1px solid var(--line)}
+@media (max-width:959px){.rd-fab{bottom:calc(84px + env(safe-area-inset-bottom,0px));right:16px}.rd-pan{bottom:calc(152px + env(safe-area-inset-bottom,0px));right:16px}}
+@media (max-width:600px){.rd-pan{inset:0;width:auto;height:auto;border-radius:0;border:0;z-index:45}.rd-fab.on{display:none}}
 .rd-chat{display:grid;gap:10px;padding:12px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
 .rd-msgs{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;padding:2px}
 .rd-msg{max-width:80%;padding:8px 12px;border-radius:14px 14px 14px 4px;background:var(--card);border:1px solid var(--line);font-size:.92rem;line-height:1.4;overflow-wrap:anywhere;align-self:flex-start}
@@ -773,14 +791,14 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 19h15';
+var VERSAO='14/10 · 19h30';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){
-  var app=document.getElementById('app');document.body.classList.toggle('sem-anim',animOff());
+  var app=document.getElementById('app');document.body.classList.toggle('sem-anim',animOff());setTimeout(rdDock,0);
   if(!S.sessao){app.innerHTML=rLogin();return;}
   if(S.carregando){app.innerHTML=rCarregando();return;}
   var a=S.assinatura,w=canWrite(),chip;
@@ -1637,10 +1655,10 @@ function redeIni(){
     ],
     meus:[{id:'k1',arqs:[{nome:'escaneamento_11_21.zip',tipo:'stl',de:'outro'},{nome:'referencia_sorriso.html',tipo:'html',de:'outro'}],cod:'R-2470',trab:'Enceramento digital',dentes:[11,21],mat:'Cera',repasse:30,hora:'19:00',prazo:hoje,de:'x3',st:'desenho'}],
     chat:{
-      r1:[{de:'sis',t:'Juliana aceitou o R-2481. Chat liberado.'},{de:'outro',t:'Oi! Peguei o 36 sobre implante. O scanbody é Neodent Cone Morse mesmo?',h:'09:12'},{de:'eu',t:'Isso, Neodent CM. Pode fazer parafusada.',h:'09:20'},{de:'outro',t:'Perfeito, te mando o HTML até as 10h amanhã.',h:'09:21'}],
-      r2:[{de:'sis',t:'Rafael aceitou o R-2475. Chat liberado.'},{de:'outro',t:'Protocolo pronto, subi o HTML e a STL. Dá uma olhada na gengiva rosa.',h:'16:40'}],
-      r4:[{de:'sis',t:'Diego aceitou o R-2460. Chat liberado.'},{de:'eu',t:'Ficou ótimo, Diego. Pix enviado!',h:'18:05'},{de:'outro',t:'Recebido, obrigado! 🙌',h:'18:09'}],
-      x3:[{de:'sis',t:'Você aceitou o R-2470. Chat liberado.'},{de:'outro',t:'Oi! O caso é enceramento do 11 e 21, quero bem natural. Mandei o HTML do sorriso de referência.',h:'13:02'}]
+      d1:[{de:'sis',t:'Juliana aceitou o R-2481. Chat liberado.'},{de:'outro',t:'Oi! Peguei o 36 sobre implante. O scanbody é Neodent Cone Morse mesmo?',h:'09:12'},{de:'eu',t:'Isso, Neodent CM. Pode fazer parafusada.',h:'09:20'},{de:'outro',t:'Perfeito, te mando o HTML até as 10h amanhã.',h:'09:21'}],
+      d2:[{de:'sis',t:'Rafael aceitou o R-2475. Chat liberado.'},{de:'outro',t:'Protocolo pronto, subi o HTML e a STL. Dá uma olhada na gengiva rosa.',h:'16:40'}],
+      d3:[{de:'sis',t:'Diego aceitou o R-2460. Chat liberado.'},{de:'eu',t:'Ficou ótimo, Diego. Pix enviado!',h:'18:05'},{de:'outro',t:'Recebido, obrigado! 🙌',h:'18:09'}],
+      k1:[{de:'sis',t:'Você aceitou o R-2470. Chat liberado.'},{de:'outro',t:'Oi! O caso é enceramento do 11 e 21, quero bem natural. Mandei o HTML do sorriso de referência.',h:'13:02'}]
     },
     cadDe:{x1:{id:'x1',nome:'Lab. de Campinas',cidade:'Campinas, SP',sw:['exocad'],nota:4.8,av:40,cor:4},x2:{id:'x2',nome:'Cadista de Salvador',cidade:'Salvador, BA',sw:['exocad'],nota:4.6,av:22,cor:6},x3:{id:'x3',nome:'Cadista de Natal',cidade:'Natal, RN',sw:['3Shape'],nota:4.9,av:61,cor:3},x4:{id:'x4',nome:'Clínica Sorriso Digital',cidade:'Recife, PE',sw:['3Shape'],nota:4.7,av:15,cor:2}},
     enviados:[
@@ -1711,7 +1729,7 @@ function rdBusca(R,p){
 function rdEnviados(R){
   return '<div class="stack">'+R.enviados.map(function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};if(d.st==='apagado')return '';
     return '<section class="card stack"><div class="between wrap"><div class="row" style="gap:12px">'+(x.nome?'<button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x)+'</button>':'')+'<div><b>'+esc(d.trab)+'</b><div class="small muted">'+d.cod+(d.dentes.length?' · dentes '+d.dentes.join(', '):'')+' · '+(x.nome?'com '+esc(x.nome):'oferecido para: '+esc(d.para||'a rede'))+'</div></div></div><span class="mono val">'+brl(d.repasse)+'</span></div>'+
-      (d.st!=='oferta'&&d.st!=='apagado'?rdArqs(d,'env',x.nome||'parceiro')+(x.id?'<div><button class="btn sm" data-a="rdConversa" data-id="'+x.id+'">💬 Conversar com '+esc(x.nome.split(' ')[0])+rdNaoLidas(x.id)+'</button></div>':''):'')+
+      (d.st!=='oferta'&&d.st!=='apagado'?rdArqs(d,'env',x.nome||'parceiro')+(x.id?'<div><button class="btn sm" data-a="rdConversa" data-id="'+d.id+'">💬 Chat do '+d.cod+rdNaoLidas(d.id)+'</button></div>':''):'')+
       (d.st==='recusado'?'<div class="banner bad"><span>Você recusou este trabalho'+(d.motivo?': '+esc(d.motivo):'')+'. Não há repasse a pagar.</span><button class="btn sm" data-a="rdReoferecer" data-id="'+d.id+'">Oferecer de novo</button></div>':etapasRede(d.st))+
       '<div class="row wrap" style="gap:8px">'+
         (d.st==='oferta'?prazoRede(d.prazo,d.hora)+'<span class="small muted"><i class="rd-pulse"></i> Aguardando alguém aceitar</span><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="desenho">Simular: alguém aceitou</button><button class="btn sm danger" data-a="rdApagar" data-id="'+d.id+'">Apagar oferta</button>':'')+
@@ -1756,7 +1774,7 @@ function rdMeus(R){
     return '<section class="card stack"><div class="between wrap"><div><b>'+esc(x.trab)+'</b><div class="small muted">'+x.cod+(x.dentes.length?' · dentes '+x.dentes.join(', '):'')+' · '+esc(x.mat)+' · para <button class="rd-de" data-a="rdPerfil" data-id="'+x.de+'">'+esc(de.nome)+'</button></div></div><span class="mono val">'+brl(x.repasse)+'</span></div>'+
       (x.st==='recusado'?'<div class="banner bad"><span>Quem delegou recusou o projeto'+(x.motivo?': '+esc(x.motivo):'')+'. Sem repasse.</span></div>':
         '<div class="rd-steps" style="grid-template-columns:repeat(4,minmax(0,1fr))">'+[['desenho','Desenhando'],['revisao','Em revisão'],['aprovado','Aprovado'],['pago','Repasse recebido']].map(function(e,k,arr){var i=arr.map(function(z){return z[0];}).indexOf(x.st);return '<span class="'+(k<i?'ok':k===i?'on':'')+'"><i></i>'+e[1]+'</span>';}).join('')+'</div>')+
-      rdArqs(x,'meu',de.nome)+'<div><button class="btn sm" data-a="rdConversa" data-id="'+x.de+'">💬 Conversar com '+esc(de.nome)+rdNaoLidas(x.de)+'</button></div>'+
+      rdArqs(x,'meu',de.nome)+'<div><button class="btn sm" data-a="rdConversa" data-id="'+x.id+'">💬 Chat do '+x.cod+rdNaoLidas(x.id)+'</button></div>'+
       '<div class="row wrap" style="gap:8px">'+
         (x.st==='desenho'?prazoRede(x.prazo,x.hora)+'<button class="btn sm pri" data-a="rdMeuSt" data-id="'+x.id+'" data-v="revisao">Enviar projeto</button>':'')+
         (x.st==='revisao'?'<span class="small muted">Aguardando quem delegou revisar.</span><button class="btn sm" data-a="rdMeuSt" data-id="'+x.id+'" data-v="aprovado">Simular: aprovado</button><button class="btn sm" data-a="rdMeuSt" data-id="'+x.id+'" data-v="recusado">Simular: recusado</button>':'')+
@@ -1764,19 +1782,39 @@ function rdMeus(R){
         (x.st==='pago'?'<span class="tag ok">Concluído · conta no seu perfil</span>':'')+
       '</div></section>';}).join('')+'</div>':'<div class="card empty">Você ainda não pegou nenhum trabalho. Veja em “Pegar trabalhos”.</div>';
 }
-function rdChatAberto(R,id){
-  var env=R.enviados.filter(function(d){return d.parceiro===id&&d.st!=='oferta'&&d.st!=='apagado';})[0];
-  var meu=R.meus.filter(function(x){return x.de===id;})[0];return env||meu||null;}
+function rdConversas(R){var l=[];
+  R.enviados.forEach(function(d){if(d.st==='apagado')return;var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||null;l.push({id:d.id,cod:d.cod,trab:d.trab,quem:x,lado:'env',aberto:d.st!=='oferta'&&!!x,st:d.st});});
+  R.meus.forEach(function(k){l.push({id:k.id,cod:k.cod,trab:k.trab,quem:R.cadDe[k.de],lado:'meu',aberto:true,st:k.st});});
+  l.forEach(function(c){var m=R.chat[c.id]||[];c.ult=m[m.length-1];c.n=(R.naoLidas||{})[c.id]||0;c.ord=c.aberto?(c.n?2:1):0;});
+  l.sort(function(a,b){return b.ord-a.ord;});return l;}
+function rdConvDe(R,id){return rdConversas(R).filter(function(c){return c.id===id;})[0];}
 function rdMsgsHTML(R,id){var m=R.chat[id]||[];
   return m.map(function(x){return x.de==='sis'?'<div class="rd-msg sis">'+esc(x.t)+'</div>':'<div class="rd-msg'+(x.de==='eu'?' eu':'')+'">'+esc(x.t)+(x.h?'<small>'+x.h+'</small>':'')+'</div>';}).join('')+(R.digitando===id?'<div class="rd-dig">digitando…</div>':'');}
-var ICO_CADEADO='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
-function rdChat(R,x){var j=rdChatAberto(R,x.id),pn=esc(x.nome.split(' ')[0]);
-  return '<div class="stack" style="gap:8px" id="rd-chat"><h3 style="margin:6px 0 0">Conversa com '+pn+'</h3>'+
-    (j?'<div class="rd-chat"><div class="small muted">Sobre o '+j.cod+' · '+esc(j.trab)+'</div><div class="rd-msgs" id="rd-msgs" aria-live="polite">'+rdMsgsHTML(R,x.id)+'</div>'+
-      '<div class="rd-envia"><input id="rd-msg-in" data-id="'+x.id+'" maxlength="500" placeholder="Escreva para '+pn+'…" autocomplete="off"><button class="btn pri" data-a="rdMsg" data-id="'+x.id+'">Enviar</button></div></div>':
-     '<div class="rd-trava">'+ICO_CADEADO+'<span>O chat com '+pn+' abre quando '+pn+' <b>aceitar um pedido que você delegou</b>. Assim ninguém recebe mensagem sem ter trabalho junto.</span></div>')+'</div>';}
-function rdChatAtualiza(id){var R=redeIni(),el=document.getElementById('rd-msgs');if(!el||!ui.sheet||ui.sheet.fn!==fPerfilCad||ui.sheet.args[0]!==id)return;el.innerHTML=rdMsgsHTML(R,id);el.scrollTop=el.scrollHeight;}
+var ICO_CADEADO='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+var ICO_CHAT='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/></svg>';
+var RD_ST={oferta:'Aguardando aceite',desenho:'Desenhando',revisao:'Em revisão',aprovado:'Aprovado',pago:'Concluído',recusado:'Recusado'};
 function rdHora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+function rdDock(){var el=document.getElementById('rd-dock');
+  if(!S.sessao||S.carregando||!S.admin){if(el)el.innerHTML='';return;}
+  if(!el){el=document.createElement('div');el.id='rd-dock';document.body.appendChild(el);}
+  var R=redeIni(),D=R.dock||(R.dock={open:false,conv:null}),cs=rdConversas(R),tot=cs.reduce(function(s,c){return s+(c.aberto?c.n:0);},0);
+  var inp=document.getElementById('rd-msg-in'),foco=inp&&document.activeElement===inp;if(inp)D.rasc=inp.value;
+  var fab='<button class="rd-fab'+(D.open?' on':'')+'" data-a="rdDock" aria-label="'+(D.open?'Fechar conversas':'Abrir conversas dos pedidos')+'">'+(D.open?'<span style="font-size:26px;line-height:1">×</span>':ICO_CHAT)+(tot&&!D.open?'<span class="n">'+tot+'</span>':'')+'</button>';
+  if(!D.open){el.innerHTML=fab;return;}
+  var c=D.conv&&rdConvDe(R,D.conv),pan;
+  if(c&&c.aberto){var q=c.quem,pn=esc(q.nome.split(' ')[0]);
+    pan='<div class="rd-ph"><button class="rd-ib" data-a="rdDockVolta" aria-label="Voltar para a lista">‹</button><button class="rd-de" data-a="rdPerfil" data-id="'+q.id+'">'+avRede(q,36)+'</button><div class="t"><b>'+c.cod+' · '+esc(c.trab)+'</b><span>'+(c.lado==='env'?'com ':'de ')+'<button class="rd-de" data-a="rdPerfil" data-id="'+q.id+'">'+esc(q.nome)+'</button> · '+(RD_ST[c.st]||'')+'</span></div><button class="rd-ib" data-a="rdDock" aria-label="Fechar">×</button></div>'+
+      '<div class="rd-msgs" id="rd-msgs" aria-live="polite">'+rdMsgsHTML(R,c.id)+'</div>'+
+      '<div class="rd-envia"><input id="rd-msg-in" data-id="'+c.id+'" maxlength="500" placeholder="Mensagem sobre o '+c.cod+'…" autocomplete="off"><button class="btn pri" data-a="rdMsg" data-id="'+c.id+'" aria-label="Enviar">➤</button></div>';}
+  else{pan='<div class="rd-ph"><div class="t"><b>Conversas dos pedidos</b><span>Uma conversa para cada pedido delegado</span></div><button class="rd-ib" data-a="rdDock" aria-label="Fechar">×</button></div><div class="rd-lista">'+
+    (cs.length?cs.map(function(c){var q=c.quem;
+      if(!c.aberto)return '<div class="rd-ci trava">'+'<span class="rd-cav">'+ICO_CADEADO+'</span><span class="t"><b>'+c.cod+' · '+esc(c.trab)+'</b><span>O chat abre quando alguém aceitar este pedido.</span></span></div>';
+      var u=c.ult;return '<button class="rd-ci" data-a="rdDockConv" data-id="'+c.id+'">'+avRede(q,40)+'<span class="t"><b>'+c.cod+' · '+esc(c.trab)+'</b><span>'+esc(q.nome.split(' ')[0])+(u?': '+(u.de==='eu'?'Você: ':'')+esc(u.t):'')+'</span></span>'+(c.n?'<span class="n">'+c.n+'</span>':'<span class="h">'+(u&&u.h||'')+'</span>')+'</button>';}).join(''):'<p class="small muted" style="padding:16px">Nenhum pedido delegado ainda.</p>')+'</div>';}
+  el.innerHTML=fab+'<section class="rd-pan" role="dialog" aria-label="Conversas dos pedidos">'+pan+'</section>';
+  var ms=document.getElementById('rd-msgs');if(ms)ms.scrollTop=ms.scrollHeight;
+  var ni=document.getElementById('rd-msg-in');if(ni&&D.rasc){ni.value=D.rasc;}if(ni&&foco)ni.focus();
+}
+function rdAbreConv(id){var R=redeIni(),D=R.dock||(R.dock={});D.open=true;D.conv=id;D.rasc='';if(R.naoLidas)R.naoLidas[id]=0;rdDock();render();var i=document.getElementById('rd-msg-in');if(i&&window.innerWidth>=700)i.focus();}
 var RD_PORT=new Map();
 function rdArte(t,i){var tl=(t||'').toLowerCase(),g='<defs><linearGradient id="bgp'+i+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#25324a"/><stop offset="1" stop-color="#0c111b"/></linearGradient><linearGradient id="dt'+i+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#e2d4b8"/></linearGradient></defs><rect width="160" height="120" fill="url(#bgp'+i+')"/>',b='';
   var dente=function(x,y,rx,ry){return '<ellipse cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" rx="'+rx+'" ry="'+ry+'" fill="url(#dt'+i+')" stroke="#b9a989" stroke-width=".6"/>';};
@@ -1816,7 +1854,6 @@ function fPerfilCad(id){
     rdPortfolio(x)+
     '<div class="stack" style="gap:6px"><h3 style="margin:6px 0 0">Trabalhos feitos pela rede</h3><p class="small muted" style="margin:0">Contados a cada trabalho delegado e aprovado.</p>'+
       hbars(tipos.map(function(k){return {l:esc(k),r:pt[k]+'',v:pt[k]};}),'Ainda sem trabalhos pela rede.')+'</div>'+
-    (id!=='eu'?rdChat(R,x):'')+
     (id!=='eu'?'<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="rdDelegarPara" data-id="'+x.id+'">Delegar um pedido para '+esc(x.nome.split(' ')[0])+'</button><button class="btn" data-a="rdFav" data-id="'+x.id+'">'+(x.fav?'★ Tirar dos favoritos':'☆ Favoritar')+'</button></div>':'');
 }
 function rdParceiros(R){
@@ -2345,7 +2382,7 @@ var A={
     clearInterval(ui.rdTimer);ui.rdTimer=setInterval(function(){var b=R.busca;if(!b||R.passo!==3){clearInterval(ui.rdTimer);return;}passo++;b.t=passo;
       if(passo>=4){b.ok=vence.id;clearInterval(ui.rdTimer);var t=tipoPed(p);
         R.enviados.unshift({id:'d'+Date.now(),cod:b.cod,trab:t?t.nome:'Elemento sobre implante',dentes:p.elementos||[],repasse:b.rep,prazo:R.prazo,hora:R.hora,parceiro:vence.id,st:'desenho',quando:today()});
-        R.chat[vence.id]=(R.chat[vence.id]||[]).concat([{de:'sis',t:vence.nome.split(' ')[0]+' aceitou o '+b.cod+'. Chat liberado.'}]);
+        R.chat[R.enviados[0].id]=[{de:'sis',t:vence.nome.split(' ')[0]+' aceitou o '+b.cod+'. Chat liberado.'}];
         toast(vence.nome+' aceitou o pedido! O chat foi liberado.');}
       if(ui.tab==='rede')render();},1500);},
   rdAbreArq:function(d){var k=d.k.split(':'),R=redeIni(),x=R.enviados.concat(R.meus).filter(function(q){return q.id===k[0];})[0],f=x&&x.arqs[+k[1]];if(!f)return;
@@ -2353,20 +2390,24 @@ var A={
     if(!file){toast(f.tipo==='html'?'Arquivo de exemplo. Anexe um HTML de verdade para ver a visualização abrindo.':'Arquivo de exemplo: na versão final, baixa o arquivo.');return;}
     var u=URL.createObjectURL(file);if(f.tipo==='html')window.open(u,'_blank');else{var l=document.createElement('a');l.href=u;l.download=f.nome;document.body.appendChild(l);l.click();l.remove();}
     setTimeout(function(){URL.revokeObjectURL(u);},60000);},
-  rdPerfil:function(d){openSheet(fPerfilCad,d.id);var R=redeIni();if(R.naoLidas&&R.naoLidas[d.id]&&rdChatAberto(R,d.id)){R.naoLidas[d.id]=0;render();}var el=document.getElementById('rd-msgs');if(el)el.scrollTop=el.scrollHeight;},
+  rdPerfil:function(d){openSheet(fPerfilCad,d.id);},
   rdPortVer:function(d){rdLightbox(d.id,+d.i);},
   rdLbFecha:function(){var el=document.getElementById('rd-lb');if(el)el.remove();},
   rdPortDel:function(d){var R=redeIni(),p=rdPortDe(R.eu),f=p[+d.i];if(!f)return;if(RD_PORT.get(f.id)){URL.revokeObjectURL(RD_PORT.get(f.id));RD_PORT.delete(f.id);}p.splice(+d.i,1);renderSheet();},
-  rdConversa:function(d){A.rdPerfil(d);var c=document.getElementById('rd-chat');if(c)c.scrollIntoView({block:'start'});var i=document.getElementById('rd-msg-in');if(i)i.focus({preventScroll:true});},
-  rdMsg:function(d){var R=redeIni(),i=document.getElementById('rd-msg-in'),t=i&&i.value.trim(),id=d.id;if(!t||!rdChatAberto(R,id))return;
-    (R.chat[id]=R.chat[id]||[]).push({de:'eu',t:t,h:rdHora()});i.value='';i.focus();rdChatAtualiza(id);
-    clearTimeout(ui.rdResp);ui.rdResp=setTimeout(function(){R.digitando=id;rdChatAtualiza(id);
+  rdConversa:function(d){rdAbreConv(d.id);},
+  rdDock:function(){var R=redeIni(),D=R.dock||(R.dock={});D.open=!D.open;if(!D.open)D.conv=null;rdDock();},
+  rdDockConv:function(d){rdAbreConv(d.id);},
+  rdDockVolta:function(){var R=redeIni();R.dock.conv=null;R.dock.rasc='';rdDock();},
+  rdMsg:function(d){var R=redeIni(),i=document.getElementById('rd-msg-in'),t=i&&i.value.trim(),id=d.id,c=rdConvDe(R,id);if(!t||!c||!c.aberto)return;
+    (R.chat[id]=R.chat[id]||[]).push({de:'eu',t:t,h:rdHora()});i.value='';R.dock.rasc='';rdDock();var ni=document.getElementById('rd-msg-in');if(ni)ni.focus();
+    clearTimeout(ui.rdResp);ui.rdResp=setTimeout(function(){R.digitando=id;if(R.dock.conv===id&&R.dock.open)rdDock();
       ui.rdResp=setTimeout(function(){R.digitando=null;var r=['Combinado!','Beleza, já vejo aqui.','Certo, ajusto e te aviso.','Ok! Qualquer coisa te chamo por aqui.'];
         R.chat[id].push({de:'outro',t:r[R.chat[id].length%r.length],h:rdHora()});
-        if(ui.sheet&&ui.sheet.fn===fPerfilCad&&ui.sheet.args[0]===id)rdChatAtualiza(id);else{R.naoLidas=R.naoLidas||{};R.naoLidas[id]=(R.naoLidas[id]||0)+1;if(ui.tab==='rede')render();}},1600);},900);},
+        if(!(R.dock.open&&R.dock.conv===id)){R.naoLidas=R.naoLidas||{};R.naoLidas[id]=(R.naoLidas[id]||0)+1;if(ui.tab==='rede')render();}
+        rdDock();},1600);},900);},
   rdPega:function(d){var R=redeIni(),x=R.mural.filter(function(q){return q.id===d.id;})[0];if(!x)return;x.st='pego';
     R.meus.unshift({id:'k'+Date.now(),cod:x.cod,trab:x.trab,dentes:x.dentes,mat:x.mat,repasse:x.repasse,hora:x.hora,prazo:x.prazo,de:x.de,st:'desenho'});
-    R.chat[x.de]=(R.chat[x.de]||[]).concat([{de:'sis',t:'Você aceitou o '+x.cod+'. Chat liberado.'}]);
+    R.chat[R.meus[0].id]=[{de:'sis',t:'Você aceitou o '+x.cod+'. Chat liberado.'}];
     R.tab='meus';render();toast('Trabalho '+x.cod+' é seu! Arquivos e chat liberados.');},
   rdIgnora:function(d){var R=redeIni(),x=R.mural.filter(function(q){return q.id===d.id;})[0];if(x){x.st='recusado';render();}},
   rdMeuSt:function(d){var R=redeIni(),x=R.meus.filter(function(q){return q.id===d.id;})[0];if(!x)return;x.st=d.v;
@@ -2384,8 +2425,8 @@ var A={
   rdCopiaPix:function(d){try{navigator.clipboard.writeText(d.v).then(function(){toast('Chave Pix copiada.');});}catch(e){toast(d.v);}},
   rdCancelar:function(){var R=redeIni();clearInterval(ui.rdTimer);R.passo=2;R.busca=null;render();toast('Oferta apagada.');},
   rdSim:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];
-    if(x&&x.st==='oferta'&&d.v==='desenho'){var livre=R.parceiros.filter(function(q){return !rdChatAberto(R,q.id);})[0]||R.parceiros[0];x.parceiro=livre.id;x.st='desenho';
-      R.chat[livre.id]=(R.chat[livre.id]||[]).concat([{de:'sis',t:livre.nome.split(' ')[0]+' aceitou o '+x.cod+'. Chat liberado.'}]);render();toast(livre.nome+' aceitou! O chat com '+livre.nome.split(' ')[0]+' foi liberado.');return;}
+    if(x&&x.st==='oferta'&&d.v==='desenho'){var livre=R.parceiros.filter(function(q){return q.id==='r3';})[0]||R.parceiros[0];x.parceiro=livre.id;x.st='desenho';
+      R.chat[x.id]=[{de:'sis',t:livre.nome.split(' ')[0]+' aceitou o '+x.cod+'. Chat liberado.'},{de:'outro',t:'Oi! Peguei o '+x.cod+'. Alguma observação sobre o caso?',h:rdHora()}];R.naoLidas=R.naoLidas||{};R.naoLidas[x.id]=1;render();toast(livre.nome+' aceitou! O chat do '+x.cod+' foi liberado.');return;}
     if(x){x.st=d.v;render();toast({revisao:'O parceiro enviou o projeto para você revisar.',desenho:'Ajuste pedido ao parceiro.',aprovado:'Projeto aprovado. Agora é só pagar o repasse.',pago:'Repasse marcado como pago.'}[d.v]);}},
   rdNota:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(x){x.nota=+d.n;render();}},
   rdVer:function(){toast('Na versão final, abre o projeto do parceiro no visualizador 3D.');},
@@ -2613,6 +2654,7 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Enter'&&e.target.id==='rd-msg-in'){e.preventDefault();A.rdMsg(e.target.dataset);return;}
   if(e.key==='Escape'&&document.getElementById('rd-lb')){A.rdLbFecha();return;}
   if(e.key==='Escape'&&ui.sheet)closeSheet();
+  else if(e.key==='Escape'&&ui.rede&&ui.rede.dock&&ui.rede.dock.open)A.rdDock();
   if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('kcard')){e.preventDefault();A.verPedido(e.target.dataset);}
 });
 document.addEventListener('keydown',function(e){if(e.target.id==='busca-top'&&e.key==='Enter'){ui.busca=e.target.value;ui.tab='pedidos';ui.sub=null;ui.filtro='todos';render();var b=document.getElementById('busca');if(b)b.focus();}});
