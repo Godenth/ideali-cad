@@ -181,6 +181,23 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .rd-fav{margin-left:auto;border:1px solid var(--line);background:var(--surface);border-radius:50%;width:40px;height:40px;font-size:1.2rem;color:var(--line);cursor:pointer;flex:none}.rd-fav.on{color:#F0A53A;border-color:#F0A53A}
 .rd-chips{display:flex;flex-wrap:wrap;gap:6px}.rd-chips span{font-size:.75rem;padding:.3em .7em;border-radius:999px;background:var(--soft);color:var(--muted)}.rd-chips .sw{background:var(--accent-soft);color:var(--accent);font-weight:700}
 .rd-on{color:var(--c-val);font-weight:700}
+.rd-port{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rd-pi{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#111827;padding:0;cursor:pointer;display:block;width:100%}
+.rd-pi img,.rd-pi video,.rd-pi svg{width:100%;height:100%;object-fit:cover;display:block}
+.rd-pi .cap{position:absolute;left:0;right:0;bottom:0;padding:14px 8px 6px;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:.72rem;font-weight:600;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rd-pi .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.rd-pi .play span{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;color:#111}
+.rd-pi .vid{position:absolute;top:6px;left:6px;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.65);color:#fff;font-size:.66rem;font-weight:700;font-family:var(--mono,monospace)}
+.rd-pw{position:relative}.rd-pw .x{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:15px;line-height:26px;padding:0;cursor:pointer}
+.rd-padd{aspect-ratio:4/3;border-radius:12px;border:1.5px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:.8rem;font-weight:600;position:relative;cursor:pointer;text-align:center;padding:6px}
+.rd-padd input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.rd-lb{position:fixed;inset:0;z-index:300;background:rgba(5,6,12,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px}
+.rd-lb .box{width:min(960px,100%);max-height:78vh;display:flex;justify-content:center}
+.rd-lb .box>*{max-width:100%;max-height:78vh;border-radius:14px;display:block}
+.rd-lb .box svg{width:100%;height:auto}
+.rd-lb p{color:#fff;margin:0;text-align:center}
+.rd-lb .fecha{position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;font-size:20px;cursor:pointer}
+.rd-lb .nav{display:flex;gap:10px}
 .rd-chat{display:grid;gap:10px;padding:12px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
 .rd-msgs{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;padding:2px}
 .rd-msg{max-width:80%;padding:8px 12px;border-radius:14px 14px 14px 4px;background:var(--card);border:1px solid var(--line);font-size:.92rem;line-height:1.4;overflow-wrap:anywhere;align-self:flex-start}
@@ -756,7 +773,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 19h00';
+var VERSAO='14/10 · 19h15';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1760,6 +1777,35 @@ function rdChat(R,x){var j=rdChatAberto(R,x.id),pn=esc(x.nome.split(' ')[0]);
      '<div class="rd-trava">'+ICO_CADEADO+'<span>O chat com '+pn+' abre quando '+pn+' <b>aceitar um pedido que você delegou</b>. Assim ninguém recebe mensagem sem ter trabalho junto.</span></div>')+'</div>';}
 function rdChatAtualiza(id){var R=redeIni(),el=document.getElementById('rd-msgs');if(!el||!ui.sheet||ui.sheet.fn!==fPerfilCad||ui.sheet.args[0]!==id)return;el.innerHTML=rdMsgsHTML(R,id);el.scrollTop=el.scrollHeight;}
 function rdHora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+var RD_PORT=new Map();
+function rdArte(t,i){var tl=(t||'').toLowerCase(),g='<defs><linearGradient id="bgp'+i+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#25324a"/><stop offset="1" stop-color="#0c111b"/></linearGradient><linearGradient id="dt'+i+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#e2d4b8"/></linearGradient></defs><rect width="160" height="120" fill="url(#bgp'+i+')"/>',b='';
+  var dente=function(x,y,rx,ry){return '<ellipse cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" rx="'+rx+'" ry="'+ry+'" fill="url(#dt'+i+')" stroke="#b9a989" stroke-width=".6"/>';};
+  if(/protocolo|barra|placa/.test(tl)){var gum=/placa/.test(tl)?'':'<path d="M27 26 Q80 150 133 26" fill="none" stroke="#e59aa6" stroke-width="20" stroke-linecap="round"/>';b+=gum;
+    for(var j=0;j<12;j++){var a=Math.PI*(0.08+0.84*j/11),x=80-56*Math.cos(a),y=24+68*Math.sin(a),m=Math.abs(j-5.5)>3.5;b+=dente(x,y,m?8:6,m?7:6);}
+    if(/placa/.test(tl))b+='<path d="M24 22 Q80 158 136 22" fill="none" stroke="rgba(160,205,255,.55)" stroke-width="26" stroke-linecap="round"/>';}
+  else if(/faceta|mockup|encer|lente/.test(tl)){b+='<rect x="0" y="20" width="160" height="26" fill="#e59aa6"/>';
+    [14,9,7,7,9,14].reduce(function(x,w,k){var h=[44,52,58,58,52,44][k];b+='<rect x="'+x+'" y="34" width="'+(w*1.9)+'" height="'+h+'" rx="9" fill="'+(/encer/.test(tl)?'#f2d18a':'url(#dt'+i+')')+'" stroke="#b9a989" stroke-width=".6"/>';return x+w*1.9+2;},16);}
+  else{b+='<rect x="12" y="78" width="136" height="20" rx="8" fill="#e59aa6"/>';
+    for(var k=0;k<3;k++){var cx=40+k*40;b+='<path d="M'+(cx-16)+' 84 Q'+(cx-19)+' 50 '+(cx-10)+' 42 Q'+cx+' 50 '+(cx+10)+' 42 Q'+(cx+19)+' 50 '+(cx+16)+' 84 Z" fill="url(#dt'+i+')" stroke="#b9a989" stroke-width=".7"/>';}
+    if(/implante/.test(tl))b+='<rect x="74" y="84" width="12" height="26" rx="3" fill="#9aa7b8"/>';}
+  return '<svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+g+b+'</svg>';}
+function rdPortDe(x){if(!x.port){var ks=Object.keys(x.porTipo||{});x.port=x.id==='eu'?[]:ks.slice(0,5).map(function(k,i){return {tipo:'foto',t:k,ex:1};});if(x.id!=='eu'&&ks.length)x.port.push({tipo:'video',t:'Desenhando '+ks[0].toLowerCase(),ex:1});}return x.port;}
+var ICO_PLAY='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+function rdPortItem(x,f,i){var u=RD_PORT.get(f.id),mid=f.ex?rdArte(f.t,x.id+i):f.tipo==='video'?'<video src="'+u+'" muted preload="metadata"></video>':'<img src="'+u+'" alt="'+esc(f.t)+'">';
+  return '<div class="rd-pw"><button class="rd-pi" data-a="rdPortVer" data-id="'+x.id+'" data-i="'+i+'" aria-label="Abrir '+esc(f.t)+'">'+mid+(f.tipo==='video'?'<span class="vid">VÍDEO</span><span class="play"><span>'+ICO_PLAY+'</span></span>':'')+'<span class="cap">'+esc(f.t)+'</span></button>'+
+    (x.id==='eu'?'<button class="x" data-a="rdPortDel" data-i="'+i+'" aria-label="Remover">×</button>':'')+'</div>';}
+function rdPortfolio(x){var p=rdPortDe(x),eu=x.id==='eu',nv=p.filter(function(f){return f.tipo==='video';}).length;
+  if(!eu&&!p.length)return '';
+  return '<div class="stack" style="gap:8px"><div class="between"><h3 style="margin:6px 0 0">'+(eu?'Meu portfólio':'Portfólio')+'</h3><span class="small muted">'+p.filter(function(f){return f.tipo==='foto';}).length+' foto(s) · '+nv+' vídeo</span></div>'+
+    (eu?'<p class="small muted" style="margin:0">Até 12 fotos ou prints e 1 vídeo de até 1 minuto. <b>Não mostre nome de paciente</b> nos prints.</p>':'')+
+    '<div class="rd-port">'+p.map(function(f,i){return rdPortItem(x,f,i);}).join('')+
+    (eu&&p.length<13?'<label class="rd-padd">'+ICO_PLAY.replace('fill="currentColor"','fill="none" stroke="currentColor" stroke-width="2"')+'+ Fotos ou vídeo<input class="rd-port-up" type="file" multiple accept="image/*,video/*" aria-label="Adicionar fotos ou vídeo ao portfólio"></label>':'')+'</div></div>';}
+function rdLightbox(id,i){var R=redeIni(),x=id==='eu'?R.eu:(R.parceiros.filter(function(q){return q.id===id;})[0]||R.cadDe[id]),p=x&&rdPortDe(x),f=p&&p[i];var el=document.getElementById('rd-lb');
+  if(!f){if(el)el.remove();return;}
+  if(!el){el=document.createElement('div');el.id='rd-lb';el.className='rd-lb';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');document.body.appendChild(el);}
+  var u=RD_PORT.get(f.id),mid=f.ex?rdArte(f.t,'lb'+i):f.tipo==='video'?'<video src="'+u+'" controls autoplay playsinline></video>':'<img src="'+u+'" alt="'+esc(f.t)+'">';
+  el.innerHTML='<button class="fecha" data-a="rdLbFecha" aria-label="Fechar">×</button><div class="box">'+mid+'</div><p><b>'+esc(f.t)+'</b>'+(f.ex?' <span class="small" style="opacity:.7">· '+(f.tipo==='video'?'vídeo':'imagem')+' de exemplo</span>':'')+'</p>'+
+    (p.length>1?'<div class="nav"><button class="btn sm" data-a="rdPortVer" data-id="'+id+'" data-i="'+((i-1+p.length)%p.length)+'">‹ Anterior</button><span style="color:#fff;align-self:center" class="small">'+(i+1)+' / '+p.length+'</span><button class="btn sm" data-a="rdPortVer" data-id="'+id+'" data-i="'+((i+1)%p.length)+'">Próxima ›</button></div>':'');}
 function fPerfilCad(id){
   var R=redeIni(),x=id==='eu'?R.eu:(R.parceiros.filter(function(q){return q.id===id;})[0]||R.cadDe[id]);if(!x)return head('Cadista')+'<p class="empty">Não encontrado.</p>';
   var pt=x.porTipo||{},tipos=Object.keys(pt).sort(function(a,b){return pt[b]-pt[a];}),tot=tipos.reduce(function(s,k){return s+pt[k];},0);
@@ -1767,6 +1813,7 @@ function fPerfilCad(id){
     '<div class="row" style="gap:14px;align-items:center">'+avRede(x,64)+'<div style="min-width:0"><h2 style="margin:0">'+esc(x.nome)+'</h2><div class="small muted">'+esc(x.cidade)+(x.desde?' · na rede desde '+x.desde:'')+'</div><div>'+estrelas(x.nota)+' <b>'+x.nota+'</b> <span class="small muted">('+x.av+' avaliações)</span></div></div></div>'+
     '<div class="rd-chips">'+x.sw.map(function(s){return '<span class="sw">'+esc(s)+'</span>';}).join('')+(x.esp||[]).map(function(s){return '<span>'+esc(s)+'</span>';}).join('')+'</div>'+
     '<div class="rd-kpis"><div><b>'+tot+'</b><span>trabalhos feitos</span></div><div><b>'+(x.elementos||0)+'</b><span>elementos</span></div><div><b>'+(x.noPrazo||0)+'%</b><span>entregues no prazo</span></div><div><b>'+(x.prazo||'—')+'</b><span>prazo médio</span></div></div>'+
+    rdPortfolio(x)+
     '<div class="stack" style="gap:6px"><h3 style="margin:6px 0 0">Trabalhos feitos pela rede</h3><p class="small muted" style="margin:0">Contados a cada trabalho delegado e aprovado.</p>'+
       hbars(tipos.map(function(k){return {l:esc(k),r:pt[k]+'',v:pt[k]};}),'Ainda sem trabalhos pela rede.')+'</div>'+
     (id!=='eu'?rdChat(R,x):'')+
@@ -2307,6 +2354,9 @@ var A={
     var u=URL.createObjectURL(file);if(f.tipo==='html')window.open(u,'_blank');else{var l=document.createElement('a');l.href=u;l.download=f.nome;document.body.appendChild(l);l.click();l.remove();}
     setTimeout(function(){URL.revokeObjectURL(u);},60000);},
   rdPerfil:function(d){openSheet(fPerfilCad,d.id);var R=redeIni();if(R.naoLidas&&R.naoLidas[d.id]&&rdChatAberto(R,d.id)){R.naoLidas[d.id]=0;render();}var el=document.getElementById('rd-msgs');if(el)el.scrollTop=el.scrollHeight;},
+  rdPortVer:function(d){rdLightbox(d.id,+d.i);},
+  rdLbFecha:function(){var el=document.getElementById('rd-lb');if(el)el.remove();},
+  rdPortDel:function(d){var R=redeIni(),p=rdPortDe(R.eu),f=p[+d.i];if(!f)return;if(RD_PORT.get(f.id)){URL.revokeObjectURL(RD_PORT.get(f.id));RD_PORT.delete(f.id);}p.splice(+d.i,1);renderSheet();},
   rdConversa:function(d){A.rdPerfil(d);var c=document.getElementById('rd-chat');if(c)c.scrollIntoView({block:'start'});var i=document.getElementById('rd-msg-in');if(i)i.focus({preventScroll:true});},
   rdMsg:function(d){var R=redeIni(),i=document.getElementById('rd-msg-in'),t=i&&i.value.trim(),id=d.id;if(!t||!rdChatAberto(R,id))return;
     (R.chat[id]=R.chat[id]||[]).push({de:'eu',t:t,h:rdHora()});i.value='';i.focus();rdChatAtualiza(id);
@@ -2561,6 +2611,7 @@ document.addEventListener('click',function(e){
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'&&ui.ddOpen){ui.ddOpen=null;render();return;}
   if(e.key==='Enter'&&e.target.id==='rd-msg-in'){e.preventDefault();A.rdMsg(e.target.dataset);return;}
+  if(e.key==='Escape'&&document.getElementById('rd-lb')){A.rdLbFecha();return;}
   if(e.key==='Escape'&&ui.sheet)closeSheet();
   if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('kcard')){e.preventDefault();A.verPedido(e.target.dataset);}
 });
@@ -2602,6 +2653,16 @@ document.addEventListener('change',function(e){
   if(t.classList&&t.classList.contains('rd-up')&&t.files.length){var R1=redeIni(),it=R1.enviados.concat(R1.meus).filter(function(q){return q.id===t.dataset.id;})[0];
     if(it){it.arqs=it.arqs||[];[].forEach.call(t.files,function(f){var tp=/\.html?$/i.test(f.name)?'html':'stl';it.arqs.push({nome:f.name,tipo:tp,de:'eu'});RD_FILES.set(it.id+':'+(it.arqs.length-1),f);});
       render();toast(t.files.length+' arquivo(s) anexado(s). O outro cadista já consegue abrir.');}}
+  if(t.classList&&t.classList.contains('rd-port-up')&&t.files.length){var Rp=redeIni(),pp=rdPortDe(Rp.eu),av=[];
+    [].forEach.call(t.files,function(f){var vid=/^video\//.test(f.type),fotos=pp.filter(function(q){return q.tipo==='foto';}).length;
+      if(!vid&&!/^image\//.test(f.type))return;
+      if(vid&&pp.some(function(q){return q.tipo==='video';})){av.push('Só cabe 1 vídeo. Apague o atual para trocar.');return;}
+      if(!vid&&fotos>=12){av.push('Limite de 12 fotos.');return;}
+      if(f.size>(vid?100:10)*1048576){av.push(f.name+' é grande demais (máx. '+(vid?'100':'10')+' MB).');return;}
+      var it={id:'p'+Date.now()+Math.random().toString(36).slice(2,6),tipo:vid?'video':'foto',t:f.name.replace(/\.[^.]+$/,'')};RD_PORT.set(it.id,URL.createObjectURL(f));
+      if(vid){var v=document.createElement('video');v.preload='metadata';v.onloadedmetadata=function(){if(v.duration>61){var k=pp.indexOf(it);if(k>=0)pp.splice(k,1);toast('O vídeo tem mais de 1 minuto. Corte e envie de novo.');if(ui.sheet)renderSheet();}};v.src=RD_PORT.get(it.id);}
+      pp.push(it);});
+    renderSheet();if(av.length)toast(av[0]);else toast('Adicionado ao seu portfólio.');}
   if(t.id==='rd-filtro'||t.id==='rd-ordem'){var R0=redeIni();if(t.id==='rd-filtro')R0.filtro=t.value;else R0.ordem=t.value;render();}
   if(t.id==='rd-disp'){redeIni().eu.on=t.checked;render();}
   if(t.id==='rd-prazo'||t.id==='rd-hora'){rdLer();var y2=window.scrollY;render();window.scrollTo(0,y2);}
