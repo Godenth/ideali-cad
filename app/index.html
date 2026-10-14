@@ -181,6 +181,7 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .rd-fav{margin-left:auto;border:1px solid var(--line);background:var(--surface);border-radius:50%;width:40px;height:40px;font-size:1.2rem;color:var(--line);cursor:pointer;flex:none}.rd-fav.on{color:#F0A53A;border-color:#F0A53A}
 .rd-chips{display:flex;flex-wrap:wrap;gap:6px}.rd-chips span{font-size:.75rem;padding:.3em .7em;border-radius:999px;background:var(--soft);color:var(--muted)}.rd-chips .sw{background:var(--accent-soft);color:var(--accent);font-weight:700}
 .rd-on{color:var(--c-val);font-weight:700}
+.rd-pix{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.85rem;padding:6px 10px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
 .cfg{max-width:1180px;margin-inline:auto;display:grid;gap:16px}
 .cfg-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);scrollbar-width:none}
 .cfg-tabs::-webkit-scrollbar{display:none}
@@ -725,7 +726,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 17h00';
+var VERSAO='14/10 · 17h15';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1570,14 +1571,15 @@ function redeIni(){
   var hoje=today();
   ui.rede={tab:'delegar',passo:1,pid:null,repasse:'',prazo:addDays(hoje,1),quem:'favoritos',cadista:'',busca:null,obs:'',
     parceiros:[
-      {id:'r1',nome:'Juliana Mendes',cidade:'Belo Horizonte, MG',sw:['exocad','3Shape'],esp:['Coroas','Facetas','Protocolos'],nota:4.9,av:128,feitos:342,prazo:'1 dia',on:true,fav:true,cor:5},
-      {id:'r2',nome:'Rafael Torres',cidade:'Curitiba, PR',sw:['exocad'],esp:['Protocolos','Sobre implante'],nota:4.8,av:96,feitos:211,prazo:'1–2 dias',on:true,fav:true,cor:4},
+      {id:'r1',pix:'juliana.cad@email.com',nome:'Juliana Mendes',cidade:'Belo Horizonte, MG',sw:['exocad','3Shape'],esp:['Coroas','Facetas','Protocolos'],nota:4.9,av:128,feitos:342,prazo:'1 dia',on:true,fav:true,cor:5},
+      {id:'r2',pix:'(41) 99999-0000',nome:'Rafael Torres',cidade:'Curitiba, PR',sw:['exocad'],esp:['Protocolos','Sobre implante'],nota:4.8,av:96,feitos:211,prazo:'1–2 dias',on:true,fav:true,cor:4},
       {id:'r3',nome:'Camila Rocha',cidade:'Recife, PE',sw:['3Shape'],esp:['Facetas','Enceramento'],nota:4.7,av:54,feitos:120,prazo:'1 dia',on:false,fav:false,cor:6},
-      {id:'r4',nome:'Diego Alves',cidade:'São Paulo, SP',sw:['exocad','DentalWings'],esp:['Coroas','Placas'],nota:4.9,av:203,feitos:580,prazo:'mesmo dia',on:true,fav:false,cor:3},
+      {id:'r4',pix:'diego@alvescad.com.br',nome:'Diego Alves',cidade:'São Paulo, SP',sw:['exocad','DentalWings'],esp:['Coroas','Placas'],nota:4.9,av:203,feitos:580,prazo:'mesmo dia',on:true,fav:false,cor:3},
       {id:'r5',nome:'Patrícia Lima',cidade:'Goiânia, GO',sw:['exocad'],esp:['Provisórios','Coroas'],nota:4.6,av:31,feitos:74,prazo:'2 dias',on:true,fav:false,cor:2},
       {id:'r6',nome:'Marcos Vieira',cidade:'Porto Alegre, RS',sw:['3Shape','exocad'],esp:['Sobre implante','Barras'],nota:4.8,av:77,feitos:190,prazo:'1–2 dias',on:false,fav:false,cor:1}
     ],
     enviados:[
+      {id:'d0',cod:'R-2486',trab:'Placa de bruxismo',dentes:[],repasse:35,prazo:addDays(hoje,2),parceiro:null,st:'oferta',quando:hoje,para:'Toda a rede'},
       {id:'d1',cod:'R-2481',trab:'Elemento sobre implante',dentes:[36],repasse:45,prazo:addDays(hoje,1),parceiro:'r1',st:'desenho',quando:hoje},
       {id:'d2',cod:'R-2475',trab:'Protocolo (superior ou inferior)',dentes:[],repasse:280,prazo:hoje,parceiro:'r2',st:'revisao',quando:addDays(hoje,-1)},
       {id:'d3',cod:'R-2460',trab:'Facetas',dentes:[11,12,21,22],repasse:96,prazo:addDays(hoje,-3),parceiro:'r4',st:'pago',quando:addDays(hoje,-4),nota:5}
@@ -1618,7 +1620,7 @@ function rdDelegar(R){
   h+='<section class="card stack"><div><h2>2. Como delegar</h2><p class="small muted">Pedido #'+p.num+' · você cobra <b class="val">'+brl(p.valor)+'</b> do seu cliente.</p></div>'+
     '<div class="grid2"><label class="fld"><span>Repasse para o parceiro (R$)</span><input id="rd-rep" type="number" min="0" step="1" value="'+rep+'"><small>Sugestão: 60% do valor.</small></label>'+
     '<label class="fld"><span>Prazo para o parceiro</span><input id="rd-prazo" type="date" value="'+R.prazo+'"></label></div>'+
-    '<div class="rd-lucro"><span>Você fica com</span><b class="mono '+(lucro>=0?'val':'late')+'">'+brl(lucro)+'</b><span class="small muted">sem taxa nem comissão da plataforma</span></div>'+
+    '<div class="rd-lucro"><span>Você fica com</span><b class="mono '+(lucro>=0?'val':'late')+'">'+brl(lucro)+'</b><span class="small muted">sem taxa nem comissão. O repasse você paga direto ao parceiro (Pix), por fora.</span></div>'+
     '<div class="fld"><span>Para quem oferecer</span><div class="fres">'+[['favoritos','Meus parceiros favoritos'],['rede','Toda a rede (quem aceitar primeiro)'],['um','Um cadista específico']].map(function(o){return '<label class="check"><input type="radio" name="rd-quem" value="'+o[0]+'" data-a="rdQuem" '+(R.quem===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('')+'</div></div>'+
     (R.quem==='um'?'<label class="fld"><span>Cadista</span><select id="rd-cad"><option value="">Escolha…</option>'+R.parceiros.map(function(x){return '<option value="'+x.id+'" '+(R.cadista===x.id?'selected':'')+'>'+esc(x.nome)+' · ★ '+x.nota+'</option>';}).join('')+'</select></label>':'')+
     '<div class="rd-sigilo"><b>🔒 Sigilo</b><div class="grid2 small"><div><span class="muted">O parceiro vê</span><ul><li>Trabalho, dentes e material</li><li>Arquivos do escaneamento</li><li>Prazo e valor do repasse</li></ul></div><div><span class="muted">O parceiro NÃO vê</span><ul><li>Nome do seu cliente</li><li>Nome do paciente (vira o código R-xxxx)</li><li>O valor que você cobra</li></ul></div></div></div>'+
@@ -1627,20 +1629,21 @@ function rdDelegar(R){
 }
 function rdBusca(R,p){
   var lista=R.quem==='um'?R.parceiros.filter(function(x){return x.id===R.cadista;}):R.quem==='favoritos'?R.parceiros.filter(function(x){return x.fav;}):R.parceiros.filter(function(x){return x.on;});
-  var b=R.busca||{t:0,ok:null};
-  return '<section class="card stack rd-busca"><div class="between wrap"><div><h2>'+(b.ok?'Pedido aceito!':'Procurando um cadista…')+'</h2><p class="small muted">Código '+b.cod+' · repasse <b class="val">'+brl(b.rep)+'</b> · prazo '+dmy(R.prazo)+'</p></div>'+
-    (b.ok?'<button class="btn pri" data-a="rdTab" data-v="andamento">Acompanhar em Enviados</button>':'<button class="btn" data-a="rdCancelar">Cancelar oferta</button>')+'</div>'+
+  var b=R.busca||{t:0,ok:null};b.t=99;
+  return '<section class="card stack rd-busca"><div class="between wrap"><div><h2>'+(b.ok?'Pedido aceito!':'Procurando um cadista…')+'</h2><p class="small muted">Código '+b.cod+' · repasse <b class="val">'+brl(b.rep)+'</b> · prazo '+dmy(R.prazo)+'</p>'+(b.ok?'':'<p class="small muted">Todos foram avisados ao mesmo tempo. A oferta fica aberta até alguém aceitar ou você apagar, sem prazo.</p>')+'</div>'+
+    (b.ok?'<button class="btn pri" data-a="rdTab" data-v="andamento">Acompanhar em Enviados</button>':'<span class="row" style="gap:8px"><button class="btn" data-a="rdDeixar">Deixar aberta e sair</button><button class="btn danger" data-a="rdCancelar">Apagar oferta</button></span>')+'</div>'+
     '<div class="rd-fila">'+lista.map(function(x,i){var st=b.ok===x.id?'aceitou':b.ok?'fechado':i<=b.t?'avisado':'fila';
       return '<div class="rd-cand '+st+'">'+avRede(x,40)+'<div class="t"><b>'+esc(x.nome)+'</b><span class="small muted">'+esc(x.cidade)+' · '+estrelas(x.nota)+' '+x.nota+'</span></div><span class="rd-cst">'+({aceitou:'✓ Aceitou',fechado:'Encerrado',avisado:'<i class="rd-pulse"></i> Avisado',fila:'Na fila'})[st]+'</span></div>';}).join('')+'</div></section>';
 }
 function rdEnviados(R){
-  return '<div class="stack">'+R.enviados.map(function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};
-    return '<section class="card stack"><div class="between wrap"><div class="row" style="gap:12px">'+(x.nome?avRede(x):'')+'<div><b>'+esc(d.trab)+'</b><div class="small muted">'+d.cod+(d.dentes.length?' · dentes '+d.dentes.join(', '):'')+' · com '+esc(x.nome||'—')+'</div></div></div><span class="mono val">'+brl(d.repasse)+'</span></div>'+
-      etapasRede(d.st)+
+  return '<div class="stack">'+R.enviados.map(function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};if(d.st==='apagado')return '';
+    return '<section class="card stack"><div class="between wrap"><div class="row" style="gap:12px">'+(x.nome?avRede(x):'')+'<div><b>'+esc(d.trab)+'</b><div class="small muted">'+d.cod+(d.dentes.length?' · dentes '+d.dentes.join(', '):'')+' · '+(x.nome?'com '+esc(x.nome):'oferecido para: '+esc(d.para||'a rede'))+'</div></div></div><span class="mono val">'+brl(d.repasse)+'</span></div>'+
+      (d.st==='recusado'?'<div class="banner bad"><span>Você recusou este trabalho'+(d.motivo?': '+esc(d.motivo):'')+'. Não há repasse a pagar.</span><button class="btn sm" data-a="rdReoferecer" data-id="'+d.id+'">Oferecer de novo</button></div>':etapasRede(d.st))+
       '<div class="row wrap" style="gap:8px">'+
+        (d.st==='oferta'?'<span class="small muted"><i class="rd-pulse"></i> Aguardando alguém aceitar · sem prazo</span><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="desenho">Simular: alguém aceitou</button><button class="btn sm danger" data-a="rdApagar" data-id="'+d.id+'">Apagar oferta</button>':'')+
         (d.st==='desenho'?'<span class="small muted">Prazo '+dmy(d.prazo)+'</span><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="revisao">Simular: parceiro entregou</button>':'')+
-        (d.st==='revisao'?'<button class="btn sm" data-a="rdVer">Ver projeto em 3D</button><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="desenho">Pedir ajuste</button><button class="btn sm pri" data-a="rdSim" data-id="'+d.id+'" data-v="aprovado">Aprovar</button>':'')+
-        (d.st==='aprovado'?'<span class="small">Avalie:</span>'+[1,2,3,4,5].map(function(n){return '<button class="rd-star'+((d.nota||0)>=n?' on':'')+'" data-a="rdNota" data-id="'+d.id+'" data-n="'+n+'" aria-label="'+n+' estrelas">★</button>';}).join('')+'<button class="btn sm pri" data-a="rdSim" data-id="'+d.id+'" data-v="pago">Marcar repasse pago</button>':'')+
+        (d.st==='revisao'?'<button class="btn sm" data-a="rdVer">Ver projeto em 3D</button><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="desenho">Pedir ajuste</button><button class="btn sm danger" data-a="rdRecusaTrab" data-id="'+d.id+'">Recusar trabalho</button><button class="btn sm pri" data-a="rdSim" data-id="'+d.id+'" data-v="aprovado">Aprovar</button>':'')+
+        (d.st==='aprovado'?'<span class="small">Avalie:</span>'+[1,2,3,4,5].map(function(n){return '<button class="rd-star'+((d.nota||0)>=n?' on':'')+'" data-a="rdNota" data-id="'+d.id+'" data-n="'+n+'" aria-label="'+n+' estrelas">★</button>';}).join('')+(x.pix?'<span class="rd-pix">Pague por fora no Pix: <b class="mono">'+esc(x.pix)+'</b><button class="btn sm" data-a="rdCopiaPix" data-v="'+esc(x.pix)+'">Copiar</button></span>':'')+'<button class="btn sm pri" data-a="rdSim" data-id="'+d.id+'" data-v="pago">Já paguei</button>':'')+
         (d.st==='pago'?'<span class="tag ok">Concluído</span>'+(d.nota?' '+estrelas(d.nota):''):'')+
       '</div></section>';}).join('')+'</div>';
 }
@@ -1651,7 +1654,7 @@ function rdRecebidos(R){
       '<div class="small muted">'+o.cod+(o.dentes.length?' · dentes '+o.dentes.join(', '):'')+' · '+esc(o.mat)+' · prazo '+dmy(o.prazo)+'</div>'+
       '<div class="small muted">De: '+esc(o.de)+' · '+estrelas(o.nota)+' '+o.nota+'</div>'+
       '<div class="row" style="gap:8px"><button class="btn sm pri" data-a="rdAceita" data-id="'+o.id+'">Aceitar</button><button class="btn sm" data-a="rdRecusa" data-id="'+o.id+'">Recusar</button></div></div>';}).join(''):'<p class="empty">Nenhuma oferta agora.</p>')+'</section>'+
-    '<section class="card stack"><div><h2>Seus trabalhos da rede</h2><p class="small muted">O que você aceitou para desenhar.</p></div>'+
+    '<section class="card stack"><div><h2>Seus trabalhos da rede</h2><p class="small muted">O que você aceitou para desenhar. Quem delegou paga o repasse direto para a sua chave Pix, e pode pedir ajuste ou recusar o projeto.</p></div>'+
     (ac.length?ac.map(function(o){return '<div class="rd-oferta"><div class="between"><b>'+esc(o.trab)+'</b><span class="mono val">'+brl(o.repasse)+'</span></div><div class="small muted">'+o.cod+' · prazo '+dmy(o.prazo)+'</div>'+
       (o.st==='aceito'?'<div class="row" style="gap:8px"><button class="btn sm">Baixar escaneamento</button><button class="btn sm pri" data-a="rdEntrega" data-id="'+o.id+'">Enviar projeto</button></div>':'<span class="tag a">Enviado para revisão</span>')+'</div>';}).join(''):'<p class="empty">Nada aceito ainda.</p>')+'</section></div>';
 }
@@ -2178,11 +2181,18 @@ var A={
     var lista=R.quem==='um'?R.parceiros.filter(function(x){return x.id===R.cadista;}):R.quem==='favoritos'?R.parceiros.filter(function(x){return x.fav;}):R.parceiros.filter(function(x){return x.on;});
     var vence=lista[Math.min(lista.length-1,1)],passo=0;
     clearInterval(ui.rdTimer);ui.rdTimer=setInterval(function(){var b=R.busca;if(!b||R.passo!==3){clearInterval(ui.rdTimer);return;}passo++;b.t=passo;
-      if(passo>=Math.min(lista.length,2)+1){b.ok=vence.id;clearInterval(ui.rdTimer);var t=tipoPed(p);
+      if(passo>=4){b.ok=vence.id;clearInterval(ui.rdTimer);var t=tipoPed(p);
         R.enviados.unshift({id:'d'+Date.now(),cod:b.cod,trab:t?t.nome:'Elemento sobre implante',dentes:p.elementos||[],repasse:b.rep,prazo:R.prazo,parceiro:vence.id,st:'desenho',quando:today()});
         toast(vence.nome+' aceitou o pedido!');}
-      if(ui.tab==='rede')render();},1100);},
-  rdCancelar:function(){var R=redeIni();clearInterval(ui.rdTimer);R.passo=2;R.busca=null;render();},
+      if(ui.tab==='rede')render();},1500);},
+  rdDeixar:function(){var R=redeIni();clearInterval(ui.rdTimer);var b=R.busca,p=byId(S.pedidos,R.pid)||{elementos:[36]},t=tipoPed(p);
+    if(b&&!b.ok)R.enviados.unshift({id:'d'+Date.now(),cod:b.cod,trab:t?t.nome:'Elemento sobre implante',dentes:p.elementos||[],repasse:b.rep,prazo:R.prazo,parceiro:null,st:'oferta',quando:today(),para:R.quem==='rede'?'Toda a rede':R.quem==='favoritos'?'Favoritos':'Um cadista'});
+    R.passo=1;R.pid=null;R.busca=null;R.tab='andamento';render();toast('Oferta aberta. Ela fica em Enviados até alguém aceitar ou você apagar.');},
+  rdApagar:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(x){x.st='apagado';render();toast('Oferta apagada. Ninguém mais consegue aceitar.');}},
+  rdRecusaTrab:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(!x)return;var m=prompt('Por que você está recusando o trabalho? (o parceiro vai ver)','');if(m===null)return;x.st='recusado';x.motivo=m.trim();render();toast('Trabalho recusado. Não há repasse a pagar.');},
+  rdReoferecer:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(x){x.st='oferta';x.parceiro=null;x.para='Toda a rede';x.motivo='';render();toast('Oferecido de novo para a rede.');}},
+  rdCopiaPix:function(d){try{navigator.clipboard.writeText(d.v).then(function(){toast('Chave Pix copiada.');});}catch(e){toast(d.v);}},
+  rdCancelar:function(){var R=redeIni();clearInterval(ui.rdTimer);R.passo=2;R.busca=null;render();toast('Oferta apagada.');},
   rdSim:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(x){x.st=d.v;render();toast({revisao:'O parceiro enviou o projeto para você revisar.',desenho:'Ajuste pedido ao parceiro.',aprovado:'Projeto aprovado. Agora é só pagar o repasse.',pago:'Repasse marcado como pago.'}[d.v]);}},
   rdNota:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(x){x.nota=+d.n;render();}},
   rdVer:function(){toast('Na versão final, abre o projeto do parceiro no visualizador 3D.');},
