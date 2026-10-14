@@ -766,8 +766,8 @@ function canWrite(){return S.assinatura.status!=='vencida';}
 function canFile(){var a=S.assinatura;if(a.status==='ativa')return !a.venceEm||today()<=a.venceEm;return a.status==='teste'&&!!a.testeAte&&today()<=a.testeAte;}
 function emGratis(){return canWrite()&&!canFile();}
 function guard(){if(!canWrite()){toast('Conta bloqueada: você pode ver e exportar, mas não alterar.');return false;}return true;}
-function guardArq(){if(!guard())return false;if(!canFile()){toast('No plano grátis não dá para guardar arquivos. Cole um link ou assine.');return false;}return true;}
-function avisoGratis(){return '<div class="banner"><span><b>Plano grátis.</b> Você usa clientes, pedidos e financeiro à vontade. Para guardar escaneamentos e arquivos STL aqui, assine. Enquanto isso, cole o link do Drive ou WeTransfer no pedido.</span><button class="btn sm pri" data-a="assinar">Assinar</button></div>';}
+function guardArq(){if(!guard())return false;if(!canFile()){toast('No Essencial não dá para guardar arquivos. Cole um link ou assine.');return false;}return true;}
+function avisoGratis(){return '<div class="banner"><span><b>Plano Essencial (de R$ 9 por R$ 0 no lançamento).</b> Você usa clientes, pedidos e financeiro à vontade. Para guardar escaneamentos e arquivos STL aqui, assine. Enquanto isso, cole o link do Drive ou WeTransfer no pedido.</span><button class="btn sm pri" data-a="assinar">Assinar</button></div>';}
 function usado(){return alive(S.arquivos).filter(function(a){return a.origem==='upload'&&!a.removido;}).reduce(function(s,a){return s+(a.tamZip||0);},0);}
 function expira(a){var p=byId(S.pedidos,a.pedidoId);return (p&&p.entregue&&a.origem==='upload')?addDays(p.entregue,60):null;}
 function aReceber(cid){return alive(S.pedidos).filter(function(p){return (p.status==='finalizado'||p.status==='arquivado')&&!p.pago&&(!cid||p.clienteId===cid);});}
@@ -798,7 +798,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 20h00';
+var VERSAO='14/10 · 20h15';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -810,7 +810,7 @@ function render(){
   if(S.carregando){app.innerHTML=rCarregando();return;}
   var a=S.assinatura,w=canWrite(),chip;
   if(!w) chip='<span class="tag u">Conta bloqueada</span>';
-  else if(emGratis()) chip='<span class="tag">Plano grátis</span>';
+  else if(emGratis()) chip='<span class="tag">Essencial · R$ 0</span>';
   else if(a.status==='teste') chip='<span class="tag a">Teste · '+Math.max(0,daysBetween(today(),a.testeAte))+' dias</span>';
   else chip='<span class="tag ok">Ativa</span>';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
@@ -908,7 +908,7 @@ var DD={
   cliOrd:{label:'Ordenar',get:function(){return ui.cliOrd||'az';},set:function(v){ui.cliOrd=v;},
     opts:function(){var n=alive(S.clientes).filter(function(c){var s=statsCli(c.id);return s.dias===null||s.dias>INATIVO_DIAS;}).length;return [['az','A a Z'],['recentes','Últimos adicionados'],['antigos','Mais antigos'],['mais','Que mais pedem'],['menos','Que menos pedem'],['inativos','Inativos ('+n+')']];}},
   cliTipo:{label:'Tipo',get:function(){return ui.cliTipo||'todos';},set:function(v){ui.cliTipo=v;},opts:function(){return [['todos','Todos'],['laboratorio','Laboratórios'],['dentista','Clínicas / consultórios']];}},
-  admFiltro:{label:'Mostrar',get:function(){return ui.admFiltro||'todos';},set:function(v){ui.admFiltro=v;},opts:function(){return [['todos','Todos'],['teste','Em teste'],['ativa','Ativos'],['gratis','Plano grátis'],['bloqueada','Bloqueados']];}},
+  admFiltro:{label:'Mostrar',get:function(){return ui.admFiltro||'todos';},set:function(v){ui.admFiltro=v;},opts:function(){return [['todos','Todos'],['teste','Em teste'],['ativa','Ativos'],['gratis','Essencial (R$ 0)'],['bloqueada','Bloqueados']];}},
   arqOrd:{label:'Ordenar',get:function(){return ui.arqOrd||'maiores';},set:function(v){ui.arqOrd=v;},opts:function(){return [['maiores','Maiores primeiro'],['expira','Expiram antes'],['recentes','Mais recentes'],['antigos','Mais antigos']];}},
   tipoMet:{label:'Medir por',get:function(){return ui.tipoMet||'n';},set:function(v){ui.tipoMet=v;},opts:function(){return [['n','Pedidos'],['el','Elementos'],['v','Faturamento']];}},
   vista:{label:'Mostrar',get:function(){return ui.vista==='arq'?'arq':'kanban';},set:function(v){ui.vista=v;},
@@ -1907,7 +1907,7 @@ function linhaTabela(t,dis){var novo=!t.id,id=t.id||('novo'+uid().replace(/-/g,'
 var PRECO_PLANO={basico:29.90,plus:59.90};
 var NOME_PLANO={basico:'Básico',plus:'Plus',rede:'Rede',vitrine:'Vitrine'};
 function sitAss(a){var agora=new Date();if(a.status==='vencida')return 'bloqueada';if(a.status==='ativa'&&(!a.vence_em||new Date(a.vence_em)>agora))return 'ativa';if(a.status==='teste'&&a.teste_ate&&new Date(a.teste_ate)>agora)return 'teste';return 'gratis';}
-var SIT_TXT={ativa:'Ativa',teste:'Teste',gratis:'Grátis',bloqueada:'Bloqueada'},SIT_TAG={ativa:'ok',teste:'a',gratis:'',bloqueada:'u'};
+var SIT_TXT={ativa:'Ativa',teste:'Teste',gratis:'Essencial',bloqueada:'Bloqueada'},SIT_TAG={ativa:'ok',teste:'a',gratis:'',bloqueada:'u'};
 function carregaAdmin(){ui.admBusy=true;sb.rpc('admin_assinantes').then(function(r){ui.admBusy=false;if(r.error){ui.admErro=r.error.message;}else{ui.admLista=r.data||[];ui.admErro=null;ui.admT=Date.now();}if(ui.tab==='admin'&&!ui.sheet)render();else if(ui.sheet&&ui.sheet.fn===fAdmin)renderSheet();});}
 function rAdmin(){
   if(!S.admin)return '<div class="card empty">Esta área é só para o administrador do sistema.</div>';
@@ -1923,7 +1923,7 @@ function rAdmin(){
     '<div class="dash">'+
       kpi('Assinantes',L.length,'<span>'+novos30+' novo(s) nos últimos 30 dias</span>')+
       kpi('Em teste',por.teste,'<span>14 dias grátis</span>')+
-      kpi('Ativos',por.ativa,'<span>'+por.gratis+' no grátis · '+por.bloqueada+' bloqueado(s)</span>')+
+      kpi('Ativos',por.ativa,'<span>'+por.gratis+' no Essencial · '+por.bloqueada+' bloqueado(s)</span>')+
       kpi('Receita mensal estimada',brl(receita),'<span>assinaturas ativas</span>')+
     '</div>'+
     '<div class="row wrap"><input class="search" id="adm-busca" type="search" placeholder="Buscar por nome, e-mail, WhatsApp ou cidade" value="'+esc(ui.admBusca||'')+'" style="flex:1;min-width:220px;max-width:420px">'+dd('admFiltro')+'</div>'+
@@ -1992,10 +1992,10 @@ function rConfig(){
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Assinatura</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
-      '<div class="between"><span>Plano</span><b>'+(emGratis()?'Grátis':esc((typeof NOME_PLANO!=='undefined'&&NOME_PLANO[a.plano])||a.plano)+(a.plano==='plus'?' · R$ 59,90/mês':a.plano==='basico'?' · R$ 29,90/mês':''))+'</b></div>'+
-      '<div class="between"><span>Situação</span>'+(!canWrite()?'<span class="tag u">Bloqueada</span>':emGratis()?'<span class="tag">Grátis · sem arquivos</span>':a.status==='teste'?'<span class="tag a">Teste até '+dmy(a.testeAte)+'</span>':'<span class="tag ok">Ativa</span>')+'</div>'+
+      '<div class="between"><span>Plano</span><b>'+(emGratis()?'Essencial · <s class="muted">R$ 9</s> R$ 0/mês':esc((typeof NOME_PLANO!=='undefined'&&NOME_PLANO[a.plano])||a.plano)+(a.plano==='plus'?' · R$ 59,90/mês':a.plano==='basico'?' · R$ 29,90/mês':''))+'</b></div>'+
+      '<div class="between"><span>Situação</span>'+(!canWrite()?'<span class="tag u">Bloqueada</span>':emGratis()?'<span class="tag ok">Preço de lançamento</span>':a.status==='teste'?'<span class="tag a">Teste até '+dmy(a.testeAte)+'</span>':'<span class="tag ok">Ativa</span>')+'</div>'+
       '<div class="between"><span>Espaço para arquivos</span><b>'+(emGratis()?'Não incluso':bytes(a.limite))+'</b></div>'+
-      (emGratis()?'<p class="small muted">No plano grátis você usa tudo, menos guardar arquivos. Assinando, ganha '+bytes(a.limite)+' para escaneamentos e STL.</p>':'')+
+      (emGratis()?'<p class="small muted">No Essencial você usa tudo, menos guardar arquivos. Assinando, ganha '+bytes(a.limite)+' para escaneamentos e STL.</p>':'')+
       '<button class="btn pri" data-a="assinar">Assinar agora</button></section>'+
     '<section class="card stack"><h2>Seus dados</h2><p class="small muted">Você pode levar seus dados ou apagar tudo quando quiser.</p>'+
       '<div class="row wrap"><button class="btn" data-a="exportar">Exportar meus dados</button><button class="btn danger" data-a="excluirConta">Excluir minha conta</button></div></section>'+
@@ -2057,7 +2057,7 @@ function fPedido(id,preCli){
     (p?'':'<div class="fld"><span>Escaneamento</span>'+
       (canFile()?'<label class="btn block" style="position:relative">Anexar arquivos (viram zip)<input id="pd-files" type="file" multiple accept=".stl,.ply,.obj,.zip" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
       '<small id="pd-files-info">STL, PLY, OBJ ou ZIP. Vários arquivos viram um zip só.</small>':
-      '<small>No plano grátis não dá para anexar arquivos aqui. <button type="button" class="linkbtn" data-a="assinar">Assinar</button></small>')+
+      '<small>No Essencial não dá para anexar arquivos aqui. <button type="button" class="linkbtn" data-a="assinar">Assinar</button></small>')+
       '<input id="pd-scan" name="scanLink" type="url" inputmode="url" placeholder="Ou cole um link (Drive, WeTransfer, Dropbox…)" style="margin-top:6px"></div>')+
     '<div class="calc" id="pd-calc"></div>'+
     '<label class="fld"><span>Valor do pedido (R$)</span><input id="pd-valor" name="valor" type="number" step="0.01" min="0" inputmode="decimal" value="'+(p?p.valor:'')+'" data-manual="'+(p?'1':'')+'"><small>Calculado pela tabela do cliente. Pode ajustar.</small></label>'+
@@ -2133,7 +2133,7 @@ function fPedidoDet(id){
     '<section class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div class="between"><h3>Arquivos</h3><span class="small muted">'+bytes(usado())+' de '+bytes(S.assinatura.limite)+'</span></div>'+
       (arqs.length?'<div class="list">'+arqs.map(function(a){return liArq(a,w);}).join('')+'</div>':'<p class="small muted">Nenhum arquivo. Envie o STL ou cole um link.</p>')+
       (canFile()?'<label class="btn block" style="position:relative">Enviar arquivos (viram zip)<input id="up-file" type="file" multiple accept=".stl,.ply,.obj,.zip" data-id="'+id+'" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>':
-        (w?'<p class="small muted">No plano grátis não dá para guardar arquivos. Cole o link abaixo ou <button type="button" class="linkbtn" data-a="assinar">assine</button>.</p>':''))+
+        (w?'<p class="small muted">No Essencial não dá para guardar arquivos. Cole o link abaixo ou <button type="button" class="linkbtn" data-a="assinar">assine</button>.</p>':''))+
       '<div id="up-st" '+(ui.up&&ui.up.pid===id?'':'hidden')+' class="stack" style="gap:6px"><div class="prog"><i id="up-bar" style="width:'+(ui.up&&ui.up.pid===id?ui.up.pct:0)+'%"></i></div><span class="small muted" id="up-txt">'+(ui.up&&ui.up.pid===id?esc(ui.up.txt):'')+'</span></div>'+
       '<form data-form="link" data-id="'+id+'" class="row"><input class="search" id="lk-url" name="url" type="url" placeholder="Ou cole o link do Drive / WeTransfer" required '+(w?'':'disabled')+'><button class="btn" type="submit" '+(w?'':'disabled')+'>Salvar</button></form>'+
     '</section>'+

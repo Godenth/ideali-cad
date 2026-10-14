@@ -217,9 +217,17 @@ a{color:inherit}
 .plans{padding-block:80px;background:var(--surface);border-block:1px solid var(--line)}
 .plans-head{text-align:center;display:grid;gap:12px;justify-items:center}
 .plans-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:40px}
+.plan-free{margin-top:40px;border:1.5px dashed color-mix(in srgb,var(--ok) 60%,transparent);border-radius:20px;padding:24px 28px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto;gap:24px;align-items:center;background:var(--surface)}
+.plan-free .row{display:flex;align-items:center;gap:10px}
+.plan-free .pf-val{font-family:var(--f-display);font-weight:800;font-size:2.6rem;line-height:1;margin-top:10px;color:var(--ok)}
+.plan-free .pf-val s{font-size:1.3rem;color:var(--muted);font-weight:600;margin-right:4px}
+.plan-free .pf-val small{font-family:var(--f-body);font-size:1rem;font-weight:500;color:var(--muted)}
+.plan-free .pf-note{font-size:.88rem;color:var(--muted);margin-top:8px}
+.plan-free .checks{font-size:.94rem}
+@media (max-width:860px){.plan-free{grid-template-columns:minmax(0,1fr)}.plan-free .btn{width:100%}}
 .plan .val.tbd{font-size:1.6rem;color:var(--muted)}
 .plan .note{font-size:.85rem;color:var(--muted);margin-top:-8px}
-.plan .checks{flex:1}
+.plan .checks{flex:1;align-content:start}
 @media (max-width:1040px){.plans-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .plan{border:1.5px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px;background:var(--bg)}
 .plan.main{border-color:var(--accent);background:var(--surface);box-shadow:0 24px 50px -30px color-mix(in srgb,var(--accent) 60%,transparent)}
@@ -436,7 +444,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
           <a class="btn btn-primary" href="app/#criar">Começar 14 dias grátis</a>
           <a class="btn btn-ghost" href="#funcoes">Saiba mais</a>
         </div>
-        <p class="fine">Sem cartão para testar. Depois, R$ 29,90 por mês. Funciona no celular e no computador.</p>
+        <p class="fine">Sem cartão para testar. Depois, continue de graça no Essencial ou assine por R$ 29,90. Funciona no celular e no computador.</p>
       </div>
 
       <article class="order" aria-label="Exemplo de pedido no sistema">
@@ -818,9 +826,18 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
       <div class="plans-head">
         <span class="eyebrow">Preços</span>
         <h2>Um plano para cada fase do seu trabalho.</h2>
-        <p class="lead"><b>Tem plano grátis:</b> depois dos 14 dias de teste, você continua usando clientes, pedidos e financeiro sem pagar nada. Só não guarda arquivos STL no sistema. Nada é apagado.</p>
+        <p class="lead">Teste tudo por 14 dias. Depois, fique no Essencial sem pagar nada ou assine para guardar seus arquivos. Nada é apagado.</p>
       </div>
-      <div class="plans-grid">
+      <div class="plan-free">
+        <div>
+          <div class="row" style="justify-content:flex-start"><h3>Essencial</h3><span class="tag paid">Preço de lançamento</span></div>
+          <div class="pf-val"><s>R$ 9</s> R$ 0 <small>/mês</small></div>
+          <p class="pf-note">Para organizar seus pedidos sem pagar nada.</p>
+        </div>
+        <ul class="checks"><li>Clientes e pedidos sem limite</li><li>Financeiro, Pix e mensagens prontas</li><li>Ranking e tabela de preços</li><li>Arquivos por link (Drive, WeTransfer), sem guardar STL no sistema</li></ul>
+        <a class="btn btn-ghost" href="app/#criar">Começar de graça</a>
+      </div>
+      <div class="plans-grid" style="margin-top:16px">
         <div class="plan main">
           <div class="row"><h3>Básico</h3><span class="tag stage">Lançamento</span></div>
           <div class="val">R$ 29,90 <small>/mês</small></div>
