@@ -151,6 +151,36 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .banner.lemb .icon-btn{width:30px;height:30px}
 .imp-box{padding:12px;border-radius:12px;border:1px dashed var(--line);background:var(--bg)}
 .imp-box .grid2{align-items:start}.imp-box .fld{align-content:start}
+.rd-grid{display:grid;gap:16px;align-items:start}
+@media (min-width:960px){.rd-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}}
+.li.rd-sel{outline:2px solid var(--accent);border-radius:12px}
+.rd-av{display:grid;place-items:center;border-radius:50%;color:#fff;font-weight:800;font-size:.85rem;flex:none}
+.rd-st{letter-spacing:1px}
+.rd-lucro{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:12px 14px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}.rd-lucro b{font-size:1.3rem}
+.rd-sigilo{padding:12px 14px;border-radius:12px;border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--line));background:color-mix(in srgb,var(--accent) 5%,var(--surface));display:grid;gap:8px}
+.rd-sigilo ul{margin:6px 0 0;padding-left:18px;display:grid;gap:3px}
+.rd-fila{display:grid;gap:8px}
+.rd-cand{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--surface);transition:all .3s}
+.rd-cand .t{display:grid;gap:2px;flex:1;min-width:0}
+.rd-cand.fila{opacity:.5}.rd-cand.fechado{opacity:.45}
+.rd-cand.aceitou{border-color:var(--c-val);box-shadow:0 0 0 3px color-mix(in srgb,var(--c-val) 25%,transparent);transform:scale(1.01)}
+.rd-cand.aceitou .rd-cst{color:var(--c-val);font-weight:800}
+.rd-cst{font-size:.85rem;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.rd-pulse{width:9px;height:9px;border-radius:50%;background:var(--p2);display:inline-block;animation:rdp 1s infinite}
+@keyframes rdp{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--p2) 60%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
+.rd-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;font-size:.72rem;color:var(--muted)}
+.rd-steps span{display:grid;gap:6px;text-align:center}
+.rd-steps i{height:6px;border-radius:6px;background:var(--line)}
+.rd-steps .ok i{background:var(--c-val)}.rd-steps .on i{background:var(--accent)}.rd-steps .on{color:var(--accent);font-weight:700}.rd-steps .ok{color:var(--ink)}
+.rd-star{border:0;background:none;font-size:1.4rem;color:var(--line);cursor:pointer;padding:0 2px}.rd-star.on{color:#F0A53A}
+.rd-oferta{display:grid;gap:6px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.rd-cards{display:grid;gap:14px}
+@media (min-width:700px){.rd-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1100px){.rd-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.rd-perfil .row{align-items:center}
+.rd-fav{margin-left:auto;border:1px solid var(--line);background:var(--surface);border-radius:50%;width:40px;height:40px;font-size:1.2rem;color:var(--line);cursor:pointer;flex:none}.rd-fav.on{color:#F0A53A;border-color:#F0A53A}
+.rd-chips{display:flex;flex-wrap:wrap;gap:6px}.rd-chips span{font-size:.75rem;padding:.3em .7em;border-radius:999px;background:var(--soft);color:var(--muted)}.rd-chips .sw{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.rd-on{color:var(--c-val);font-weight:700}
 .cfg{max-width:1180px;margin-inline:auto;display:grid;gap:16px}
 .cfg-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);scrollbar-width:none}
 .cfg-tabs::-webkit-scrollbar{display:none}
@@ -687,17 +717,18 @@ var ICON={
   config:ic('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
   menu:ic('<path d="M4 7h16M4 12h16M4 17h16"/>'),
   sair:ic('<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>'),
-  admin:ic('<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>')
+  admin:ic('<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>'),
+  rede:ic('<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M10.8 7.2 6.3 15.8M13.2 7.2l4.5 8.6M7.5 18h9"/>')
 };
 var MENU=[
   ['Principal',[['dashboard','Dashboard'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
-  ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho']]],
+  ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 15h50';
+var VERSAO='14/10 · 17h00';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
-var TITULOS={admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
+var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){
@@ -709,14 +740,14 @@ function render(){
   else if(a.status==='teste') chip='<span class="tag a">Teste · '+Math.max(0,daysBetween(today(),a.testeAte))+' dias</span>';
   else chip='<span class="tag ok">Ativa</span>';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
-    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,config:rConfig,admin:rAdmin};
+    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,config:rConfig,admin:rAdmin};
   var body=(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
   var u=usado(),lim=a.limite,pct=Math.min(100,u/lim*100);
   var nome=S.perfil.nome||S.sessao.email||'';
   var side='<aside class="side" aria-label="Menu"><div class="brand">'+logo(30)+'<span>Ideali CAD</span></div>'+
-    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return it[0]!=='admin'||S.admin;}).map(function(it){
+    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return (it[0]!=='admin'&&it[0]!=='rede')||S.admin;}).map(function(it){
       var badge=it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':it[0]==='config'&&lix?'<span class="badge" style="background:var(--muted)">'+lix+'</span>':'';
       return '<button class="it '+(ui.tab===it[0]||(it[0]==='config'&&emCfg())?'on':'')+'" data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+it[1]+'</span>'+badge+'</button>';}).join('');}).join('')+
     '<div class="plan"><div class="between"><b>Plano '+a.plano+'</b>'+chip+'</div>'+
@@ -725,7 +756,7 @@ function render(){
       (a.status==='teste'&&w?'<button class="btn sm pri" data-a="tab" data-v="config">Assinar</button>':'')+'</div>'+
     '<div class="me"><span class="av">'+esc((nome[0]||'?').toUpperCase())+'</span><span class="nm">'+esc(nome)+'</span><button class="icon-btn" data-a="sair" aria-label="Sair" title="Sair" style="width:32px;height:32px">'+ICON.sair+'</button></div></aside>';
   var titulo=TITULOS[ui.tab]||'';
-  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config')flat.push(it);});});
+  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config'&&(it[0]!=='rede'||S.admin))flat.push(it);});});
   var top='<header class="top"><div class="top-in">'+
     '<button class="icon-btn menu-btn" data-a="drawer" aria-label="Abrir menu">'+ICON.menu+'</button>'+
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
@@ -1533,6 +1564,105 @@ function lembretes(){var out=[],t=today(),dow=new Date().getDay(),fora=function(
   return out.join('');
 }
 
+/* ===================== Rede (PRÉVIA · dados de exemplo, nada é salvo) ===================== */
+function redeIni(){
+  if(ui.rede)return ui.rede;
+  var hoje=today();
+  ui.rede={tab:'delegar',passo:1,pid:null,repasse:'',prazo:addDays(hoje,1),quem:'favoritos',cadista:'',busca:null,obs:'',
+    parceiros:[
+      {id:'r1',nome:'Juliana Mendes',cidade:'Belo Horizonte, MG',sw:['exocad','3Shape'],esp:['Coroas','Facetas','Protocolos'],nota:4.9,av:128,feitos:342,prazo:'1 dia',on:true,fav:true,cor:5},
+      {id:'r2',nome:'Rafael Torres',cidade:'Curitiba, PR',sw:['exocad'],esp:['Protocolos','Sobre implante'],nota:4.8,av:96,feitos:211,prazo:'1–2 dias',on:true,fav:true,cor:4},
+      {id:'r3',nome:'Camila Rocha',cidade:'Recife, PE',sw:['3Shape'],esp:['Facetas','Enceramento'],nota:4.7,av:54,feitos:120,prazo:'1 dia',on:false,fav:false,cor:6},
+      {id:'r4',nome:'Diego Alves',cidade:'São Paulo, SP',sw:['exocad','DentalWings'],esp:['Coroas','Placas'],nota:4.9,av:203,feitos:580,prazo:'mesmo dia',on:true,fav:false,cor:3},
+      {id:'r5',nome:'Patrícia Lima',cidade:'Goiânia, GO',sw:['exocad'],esp:['Provisórios','Coroas'],nota:4.6,av:31,feitos:74,prazo:'2 dias',on:true,fav:false,cor:2},
+      {id:'r6',nome:'Marcos Vieira',cidade:'Porto Alegre, RS',sw:['3Shape','exocad'],esp:['Sobre implante','Barras'],nota:4.8,av:77,feitos:190,prazo:'1–2 dias',on:false,fav:false,cor:1}
+    ],
+    enviados:[
+      {id:'d1',cod:'R-2481',trab:'Elemento sobre implante',dentes:[36],repasse:45,prazo:addDays(hoje,1),parceiro:'r1',st:'desenho',quando:hoje},
+      {id:'d2',cod:'R-2475',trab:'Protocolo (superior ou inferior)',dentes:[],repasse:280,prazo:hoje,parceiro:'r2',st:'revisao',quando:addDays(hoje,-1)},
+      {id:'d3',cod:'R-2460',trab:'Facetas',dentes:[11,12,21,22],repasse:96,prazo:addDays(hoje,-3),parceiro:'r4',st:'pago',quando:addDays(hoje,-4),nota:5}
+    ],
+    recebidos:[
+      {id:'o1',cod:'R-2490',trab:'Elemento sobre dente',dentes:[14,15],mat:'Zircônia',repasse:40,prazo:addDays(hoje,1),de:'Cadista de Campinas, SP',nota:4.8,st:'oferta'},
+      {id:'o2',cod:'R-2488',trab:'Placa de bruxismo',dentes:[],mat:'PMMA',repasse:35,prazo:addDays(hoje,2),de:'Cadista de Salvador, BA',nota:4.6,st:'oferta'},
+      {id:'o3',cod:'R-2470',trab:'Enceramento digital',dentes:[11,21],mat:'Cera',repasse:30,prazo:hoje,de:'Cadista de Natal, RN',nota:4.9,st:'aceito'}
+    ]};
+  return ui.rede;
+}
+var ETAPAS_REDE=[['oferta','Ofertado'],['desenho','Em desenho'],['revisao','Para revisar'],['aprovado','Aprovado'],['pago','Repasse pago']];
+function avRede(p,z){z=z||44;var ini=p.nome.split(' ').map(function(x){return x[0];}).slice(0,2).join('');
+  return '<span class="rd-av" style="width:'+z+'px;height:'+z+'px;background:linear-gradient(135deg,var(--p'+p.cor+'),var(--p'+((p.cor%6)+1)+'))">'+ini+'</span>';}
+function estrelas(n){var s='';for(var i=1;i<=5;i++)s+='<span style="color:'+(n>=i-0.25?'#F0A53A':'var(--line)')+'">★</span>';return '<span class="rd-st">'+s+'</span>';}
+function etapasRede(st){var i=ETAPAS_REDE.map(function(e){return e[0];}).indexOf(st);
+  return '<div class="rd-steps">'+ETAPAS_REDE.map(function(e,k){return '<span class="'+(k<i?'ok':k===i?'on':'')+'"><i></i>'+e[1]+'</span>';}).join('')+'</div>';}
+function rdLer(){var R=ui.rede;if(!R)return;var a=document.getElementById('rd-rep'),b=document.getElementById('rd-prazo'),c=document.getElementById('rd-cad');if(a)R.repasse=a.value;if(b&&b.value)R.prazo=b.value;if(c)R.cadista=c.value;}
+function rRede(){
+  var R=redeIni(),tab=R.tab,nRec=R.recebidos.filter(function(o){return o.st==='oferta';}).length;
+  var h='<div class="banner"><span><b>Prévia da Etapa 2 · Rede.</b> Tudo aqui é exemplo para ver como vai funcionar: nada é salvo e nenhum cadista real recebe nada.</span></div>'+
+    '<nav class="cfg-tabs msg-tabs">'+[['delegar','Delegar um pedido'],['andamento','Enviados'],['recebidos','Recebidos'+(nRec?' '+nRec:'')],['parceiros','Cadistas da rede']].map(function(a){return '<button class="'+(tab===a[0]?'on':'')+'" data-a="rdTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
+  if(tab==='delegar')h+=rdDelegar(R);
+  if(tab==='andamento')h+=rdEnviados(R);
+  if(tab==='recebidos')h+=rdRecebidos(R);
+  if(tab==='parceiros')h+=rdParceiros(R);
+  return '<div class="stack" style="gap:16px">'+h+'</div>';
+}
+function rdDelegar(R){
+  var abertos=alive(S.pedidos).filter(function(p){return aberto(p)&&p.status!=='finalizado';});
+  if(!abertos.length)abertos=[{id:'ex1',num:142,paciente:'M.A.S.',clienteId:null,elementos:[36],valor:90,exemplo:true,itens:[{d:36,t:null}],tipoId:null}];
+  var p=R.pid?(byId(S.pedidos,R.pid)||abertos.filter(function(x){return x.id===R.pid;})[0]):null;
+  if(R.passo===3)return rdBusca(R,p);
+  var h='<div class="rd-grid"><section class="card stack"><div><h2>1. Qual pedido?</h2><p class="small muted">Escolha um pedido em aberto para mandar para outro cadista desenhar.</p></div><div class="list">'+
+    abertos.slice(0,8).map(function(x){var t=tipoPed(x),c=cliente(x.clienteId);return '<button class="li'+(R.pid===x.id?' rd-sel':'')+'" data-a="rdPed" data-id="'+x.id+'"><span class="t"><b><span class="pac-i">'+esc(x.paciente)+'</span> · '+esc(t?t.nome:'Elemento sobre implante')+'</b><span><span class="cli-i">'+esc(c?c.nome:'Lab. Exemplo')+'</span> · dentes '+(x.elementos||[]).join(', ')+'</span></span><span class="mono small val">'+brl(x.valor)+'</span></button>';}).join('')+'</div></section>';
+  if(!p){return h+'<section class="card empty">Escolha o pedido ao lado para continuar.</section></div>';}
+  var sug=Math.round((+p.valor||0)*0.6),rep=R.repasse===''?sug:+R.repasse,lucro=(+p.valor||0)-rep;
+  h+='<section class="card stack"><div><h2>2. Como delegar</h2><p class="small muted">Pedido #'+p.num+' · você cobra <b class="val">'+brl(p.valor)+'</b> do seu cliente.</p></div>'+
+    '<div class="grid2"><label class="fld"><span>Repasse para o parceiro (R$)</span><input id="rd-rep" type="number" min="0" step="1" value="'+rep+'"><small>Sugestão: 60% do valor.</small></label>'+
+    '<label class="fld"><span>Prazo para o parceiro</span><input id="rd-prazo" type="date" value="'+R.prazo+'"></label></div>'+
+    '<div class="rd-lucro"><span>Você fica com</span><b class="mono '+(lucro>=0?'val':'late')+'">'+brl(lucro)+'</b><span class="small muted">sem taxa nem comissão da plataforma</span></div>'+
+    '<div class="fld"><span>Para quem oferecer</span><div class="fres">'+[['favoritos','Meus parceiros favoritos'],['rede','Toda a rede (quem aceitar primeiro)'],['um','Um cadista específico']].map(function(o){return '<label class="check"><input type="radio" name="rd-quem" value="'+o[0]+'" data-a="rdQuem" '+(R.quem===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('')+'</div></div>'+
+    (R.quem==='um'?'<label class="fld"><span>Cadista</span><select id="rd-cad"><option value="">Escolha…</option>'+R.parceiros.map(function(x){return '<option value="'+x.id+'" '+(R.cadista===x.id?'selected':'')+'>'+esc(x.nome)+' · ★ '+x.nota+'</option>';}).join('')+'</select></label>':'')+
+    '<div class="rd-sigilo"><b>🔒 Sigilo</b><div class="grid2 small"><div><span class="muted">O parceiro vê</span><ul><li>Trabalho, dentes e material</li><li>Arquivos do escaneamento</li><li>Prazo e valor do repasse</li></ul></div><div><span class="muted">O parceiro NÃO vê</span><ul><li>Nome do seu cliente</li><li>Nome do paciente (vira o código R-xxxx)</li><li>O valor que você cobra</li></ul></div></div></div>'+
+    '<button class="btn pri" data-a="rdOferecer">Oferecer para a rede</button></section></div>';
+  return h;
+}
+function rdBusca(R,p){
+  var lista=R.quem==='um'?R.parceiros.filter(function(x){return x.id===R.cadista;}):R.quem==='favoritos'?R.parceiros.filter(function(x){return x.fav;}):R.parceiros.filter(function(x){return x.on;});
+  var b=R.busca||{t:0,ok:null};
+  return '<section class="card stack rd-busca"><div class="between wrap"><div><h2>'+(b.ok?'Pedido aceito!':'Procurando um cadista…')+'</h2><p class="small muted">Código '+b.cod+' · repasse <b class="val">'+brl(b.rep)+'</b> · prazo '+dmy(R.prazo)+'</p></div>'+
+    (b.ok?'<button class="btn pri" data-a="rdTab" data-v="andamento">Acompanhar em Enviados</button>':'<button class="btn" data-a="rdCancelar">Cancelar oferta</button>')+'</div>'+
+    '<div class="rd-fila">'+lista.map(function(x,i){var st=b.ok===x.id?'aceitou':b.ok?'fechado':i<=b.t?'avisado':'fila';
+      return '<div class="rd-cand '+st+'">'+avRede(x,40)+'<div class="t"><b>'+esc(x.nome)+'</b><span class="small muted">'+esc(x.cidade)+' · '+estrelas(x.nota)+' '+x.nota+'</span></div><span class="rd-cst">'+({aceitou:'✓ Aceitou',fechado:'Encerrado',avisado:'<i class="rd-pulse"></i> Avisado',fila:'Na fila'})[st]+'</span></div>';}).join('')+'</div></section>';
+}
+function rdEnviados(R){
+  return '<div class="stack">'+R.enviados.map(function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};
+    return '<section class="card stack"><div class="between wrap"><div class="row" style="gap:12px">'+(x.nome?avRede(x):'')+'<div><b>'+esc(d.trab)+'</b><div class="small muted">'+d.cod+(d.dentes.length?' · dentes '+d.dentes.join(', '):'')+' · com '+esc(x.nome||'—')+'</div></div></div><span class="mono val">'+brl(d.repasse)+'</span></div>'+
+      etapasRede(d.st)+
+      '<div class="row wrap" style="gap:8px">'+
+        (d.st==='desenho'?'<span class="small muted">Prazo '+dmy(d.prazo)+'</span><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="revisao">Simular: parceiro entregou</button>':'')+
+        (d.st==='revisao'?'<button class="btn sm" data-a="rdVer">Ver projeto em 3D</button><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="desenho">Pedir ajuste</button><button class="btn sm pri" data-a="rdSim" data-id="'+d.id+'" data-v="aprovado">Aprovar</button>':'')+
+        (d.st==='aprovado'?'<span class="small">Avalie:</span>'+[1,2,3,4,5].map(function(n){return '<button class="rd-star'+((d.nota||0)>=n?' on':'')+'" data-a="rdNota" data-id="'+d.id+'" data-n="'+n+'" aria-label="'+n+' estrelas">★</button>';}).join('')+'<button class="btn sm pri" data-a="rdSim" data-id="'+d.id+'" data-v="pago">Marcar repasse pago</button>':'')+
+        (d.st==='pago'?'<span class="tag ok">Concluído</span>'+(d.nota?' '+estrelas(d.nota):''):'')+
+      '</div></section>';}).join('')+'</div>';
+}
+function rdRecebidos(R){
+  var of=R.recebidos.filter(function(o){return o.st==='oferta';}),ac=R.recebidos.filter(function(o){return o.st!=='oferta'&&o.st!=='recusado';});
+  return '<div class="rd-grid"><section class="card stack"><div><h2>Ofertas para você</h2><p class="small muted">Outros cadistas oferecendo trabalho. Você não vê o cliente nem o paciente.</p></div>'+
+    (of.length?of.map(function(o){return '<div class="rd-oferta"><div class="between"><b>'+esc(o.trab)+'</b><span class="mono val" style="font-size:1.1rem">'+brl(o.repasse)+'</span></div>'+
+      '<div class="small muted">'+o.cod+(o.dentes.length?' · dentes '+o.dentes.join(', '):'')+' · '+esc(o.mat)+' · prazo '+dmy(o.prazo)+'</div>'+
+      '<div class="small muted">De: '+esc(o.de)+' · '+estrelas(o.nota)+' '+o.nota+'</div>'+
+      '<div class="row" style="gap:8px"><button class="btn sm pri" data-a="rdAceita" data-id="'+o.id+'">Aceitar</button><button class="btn sm" data-a="rdRecusa" data-id="'+o.id+'">Recusar</button></div></div>';}).join(''):'<p class="empty">Nenhuma oferta agora.</p>')+'</section>'+
+    '<section class="card stack"><div><h2>Seus trabalhos da rede</h2><p class="small muted">O que você aceitou para desenhar.</p></div>'+
+    (ac.length?ac.map(function(o){return '<div class="rd-oferta"><div class="between"><b>'+esc(o.trab)+'</b><span class="mono val">'+brl(o.repasse)+'</span></div><div class="small muted">'+o.cod+' · prazo '+dmy(o.prazo)+'</div>'+
+      (o.st==='aceito'?'<div class="row" style="gap:8px"><button class="btn sm">Baixar escaneamento</button><button class="btn sm pri" data-a="rdEntrega" data-id="'+o.id+'">Enviar projeto</button></div>':'<span class="tag a">Enviado para revisão</span>')+'</div>';}).join(''):'<p class="empty">Nada aceito ainda.</p>')+'</section></div>';
+}
+function rdParceiros(R){
+  return '<p class="small muted">Cadistas que estão na rede. Marque ★ nos seus favoritos: eles recebem suas ofertas primeiro.</p><div class="rd-cards">'+R.parceiros.map(function(x){
+    return '<section class="card stack rd-perfil"><div class="row" style="gap:12px">'+avRede(x,52)+'<div style="min-width:0"><b>'+esc(x.nome)+'</b><div class="small muted">'+esc(x.cidade)+'</div><div class="small">'+estrelas(x.nota)+' <b>'+x.nota+'</b> <span class="muted">('+x.av+')</span></div></div>'+
+      '<button class="rd-fav'+(x.fav?' on':'')+'" data-a="rdFav" data-id="'+x.id+'" aria-label="Favorito">★</button></div>'+
+      '<div class="rd-chips">'+x.sw.map(function(s){return '<span class="sw">'+esc(s)+'</span>';}).join('')+x.esp.map(function(s){return '<span>'+esc(s)+'</span>';}).join('')+'</div>'+
+      '<div class="between small"><span class="muted">'+x.feitos+' trabalhos · prazo médio '+x.prazo+'</span><span class="'+(x.on?'rd-on':'muted')+'">'+(x.on?'● disponível':'○ ocupado')+'</span></div></section>';}).join('')+'</div>';
+}
+
 /* ---------- Tabela de preços (Configurações) ---------- */
 function rTabela(){
   var w=canWrite(),dis=w?'':'disabled',ts=alive(S.tipos),falta=refFaltando(),tb=(S.prefs&&S.prefs.tab)||{};
@@ -2039,6 +2169,27 @@ var A={
   msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
+  rdTab:function(d){var R=redeIni();R.tab=d.v;if(d.v==='delegar'&&R.passo===3&&R.busca&&R.busca.ok){R.passo=1;R.pid=null;R.busca=null;}render();},
+  rdPed:function(d){var R=redeIni();rdLer();R.pid=d.id;R.repasse='';R.passo=2;render();},
+  rdQuem:function(d,el){var R=redeIni();rdLer();R.quem=el.value;render();},
+  rdOferecer:function(){var R=redeIni();rdLer();if(R.quem==='um'&&!R.cadista){toast('Escolha o cadista.');return;}
+    var p=byId(S.pedidos,R.pid)||{valor:90,num:142,elementos:[36],paciente:'M.A.S.'},rep=R.repasse===''?Math.round((+p.valor||0)*0.6):+R.repasse;
+    R.passo=3;R.busca={t:0,ok:null,cod:'R-'+(2491+R.enviados.length),rep:rep};render();
+    var lista=R.quem==='um'?R.parceiros.filter(function(x){return x.id===R.cadista;}):R.quem==='favoritos'?R.parceiros.filter(function(x){return x.fav;}):R.parceiros.filter(function(x){return x.on;});
+    var vence=lista[Math.min(lista.length-1,1)],passo=0;
+    clearInterval(ui.rdTimer);ui.rdTimer=setInterval(function(){var b=R.busca;if(!b||R.passo!==3){clearInterval(ui.rdTimer);return;}passo++;b.t=passo;
+      if(passo>=Math.min(lista.length,2)+1){b.ok=vence.id;clearInterval(ui.rdTimer);var t=tipoPed(p);
+        R.enviados.unshift({id:'d'+Date.now(),cod:b.cod,trab:t?t.nome:'Elemento sobre implante',dentes:p.elementos||[],repasse:b.rep,prazo:R.prazo,parceiro:vence.id,st:'desenho',quando:today()});
+        toast(vence.nome+' aceitou o pedido!');}
+      if(ui.tab==='rede')render();},1100);},
+  rdCancelar:function(){var R=redeIni();clearInterval(ui.rdTimer);R.passo=2;R.busca=null;render();},
+  rdSim:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(x){x.st=d.v;render();toast({revisao:'O parceiro enviou o projeto para você revisar.',desenho:'Ajuste pedido ao parceiro.',aprovado:'Projeto aprovado. Agora é só pagar o repasse.',pago:'Repasse marcado como pago.'}[d.v]);}},
+  rdNota:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(x){x.nota=+d.n;render();}},
+  rdVer:function(){toast('Na versão final, abre o projeto do parceiro no visualizador 3D.');},
+  rdAceita:function(d){var R=redeIni(),o=R.recebidos.filter(function(q){return q.id===d.id;})[0];if(o){o.st='aceito';render();toast('Você aceitou o '+o.cod+'. Os arquivos foram liberados para você.');}},
+  rdRecusa:function(d){var R=redeIni(),o=R.recebidos.filter(function(q){return q.id===d.id;})[0];if(o){o.st='recusado';render();}},
+  rdEntrega:function(d){var R=redeIni(),o=R.recebidos.filter(function(q){return q.id===d.id;})[0];if(o){o.st='entregue';render();toast('Projeto enviado para revisão de quem delegou.');}},
+  rdFav:function(d){var R=redeIni(),x=R.parceiros.filter(function(q){return q.id===d.id;})[0];if(x){x.fav=!x.fav;render();}},
   addItem:function(){if(!guard())return;var l=document.getElementById('tp-list');if(!l)return;var v=l.querySelector('.tp-vazio');if(v)v.remove();
     l.insertAdjacentHTML('beforeend',linhaTabela({nome:'',forma:'elemento',valor:0,ativo:true},''));var n=l.lastElementChild.querySelector('.tp-nome');n.focus();n.scrollIntoView({block:'center',behavior:'smooth'});},
   delNovo:function(d,el){var li=el.closest('.tp-li');if(li)li.remove();},
@@ -2277,6 +2428,7 @@ document.addEventListener('toggle',function(e){if(e.target.classList&&e.target.c
 document.addEventListener('focusin',function(e){if(e.target.closest&&e.target.closest('.mm-li'))window._mmTa=e.target;});
 document.addEventListener('input',function(e){
   var t=e.target;
+  if(t.id==='rd-rep'){rdLer();var R=ui.rede,pp=R&&(byId(S.pedidos,R.pid)||{valor:90}),lb=document.querySelector('.rd-lucro b');if(lb&&pp){var l=(+pp.valor||0)-(+t.value||0);lb.textContent=brl(l);lb.className='mono '+(l>=0?'val':'late');}}
   if(t.classList&&t.classList.contains('cid-ac'))buscaCidades(t);
   if(t.id==='adm-busca'){ui.admBusca=t.value;var pa=t.selectionStart;render();var ab=document.getElementById('adm-busca');ab.focus();try{ab.setSelectionRange(pa,pa);}catch(x){}}
   if(t.id==='cl-doc'){var d=soDig(t.value).slice(0,14),v=d;if(d.length>11)v=d.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})(\d{0,2}).*/,function(m,a,b,c,e,f){return a+'.'+b+'.'+c+'/'+e+(f?'-'+f:'');});else if(d.length>9)v=d.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');else if(d.length>6)v=d.replace(/^(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');else if(d.length>3)v=d.replace(/^(\d{3})(\d{0,3})/,'$1.$2');if(v!==t.value)t.value=v;}
@@ -2292,6 +2444,7 @@ document.addEventListener('change',function(e){
   if(t.id==='up-file'&&t.files.length)enviaArquivo(t.dataset.id,t.files);
   if(t.id==='pd-files'){var inf=document.getElementById('pd-files-info');if(inf)inf.textContent=t.files.length?t.files.length+' arquivo(s) · '+bytes([].reduce.call(t.files,function(s,f){return s+f.size;},0))+' · vão ser compactados e enviados ao salvar':'STL, PLY, OBJ ou ZIP. Vários arquivos viram um zip só.';}
   if(t.id==='ed-imp'){var bx=document.getElementById('ed-impbox');if(bx)bx.hidden=!t.checked;lerEditor();renderItens();}
+  if(t.id==='rd-rep'||t.id==='rd-cad')rdLer();
   if(/^pd-ed[MC]/.test(t.id||'')){lerEditor();renderItens();}
   if(t.id==='ed-t'){if(ehImplante(t.value)){var cb=document.getElementById('ed-imp');if(cb&&!cb.checked){cb.checked=true;document.getElementById('ed-impbox').hidden=false;}}lerEditor();renderItens();}
   if(t.classList&&(t.classList.contains('pd-ex-t')||t.classList.contains('pd-ex-q'))){var x=ui.pdExtras[+t.dataset.k];if(x){if(t.classList.contains('pd-ex-t'))x.t=t.value;else x.q=Math.max(1,Math.min(20,parseInt(t.value,10)||1));atualizaCalc();}}
