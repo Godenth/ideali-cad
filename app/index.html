@@ -293,6 +293,22 @@ select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline
 .chart text{fill:var(--muted);font:500 11px var(--f-body)}
 .chart text.val{fill:var(--ink);font:600 12px var(--f-mono)}
 .chart .pago{fill:var(--accent)}
+.chart .pv-f{fill:color-mix(in srgb,var(--accent) 22%,var(--surface));stroke:var(--accent);stroke-width:1.4;stroke-dasharray:4 3}
+.chart .pv-band{fill:color-mix(in srgb,var(--accent) 12%,transparent);stroke:none}
+.chart .pv-hoje{stroke:var(--muted);stroke-dasharray:3 4}.chart .pv-hoje-t{font:600 11px var(--f-body);fill:var(--muted)}
+.chart .pv-cap{stroke:var(--p2);stroke-width:1.6;stroke-dasharray:6 4}.chart .pv-cap-t{font:600 11px var(--f-body);fill:var(--p2)}
+.chart .pv-lbl{font-style:italic}
+.pv-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pv-kpis>div{border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:grid;gap:2px;background:var(--bg)}
+.pv-kpis span{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.pv-kpis b{font-family:var(--f-display);font-size:1.3rem}.pv-kpis small{color:var(--muted);font-size:.8rem}
+.pv-kpis .up{color:var(--ok)}.pv-kpis .down,.pv-kpis small .down{color:var(--urgent)}
+.lg-pv{background:color-mix(in srgb,var(--accent) 22%,var(--surface));box-shadow:inset 0 0 0 1.5px var(--accent)}.lg-band{background:color-mix(in srgb,var(--accent) 14%,transparent)}.lg-cap{height:3px!important;background:var(--p2)}
+.pv-ajuste summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:.9rem}
+.pv-pars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 24px;margin-top:10px}
+.pv-par{display:grid;gap:4px;font-size:.88rem}.pv-par span{display:flex;justify-content:space-between}.pv-par output{font-family:var(--f-mono);color:var(--accent);font-weight:700}.pv-par input{accent-color:var(--accent);width:100%}
+.pv-listas{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.pv-listas h3{font-size:.95rem;margin:0 0 6px}
+@media (max-width:699px){.pv-kpis,.pv-pars{grid-template-columns:minmax(0,1fr)}}
 .chart .aberto{fill:color-mix(in srgb,var(--accent) 32%,var(--surface))}
 .chart .hit{fill:transparent;cursor:pointer}
 .chart .dim{opacity:.45}
@@ -910,7 +926,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 03h00';
+var VERSAO='15/10 · 03h20';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1095,6 +1111,74 @@ function hbars(rows,empty){
   return '<div>'+rows.map(function(r){var tag=r.a?'button':'div';return '<'+tag+' class="hbar"'+(r.a?' data-a="'+r.a+'" data-id="'+(r.id||'')+'" data-v="'+(r.dv||'')+'"':' style="cursor:default"')+'><b>'+r.l+'</b><span class="row" style="gap:6px">'+(r.tag||'')+'<span class="mono small">'+r.r+'</span></span><span class="track"><i style="width:'+(r.v/max*100).toFixed(1)+'%;'+(r.cor?'background:'+r.cor:'')+'"></i></span></'+tag+'>';}).join('')+'</div>';
 }
 
+/* ---------- Previsão de pedidos ----------
+   Modelo simples e explicável: para cada cliente, ritmo recente de pedidos (últimos 30/60/90 dias com pesos 50/30/20%),
+   intervalo médio entre pedidos e chance de continuar ativo (cai quando ele passa muito do intervalo de costume).
+   A soma dos clientes dá a previsão; a faixa é uma margem de 90% (Poisson). Os parâmetros somam novos clientes,
+   reativação de inativos e um ajuste de ritmo. Comparamos com a sua produção média (pedidos enviados por período). */
+function prevClientes(){var t=today(),m={};alive(S.pedidos).forEach(function(p){if(!p.clienteId||!p.recebido)return;(m[p.clienteId]=m[p.clienteId]||[]).push(p.recebido);});
+  return Object.keys(m).map(function(cid){var ds=m[cid].sort(),c=cliente(cid);if(!c)return null;
+    var n=function(a,b){return ds.filter(function(d){var x=daysBetween(d,t);return x>=a&&x<b;}).length;};
+    var r=(n(0,30)*0.5+n(30,60)*0.3+n(60,90)*0.2)/30;
+    var gaps=[];for(var i=Math.max(1,ds.length-6);i<ds.length;i++)gaps.push(daysBetween(ds[i-1],ds[i]));
+    var iv=gaps.length?Math.max(1,gaps.reduce(function(a,b){return a+b;},0)/gaps.length):null,ult=ds[ds.length-1],dias=daysBetween(ult,t);
+    var lim=iv?Math.max(iv*1.5,10):45,pa=dias<=lim?1:Math.max(0.08,lim/dias);if(dias>150)pa=0.05;
+    var hist=ds.filter(function(d){return daysBetween(d,t)<365;}).length/365;
+    var a60=n(0,60),b60=n(60,120);
+    return {c:c,ds:ds,r:r,iv:iv,ult:ult,dias:dias,pa:pa,hist:hist,tend:(a60+1)/(b60+1),prox:iv?addDays(ult,Math.round(iv)):null};}).filter(Boolean);}
+function previsao(mod,par){var t=today(),cs=prevClientes(),semana=mod!=='mes',N=semana?8:6,H=semana?12:12;
+  var ritmo=1+(par.ritmo||0)/100,rates=cs.filter(function(x){return x.r>0;}).map(function(x){return x.r;}).sort(function(a,b){return a-b;}),med=rates.length?rates[Math.floor(rates.length/2)]:0.05;
+  var porDia=cs.reduce(function(s,x){return s+x.r*x.pa;},0)*ritmo;
+  var n60=alive(S.pedidos).filter(function(p){var d=daysBetween(p.recebido,t);return d>=0&&d<60;}).length,n120=alive(S.pedidos).filter(function(p){var d=daysBetween(p.recebido,t);return d>=60&&d<120;}).length;
+  var g=n120?Math.min(1.3,Math.max(0.7,n60/n120)):1,gDia=Math.pow(g,1/60);  /* tendência geral, suavizada e limitada a ±30% em 60 dias */
+  var reat=cs.filter(function(x){return x.pa<0.5;}).reduce(function(s,x){return s+x.hist;},0)*(par.reativar||0)/100;
+  var hist=[],fut=[];
+  if(semana){for(var k=H-1;k>=0;k--){var a=addDays(t,-7*(k+1)+1),b=addDays(t,-7*k);hist.push({l:dm(a),v:alive(S.pedidos).filter(function(p){return p.recebido>=a&&p.recebido<=b;}).length,
+      env:alive(S.pedidos).filter(function(p){return p.entregue&&p.entregue>=a&&p.entregue<=b;}).length});}
+    for(var j=1;j<=N;j++){var dias=7,novos=(par.novos||0)/30*med*dias*Math.min(1,j/4);var mu=(porDia*Math.pow(gDia,7*j-3.5))*dias+reat*dias+novos;fut.push({l:dm(addDays(t,7*(j-1)+1)),v:mu});}}
+  else{var ms=ultimosMeses(H);ms.forEach(function(m,ix){hist.push({parcial:ix===ms.length-1,l:mesCurto(m),v:alive(S.pedidos).filter(function(p){return monthOf(p.recebido)===m;}).length,env:alive(S.pedidos).filter(function(p){return monthOf(p.entregue)===m;}).length});});
+    var mm=monthOf(t);for(var j2=1;j2<=N;j2++){var y=+mm.slice(0,4),mo=+mm.slice(5,7)+j2;while(mo>12){mo-=12;y++;}var mk=y+'-'+('0'+mo).slice(-2);
+      var nov=(par.novos||0)*med*30*Math.min(1,j2/2);fut.push({l:mesCurto(mk),v:porDia*Math.pow(gDia,30.4*j2-15)*30.4+reat*30.4+nov});}}
+  fut.forEach(function(f){var e=1.64*Math.sqrt(Math.max(f.v,0.3));f.min=Math.max(0,f.v-e);f.max=f.v+e;});
+  var ult4=hist.slice(-4),cap=ult4.reduce(function(s,h){return s+h.env;},0)/Math.max(1,ult4.length);
+  var bh=semana?hist.slice(-4):hist.slice(-4,-1),base=bh.reduce(function(s,h){return s+h.v;},0)/bh.length,pf=semana?fut.slice(0,4):fut.slice(0,1),prox4=pf.reduce(function(s,f){return s+f.v;},0)/pf.length;
+  return {hist:hist,fut:fut,cap:cap,var:base?((prox4-base)/base*100):null,cs:cs,semana:semana};}
+function svgPrev(P){var nar=window.innerWidth<700,W=nar?360:Math.round(Math.min(1300,Math.max(600,window.innerWidth*0.62))),H=nar?220:240,L=nar?34:40,B=26,T=22,R=8;
+  var all=P.hist.concat(P.fut),max=Math.max(2,Math.ceil(nice(Math.max.apply(null,P.hist.map(function(h){return h.v;}).concat(P.fut.map(function(f){return f.max;}),[P.cap||0])))));
+  var cw=(W-L-R)/all.length,bw=Math.min(30,cw*0.56);function y(v){return T+(H-T-B)*(1-v/max);}
+  var g='<g class="grid">'+[0,.5,1].map(function(f){var v=max*f;return '<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'"/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end">'+Math.round(v)+'</text>';}).join('')+'</g>';
+  var xh=L+cw*P.hist.length;g+='<line x1="'+xh+'" x2="'+xh+'" y1="'+(T-8)+'" y2="'+(H-B)+'" class="pv-hoje"/><text x="'+(xh+5)+'" y="'+(T-10)+'" class="pv-hoje-t">previsão →</text>';
+  var band='',linha='';P.fut.forEach(function(f,i){var cx=L+cw*(P.hist.length+i)+cw/2;band+=(i?'L':'M')+cx+' '+y(f.max);});
+  for(var i=P.fut.length-1;i>=0;i--){var cx2=L+cw*(P.hist.length+i)+cw/2;band+='L'+cx2+' '+y(P.fut[i].min);}
+  var cols=all.map(function(h,i){var fut=i>=P.hist.length,x=L+cw*i+(cw-bw)/2,v=h.v,top=y(v),r=Math.min(4,bw/2);
+    var bar=v>0?'<path class="'+(fut?'pv-f':h.parcial?'aberto':'pago')+'" d="M'+x+' '+y(0)+'V'+(top+r)+'Q'+x+' '+top+' '+(x+r)+' '+top+'H'+(x+bw-r)+'Q'+(x+bw)+' '+top+' '+(x+bw)+' '+(top+r)+'V'+y(0)+'Z"/>':'';
+    var tip=fut?'<b>'+h.l+' (previsão)</b><br>'+h.v.toFixed(1).replace('.',',')+' pedidos<br>faixa '+Math.floor(h.min)+' a '+Math.ceil(h.max):'<b>'+h.l+(h.parcial?' (até hoje)':'')+'</b><br>'+h.v+' pedido(s) recebidos<br>'+h.env+' enviado(s)';
+    return '<g class="col">'+bar+(!nar||i%3===0?'<text x="'+(x+bw/2)+'" y="'+(H-6)+'" text-anchor="middle"'+(fut?' class="pv-lbl"':'')+'>'+h.l+'</text>':'')+'<rect class="hit" x="'+(L+cw*i)+'" y="'+T+'" width="'+cw+'" height="'+(H-T)+'" data-tip="'+esc(tip)+'" data-x="'+(x+bw/2)+'" data-y="'+top+'"/></g>';}).join('');
+  var cap=P.cap>0?'<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(P.cap)+'" y2="'+y(P.cap)+'" class="pv-cap"/><text x="'+(W-R)+'" y="'+(y(P.cap)-5)+'" text-anchor="end" class="pv-cap-t">sua produção média</text>':'';
+  return '<div class="chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Pedidos recebidos e previsão">'+g+'<path d="'+band+'Z" class="pv-band"/>'+cols+cap+'</svg><div class="tip" hidden></div></div>';}
+function secPrevisao(){var tot=alive(S.pedidos).length,par=ui.prevPar||(ui.prevPar={novos:0,reativar:0,ritmo:0}),mod=ui.prevMod||'sem';
+  if(tot<5)return '<section class="card stack" style="grid-column:span 12"><h2>Previsão de pedidos</h2><p class="empty">A previsão aparece quando você tiver pelo menos 5 pedidos registrados.</p></section>';
+  var P=previsao(mod,par),t=today(),f30=P.semana?P.fut.slice(0,4).reduce(function(s,f){return s+f.v;},0)+P.fut[4].v*2/7:P.fut[0].v;
+  var e30=1.64*Math.sqrt(Math.max(f30,0.3)),capPer=P.cap,dem=P.fut.slice(0,P.semana?4:1).reduce(function(s,f){return s+f.v;},0)/(P.semana?4:1);
+  var vv=P.var,seta=vv==null?'—':(vv>=0?'▲ +':'▼ ')+Math.round(vv)+'%';
+  var breve=P.cs.filter(function(x){return x.prox&&x.pa>=0.5&&daysBetween(t,x.prox)<=7&&daysBetween(t,x.prox)>=-3;}).sort(function(a,b){return a.prox<b.prox?-1:1;}).slice(0,5);
+  var risco=P.cs.filter(function(x){return x.pa<0.6&&x.ds.length>=2&&x.dias<=200;}).sort(function(a,b){return b.hist-a.hist;}).slice(0,5);
+  var queda=P.cs.filter(function(x){return x.pa>=0.6&&x.tend<0.7&&x.ds.length>=3;}).slice(0,5);
+  function li(x,txt,cls){return '<button class="li" data-a="verCliente" data-id="'+x.c.id+'"><span class="t"><b>'+esc(x.c.nome)+'</b><span>'+txt+'</span></span><span class="tag '+cls+'">'+(cls==='ok'?'em breve':cls==='u'?'risco':'em queda')+'</span></button>';}
+  var rng=function(n,k,v,mx,suf){return '<label class="pv-par"><span>'+n+' <output>'+(v>0&&suf==='%'&&k==='ritmo'?'+':'')+v+suf+'</output></span><input type="range" class="pv-in" data-k="'+k+'" min="'+(k==='ritmo'?-50:0)+'" max="'+mx+'" step="'+(k==='novos'?1:5)+'" value="'+v+'"></label>';};
+  return '<section class="card stack" style="grid-column:span 12" id="prev-sec"><div class="between wrap"><div><h2>Previsão de pedidos</h2><p class="small muted">Com base no ritmo de cada cliente e no seu próprio ritmo de entrega. É uma estimativa, não uma promessa.</p></div>'+
+    '<div class="seg" role="tablist">'+[['sem','Próximas semanas'],['mes','Próximos meses']].map(function(o){return '<button class="'+(mod===o[0]?'on':'')+'" data-a="prevMod" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
+    '<div class="pv-kpis"><div><span>Próximos 30 dias</span><b>'+Math.round(f30)+' pedidos</b><small>entre '+Math.max(0,Math.floor(f30-e30))+' e '+Math.ceil(f30+e30)+'</small></div>'+
+      '<div><span>Tendência</span><b class="'+(vv==null?'':vv>=0?'up':'down')+'">'+seta+'</b><small>vs. '+(P.semana?'últimas 4 semanas':'últimos 3 meses')+'</small></div>'+
+      '<div><span>Sua produção média</span><b>'+capPer.toFixed(1).replace('.',',')+' / '+(P.semana?'semana':'mês')+'</b><small>'+(capPer?(dem>capPer*1.15?'<span class="down">demanda acima do seu ritmo</span>':dem<capPer*0.6?'tem folga para mais clientes':'equilibrado'):'pedidos enviados')+'</small></div></div>'+
+    svgPrev(P)+
+    '<div class="legend"><span><i style="background:var(--accent)"></i>Recebidos</span><span><i class="lg-pv"></i>Previsão</span><span><i class="lg-band"></i>Faixa provável</span>'+(P.cap?'<span><i class="lg-cap"></i>Sua produção média</span>':'')+'</div>'+
+    '<details class="pv-ajuste"><summary>Ajustar parâmetros da previsão</summary><div class="pv-pars">'+rng('Novos clientes por mês','novos',par.novos,10,'')+rng('Reativar clientes parados','reativar',par.reativar,100,'%')+rng('Ritmo geral dos clientes','ritmo',par.ritmo,50,'%')+'</div></details>'+
+    '<div class="pv-listas">'+
+      '<div><h3>Devem pedir nos próximos dias</h3>'+(breve.length?'<div class="list">'+breve.map(function(x){return li(x,'costuma pedir a cada '+Math.round(x.iv)+' dias · previsto por volta de '+dm(x.prox),'ok');}).join('')+'</div>':'<p class="small muted">Ninguém com pedido previsto nesta semana.</p>')+'</div>'+
+      '<div><h3>Risco de perder</h3>'+(risco.length?'<div class="list">'+risco.map(function(x){return li(x,'sem pedir há '+x.dias+' dias'+(x.iv?' (costumava a cada '+Math.round(x.iv)+')':''),'u');}).join('')+'</div>':'<p class="small muted">Nenhum cliente sumido. 👏</p>')+'</div>'+
+      (queda.length?'<div><h3>Pedindo menos</h3><div class="list">'+queda.map(function(x){return li(x,'menos pedidos nos últimos 60 dias que nos 60 anteriores','w');}).join('')+'</div></div>':'')+
+    '</div></section>';}
 /* ---------- Dashboard ---------- */
 function rDashboard(){
   var t=today(),G=geral(),ps=pedPer(),meses=chartMeses();
@@ -1122,6 +1206,7 @@ function rDashboard(){
         '<details class="small"><summary class="muted" style="cursor:pointer">Ver em tabela</summary><table style="width:100%;margin-top:8px;border-collapse:collapse">'+meses.map(function(m,i){return '<tr style="border-top:1px solid var(--line)"><td style="padding:6px 0;text-transform:capitalize">'+mesNome(m)+'</td><td class="mono" style="text-align:right">'+brl(fv[i])+'</td><td class="mono" style="text-align:right;color:var(--muted)">pago '+brl(pv[i])+'</td></tr>';}).join('')+'</table></details></section>'+
       '<section class="card stack narrow"><div class="between"><h2>Produção agora</h2><button class="btn sm" data-a="tab" data-v="pedidos">Abrir</button></div>'+
         hbars(STATUS.map(function(s){var l=alive(S.pedidos).filter(function(p){return p.status===s[0];});return {l:s[1],r:l.length+' · '+brl(soma(l)),v:l.length,a:'tab',dv:'pedidos',cor:'var(--c'+(STATUS.indexOf(s)+1)+')'};}))+'</section>'+
+      secPrevisao()+
       '<section class="card stack half"><div class="between"><h2>Próximos prazos</h2><button class="btn sm" data-a="tab" data-v="pedidos">Ver todos</button></div>'+
         (prox.length?'<div class="list">'+prox.map(liPedido).join('')+'</div>':'<p class="empty">Nenhum pedido em aberto.</p>')+'</section>'+
       '<section class="card stack half"><div class="between"><h2>Quem está devendo</h2><button class="btn sm" data-a="tab" data-v="financeiro">Financeiro</button></div>'+
@@ -2881,6 +2966,7 @@ var A={
   relProd:function(){openSheet(fRelProd,ui.cliProd||null);},
   relCli:function(d){ui.sheet.args=[d.id||null];renderSheet();},
   relPdf:function(d,el){var cb=document.getElementById('rel-val'),v=!cb||cb.checked;ui.relVal=v;var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraRelProd(d.id,v).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
+  prevMod:function(d){ui.prevMod=d.v;var y=window.scrollY;render();window.scrollTo(0,y);},
   limpaCliProd:function(){ui.cliProd=null;render();},
   linkGerar:async function(d,el){if(!guard()||!sb)return;var tinha=ui.links&&ui.links[d.id]&&ui.links[d.id].token;
     if(tinha&&!confirm('Trocar o link? O link antigo para de funcionar na hora.'))return;
@@ -3075,6 +3161,7 @@ document.addEventListener('submit',function(e){var f=e.target;if(!f.dataset.form
 document.addEventListener('toggle',function(e){if(e.target.classList&&e.target.classList.contains('mm'))ui.mmAberto=e.target.open;},true);
 document.addEventListener('focusin',function(e){if(e.target.closest&&e.target.closest('.mm-li'))window._mmTa=e.target;});
 document.addEventListener('input',function(e){
+  if(e.target.classList&&e.target.classList.contains('pv-in')){(ui.prevPar=ui.prevPar||{})[e.target.dataset.k]=+e.target.value;clearTimeout(ui.prevT);ui.prevT=setTimeout(function(){var y=window.scrollY,ab=!!document.querySelector('.pv-ajuste[open]');render();var d=document.querySelector('.pv-ajuste');if(d&&ab)d.open=true;window.scrollTo(0,y);},180);}
   if(e.target.classList&&e.target.classList.contains('nome-p')){var el=e.target,st=el.selectionStart,en=el.selectionEnd,nv=nomeProprio(el.value,el.id==='cl-sobrenome');if(nv!==el.value){el.value=nv;try{el.setSelectionRange(st,en);}catch(x){}}}
   if(e.target.classList&&(e.target.classList.contains('tel-ddd')||e.target.classList.contains('tel-num'))){var pr=e.target.dataset.pre,dd=document.getElementById(pr+'-ddd'),nu=document.getElementById(pr+'-num');
     if(e.target===dd){dd.value=dd.value.replace(/\D/g,'').slice(0,2);if(dd.value.length===2&&e.inputType!=='deleteContentBackward')nu.focus();}
