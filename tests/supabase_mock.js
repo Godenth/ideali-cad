@@ -2,12 +2,12 @@
 (function(){
   var U='dddddddd-0000-0000-0000-000000000004';
   var tabelas={perfis:[{user_id:U,nome:'Danilo',preferencias:{}}],assinaturas:[{user_id:U,plano:'basico',status:'teste',teste_ate:new Date(Date.now()+13*864e5).toISOString(),limite_bytes:5368709120,bytes_usados:0}],
-    clientes:[],tipos_trabalho:[],precos_cliente:[],faixas_desconto:[],pagamentos:[],pedidos:[],arquivos:[]};
+    clientes:[],tipos_trabalho:[],precos_cliente:[],faixas_desconto:[],pagamentos:[],pedidos:[],arquivos:[],links_cliente:[]};
   window.__ops=[];var cbs=[],sessao=null;
   function Q(t){this.t=t;this.f=[];}
   Q.prototype.select=function(){this.op='select';return this;};
   Q.prototype.eq=function(c,v){this.f.push([c,v]);return this;};
-  Q.prototype.range=function(){return this;};Q.prototype.order=function(){return this;};
+  Q.prototype.range=function(){return this;};Q.prototype.is=function(){return this;};Q.prototype.order=function(){return this;};
   Q.prototype.maybeSingle=function(){this.single=true;return this;};
   Q.prototype.insert=function(r){this.op='insert';this.row=r;return this;};
   Q.prototype.update=function(r){this.op='update';this.row=r;return this;};
@@ -30,6 +30,7 @@
       updateUser:function(){return Promise.resolve({error:null});}
     },
     rpc:function(n,a){window.__ops.push({op:'rpc',name:n,args:a});
+      if(n==='criar_link_cliente')return Promise.resolve({data:'TesteTokenSecreto_abcdefghijklmnopqrstuvwxyz012',error:null});
       if(n==='sou_admin')return Promise.resolve({data:true,error:null});
       if(n==='admin_assinantes')return Promise.resolve({data:[
         {user_id:U,email:'dan@x.com',nome:'Danilo',telefone:'',cidade:'São Paulo',plano:'vitrine',status:'ativa',teste_ate:null,vence_em:null,limite_bytes:53687091200,bytes_usados:0,cadastro:new Date().toISOString(),ultimo_acesso:new Date().toISOString(),admin:true},

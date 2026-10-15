@@ -815,7 +815,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 23h30';
+var VERSAO='14/10 · 23h50';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1331,6 +1331,7 @@ function rCliente(id){
     '<div class="stat" style="cursor:default"><span class="lbl">Este mês</span><span class="v">'+brl(mes)+'</span></div></div>'+
     (f?'<div class="banner"><span>Este cliente tem <b>'+f.pct+'% de desconto</b> nos pedidos deste mês pelo volume do mês passado.</span></div>':'')+
     '<div class="row wrap"><button class="btn pri" data-a="pix" data-id="'+id+'">Cobrar por Pix</button><button class="btn" data-a="editCliente" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Editar</button><button class="btn danger" data-a="delCliente" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Excluir</button></div>'+
+    secLinkCli(c)+
     '<section class="card stack"><div><h2>Tabela de preços</h2><p class="small muted">Deixe em branco para usar o valor padrão do tipo de trabalho.</p></div>'+
     '<form data-form="precos" data-id="'+id+'" class="stack">'+alive(S.tipos).filter(function(t){return t.ativo;}).map(function(t){
       var pr=S.precos.filter(function(p){return p.clienteId===id&&p.tipoId===t.id&&!p.deleted;})[0];
@@ -1340,6 +1341,20 @@ function rCliente(id){
     (c.obs?'<section class="card"><h3>Observações</h3><p class="muted" style="margin-top:6px">'+esc(c.obs)+'</p></section>':'');
 }
 
+/* ---------- Link de acompanhamento para o cliente ---------- */
+function urlLink(tk){return location.href.split('/app/')[0].split('#')[0].replace(/\/$/,'')+'/ver/#t='+tk;}
+function secLinkCli(c){
+  var L=ui.links||(ui.links={}),k=L[c.id];
+  if(k===undefined&&sb){L[c.id]=null;sb.from('links_cliente').select('token,criado_em,ultimo_acesso').eq('cliente_id',c.id).is('revogado_em',null).maybeSingle()
+    .then(function(r){L[c.id]=(r&&r.data)||false;if(ui.tab==='clientes'&&ui.sub===c.id)render();});}
+  var tem=k&&k.token;
+  return '<section class="card stack"><div><h2>Link de acompanhamento</h2><p class="small muted">Mande para '+esc(c.nome)+' acompanhar os casos: situação de cada pedido, dentes, valores e os arquivos em 3D (STL, HTML e fotos). Sem login. Só vê quem tiver o link, e você cancela quando quiser.</p></div>'+
+    (k===null?'<p class="small muted">Carregando…</p>':tem?
+      '<div class="code" style="user-select:all;word-break:break-all">'+esc(urlLink(k.token))+'</div>'+
+      '<p class="small muted">Criado em '+new Date(k.criado_em).toLocaleDateString('pt-BR')+(k.ultimo_acesso?' · aberto pela última vez em '+new Date(k.ultimo_acesso).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):' · ainda não foi aberto')+'</p>'+
+      '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="linkCopiar" data-id="'+c.id+'">Copiar link</button><button class="btn" data-a="linkWa" data-id="'+c.id+'">Mandar no WhatsApp</button><button class="btn" data-a="linkGerar" data-id="'+c.id+'" '+(canWrite()?'':'disabled')+'>Trocar link</button><button class="btn danger" data-a="linkCancelar" data-id="'+c.id+'" '+(canWrite()?'':'disabled')+'>Cancelar link</button></div>':
+      '<div><button class="btn pri" data-a="linkGerar" data-id="'+c.id+'" '+(canWrite()?'':'disabled')+'>Gerar link</button></div>')+'</section>';
+}
 function formaNome(f){return {pix:'Pix',dinheiro:'Dinheiro',transferencia:'Transferência',cartao:'Cartão'}[f]||f;}
 
 /* ---------- Mais ---------- */
@@ -2079,8 +2094,8 @@ function fPedido(id,preCli){
     '<label class="check"><input type="checkbox" id="pd-urg" name="urgente" '+(p&&p.urgente?'checked':'')+'> Urgente</label>'+
     '<label class="fld"><span>Observações</span><textarea id="pd-obs" name="obs" maxlength="500">'+esc(p?p.obs:'')+'</textarea></label>'+
     (p?'':'<div class="fld"><span>Escaneamento</span>'+
-      (canFile()?'<label class="btn block" style="position:relative">Anexar arquivos (viram zip)<input id="pd-files" type="file" multiple accept=".stl,.ply,.obj,.zip" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
-      '<small id="pd-files-info">STL, PLY, OBJ ou ZIP. Vários arquivos viram um zip só.</small>':
+      (canFile()?'<label class="btn block" style="position:relative">Anexar arquivos (viram zip)<input id="pd-files" type="file" multiple accept=".stl,.ply,.obj,.zip,.html,.htm,.png,.jpg,.jpeg,.webp" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
+      '<small id="pd-files-info">STL, HTML do exocad, prints/fotos ou ZIP. Vários arquivos viram um zip só.</small>':
       '<small>No Essencial não dá para anexar arquivos aqui. <button type="button" class="linkbtn" data-a="assinar">Assinar</button></small>')+
       '<input id="pd-scan" name="scanLink" type="url" inputmode="url" placeholder="Ou cole um link (Drive, WeTransfer, Dropbox…)" style="margin-top:6px"></div>')+
     '<div class="calc" id="pd-calc"></div>'+
@@ -2162,7 +2177,7 @@ function fPedidoDet(id){
     '<label class="fld"><span>Mover para</span><select id="pd-mover" data-id="'+id+'" '+(w?'':'disabled')+'>'+STATUS.concat([['arquivado','Arquivado (enviado ao cliente)']]).map(function(s){return '<option value="'+s[0]+'" '+(p.status===s[0]?'selected':'')+'>'+s[1]+'</option>';}).join('')+'</select></label>'+
     '<section class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div class="between"><h3>Arquivos</h3><span class="small muted">'+bytes(usado())+' de '+bytes(S.assinatura.limite)+'</span></div>'+
       (arqs.length?'<div class="list">'+arqs.map(function(a){return liArq(a,w);}).join('')+'</div>':'<p class="small muted">Nenhum arquivo. Envie o STL ou cole um link.</p>')+
-      (canFile()?'<label class="btn block" style="position:relative">Enviar arquivos (viram zip)<input id="up-file" type="file" multiple accept=".stl,.ply,.obj,.zip" data-id="'+id+'" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>':
+      (canFile()?'<label class="btn block" style="position:relative">Enviar arquivos (viram zip)<input id="up-file" type="file" multiple accept=".stl,.ply,.obj,.zip,.html,.htm,.png,.jpg,.jpeg,.webp" data-id="'+id+'" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>':
         (w?'<p class="small muted">No Essencial não dá para guardar arquivos. Cole o link abaixo ou <button type="button" class="linkbtn" data-a="assinar">assine</button>.</p>':''))+
       '<div id="up-st" '+(ui.up&&ui.up.pid===id?'':'hidden')+' class="stack" style="gap:6px"><div class="prog"><i id="up-bar" style="width:'+(ui.up&&ui.up.pid===id?ui.up.pct:0)+'%"></i></div><span class="small muted" id="up-txt">'+(ui.up&&ui.up.pid===id?esc(ui.up.txt):'')+'</span></div>'+
       '<form data-form="link" data-id="'+id+'" class="row"><input class="search" id="lk-url" name="url" type="url" placeholder="Ou cole o link do Drive / WeTransfer" required '+(w?'':'disabled')+'><button class="btn" type="submit" '+(w?'':'disabled')+'>Salvar</button></form>'+
@@ -2479,7 +2494,7 @@ function putComProgresso(url,blob,onp){return new Promise(function(ok,ko){var x=
 async function enviaArquivo(pid,files){
   if(!guardArq())return;files=[].slice.call(files||[]).filter(Boolean);var fi=document.getElementById('up-file');if(fi)fi.value='';if(!files.length)return;
   if(ui.up){toast('Espere o envio atual terminar.');return;}
-  if(files.some(function(f){return !/\.(stl|ply|obj|zip)$/i.test(f.name);})){toast('Envie arquivos .stl, .ply, .obj ou .zip.');return;}
+  if(files.some(function(f){return !/\.(stl|ply|obj|zip|html?|png|jpe?g|webp)$/i.test(f.name);})){toast('Envie STL, PLY, OBJ, ZIP, HTML ou imagens (PNG, JPG).');return;}
   var tot=files.reduce(function(s,f){return s+f.size;},0);if(tot>2*GB){toast('Os arquivos passam de 2 GB. Use um link externo.');return;}
   var p=byId(S.pedidos,pid),umZip=files.length===1&&/\.zip$/i.test(files[0].name);
   var nome=umZip?files[0].name:files.length===1?files[0].name.replace(/\.[^.]+$/,'')+'.zip':('Escaneamento '+(p?p.paciente+' #'+p.num:'')).trim()+'.zip';
@@ -2679,6 +2694,16 @@ var A={
   relCli:function(d){ui.sheet.args=[d.id||null];renderSheet();},
   relPdf:function(d,el){var cb=document.getElementById('rel-val'),v=!cb||cb.checked;ui.relVal=v;var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraRelProd(d.id,v).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
   limpaCliProd:function(){ui.cliProd=null;render();},
+  linkGerar:async function(d,el){if(!guard()||!sb)return;var tinha=ui.links&&ui.links[d.id]&&ui.links[d.id].token;
+    if(tinha&&!confirm('Trocar o link? O link antigo para de funcionar na hora.'))return;
+    el.disabled=true;try{clearTimeout(syncTimer);syncFila=syncFila.then(sincroniza);await syncFila;
+      var r=await sb.rpc('criar_link_cliente',{cid:d.id});if(r.error)throw r.error;ui.links[d.id]={token:r.data,criado_em:new Date().toISOString(),ultimo_acesso:null};render();toast('Link criado. Copie e mande para o cliente.');}
+    catch(x){toast('Não consegui criar o link: '+((x&&x.message)||x));el.disabled=false;}},
+  linkCancelar:async function(d){if(!guard()||!sb)return;if(!confirm('Cancelar o link? Quem tiver o link antigo não vai mais conseguir abrir.'))return;
+    var r=await sb.rpc('revogar_link_cliente',{cid:d.id});if(r.error){toast('Não consegui cancelar: '+r.error.message);return;}ui.links[d.id]=false;render();toast('Link cancelado.');},
+  linkCopiar:function(d){var k=ui.links[d.id];if(!k)return;var u=urlLink(k.token);(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){toast('Link copiado.');},function(){toast('Selecione o link e copie.');});},
+  linkWa:function(d){var k=ui.links[d.id],c=cliente(d.id);if(!k)return;var tel=((c&&c.telefone)||'').replace(/\D/g,'');if(tel&&tel.length<=11)tel='55'+tel;
+    var m='Olá! Por este link você acompanha os seus casos comigo: a situação de cada pedido e os arquivos em 3D. '+urlLink(k.token);window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(m),'_blank','noopener');},
   cobranca:function(d,el,e){if(e)e.stopPropagation();ui.cobSel={};openSheet(fCobranca,d.id||null);},
   cobrancaCli:function(d){ui.cobSel={};ui.sheet.args=[d.id||null];renderSheet();},
   cobrancaPdf:function(d,el){var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraPdfCobranca(d.id).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
@@ -2876,7 +2901,7 @@ document.addEventListener('change',function(e){
   var t=e.target;
   if(t.classList&&t.classList.contains('arqck')){ui.arqSel=ui.arqSel||{};if(t.checked)ui.arqSel[t.dataset.id]=1;else delete ui.arqSel[t.dataset.id];render();}
   if(t.id==='up-file'&&t.files.length)enviaArquivo(t.dataset.id,t.files);
-  if(t.id==='pd-files'){var inf=document.getElementById('pd-files-info');if(inf)inf.textContent=t.files.length?t.files.length+' arquivo(s) · '+bytes([].reduce.call(t.files,function(s,f){return s+f.size;},0))+' · vão ser compactados e enviados ao salvar':'STL, PLY, OBJ ou ZIP. Vários arquivos viram um zip só.';}
+  if(t.id==='pd-files'){var inf=document.getElementById('pd-files-info');if(inf)inf.textContent=t.files.length?t.files.length+' arquivo(s) · '+bytes([].reduce.call(t.files,function(s,f){return s+f.size;},0))+' · vão ser compactados e enviados ao salvar':'STL, HTML do exocad, prints/fotos ou ZIP. Vários arquivos viram um zip só.';}
   if(t.id==='ed-imp'){var bx=document.getElementById('ed-impbox');if(bx)bx.hidden=!t.checked;lerEditor();renderItens();}
   if(t.id==='rd-rep'||t.id==='rd-cad')rdLer();
   if(t.classList&&t.classList.contains('rd-up')&&t.files.length){var R1=redeIni(),it=R1.enviados.concat(R1.meus).filter(function(q){return q.id===t.dataset.id;})[0];
