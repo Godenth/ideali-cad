@@ -108,6 +108,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .cid-uf{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:12px;align-items:start}
 .tp-grid{display:grid;gap:16px;align-items:start}@media (min-width:1100px){.tp-grid{grid-template-columns:minmax(0,1fr) 380px}}
 .tp-list{display:grid;gap:8px}
+.pg-ops{display:flex;flex-wrap:wrap;gap:6px}.pg-ck{padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);white-space:nowrap}.pg-ck:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
 .tp-extra{display:grid;gap:16px;align-items:start}
 
 .tp-li{display:grid;grid-template-columns:minmax(0,1fr) 170px 160px auto 36px;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
@@ -1039,7 +1040,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 14h25';
+var VERSAO='15/10 · 14h35';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2514,7 +2515,10 @@ function rTabela(){
 ''+
         '<section class="card stack"><div><h2>Informações</h2><p class="small muted">Condições do seu serviço, para você ter à mão e mandar ao cliente.</p></div>'+
           '<label class="fld"><span>Prazo médio</span><input id="tb-prazo" name="prazo" maxlength="120" placeholder="Ex.: 1 a 2 dias úteis, conforme a demanda e a complexidade" value="'+esc(tb.prazo||'')+'" '+dis+'></label>'+
-          '<label class="fld"><span>Formas de pagamento</span><input id="tb-pag" name="pagamento" maxlength="120" placeholder="Ex.: Pix ou cartão de crédito (link de pagamento)" value="'+esc(tb.pagamento||'')+'" '+dis+'></label>'+
+          '<div class="fld"><span>Formas de pagamento</span><div class="pg-ops">'+(function(){var cur=String(tb.pagamento||'').split(/\s*,\s*|\s+ou\s+|\s+e\s+/).filter(Boolean),low=cur.map(function(x){return semAcento(x).toLowerCase();}),usados=[];
+            var h=FORMAS_PG.map(function(o){var on=low.indexOf(semAcento(o).toLowerCase())>=0;if(on)usados.push(semAcento(o).toLowerCase());return '<label class="check pg-ck"><input type="checkbox" name="pg" value="'+esc(o)+'" '+(on?'checked':'')+' '+dis+'> '+esc(o)+'</label>';}).join('');
+            var outros=cur.filter(function(x){return usados.indexOf(semAcento(x).toLowerCase())<0;}).join(', ');
+            return h+'</div><input id="tb-pag-o" name="pgOutro" maxlength="80" placeholder="Outra forma (opcional). Ex.: parcelado em 2x" value="'+esc(outros)+'" '+dis+' style="margin-top:8px">';})()+'</div>'+
           '<label class="fld"><span>Outras informações</span><textarea id="tb-info" name="info" maxlength="400" placeholder="Ex.: Todos os projetos são feitos no fluxo 100% digital" '+dis+'>'+esc(tb.info||'')+'</textarea></label></section>'+
       '</div>'+
     '</div>'+
@@ -2893,6 +2897,7 @@ function campoTel(pre,v,dis){var t=telPartes(v);
 function cidUF(c){return c.cidade?esc(c.cidade)+(c.uf?'/'+c.uf:''):(c.uf||'');}
 var TIPO_CLI={laboratorio:'Laboratório',dentista:'Clínica / consultório'};
 function pessoaCli(c){return ((c.titulo?c.titulo+' ':'')+(c.pnome||'')+' '+(c.sobrenome||'')).trim();}
+var FORMAS_PG=['Pix','Cartão de crédito','Cartão de débito','Link de pagamento','Boleto','Transferência (TED)','Dinheiro'];
 var TRATAMENTOS=['Dr.','Dra.','Protético','Protética'];
 function nomeia(c){c.nome=(c.empresa||'').trim()||pessoaCli(c)||'(sem nome)';return c;}
 function soDig(v){return String(v||'').replace(/\D/g,'');}
@@ -3516,7 +3521,7 @@ var F={
     var nomes={};alive(S.tipos).forEach(function(t){nomes[semAcento(t.nome)]=1;});
     for(var i=0;i<novos.length;i++){var kk=semAcento(novos[i].nome);if(nomes[kk]){toast('Já existe um item chamado “'+novos[i].nome+'”.');return;}nomes[kk]=1;}
     novos.forEach(function(t){S.tipos.push(t);n++;});
-    var tb={modelos:(S.prefs&&S.prefs.tab&&S.prefs.tab.modelos!=null)?S.prefs.tab.modelos:null,prazo:(fd.get('prazo')||'').trim(),pagamento:(fd.get('pagamento')||'').trim(),info:(fd.get('info')||'').trim()};
+    var tb={modelos:(S.prefs&&S.prefs.tab&&S.prefs.tab.modelos!=null)?S.prefs.tab.modelos:null,prazo:(fd.get('prazo')||'').trim(),pagamento:fd.getAll('pg').concat(String(fd.get('pgOutro')||'').trim()?[String(fd.get('pgOutro')).trim()]:[]).join(', '),info:(fd.get('info')||'').trim()};
     S.prefs=S.prefs||{};var pv=S.prefs.tab||{};if(JSON.stringify(tb)!==JSON.stringify({modelos:pv.modelos==null?null:pv.modelos,prazo:pv.prazo||'',pagamento:pv.pagamento||'',info:pv.info||''})){S.prefs.tab=tb;n++;}
     save();render();toast(n?'Tabela salva ('+n+' alteração(ões)).':'Nada mudou na tabela.');
   },
