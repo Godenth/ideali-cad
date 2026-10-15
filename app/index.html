@@ -198,6 +198,7 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .rd-lb p{color:#fff;margin:0;text-align:center}
 .rd-lb .fecha{position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;font-size:20px;cursor:pointer}
 .rd-lb .nav{display:flex;gap:10px}
+.li-arq{flex-wrap:wrap;row-gap:8px}.li-arq>.row{margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
 .linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);font-weight:600;text-decoration:underline;cursor:pointer}
 .rd-fab{position:fixed;right:20px;bottom:20px;z-index:42;width:58px;height:58px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 14px 30px -10px color-mix(in srgb,var(--accent) 75%,transparent)}
 .rd-fab .n{position:absolute;top:-2px;right:-2px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--urgent);color:#fff;font:700 .75rem/22px var(--f-mono);border:2px solid var(--bg)}
@@ -805,7 +806,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 22h00';
+var VERSAO='14/10 · 22h10';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1216,8 +1217,8 @@ function rPedidos(){
     arq.sort(function(a,b){return (b.entregue||'')<(a.entregue||'')?-1:1;});
     return head_+'<section class="card stack"><div><h2>Arquivados</h2><p class="small muted">Pedidos já enviados ao cliente. Os arquivos STL somem 60 dias após o envio.</p></div>'+
       (arq.length?'<div class="list">'+arq.slice(0,80).map(function(p){var c=cliente(p.clienteId),t=tipoPed(p);
-        return '<div class="li"><button class="t" data-a="verPedido" data-id="'+p.id+'" style="border:0;background:none;text-align:left;cursor:pointer;padding:0;flex:1;min-width:0"><b>#'+p.num+' '+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</b><span>'+esc(c?c.nome:'')+' · enviado '+dmy(p.entregue)+'</span></button>'+
-        '<span class="row">'+(p.pago?'<span class="tag ok">Pago</span>':'<span class="tag w">A receber</span>')+'<span class="mono small">'+brl(p.valor)+'</span></span></div>';}).join('')+'</div>':'<p class="empty">Nenhum pedido arquivado.</p>')+'</section>';
+        return '<div class="li li-arq"><button class="t" data-a="verPedido" data-id="'+p.id+'" style="border:0;background:none;text-align:left;cursor:pointer;padding:0;flex:1 1 220px;min-width:0"><b>#'+p.num+' '+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</b><span>'+esc(c?c.nome:'')+' · enviado '+dmy(p.entregue)+'</span></button>'+
+        '<span class="row">'+(p.pago?'<span class="tag ok">Pago</span>':'<span class="tag w">A receber</span>')+'<span class="mono small">'+brl(p.valor)+'</span><button class="btn sm" data-a="restaurarFin" data-id="'+p.id+'" '+(canWrite()?'':'disabled')+' title="Voltar para Finalizado">↩ Restaurar</button></span></div>';}).join('')+'</div>':'<p class="empty">Nenhum pedido arquivado.</p>')+'</section>';
   }
   return head_+'<div class="kanban">'+STATUS.map(function(s){
       var col=ps.filter(function(p){return p.status===s[0];}).sort(function(a,b){return (b.urgente-a.urgente)||((a.prazo||'9')<(b.prazo||'9')?-1:1);});
@@ -2136,7 +2137,7 @@ function fPedidoDet(id){
     (itensDe(p).length||(p.extras||[]).length?'<div class="pd-lista">'+itensDe(p).map(function(i){return '<div class="pd-it"><span class="pd-it-t">'+descItem(i)+'</span></div>';}).join('')+(p.extras||[]).map(function(x){var t=tipo(x.t);return '<div class="pd-it"><span class="pd-it-t">'+(t?esc(t.nome):'')+' · '+(x.q||1)+'×</span></div>';}).join('')+'</div>':'')+
     (p.obs?'<div class="calc"><b>Observações</b><span>'+esc(p.obs)+'</span></div>':'')+
     (p.status==='pendente'&&p.pendencia?'<div class="pend" style="padding:12px">'+p.pendencia.motivos.map(function(m){return '<span>'+esc(m)+'</span>';}).join('')+(p.pendencia.obs?'<em>'+esc(p.pendencia.obs)+'</em>':'')+'</div>':'')+
-    (p.status!=='arquivado'?(function(){var x=acoes(p);return (p.status!=='pendente'?x.extra:'')+(x.acts?'<div class="acts">'+x.acts+'</div>':'');})():'')+
+    (p.status!=='arquivado'?(function(){var x=acoes(p);return (p.status!=='pendente'?x.extra:'')+(x.acts?'<div class="acts">'+x.acts+'</div>':'');})():'<div class="acts"><button class="btn sm" data-a="restaurarFin" data-id="'+p.id+'" '+(w?'':'disabled')+'>↩ Restaurar para Finalizado</button></div>')+
     '<label class="fld"><span>Mover para</span><select id="pd-mover" data-id="'+id+'" '+(w?'':'disabled')+'>'+STATUS.concat([['arquivado','Arquivado (enviado ao cliente)']]).map(function(s){return '<option value="'+s[0]+'" '+(p.status===s[0]?'selected':'')+'>'+s[1]+'</option>';}).join('')+'</select></label>'+
     '<section class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div class="between"><h3>Arquivos</h3><span class="small muted">'+bytes(usado())+' de '+bytes(S.assinatura.limite)+'</span></div>'+
       (arqs.length?'<div class="list">'+arqs.map(function(a){return liArq(a,w);}).join('')+'</div>':'<p class="small muted">Nenhum arquivo. Envie o STL ou cole um link.</p>')+
@@ -2475,6 +2476,8 @@ var A={
   ajuste:function(d,el,e){e.stopPropagation();if(!guard())return;var p=byId(S.pedidos,d.id);p.ajustes=(p.ajustes||0)+1;setStatus(d.id,'entrada');},
   enviado:function(d,el,e){if(e)e.stopPropagation();if(!guard())return;var p=byId(S.pedidos,d.id);if(!p)return;p.entregue=today();save();render();if(ui.sheet)renderSheet();
     toast('#'+p.num+' enviado. Fica em Finalizado até o fim do mês e vai para o arquivo em '+dmy(proxMes(p.entregue))+'.');},
+  restaurarFin:function(d,el,e){if(e)e.stopPropagation();if(!guard())return;var p=byId(S.pedidos,d.id);if(!p)return;p.status='finalizado';p.entregue=null;save();render();if(ui.sheet)renderSheet();
+    toast('#'+p.num+' voltou para Finalizado. Quando enviar de novo, marque “Sim, enviado”.');},
   desfazEnvio:function(d,el,e){if(e)e.stopPropagation();if(!guard())return;var p=byId(S.pedidos,d.id);if(!p)return;p.entregue=null;save();render();if(ui.sheet)renderSheet();},
   naoEnviado:function(d,el,e){e.stopPropagation();toast('Ok, o pedido continua em Finalizado até você enviar.');},
   copiarPend:function(d,el,e){e.stopPropagation();var t=avisoPendencia(byId(S.pedidos,d.id));try{navigator.clipboard.writeText(t).then(function(){toast('Aviso copiado. Cole no WhatsApp do cliente.');},function(){openSheet(fTexto,'Aviso de pendência',t);});}catch(x){openSheet(fTexto,'Aviso de pendência',t);}},
