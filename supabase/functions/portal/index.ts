@@ -31,7 +31,7 @@ Deno.serve(async (req: Request) => {
   const dono = link.user_id, cid = link.cliente_id;
 
   if (body.acao === "listar") {
-    const { data: cli } = await admin.from("clientes").select("nome").eq("id", cid).eq("user_id", dono).is("deleted_at", null).maybeSingle();
+    const { data: cli } = await admin.from("clientes").select("nome,sobrenome,empresa,titulo").eq("id", cid).eq("user_id", dono).is("deleted_at", null).maybeSingle();
     if (!cli) return json(404, { erro: "Este link não está mais disponível." });
     const { data: perfil } = await admin.from("perfis").select("nome,telefone").eq("user_id", dono).maybeSingle();
     const { data: peds } = await admin.from("pedidos")
@@ -52,7 +52,8 @@ Deno.serve(async (req: Request) => {
     const { data: arqs } = pids.length ? await admin.from("arquivos").select("id,pedido_id,origem,nome,url_externa,tamanho_zip,criado_em")
       .eq("user_id", dono).in("pedido_id", pids).is("deleted_at", null).is("removido_em", null) : { data: [] };
     await admin.from("links_cliente").update({ ultimo_acesso: new Date().toISOString() }).eq("id", link.id);
-    return json(200, { cliente: cli.nome, cadista: perfil?.nome ?? "", telefone: perfil?.telefone ?? "", pedidos: lista, tipos: tipos ?? [], arquivos: arqs ?? [] });
+    const nomeCli = (cli.empresa || "").trim() || [cli.titulo, cli.nome, cli.sobrenome].filter(Boolean).join(" ");
+    return json(200, { cliente: nomeCli, cadista: perfil?.nome ?? "", telefone: perfil?.telefone ?? "", pedidos: lista, tipos: tipos ?? [], arquivos: arqs ?? [] });
   }
 
   if (body.acao === "baixar") {

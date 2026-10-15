@@ -623,8 +623,8 @@ function ts(d){return d?(String(d).length===10?d+'T12:00:00Z':d):null;}
 function nn(v){return v===''||v===undefined?null:v;}
 var MAP={
   clientes:{t:'clientes',
-    to:function(x){return {nome:x.pnome,sobrenome:nn(x.sobrenome),empresa:nn(x.empresa),documento:nn(x.doc),cidade:nn(x.cidade),uf:nn(x.uf),tipo:x.tipo,telefone:nn(x.telefone),email:nn(x.email),observacoes:nn(x.obs),deleted_at:ts(x.deleted)};},
-    from:function(r){return nomeia({id:r.id,pnome:r.nome,sobrenome:r.sobrenome||'',empresa:r.empresa||'',doc:r.documento||'',cidade:r.cidade||'',uf:r.uf||'',tipo:r.tipo,telefone:r.telefone||'',email:r.email||'',obs:r.observacoes||'',criado:dia(r.criado_em),deleted:dia(r.deleted_at)});}},
+    to:function(x){return {nome:x.pnome,titulo:nn(x.titulo),sobrenome:nn(x.sobrenome),empresa:nn(x.empresa),documento:nn(x.doc),cidade:nn(x.cidade),uf:nn(x.uf),tipo:x.tipo,telefone:nn(x.telefone),email:nn(x.email),observacoes:nn(x.obs),deleted_at:ts(x.deleted)};},
+    from:function(r){return nomeia({id:r.id,pnome:r.nome,titulo:r.titulo||'',sobrenome:r.sobrenome||'',empresa:r.empresa||'',doc:r.documento||'',cidade:r.cidade||'',uf:r.uf||'',tipo:r.tipo,telefone:r.telefone||'',email:r.email||'',obs:r.observacoes||'',criado:dia(r.criado_em),deleted:dia(r.deleted_at)});}},
   tipos:{t:'tipos_trabalho',
     to:function(x){return {nome:x.nome,forma:x.forma,valor_padrao:+x.valor||0,ativo:!!x.ativo,deleted_at:ts(x.deleted)};},
     from:function(r){return {id:r.id,nome:r.nome,forma:r.forma,valor:+r.valor_padrao,ativo:r.ativo,deleted:dia(r.deleted_at)};}},
@@ -852,7 +852,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 01h35';
+var VERSAO='15/10 · 01h45';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2293,7 +2293,8 @@ var DDD_UF=(function(){var m={},t={SP:'11 12 13 14 15 16 17 18 19',RJ:'21 22 24'
 function ufDoTel(v){var d=String(v||'').replace(/\D/g,'');if(d.length>11&&d.slice(0,2)==='55')d=d.slice(2);if(d.charAt(0)==='0')d=d.slice(1);return d.length>=10?DDD_UF[d.slice(0,2)]||'':'';}
 function cidUF(c){return c.cidade?esc(c.cidade)+(c.uf?'/'+c.uf:''):(c.uf||'');}
 var TIPO_CLI={laboratorio:'Laboratório',dentista:'Clínica / consultório'};
-function pessoaCli(c){return ((c.pnome||'')+' '+(c.sobrenome||'')).trim();}
+function pessoaCli(c){return ((c.titulo?c.titulo+' ':'')+(c.pnome||'')+' '+(c.sobrenome||'')).trim();}
+var TITULOS=['Dr.','Dra.','Protético','Protética'];
 function nomeia(c){c.nome=(c.empresa||'').trim()||pessoaCli(c)||'(sem nome)';return c;}
 function soDig(v){return String(v||'').replace(/\D/g,'');}
 function cpfOk(d){if(!/^\d{11}$/.test(d)||/^(\d)\1{10}$/.test(d))return false;for(var t=9;t<11;t++){var s=0;for(var i=0;i<t;i++)s+=+d[i]*(t+1-i);if(((s*10)%11)%10!==+d[t])return false;}return true;}
@@ -2303,6 +2304,7 @@ function fCliente(id){
   var c=id?cliente(id):null;
   return head(c?'Editar cliente':'Novo cliente')+'<form data-form="cliente" data-id="'+(id||'')+'" class="stack">'+
     '<div class="fld"><span>Tipo de cliente</span><div class="seg" role="radiogroup">'+[['laboratorio','Laboratório'],['dentista','Clínica / consultório']].map(function(o){return '<label class="check"><input type="radio" name="tipo" value="'+o[0]+'" '+((c?c.tipo:'laboratorio')===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('<span style="width:14px"></span>')+'</div></div>'+
+    '<div class="fld"><span>Tratamento</span>'+selOutro('titulo',TITULOS,c?c.titulo||'':'','Ex.: Técnico, Prof., Sr.').replace('<option value="">Escolha…</option>','<option value="">Nenhum</option>')+'</div>'+
     '<div class="grid2"><label class="fld"><span>Nome *</span><input id="cl-nome" name="pnome" required maxlength="80" autocomplete="off" value="'+esc(c?c.pnome:'')+'" placeholder="Ana"></label>'+
     '<label class="fld"><span>Sobrenome *</span><input id="cl-sobrenome" name="sobrenome" required maxlength="80" autocomplete="off" value="'+esc(c?c.sobrenome:'')+'" placeholder="Souza"></label></div>'+
     '<label class="fld"><span>Nome da empresa <i class="muted" style="font-style:normal;font-weight:400">(opcional)</i></span><input id="cl-empresa" name="empresa" maxlength="100" value="'+esc(c?c.empresa:'')+'" placeholder="Lab. Exemplo ou Clínica Sorriso"><small>Se preencher, é esse nome que aparece na lista de clientes.</small></label>'+
@@ -2867,7 +2869,7 @@ var F={
   },
   cliente:function(fd,f){
     if(!guard())return;
-    var o={pnome:(fd.get('pnome')||'').trim(),sobrenome:(fd.get('sobrenome')||'').trim(),empresa:(fd.get('empresa')||'').trim(),doc:soDig(fd.get('doc')),cidade:(fd.get('cidade')||'').trim(),uf:fd.get('uf')||'',tipo:fd.get('tipo'),telefone:fd.get('telefone').trim(),email:fd.get('email').trim(),obs:fd.get('obs').trim()};
+    var o={titulo:valOutro(fd,'titulo').slice(0,20),pnome:(fd.get('pnome')||'').trim(),sobrenome:(fd.get('sobrenome')||'').trim(),empresa:(fd.get('empresa')||'').trim(),doc:soDig(fd.get('doc')),cidade:(fd.get('cidade')||'').trim(),uf:fd.get('uf')||'',tipo:fd.get('tipo'),telefone:fd.get('telefone').trim(),email:fd.get('email').trim(),obs:fd.get('obs').trim()};
     if(!o.pnome||!o.sobrenome){toast('Preencha o nome e o sobrenome.');return;}
     if(o.doc&&!(o.doc.length===11?cpfOk(o.doc):o.doc.length===14?cnpjOk(o.doc):false)){toast(o.doc.length===11?'CPF inválido. Confira os números.':o.doc.length===14?'CNPJ inválido. Confira os números.':'CPF tem 11 números e CNPJ tem 14.');var di=document.getElementById('cl-doc');if(di)di.focus();return;}
     var id=f.dataset.id;if(id)nomeia(Object.assign(cliente(id),o));else{var c=nomeia(Object.assign({id:uid(),criado:today()},o));S.clientes.push(c);id=c.id;}
