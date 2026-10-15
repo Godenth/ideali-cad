@@ -480,6 +480,24 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .teeth{display:grid;gap:6px;overflow-x:auto}
 .arch{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:2px}
 @media (max-width:699px){.tooth{font-size:.6rem;padding:8px 0;border-radius:5px;letter-spacing:-.03em}}
+.odonto-box{display:grid;gap:8px;padding:12px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
+.odonto{width:100%;height:auto;display:block}
+.od-n{fill:none;stroke:var(--line);stroke-width:1.2}
+.od-r{fill:color-mix(in srgb,#F2E8D5 70%,var(--surface));stroke:#B9A989;stroke-width:1}
+.od-c{fill:var(--accent);stroke:var(--accent);stroke-width:1}
+.od-trans{fill-opacity:.22}
+.od-prep{fill:#E8D9BC;stroke:#7A6A48;stroke-width:1.6}
+.od-par{fill:#A7B1BE;stroke:#6B7685;stroke-width:1}.od-rosca{stroke:#6B7685;stroke-width:1.2}.od-pil{fill:#7E8896}
+.od-fac{fill:var(--accent);fill-opacity:.3;stroke:var(--accent);stroke-width:2.6;stroke-linejoin:round}
+.od-gengiva{stroke:#E59AA6;stroke-width:3;stroke-dasharray:3 3;stroke-linecap:round}
+.od-uniao{fill:var(--accent);stroke:var(--surface);stroke-width:1.5}
+.od-meio{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4;opacity:.6}
+.od-num{font:600 11px var(--f-mono);fill:var(--muted);text-anchor:middle}.od-num.on{fill:var(--ink);font-weight:700}
+.od-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8rem;color:var(--muted)}
+.od-leg span{display:inline-flex;align-items:center;gap:6px}
+.od-leg i{width:12px;height:12px;border-radius:3px;display:inline-block;background:var(--accent)}
+.od-leg .od-i-imp{background:linear-gradient(var(--accent) 50%,#A7B1BE 50%)}.od-leg .od-i-prep{background:linear-gradient(color-mix(in srgb,var(--accent) 35%,var(--surface)) 50%,#E8D9BC 50%)}
+.od-leg .od-i-fac{background:color-mix(in srgb,var(--accent) 30%,var(--surface));box-shadow:inset 0 0 0 2px var(--accent)}.od-leg .od-i-pon{background:linear-gradient(var(--accent) 60%,#E59AA6 60%)}.od-leg .od-i-uni{height:6px;border-radius:3px}
 .conn{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:2px;height:24px}
 .conn>span{position:relative}
 .conn>span.u::before{content:"";position:absolute;left:50%;top:50%;width:calc(100% + 2px);height:4px;margin-top:-2px;border-radius:4px;background:var(--accent)}
@@ -815,7 +833,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 00h05';
+var VERSAO='15/10 · 00h20';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2156,6 +2174,33 @@ function atualizaCalc(){
 }
 
 /* Pedido: detalhe */
+/* ---------- Desenho das arcadas no pedido ----------
+   Cada dente marcado é desenhado pelo tipo do trabalho: sobre implante = coroa + parafuso,
+   sobre dente = coroa com o preparo aparecendo, pôntico = coroa sem raiz, faceta = lâmina na frente,
+   unidos = barra ligando as coroas. Arcada superior com a coroa para baixo, inferior espelhada. */
+function tipoDesenho(i){var t=tipo(i.t),n=((t&&t.nome)||'').toLowerCase();
+  if(/p[oô]ntico/.test(n))return 'pon';if(i.imp||/implante|protocolo/.test(n))return 'imp';if(/faceta|lente/.test(n))return 'fac';
+  if(/sobre dente|coroa|inlay|onlay|provis|elemento/.test(n))return 'prep';return 'out';}
+function odontoSVG(p){
+  var its=itensDe(p);if(!its.length)return '';var mapa={};its.forEach(function(i){mapa[i.d]=i;});
+  var W=40,usados={},raiz='M13 56 L15.5 14 Q20 7 24.5 14 L27 56 Z',coroa='M8 56 Q5.5 71 9 86 Q20 95 31 86 Q34.5 71 32 56 Z';
+  function dente(n){var i=mapa[n];if(!i)return '<path d="'+raiz+'" class="od-n"/><path d="'+coroa+'" class="od-n"/>';
+    var k=tipoDesenho(i);usados[k]=1;
+    if(k==='imp'){var r='<rect x="14.5" y="12" width="11" height="40" rx="3" class="od-par"/>';for(var y=17;y<50;y+=5)r+='<path d="M14.5 '+y+' L25.5 '+(y+3)+'" class="od-rosca"/>';
+      return r+'<rect x="16" y="50" width="8" height="9" rx="1.5" class="od-pil"/><path d="'+coroa+'" class="od-c"/>';}
+    if(k==='pon')return '<path d="M6 57 H34" class="od-gengiva"/><path d="'+coroa+'" class="od-c"/>';
+    if(k==='fac')return '<path d="'+raiz+'" class="od-r"/><path d="'+coroa+'" class="od-r"/><path d="M8.5 60 Q7 72 10 84 Q20 91 30 84 Q33 72 31.5 60 Q20 66 8.5 60 Z" class="od-fac"/>';
+    if(k==='prep')return '<path d="'+raiz+'" class="od-r"/><path d="'+coroa+'" class="od-c od-trans"/><path d="M12.5 56 L14.5 73 Q20 78 25.5 73 L27.5 56 Z" class="od-prep"/>';
+    return '<path d="'+raiz+'" class="od-r"/><path d="'+coroa+'" class="od-c"/>';}
+  function arco(list,inf){var g='',un=0;list.forEach(function(n,k){g+='<g transform="translate('+(k*W)+',0)">'+dente(n)+'</g>';
+      var a=mapa[n],b=mapa[list[k+1]];if(a&&b&&a.u){un=1;g+='<rect x="'+(k*W+29)+'" y="65" width="22" height="9" rx="3" class="od-uniao"/>';}});
+    if(un)usados.uni=1;
+    return '<g transform="'+(inf?'translate(0,236) scale(1,-1)':'')+'">'+g+'</g>'+list.map(function(n,k){return '<text x="'+(k*W+20)+'" y="'+(inf?131:111)+'" class="od-num'+(mapa[n]?' on':'')+'">'+n+'</text>';}).join('');}
+  var svg='<svg class="odonto" viewBox="0 0 640 236" role="img" aria-label="Arcadas com os elementos do pedido">'+
+    '<line x1="320" y1="4" x2="320" y2="232" class="od-meio"/>'+arco(UP,false)+arco(LO,true)+'</svg>';
+  var LEG={imp:'Sobre implante (parafuso)',prep:'Sobre dente (preparo)',pon:'Pôntico',fac:'Faceta',out:'Outro trabalho',uni:'Unidos (fixo)'};
+  return '<div class="odonto-box">'+svg+'<div class="od-leg">'+Object.keys(LEG).filter(function(k){return usados[k];}).map(function(k){return '<span><i class="od-i-'+k+'"></i>'+LEG[k]+'</span>';}).join('')+'</div></div>';
+}
 function fPedidoDet(id){
   var p=byId(S.pedidos,id); if(!p)return head('Pedido')+'<p class="empty">Pedido não encontrado.</p>';
   var c=cliente(p.clienteId),t=tipoPed(p),i=STATUS.map(function(s){return s[0];}).indexOf(p.status),w=canWrite();
@@ -2164,6 +2209,7 @@ function fPedidoDet(id){
   return head('Pedido #'+p.num)+
     '<div class="row wrap"><span class="tag a">'+stLabel(p.status)+'</span>'+(p.pago?'<span class="tag ok">Pago</span>':!aberto(p)?'<span class="tag w">A receber</span>':'')+(p.urgente?'<span class="tag u">Urgente</span>':'')+'</div>'+
     '<div><h2>'+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</h2><p class="muted">'+esc(c?c.nome:'(cliente excluído)')+'</p></div>'+
+    odontoSVG(p)+
     '<div class="grid2 small">'+
       kv('Elementos',p.elementos.length?p.elementos.join(', '):'—')+gruposUniao(itensDe(p)).map(function(g){return kv('Unidos (fixo)','<b>'+g.join(' – ')+'</b>');}).join('')+(p.material?kv('Material',esc(p.material)):'')+(p.fresadora?kv('Fresadora',esc(p.fresadora)):'')+
       kv('Recebido',dmy(p.recebido))+kv('Prazo',p.prazo?dmy(p.prazo):'—')+
