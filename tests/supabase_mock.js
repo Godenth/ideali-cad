@@ -32,6 +32,10 @@
     rpc:function(n,a){window.__ops.push({op:'rpc',name:n,args:a});
       if(n==='criar_link_cliente')return Promise.resolve({data:'TesteTokenSecreto_abcdefghijklmnopqrstuvwxyz012',error:null});
       if(n==='sou_admin')return Promise.resolve({data:true,error:null});
+      if(n==='admin_metricas')return Promise.resolve({data:[
+        {user_id:U,visto_em:new Date().toISOString(),dispositivo:'computador',seg_hoje:5400,seg_7d:36000,seg_30d:140000,seg_total:260000,dias_ativos_30:22,pedidos_total:312,pedidos_30d:48,clientes_total:27,cidade:'São Paulo',uf:'SP'},
+        {user_id:'eeee',visto_em:new Date(Date.now()-3*36e5).toISOString(),dispositivo:'celular',seg_hoje:0,seg_7d:7200,seg_30d:21000,seg_total:21000,dias_ativos_30:6,pedidos_total:14,pedidos_30d:14,clientes_total:4,cidade:'Belo Horizonte',uf:'MG'},
+        {user_id:'ffff',visto_em:null,dispositivo:null,seg_hoje:0,seg_7d:0,seg_30d:0,seg_total:0,dias_ativos_30:0,pedidos_total:0,pedidos_30d:0,clientes_total:0,cidade:null,uf:null}],error:null});
       if(n==='admin_assinantes')return Promise.resolve({data:[
         {user_id:U,email:'dan@x.com',nome:'Danilo',telefone:'',cidade:'São Paulo',plano:'vitrine',status:'ativa',teste_ate:null,vence_em:null,limite_bytes:53687091200,bytes_usados:0,cadastro:new Date().toISOString(),ultimo_acesso:new Date().toISOString(),admin:true},
         {user_id:'eeee',email:'ana@lab.com',nome:'Ana Cadista',telefone:'(31) 9999-0000',cidade:'BH',plano:'basico',status:'teste',teste_ate:new Date(Date.now()+5*864e5).toISOString(),vence_em:null,limite_bytes:5368709120,bytes_usados:120000000,cadastro:new Date(Date.now()-9*864e5).toISOString(),ultimo_acesso:new Date().toISOString(),admin:false},
