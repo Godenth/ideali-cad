@@ -306,6 +306,21 @@ select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline
 .chips-f{display:flex;gap:8px;flex-wrap:wrap}.chips-f button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:.4em .9em;font-weight:600;font-size:.86rem;cursor:pointer;color:var(--ink)}
 .chips-f button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.chips-f b{font-family:var(--f-mono);margin-left:4px}
 .main>.an-wrap,.an-wrap{display:flex!important;flex-direction:column}.an-wrap>section,.an-wrap>div{width:100%;box-sizing:border-box}.an-demo-b{border-color:rgba(167,139,250,.55)}
+.sd{color:var(--sd)!important}.sd svg{stroke:var(--sd)!important}.sd>span{font-weight:700}
+.sd.on{background:color-mix(in srgb,var(--sd) 18%,transparent)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sd) 45%,transparent)}
+.sd::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--sd);margin-left:6px;flex:none}
+.sd-perigo::after,.sd-falencia::after{animation:sdPulse 1.4s ease-in-out infinite}
+@keyframes sdPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--sd) 70%,transparent)}50%{box-shadow:0 0 0 6px transparent}}
+.sd-card{display:grid;gap:20px;grid-template-columns:1fr;border-color:color-mix(in srgb,var(--sd,var(--line)) 55%,var(--line));background:linear-gradient(135deg,color-mix(in srgb,var(--sd,transparent) 12%,var(--surface)),var(--surface) 55%)}
+@media (min-width:900px){.sd-card{grid-template-columns:260px 1fr;align-items:center}}
+.sd-esq{display:grid;justify-items:center;gap:4px;text-align:center}.sd-esq h2{justify-self:start}
+.sd-g{width:100%;max-width:240px}
+.sd-n{display:flex;align-items:baseline;gap:4px;margin-top:-6px}.sd-n b{font-family:var(--f-display);font-size:2.4rem;line-height:1;color:var(--sd)}.sd-n span{color:var(--muted)}
+.sd-tag{font-family:var(--f-mono);font-weight:700;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;padding:.35em .9em;border-radius:99px;background:var(--sd);color:#fff}
+.sd-frase{font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.sd-l{width:100%;height:auto}.sd-ax{font-size:10px;fill:var(--muted);font-family:var(--f-mono)}
+.sd-b{opacity:.10}.sdb-saudavel{fill:hsl(120,60%,45%)}.sdb-atencao{fill:hsl(48,90%,50%)}.sdb-perigo{fill:hsl(12,85%,50%)}.sdb-falencia{fill:hsl(0,80%,35%);opacity:.16}
+.sd-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem}.sd-leg span{display:inline-flex;align-items:center;gap:6px}.sd-leg i{width:10px;height:10px;border-radius:50%}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -959,7 +974,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 02h10';
+var VERSAO='15/10 · 02h40';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -981,16 +996,18 @@ function render(){
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
   var u=usado(),lim=a.limite,pct=Math.min(100,u/lim*100);
   var nome=S.perfil.nome||S.sessao.email||'';
+  var SD=null;try{SD=saudeAtual();}catch(x){SD=null;}
+  var itSd=function(id,lbl){return id==='analises'&&SD?{c:' sd sd-'+SD.nivel,st:' style="--sd:'+SD.cor+'" title="Saúde do negócio: '+SD.nota+'/100"',l:SD.nome}:{c:'',st:'',l:lbl};};
   var side='<aside class="side" aria-label="Menu"><div class="brand">'+logo(30)+'<span>Ideali CAD</span></div>'+
     MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return (it[0]!=='admin'&&it[0]!=='rede')||S.admin;}).map(function(it){
       var badge=it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':it[0]==='config'&&lix?'<span class="badge" style="background:var(--muted)">'+lix+'</span>':'';
-      return '<button class="it '+(ui.tab===it[0]||(it[0]==='config'&&emCfg())?'on':'')+'" data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+it[1]+'</span>'+badge+'</button>';}).join('');}).join('')+
+      var z=itSd(it[0],it[1]);return '<button class="it'+z.c+' '+(ui.tab===it[0]||(it[0]==='config'&&emCfg())?'on':'')+'"'+z.st+' data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+z.l+'</span>'+badge+'</button>';}).join('');}).join('')+
     '<div class="plan"><div class="between"><b>Plano '+a.plano+'</b>'+chip+'</div>'+
       '<div class="bar '+(pct>90?'full':pct>75?'warn':'')+'" style="height:8px"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
       '<span class="muted mono" style="font-size:.75rem">'+bytes(u)+' de '+bytes(lim)+'</span>'+
       (a.status==='teste'&&w?'<button class="btn sm pri" data-a="tab" data-v="config">Assinar</button>':'')+'</div>'+
     '<div class="me"><span class="av">'+esc((nome[0]||'?').toUpperCase())+'</span><span class="nm">'+esc(nome)+'</span><button class="icon-btn" data-a="sair" aria-label="Sair" title="Sair" style="width:32px;height:32px">'+ICON.sair+'</button></div></aside>';
-  var titulo=TITULOS[ui.tab]||'';
+  var titulo=ui.tab==='analises'&&SD?'<span style="color:'+SD.cor+'">'+SD.nome+'</span>':(TITULOS[ui.tab]||'');
   var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config'&&(it[0]!=='rede'||S.admin))flat.push(it);});});
   var top='<header class="top"><div class="top-in">'+
     '<button class="icon-btn menu-btn" data-a="drawer" aria-label="Abrir menu">'+ICON.menu+'</button>'+
@@ -1003,7 +1020,7 @@ function render(){
     '<span class="menu-btn">'+chip+'</span></div>'+
     '<nav class="tnav" aria-label="Menu principal"><div class="tnav-in">'+flat.map(function(it){
       var badge=it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':'';
-      return '<button class="'+(ui.tab===it[0]?'on':'')+'" data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+it[1]+'</span>'+badge+'</button>';}).join('')+'</div></nav></header>';
+      var z=itSd(it[0],it[1]);return '<button class="'+(ui.tab===it[0]?'on':'')+z.c+'"'+z.st+' data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+z.l+'</span>'+badge+'</button>';}).join('')+'</div></nav></header>';
   var bnav='<nav class="bnav" aria-label="Navegação">'+
     bn('dashboard','Início')+bn('pedidos','Produção')+
     '<button data-a="novoPedido" aria-label="Novo pedido" '+(w?'':'disabled')+'><span class="plus">+</span></button>'+
@@ -1209,6 +1226,46 @@ function cartaoSinalBase(s,c,cat){
 function secSinaisMini(){var an=analisar(),top=an.sig.filter(function(s){return s.n>=1;}).slice(0,3);
   return '<section class="card stack" style="grid-column:span 12"><div class="between wrap"><div><h2>Sinais e alertas</h2><p class="small muted">Mudanças de comportamento dos clientes e dos seus prazos.</p></div><button class="btn sm pri" data-a="tab" data-v="analises">Ver Análises</button></div>'+
     (top.length?'<div class="sin-grid">'+top.map(cartaoSinal).join('')+'</div>':'<p class="empty">Nenhum sinal de alerta agora. 👍</p>')+'</section>';}
+/* ---------- Saúde do negócio ----------
+   Nota de 0 a 100. Base: elementos recebidos nos últimos 30 dias contra a média mensal dos 90 dias anteriores.
+   Sinais graves da aba Análises (atrasos, clientes sumindo, mudança de comportamento) descontam alguns pontos.
+   A aba Análises no menu muda de cor e de nome conforme a nota: Análises (verde) → Atenção → Perigo → Falência. */
+var NIVEIS_SD=[[75,'saudavel','Análises','Saudável'],[50,'atencao','Atenção','Atenção'],[25,'perigo','Perigo','Perigo'],[-1,'falencia','Falência','Falência']];
+function notaRatio(r){var P=[[0,0],[0.2,10],[0.4,26],[0.6,45],[0.75,62],[0.9,78],[1,88],[1.15,100]];if(r>=1.15)return 100;
+  for(var i=1;i<P.length;i++)if(r<=P[i][0]){var a=P[i-1],b=P[i];return a[1]+(b[1]-a[1])*(r-a[0])/(b[0]-a[0]);}return 100;}
+function janelaEl(a,b){return elems(alive(S.pedidos).filter(function(p){return p.recebido&&p.recebido>=a&&p.recebido<=b;}));}
+function saudeEm(ref){var r30=janelaEl(addDays(ref,-29),ref),b90=janelaEl(addDays(ref,-119),addDays(ref,-30)),base=b90/3;
+  if(b90<6)return null;var ratio=r30/base;return {r30:r30,base:base,ratio:ratio,nota:notaRatio(ratio)};}
+function corSaude(n){if(n==null)return '';n=Math.max(0,Math.min(100,n));
+  if(n<25)return 'hsl(0,'+(78+n*0.4)+'%,'+(46+n*0.24)+'%)';
+  var h=n>=75?105+(n-75)/25*30:n>=50?32+(n-50)/25*20:6+(n-25)/25*22;return 'hsl('+Math.round(h)+','+(n>=75?65:85)+'%,'+(n>=75?42:n>=50?47:50)+'%)';}
+function nivelSaude(n){for(var i=0;i<NIVEIS_SD.length;i++)if(n>=NIVEIS_SD[i][0])return NIVEIS_SD[i];return NIVEIS_SD[3];}
+function saudeAtual(){var b=saudeEm(today());if(!b)return null;var an=analisar(),pen=0,mot=[];
+  an.sig.forEach(function(x){if(x.cat==='positivo'||x.cat==='financeiro')return;var p=x.n>=3?6:x.n>=2?3:0;if(p){pen+=p;mot.push(x.tit);}});
+  pen=Math.min(pen,20);var nota=Math.max(0,Math.round(b.nota-pen)),nv=nivelSaude(nota);
+  return {nota:nota,base:b,pen:pen,mot:mot,nivel:nv[1],nome:nv[2],rotulo:nv[3],cor:corSaude(nota)};}
+function gaugeSaude(sd){var R=80,cx=100,cy=96,pt=function(v,r){var a=Math.PI*(1-v/100);return [cx+r*Math.cos(a),cy-r*Math.sin(a)];};
+  var arcs='';for(var v=0;v<100;v+=2){var a=pt(v,R),b=pt(v+2.4,R);arcs+='<path d="M'+a[0].toFixed(1)+' '+a[1].toFixed(1)+' A'+R+' '+R+' 0 0 1 '+b[0].toFixed(1)+' '+b[1].toFixed(1)+'" stroke="'+corSaude(v+1)+'" stroke-width="14" fill="none" opacity="'+(sd&&v<=sd.nota?1:.22)+'"/>';}
+  var nd=sd?pt(sd.nota,R-24):null;
+  return '<svg class="sd-g" viewBox="0 0 200 112" role="img" aria-label="Saúde do negócio: '+(sd?sd.nota+' de 100':'sem dados')+'">'+arcs+
+    (sd?'<line x1="'+cx+'" y1="'+cy+'" x2="'+nd[0].toFixed(1)+'" y2="'+nd[1].toFixed(1)+'" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/><circle cx="'+cx+'" cy="'+cy+'" r="6" fill="var(--ink)"/>':'')+'</svg>';}
+function svgSaude(){var t=today(),pts=[];for(var i=25;i>=0;i--){var d=addDays(t,-7*i),x=saudeEm(d);pts.push({d:d,n:x?Math.round(x.nota):null});}
+  var ok=pts.filter(function(p){return p.n!=null;});if(ok.length<2)return '<p class="empty">O gráfico aparece quando houver uns 4 meses de pedidos registrados.</p>';
+  var W=innerWidth<600?360:1000,H=innerWidth<600?200:230,L=30,Rr=8,T=8,B=24,x=function(i){return L+(W-L-Rr)*i/(pts.length-1);},y=function(v){return T+(H-T-B)*(1-v/100);};
+  var bands=[[75,100,'saudavel'],[50,75,'atencao'],[25,50,'perigo'],[0,25,'falencia']].map(function(b){return '<rect x="'+L+'" y="'+y(b[1])+'" width="'+(W-L-Rr)+'" height="'+(y(b[0])-y(b[1]))+'" class="sd-b sdb-'+b[2]+'"/><text x="'+(L-6)+'" y="'+(y(b[1])+4)+'" text-anchor="end" class="sd-ax">'+b[1]+'</text>'+(b[0]===0?'<text x="'+(L-6)+'" y="'+(y(0)+4)+'" text-anchor="end" class="sd-ax">0</text>':'');}).join('');
+  var segs='';for(var i=1;i<pts.length;i++){var a=pts[i-1],b=pts[i];if(a.n==null||b.n==null)continue;segs+='<line x1="'+x(i-1).toFixed(1)+'" y1="'+y(a.n).toFixed(1)+'" x2="'+x(i).toFixed(1)+'" y2="'+y(b.n).toFixed(1)+'" stroke="'+corSaude((a.n+b.n)/2)+'" stroke-width="3.5" stroke-linecap="round"/>';}
+  var dots=pts.map(function(p,i){return p.n==null?'':'<circle cx="'+x(i).toFixed(1)+'" cy="'+y(p.n).toFixed(1)+'" r="'+(i===pts.length-1?5.5:3)+'" fill="'+corSaude(p.n)+'"><title>'+dmy(p.d)+': '+p.n+'</title></circle>';}).join('');
+  var lbl=pts.map(function(p,i){return i%(innerWidth<600?6:4)===(pts.length-1)%(innerWidth<600?6:4)?'<text x="'+x(i).toFixed(1)+'" y="'+(H-8)+'" text-anchor="'+(i===pts.length-1?'end':'middle')+'" class="sd-ax">'+p.d.slice(8,10)+'/'+p.d.slice(5,7)+'</text>':'';}).join('');
+  return '<svg class="sd-l" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Saúde do negócio nas últimas 26 semanas">'+bands+segs+dots+lbl+'</svg>';}
+function secSaude(){var sd=saudeAtual();
+  var exp='';if(sd){var b=sd.base,v=Math.round((b.ratio-1)*100);
+    exp='<p>Nos últimos 30 dias você recebeu <b>'+b.r30+' elementos</b>. Nos 3 meses anteriores a média era <b>'+Math.round(b.base)+' por mês</b> ('+'<span class="'+(v>=0?'up':'down')+'">'+(v>=0?'+':'')+v+'%</span>).</p>'+
+      (sd.pen?'<p class="small muted">Também perdeu '+sd.pen+' ponto(s) por: '+esc(sd.mot.slice(0,3).join('; '))+(sd.mot.length>3?' e mais '+(sd.mot.length-3):'')+'.</p>':'');}
+  var txt={saudavel:'Seu volume está estável ou crescendo. Continue de olho nos sinais abaixo.',atencao:'Queda considerável no volume. Vale conversar com os clientes que diminuíram.',perigo:'Queda forte nos pedidos. Priorize recuperar clientes e buscar novos.',falencia:'Redução drástica: quase não estão chegando pedidos. Hora de agir em todas as frentes.'};
+  return '<section class="card sd-card"'+(sd?' style="--sd:'+sd.cor+'"':'')+'><div class="sd-esq"><h2>Saúde do negócio</h2>'+gaugeSaude(sd)+
+    (sd?'<div class="sd-n"><b>'+sd.nota+'</b><span>/100</span></div><span class="sd-tag">'+sd.rotulo+'</span>':'<p class="small muted" style="text-align:center">Ainda sem histórico suficiente. A nota aparece depois de uns 4 meses de pedidos.</p>')+'</div>'+
+    '<div class="sd-dir stack">'+(sd?'<p class="sd-frase">'+txt[sd.nivel]+'</p>'+exp:'')+svgSaude()+
+    '<div class="sd-leg">'+NIVEIS_SD.map(function(nv,i){var c=corSaude([88,62,38,10][i]);return '<span><i style="background:'+c+'"></i>'+nv[3]+'</span>';}).join('')+'<span class="muted">· a aba muda de cor e de nome no menu</span></div></div></section>';}
 /* ---------- Metas ----------
    Guardadas em perfis.preferencias.metas = {dias:5, v:[{desde:'2026-10', el, fat, cli}]}.
    Cada edição vale a partir do mês escolhido; meses anteriores continuam com a meta que tinham. */
@@ -1328,7 +1385,7 @@ function fDemoMsg(m){return head('Mensagem que iria pelo WhatsApp')+'<p class="m
 function rAnalises(){var an=analisar(),f=ui.sinF||'todos',cont={};an.sig.forEach(function(s){cont[s.cat]=(cont[s.cat]||0)+1;});
   var lista=an.sig.filter(function(s){return f==='todos'||s.cat===f;});
   var dlt=function(a,b){if(!b)return a?'<span class="up">novo</span>':'—';var v=Math.round((a-b)/b*100);return '<span class="'+(v>=0?'up':'down')+'">'+(v>=0?'+':'')+v+'%</span>';};
-  return '<div class="stack an-wrap" style="gap:16px">'+
+  return '<div class="stack an-wrap" style="gap:16px">'+secSaude()+
     '<section class="card stack"><div class="between wrap"><div><h2>Sinais e alertas</h2><p class="small muted">Compara os últimos 90 dias com os 90 anteriores. São sinais para conferir com o cliente, não certezas.</p></div>'+(ui.anDemo?'':'<button class="btn sm" data-a="anDemo" data-v="1">Ver simulação</button>')+'</div>'+
       '<div class="chips-f"><button class="'+(f==='todos'?'on':'')+'" data-a="sinF" data-v="todos">Todos <b>'+an.sig.length+'</b></button>'+Object.keys(CAT_SIN).filter(function(k){return cont[k];}).map(function(k){return '<button class="'+(f===k?'on':'')+'" data-a="sinF" data-v="'+k+'">'+CAT_SIN[k][0]+' <b>'+cont[k]+'</b></button>';}).join('')+'</div>'+
       (lista.length?'<div class="sin-grid">'+lista.map(cartaoSinal).join('')+'</div>':(an.cli.length||EM_DEMO?'<p class="empty">Nenhum sinal por aqui. 👍</p>':'<p class="empty">Os sinais aparecem conforme você registra pedidos. Quer ver como fica? <button class="linkbtn" data-a="anDemo" data-v="1">Ver simulação</button></p>'))+'</section>'+
