@@ -97,7 +97,7 @@ var URL_FN='https://qxspiaqaigjkmilxxfri.supabase.co/functions/v1/portal';
 var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4c3BpYXFhaWdqa21pbHh4ZnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjYwMzMsImV4cCI6MjEwNzIwMjAzM30.TeIHiEvHx1PmvS5PQ3lzvByYP9ppYuq5GLZURtutXc0';
 var TOKEN=(location.hash.match(/t=([A-Za-z0-9_-]{40,64})/)||[])[1]||'';
 var D=null,filtro='todos',viewer=null,blobs={},urls=[];
-var ST=[['entrada','Em produção'],['pendente','Aguardando informação'],['aprovacao','Em aprovação'],['finalizado','Finalizado'],['arquivado','Enviado']];
+var ST=[['aprovacao','Aguardando sua aprovação'],['finalizado','Finalizado']];
 var UP=[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28],LO=[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function dmy(d){if(!d)return '—';var p=String(d).slice(0,10).split('-');return p[2]+'/'+p[1]+'/'+p[0];}
@@ -128,7 +128,7 @@ function render(){
     '<div class="lista">'+(lista.length?lista.map(function(p){var na=arqsDe(p.id).length,late=p.prazo&&p.prazo<hoje()&&['entrada','pendente','aprovacao'].indexOf(p.status)>=0;
       return '<button class="caso" data-p="'+p.id+'"><span class="bar st-'+p.status+'"></span><span class="t"><b>#'+p.numero+' · '+esc(nomeTrab(p))+'</b><span>Paciente '+esc(p.paciente)+((p.elementos||[]).length?' · dentes '+esc(p.elementos.join(', ')):'')+'</span></span>'+
         '<span class="r"><span class="tag st-'+p.status+'">'+stNome(p.status)+'</span>'+(p.urgente?'<span class="tag st-pendente">Urgente</span>':'')+'</span>'+
-        '<span class="foot"><span>Recebido '+dmy(p.recebido_em)+'</span>'+(p.prazo?'<span class="'+(late?'late':'')+'">Prazo '+dmy(p.prazo)+'</span>':'')+(na?'<span>'+na+' arquivo(s)</span>':'')+'<span class="val" style="margin-left:auto">'+brl(p.valor)+'</span></span></button>';}).join(''):'<p class="empty">Nenhum caso aqui.</p>')+'</div></main>'+
+        '<span class="foot"><span>Recebido '+dmy(p.recebido_em)+'</span>'+(p.prazo?'<span class="'+(late?'late':'')+'">Prazo '+dmy(p.prazo)+'</span>':'')+(na?'<span>'+na+' arquivo(s)</span>':'')+'<span class="val" style="margin-left:auto">'+brl(p.valor)+'</span></span></button>';}).join(''):'<p class="empty">Nenhum caso aguardando você agora. Quando o seu cadista mandar um projeto para aprovação, ele aparece aqui.</p>')+'</div></main>'+
     '<footer>Página de acompanhamento enviada pelo seu cadista · Ideali CAD</footer>';
 }
 function ficha(pid){

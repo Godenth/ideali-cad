@@ -815,7 +815,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 23h50';
+var VERSAO='15/10 · 00h05';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1348,11 +1348,11 @@ function secLinkCli(c){
   if(k===undefined&&sb){L[c.id]=null;sb.from('links_cliente').select('token,criado_em,ultimo_acesso').eq('cliente_id',c.id).is('revogado_em',null).maybeSingle()
     .then(function(r){L[c.id]=(r&&r.data)||false;if(ui.tab==='clientes'&&ui.sub===c.id)render();});}
   var tem=k&&k.token;
-  return '<section class="card stack"><div><h2>Link de acompanhamento</h2><p class="small muted">Mande para '+esc(c.nome)+' acompanhar os casos: situação de cada pedido, dentes, valores e os arquivos em 3D (STL, HTML e fotos). Sem login. Só vê quem tiver o link, e você cancela quando quiser.</p></div>'+
+  return '<section class="card stack"><div><h2>Link de acompanhamento</h2><p class="small muted">Mande para '+esc(c.nome)+' aprovar os casos. Aparecem os pedidos em <b>Aguardando aprovação</b> e <b>Finalizado</b>, com dentes, valores e arquivos em 3D (STL, HTML e fotos), até você arquivar. O link é fixo: mande uma vez só. Sem login; você cancela quando quiser.</p></div>'+
     (k===null?'<p class="small muted">Carregando…</p>':tem?
       '<div class="code" style="user-select:all;word-break:break-all">'+esc(urlLink(k.token))+'</div>'+
       '<p class="small muted">Criado em '+new Date(k.criado_em).toLocaleDateString('pt-BR')+(k.ultimo_acesso?' · aberto pela última vez em '+new Date(k.ultimo_acesso).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):' · ainda não foi aberto')+'</p>'+
-      '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="linkCopiar" data-id="'+c.id+'">Copiar link</button><button class="btn" data-a="linkWa" data-id="'+c.id+'">Mandar no WhatsApp</button><button class="btn" data-a="linkGerar" data-id="'+c.id+'" '+(canWrite()?'':'disabled')+'>Trocar link</button><button class="btn danger" data-a="linkCancelar" data-id="'+c.id+'" '+(canWrite()?'':'disabled')+'>Cancelar link</button></div>':
+      '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="linkCopiar" data-id="'+c.id+'">Copiar link</button><button class="btn" data-a="linkWa" data-id="'+c.id+'">Mandar no WhatsApp</button><button class="btn danger" data-a="linkCancelar" data-id="'+c.id+'" '+(canWrite()?'':'disabled')+'>Cancelar link</button></div>':
       '<div><button class="btn pri" data-a="linkGerar" data-id="'+c.id+'" '+(canWrite()?'':'disabled')+'>Gerar link</button></div>')+'</section>';
 }
 function formaNome(f){return {pix:'Pix',dinheiro:'Dinheiro',transferencia:'Transferência',cartao:'Cartão'}[f]||f;}
