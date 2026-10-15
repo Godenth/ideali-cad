@@ -232,6 +232,8 @@ select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline
 .rd-envia{display:flex;gap:8px}.rd-envia input{flex:1;min-width:0}
 .rd-trava{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;border:1px dashed var(--line);color:var(--muted);font-size:.9rem}
 .rd-trava svg{flex:none;margin-top:2px}
+.rd-trabs{display:grid;gap:16px;align-items:start}.rd-trabs>section{min-width:0}
+@media (min-width:1100px){.rd-trabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .rd-arqs{display:grid;gap:8px;padding:12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
 .rd-arq{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
 .rd-arq .t{display:grid;gap:1px;flex:1;min-width:0}.rd-arq .t b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -986,7 +988,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 11h00';
+var VERSAO='15/10 · 11h20';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2268,9 +2270,8 @@ function rdBusca(R,p){
       return '<div class="rd-cand '+st+'"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,40)+'</button><div class="t"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'"><b>'+esc(x.nome)+'</b></button><span class="small muted">'+esc(x.cidade)+' · '+estrelas(x.nota)+' '+x.nota+'</span></div><span class="rd-cst">'+({aceitou:'✓ Aceitou',fechado:'Encerrado',avisado:'<i class="rd-pulse"></i> Avisado',fila:'Na fila'})[st]+'</span></div>';}).join('')+'</div></section>';
 }
 function rdEnviados(R){
-  return '<div class="stack">'+R.enviados.map(function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};if(d.st==='apagado')return '';
+  return '<div class="rd-trabs">'+R.enviados.map(function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};if(d.st==='apagado')return '';
     return '<section class="card stack"><div class="between wrap"><div class="row" style="gap:12px">'+(x.nome?'<button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x)+'</button>':'')+'<div><b>'+esc(d.trab)+'</b><div class="small muted">'+d.cod+(d.dentes.length?' · dentes '+d.dentes.join(', '):'')+' · '+(x.nome?'com '+esc(x.nome):'oferecido para: '+esc(d.para||'a rede'))+'</div></div></div><span class="mono val">'+brl(d.repasse)+'</span></div>'+
-      (d.st!=='oferta'&&d.st!=='apagado'?rdArqs(d,'env',x.nome||'parceiro')+(x.id?'<div><button class="btn sm" data-a="rdConversa" data-id="'+d.id+'">💬 Chat do '+d.cod+rdNaoLidas(d.id)+'</button></div>':''):'')+
       (d.st==='recusado'?'<div class="banner bad"><span>Você recusou este trabalho'+(d.motivo?': '+esc(d.motivo):'')+'. Não há repasse a pagar.</span><button class="btn sm" data-a="rdReoferecer" data-id="'+d.id+'">Oferecer de novo</button></div>':etapasRede(d.st))+
       '<div class="row wrap" style="gap:8px">'+
         (d.st==='oferta'?prazoRede(d.prazo,d.hora)+'<span class="small muted"><i class="rd-pulse"></i> Aguardando alguém aceitar</span><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="desenho">Simular: alguém aceitou</button><button class="btn sm danger" data-a="rdApagar" data-id="'+d.id+'">Apagar oferta</button>':'')+
@@ -2278,7 +2279,9 @@ function rdEnviados(R){
         (d.st==='revisao'?'<button class="btn sm" data-a="rdVer">Ver projeto em 3D</button><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="desenho">Pedir ajuste</button><button class="btn sm danger" data-a="rdRecusaTrab" data-id="'+d.id+'">Recusar trabalho</button><button class="btn sm pri" data-a="rdSim" data-id="'+d.id+'" data-v="aprovado">Aprovar</button>':'')+
         (d.st==='aprovado'?'<span class="small">Avalie:</span>'+[1,2,3,4,5].map(function(n){return '<button class="rd-star'+((d.nota||0)>=n?' on':'')+'" data-a="rdNota" data-id="'+d.id+'" data-n="'+n+'" aria-label="'+n+' estrelas">★</button>';}).join('')+(x.pix?'<span class="rd-pix">Pague por fora no Pix: <b class="mono">'+esc(x.pix)+'</b><button class="btn sm" data-a="rdCopiaPix" data-v="'+esc(x.pix)+'">Copiar</button></span>':'')+'<button class="btn sm pri" data-a="rdSim" data-id="'+d.id+'" data-v="pago">Já paguei</button>':'')+
         (d.st==='pago'?'<span class="tag ok">Concluído</span>'+(d.nota?' '+estrelas(d.nota):''):'')+
-      '</div></section>';}).join('')+'</div>';
+      '</div>'+
+      (d.st!=='oferta'&&d.st!=='apagado'?rdArqs(d,'env',x.nome||'parceiro')+(x.id?'<div><button class="btn sm" data-a="rdConversa" data-id="'+d.id+'">💬 Chat do '+d.cod+rdNaoLidas(d.id)+'</button></div>':''):'')+
+      '</section>';}).join('')+'</div>';
 }
 var RD_FILES=new Map();
 function rdNaoLidas(id){var R=redeIni(),n=(R.naoLidas||{})[id]||0;return n?' <span class="tag">'+n+' nova'+(n>1?'s':'')+'</span>':'';}
@@ -2311,17 +2314,18 @@ function rdPegar(R){
 }
 function rdMeus(R){
   var ms=R.meus;
-  return ms.length?'<div class="stack">'+ms.map(function(x){var de=R.cadDe[x.de];
+  return ms.length?'<div class="rd-trabs">'+ms.map(function(x){var de=R.cadDe[x.de];
     return '<section class="card stack"><div class="between wrap"><div><b>'+esc(x.trab)+'</b><div class="small muted">'+x.cod+(x.dentes.length?' · dentes '+x.dentes.join(', '):'')+' · '+esc(x.mat)+' · para <button class="rd-de" data-a="rdPerfil" data-id="'+x.de+'">'+esc(de.nome)+'</button></div></div><span class="mono val">'+brl(x.repasse)+'</span></div>'+
       (x.st==='recusado'?'<div class="banner bad"><span>Quem delegou recusou o projeto'+(x.motivo?': '+esc(x.motivo):'')+'. Sem repasse.</span></div>':
         '<div class="rd-steps" style="grid-template-columns:repeat(4,minmax(0,1fr))">'+[['desenho','Desenhando'],['revisao','Em revisão'],['aprovado','Aprovado'],['pago','Repasse recebido']].map(function(e,k,arr){var i=arr.map(function(z){return z[0];}).indexOf(x.st);return '<span class="'+(k<i?'ok':k===i?'on':'')+'"><i></i>'+e[1]+'</span>';}).join('')+'</div>')+
-      rdArqs(x,'meu',de.nome)+'<div><button class="btn sm" data-a="rdConversa" data-id="'+x.id+'">💬 Chat do '+x.cod+rdNaoLidas(x.id)+'</button></div>'+
       '<div class="row wrap" style="gap:8px">'+
         (x.st==='desenho'?prazoRede(x.prazo,x.hora)+'<button class="btn sm pri" data-a="rdMeuSt" data-id="'+x.id+'" data-v="revisao">Enviar projeto</button>':'')+
         (x.st==='revisao'?'<span class="small muted">Aguardando quem delegou revisar.</span><button class="btn sm" data-a="rdMeuSt" data-id="'+x.id+'" data-v="aprovado">Simular: aprovado</button><button class="btn sm" data-a="rdMeuSt" data-id="'+x.id+'" data-v="recusado">Simular: recusado</button>':'')+
         (x.st==='aprovado'?'<span class="small">Aguardando o Pix de '+esc(de.nome)+' na sua chave.</span><button class="btn sm pri" data-a="rdMeuSt" data-id="'+x.id+'" data-v="pago">Recebi o repasse</button>':'')+
         (x.st==='pago'?'<span class="tag ok">Concluído · conta no seu perfil</span>':'')+
-      '</div></section>';}).join('')+'</div>':'<div class="card empty">Você ainda não pegou nenhum trabalho. Veja em “Pegar trabalhos”.</div>';
+      '</div>'+
+      rdArqs(x,'meu',de.nome)+'<div><button class="btn sm" data-a="rdConversa" data-id="'+x.id+'">💬 Chat do '+x.cod+rdNaoLidas(x.id)+'</button></div>'+
+      '</section>';}).join('')+'</div>':'<div class="card empty">Você ainda não pegou nenhum trabalho. Veja em “Pegar trabalhos”.</div>';
 }
 function rdConversas(R){var l=[];
   R.enviados.forEach(function(d){if(d.st==='apagado')return;var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||null;l.push({id:d.id,cod:d.cod,trab:d.trab,quem:x,lado:'env',aberto:d.st!=='oferta'&&!!x,st:d.st});});
@@ -2402,7 +2406,7 @@ function rdParceiros(R){
     return '<section class="card stack rd-perfil"><div class="row" style="gap:12px"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'" aria-label="Ver perfil de '+esc(x.nome)+'">'+avRede(x,52)+'</button><div style="min-width:0"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'"><b>'+esc(x.nome)+'</b></button><div class="small muted">'+esc(x.cidade)+'</div><div class="small">'+estrelas(x.nota)+' <b>'+x.nota+'</b> <span class="muted">('+x.av+')</span></div></div>'+
       '<button class="rd-fav'+(x.fav?' on':'')+'" data-a="rdFav" data-id="'+x.id+'" aria-label="Favorito">★</button></div>'+
       '<div class="rd-chips">'+x.sw.map(function(s){return '<span class="sw">'+esc(s)+'</span>';}).join('')+x.esp.map(function(s){return '<span>'+esc(s)+'</span>';}).join('')+'</div>'+
-      '<button class="btn sm" data-a="rdPerfil" data-id="'+x.id+'">Ver perfil e trabalhos feitos</button>'+
+      '<button class="btn sm" style="justify-self:start" data-a="rdPerfil" data-id="'+x.id+'">Ver perfil e trabalhos feitos</button>'+
       '<div class="between small"><span class="muted">'+somaTipos(x)+' trabalhos · prazo médio '+x.prazo+'</span><span class="'+(x.on?'rd-on':'muted')+'">'+(x.on?'● disponível':'○ ocupado')+'</span></div></section>';}).join('')+'</div>';
 }
 
