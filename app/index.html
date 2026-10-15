@@ -480,6 +480,14 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .teeth{display:grid;gap:6px;overflow-x:auto}
 .arch{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:2px}
 @media (max-width:699px){.tooth{font-size:.6rem;padding:8px 0;border-radius:5px;letter-spacing:-.03em}}
+.conn{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:2px;height:24px}
+.conn>span{position:relative}
+.conn>span.u::before{content:"";position:absolute;left:50%;top:50%;width:calc(100% + 2px);height:4px;margin-top:-2px;border-radius:4px;background:var(--accent)}
+.cn{display:none;position:absolute;left:100%;top:50%;width:24px;height:24px;margin:-12px 0 0 -11px;border:0;padding:0;background:none;cursor:pointer;z-index:1}
+.cn::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:color-mix(in srgb,var(--muted) 55%,var(--bg));box-shadow:0 0 0 2px var(--surface)}
+.cn.vis{display:block}.cn:hover::after{background:var(--muted)}
+.cn.u::after{background:var(--accent);width:14px;height:14px;margin:-7px 0 0 -7px}
+.pd-uniao{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.88rem;padding:8px 12px;border-radius:10px;background:var(--accent-soft);color:var(--accent)}
 .arch .mid{box-shadow:inset 2px 0 0 var(--ink)}
 .tooth{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:7px 0;font:600 .68rem var(--f-mono);cursor:pointer;color:var(--muted)}
 .tooth.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -807,7 +815,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 23h00';
+var VERSAO='14/10 · 23h15';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2055,11 +2063,12 @@ function fPedido(id,preCli){
   if(ui.pdInit||!ui.pdItens){ui.pdInit=false;ui.pdItens=JSON.parse(JSON.stringify(itensDe(p)));ui.pdExtras=JSON.parse(JSON.stringify((p&&p.extras)||[]));ui.pdEd=null;}
   var mat=p?p.material||'':'',fr=p?p.fresadora||'':'';
   function arch(list){return '<div class="arch">'+list.map(function(n,i){return '<button type="button" class="tooth '+(i===8?'mid':'')+'" data-a="tooth" data-n="'+n+'">'+n+'</button>';}).join('')+'</div>';}
+  function conn(list){return '<div class="conn" aria-label="Uniões entre dentes">'+list.map(function(n,i){return '<span data-cn="'+n+'">'+(i<15?'<button type="button" class="cn" data-a="pdUne" data-n="'+n+'" aria-label="Unir '+n+' e '+list[i+1]+'"></button>':'')+'</span>';}).join('')+'</div>';}
   return head(p?'Editar pedido #'+p.num:'Novo pedido')+
   '<form data-form="pedido" data-id="'+(id||'')+'" class="stack">'+
     '<label class="fld"><span>Cliente</span><select id="pd-cli" name="clienteId" required><option value="">Escolha…</option>'+cs.map(function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select>'+(cs.length?'':'<small>Cadastre um cliente primeiro.</small>')+'</label>'+
     '<label class="fld"><span>Paciente</span><input id="pd-pac" name="paciente" required maxlength="40" placeholder="Iniciais, ex.: M.A.S." value="'+esc(p?p.paciente:'')+'"><small>Guarde só as iniciais ou o primeiro nome (LGPD).</small></label>'+
-    '<div class="fld"><span>Elementos <b id="pd-qtd" class="mono"></b></span><div class="teeth">'+arch(UP)+arch(LO)+'</div><small>Toque em cada dente e diga o trabalho dele. Numeração FDI.</small></div>'+
+    '<div class="fld"><span>Elementos <b id="pd-qtd" class="mono"></b></span><div class="teeth">'+conn(UP)+arch(UP)+arch(LO)+conn(LO)+'</div><small>Toque em cada dente e diga o trabalho dele. Para unir dentes vizinhos (fixo / ponte), toque na bolinha entre eles.</small></div>'+
     '<div id="pd-ed"></div>'+
     '<div id="pd-lista" class="pd-lista"></div>'+
     '<div><button type="button" class="btn sm" data-a="pdExtra">+ Trabalho sem dente (ex.: Modelo 3D)</button></div>'+
@@ -2087,13 +2096,19 @@ function renderItens(){
   var f=document.querySelector('form[data-form="pedido"]');if(!f)return;
   var its=ui.pdItens||[],mapa={};its.forEach(function(i){mapa[i.d]=i;});
   [].forEach.call(f.querySelectorAll('.tooth'),function(b){var i=mapa[+b.dataset.n];b.classList.toggle('on',!!i);b.classList.toggle('imp',!!(i&&i.imp));b.classList.toggle('ed',ui.pdEd===+b.dataset.n);});
+  [UP,LO].forEach(function(list){list.forEach(function(n,k){var sp=f.querySelector('.conn span[data-cn="'+n+'"]'),b=sp&&sp.querySelector('.cn');if(!b)return;var nx=list[k+1],vis=!!(mapa[n]&&mapa[nx]),u=vis&&!!mapa[n].u;
+    b.classList.toggle('vis',vis);b.classList.toggle('u',u);sp.classList.toggle('u',u);b.setAttribute('aria-pressed',u);b.title=u?'Unidos (fixo). Toque para separar':'Separados. Toque para unir';});});
   var q=document.getElementById('pd-qtd');if(q)q.textContent='('+its.length+')';
   var ord=its.slice().sort(function(a,b){return UP.concat(LO).indexOf(a.d)-UP.concat(LO).indexOf(b.d);});
   var L=document.getElementById('pd-lista');
-  if(L)L.innerHTML=(ord.length?ord.map(function(i){return '<div class="pd-it'+(i.t?'':' falta')+'"><button type="button" class="pd-it-t" data-a="tooth" data-n="'+i.d+'">'+descItem(i)+'</button><button type="button" class="tp-x" data-a="pdTira" data-n="'+i.d+'" aria-label="Tirar dente '+i.d+'">✕</button></div>';}).join(''):'')+
+  var gu=gruposUniao(its);
+  if(L)L.innerHTML=(gu.length?'<div class="pd-uniao">'+gu.map(function(g){return '<span><b>Unidos (fixo):</b> '+g.join(' – ')+'</span>';}).join('')+'</div>':'')+(ord.length?ord.map(function(i){return '<div class="pd-it'+(i.t?'':' falta')+'"><button type="button" class="pd-it-t" data-a="tooth" data-n="'+i.d+'">'+descItem(i)+'</button><button type="button" class="tp-x" data-a="pdTira" data-n="'+i.d+'" aria-label="Tirar dente '+i.d+'">✕</button></div>';}).join(''):'')+
     (ui.pdExtras||[]).map(function(x,k){return '<div class="pd-it ex"><select data-k="'+k+'" class="pd-ex-t" aria-label="Trabalho">'+tiposOpts(x.t)+'</select><input class="pd-ex-q" data-k="'+k+'" type="number" min="1" max="20" value="'+(x.q||1)+'" aria-label="Quantidade"><button type="button" class="tp-x" data-a="pdTiraEx" data-k="'+k+'" aria-label="Tirar">✕</button></div>';}).join('');
   atualizaCalc();
 }
+function gruposUniao(its){var mapa={},out=[];(its||[]).forEach(function(i){mapa[i.d]=i;});
+  [UP,LO].forEach(function(list){var cur=null;list.forEach(function(n,k){if(!mapa[n]){cur=null;return;}if(cur)cur.push(n);if(mapa[n].u&&mapa[list[k+1]]){if(!cur)cur=[n];}else{if(cur&&cur.length>1)out.push(cur);cur=null;}});});
+  return out;}
 function abreEditorDente(n){
   var its=ui.pdItens,i=its.filter(function(x){return x.d===n;})[0],novo=!i;
   if(novo){var ult=its[its.length-1];i={d:n,t:ult?ult.t:'',imp:ult?ult.imp:false,m:ult?ult.m:'',c:ult?ult.c:''};its.push(i);}
@@ -2135,7 +2150,7 @@ function fPedidoDet(id){
     '<div class="row wrap"><span class="tag a">'+stLabel(p.status)+'</span>'+(p.pago?'<span class="tag ok">Pago</span>':!aberto(p)?'<span class="tag w">A receber</span>':'')+(p.urgente?'<span class="tag u">Urgente</span>':'')+'</div>'+
     '<div><h2>'+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</h2><p class="muted">'+esc(c?c.nome:'(cliente excluído)')+'</p></div>'+
     '<div class="grid2 small">'+
-      kv('Elementos',p.elementos.length?p.elementos.join(', '):'—')+(p.material?kv('Material',esc(p.material)):'')+(p.fresadora?kv('Fresadora',esc(p.fresadora)):'')+
+      kv('Elementos',p.elementos.length?p.elementos.join(', '):'—')+gruposUniao(itensDe(p)).map(function(g){return kv('Unidos (fixo)','<b>'+g.join(' – ')+'</b>');}).join('')+(p.material?kv('Material',esc(p.material)):'')+(p.fresadora?kv('Fresadora',esc(p.fresadora)):'')+
       kv('Recebido',dmy(p.recebido))+kv('Prazo',p.prazo?dmy(p.prazo):'—')+
       (p.entregue?kv('Enviado ao cliente',dmy(p.entregue)):'')+(p.pago?kv('Pago',dmy(p.pago)):'')+
       kv('Valor','<span class="mono" style="font-size:1.1rem"><b>'+brl(p.valor)+'</b></span>')+(g?kv('Pagamento',formaNome(g.forma)+' de '+dmy(g.data)):'')+
@@ -2634,6 +2649,7 @@ var A={
   tipoMet:function(d){ui.tipoMet=d.v;render();},
   delSel:function(){if(!guard())return;var ids=Object.keys(ui.arqSel||{}),n=0,tam=0;ids.forEach(function(id){var a=byId(S.arquivos,id);if(a&&!a.deleted&&!a.removido){softDel(a);blobs.delete(id);n++;tam+=a.tamZip||0;}});ui.arqSel={};save();render();toast(n+' arquivo(s) na lixeira. '+bytes(tam)+' liberados.');},
   cliTipo:function(d){ui.cliTipo=d.v;render();},
+  pdUne:function(d){var n=+d.n,i=(ui.pdItens||[]).filter(function(x){return x.d===n;})[0];if(!i)return;i.u=!i.u;renderItens();},
   tooth:function(d){var n=+d.n;if(ui.pdEd!=null&&ui.pdEd!==n&&!lerEditor()){var a=ui.pdEd;toast('Escolha o trabalho do dente '+a+' primeiro.');return;}abreEditorDente(n);},
   pdOk:function(){if(!lerEditor()){toast('Escolha o trabalho deste dente.');var s=document.getElementById('ed-t');if(s)s.focus();return;}fechaEditor();},
   pdTira:function(d){var n=+d.n;ui.pdItens=(ui.pdItens||[]).filter(function(i){return i.d!==n;});if(ui.pdEd===n)fechaEditor();else renderItens();},
