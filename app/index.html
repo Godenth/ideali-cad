@@ -550,7 +550,21 @@ span.pd-it-t{cursor:default}
 .sheet{background:var(--surface);width:100%;max-width:620px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:14px;align-content:start;animation:up .22s ease}
 @keyframes up{from{transform:translateY(30px);opacity:.4}}
 @media (min-width:700px){.sheet-bg{align-items:center}.sheet{border-radius:20px;max-height:88%}}
-.pdet{display:grid;gap:14px;align-items:start}.pdet-a,.pdet-b{display:grid;gap:14px;align-content:start;min-width:0}
+.pdet{display:grid;gap:14px;align-items:start}
+.pdf{display:grid;gap:14px}.pdf-a,.pdf-b1,.pdf-b2{display:grid;gap:14px;align-content:start;min-width:0}
+@media (min-width:1100px){
+  .sheet.frm{max-width:min(980px,94vw);max-height:94vh}.sheet.mid{max-width:min(720px,94vw);max-height:94vh}
+  .sheet .btn.block{width:auto;min-width:220px;justify-self:end;padding-inline:28px}
+  .sheet label.btn.block{justify-self:start}
+  .frm2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 24px;align-items:start}
+  .frm2>.grid2{display:contents}
+  .frm2>button[type=submit]{grid-column:1/-1}
+  .frm2 textarea{min-height:46px;height:46px}
+  .pdf{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:min-content 1fr;gap:14px 26px;align-items:start}
+  .pdf-a{grid-column:1;grid-row:1/3}.pdf-b1{grid-column:2;grid-row:1}.pdf-b2{grid-column:2;grid-row:2}
+  .pdf textarea{min-height:46px;height:46px}
+  .pdf-a .teeth+small{display:none}
+}.pdet-a,.pdet-b{display:grid;gap:14px;align-content:start;min-width:0}
 @media (min-width:1100px){.sheet.wide{max-width:min(1240px,94vw);max-height:94vh}.pdet{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px}}
 .sheet-h{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:-18px;background:var(--surface);padding-block:4px;z-index:2}
 .qrbox{background:#fff;border-radius:14px;padding:14px;width:max-content;max-width:100%;margin-inline:auto}
@@ -854,7 +868,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 02h10';
+var VERSAO='15/10 · 02h25';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2084,7 +2098,7 @@ function openSheet(fn){var args=[].slice.call(arguments,1);ui.sheet={fn:fn,args:
 function renderSheet(){
   var el=document.getElementById('sheet');
   if(!ui.sheet){el.innerHTML='';return;}
-  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+(ui.sheet.fn===fPedidoDet?' wide':'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
+  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+({fPedidoDet:' wide',fPedido:' wide',fCliente:' frm',fPagamento:' mid',fCobranca:' mid',fRelProd:' mid'}[ui.sheet.fn.name]||'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
   if(ui.sheet.after)ui.sheet.after();
 }
 function closeSheet(){if(viewer)viewer.stop();ui.sheet=null;renderSheet();}
@@ -2122,26 +2136,30 @@ function fPedido(id,preCli){
   function conn(list){return '<div class="conn" aria-label="Uniões entre dentes">'+list.map(function(n,i){return '<span data-cn="'+n+'">'+(i<15?'<button type="button" class="cn" data-a="pdUne" data-n="'+n+'" aria-label="Unir '+n+' e '+list[i+1]+'"></button>':'')+'</span>';}).join('')+'</div>';}
   return head(p?'Editar pedido #'+p.num:'Novo pedido')+
   '<form data-form="pedido" data-id="'+(id||'')+'" class="stack">'+
+    '<div class="pdf"><div class="pdf-b1">'+
     '<label class="fld"><span>Cliente</span><select id="pd-cli" name="clienteId" required><option value="">Escolha…</option>'+cs.map(function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select>'+(cs.length?'':'<small>Cadastre um cliente primeiro.</small>')+'</label>'+
     '<label class="fld"><span>Paciente</span><input id="pd-pac" class="nome-p" name="paciente" required maxlength="40" placeholder="Iniciais, ex.: M.A.S." value="'+esc(p?p.paciente:'')+'"><small>Guarde só as iniciais ou o primeiro nome (LGPD).</small></label>'+
+    '</div><div class="pdf-a">'+
     '<div class="fld"><span>Elementos <b id="pd-qtd" class="mono"></b></span><div class="teeth">'+conn(UP)+arch(UP)+arch(LO)+conn(LO)+'</div><small>Toque em cada dente e diga o trabalho dele. Para unir dentes vizinhos (fixo / ponte), toque na bolinha entre eles.</small></div>'+
     '<div id="pd-ed"></div>'+
     '<div id="pd-lista" class="pd-lista"></div>'+
     '<div><button type="button" class="btn sm" data-a="pdExtra">+ Trabalho sem dente (ex.: Modelo 3D)</button></div>'+
-    '<div class="pd-mf"><div class="fld"><span>Material</span>'+selOutro('material',MATERIAIS,mat,'Digite o material')+'</div>'+
-    '<div class="fld"><span>Fresadora</span><div class="fres" role="radiogroup">'+[['','Não se aplica'],['3 eixos','3 eixos'],['4 eixos','4 eixos']].map(function(o){return '<label class="check"><input type="radio" name="fresadora" value="'+o[0]+'" '+(fr===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('')+'</div></div></div>'+
-    '<div class="grid2"><label class="fld"><span>Recebido em</span><input id="pd-rec" name="recebido" type="date" required value="'+(p?p.recebido:today())+'"></label>'+
-    '<label class="fld"><span>Prazo</span><input id="pd-prazo" name="prazo" type="date" value="'+(p?p.prazo||'':addDays(today(),2))+'"></label></div>'+
-    '<label class="check"><input type="checkbox" id="pd-urg" name="urgente" '+(p&&p.urgente?'checked':'')+'> Urgente</label>'+
     '<label class="fld"><span>Observações</span><textarea id="pd-obs" name="obs" maxlength="500">'+esc(p?p.obs:'')+'</textarea></label>'+
     (p?'':'<div class="fld"><span>Escaneamento</span>'+
       (canFile()?'<label class="btn block" style="position:relative">Anexar arquivos (viram zip)<input id="pd-files" type="file" multiple accept=".stl,.ply,.obj,.zip,.html,.htm,.png,.jpg,.jpeg,.webp" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
       '<small id="pd-files-info">STL, HTML do exocad, prints/fotos ou ZIP. Vários arquivos viram um zip só.</small>':
       '<small>No Essencial não dá para anexar arquivos aqui. <button type="button" class="linkbtn" data-a="assinar">Assinar</button></small>')+
       '<input id="pd-scan" name="scanLink" type="url" inputmode="url" placeholder="Ou cole um link (Drive, WeTransfer, Dropbox…)" style="margin-top:6px"></div>')+
+    '</div><div class="pdf-b2">'+
+    '<div class="pd-mf"><div class="fld"><span>Material</span>'+selOutro('material',MATERIAIS,mat,'Digite o material')+'</div>'+
+    '<div class="fld"><span>Fresadora</span><div class="fres" role="radiogroup">'+[['','Não se aplica'],['3 eixos','3 eixos'],['4 eixos','4 eixos']].map(function(o){return '<label class="check"><input type="radio" name="fresadora" value="'+o[0]+'" '+(fr===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('')+'</div></div></div>'+
+    '<div class="grid2"><label class="fld"><span>Recebido em</span><input id="pd-rec" name="recebido" type="date" required value="'+(p?p.recebido:today())+'"></label>'+
+    '<label class="fld"><span>Prazo</span><input id="pd-prazo" name="prazo" type="date" value="'+(p?p.prazo||'':addDays(today(),2))+'"></label></div>'+
+    '<label class="check"><input type="checkbox" id="pd-urg" name="urgente" '+(p&&p.urgente?'checked':'')+'> Urgente</label>'+
     '<div class="calc" id="pd-calc"></div>'+
     '<label class="fld"><span>Valor do pedido (R$)</span><input id="pd-valor" name="valor" type="number" step="0.01" min="0" inputmode="decimal" value="'+(p?p.valor:'')+'" data-manual="'+(p?'1':'')+'"><small>Calculado pela tabela do cliente. Pode ajustar.</small></label>'+
     '<button class="btn pri block" type="submit">'+(p?'Salvar':'Criar pedido')+'</button>'+
+    '</div></div>'+
   '</form>';
 }
 function tiposOpts(sel){var ts=alive(S.tipos).filter(function(t){return t.ativo||t.id===sel;});
@@ -2316,7 +2334,7 @@ function cnpjOk(d){if(!/^\d{14}$/.test(d)||/^(\d)\1{13}$/.test(d))return false;v
 function fmtDoc(d){d=soDig(d);if(d.length===11)return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');if(d.length===14)return d.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,'$1.$2.$3/$4-$5');return d;}
 function fCliente(id){
   var c=id?cliente(id):null;
-  return head(c?'Editar cliente':'Novo cliente')+'<form data-form="cliente" data-id="'+(id||'')+'" class="stack">'+
+  return head(c?'Editar cliente':'Novo cliente')+'<form data-form="cliente" data-id="'+(id||'')+'" class="stack frm2">'+
     '<div class="fld"><span>Tipo de cliente</span><div class="seg" role="radiogroup">'+[['laboratorio','Laboratório'],['dentista','Clínica / consultório']].map(function(o){return '<label class="check"><input type="radio" name="tipo" value="'+o[0]+'" '+((c?c.tipo:'laboratorio')===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('<span style="width:14px"></span>')+'</div></div>'+
     (function(){var v=c?c.titulo||'':'',outro=!!v&&TITULOS.indexOf(v)<0;
       return '<div class="fld"><span>Tratamento</span><div class="tit-op" role="radiogroup" aria-label="Tratamento">'+[['','Nenhum']].concat(TITULOS.map(function(t){return [t,t];})).concat([['__outro','Outros']]).map(function(o){var on=o[0]==='__outro'?outro:(!outro&&v===o[0]);
