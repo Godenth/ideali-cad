@@ -328,6 +328,11 @@ select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline
 .mt-p{display:grid;gap:8px;padding:12px 16px}.mt-p .lbl{font-size:.8rem}.mt-vp{font-family:var(--f-display);font-size:1.3rem}
 .mt-info{margin-top:-4px}.mt-fbig input{font-size:1.25rem;font-weight:700}
 @media (max-width:600px){.mt-mes{font-size:2rem}.mt-anel.lg{width:92px;height:92px}.mt-g .mt-v{font-size:1.9rem}}
+.tp-grid .li{width:100%}
+.tp-cols{display:grid;gap:16px;margin-top:16px}@media (min-width:1100px){.tp-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}}
+@media (min-width:900px){.tp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+  .tp-grid .li{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg)}.tp-grid .li:first-child{border-top:1px solid var(--line)}
+  .tp-grid .li:hover{border-color:var(--accent)}}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -981,7 +986,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 10h15';
+var VERSAO='15/10 · 11h00';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2002,14 +2007,14 @@ function rTipos(){
       kpi('Menos feito',menos?esc(menos.t.nome):'—',menos?'<span>'+menos.n+' pedido(s) '+perCurto()+'</span>':'')+
       kpi('Trabalhos',tot,'<span>'+feitos.reduce(function(s,x){return s+x.el;},0)+' elementos</span>')+
       kpi('Valor médio',brl(tot?feitos.reduce(function(s,x){return s+x.v;},0)/tot:0),'<span>por pedido</span>')+
-      '<section class="card stack half"><div class="between wrap"><div><h2>Ranking de trabalhos</h2><p class="small muted">Do mais feito ao menos feito</p></div>'+
-        dd('tipoMet')+
+    '</div><div class="tp-cols">'+
+      '<section class="card stack"><div class="between wrap"><div><h2>Ranking de trabalhos</h2><p class="small muted">Do mais feito ao menos feito</p></div>'+
+        dd('tipoMet')+'</div>'+
         hbars(ordem.map(function(x,i){var v=met==='v'?x.v:met==='el'?x.el:x.n;return {l:esc(x.t.nome)+(x.t.ativo?'':' <span class="muted small">(inativo)</span>'),r:met==='v'?brl(x.v):v+(met==='el'?' elem.':' ped.'),v:v,tag:i===ordem.length-1&&ordem.length>1?'<span class="tag w">menos feito</span>':i===0&&v?'<span class="tag a">mais feito</span>':'',cor:i===ordem.length-1&&ordem.length>1?'var(--warn)':''};}))+'</section>'+
-      '<section class="card stack half"><div><h2>Trabalhos por mês</h2><p class="small muted">Quantidade de pedidos recebidos</p></div>'+
+      '<div class="stack" style="gap:16px;align-content:start"><section class="card stack" style="align-content:start"><div><h2>Trabalhos por mês</h2><p class="small muted">Quantidade de pedidos recebidos</p></div>'+
         svgBars(meses,[{v:mv,cls:'pago'}],{sel:G?null:meses.length-1,int:true,fmt:function(v){return String(Math.round(v));},label:'Pedidos por mês',tip:function(i){return '<b>'+capMes(meses[i])+'</b><br>'+mv[i]+' pedido(s)';}})+'</section>'+
-    '</div>'+
-    '<section class="card stack"><div class="between"><h2>Seus tipos de trabalho</h2><button class="btn sm pri" data-a="editTipo" '+(canWrite()?'':'disabled')+'>+ Novo tipo</button></div><div class="list">'+alive(S.tipos).map(function(t){
-      return '<button class="li" data-a="editTipo" data-id="'+t.id+'"><span class="t"><b>'+esc(t.nome)+(t.ativo?'':' (inativo)')+'</b><span>'+(t.forma==='elemento'?'Por elemento':'Por trabalho')+'</span></span><span class="mono">'+brl(t.valor)+'</span></button>';}).join('')+'</div></section>';
+    '<section class="card stack"><div class="between"><h2>Seus tipos de trabalho</h2><button class="btn sm pri" data-a="editTipo" '+(canWrite()?'':'disabled')+'>+ Novo tipo</button></div><div class="list tp-grid">'+alive(S.tipos).map(function(t){
+      return '<button class="li" data-a="editTipo" data-id="'+t.id+'"><span class="t"><b>'+esc(t.nome)+(t.ativo?'':' (inativo)')+'</b><span>'+(t.forma==='elemento'?'Por elemento':'Por trabalho')+'</span></span><span class="mono">'+brl(t.valor)+'</span></button>';}).join('')+'</div></section></div></div>';
 }
 
 /* ---------- Mensagens prontas para o WhatsApp ---------- */
