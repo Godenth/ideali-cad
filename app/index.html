@@ -1086,7 +1086,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 18h25';
+var VERSAO='15/10 · 18h55';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3710,6 +3710,7 @@ var F={
     if(ui.loginCriar){
       sb.auth.signUp({email:email,password:senha,options:{data:{nome:String(fd.get('nome')||'').trim()},emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){
         if(r.error)return fim(msgAuth(r.error));
+        try{window.idealiEvento&&window.idealiEvento('CompleteRegistration');}catch(x){}
         if(!r.data.session){ui.loginCriar=false;return fim('Conta criada! Enviamos um e-mail para <b>'+esc(email)+'</b>. Clique no link de confirmação e depois entre aqui. Veja também o spam.');}
         ui.loginBusy=false;});
     }else{
@@ -3961,3 +3962,4 @@ function boot(){
 }
 boot();
 </script>
+<script src="../pixel.js" defer></script>
