@@ -408,6 +408,15 @@ table.adm td{vertical-align:top}
 .lm-prop{display:flex;gap:10px;align-items:center;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.lm-prop .t{flex:1;display:grid;gap:2px;min-width:0}
 .lm-mais summary{cursor:pointer;color:var(--accent);font-weight:600}
 @media (max-width:520px){.lm-pas span{font-size:.62rem}}
+.rd-oferta.qp-den{background:color-mix(in srgb,#3A96EC 9%,var(--surface));border-color:color-mix(in srgb,#3A96EC 35%,var(--line))}
+.rd-oferta.qp-lab{background:color-mix(in srgb,#F0A53A 9%,var(--surface));border-color:color-mix(in srgb,#F0A53A 35%,var(--line))}
+.rd-oferta.qp-cad{background:color-mix(in srgb,#9E8CFF 9%,var(--surface));border-color:color-mix(in srgb,#9E8CFF 35%,var(--line))}
+.qp-i{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:5px}
+.chips-f .qp-i{width:15px;height:15px}
+.qp-tag{justify-self:start;display:inline-flex;align-items:center;font:700 .72rem var(--f-mono);letter-spacing:.04em;text-transform:uppercase;padding:.3em .7em;border-radius:999px}
+.qp-den .qp-tag{background:color-mix(in srgb,#3A96EC 18%,transparent);color:#1F66B8}.qp-lab .qp-tag{background:color-mix(in srgb,#F0A53A 22%,transparent);color:#8A5200}.qp-cad .qp-tag{background:color-mix(in srgb,#7B5CF2 16%,transparent);color:#5B45E0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .qp-den .qp-tag{color:#7BBEFF}:root:not([data-theme="light"]) .qp-lab .qp-tag{color:#F7BC5C}:root:not([data-theme="light"]) .qp-cad .qp-tag{color:#B8ABFF}}
+:root[data-theme="dark"] .qp-den .qp-tag{color:#7BBEFF}:root[data-theme="dark"] .qp-lab .qp-tag{color:#F7BC5C}:root[data-theme="dark"] .qp-cad .qp-tag{color:#B8ABFF}
 .lm-tabs{display:flex;gap:6px;padding:5px;border-radius:999px;background:var(--surface);border:1px solid var(--line);width:max-content;max-width:100%}
 .lm-tabs button{border:0;background:none;color:var(--muted);font:700 .98rem var(--f-body);padding:10px 18px;border-radius:999px;cursor:pointer;white-space:nowrap}
 .lm-tabs button.on{background:var(--accent);color:var(--accent-ink)}.lm-tabs button b{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:99px;background:var(--urgent);color:#fff;font-size:.72rem;margin-left:4px}
@@ -1077,7 +1086,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 17h00';
+var VERSAO='15/10 · 18h25';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2346,7 +2355,9 @@ function redeIni(){
       {id:'m3',cod:'R-2498',trab:'Placa de bruxismo',dentes:[],mat:'PMMA',sw:'qualquer',repasse:35,hora:'10:00',prazo:addDays(hoje,1),de:'x3',min:25,st:'aberto'},
       {id:'m4',cod:'R-2496',trab:'Protocolo (superior ou inferior)',dentes:[],mat:'PMMA',sw:'exocad',repasse:280,hora:'18:00',prazo:addDays(hoje,2),de:'x1',min:40,st:'aberto'},
       {id:'m5',cod:'R-2495',trab:'Mockup',dentes:[14,13,12,11,21,22,23,24],mat:'Impressão 3D',sw:'3Shape',repasse:80,hora:'20:00',prazo:hoje,de:'x4',min:55,st:'aberto'},
-      {id:'m6',cod:'R-2493',trab:'Ponte fixa',dentes:[24,25,26],mat:'Zircônia',sw:'exocad',repasse:105,hora:'16:00',prazo:addDays(hoje,1),de:'x2',min:90,st:'aberto'}
+      {id:'m6',cod:'R-2493',trab:'Ponte fixa',dentes:[24,25,26],mat:'Zircônia',sw:'exocad',repasse:105,hora:'16:00',prazo:addDays(hoje,1),de:'x2',min:90,st:'aberto'},
+      {id:'m7',cod:'R-2492',trab:'Lente de contato',dentes:[12,11,21,22],mat:'Dissilicato de lítio',sw:'exocad',repasse:180,hora:'14:00',prazo:addDays(hoje,2),de:'x5',min:18,st:'aberto'},
+      {id:'m8',cod:'R-2490',trab:'Coroa sobre dente',dentes:[16],mat:'Zircônia',sw:'qualquer',repasse:40,hora:'18:00',prazo:addDays(hoje,1),de:'x6',min:33,st:'aberto'}
     ],
     meus:[{id:'k1',arqs:[{nome:'escaneamento_11_21.zip',tipo:'stl',de:'outro'},{nome:'referencia_sorriso.html',tipo:'html',de:'outro'}],cod:'R-2470',trab:'Enceramento digital',dentes:[11,21],mat:'Cera',repasse:30,hora:'19:00',prazo:hoje,de:'x3',st:'desenho'}],
     chat:{
@@ -2355,7 +2366,7 @@ function redeIni(){
       d3:[{de:'sis',t:'Diego aceitou o R-2460. Chat liberado.'},{de:'eu',t:'Ficou ótimo, Diego. Pix enviado!',h:'18:05'},{de:'outro',t:'Recebido, obrigado! 🙌',h:'18:09'}],
       k1:[{de:'sis',t:'Você aceitou o R-2470. Chat liberado.'},{de:'outro',t:'Oi! O caso é enceramento do 11 e 21, quero bem natural. Mandei o HTML do sorriso de referência.',h:'13:02'}]
     },
-    cadDe:{x1:{id:'x1',nome:'Lab. de Campinas',cidade:'Campinas, SP',sw:['exocad'],nota:4.8,av:40,cor:4},x2:{id:'x2',nome:'Cadista de Salvador',cidade:'Salvador, BA',sw:['exocad'],nota:4.6,av:22,cor:6},x3:{id:'x3',nome:'Cadista de Natal',cidade:'Natal, RN',sw:['3Shape'],nota:4.9,av:61,cor:3},x4:{id:'x4',nome:'Clínica Sorriso Digital',cidade:'Recife, PE',sw:['3Shape'],nota:4.7,av:15,cor:2}},
+    cadDe:{x1:{id:'x1',tipo:'lab',nome:'Lab. de Campinas',cidade:'Campinas, SP',sw:['exocad'],nota:4.8,av:40,cor:4},x2:{id:'x2',tipo:'cad',nome:'Cadista de Salvador',cidade:'Salvador, BA',sw:['exocad'],nota:4.6,av:22,cor:6},x3:{id:'x3',tipo:'cad',nome:'Cadista de Natal',cidade:'Natal, RN',sw:['3Shape'],nota:4.9,av:61,cor:3},x4:{id:'x4',tipo:'den',nome:'Clínica Sorriso Digital',cidade:'Recife, PE',sw:['3Shape'],nota:4.7,av:15,cor:2},x5:{id:'x5',tipo:'den',nome:'Dra. Renata Lopes',cidade:'Goiânia, GO',sw:['exocad'],nota:4.9,av:9,cor:1},x6:{id:'x6',tipo:'lab',nome:'Lab. Prótese Sul',cidade:'Florianópolis, SC',sw:['exocad','3Shape'],nota:4.7,av:33,cor:5}},
     enviados:[
       {id:'d0',cod:'R-2486',trab:'Placa de bruxismo',dentes:[],repasse:35,hora:'12:00',prazo:addDays(hoje,2),parceiro:null,st:'oferta',quando:hoje,para:'Toda a rede'},
       {id:'d1',arqs:[{nome:'escaneamento_36.zip',tipo:'stl',de:'eu'}],cod:'R-2481',trab:'Elemento sobre implante',dentes:[36],repasse:45,hora:'10:00',prazo:addDays(hoje,1),parceiro:'r1',st:'desenho',quando:hoje},
@@ -2567,10 +2578,11 @@ function rdArqs(x,lado,quem){var a=x.arqs||(x.arqs=[]);
       (f.tipo==='html'?'<button class="btn sm" data-a="rdAbreArq" data-k="'+x.id+':'+i+'">Visualizar</button>':'<button class="btn sm" data-a="rdAbreArq" data-k="'+x.id+':'+i+'">Baixar</button>')+'</div>';}).join(''):'<p class="small muted">Nenhum arquivo ainda.</p>')+
     '<div class="row wrap" style="gap:8px"><label class="btn sm" style="position:relative">+ STL / ZIP<input class="rd-up" data-id="'+x.id+'" data-t="stl" type="file" multiple accept=".stl,.zip,.ply,.obj" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
       '<label class="btn sm" style="position:relative">+ HTML (visualização)<input class="rd-up" data-id="'+x.id+'" data-t="html" type="file" multiple accept=".html,.htm" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label></div></div>';}
+var QUEM_PUB={den:['Dentista','<svg class="qp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4c-2 0-3.5 1.6-3.5 4.2 0 2 .9 3.3 1.4 5 .5 1.9.6 4.2 1 6.4.3 1.4 1.9 1.6 2.3.2l1-3.5c.3-1.2 2.1-1.2 2.4 0l1 3.5c.4 1.4 2 1.2 2.3-.2.4-2.2.5-4.5 1-6.4.5-1.7 1.4-3 1.4-5C17.3 5.6 15.8 4 13.8 4c-1.5 0-2.3.8-3.4.8S8.5 4 7 4z" transform="translate(1.6 0)"/></svg>','Dentistas'],lab:['Laboratório','<svg class="qp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V10l5 3V10l5 3V6l8 4v11z"/><path d="M7 17h2M12 17h2M17 17h2"/></svg>','Laboratórios'],cad:['Cadista','<svg class="qp-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>','Cadistas']};
 function rdPegar(R){
   var f=R.filtro||'todos',o=R.ordem||'valor',me=R.eu;
   var tiposMural=[];R.mural.forEach(function(x){if(tiposMural.indexOf(x.trab)<0)tiposMural.push(x.trab);});
-  var lista=R.mural.filter(function(x){return (x.st==='aberto'||x.st==='proposta')&&(f==='todos'||x.trab===f);});
+  var qf=R.quemF||'todos';var lista=R.mural.filter(function(x){return (x.st==='aberto'||x.st==='proposta')&&(f==='todos'||x.trab===f)&&(qf==='todos'||(R.cadDe[x.de].tipo||'cad')===qf);});
   lista.sort(function(a,b){if(!!a.novo!==!!b.novo)return a.novo?-1:1;if(a.paraMim!==b.paraMim)return a.paraMim?-1:1;return o==='valor'?b.repasse-a.repasse:o==='prazo'?(a.prazo+a.hora<b.prazo+b.hora?-1:1):(a.min-b.min);});
   return '<section class="card rd-eu"><div class="row" style="gap:14px;flex-wrap:wrap">'+avRede(me,52)+
       '<div style="flex:1;min-width:200px"><b>Você na rede</b><div class="small muted">'+me.feitos+' trabalhos feitos · '+estrelas(me.nota)+' '+me.nota+' · '+me.sw.join(', ')+'</div></div>'+
@@ -2579,8 +2591,10 @@ function rdPegar(R){
     '<div class="row wrap" style="gap:10px"><label class="fld" style="min-width:200px"><span>Trabalho</span><select id="rd-filtro"><option value="todos">Todos</option>'+tiposMural.map(function(t){return '<option '+(f===t?'selected':'')+'>'+esc(t)+'</option>';}).join('')+'</select></label>'+
       '<label class="fld" style="min-width:200px"><span>Ordenar por</span><select id="rd-ordem">'+[['valor','Maior valor'],['prazo','Prazo mais curto'],['recentes','Mais recentes']].map(function(x){return '<option value="'+x[0]+'" '+(o===x[0]?'selected':'')+'>'+x[1]+'</option>';}).join('')+'</select></label>'+
       '<span class="small muted" style="align-self:end;padding-bottom:12px">'+lista.length+' trabalho(s) disponível(is)</span></div>'+
+    '<div class="chips-f">'+[['todos','Todos']].concat(['den','lab','cad'].map(function(k){return [k,QUEM_PUB[k][1]+QUEM_PUB[k][2]];})).map(function(o){return '<button class="'+(qf===o[0]?'on':'')+'" data-a="rdQuem" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
     (lista.length?'<div class="rd-mural">'+lista.map(function(x){var de=R.cadDe[x.de];
-      return '<div class="rd-oferta'+(x.paraMim||x.novo?' mim':'')+'">'+(x.novo?'<span class="tag ok">Acabou de ser publicado</span>':'')+(x.paraMim?'<span class="tag a">Oferecido direto para você</span>':'')+
+      var tp=QUEM_PUB[de.tipo||'cad'];
+      return '<div class="rd-oferta qp-'+(de.tipo||'cad')+(x.paraMim||x.novo?' mim':'')+'"><span class="qp-tag">'+tp[1]+tp[0]+'</span>'+(x.novo?'<span class="tag ok">Acabou de ser publicado</span>':'')+(x.paraMim?'<span class="tag a">Oferecido direto para você</span>':'')+
         '<div class="between"><b style="font-size:1.05rem">'+esc(x.trab)+'</b><span class="mono val" style="font-size:1.2rem">'+brl(x.repasse)+'</span></div>'+
         '<div class="small muted">'+x.cod+(x.dentes.length?' · dentes '+x.dentes.join(', '):'')+' · '+esc(x.mat)+' · '+esc(x.sw)+'</div>'+
         prazoRede(x.prazo,x.hora)+
@@ -3522,6 +3536,7 @@ var A={
     R.meus.unshift({id:'k'+Date.now(),cod:x.cod,trab:x.trab,dentes:x.dentes,mat:x.mat,repasse:x.repasse,hora:x.hora,prazo:x.prazo,de:x.de,st:'desenho'});
     R.chat[R.meus[0].id]=[{de:'sis',t:'Você aceitou o '+x.cod+'. Chat liberado.'}];
     R.tab='meus';render();toast('Trabalho '+x.cod+' é seu! Arquivos e chat liberados.');},
+  rdQuem:function(d){redeIni().quemF=d.v;render();},
   rdIgnora:function(d){var R=redeIni(),x=R.mural.filter(function(q){return q.id===d.id;})[0];if(x){x.st='recusado';render();toast('Trabalho recusado. Ele some do seu feed.');}},
   rdMeuSt:function(d){var R=redeIni(),x=R.meus.filter(function(q){return q.id===d.id;})[0];if(!x)return;x.st=d.v;
     if(d.v==='recusado')x.motivo='Margem curta no 21';
@@ -3769,7 +3784,7 @@ var F={
   labNovo:function(fd){var L=labIni(),v=function(k){return String(fd.get(k)||'').trim();};
     if(!v('dentes')){toast('Diga quais dentes.');return;}if(!(+v('valor')>0)){toast('Diga quanto você paga pelo projeto.');return;}
     var q=v('quem'),c=q==='um'?v('cad'):null,num='L'+(105+L.pedidos.length);
-    var R=redeIni();R.cadDe.lab={id:'lab',nome:L.perfil.nome,cidade:L.perfil.cidade,sw:L.perfil.sw,nota:4.8,av:12,cor:2};
+    var R=redeIni();R.cadDe.lab={id:'lab',tipo:L.perfil.tipo==='Clínica'?'den':'lab',nome:L.perfil.nome,cidade:L.perfil.cidade,sw:L.perfil.sw,nota:4.8,av:12,cor:2};
     R.mural.unshift({id:'m'+num,lab:num,cod:num,trab:v('trab'),dentes:v('dentes').split(/[^0-9]+/).filter(Boolean).map(Number),mat:v('mat')||'—',sw:v('sw')||'qualquer',repasse:+v('valor'),hora:v('hora')||'18:00',prazo:v('prazo')||addDays(today(),1),de:'lab',min:0,paraMim:q==='um'&&v('cad')==='eu',st:'aberto',novo:true});
     L.pedidos.unshift({id:num,trab:v('trab'),dentes:v('dentes'),mat:v('mat'),sw:v('sw'),prazo:v('prazo')||addDays(today(),1),hora:v('hora')||'18:00',valor:+v('valor'),st:'busca',cad:null,quem:q==='rede'?'Toda a rede':q==='favoritos'?'Favoritos':labCad(c).nome,criado:today(),min:0,props:[]});
     L.novo.dentes='';L.novo.valor='';L.novo.obs='';L.tab='pedidos';L.aba='meus';L.filtro=ui.modoLab?'abertos':'todos';closeSheet();render();window.scrollTo(0,0);toast('Trabalho '+num+' publicado. Já aparece no feed dos cadistas.');},
