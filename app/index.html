@@ -1039,7 +1039,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 14h00';
+var VERSAO='15/10 · 14h15';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1563,6 +1563,7 @@ function fTemaQuiz(){return head('Descobrir meu tema')+'<form data-form="temaQui
 /* ---------- Primeiros passos (some quando tudo estiver feito ou a pessoa fechar) ---------- */
 function passosOnb(){var p=S.perfil||{},pr=S.prefs||{};
   return [
+    {ok:!!pr.tema,t:'Escolha seu tema',d:'4 perguntas rápidas para deixar o sistema com a sua cara.',a:'temaQuiz',b:'✨ Descobrir meu tema'},
     {ok:!!(p.nome&&p.telefone&&(p.cidade||p.uf)),t:'Complete seu perfil',d:'Nome, WhatsApp e cidade aparecem nos seus orçamentos e cobranças.',a:'tab',v:'config',b:'Abrir perfil'},
     {ok:!!(pr.tab&&Object.keys(pr.tab).length),t:'Revise sua tabela de preços',d:'Os valores de cada trabalho entram sozinhos nos pedidos.',a:'tab',v:'tabela',b:'Abrir tabela'},
     {ok:!!p.chave,t:'Cadastre sua chave Pix',d:'Para gerar cobranças com QR Code Pix em PDF.',a:'tab',v:'config',b:'Cadastrar Pix'},
