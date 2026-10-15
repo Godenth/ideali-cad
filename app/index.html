@@ -200,6 +200,7 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .rd-lb .nav{display:flex;gap:10px}
 .li-arq{flex-wrap:wrap;row-gap:8px}.li-arq>.row{margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
 .cb-li{cursor:pointer;gap:12px}.cb-li .t{flex:1;min-width:0;text-align:left}.cb-li input{width:20px;height:20px;flex:none;accent-color:var(--accent)}.cb-tot{padding:10px 2px;border-top:1px solid var(--line);font-size:1.05rem}
+select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline-color .3s}
 .linkbtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);font-weight:600;text-decoration:underline;cursor:pointer}
 .rd-fab{position:fixed;right:20px;bottom:20px;z-index:42;width:58px;height:58px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 14px 30px -10px color-mix(in srgb,var(--accent) 75%,transparent)}
 .rd-fab .n{position:absolute;top:-2px;right:-2px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--urgent);color:#fff;font:700 .75rem/22px var(--f-mono);border:2px solid var(--bg)}
@@ -851,7 +852,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 01h25';
+var VERSAO='15/10 · 01h35';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2286,6 +2287,10 @@ function campoCidadeUF(pre,ctx,cid,uf,dis,dica){
   return '<div class="cid-uf"><div class="fld ac"><span>Cidade</span><input id="'+pre+'-cid" class="cid-ac" data-ctx="'+ctx+'" data-uf-sel="'+pre+'-uf" name="cidade" maxlength="60" autocomplete="off" placeholder="Comece a digitar: São Pa…" value="'+esc(cid||'')+'" '+(dis||'')+'><div class="cid-sug" hidden></div>'+(dica?'<small>'+dica+'</small>':'')+'</div>'+
     '<label class="fld"><span>Estado</span><select id="'+pre+'-uf" name="uf" '+(dis||'')+'><option value="">UF</option>'+UFS.map(function(u){return '<option '+(uf===u?'selected':'')+'>'+u+'</option>';}).join('')+'</select></label></div>';
 }
+/* DDD → estado (ANATEL). Preenche o Estado sozinho ao digitar o WhatsApp com DDD. */
+var DDD_UF=(function(){var m={},t={SP:'11 12 13 14 15 16 17 18 19',RJ:'21 22 24',ES:'27 28',MG:'31 32 33 34 35 37 38',PR:'41 42 43 44 45 46',SC:'47 48 49',RS:'51 53 54 55',DF:'61',GO:'62 64',TO:'63',MT:'65 66',MS:'67',AC:'68',RO:'69',BA:'71 73 74 75 77',SE:'79',PE:'81 87',AL:'82',PB:'83',RN:'84',CE:'85 88',PI:'86 89',PA:'91 93 94',AM:'92 97',RR:'95',AP:'96',MA:'98 99'};
+  Object.keys(t).forEach(function(u){t[u].split(' ').forEach(function(d){m[d]=u;});});return m;})();
+function ufDoTel(v){var d=String(v||'').replace(/\D/g,'');if(d.length>11&&d.slice(0,2)==='55')d=d.slice(2);if(d.charAt(0)==='0')d=d.slice(1);return d.length>=10?DDD_UF[d.slice(0,2)]||'':'';}
 function cidUF(c){return c.cidade?esc(c.cidade)+(c.uf?'/'+c.uf:''):(c.uf||'');}
 var TIPO_CLI={laboratorio:'Laboratório',dentista:'Clínica / consultório'};
 function pessoaCli(c){return ((c.pnome||'')+' '+(c.sobrenome||'')).trim();}
@@ -2977,6 +2982,8 @@ document.addEventListener('submit',function(e){var f=e.target;if(!f.dataset.form
 document.addEventListener('toggle',function(e){if(e.target.classList&&e.target.classList.contains('mm'))ui.mmAberto=e.target.open;},true);
 document.addEventListener('focusin',function(e){if(e.target.closest&&e.target.closest('.mm-li'))window._mmTa=e.target;});
 document.addEventListener('input',function(e){
+  if(e.target.id==='cl-tel'||e.target.id==='cf-tel'){var uf=ufDoTel(e.target.value),sel=document.getElementById(e.target.id==='cl-tel'?'cl-uf':'cf-uf');
+    if(uf&&sel&&!sel.disabled&&sel.value!==uf&&(!sel.value||sel.dataset.auto==='1')){sel.value=uf;sel.dataset.auto='1';sel.classList.add('auto-ok');setTimeout(function(){sel.classList.remove('auto-ok');},900);}}
   var t=e.target;
   if(t.id==='rd-rep'){rdLer();var R=ui.rede,pp=R&&(byId(S.pedidos,R.pid)||{valor:90}),lb=document.querySelector('.rd-lucro b');if(lb&&pp){var l=(+pp.valor||0)-(+t.value||0);lb.textContent=brl(l);lb.className='mono '+(l>=0?'val':'late');}}
   if(t.classList&&t.classList.contains('cid-ac'))buscaCidades(t);
@@ -2989,6 +2996,7 @@ document.addEventListener('input',function(e){
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
 document.addEventListener('change',function(e){
+  if(e.target.id==='cl-uf'||e.target.id==='cf-uf')delete e.target.dataset.auto;
   if(e.target.classList&&e.target.classList.contains('cb-ped')){(ui.cobSel=ui.cobSel||{})[e.target.dataset.id]=e.target.checked;var tt=document.getElementById('cb-total');if(tt&&ui.sheet)tt.textContent=brl(cobTotal(ui.sheet.args[0]));return;}
   var t=e.target;
   if(t.classList&&t.classList.contains('arqck')){ui.arqSel=ui.arqSel||{};if(t.checked)ui.arqSel[t.dataset.id]=1;else delete ui.arqSel[t.dataset.id];render();}
