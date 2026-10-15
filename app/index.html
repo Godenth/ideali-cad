@@ -484,6 +484,7 @@ table.adm td{vertical-align:top}
 .kcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:6px;cursor:pointer;text-align:left;min-width:0}
 .kcard.u{box-shadow:inset 3px 0 0 var(--urgent)}
 .kcard .r{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.kc-who{display:flex;gap:10px;align-items:center;min-width:0}.kc-nm{display:grid;gap:4px;min-width:0}
 .ico-trab{position:relative;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none;color:var(--ic);background:color-mix(in srgb,var(--ic) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ic) 35%,transparent)}
 .ico-trab svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .ico-trab i{position:absolute;right:-6px;bottom:-5px;font:700 .6rem var(--f-mono);font-style:normal;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:0 4px;line-height:1.4}
@@ -1043,7 +1044,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 14h50';
+var VERSAO='15/10 · 15h00';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1838,9 +1839,9 @@ function kcard(p){
   var nf=alive(S.arquivos).filter(function(a){return a.pedidoId===p.id&&!a.removido;}).length;
   var x=acoes(p),extra=x.extra,acts=x.acts;
   return '<div class="kcard '+(p.urgente?'u':'')+'" data-a="verPedido" data-id="'+p.id+'" role="button" tabindex="0" draggable="'+(w?'true':'false')+'">'+
-    '<div class="r"><span class="row" style="gap:8px">'+iconeTrab(p)+'<span class="mono small muted">#'+p.num+'</span></span><span class="row" style="gap:4px">'+(p.urgente?'<span class="tag u">Urgente</span>':'')+(p.pago?'<span class="tag ok">Pago</span>':'')+'</span></div>'+
-    '<span class="pac" title="Paciente">'+ICO_PAC+esc(p.paciente)+'</span>'+
-    '<span class="who cli" title="Cliente">'+ICO_CLI+esc(c?c.nome:'(cliente excluído)')+'</span>'+
+    '<div class="r"><span class="mono small muted">#'+p.num+'</span><span class="row" style="gap:4px">'+(p.urgente?'<span class="tag u">Urgente</span>':'')+(p.pago?'<span class="tag ok">Pago</span>':'')+'</span></div>'+
+    '<div class="kc-who">'+iconeTrab(p)+'<div class="kc-nm"><span class="pac" title="Paciente">'+ICO_PAC+esc(p.paciente)+'</span>'+
+    '<span class="who cli" title="Cliente">'+ICO_CLI+esc(c?c.nome:'(cliente excluído)')+'</span></div></div>'+
     '<span class="trab">'+esc(t?t.nome:'—')+'</span>'+
     '<div class="r small"><span class="mono">'+elTxt(p.elementos)+'</span><span class="mono val">'+brl(p.valor)+'</span></div>'+
     '<div class="r small"><span class="'+(late?'late':'muted')+'">prazo '+(p.prazo?dm(p.prazo):'—')+'</span>'+(nf?'<span class="muted">📎 '+nf+'</span>':'')+'</div>'+
