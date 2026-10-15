@@ -298,6 +298,15 @@ select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline
 .chart .pv-hoje{stroke:var(--muted);stroke-dasharray:3 4}.chart .pv-hoje-t{font:600 11px var(--f-body);fill:var(--muted)}
 .chart .pv-cap{stroke:var(--p2);stroke-width:1.6;stroke-dasharray:6 4}.chart .pv-cap-t{font:600 11px var(--f-body);fill:var(--p2)}
 .chart .pv-lbl{font-style:italic}
+.sin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.sin{border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:12px;padding:12px 14px;display:grid;gap:6px;background:var(--bg);align-content:start}
+.sin p{margin:0;color:var(--muted);font-size:.9rem}.sin b{font-family:var(--f-display);font-size:1.02rem}
+.sin.n3{border-left-color:var(--urgent)}.sin.n2{border-left-color:var(--p2)}.sin.n1{border-left-color:var(--p4)}.sin.c-positivo{border-left-color:var(--ok)}
+.sin-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sin-pr{font:700 .68rem var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--urgent)}
+.chips-f{display:flex;gap:8px;flex-wrap:wrap}.chips-f button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:.4em .9em;font-weight:600;font-size:.86rem;cursor:pointer;color:var(--ink)}
+.chips-f button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.chips-f b{font-family:var(--f-mono);margin-left:4px}
+.an-t{width:100%;border-collapse:collapse;font-size:.9rem;min-width:760px}.an-t th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);font-weight:600}
+.an-t td{padding:9px 10px;border-bottom:1px solid var(--line)}.an-t .up{color:var(--ok);font-weight:600}.an-t .down,.an-t td.down{color:var(--urgent);font-weight:600}
 .pv-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .pv-kpis>div{border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:grid;gap:2px;background:var(--bg)}
 .pv-kpis span{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
@@ -714,10 +723,10 @@ var MAP={
   pedidos:{t:'pedidos',
     to:function(x){var p=x.pendencia||{};return {numero:x.num,cliente_id:x.clienteId,paciente:x.paciente,elementos:x.elementos||[],tipo_trabalho_id:nn(x.tipoId),cor:nn(x.cor),observacoes:nn(x.obs),
       valor:+x.valor||0,urgente:!!x.urgente,status:x.status,pendencia_motivos:p.motivos||[],pendencia_obs:nn(p.obs),pendencia_desde:x.pendencia?nn(p.desde):null,aprovacao_desde:nn(x.aprovDesde),
-      ajustes:x.ajustes||0,recebido_em:x.recebido,prazo:nn(x.prazo),enviado_em:nn(x.entregue),pago_em:nn(x.pago),pagamento_id:nn(x.pagamentoId),implante_marca:nn(x.impMarca),implante_tipo:nn(x.impTipo),itens:x.itens||[],extras:x.extras||[],material:nn(x.material),fresadora:nn(x.fresadora),deleted_at:ts(x.deleted)};},
+      ajustes:x.ajustes||0,ajustes_motivos:(x.ajMotivos||[]).slice(-60),recebido_em:x.recebido,prazo:nn(x.prazo),enviado_em:nn(x.entregue),pago_em:nn(x.pago),pagamento_id:nn(x.pagamentoId),implante_marca:nn(x.impMarca),implante_tipo:nn(x.impTipo),itens:x.itens||[],extras:x.extras||[],material:nn(x.material),fresadora:nn(x.fresadora),deleted_at:ts(x.deleted)};},
     from:function(r){return {id:r.id,num:r.numero,clienteId:r.cliente_id,paciente:nomeProprio(r.paciente),elementos:r.elementos||[],tipoId:r.tipo_trabalho_id,cor:r.cor||'',obs:r.observacoes||'',
       valor:+r.valor,urgente:r.urgente,status:r.status,pendencia:r.status==='pendente'?{motivos:r.pendencia_motivos||[],obs:r.pendencia_obs||'',desde:dia(r.pendencia_desde)}:null,
-      aprovDesde:dia(r.aprovacao_desde),ajustes:r.ajustes,recebido:dia(r.recebido_em),prazo:dia(r.prazo),entregue:dia(r.enviado_em),pago:dia(r.pago_em),pagamentoId:r.pagamento_id,impMarca:r.implante_marca||'',impTipo:r.implante_tipo||'',itens:r.itens||[],extras:r.extras||[],material:r.material||'',fresadora:r.fresadora||'',deleted:dia(r.deleted_at)};}},
+      aprovDesde:dia(r.aprovacao_desde),ajustes:r.ajustes,ajMotivos:r.ajustes_motivos||[],recebido:dia(r.recebido_em),prazo:dia(r.prazo),entregue:dia(r.enviado_em),pago:dia(r.pago_em),pagamentoId:r.pagamento_id,impMarca:r.implante_marca||'',impTipo:r.implante_tipo||'',itens:r.itens||[],extras:r.extras||[],material:r.material||'',fresadora:r.fresadora||'',deleted:dia(r.deleted_at)};}},
   arquivos:{t:'arquivos',
     to:function(x){return x.origem==='link'?{pedido_id:x.pedidoId,origem:'link',nome:x.nome,url_externa:x.url,deleted_at:ts(x.deleted)}:{deleted_at:ts(x.deleted)};},
     from:function(r){return {id:r.id,pedidoId:r.pedido_id,origem:r.origem,nome:r.nome,url:r.url_externa,tamOrig:+r.tamanho_original||0,tamZip:+r.tamanho_zip||0,criado:dia(r.criado_em),removido:dia(r.removido_em),deleted:dia(r.deleted_at)};}}
@@ -913,6 +922,7 @@ var ICON={
   ranking:ic('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>'),
   arquivos:ic('<path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/>'),
   tipos:ic('<path d="M4 6h16M4 12h16M4 18h10"/>'),
+  analises:ic('<path d="M3 20h18"/><path d="M5 16l4-5 4 3 6-8"/><circle cx="19" cy="6" r="1.6"/>'),
   tabela:ic('<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 12h6M10 16h6"/>'),
   lixeira:ic('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
   config:ic('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
@@ -923,13 +933,13 @@ var ICON={
 };
 var MENU=[
   ['Principal',[['dashboard','Dashboard'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
-  ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
+  ['Ferramentas',[['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 03h20';
+var VERSAO='15/10 · 00h55';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
-var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
+var TITULOS={analises:'Análises',rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){
@@ -942,7 +952,7 @@ function render(){
   else if(a.status==='teste') chip='<span class="tag a">Teste · '+Math.max(0,daysBetween(today(),a.testeAte))+' dias</span>';
   else chip='<span class="tag ok">Ativa</span>';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
-    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,config:rConfig,admin:rAdmin};
+    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,analises:rAnalises,config:rConfig,admin:rAdmin};
   var body=(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
@@ -1111,6 +1121,83 @@ function hbars(rows,empty){
   return '<div>'+rows.map(function(r){var tag=r.a?'button':'div';return '<'+tag+' class="hbar"'+(r.a?' data-a="'+r.a+'" data-id="'+(r.id||'')+'" data-v="'+(r.dv||'')+'"':' style="cursor:default"')+'><b>'+r.l+'</b><span class="row" style="gap:6px">'+(r.tag||'')+'<span class="mono small">'+r.r+'</span></span><span class="track"><i style="width:'+(r.v/max*100).toFixed(1)+'%;'+(r.cor?'background:'+r.cor:'')+'"></i></span></'+tag+'>';}).join('')+'</div>';
 }
 
+/* ===================== Análises: sinais de mudança de comportamento =====================
+   Compara os últimos 90 dias com os 90 anteriores, por cliente e por tipo de trabalho, e cruza com
+   o seu prazo, tempo de entrega e ajustes. São sinais para investigar, não conclusões. */
+function tiposDoPedido(p){var ids=[];itensDe(p).forEach(function(i){if(i.t&&ids.indexOf(i.t)<0)ids.push(i.t);});(p.extras||[]).forEach(function(x){if(x.t&&ids.indexOf(x.t)<0)ids.push(x.t);});if(!ids.length&&p.tipoId)ids.push(p.tipoId);
+  return ids.map(function(i){var t=tipo(i);return t?t.nome:'';}).filter(Boolean);}
+function entregaDe(p){return p.aprovDesde||p.entregue||null;}
+function janela(p,a,b){var d=daysBetween(p.recebido,today());return d>=a&&d<b;}
+function pct(n,d){return d?Math.round(n/d*100):0;}
+function analisar(){var t=today(),ps=alive(S.pedidos).filter(function(p){return p.recebido;}),A=ps.filter(function(p){return janela(p,0,90);}),B=ps.filter(function(p){return janela(p,90,180);}),sig=[];
+  function add(o){sig.push(o);}
+  /* --- 1. Você (prazo e velocidade) --- */
+  var atr=ps.filter(function(p){return (p.status==='entrada'||p.status==='pendente')&&p.prazo&&p.prazo<t;});
+  if(atr.length)add({n:3,cat:'atraso',tit:'Você tem '+atr.length+' pedido(s) atrasado(s) agora',txt:'Passaram do prazo e ainda não foram enviados para aprovação: '+atr.slice(0,6).map(function(p){var c=cliente(p.clienteId);return '#'+p.num+(c?' ('+c.nome+')':'');}).join(', ')+'.',acao:'atrasados'});
+  function tardio(L){var com=L.filter(function(p){return p.prazo&&entregaDe(p);});return {n:com.length,late:com.filter(function(p){return entregaDe(p)>p.prazo;}).length};}
+  var la=tardio(A),lb=tardio(B),pa=pct(la.late,la.n),pb=pct(lb.late,lb.n);
+  if(la.n>=4&&pa>=20&&pa>=pb+10)add({n:pa>=40?3:2,cat:'atraso',tit:'Você está atrasando mais entregas',txt:pa+'% dos pedidos dos últimos 90 dias foram entregues depois do prazo'+(lb.n?' (antes: '+pb+'%)':'')+'. Atraso costuma ser o primeiro motivo de cliente procurar outro cadista.'});
+  function lead(L){var v=L.filter(entregaDe).map(function(p){return Math.max(0,daysBetween(p.recebido,entregaDe(p)));});return v.length?{m:v.reduce(function(a,b){return a+b;},0)/v.length,n:v.length}:null;}
+  var ta=lead(A),tb=lead(B);
+  if(ta&&tb&&ta.n>=4&&tb.n>=4&&ta.m>=tb.m*1.3&&ta.m-tb.m>=1)add({n:2,cat:'atraso',tit:'Suas entregas estão mais lentas',txt:'Você leva em média '+ta.m.toFixed(1).replace('.',',')+' dias do recebimento até enviar para aprovação (antes: '+tb.m.toFixed(1).replace('.',',')+' dias).'});
+  /* --- 2. Clientes --- */
+  var porCli={};ps.forEach(function(p){if(p.clienteId)(porCli[p.clienteId]=porCli[p.clienteId]||[]).push(p);});
+  var linhasCli=[];
+  Object.keys(porCli).forEach(function(cid){var c=cliente(cid);if(!c)return;var L=porCli[cid].sort(function(a,b){return a.recebido<b.recebido?-1:1;}),a=L.filter(function(p){return janela(p,0,90);}),b=L.filter(function(p){return janela(p,90,180);});
+    var ds=L.map(function(p){return p.recebido;}),gaps=[];for(var i=Math.max(1,ds.length-6);i<ds.length;i++)gaps.push(daysBetween(ds[i-1],ds[i]));
+    var iv=gaps.length?gaps.reduce(function(x,y){return x+y;},0)/gaps.length:null,dias=daysBetween(ds[ds.length-1],t);
+    var parou=[];var ta2={},tb2={};a.forEach(function(p){tiposDoPedido(p).forEach(function(n){ta2[n]=(ta2[n]||0)+1;});});b.forEach(function(p){tiposDoPedido(p).forEach(function(n){tb2[n]=(tb2[n]||0)+1;});});
+    var aj=function(L2,n){var x=L2.filter(function(p){return tiposDoPedido(p).indexOf(n)>=0;});return x.length?x.reduce(function(s,p){return s+(p.ajustes||0);},0)/x.length:0;};
+    var lin={c:c,a:a.length,b:b.length,iv:iv,dias:dias,parou:[],ult:ds[ds.length-1],aj:L.length?L.reduce(function(s,p){return s+(p.ajustes||0);},0)/L.length:0};
+    if(L.length>=3&&iv&&dias>Math.max(2*iv,14)&&dias<=240)add({n:dias>3*iv?3:2,cat:'frequencia',cid:cid,tit:c.nome+' parou de enviar com frequência',txt:'Sem pedidos há '+dias+' dias. Costumava mandar a cada '+Math.round(iv)+' dias.',msg:'sumiu'});
+    else if(b.length>=5&&a.length<=b.length*0.7&&b.length-a.length>=3)add({n:a.length<=b.length/2?2:1,cat:'frequencia',cid:cid,tit:c.nome+' está enviando menos',txt:a.length+' pedido(s) nos últimos 90 dias, contra '+b.length+' nos 90 anteriores.',msg:'menos'});
+    if(a.length>=4&&a.length>=b.length*1.5&&b.length>=1)add({n:0,cat:'positivo',cid:cid,tit:c.nome+' está mandando mais',txt:a.length+' pedidos nos últimos 90 dias (antes: '+b.length+'). Bom momento para agradecer.'});
+    if(a.length>=1)Object.keys(tb2).forEach(function(n){if(tb2[n]>=2&&!ta2[n]){lin.parou.push(n);var ajB=aj(b,n),media=lin.aj;
+      add({n:ajB>=1.5?3:2,cat:'mudanca',cid:cid,tipo:n,tit:c.nome+' não envia mais '+n,txt:'Mandou '+tb2[n]+' de '+n+' nos 90 dias anteriores e nenhum nos últimos 90, mas continua mandando outros trabalhos.'+(ajB>=1.2?' Os seus pedidos de '+n+' para esse cliente tiveram em média '+ajB.toFixed(1).replace('.',',')+' ajustes: pode ser sinal de insatisfação.':''),msg:'tipo'});}});
+    var el=function(L2){return L2.length?L2.reduce(function(s,p){return s+Math.max(1,(p.elementos||[]).length);},0)/L2.length:0;},ea=el(a),eb=el(b);
+    if(a.length>=4&&b.length>=4&&ea<=eb*0.6)add({n:1,cat:'mudanca',cid:cid,tit:c.nome+' está mandando casos menores',txt:'Média de '+ea.toFixed(1).replace('.',',')+' elementos por pedido nos últimos 90 dias (antes: '+eb.toFixed(1).replace('.',',')+'). Os casos grandes podem estar indo para outro lugar.',msg:'menos'});
+    var dev=L.filter(function(p){return p.entregue&&!p.pago&&daysBetween(p.entregue,t)>30;});
+    if(dev.length)add({n:1,cat:'financeiro',cid:cid,tit:c.nome+' tem '+dev.length+' pedido(s) sem pagar há mais de 30 dias',txt:'Total de '+brl(soma(dev))+'. Atraso de pagamento às vezes vem junto com insatisfação.',acao:'cobrar'});
+    linhasCli.push(lin);});
+  /* --- 3. Qualidade por tipo --- */
+  var R=ps.filter(function(p){return janela(p,0,180);}),porTipo={};
+  R.forEach(function(p){tiposDoPedido(p).forEach(function(n){var o=porTipo[n]=porTipo[n]||{n:n,ped:0,aj:0,mot:{},a:0,b:0,late:0,com:0,lead:0,leadN:0};o.ped++;o.aj+=p.ajustes||0;(p.ajMotivos||[]).forEach(function(m){o.mot[m]=(o.mot[m]||0)+1;});
+    if(janela(p,0,90))o.a++;else o.b++;if(p.prazo&&entregaDe(p)){o.com++;if(entregaDe(p)>p.prazo)o.late++;}if(entregaDe(p)){o.lead+=Math.max(0,daysBetween(p.recebido,entregaDe(p)));o.leadN++;}});});
+  var tipos=Object.keys(porTipo).map(function(k){return porTipo[k];}),ajGeral=R.length?R.reduce(function(s,p){return s+(p.ajustes||0);},0)/R.length:0;
+  tipos.forEach(function(o){o.ajm=o.ped?o.aj/o.ped:0;var ms=Object.keys(o.mot).sort(function(x,y){return o.mot[y]-o.mot[x];}),tot=ms.reduce(function(s,m){return s+o.mot[m];},0);o.motTop=ms[0]&&ms[0]!=='Não informado'?ms[0]+' ('+pct(o.mot[ms[0]],tot)+'%)':'';
+    if(o.ped>=3&&o.ajm>=1.2&&o.ajm>=ajGeral*1.6)add({n:o.ajm>=2?3:2,cat:'qualidade',tit:'Pedidos de '+o.n+' voltam mais para ajuste',txt:'Média de '+o.ajm.toFixed(1).replace('.',',')+' ajustes por pedido nos últimos 6 meses (seus trabalhos em geral: '+ajGeral.toFixed(1).replace('.',',')+').'+' Vale perguntar aos clientes o que costuma voltar.'});});
+  tipos.sort(function(x,y){return y.ped-x.ped;});linhasCli.sort(function(x,y){return (y.a+y.b)-(x.a+x.b);});
+  sig.sort(function(x,y){return y.n-x.n;});
+  return {sig:sig,tipos:tipos,cli:linhasCli,ajGeral:ajGeral};}
+function n2(n){return n;}
+var CAT_SIN={atraso:['Atenção: seus prazos','u'],frequencia:['Frequência do cliente','w'],mudanca:['Mudança de comportamento','a'],qualidade:['Qualidade','u'],financeiro:['Pagamento','w'],positivo:['Boa notícia','ok']};
+function msgSinal(s){var c=cliente(s.cid),nome=c?(c.pnome||c.nome):'';
+  if(s.msg==='tipo')return 'Oi, '+nome+'! Tudo bem? Faz um tempo que não recebo '+s.tipo.toLowerCase()+' de você e queria saber se ficou alguma coisa a desejar nos últimos que fiz. Seu retorno me ajuda muito a melhorar! 🙏';
+  if(s.msg==='sumiu')return 'Oi, '+nome+'! Tudo bem por aí? Senti falta dos seus casos 😊 Se precisar de algo, minha agenda está aberta. E se tiver algo que eu possa melhorar, me conta!';
+  return 'Oi, '+nome+'! Tudo bem? Queria saber como estão sendo os trabalhos comigo e se tem algo que eu possa melhorar no atendimento ou nos projetos. Obrigado pela parceria!';}
+function cartaoSinal(s){var c=s.cid?cliente(s.cid):null,cat=CAT_SIN[s.cat];
+  return '<article class="sin n'+s.n+' c-'+s.cat+'"><div class="sin-h"><span class="tag '+cat[1]+'">'+cat[0]+'</span>'+(s.n>=3?'<span class="sin-pr">prioridade alta</span>':'')+'</div><b>'+esc(s.tit)+'</b><p>'+esc(s.txt)+'</p>'+
+    '<div class="row wrap" style="gap:8px">'+(c?'<button class="btn sm" data-a="verCliente" data-id="'+c.id+'">Ver cliente</button>':'')+
+    (s.msg&&c?'<a class="btn sm pri" target="_blank" rel="noopener" href="'+waLink(msgSinal(s),c.telefone)+'">Pedir retorno no WhatsApp</a>':'')+
+    (s.acao==='atrasados'?'<button class="btn sm pri" data-a="tab" data-v="pedidos">Abrir Produção</button>':'')+(s.acao==='cobrar'&&c?'<button class="btn sm pri" data-a="cobranca" data-id="'+c.id+'">Gerar cobrança</button>':'')+'</div></article>';}
+function secSinaisMini(){var an=analisar(),top=an.sig.filter(function(s){return s.n>=1;}).slice(0,3);
+  return '<section class="card stack" style="grid-column:span 12"><div class="between wrap"><div><h2>Sinais e alertas</h2><p class="small muted">Mudanças de comportamento dos clientes e dos seus prazos.</p></div><button class="btn sm pri" data-a="tab" data-v="analises">Ver Análises</button></div>'+
+    (top.length?'<div class="sin-grid">'+top.map(cartaoSinal).join('')+'</div>':'<p class="empty">Nenhum sinal de alerta agora. 👍</p>')+'</section>';}
+function rAnalises(){var an=analisar(),f=ui.sinF||'todos',cont={};an.sig.forEach(function(s){cont[s.cat]=(cont[s.cat]||0)+1;});
+  var lista=an.sig.filter(function(s){return f==='todos'||s.cat===f;});
+  var dlt=function(a,b){if(!b)return a?'<span class="up">novo</span>':'—';var v=Math.round((a-b)/b*100);return '<span class="'+(v>=0?'up':'down')+'">'+(v>=0?'+':'')+v+'%</span>';};
+  return '<div class="stack" style="gap:16px">'+
+    '<section class="card stack"><div class="between wrap"><div><h2>Sinais e alertas</h2><p class="small muted">Compara os últimos 90 dias com os 90 anteriores. São sinais para conferir com o cliente, não certezas.</p></div></div>'+
+      '<div class="chips-f"><button class="'+(f==='todos'?'on':'')+'" data-a="sinF" data-v="todos">Todos <b>'+an.sig.length+'</b></button>'+Object.keys(CAT_SIN).filter(function(k){return cont[k];}).map(function(k){return '<button class="'+(f===k?'on':'')+'" data-a="sinF" data-v="'+k+'">'+CAT_SIN[k][0]+' <b>'+cont[k]+'</b></button>';}).join('')+'</div>'+
+      (lista.length?'<div class="sin-grid">'+lista.map(cartaoSinal).join('')+'</div>':'<p class="empty">Nenhum sinal por aqui. 👍</p>')+'</section>'+
+    secPrevisao().replace('style="grid-column:span 12" id="prev-sec"','id="prev-sec"')+
+    '<section class="card stack"><h2>Por tipo de trabalho</h2><p class="small muted">Últimos 6 meses. Variação compara os últimos 90 dias com os 90 anteriores.</p>'+
+      (an.tipos.length?'<div style="overflow-x:auto"><table class="an-t"><thead><tr><th>Trabalho</th><th>Últimos 90 dias</th><th>90 dias antes</th><th>Variação</th><th>Ajustes por pedido</th><th>Tempo até enviar</th><th>No prazo</th></tr></thead><tbody>'+
+        an.tipos.map(function(o){return '<tr><td><b>'+esc(o.n)+'</b></td><td>'+o.a+'</td><td>'+o.b+'</td><td>'+dlt(o.a,o.b)+'</td><td class="'+(o.ajm>=an.ajGeral*1.6&&o.ajm>=1.2?'down':'')+'">'+o.ajm.toFixed(1).replace('.',',')+'</td><td>'+(o.leadN?(o.lead/o.leadN).toFixed(1).replace('.',',')+' dias':'—')+'</td><td>'+(o.com?pct(o.com-o.late,o.com)+'%':'—')+'</td></tr>';}).join('')+'</tbody></table></div>':'<p class="empty">Sem pedidos nos últimos 6 meses.</p>')+'</section>'+
+    '<section class="card stack"><h2>Por cliente</h2>'+
+      (an.cli.length?'<div style="overflow-x:auto"><table class="an-t"><thead><tr><th>Cliente</th><th>Últimos 90 dias</th><th>90 dias antes</th><th>Variação</th><th>Costuma pedir a cada</th><th>Último pedido</th><th>Parou de mandar</th><th>Ajustes por pedido</th></tr></thead><tbody>'+
+        an.cli.map(function(l){return '<tr><td><button class="linkbtn" data-a="verCliente" data-id="'+l.c.id+'">'+esc(l.c.nome)+'</button></td><td>'+l.a+'</td><td>'+l.b+'</td><td>'+dlt(l.a,l.b)+'</td><td>'+(l.iv?Math.round(l.iv)+' dias':'—')+'</td><td>'+dmy(l.ult)+' <span class="muted small">('+l.dias+'d)</span></td><td>'+(l.parou.length?'<span class="down">'+esc(l.parou.join(', '))+'</span>':'—')+'</td><td>'+l.aj.toFixed(1).replace('.',',')+'</td></tr>';}).join('')+'</tbody></table></div>':'<p class="empty">Sem clientes com pedidos.</p>')+'</section>'+
+  '</div>';}
 /* ---------- Previsão de pedidos ----------
    Modelo simples e explicável: para cada cliente, ritmo recente de pedidos (últimos 30/60/90 dias com pesos 50/30/20%),
    intervalo médio entre pedidos e chance de continuar ativo (cai quando ele passa muito do intervalo de costume).
@@ -1206,7 +1293,7 @@ function rDashboard(){
         '<details class="small"><summary class="muted" style="cursor:pointer">Ver em tabela</summary><table style="width:100%;margin-top:8px;border-collapse:collapse">'+meses.map(function(m,i){return '<tr style="border-top:1px solid var(--line)"><td style="padding:6px 0;text-transform:capitalize">'+mesNome(m)+'</td><td class="mono" style="text-align:right">'+brl(fv[i])+'</td><td class="mono" style="text-align:right;color:var(--muted)">pago '+brl(pv[i])+'</td></tr>';}).join('')+'</table></details></section>'+
       '<section class="card stack narrow"><div class="between"><h2>Produção agora</h2><button class="btn sm" data-a="tab" data-v="pedidos">Abrir</button></div>'+
         hbars(STATUS.map(function(s){var l=alive(S.pedidos).filter(function(p){return p.status===s[0];});return {l:s[1],r:l.length+' · '+brl(soma(l)),v:l.length,a:'tab',dv:'pedidos',cor:'var(--c'+(STATUS.indexOf(s)+1)+')'};}))+'</section>'+
-      secPrevisao()+
+      secSinaisMini()+
       '<section class="card stack half"><div class="between"><h2>Próximos prazos</h2><button class="btn sm" data-a="tab" data-v="pedidos">Ver todos</button></div>'+
         (prox.length?'<div class="list">'+prox.map(liPedido).join('')+'</div>':'<p class="empty">Nenhum pedido em aberto.</p>')+'</section>'+
       '<section class="card stack half"><div class="between"><h2>Quem está devendo</h2><button class="btn sm" data-a="tab" data-v="financeiro">Financeiro</button></div>'+
@@ -2966,6 +3053,7 @@ var A={
   relProd:function(){openSheet(fRelProd,ui.cliProd||null);},
   relCli:function(d){ui.sheet.args=[d.id||null];renderSheet();},
   relPdf:function(d,el){var cb=document.getElementById('rel-val'),v=!cb||cb.checked;ui.relVal=v;var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraRelProd(d.id,v).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
+  sinF:function(d){ui.sinF=d.v;render();},
   prevMod:function(d){ui.prevMod=d.v;var y=window.scrollY;render();window.scrollTo(0,y);},
   limpaCliProd:function(){ui.cliProd=null;render();},
   linkGerar:async function(d,el){if(!guard()||!sb)return;var tinha=ui.links&&ui.links[d.id]&&ui.links[d.id].token;
