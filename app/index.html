@@ -815,7 +815,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 23h15';
+var VERSAO='14/10 · 23h30';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2356,40 +2356,48 @@ function fRelProd(cid){
 }
 async function geraRelProd(cid,comValor){
   var c=cliente(cid),ps=relPeds(cid);if(!ps.length){toast('Esse cliente não tem trabalhos em aberto.');return;}
-  await carregaJsPDF();var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,M=16,y;
-  var roxo=[91,69,224],cinza=[98,94,117],tinta=[27,24,48];
-  doc.setFillColor.apply(doc,roxo);doc.rect(0,0,W,34,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text('Relatório de produção',M,16);
-  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text(pdfTxt((S.perfil.nome||'Cadista')+(S.perfil.telefone?' · '+S.perfil.telefone:'')),M,24);doc.text('Atualizado em '+dmy(today()),W-M,24,{align:'right'});
-  y=46;doc.setTextColor.apply(doc,cinza);doc.setFontSize(9);doc.text('PARA',M,y);doc.setTextColor.apply(doc,tinta);doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text(pdfTxt(c?c.nome:''),M,y+7);doc.setFont('helvetica','normal');
-  y+=16;
-  // resumo
-  var bw=(W-2*M-9)/4;REL_GRUPOS.forEach(function(g,i){var n=ps.filter(function(p){return p.status===g[0];}).length,x=M+i*(bw+3);
-    doc.setFillColor(248,247,252);doc.roundedRect(x,y,bw,18,2,2,'F');doc.setFillColor.apply(doc,g[2]);doc.rect(x,y,1.6,18,'F');
-    doc.setTextColor.apply(doc,tinta);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text(String(n),x+5,y+8.5);doc.setFont('helvetica','normal');doc.setFontSize(7.8);doc.setTextColor.apply(doc,cinza);doc.text(g[1],x+5,y+14);});
-  y+=28;
-  var cols=[{t:'Pedido',x:M,w:16},{t:'Trabalho',x:M+16,w:comValor?52:64},{t:'Paciente',x:M+(comValor?68:80),w:20},{t:'Elementos',x:M+(comValor?88:100),w:30},{t:'Recebido',x:M+(comValor?118:130),w:20},{t:'Prazo',x:M+(comValor?138:150),w:20}];
-  if(comValor)cols.push({t:'Valor',x:W-M,w:0,r:true});
-  function cab(){doc.setFillColor(238,235,253);doc.rect(M,y-5,W-2*M,7.5,'F');doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor.apply(doc,roxo);cols.forEach(function(k){doc.text(k.t,k.r?k.x-2:k.x+2,y,k.r?{align:'right'}:undefined);});y+=7.5;doc.setFont('helvetica','normal');doc.setTextColor.apply(doc,tinta);}
-  REL_GRUPOS.forEach(function(g){var l=ps.filter(function(p){return p.status===g[0];}).sort(function(a,b){return (b.urgente-a.urgente)||((a.prazo||'9')<(b.prazo||'9')?-1:1);});if(!l.length)return;
-    if(y>250){doc.addPage();y=20;}
-    doc.setFillColor.apply(doc,g[2]);doc.circle(M+1.8,y-1.4,1.8,'F');doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor.apply(doc,tinta);doc.text(g[1]+'  ('+l.length+')',M+6,y);doc.setFont('helvetica','normal');y+=7;cab();
-    l.forEach(function(p,i){
-      var tr=doc.splitTextToSize(pdfTxt((nomeTrab(p)||'Trabalho')+(p.urgente?' - URGENTE':'')),cols[1].w-3),el=doc.splitTextToSize(pdfTxt((p.elementos||[]).join(', ')||'-'),cols[3].w-3);
-      var extra='';if(g[0]==='pendente'&&p.pendencia){extra='Falta: '+(p.pendencia.motivos||[]).join(', ')+(p.pendencia.obs?' - '+p.pendencia.obs:'');}
-      else if(g[0]==='aprovacao'&&p.aprovDesde){extra='Enviado para sua aprovação em '+dmy(p.aprovDesde)+(p.ajustes?' · '+p.ajustes+' ajuste(s)':'');}
-      else if(g[0]==='finalizado'){extra=p.entregue?'Enviado em '+dmy(p.entregue):'Pronto, aguardando envio';}
-      doc.setFontSize(8.5);var ex=extra?doc.splitTextToSize(pdfTxt(extra),W-2*M-20):[];
-      var h=Math.max(tr.length,el.length)*4.4+3+ex.length*4;
-      if(y+h>275){doc.addPage();y=20;cab();}
-      if(i%2){doc.setFillColor(248,247,252);doc.rect(M,y-4.3,W-2*M,h,'F');}
-      doc.setFontSize(9);doc.setTextColor.apply(doc,tinta);doc.text('#'+p.num,M+2,y);doc.text(tr,cols[1].x+2,y);doc.text(pdfTxt(p.paciente||''),cols[2].x+2,y);doc.text(el,cols[3].x+2,y);
-      doc.text(p.recebido?dmy(p.recebido):'-',cols[4].x+2,y);if(p.prazo&&p.prazo<today()&&g[0]!=='finalizado')doc.setTextColor(210,67,58);doc.text(p.prazo?dmy(p.prazo):'-',cols[5].x+2,y);doc.setTextColor.apply(doc,tinta);
-      if(comValor){doc.setFont('helvetica','bold');doc.text(brl(p.valor),W-M-2,y,{align:'right'});doc.setFont('helvetica','normal');}
-      if(ex.length){var yy=y+Math.max(tr.length,el.length)*4.4;doc.setFontSize(8.5);if(g[0]==='pendente')doc.setTextColor(190,90,0);else doc.setTextColor.apply(doc,cinza);doc.text(ex,cols[1].x+2,yy);doc.setTextColor.apply(doc,tinta);}
-      y+=h;});
-    y+=6;});
-  if(comValor){if(y>270){doc.addPage();y=20;}doc.setDrawColor(226,223,234);doc.line(M,y-3,W-M,y-3);y+=4;doc.setFontSize(11);doc.setTextColor.apply(doc,cinza);doc.text(ps.length+' trabalho(s) em aberto',M,y);doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(20,133,90);doc.text('Total: '+brl(soma(ps)),W-M,y,{align:'right'});doc.setFont('helvetica','normal');}
-  var n=doc.getNumberOfPages();for(var i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(160,156,180);doc.text('Gerado pelo Ideali CAD · página '+i+' de '+n,W/2,292,{align:'center'});}
+  await carregaJsPDF();var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4',orientation:'landscape'}),W=297,H=210,M=12,y;
+  /* cores no estilo da formatação condicional do Excel: fundo claro, texto escuro da mesma cor */
+  var COR={entrada:{f:[255,235,156],t:[127,96,0],n:'Em produção'},pendente:{f:[255,199,206],t:[156,0,6],n:'Aguardando informação'},aprovacao:{f:[189,215,238],t:[31,78,121],n:'Em aprovação'},finalizado:{f:[198,239,206],t:[0,97,0],n:'Finalizado'}};
+  var ordem=['entrada','pendente','aprovacao','finalizado'],tinta=[30,30,30],linha=[191,191,191];
+  ps.sort(function(a,b){return (ordem.indexOf(a.status)-ordem.indexOf(b.status))||((a.prazo||'9')<(b.prazo||'9')?-1:1);});
+  // título
+  doc.setTextColor.apply(doc,tinta);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text(pdfTxt('Relatório de produção · '+(c?c.nome:'')),M,15);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(90,90,90);doc.text(pdfTxt((S.perfil.nome||'Cadista')+(S.perfil.telefone?' · '+S.perfil.telefone:'')+' · atualizado em '+dmy(today())),M,21);
+  // legenda com contagem
+  var lx=M;doc.setFontSize(8.5);ordem.forEach(function(k){var n=ps.filter(function(p){return p.status===k;}).length,t=COR[k].n+': '+n,w=doc.getTextWidth(t)+6;
+    doc.setFillColor.apply(doc,COR[k].f);doc.rect(lx,25,w,6,'F');doc.setTextColor.apply(doc,COR[k].t);doc.text(t,lx+3,29.2);lx+=w+3;});
+  y=36;
+  var cols=[['Situação',42],['Pedido',15],['Trabalho',54],['Paciente',22],['Elementos',36],['Recebido',20],['Prazo',20],['Observação',comValor?42:64]];
+  if(comValor)cols.push(['Valor',22]);
+  var xs=[],x=M;cols.forEach(function(k){xs.push(x);x+=k[1];});var TW=x-M;
+  function cab(){doc.setFillColor(242,242,242);doc.rect(M,y,TW,7,'F');doc.setDrawColor.apply(doc,linha);doc.setLineWidth(.2);
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor.apply(doc,tinta);
+    cols.forEach(function(k,i){doc.rect(xs[i],y,k[1],7,'S');doc.text(k[0],k[0]==='Valor'?xs[i]+k[1]-2:xs[i]+2,y+4.8,k[0]==='Valor'?{align:'right'}:undefined);});y+=7;doc.setFont('helvetica','normal');}
+  cab();
+  ps.forEach(function(p){
+    var cr=COR[p.status],obs='';
+    if(p.status==='pendente'&&p.pendencia)obs=(p.pendencia.motivos||[]).join(', ')+(p.pendencia.obs?'. '+p.pendencia.obs:'');
+    else if(p.status==='aprovacao')obs=(p.aprovDesde?'Com você desde '+dmy(p.aprovDesde):'')+(p.ajustes?(p.aprovDesde?' · ':'')+p.ajustes+' ajuste(s)':'');
+    else if(p.status==='finalizado')obs=p.entregue?'Enviado em '+dmy(p.entregue):'Pronto para envio';
+    else if(p.urgente)obs='Urgente';
+    var gu=gruposUniao(itensDe(p)).map(function(g){return g.join('-');}).join('; ');
+    var cel=[cr.n,'#'+p.num,nomeTrab(p)||'Trabalho',p.paciente||'',((p.elementos||[]).join(', ')||'-')+(gu?' (unidos '+gu+')':''),p.recebido?dmy(p.recebido):'-',p.prazo?dmy(p.prazo):'-',obs];
+    if(comValor)cel.push(brl(p.valor));
+    doc.setFontSize(8.5);
+    var lin=cel.map(function(t,i){return doc.splitTextToSize(pdfTxt(t),cols[i][1]-4);}),h=Math.max.apply(null,lin.map(function(l){return l.length;}))*3.8+3.4;
+    if(y+h>H-14){doc.addPage();y=14;cab();}
+    doc.setFillColor.apply(doc,cr.f);doc.rect(xs[0],y,cols[0][1],h,'F');
+    doc.setDrawColor.apply(doc,linha);doc.setLineWidth(.2);cols.forEach(function(k,i){doc.rect(xs[i],y,k[1],h,'S');});
+    lin.forEach(function(l,i){var atras=i===6&&p.prazo&&p.prazo<today()&&p.status!=='finalizado';
+      if(i===0){doc.setFont('helvetica','bold');doc.setTextColor.apply(doc,cr.t);}else if(atras){doc.setTextColor(192,0,0);doc.setFont('helvetica','bold');}else if(i===7&&p.status==='pendente'){doc.setTextColor(156,0,6);}else{doc.setTextColor.apply(doc,tinta);}
+      if(comValor&&i===cols.length-1)doc.text(l,xs[i]+cols[i][1]-2,y+4.6,{align:'right'});else doc.text(l,xs[i]+2,y+4.6);
+      doc.setFont('helvetica','normal');});
+    y+=h;});
+  if(comValor){var tw=cols[cols.length-1][1];if(y+8>H-14){doc.addPage();y=14;}
+    doc.setFillColor(242,242,242);doc.rect(M,y,TW,7,'F');doc.setDrawColor.apply(doc,linha);doc.rect(M,y,TW-tw,7,'S');doc.rect(M+TW-tw,y,tw,7,'S');
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor.apply(doc,tinta);doc.text(ps.length+' trabalho(s) em aberto · Total',M+TW-tw-2,y+4.8,{align:'right'});doc.text(brl(soma(ps)),M+TW-2,y+4.8,{align:'right'});doc.setFont('helvetica','normal');}
+  var n=doc.getNumberOfPages();for(var i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.text('Gerado pelo Ideali CAD · página '+i+' de '+n,W/2,H-6,{align:'center'});}
   if(await salvaPdf(doc,'producao_'+norm(c?c.nome:'cliente',30).replace(/\s+/g,'_').toLowerCase()+'_'+today()+'.pdf','Relatório de produção','Segue como estão os seus trabalhos.'))toast('Relatório de produção baixado.');
 }
 function desenhaPix(){
