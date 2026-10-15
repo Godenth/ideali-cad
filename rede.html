@@ -45,6 +45,22 @@ h2{font-size:clamp(1.9rem,4.6vw,3rem);font-weight:800}
 h3{font-size:1.15rem;font-weight:700}
 p{margin:0}
 a{color:inherit}
+.telas{padding-block:80px}
+.tl{display:grid;gap:24px;margin-top:36px;align-items:start}
+@media (min-width:980px){.tl{grid-template-columns:300px minmax(0,1fr)}}
+.tl-tabs{display:grid;gap:6px}
+.tl-t{display:grid;gap:3px;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid transparent;background:none;color:var(--ink);cursor:pointer;font:inherit}
+.tl-t b{font-family:var(--f-display);font-size:1rem}.tl-t span{font-size:.88rem;color:var(--muted);line-height:1.45;display:none}
+.tl-t:hover{background:var(--surface)}
+.tl-t.on{background:var(--surface);border-color:var(--line);box-shadow:inset 3px 0 0 var(--accent)}.tl-t.on span{display:block}
+@media (max-width:979px){.tl-tabs{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scrollbar-width:none}.tl-tabs::-webkit-scrollbar{display:none}
+  .tl-t{flex:none;padding:8px 14px;border-radius:999px;border-color:var(--line)}.tl-t.on{box-shadow:none;background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.tl-t.on span{display:none}}
+.tl-frame{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#121019;box-shadow:0 30px 60px -30px rgba(40,20,90,.45)}
+.tl-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#1B1826;border-bottom:1px solid #2D2940}
+.tl-bar i{width:10px;height:10px;border-radius:50%;background:#3a3550}.tl-bar span{margin-left:10px;font:600 .75rem var(--f-mono);color:#A39FB6}
+.tl-img img{display:block;width:100%;height:auto}
+.tl-cap{display:none}
+@media (max-width:979px){.tl-cap{display:block;color:var(--muted);font-size:.92rem;margin:12px 2px 0}}
 .eyebrow{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
 .lead{color:var(--muted);font-size:1.08rem;max-width:58ch}
 .mono{font-family:var(--f-mono)}
@@ -460,6 +476,19 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
     </div>
   </section>
 
+  <section class="telas" id="por-dentro">
+    <div class="wrap">
+      <span class="eyebrow">Por dentro</span>
+      <h2>Veja a rede funcionando.</h2>
+      <p class="lead" style="margin-top:14px">Telas reais do Ideali CAD, com dados de exemplo.</p>
+      <div class="tl">
+        <div class="tl-tabs" role="tablist" aria-label="Telas do sistema"><button class="tl-t on" data-i="0" role="tab" aria-selected="true"><b>Pegar trabalhos</b><span>Pedidos que outros cadistas e laboratórios ofereceram, com valor, prazo e quem está pedindo. Um clique e é seu.</span></button><button class="tl-t" data-i="1" role="tab" aria-selected="false"><b>Delegar com sigilo</b><span>Lotou? Mande um pedido para outro cadista desenhar. Ele não vê seu cliente, o paciente nem o valor que você cobra.</span></button><button class="tl-t" data-i="2" role="tab" aria-selected="false"><b>Cadistas da rede</b><span>Perfil, avaliações, programas que usa e se está disponível agora. Marque seus favoritos.</span></button><button class="tl-t" data-i="3" role="tab" aria-selected="false"><b>Sua produção</b><span>Os trabalhos da rede entram na mesma produção que você já usa, com prazo e etapas.</span></button></div>
+        <figure class="tl-frame"><div class="tl-bar"><i></i><i></i><i></i><span>Ideali CAD</span></div><div class="tl-img"><img src="img/telas/rede_pegar.webp" alt="Tela do Ideali CAD: Pegar trabalhos" loading="lazy" decoding="async"><img src="img/telas/rede_delegar.webp" alt="Tela do Ideali CAD: Delegar com sigilo" loading="lazy" decoding="async" hidden><img src="img/telas/rede_parceiros.webp" alt="Tela do Ideali CAD: Cadistas da rede" loading="lazy" decoding="async" hidden><img src="img/telas/producao.webp" alt="Tela do Ideali CAD: Sua produção" loading="lazy" decoding="async" hidden></div></figure>
+        <p class="tl-cap" id="tl-cap">Pedidos que outros cadistas e laboratórios ofereceram, com valor, prazo e quem está pedindo. Um clique e é seu.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="sec" id="pegar">
     <div class="wrap split rev">
       <div>
@@ -756,4 +785,9 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
     m.scrollTo({left:a.offsetLeft-m.clientWidth/2+a.clientWidth/2,behavior:'smooth'});});},{rootMargin:'-45% 0px -50% 0px'});
   Object.keys(links).forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el);});
 })();
+</script>
+<script>
+(function(){var ts=document.querySelectorAll('.tl-t'),im=document.querySelectorAll('.tl-img img'),cap=document.getElementById('tl-cap');
+  ts.forEach(function(b){b.addEventListener('click',function(){var i=+b.dataset.i;ts.forEach(function(x,k){x.classList.toggle('on',k===i);x.setAttribute('aria-selected',k===i);});
+    im.forEach(function(x,k){x.hidden=k!==i;});if(cap)cap.textContent=b.querySelector('span').textContent;});});})();
 </script>

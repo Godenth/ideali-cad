@@ -171,6 +171,22 @@ a{color:inherit}
 @media (max-width:520px){.lanes{grid-template-columns:1fr}}
 
 /* Funções */
+.telas{padding-block:80px}
+.tl{display:grid;gap:24px;margin-top:36px;align-items:start}
+@media (min-width:980px){.tl{grid-template-columns:300px minmax(0,1fr)}}
+.tl-tabs{display:grid;gap:6px}
+.tl-t{display:grid;gap:3px;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid transparent;background:none;color:var(--ink);cursor:pointer;font:inherit}
+.tl-t b{font-family:var(--f-display);font-size:1rem}.tl-t span{font-size:.88rem;color:var(--muted);line-height:1.45;display:none}
+.tl-t:hover{background:var(--surface)}
+.tl-t.on{background:var(--surface);border-color:var(--line);box-shadow:inset 3px 0 0 var(--accent)}.tl-t.on span{display:block}
+@media (max-width:979px){.tl-tabs{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scrollbar-width:none}.tl-tabs::-webkit-scrollbar{display:none}
+  .tl-t{flex:none;padding:8px 14px;border-radius:999px;border-color:var(--line)}.tl-t.on{box-shadow:none;background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}.tl-t.on span{display:none}}
+.tl-frame{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#121019;box-shadow:0 30px 60px -30px rgba(40,20,90,.45)}
+.tl-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#1B1826;border-bottom:1px solid #2D2940}
+.tl-bar i{width:10px;height:10px;border-radius:50%;background:#3a3550}.tl-bar span{margin-left:10px;font:600 .75rem var(--f-mono);color:#A39FB6}
+.tl-img img{display:block;width:100%;height:auto}
+.tl-cap{display:none}
+@media (max-width:979px){.tl-cap{display:block;color:var(--muted);font-size:.92rem;margin:12px 2px 0}}
 .feat{padding-block:80px}
 .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:40px;border-top:1px solid var(--line);border-left:1px solid var(--line)}
 .f{padding:26px 24px 30px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
@@ -571,6 +587,19 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
           <h3>Painel do dia</h3>
           <p>Ao abrir: o clima da sua cidade, pedidos em aberto, urgentes, quanto tem a receber e lembretes de feriado.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="telas" id="por-dentro">
+    <div class="wrap">
+      <span class="eyebrow">Por dentro</span>
+      <h2>Veja o sistema funcionando.</h2>
+      <p class="lead" style="margin-top:14px">Telas reais do Ideali CAD, com dados de exemplo.</p>
+      <div class="tl">
+        <div class="tl-tabs" role="tablist" aria-label="Telas do sistema"><button class="tl-t on" data-i="0" role="tab" aria-selected="true"><b>Produção</b><span>Cada pedido num card, com ícone do trabalho (implante, protocolo, placa, faceta…), prazo, urgência e pendências.</span></button><button class="tl-t" data-i="1" role="tab" aria-selected="false"><b>Pedido com odontograma</b><span>As duas arcadas desenhadas: implante, preparo, pôntico e elementos unidos da prótese fixa.</span></button><button class="tl-t" data-i="2" role="tab" aria-selected="false"><b>Metas do mês</b><span>Elementos e valor que você quer fazer, quanto falta e quanto precisa por dia para bater.</span></button><button class="tl-t" data-i="3" role="tab" aria-selected="false"><b>Saúde do negócio</b><span>Uma nota de 0 a 100 que mostra se seus pedidos estão crescendo ou caindo. A aba muda de cor quando acende o alerta.</span></button><button class="tl-t" data-i="4" role="tab" aria-selected="false"><b>Sinais e alertas</b><span>Avisa quando um cliente parou de mandar, quando você está atrasando e quando alguém mudou o tipo de trabalho.</span></button><button class="tl-t" data-i="5" role="tab" aria-selected="false"><b>Previsão de pedidos</b><span>Quantos pedidos devem chegar nas próximas semanas, pelo ritmo de cada cliente.</span></button><button class="tl-t" data-i="6" role="tab" aria-selected="false"><b>Ranking de clientes</b><span>Quem mais compra no mês, para você saber a quem dar atenção e desconto.</span></button><button class="tl-t" data-i="7" role="tab" aria-selected="false"><b>Rede de cadistas</b><span>Pegue trabalhos de outros cadistas e laboratórios, ou delegue quando estiver lotado.</span></button></div>
+        <figure class="tl-frame"><div class="tl-bar"><i></i><i></i><i></i><span>Ideali CAD</span></div><div class="tl-img"><img src="img/telas/producao.webp" alt="Tela do Ideali CAD: Produção" loading="lazy" decoding="async"><img src="img/telas/pedido.webp" alt="Tela do Ideali CAD: Pedido com odontograma" loading="lazy" decoding="async" hidden><img src="img/telas/metas.webp" alt="Tela do Ideali CAD: Metas do mês" loading="lazy" decoding="async" hidden><img src="img/telas/saude.webp" alt="Tela do Ideali CAD: Saúde do negócio" loading="lazy" decoding="async" hidden><img src="img/telas/sinais.webp" alt="Tela do Ideali CAD: Sinais e alertas" loading="lazy" decoding="async" hidden><img src="img/telas/previsao.webp" alt="Tela do Ideali CAD: Previsão de pedidos" loading="lazy" decoding="async" hidden><img src="img/telas/ranking.webp" alt="Tela do Ideali CAD: Ranking de clientes" loading="lazy" decoding="async" hidden><img src="img/telas/rede_pegar.webp" alt="Tela do Ideali CAD: Rede de cadistas" loading="lazy" decoding="async" hidden></div></figure>
+        <p class="tl-cap" id="tl-cap">Cada pedido num card, com ícone do trabalho (implante, protocolo, placa, faceta…), prazo, urgência e pendências.</p>
       </div>
     </div>
   </section>
@@ -1127,4 +1156,9 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
     m.scrollTo({left:a.offsetLeft-m.clientWidth/2+a.clientWidth/2,behavior:'smooth'});});},{rootMargin:'-45% 0px -50% 0px'});
   Object.keys(links).forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el);});
 })();
+</script>
+<script>
+(function(){var ts=document.querySelectorAll('.tl-t'),im=document.querySelectorAll('.tl-img img'),cap=document.getElementById('tl-cap');
+  ts.forEach(function(b){b.addEventListener('click',function(){var i=+b.dataset.i;ts.forEach(function(x,k){x.classList.toggle('on',k===i);x.setAttribute('aria-selected',k===i);});
+    im.forEach(function(x,k){x.hidden=k!==i;});if(cap)cap.textContent=b.querySelector('span').textContent;});});})();
 </script>
