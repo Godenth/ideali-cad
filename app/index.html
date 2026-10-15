@@ -1037,17 +1037,18 @@ var ICON={
   menu:ic('<path d="M4 7h16M4 12h16M4 17h16"/>'),
   sair:ic('<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11"/>'),
   admin:ic('<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>'),
+  lab:ic('<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 15h9"/>'),
   rede:ic('<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M10.8 7.2 6.3 15.8M13.2 7.2l4.5 8.6M7.5 18h9"/>')
 };
 var MENU=[
   ['Principal',[['dashboard','Dashboard'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
-  ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
+  ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)'],['lab','Laboratório (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 15h30';
+var VERSAO='15/10 · 16h10';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
-var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
+var TITULOS={lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){
@@ -1060,7 +1061,7 @@ function render(){
   else if(a.status==='teste') chip='<span class="tag a">Teste · '+Math.max(0,daysBetween(today(),a.testeAte))+' dias</span>';
   else chip='<span class="tag ok">Ativa</span>';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
-    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,analises:rAnalisesTab,metas:rMetasTab,config:rConfig,admin:rAdmin};
+    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,lab:rLab,analises:rAnalisesTab,metas:rMetasTab,config:rConfig,admin:rAdmin};
   var body=(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
@@ -1069,7 +1070,7 @@ function render(){
   var SD=null;try{SD=saudeAtual();}catch(x){SD=null;}
   var itSd=function(id,lbl){return id==='analises'&&SD?{c:' sd sd-'+SD.nivel,st:' style="--sd:'+SD.cor+'" title="Saúde do negócio: '+SD.nota+'/100"',l:SD.nome}:{c:'',st:'',l:lbl};};
   var side='<aside class="side" aria-label="Menu"><div class="brand">'+logo(30)+'<span>Ideali CAD</span></div>'+
-    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return (it[0]!=='admin'&&it[0]!=='rede')||S.admin;}).map(function(it){
+    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return (it[0]!=='admin'&&it[0]!=='rede'&&it[0]!=='lab')||S.admin;}).map(function(it){
       var badge=it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':it[0]==='config'&&lix?'<span class="badge" style="background:var(--muted)">'+lix+'</span>':'';
       var z=itSd(it[0],it[1]);return '<button class="it'+z.c+' '+(ui.tab===it[0]||(it[0]==='config'&&emCfg())?'on':'')+'"'+z.st+' data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+z.l+'</span>'+badge+'</button>';}).join('');}).join('')+
     '<div class="plan"><div class="between"><b>Plano '+a.plano+'</b>'+chip+'</div>'+
@@ -1078,7 +1079,7 @@ function render(){
       (a.status==='teste'&&w?'<button class="btn sm pri" data-a="tab" data-v="config">Assinar</button>':'')+'</div>'+
     '<div class="me"><span class="av">'+esc((nome[0]||'?').toUpperCase())+'</span><span class="nm">'+esc(nome)+'</span><button class="icon-btn" data-a="sair" aria-label="Sair" title="Sair" style="width:32px;height:32px">'+ICON.sair+'</button></div></aside>';
   var titulo=ui.tab==='analises'&&SD?'<span style="color:'+SD.cor+'">'+SD.nome+'</span>':(TITULOS[ui.tab]||'');
-  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config'&&((it[0]!=='rede'&&it[0]!=='admin')||S.admin))flat.push(it);});});
+  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config'&&((it[0]!=='rede'&&it[0]!=='admin'&&it[0]!=='lab')||S.admin))flat.push(it);});});
   var top='<header class="top"><div class="top-in">'+
     '<button class="icon-btn menu-btn" data-a="drawer" aria-label="Abrir menu">'+ICON.menu+'</button>'+
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
@@ -2387,6 +2388,77 @@ function rdBusca(R,p){
     '<div class="rd-fila">'+lista.map(function(x,i){var st=b.ok===x.id?'aceitou':b.ok?'fechado':i<=b.t?'avisado':'fila';
       return '<div class="rd-cand '+st+'"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,40)+'</button><div class="t"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'"><b>'+esc(x.nome)+'</b></button><span class="small muted">'+esc(x.cidade)+' · '+estrelas(x.nota)+' '+x.nota+'</span></div><span class="rd-cst">'+({aceitou:'✓ Aceitou',fechado:'Encerrado',avisado:'<i class="rd-pulse"></i> Avisado',fila:'Na fila'})[st]+'</span></div>';}).join('')+'</div></section>';
 }
+/* ---------- Prévia: conta de Laboratório / Clínica (quem procura cadista) ----------
+   Tudo aqui é exemplo, guardado só na memória da página. Nenhum cadista real recebe nada. */
+var ETAPAS_LAB=[['busca','Procurando cadista'],['desenho','Em desenho'],['revisao','Para revisar'],['aprovado','Aprovado'],['pago','Pago']];
+function labIni(){if(ui.lab)return ui.lab;var h=today(),R=redeIni();
+  ui.lab={tab:'painel',perfil:{nome:'Lab. Sorriso Perfeito',tipo:'Laboratório',cidade:'Campinas, SP',resp:'Carla Mendes',sw:['exocad','3Shape'],pag:'Pix em até 2 dias após aprovar'},
+    novo:{trab:'Coroa sobre implante',dentes:'',mat:'Zircônia',sw:'exocad',prazo:addDays(h,1),hora:'18:00',valor:'',quem:'rede',cad:'',obs:''},
+    pedidos:[
+      {id:'L104',trab:'Protocolo (superior)',dentes:'11 a 16, 21 a 26',mat:'PMMA',sw:'exocad',prazo:addDays(h,2),hora:'12:00',valor:280,st:'busca',cad:null,quem:'Toda a rede',criado:h,props:[{cad:'r2',em:'há 3 min',obs:'Faço em 1 dia, já desenhei 88 protocolos.'},{cad:'r4',em:'há 10 min',obs:'Posso entregar amanhã cedo.'}]},
+      {id:'L103',trab:'Coroa sobre implante',dentes:'36',mat:'Zircônia',sw:'exocad',prazo:addDays(h,1),hora:'18:00',valor:45,st:'revisao',cad:'r1',quem:'Favoritos',criado:addDays(h,-1),arq:true},
+      {id:'L102',trab:'Facetas',dentes:'13 a 23',mat:'Dissilicato de lítio',sw:'3Shape',prazo:addDays(h,1),hora:'12:00',valor:150,st:'desenho',cad:'r3',quem:'Camila Rocha',criado:addDays(h,-1)},
+      {id:'L101',trab:'Placa de bruxismo',dentes:'Superior',mat:'PMMA',sw:'qualquer',prazo:addDays(h,-2),hora:'10:00',valor:35,st:'aprovado',cad:'r4',quem:'Toda a rede',criado:addDays(h,-4)},
+      {id:'L100',trab:'Ponte fixa',dentes:'24, 25, 26',mat:'Zircônia',sw:'exocad',prazo:addDays(h,-6),hora:'16:00',valor:105,st:'pago',cad:'r1',quem:'Favoritos',criado:addDays(h,-8),nota:5}]};
+  return ui.lab;}
+function labCad(id){var R=redeIni();return R.parceiros.filter(function(x){return x.id===id;})[0]||null;}
+function etapasLab(st){var i=ETAPAS_LAB.map(function(e){return e[0];}).indexOf(st);
+  return '<div class="rd-steps">'+ETAPAS_LAB.map(function(e,k){return '<span class="'+(k<i?'ok':k===i?'on':'')+'"><i></i>'+e[1]+'</span>';}).join('')+'</div>';}
+function rLab(){var L=labIni(),t=L.tab,P=L.pedidos;
+  var nRev=P.filter(function(p){return p.st==='revisao';}).length,nProp=P.filter(function(p){return p.st==='busca'&&p.props&&p.props.length;}).length,nPag=P.filter(function(p){return p.st==='aprovado';}).length;
+  var h='<div class="banner"><span><b>Prévia · conta de Laboratório / Clínica.</b> É assim que um laboratório ou clínica vai ver o Ideali CAD quando procurar cadistas. Tudo aqui é exemplo: nada é salvo e nenhum cadista real recebe nada.</span></div>'+
+    '<nav class="cfg-tabs msg-tabs">'+[['painel','Início'],['novo','Pedir um projeto'],['pedidos','Meus pedidos'+((nRev+nProp)?' '+(nRev+nProp):'')],['cadistas','Encontrar cadistas'],['perfil','Meu laboratório']].map(function(a){return '<button class="'+(t===a[0]?'on':'')+'" data-a="labTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
+  if(t==='painel')h+=labPainel(L,nRev,nProp,nPag);
+  if(t==='novo')h+=labNovo(L);
+  if(t==='pedidos')h+=labPedidos(L);
+  if(t==='cadistas')h+='<p class="small muted">Cadistas disponíveis na rede. Marque ★ nos favoritos: eles recebem seus pedidos primeiro.</p>'+rdParceiros(redeIni()).replace(/Cadistas que estão na rede\.[^<]*/,'');
+  if(t==='perfil')h+=labPerfil(L);
+  return '<div class="stack" style="gap:16px">'+h+'</div>';}
+function labPainel(L,nRev,nProp,nPag){var P=L.pedidos,m=monthOf(today());
+  var gasto=P.filter(function(p){return (p.st==='pago'||p.st==='aprovado')&&monthOf(p.criado)===m;}).reduce(function(a,p){return a+p.valor;},0);
+  var ab=P.filter(function(p){return p.st!=='pago';}).length;
+  var acao=P.filter(function(p){return p.st==='revisao'||(p.st==='busca'&&p.props&&p.props.length)||p.st==='aprovado';});
+  return '<section class="card rd-eu"><div class="between wrap"><div><h2>Olá, '+esc(L.perfil.resp.split(' ')[0])+'</h2><p class="small muted">'+esc(L.perfil.nome)+' · '+esc(L.perfil.cidade)+'</p></div><button class="btn pri" data-a="labTab" data-v="novo">+ Pedir um projeto</button></div></section>'+
+    '<div class="dash">'+kpi('Em andamento',ab,'<span>pedidos com cadistas</span>')+kpi('Para você revisar',nRev,'<span>projetos entregues</span>')+kpi('Propostas',nProp,'<span>pedido(s) com cadista interessado</span>')+kpi('Gasto no mês',brl(gasto),'<span>projetos aprovados</span>')+'</div>'+
+    '<section class="card stack"><h2>Precisa de você</h2>'+(acao.length?'<div class="list">'+acao.map(function(p){var c=labCad(p.cad);
+      var o=p.st==='revisao'?'Projeto entregue por '+esc(c.nome)+': revise e aprove':p.st==='aprovado'?'Aprovado: pague '+brl(p.valor)+' no Pix de '+esc(c.nome):p.props.length+' cadista(s) querem fazer: escolha um';
+      return '<button class="li" data-a="labVer" data-id="'+p.id+'"><span class="t"><b>'+esc(p.trab)+' · '+p.id+'</b><span>'+o+'</span></span><span class="tag '+(p.st==='aprovado'?'ok':'a')+'">'+(p.st==='revisao'?'Revisar':p.st==='aprovado'?'Pagar':'Escolher')+'</span></button>';}).join('')+'</div>':'<p class="empty">Nada pendente agora. 👍</p>')+'</section>';}
+function labNovo(L){var n=L.novo,ts=['Coroa sobre dente','Coroa sobre implante','Facetas','Ponte fixa','Protocolo (superior)','Protocolo (inferior)','Placa de bruxismo','Provisório','Enceramento digital','Mockup','Modelo 3D'];
+  var favs=redeIni().parceiros;
+  return '<form data-form="labNovo" class="rd-grid"><section class="card stack"><h2>1. O que precisa</h2>'+
+    '<label class="fld"><span>Trabalho</span><select name="trab">'+ts.map(function(x){return '<option'+(x===n.trab?' selected':'')+'>'+x+'</option>';}).join('')+'</select></label>'+
+    '<div class="grid2"><label class="fld"><span>Dentes</span><input name="dentes" placeholder="Ex.: 36 ou 11 a 21" value="'+esc(n.dentes)+'"></label><label class="fld"><span>Material</span><input name="mat" value="'+esc(n.mat)+'"></label></div>'+
+    '<div class="grid2"><label class="fld"><span>Software</span><select name="sw">'+['exocad','3Shape','DentalWings','qualquer'].map(function(x){return '<option'+(x===n.sw?' selected':'')+'>'+x+'</option>';}).join('')+'</select></label><label class="fld"><span>Quanto você paga (R$)</span><input name="valor" type="number" min="0" step="5" inputmode="decimal" placeholder="Ex.: 45" value="'+esc(n.valor)+'"></label></div>'+
+    '<label class="fld"><span>Observações para o cadista</span><textarea name="obs" rows="3" placeholder="Ex.: cor A2, contato proximal justo">'+esc(n.obs)+'</textarea></label>'+
+    '<div class="rd-arqs"><div class="between small"><b>Escaneamento</b><span class="muted">STL, ZIP ou PLY</span></div><label class="btn sm" style="position:relative;justify-self:start">+ Anexar arquivos<input type="file" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer"></label><p class="small muted">Os arquivos só ficam visíveis para o cadista que aceitar o pedido.</p></div></section>'+
+    '<section class="card stack"><h2>2. Prazo e para quem</h2>'+
+    '<div class="grid2"><label class="fld"><span>Entregar até</span><input name="prazo" type="date" value="'+n.prazo+'"></label><label class="fld"><span>Hora</span><input name="hora" type="time" value="'+n.hora+'"></label></div>'+
+    '<div class="fld"><span>Oferecer para</span><div class="stack" style="gap:8px">'+[['rede','Toda a rede (o primeiro cadista que aceitar)'],['favoritos','Meus cadistas favoritos primeiro'],['um','Um cadista específico']].map(function(o){return '<label class="check"><input type="radio" name="quem" value="'+o[0]+'"'+(n.quem===o[0]?' checked':'')+' data-a2="labQuem"> '+o[1]+'</label>';}).join('')+'</div></div>'+
+    '<label class="fld" '+(n.quem==='um'?'':'hidden')+' id="lab-cad"><span>Cadista</span><select name="cad">'+favs.map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+' · '+esc(c.cidade)+'</option>';}).join('')+'</select></label>'+
+    '<div class="rd-sigilo"><b>🔒 Sigilo do paciente</b><p class="small muted" style="margin:6px 0 0">O cadista vê só o trabalho, os dentes, o material e o escaneamento. O nome do paciente nunca é enviado: o pedido vira um código (L-xxxx).</p></div>'+
+    '<button class="btn pri block" type="submit">Publicar pedido</button><p class="small muted">Sem taxa nem comissão na prévia. Você paga o cadista direto no Pix dele, depois de aprovar o projeto.</p></section></form>';}
+function labCard(p){var c=p.cad?labCad(p.cad):null;
+  var acts='';
+  if(p.st==='busca')acts=(p.props&&p.props.length?'<div class="stack" style="gap:8px"><b class="small">'+p.props.length+' cadista(s) querem fazer</b>'+p.props.map(function(pr){var x=labCad(pr.cad);return '<div class="rd-cand"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,36)+'</button><div style="flex:1;min-width:0"><b>'+esc(x.nome)+'</b> <span class="small">'+estrelas(x.nota)+' '+x.nota+'</span><div class="small muted">'+esc(x.cidade)+' · '+x.feitos+' trabalhos · '+esc(pr.obs)+'</div></div><button class="btn sm pri" data-a="labEscolhe" data-id="'+p.id+'" data-c="'+x.id+'">Escolher</button></div>';}).join('')+'</div>':'<span class="small muted"><i class="rd-pulse"></i> Aguardando cadistas…</span><button class="btn sm" data-a="labSim" data-id="'+p.id+'">Simular: chegou proposta</button>')+'<button class="btn sm danger" data-a="labCancela" data-id="'+p.id+'">Cancelar pedido</button>';
+  if(p.st==='desenho')acts=prazoRede(p.prazo,p.hora)+'<button class="btn sm" data-a="labSt" data-id="'+p.id+'" data-v="revisao">Simular: cadista entregou</button>';
+  if(p.st==='revisao')acts='<button class="btn sm" data-a="rdVer">Ver projeto em 3D</button><button class="btn sm" data-a="labSt" data-id="'+p.id+'" data-v="desenho">Pedir ajuste</button><button class="btn sm pri" data-a="labSt" data-id="'+p.id+'" data-v="aprovado">Aprovar projeto</button>';
+  if(p.st==='aprovado')acts='<span class="small">Avalie:</span>'+[1,2,3,4,5].map(function(n){return '<button class="rd-star'+((p.nota||0)>=n?' on':'')+'" data-a="labNota" data-id="'+p.id+'" data-n="'+n+'" aria-label="'+n+' estrelas">★</button>';}).join('')+(c&&c.pix?'<span class="rd-pix">Pix de '+esc(c.nome.split(' ')[0])+': <b class="mono">'+esc(c.pix)+'</b><button class="btn sm" data-a="rdCopiaPix" data-v="'+esc(c.pix)+'">Copiar</button></span>':'')+'<button class="btn sm pri" data-a="labSt" data-id="'+p.id+'" data-v="pago">Já paguei</button>';
+  if(p.st==='pago')acts='<span class="tag ok">Concluído</span>'+(p.nota?' '+estrelas(p.nota):'');
+  return '<section class="card stack" id="lab-'+p.id+'"><div class="between wrap"><div class="row" style="gap:12px">'+(c?'<button class="rd-de" data-a="rdPerfil" data-id="'+c.id+'">'+avRede(c)+'</button>':'<span class="rd-av" style="width:44px;height:44px;background:var(--soft);color:var(--muted)">?</span>')+
+    '<div><b>'+esc(p.trab)+'</b><div class="small muted">'+p.id+' · dentes '+esc(p.dentes)+' · '+esc(p.mat)+' · '+esc(p.sw)+'</div><div class="small muted">'+(c?'com '+esc(c.nome):'oferecido para: '+esc(p.quem))+'</div></div></div><span class="mono val">'+brl(p.valor)+'</span></div>'+
+    etapasLab(p.st)+(p.st!=='busca'&&p.st!=='pago'?'<div><button class="btn sm" data-a="labChat" data-id="'+p.id+'">💬 Conversar com '+esc(c.nome.split(' ')[0])+'</button></div>':'')+
+    '<div class="row wrap" style="gap:8px">'+acts+'</div></section>';}
+function labPedidos(L){var f=L.filtro||'todos',P=L.pedidos.filter(function(p){return f==='todos'||(f==='abertos'?p.st!=='pago':p.st==='pago');});
+  return '<div class="chips-f">'+[['todos','Todos'],['abertos','Em andamento'],['pagos','Concluídos']].map(function(o){return '<button class="'+(f===o[0]?'on':'')+'" data-a="labFiltro" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
+    (P.length?'<div class="rd-trabs">'+P.map(labCard).join('')+'</div>':'<div class="card empty">Nenhum pedido aqui.</div>');}
+function labPerfil(L){var p=L.perfil;
+  return '<div class="rd-grid"><section class="card stack"><h2>Dados do laboratório</h2>'+
+    '<div class="fld"><span>Tipo de conta</span><div class="seg">'+['Laboratório','Clínica'].map(function(x){return '<label class="check"><input type="radio" name="lt"'+(p.tipo===x?' checked':'')+' data-a2="labTipo" value="'+x+'"> '+x+'</label>';}).join('<span style="width:14px"></span>')+'</div></div>'+
+    kv('Nome',esc(p.nome))+kv('Responsável',esc(p.resp))+kv('Cidade',esc(p.cidade))+kv('Softwares que usam',esc(p.sw.join(', ')))+kv('Como pagam os cadistas',esc(p.pag))+'</section>'+
+    '<section class="card stack"><h2>Como funciona</h2><ol class="small" style="margin:0;padding-left:18px;display:grid;gap:6px">'+
+      '<li>Você publica o pedido com o escaneamento, o prazo e quanto paga.</li><li>Cadistas da rede veem e mandam proposta (ou o primeiro aceita, se você escolher "toda a rede").</li>'+
+      '<li>Você escolhe o cadista e conversa com ele pelo chat do pedido.</li><li>Ele entrega o projeto, você revisa em 3D e aprova ou pede ajuste.</li><li>Você paga direto no Pix dele e avalia com estrelas.</li></ol>'+
+      '<p class="small muted">O laboratório não precisa do resto do sistema do cadista (produção, metas, cobrança). A conta dele é só para pedir e acompanhar projetos.</p></section></div>';}
 function rdEnviados(R){
   return '<div class="rd-trabs">'+R.enviados.map(function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};if(d.st==='apagado')return '';
     return '<section class="card stack"><div class="between wrap"><div class="row" style="gap:12px">'+(x.nome?'<button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x)+'</button>':'')+'<div><b>'+esc(d.trab)+'</b><div class="small muted">'+d.cod+(d.dentes.length?' · dentes '+d.dentes.join(', '):'')+' · '+(x.nome?'com '+esc(x.nome):'oferecido para: '+esc(d.para||'a rede'))+'</div></div></div><span class="mono val">'+brl(d.repasse)+'</span></div>'+
@@ -3305,6 +3377,15 @@ var A={
   msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
+  labTab:function(d){labIni().tab=d.v;render();window.scrollTo(0,0);},
+  labFiltro:function(d){labIni().filtro=d.v;render();},
+  labVer:function(d){var L=labIni();L.tab='pedidos';L.filtro='todos';render();setTimeout(function(){var e=document.getElementById('lab-'+d.id);if(e)e.scrollIntoView({behavior:'smooth',block:'center'});},50);},
+  labSim:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.props=[{cad:'r1',em:'agora',obs:'Consigo entregar antes do prazo.'},{cad:'r5',em:'agora',obs:'Faço hoje à noite.'}];render();toast('2 cadistas mandaram proposta.');},
+  labEscolhe:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.cad=d.c;p.st='desenho';p.props=[];render();toast(labCad(d.c).nome+' vai desenhar o '+p.id+'.');},
+  labSt:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.st=d.v;render();toast(d.v==='aprovado'?'Projeto aprovado. Agora é só pagar o cadista.':d.v==='pago'?'Pagamento registrado.':d.v==='desenho'?'Ajuste pedido ao cadista.':'Projeto entregue para você revisar.');},
+  labNota:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.nota=+d.n;render();},
+  labCancela:function(d){var L=labIni();L.pedidos=L.pedidos.filter(function(x){return x.id!==d.id;});render();toast('Pedido cancelado.');},
+  labChat:function(){toast('Na versão final, o chat do pedido abre aqui (igual ao da Rede).');},
   rdTab:function(d){var R=redeIni();R.tab=d.v;if(d.v==='delegar'&&R.passo===3&&R.busca&&R.busca.ok){R.passo=1;R.pid=null;R.busca=null;}render();},
   rdPed:function(d){var R=redeIni();rdLer();R.pid=d.id;R.repasse='';R.passo=2;render();},
   rdQuem:function(d,el){var R=redeIni();rdLer();R.quem=el.value;render();},
@@ -3587,6 +3668,11 @@ var F={
   mfaCodigo:function(fd){var c=String(fd.get('codigo')||'').trim(),fid=ui.mfa&&ui.mfa.fat&&ui.mfa.fat.id;if(!fid)return;
     sb.auth.mfa.challengeAndVerify({factorId:fid,code:c}).then(function(r){if(r.error){toast('Código não confere. Confira no app e tente de novo.');return;}
       ui.mfa=null;ui.admLista=null;ui.admErro=null;render();});},
+  labNovo:function(fd){var L=labIni(),v=function(k){return String(fd.get(k)||'').trim();};
+    if(!v('dentes')){toast('Diga quais dentes.');return;}if(!(+v('valor')>0)){toast('Diga quanto você paga pelo projeto.');return;}
+    var q=v('quem'),c=q==='um'?v('cad'):null,num='L'+(105+L.pedidos.length);
+    L.pedidos.unshift({id:num,trab:v('trab'),dentes:v('dentes'),mat:v('mat'),sw:v('sw'),prazo:v('prazo')||addDays(today(),1),hora:v('hora')||'18:00',valor:+v('valor'),st:'busca',cad:null,quem:q==='rede'?'Toda a rede':q==='favoritos'?'Favoritos':labCad(c).nome,criado:today(),props:q==='um'?[{cad:c,em:'agora',obs:'Recebi seu convite.'}]:[]});
+    L.novo.dentes='';L.novo.valor='';L.novo.obs='';L.tab='pedidos';L.filtro='todos';render();window.scrollTo(0,0);toast('Pedido '+num+' publicado na rede.');},
   metas:function(fd,f){if(!guard())return;var m=f.dataset.m,num=function(k){var v=parseFloat(String(fd.get(k)||'').replace(',','.'));return v>0?Math.round(v*(k==='fat'?100:1))/(k==='fat'?100:1):0;};
     var o={desde:m,el:num('el'),fat:num('fat'),prot:num('prot'),pla:num('pla')};
     S.prefs=S.prefs||{};var cfg=JSON.parse(JSON.stringify(S.prefs.metas||{dias:5,v:[]}));cfg.dias=+fd.get('dias')||5;
@@ -3694,6 +3780,8 @@ document.addEventListener('input',function(e){
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
 document.addEventListener('change',function(e){
+  if(e.target.dataset&&e.target.dataset.a2==='labQuem'){labIni().novo.quem=e.target.value;var lc=document.getElementById('lab-cad');if(lc)lc.hidden=e.target.value!=='um';return;}
+  if(e.target.dataset&&e.target.dataset.a2==='labTipo'){labIni().perfil.tipo=e.target.value;toast('Na conta final, isso muda o texto do painel (clínica ou laboratório).');return;}
   if(e.target.name==='titulo'&&e.target.type==='radio'){var to=document.getElementById('pd-titulo-o');if(to){to.hidden=e.target.value!=='__outro';if(!to.hidden)to.focus();}}
   if(e.target.id==='cl-uf'||e.target.id==='cf-uf')delete e.target.dataset.auto;
   if(e.target.classList&&e.target.classList.contains('cb-ped')){(ui.cobSel=ui.cobSel||{})[e.target.dataset.id]=e.target.checked;var tt=document.getElementById('cb-total');if(tt&&ui.sheet)tt.textContent=brl(cobTotal(ui.sheet.args[0]));return;}
