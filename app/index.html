@@ -351,6 +351,34 @@ table.adm td{vertical-align:top}
 .onb-l li .t{flex:1;display:grid;min-width:0}.onb-l li.ok{opacity:.6}.onb-l li.ok b{text-decoration:line-through}.onb-l li.cur{border-color:var(--accent)}
 .onb-c{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.75rem;font-weight:800;flex:none}
 .onb-l li.ok .onb-c{background:var(--ok);border-color:var(--ok);color:#fff}.onb-l li.cur .onb-c{border-color:var(--accent)}
+:root[data-tema="oceano"]{--accent:#1F6FD1;--accent-soft:#E6F0FC;--accent-ink:#FFFFFF;--bg:#F4F7FB;--surface:#FFFFFF;--line:#DCE5F0;--soft:#EEF1F3}
+@media (prefers-color-scheme: dark){:root[data-tema="oceano"]:not([data-theme="light"]){--accent:#6FB1FF;--accent-soft:#13263F;--accent-ink:#111214;--bg:#0D141E;--surface:#141F2D;--line:#223247;--soft:#13263F}}
+:root[data-tema="oceano"][data-theme="dark"]{--accent:#6FB1FF;--accent-soft:#13263F;--accent-ink:#111214;--bg:#0D141E;--surface:#141F2D;--line:#223247;--soft:#13263F}
+:root[data-tema="esmeralda"]{--accent:#138A63;--accent-soft:#E3F5EE;--accent-ink:#FFFFFF;--bg:#F4F8F6;--surface:#FFFFFF;--line:#DCE8E2;--soft:#EEF1F3}
+@media (prefers-color-scheme: dark){:root[data-tema="esmeralda"]:not([data-theme="light"]){--accent:#4FD1A1;--accent-soft:#10302A;--accent-ink:#111214;--bg:#0C1613;--surface:#13211D;--line:#213A33;--soft:#10302A}}
+:root[data-tema="esmeralda"][data-theme="dark"]{--accent:#4FD1A1;--accent-soft:#10302A;--accent-ink:#111214;--bg:#0C1613;--surface:#13211D;--line:#213A33;--soft:#10302A}
+:root[data-tema="brasa"]{--accent:#D9531E;--accent-soft:#FDEDE5;--accent-ink:#FFFFFF;--bg:#FBF6F3;--surface:#FFFFFF;--line:#F0E1D9;--soft:#EEF1F3}
+@media (prefers-color-scheme: dark){:root[data-tema="brasa"]:not([data-theme="light"]){--accent:#FF8A5B;--accent-soft:#3A1E14;--accent-ink:#111214;--bg:#16100D;--surface:#211813;--line:#3A2A22;--soft:#3A1E14}}
+:root[data-tema="brasa"][data-theme="dark"]{--accent:#FF8A5B;--accent-soft:#3A1E14;--accent-ink:#111214;--bg:#16100D;--surface:#211813;--line:#3A2A22;--soft:#3A1E14}
+:root[data-tema="rose"]{--accent:#C2367A;--accent-soft:#FBE8F1;--accent-ink:#FFFFFF;--bg:#FBF5F8;--surface:#FFFFFF;--line:#F0DEE7;--soft:#EEF1F3}
+@media (prefers-color-scheme: dark){:root[data-tema="rose"]:not([data-theme="light"]){--accent:#F27AB8;--accent-soft:#3A1A2B;--accent-ink:#111214;--bg:#160E13;--surface:#21161D;--line:#3A2532;--soft:#3A1A2B}}
+:root[data-tema="rose"][data-theme="dark"]{--accent:#F27AB8;--accent-soft:#3A1A2B;--accent-ink:#111214;--bg:#160E13;--surface:#21161D;--line:#3A2532;--soft:#3A1A2B}
+:root[data-tema="dourado"]{--accent:#9A7419;--accent-soft:#F6EFDC;--accent-ink:#FFFFFF;--bg:#F8F6F1;--surface:#FFFFFF;--line:#E9E3D3;--soft:#EEF1F3}
+@media (prefers-color-scheme: dark){:root[data-tema="dourado"]:not([data-theme="light"]){--accent:#E3C26E;--accent-soft:#3A3016;--accent-ink:#111214;--bg:#12110C;--surface:#1C1A13;--line:#332E22;--soft:#3A3016}}
+:root[data-tema="dourado"][data-theme="dark"]{--accent:#E3C26E;--accent-soft:#3A3016;--accent-ink:#111214;--bg:#12110C;--surface:#1C1A13;--line:#332E22;--soft:#3A3016}
+:root[data-tema="grafite"]{--accent:#2B2F36;--accent-soft:#ECEDEF;--accent-ink:#FFFFFF;--bg:#F5F5F6;--surface:#FFFFFF;--line:#E2E3E6;--soft:#EEF1F3}
+@media (prefers-color-scheme: dark){:root[data-tema="grafite"]:not([data-theme="light"]){--accent:#E5E7EB;--accent-soft:#2A2C31;--accent-ink:#111214;--bg:#101113;--surface:#1A1B1E;--line:#2C2E33;--soft:#2A2C31}}
+:root[data-tema="grafite"][data-theme="dark"]{--accent:#E5E7EB;--accent-soft:#2A2C31;--accent-ink:#111214;--bg:#101113;--surface:#1A1B1E;--line:#2C2E33;--soft:#2A2C31}
+.tm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tm{display:grid;gap:6px;padding:8px;border-radius:14px;border:2px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;color:var(--ink);font:inherit}
+.tm.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.tm-pv{height:54px;border-radius:9px;display:grid;grid-template-columns:22px 1fr;gap:5px;padding:6px;border:1px solid rgba(127,127,127,.25)}
+.tm-pv i{border-radius:5px}.tm-pv span{display:grid;gap:4px;align-content:start}.tm-pv span i{height:7px}.tm-pv span i:first-child{width:70%}
+.tm b{font-family:var(--f-display);font-size:.95rem;line-height:1.1}.tm small{color:var(--muted);font-size:.78rem}
+.tm-modo{display:flex;gap:6px;flex-wrap:wrap}
+.qz{display:grid;gap:14px}.qz fieldset{border:0;margin:0;padding:0;display:grid;gap:8px}.qz legend{font-weight:700;margin-bottom:6px;font-family:var(--f-display)}
+.qz label{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:var(--surface)}
+.qz label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -801,7 +829,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -853,7 +881,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -863,7 +891,7 @@ async function carregar2(){
     S=novo;tiraFoto();
     try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
-  S.carregando=false;ui.autoArqMes=null;autoArquivar();render();iniciaUso();
+  S.carregando=false;ui.autoArqMes=null;aplicaTema(temaAtual(),modoAtual());autoArquivar();render();iniciaUso();
 }
 setInterval(function(){if(autoArquivar())render();},3600000);
 var TRAB_REF=[['Elemento sobre dente','elemento'],['Elemento sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
@@ -1011,7 +1039,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 13h30';
+var VERSAO='15/10 · 14h00';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1508,6 +1536,30 @@ function secPrevisao(){var tot=alive(S.pedidos).length,par=ui.prevPar||(ui.prevP
       (queda.length?'<div><h3>Pedindo menos</h3><div class="list">'+queda.map(function(x){return li(x,'menos pedidos nos últimos 60 dias que nos 60 anteriores','w');}).join('')+'</div></div>':'')+
     '</div></section>';}
 /* ---------- Dashboard ---------- */
+/* ---------- Temas (cor do sistema por personalidade) + modo claro/escuro ----------
+   Guardado em perfis.preferencias (tema, modo) e copiado no navegador para abrir já com o tema certo. */
+var TEMAS=[['ideali','Ideali','#5B45E0','#F6F5F8','#E2DFEA','Criativo'],['oceano','Oceano','#1F6FD1','#F4F7FB','#DCE5F0','Calmo'],['esmeralda','Esmeralda','#138A63','#F4F8F6','#DCE8E2','Equilibrado'],['brasa','Brasa','#D9531E','#FBF6F3','#F0E1D9','Energético'],['rose','Rosé','#C2367A','#FBF5F8','#F0DEE7','Acolhedor'],['dourado','Dourado','#9A7419','#F8F6F1','#E9E3D3','Elegante'],['grafite','Grafite','#2B2F36','#F5F5F6','#E2E3E6','Focado']];
+function temaAtual(){return (S.prefs&&S.prefs.tema)||'ideali';}
+function modoAtual(){return (S.prefs&&S.prefs.modo)||'auto';}
+function aplicaTema(t,m){var r=document.documentElement;if(!t||t==='ideali')r.removeAttribute('data-tema');else r.setAttribute('data-tema',t);
+  if(m==='claro')r.setAttribute('data-theme','light');else if(m==='escuro')r.setAttribute('data-theme','dark');else r.removeAttribute('data-theme');
+  try{var mc=document.querySelector('meta[name=theme-color]');if(mc)mc.setAttribute('content',getComputedStyle(r).getPropertyValue('--accent').trim()||'#5B45E0');}catch(x){}
+  try{localStorage.setItem('ideali_tema',JSON.stringify({t:t||'ideali',m:m||'auto'}));}catch(x){}}
+(function(){try{var v=JSON.parse(localStorage.getItem('ideali_tema')||'null');if(v)aplicaTema(v.t,v.m);}catch(x){}})();
+function cartaoTema(t){var on=temaAtual()===t[0];
+  return '<button class="tm'+(on?' on':'')+'" data-a="temaSet" data-v="'+t[0]+'" aria-pressed="'+on+'"><span class="tm-pv" style="background:'+t[3]+'"><i style="background:'+t[2]+'"></i><span><i style="background:'+t[2]+'"></i><i style="background:'+t[4]+'"></i><i style="background:'+t[4]+';width:50%"></i></span></span><b>'+t[1]+'</b><small>'+t[5]+'</small></button>';}
+function secTema(){var m=modoAtual();
+  return '<section class="card stack"><h2>Tema</h2><p class="small muted">Escolha a cor que combina com você. Dá para mudar quando quiser.</p>'+
+    '<div class="tm-grid">'+TEMAS.map(cartaoTema).join('')+'</div>'+
+    '<div class="fld"><span>Claro ou escuro</span><div class="tm-modo">'+[['auto','Automático'],['claro','Claro'],['escuro','Escuro']].map(function(o){return '<button class="btn sm'+(m===o[0]?' pri':'')+'" data-a="modoSet" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><small class="muted">Automático segue o celular ou computador.</small></div>'+
+    '<button class="btn" data-a="temaQuiz">✨ Descobrir meu tema (3 perguntas)</button></section>';}
+var QUIZ=[
+  ['Como é o seu jeito de trabalhar?',[['brasa','Rápido e intenso, gosto de ritmo'],['oceano','Calmo e organizado'],['grafite','Detalhista e focado'],['ideali','Criativo, cada caso é um projeto']]],
+  ['O que mais combina com você?',[['esmeralda','Equilíbrio e natureza'],['dourado','Sofisticação e capricho'],['rose','Leveza e simpatia'],['ideali','Tecnologia e novidade']]],
+  ['No dia a dia você prefere…',[['oceano','Tranquilidade'],['brasa','Energia'],['grafite','Simplicidade, sem distrações'],['dourado','Acabamento impecável']]],
+  ['Tela clara ou escura?',[['claro','Clara'],['escuro','Escura'],['auto','Tanto faz, segue o celular']]]];
+function fTemaQuiz(){return head('Descobrir meu tema')+'<form data-form="temaQuiz" class="qz">'+QUIZ.map(function(q,i){return '<fieldset><legend>'+(i+1)+'. '+q[0]+'</legend>'+q[1].map(function(o,j){return '<label><input type="radio" name="q'+i+'" value="'+o[0]+'" '+(j===0&&i===3?'':'')+' required> '+o[1]+'</label>';}).join('')+'</fieldset>';}).join('')+
+  '<button class="btn pri block" type="submit">Ver meu tema</button></form>';}
 /* ---------- Primeiros passos (some quando tudo estiver feito ou a pessoa fechar) ---------- */
 function passosOnb(){var p=S.perfil||{},pr=S.prefs||{};
   return [
@@ -2595,6 +2647,7 @@ function rConfig(){
     '<div class="stack cfg-lado">'+
     '<section class="card stack"><h2>Use como aplicativo</h2>'+(window._instalar?'<p class="small muted">Coloque o Ideali CAD na tela inicial e abra como um app, sem a barra do navegador.</p><button class="btn pri" data-a="instalarApp">Instalar no celular / computador</button>':
       (window.matchMedia&&matchMedia('(display-mode: standalone)').matches?'<p class="small muted">Você já está usando como aplicativo. ✓</p>':'<p class="small muted"><b>Android (Chrome):</b> menu ⋮ → <b>Adicionar à tela inicial</b>.<br><b>iPhone (Safari):</b> botão Compartilhar → <b>Adicionar à Tela de Início</b>.</p>'))+'</section>'+
+    secTema()+
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Assinatura</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
@@ -3301,6 +3354,9 @@ var A={
     S.perfil.cidade=d.n;S.perfil.uf=d.uf||'';S.perfil.cidadeGeo=d.lat?{nome:d.n,uf:d.uf,lat:+d.lat,lon:+d.lon}:null;ui.clima=null;ui.climaErr=null;save();
     if(ctx==='perfil'){toast('Cidade definida: '+d.n+(d.uf?' ('+d.uf+')':'')+'.');return;}
     if(ui.sheet&&ui.sheet.fn===fCidade)closeSheet();render();toast('Cidade definida: '+d.n+(d.uf?' ('+d.uf+')':'')+'.');},
+  temaSet:function(d){S.prefs=S.prefs||{};S.prefs.tema=d.v;aplicaTema(d.v,modoAtual());save();render();var t=TEMAS.filter(function(x){return x[0]===d.v;})[0];toast('Tema '+(t?t[1]:'')+' aplicado.');},
+  modoSet:function(d){S.prefs=S.prefs||{};S.prefs.modo=d.v;aplicaTema(temaAtual(),d.v);save();render();},
+  temaQuiz:function(){openSheet(fTemaQuiz);},
   onbFechar:function(){S.prefs=S.prefs||{};S.prefs.onb='ok';save();render();toast('Primeiros passos ocultados.');},
   admAtv:function(d){ui.admAtv=d.v;render();},
   admRecarregar:function(){ui.admLista=null;ui.admErro=null;render();},
@@ -3465,6 +3521,9 @@ var F={
     S.prefs=S.prefs||{};var pv=S.prefs.tab||{};if(JSON.stringify(tb)!==JSON.stringify({modelos:pv.modelos==null?null:pv.modelos,prazo:pv.prazo||'',pagamento:pv.pagamento||'',info:pv.info||''})){S.prefs.tab=tb;n++;}
     save();render();toast(n?'Tabela salva ('+n+' alteração(ões)).':'Nada mudou na tabela.');
   },
+  temaQuiz:function(fd){var v={};[0,1,2].forEach(function(i){var x=fd.get('q'+i);if(x)v[x]=(v[x]||0)+(i===1?1.5:1);});
+    var t=Object.keys(v).sort(function(a,b){return v[b]-v[a];})[0]||'ideali',m=fd.get('q3')||'auto',T=TEMAS.filter(function(x){return x[0]===t;})[0];
+    S.prefs=S.prefs||{};S.prefs.tema=t;S.prefs.modo=m;aplicaTema(t,m);save();closeSheet();render();toast('Seu tema: '+T[1]+' ('+T[5].toLowerCase()+'). Dá para trocar em Configurações.');},
   metas:function(fd,f){if(!guard())return;var m=f.dataset.m,num=function(k){var v=parseFloat(String(fd.get(k)||'').replace(',','.'));return v>0?Math.round(v*(k==='fat'?100:1))/(k==='fat'?100:1):0;};
     var o={desde:m,el:num('el'),fat:num('fat'),prot:num('prot'),pla:num('pla')};
     S.prefs=S.prefs||{};var cfg=JSON.parse(JSON.stringify(S.prefs.metas||{dias:5,v:[]}));cfg.dias=+fd.get('dias')||5;
