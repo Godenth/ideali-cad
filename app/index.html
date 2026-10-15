@@ -1004,7 +1004,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 11h50';
+var VERSAO='15/10 · 13h10';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1103,7 +1103,7 @@ function rLogin(){
     (criar?'<label class="fld"><span>Seu nome</span><input id="lg-nome" name="nome" required maxlength="80" autocomplete="name"></label>':'')+
     '<label class="fld"><span>E-mail</span><input id="lg-email" name="email" type="email" required autocomplete="email" value="'+esc(ui.loginEmail||'')+'"></label>'+
     '<label class="fld"><span>Senha</span><input id="lg-senha" name="senha" type="password" required minlength="'+(criar?8:6)+'" autocomplete="'+(criar?'new-password':'current-password')+'"><small>'+(criar?'Mínimo de 8 caracteres.':'')+'</small></label>'+
-    (criar?'<label class="check small"><input type="checkbox" required id="lg-termos"> Li e aceito os termos de uso e a política de privacidade.</label>':'')+
+    (criar?'<label class="check small"><input type="checkbox" required id="lg-termos"> Li e aceito os <a href="../termos.html" target="_blank" rel="noopener">termos de uso</a> e a <a href="../privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</label>':'')+
     '<button class="btn pri block" type="submit" '+(ui.loginBusy?'disabled':'')+'>'+(ui.loginBusy?'Aguarde…':criar?'Criar conta grátis':'Entrar')+'</button>'+
     '<div class="between small"><button type="button" class="btn sm" data-a="loginModo">'+(criar?'Já tenho conta':'Criar conta')+'</button>'+
     (criar?'':'<button type="button" class="btn sm" data-a="esqueci">Esqueci a senha</button>')+'</div>'+
@@ -2583,7 +2583,7 @@ function rConfig(){
       (emGratis()?'<p class="small muted">No Essencial você usa tudo, menos guardar arquivos. Assinando, ganha '+bytes(a.limite)+' para escaneamentos e STL.</p>':'')+
       '<button class="btn pri" data-a="assinar">Assinar agora</button></section>'+
     '<section class="card stack"><h2>Seus dados</h2><p class="small muted">Você pode levar seus dados ou apagar tudo quando quiser.</p>'+
-      '<div class="row wrap"><button class="btn" data-a="exportar">Exportar meus dados</button><button class="btn danger" data-a="excluirConta">Excluir minha conta</button></div></section>'+
+      '<div class="row wrap"><button class="btn" data-a="exportar">Exportar meus dados</button><button class="btn danger" data-a="excluirConta">Excluir minha conta</button></div>'+'<p class="small muted"><a href="../termos.html" target="_blank" rel="noopener">Termos de uso</a> · <a href="../privacidade.html" target="_blank" rel="noopener">Política de privacidade</a></p></section>'+
     '<button class="btn" data-a="sair">Sair da conta</button><p class="small muted" style="text-align:center">Versão '+VERSAO+'</p></div></div>';
 }
 

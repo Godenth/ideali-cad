@@ -1,6 +1,7 @@
 // Ideali CAD · Exclui a conta do usuário logado e todos os dados dele (LGPD).
 // Roda no servidor: a chave service_role nunca vai para o navegador.
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { AwsClient } from "npm:aws4fetch@1.0.20";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -27,8 +28,24 @@ Deno.serve(async (req: Request) => {
   const body = await req.json().catch(() => ({}));
   if (body?.confirmacao !== "EXCLUIR") return json(400, { erro: "Confirmação ausente" });
 
-  // Futuro: apagar também os arquivos STL do Cloudflare R2 (pasta do usuário).
   const admin = createClient(url, service);
+
+  // Apaga os arquivos do usuário no Cloudflare R2 antes de apagar a conta (LGPD).
+  const acc = Deno.env.get("R2_ACCOUNT_ID"), kid = Deno.env.get("R2_ACCESS_KEY_ID");
+  const sec = Deno.env.get("R2_SECRET_ACCESS_KEY"), bucket = Deno.env.get("R2_BUCKET");
+  const { data: arqs } = await admin.from("arquivos").select("storage_key").eq("user_id", user.id).not("storage_key", "is", null);
+  if (arqs && arqs.length) {
+    if (!acc || !kid || !sec || !bucket) return json(503, { erro: "Não foi possível apagar seus arquivos agora. Tente de novo mais tarde." });
+    const r2 = new AwsClient({ accessKeyId: kid, secretAccessKey: sec, service: "s3", region: "auto" });
+    for (const a of arqs) {
+      const key = String(a.storage_key);
+      if (!key.startsWith(user.id + "/")) continue; // só a pasta do próprio usuário
+      const u = `https://${acc}.r2.cloudflarestorage.com/${bucket}/${key.split("/").map(encodeURIComponent).join("/")}`;
+      const r = await r2.fetch(u, { method: "DELETE" });
+      if (!r.ok && r.status !== 404) return json(502, { erro: "Não foi possível apagar seus arquivos agora. Tente de novo mais tarde." });
+    }
+  }
+
   const { error: e2 } = await admin.auth.admin.deleteUser(user.id);
   if (e2) return json(500, { erro: "Não foi possível excluir a conta" });
 
