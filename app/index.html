@@ -480,6 +480,14 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .teeth{display:grid;gap:6px;overflow-x:auto}
 .arch{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:2px}
 @media (max-width:699px){.tooth{font-size:.6rem;padding:8px 0;border-radius:5px;letter-spacing:-.03em}}
+.pd-quem{display:grid;gap:8px}
+.pq{display:grid;grid-template-columns:110px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg)}
+.pq-l{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.pq-l svg{width:15px;height:15px}
+.pq b{font-family:var(--f-display);font-size:1.08rem;overflow-wrap:anywhere}
+.pq.pac b{color:var(--c-pac)}.pq.cli b{color:var(--c-cli)}
+.pq-cp.ok{border-color:var(--ok);color:var(--ok)}
+@media (max-width:520px){.pq{grid-template-columns:minmax(0,1fr) auto}.pq-l{grid-column:1/-1}}
 .odonto-box{display:grid;gap:8px;padding:12px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
 .odonto{width:100%;height:auto;display:block}
 .od-n{fill:none;stroke:var(--line);stroke-width:1.2}
@@ -833,7 +841,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 00h20';
+var VERSAO='15/10 · 00h30';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2208,7 +2216,11 @@ function fPedidoDet(id){
   var g=p.pagamentoId?byId(S.pagamentos,p.pagamentoId):null;
   return head('Pedido #'+p.num)+
     '<div class="row wrap"><span class="tag a">'+stLabel(p.status)+'</span>'+(p.pago?'<span class="tag ok">Pago</span>':!aberto(p)?'<span class="tag w">A receber</span>':'')+(p.urgente?'<span class="tag u">Urgente</span>':'')+'</div>'+
-    '<div><h2>'+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</h2><p class="muted">'+esc(c?c.nome:'(cliente excluído)')+'</p></div>'+
+    '<div class="pd-quem">'+
+      '<div class="pq pac"><span class="pq-l">'+ICO_PAC+' Paciente</span><b>'+esc(p.paciente)+'</b><button class="btn sm pq-cp" data-a="copiaTxt" data-v="'+esc(p.paciente)+'" aria-label="Copiar nome do paciente">Copiar</button></div>'+
+      '<div class="pq cli"><span class="pq-l">'+ICO_CLI+' Cliente</span><b>'+esc(c?c.nome:'(cliente excluído)')+'</b>'+(c?'<button class="btn sm pq-cp" data-a="copiaTxt" data-v="'+esc(c.nome)+'" aria-label="Copiar nome do cliente">Copiar</button>':'')+'</div>'+
+      '<div class="pq trab"><span class="pq-l">Trabalho</span><b>'+esc(t?t.nome:'—')+'</b></div>'+
+    '</div>'+
     odontoSVG(p)+
     '<div class="grid2 small">'+
       kv('Elementos',p.elementos.length?p.elementos.join(', '):'—')+gruposUniao(itensDe(p)).map(function(g){return kv('Unidos (fixo)','<b>'+g.join(' – ')+'</b>');}).join('')+(p.material?kv('Material',esc(p.material)):'')+(p.fresadora?kv('Fresadora',esc(p.fresadora)):'')+
@@ -2747,6 +2759,7 @@ var A={
     catch(x){toast('Não consegui criar o link: '+((x&&x.message)||x));el.disabled=false;}},
   linkCancelar:async function(d){if(!guard()||!sb)return;if(!confirm('Cancelar o link? Quem tiver o link antigo não vai mais conseguir abrir.'))return;
     var r=await sb.rpc('revogar_link_cliente',{cid:d.id});if(r.error){toast('Não consegui cancelar: '+r.error.message);return;}ui.links[d.id]=false;render();toast('Link cancelado.');},
+  copiaTxt:function(d,el){var v=d.v||'';(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(function(){if(el){var o=el.textContent;el.textContent='Copiado ✓';el.classList.add('ok');setTimeout(function(){el.textContent=o;el.classList.remove('ok');},1500);}toast('Copiado: '+v);},function(){toast('Não consegui copiar.');});},
   linkCopiar:function(d){var k=ui.links[d.id];if(!k)return;var u=urlLink(k.token);(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){toast('Link copiado.');},function(){toast('Selecione o link e copie.');});},
   linkWa:function(d){var k=ui.links[d.id],c=cliente(d.id);if(!k)return;var tel=((c&&c.telefone)||'').replace(/\D/g,'');if(tel&&tel.length<=11)tel='55'+tel;
     var m='Olá! Por este link você acompanha os seus casos comigo: a situação de cada pedido e os arquivos em 3D. '+urlLink(k.token);window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(m),'_blank','noopener');},
