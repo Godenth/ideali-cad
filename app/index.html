@@ -807,7 +807,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 22h45';
+var VERSAO='14/10 · 23h00';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1218,7 +1218,7 @@ function rPedidos(){
       '<input class="search" id="busca" type="search" placeholder="Buscar paciente, cliente, dente ou nº" value="'+esc(ui.busca)+'" style="width:min(280px,100%)">'+
       '<span class="btn sm" style="cursor:default">Atrasados '+atr+'</span>'+
       '<button class="btn sm" data-a="tab" data-v="financeiro">A receber '+brl(rec)+'</button></div>'+
-      '<div class="row wrap">'+dd('cliProd')+(ui.cliProd?'<button class="btn sm" data-a="limpaCliProd" aria-label="Mostrar todos os clientes">✕ Limpar</button>':'')+dd('filtro')+dd('vista')+'</div></div>';
+      '<div class="row wrap"><button class="btn sm" data-a="relProd">Relatório PDF</button>'+dd('cliProd')+(ui.cliProd?'<button class="btn sm" data-a="limpaCliProd" aria-label="Mostrar todos os clientes">✕ Limpar</button>':'')+dd('filtro')+dd('vista')+'</div></div>';
   if(ui.vista==='arq'){
     arq.sort(function(a,b){return (b.entregue||'')<(a.entregue||'')?-1:1;});
     return head_+'<section class="card stack"><div><h2>Arquivados</h2><p class="small muted">Pedidos já enviados ao cliente. Os arquivos STL somem 60 dias após o envio.</p></div>'+
@@ -2319,11 +2319,63 @@ async function geraPdfCobranca(cid){
     doc.setTextColor.apply(doc,tinta);doc.text('Pix copia e cola:',tx,y+29);doc.setFont('courier','normal');doc.setFontSize(8);doc.text(lines,tx,y+34);doc.setFont('helvetica','normal');
   }else{doc.setFontSize(10);doc.setTextColor.apply(doc,cinza);doc.text('Combine a forma de pagamento com o cadista.',M,y);}
   var n=doc.getNumberOfPages();for(var i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(160,156,180);doc.text('Gerado pelo Ideali CAD · página '+i+' de '+n,W/2,292,{align:'center'});}
-  var nomeArq='cobranca_'+norm(c?c.nome:'cliente',30).replace(/\s+/g,'_').toLowerCase()+'_'+today()+'.pdf',blob=doc.output('blob');
-  var file=null;try{file=new File([blob],nomeArq,{type:'application/pdf'});}catch(e){}
-  if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&/Android|iPhone|iPad/i.test(navigator.userAgent)){try{await navigator.share({files:[file],title:'Cobrança',text:'Segue a cobrança dos trabalhos. Total '+brl(tot)+'.'});return;}catch(e){if(e&&e.name==='AbortError')return;}}
-  var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nomeArq;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},30000);
-  toast('PDF da cobrança baixado: '+brl(tot)+'.');
+  if(await salvaPdf(doc,'cobranca_'+norm(c?c.nome:'cliente',30).replace(/\s+/g,'_').toLowerCase()+'_'+today()+'.pdf','Cobrança','Segue a cobrança dos trabalhos. Total '+brl(tot)+'.'))toast('PDF da cobrança baixado: '+brl(tot)+'.');
+}
+async function salvaPdf(doc,nomeArq,titulo,texto){var blob=doc.output('blob'),file=null;try{file=new File([blob],nomeArq,{type:'application/pdf'});}catch(e){}
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&/Android|iPhone|iPad/i.test(navigator.userAgent)){try{await navigator.share({files:[file],title:titulo,text:texto});return false;}catch(e){if(e&&e.name==='AbortError')return false;}}
+  var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nomeArq;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},30000);return true;}
+/* ---------- Relatório de produção para o cliente ---------- */
+var REL_GRUPOS=[['entrada','Em produção',[58,150,236]],['pendente','Aguardando informação',[221,138,16]],['aprovacao','Aguardando sua aprovação',[123,92,242]],['finalizado','Finalizado',[29,174,138]]];
+function relPeds(cid){return alive(S.pedidos).filter(function(p){return p.clienteId===cid&&p.status!=='arquivado';});}
+function fRelProd(cid){
+  var m={};alive(S.pedidos).forEach(function(p){if(p.status!=='arquivado'&&p.clienteId)m[p.clienteId]=(m[p.clienteId]||0)+1;});
+  var ids=Object.keys(m).filter(function(k){return cliente(k);}).sort(function(a,b){return cliente(a).nome.localeCompare(cliente(b).nome,'pt');});
+  if(!cid)return head('Relatório de produção')+'<p class="small muted">Escolha o cliente. O PDF mostra os trabalhos dele em produção, aguardando informação, em aprovação e finalizados.</p>'+
+    (ids.length?'<div class="list">'+ids.map(function(k){var ps=relPeds(k);return '<button class="li" data-a="relCli" data-id="'+k+'"><span class="t"><b>'+esc(cliente(k).nome)+'</b><span>'+REL_GRUPOS.map(function(g){var n=ps.filter(function(p){return p.status===g[0];}).length;return n?n+' '+g[1].toLowerCase():'';}).filter(Boolean).join(' · ')+'</span></span><span aria-hidden="true">›</span></button>';}).join('')+'</div>':'<p class="empty">Nenhum trabalho em aberto.</p>');
+  var c=cliente(cid),ps=relPeds(cid);
+  return head('Relatório · '+esc(c?c.nome:''))+'<button class="linkbtn" data-a="relCli" data-id="" style="justify-self:start">‹ Outro cliente</button>'+
+    REL_GRUPOS.map(function(g){var l=ps.filter(function(p){return p.status===g[0];});return l.length?'<div class="between small"><b>'+g[1]+'</b><span class="muted">'+l.length+' pedido(s)</span></div>':'';}).join('')+
+    '<label class="check"><input type="checkbox" id="rel-val" '+(ui.relVal===false?'':'checked')+'> Mostrar os valores no relatório</label>'+
+    '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="relPdf" data-id="'+cid+'">Gerar PDF</button></div>'+
+    '<p class="small muted">No celular, dá para mandar direto pelo WhatsApp.</p>';
+}
+async function geraRelProd(cid,comValor){
+  var c=cliente(cid),ps=relPeds(cid);if(!ps.length){toast('Esse cliente não tem trabalhos em aberto.');return;}
+  await carregaJsPDF();var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,M=16,y;
+  var roxo=[91,69,224],cinza=[98,94,117],tinta=[27,24,48];
+  doc.setFillColor.apply(doc,roxo);doc.rect(0,0,W,34,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text('Relatório de produção',M,16);
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text(pdfTxt((S.perfil.nome||'Cadista')+(S.perfil.telefone?' · '+S.perfil.telefone:'')),M,24);doc.text('Atualizado em '+dmy(today()),W-M,24,{align:'right'});
+  y=46;doc.setTextColor.apply(doc,cinza);doc.setFontSize(9);doc.text('PARA',M,y);doc.setTextColor.apply(doc,tinta);doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text(pdfTxt(c?c.nome:''),M,y+7);doc.setFont('helvetica','normal');
+  y+=16;
+  // resumo
+  var bw=(W-2*M-9)/4;REL_GRUPOS.forEach(function(g,i){var n=ps.filter(function(p){return p.status===g[0];}).length,x=M+i*(bw+3);
+    doc.setFillColor(248,247,252);doc.roundedRect(x,y,bw,18,2,2,'F');doc.setFillColor.apply(doc,g[2]);doc.rect(x,y,1.6,18,'F');
+    doc.setTextColor.apply(doc,tinta);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text(String(n),x+5,y+8.5);doc.setFont('helvetica','normal');doc.setFontSize(7.8);doc.setTextColor.apply(doc,cinza);doc.text(g[1],x+5,y+14);});
+  y+=28;
+  var cols=[{t:'Pedido',x:M,w:16},{t:'Trabalho',x:M+16,w:comValor?52:64},{t:'Paciente',x:M+(comValor?68:80),w:20},{t:'Elementos',x:M+(comValor?88:100),w:30},{t:'Recebido',x:M+(comValor?118:130),w:20},{t:'Prazo',x:M+(comValor?138:150),w:20}];
+  if(comValor)cols.push({t:'Valor',x:W-M,w:0,r:true});
+  function cab(){doc.setFillColor(238,235,253);doc.rect(M,y-5,W-2*M,7.5,'F');doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor.apply(doc,roxo);cols.forEach(function(k){doc.text(k.t,k.r?k.x-2:k.x+2,y,k.r?{align:'right'}:undefined);});y+=7.5;doc.setFont('helvetica','normal');doc.setTextColor.apply(doc,tinta);}
+  REL_GRUPOS.forEach(function(g){var l=ps.filter(function(p){return p.status===g[0];}).sort(function(a,b){return (b.urgente-a.urgente)||((a.prazo||'9')<(b.prazo||'9')?-1:1);});if(!l.length)return;
+    if(y>250){doc.addPage();y=20;}
+    doc.setFillColor.apply(doc,g[2]);doc.circle(M+1.8,y-1.4,1.8,'F');doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor.apply(doc,tinta);doc.text(g[1]+'  ('+l.length+')',M+6,y);doc.setFont('helvetica','normal');y+=7;cab();
+    l.forEach(function(p,i){
+      var tr=doc.splitTextToSize(pdfTxt((nomeTrab(p)||'Trabalho')+(p.urgente?' - URGENTE':'')),cols[1].w-3),el=doc.splitTextToSize(pdfTxt((p.elementos||[]).join(', ')||'-'),cols[3].w-3);
+      var extra='';if(g[0]==='pendente'&&p.pendencia){extra='Falta: '+(p.pendencia.motivos||[]).join(', ')+(p.pendencia.obs?' - '+p.pendencia.obs:'');}
+      else if(g[0]==='aprovacao'&&p.aprovDesde){extra='Enviado para sua aprovação em '+dmy(p.aprovDesde)+(p.ajustes?' · '+p.ajustes+' ajuste(s)':'');}
+      else if(g[0]==='finalizado'){extra=p.entregue?'Enviado em '+dmy(p.entregue):'Pronto, aguardando envio';}
+      doc.setFontSize(8.5);var ex=extra?doc.splitTextToSize(pdfTxt(extra),W-2*M-20):[];
+      var h=Math.max(tr.length,el.length)*4.4+3+ex.length*4;
+      if(y+h>275){doc.addPage();y=20;cab();}
+      if(i%2){doc.setFillColor(248,247,252);doc.rect(M,y-4.3,W-2*M,h,'F');}
+      doc.setFontSize(9);doc.setTextColor.apply(doc,tinta);doc.text('#'+p.num,M+2,y);doc.text(tr,cols[1].x+2,y);doc.text(pdfTxt(p.paciente||''),cols[2].x+2,y);doc.text(el,cols[3].x+2,y);
+      doc.text(p.recebido?dmy(p.recebido):'-',cols[4].x+2,y);if(p.prazo&&p.prazo<today()&&g[0]!=='finalizado')doc.setTextColor(210,67,58);doc.text(p.prazo?dmy(p.prazo):'-',cols[5].x+2,y);doc.setTextColor.apply(doc,tinta);
+      if(comValor){doc.setFont('helvetica','bold');doc.text(brl(p.valor),W-M-2,y,{align:'right'});doc.setFont('helvetica','normal');}
+      if(ex.length){var yy=y+Math.max(tr.length,el.length)*4.4;doc.setFontSize(8.5);if(g[0]==='pendente')doc.setTextColor(190,90,0);else doc.setTextColor.apply(doc,cinza);doc.text(ex,cols[1].x+2,yy);doc.setTextColor.apply(doc,tinta);}
+      y+=h;});
+    y+=6;});
+  if(comValor){if(y>270){doc.addPage();y=20;}doc.setDrawColor(226,223,234);doc.line(M,y-3,W-M,y-3);y+=4;doc.setFontSize(11);doc.setTextColor.apply(doc,cinza);doc.text(ps.length+' trabalho(s) em aberto',M,y);doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(20,133,90);doc.text('Total: '+brl(soma(ps)),W-M,y,{align:'right'});doc.setFont('helvetica','normal');}
+  var n=doc.getNumberOfPages();for(var i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(160,156,180);doc.text('Gerado pelo Ideali CAD · página '+i+' de '+n,W/2,292,{align:'center'});}
+  if(await salvaPdf(doc,'producao_'+norm(c?c.nome:'cliente',30).replace(/\s+/g,'_').toLowerCase()+'_'+today()+'.pdf','Relatório de produção','Segue como estão os seus trabalhos.'))toast('Relatório de produção baixado.');
 }
 function desenhaPix(){
   var inp=document.getElementById('px-valor'); if(!inp)return;
@@ -2599,6 +2651,9 @@ var A={
   novoPagamento:function(){if(!guard())return;openSheet(fPagamento,null);},
   verPagamento:function(d){openSheet(fPagDet,d.id);},
   delPagamento:function(d){if(!guard())return;excluirPagamento(byId(S.pagamentos,d.id));save();closeSheet();render();toast('Pagamento na lixeira. Pedidos voltaram para "Entregue".');},
+  relProd:function(){openSheet(fRelProd,ui.cliProd||null);},
+  relCli:function(d){ui.sheet.args=[d.id||null];renderSheet();},
+  relPdf:function(d,el){var cb=document.getElementById('rel-val'),v=!cb||cb.checked;ui.relVal=v;var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraRelProd(d.id,v).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
   limpaCliProd:function(){ui.cliProd=null;render();},
   cobranca:function(d,el,e){if(e)e.stopPropagation();ui.cobSel={};openSheet(fCobranca,d.id||null);},
   cobrancaCli:function(d){ui.cobSel={};ui.sheet.args=[d.id||null];renderSheet();},
