@@ -321,6 +321,13 @@ select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline
 .sd-l{width:100%;height:auto}.sd-ax{font-size:10px;fill:var(--muted);font-family:var(--f-mono)}
 .sd-b{opacity:.10}.sdb-saudavel{fill:hsl(120,60%,45%)}.sdb-atencao{fill:hsl(48,90%,50%)}.sdb-perigo{fill:hsl(12,85%,50%)}.sdb-falencia{fill:hsl(0,80%,35%);opacity:.16}
 .sd-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem}.sd-leg span{display:inline-flex;align-items:center;gap:6px}.sd-leg i{width:10px;height:10px;border-radius:50%}
+.mt-hero{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;background:linear-gradient(135deg,var(--accent-soft),var(--surface) 70%)}
+.mt-hero-m{display:flex;align-items:center;gap:14px}.mt-mes{font-size:2.6rem;line-height:1.05;letter-spacing:-.03em}.mt-mes span{color:var(--muted);font-weight:600}
+.mt-grid2{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.mt-g .mt-v{font-size:2.4rem}.mt-anel.lg{width:116px;height:116px}
+.mt-p{display:grid;gap:8px;padding:12px 16px}.mt-p .lbl{font-size:.8rem}.mt-vp{font-family:var(--f-display);font-size:1.3rem}
+.mt-info{margin-top:-4px}.mt-fbig input{font-size:1.25rem;font-weight:700}
+@media (max-width:600px){.mt-mes{font-size:2rem}.mt-anel.lg{width:92px;height:92px}.mt-g .mt-v{font-size:1.9rem}}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -974,7 +981,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 02h40';
+var VERSAO='15/10 · 03h15';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1234,8 +1241,13 @@ var NIVEIS_SD=[[75,'saudavel','Análises','Saudável'],[50,'atencao','Atenção'
 function notaRatio(r){var P=[[0,0],[0.2,10],[0.4,26],[0.6,45],[0.75,62],[0.9,78],[1,88],[1.15,100]];if(r>=1.15)return 100;
   for(var i=1;i<P.length;i++)if(r<=P[i][0]){var a=P[i-1],b=P[i];return a[1]+(b[1]-a[1])*(r-a[0])/(b[0]-a[0]);}return 100;}
 function janelaEl(a,b){return elems(alive(S.pedidos).filter(function(p){return p.recebido&&p.recebido>=a&&p.recebido<=b;}));}
-function saudeEm(ref){var r30=janelaEl(addDays(ref,-29),ref),b90=janelaEl(addDays(ref,-119),addDays(ref,-30)),base=b90/3;
-  if(b90<6)return null;var ratio=r30/base;return {r30:r30,base:base,ratio:ratio,nota:notaRatio(ratio)};}
+/* Usa até 90 dias antes dos últimos 30 como base. Com menos histórico (mínimo 3 semanas), compara com o que tiver
+   e a nota fica marcada como provisória. */
+var PRIMEIRO_PED={k:null,v:null};
+function primeiroRec(){var k=S.pedidos.length+'|'+(S.pedidos[0]&&S.pedidos[0].id);if(PRIMEIRO_PED.k===k)return PRIMEIRO_PED.v;var m=null;alive(S.pedidos).forEach(function(p){if(p.recebido&&(!m||p.recebido<m))m=p.recebido;});PRIMEIRO_PED={k:k,v:m};return m;}
+function saudeEm(ref){var pr=primeiroRec();if(!pr)return null;var fimB=addDays(ref,-30),disp=daysBetween(pr,fimB)+1;if(disp<21)return null;
+  var w=Math.min(90,disp),bEl=janelaEl(addDays(fimB,-(w-1)),fimB);if(bEl<4)return null;
+  var base=bEl/(w/30),r30=janelaEl(addDays(ref,-29),ref),ratio=r30/base;return {r30:r30,base:base,ratio:ratio,nota:notaRatio(ratio),dias:w,prov:w<90};}
 function corSaude(n){if(n==null)return '';n=Math.max(0,Math.min(100,n));
   if(n<25)return 'hsl(0,'+(78+n*0.4)+'%,'+(46+n*0.24)+'%)';
   var h=n>=75?105+(n-75)/25*30:n>=50?32+(n-50)/25*20:6+(n-25)/25*22;return 'hsl('+Math.round(h)+','+(n>=75?65:85)+'%,'+(n>=75?42:n>=50?47:50)+'%)';}
@@ -1250,7 +1262,7 @@ function gaugeSaude(sd){var R=80,cx=100,cy=96,pt=function(v,r){var a=Math.PI*(1-
   return '<svg class="sd-g" viewBox="0 0 200 112" role="img" aria-label="Saúde do negócio: '+(sd?sd.nota+' de 100':'sem dados')+'">'+arcs+
     (sd?'<line x1="'+cx+'" y1="'+cy+'" x2="'+nd[0].toFixed(1)+'" y2="'+nd[1].toFixed(1)+'" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/><circle cx="'+cx+'" cy="'+cy+'" r="6" fill="var(--ink)"/>':'')+'</svg>';}
 function svgSaude(){var t=today(),pts=[];for(var i=25;i>=0;i--){var d=addDays(t,-7*i),x=saudeEm(d);pts.push({d:d,n:x?Math.round(x.nota):null});}
-  var ok=pts.filter(function(p){return p.n!=null;});if(ok.length<2)return '<p class="empty">O gráfico aparece quando houver uns 4 meses de pedidos registrados.</p>';
+  var ok=pts.filter(function(p){return p.n!=null;});if(ok.length<2)return '<p class="empty">O gráfico aparece a partir de umas 8 semanas de pedidos registrados.</p>';
   var W=innerWidth<600?360:1000,H=innerWidth<600?200:230,L=30,Rr=8,T=8,B=24,x=function(i){return L+(W-L-Rr)*i/(pts.length-1);},y=function(v){return T+(H-T-B)*(1-v/100);};
   var bands=[[75,100,'saudavel'],[50,75,'atencao'],[25,50,'perigo'],[0,25,'falencia']].map(function(b){return '<rect x="'+L+'" y="'+y(b[1])+'" width="'+(W-L-Rr)+'" height="'+(y(b[0])-y(b[1]))+'" class="sd-b sdb-'+b[2]+'"/><text x="'+(L-6)+'" y="'+(y(b[1])+4)+'" text-anchor="end" class="sd-ax">'+b[1]+'</text>'+(b[0]===0?'<text x="'+(L-6)+'" y="'+(y(0)+4)+'" text-anchor="end" class="sd-ax">0</text>':'');}).join('');
   var segs='';for(var i=1;i<pts.length;i++){var a=pts[i-1],b=pts[i];if(a.n==null||b.n==null)continue;segs+='<line x1="'+x(i-1).toFixed(1)+'" y1="'+y(a.n).toFixed(1)+'" x2="'+x(i).toFixed(1)+'" y2="'+y(b.n).toFixed(1)+'" stroke="'+corSaude((a.n+b.n)/2)+'" stroke-width="3.5" stroke-linecap="round"/>';}
@@ -1259,107 +1271,103 @@ function svgSaude(){var t=today(),pts=[];for(var i=25;i>=0;i--){var d=addDays(t,
   return '<svg class="sd-l" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Saúde do negócio nas últimas 26 semanas">'+bands+segs+dots+lbl+'</svg>';}
 function secSaude(){var sd=saudeAtual();
   var exp='';if(sd){var b=sd.base,v=Math.round((b.ratio-1)*100);
-    exp='<p>Nos últimos 30 dias você recebeu <b>'+b.r30+' elementos</b>. Nos 3 meses anteriores a média era <b>'+Math.round(b.base)+' por mês</b> ('+'<span class="'+(v>=0?'up':'down')+'">'+(v>=0?'+':'')+v+'%</span>).</p>'+
+    exp='<p>Nos últimos 30 dias você recebeu <b>'+b.r30+' elementos</b>. '+(b.prov?'Nos '+b.dias+' dias anteriores (todo o histórico que você tem até agora) o ritmo era de':'Nos 3 meses anteriores a média era')+' <b>'+Math.round(b.base)+' por mês</b> ('+'<span class="'+(v>=0?'up':'down')+'">'+(v>=0?'+':'')+v+'%</span>).</p>'+
       (sd.pen?'<p class="small muted">Também perdeu '+sd.pen+' ponto(s) por: '+esc(sd.mot.slice(0,3).join('; '))+(sd.mot.length>3?' e mais '+(sd.mot.length-3):'')+'.</p>':'');}
   var txt={saudavel:'Seu volume está estável ou crescendo. Continue de olho nos sinais abaixo.',atencao:'Queda considerável no volume. Vale conversar com os clientes que diminuíram.',perigo:'Queda forte nos pedidos. Priorize recuperar clientes e buscar novos.',falencia:'Redução drástica: quase não estão chegando pedidos. Hora de agir em todas as frentes.'};
   return '<section class="card sd-card"'+(sd?' style="--sd:'+sd.cor+'"':'')+'><div class="sd-esq"><h2>Saúde do negócio</h2>'+gaugeSaude(sd)+
-    (sd?'<div class="sd-n"><b>'+sd.nota+'</b><span>/100</span></div><span class="sd-tag">'+sd.rotulo+'</span>':'<p class="small muted" style="text-align:center">Ainda sem histórico suficiente. A nota aparece depois de uns 4 meses de pedidos.</p>')+'</div>'+
+    (sd?'<div class="sd-n"><b>'+sd.nota+'</b><span>/100</span></div><span class="sd-tag">'+sd.rotulo+'</span>'+(sd.base.prov?'<span class="small muted">Nota provisória: fica mais precisa ao completar 4 meses de pedidos.</span>':''):'<p class="small muted" style="text-align:center">A nota aparece depois de umas 7 semanas de pedidos registrados (30 dias recentes + pelo menos 3 semanas para comparar).</p>')+'</div>'+
     '<div class="sd-dir stack">'+(sd?'<p class="sd-frase">'+txt[sd.nivel]+'</p>'+exp:'')+svgSaude()+
     '<div class="sd-leg">'+NIVEIS_SD.map(function(nv,i){var c=corSaude([88,62,38,10][i]);return '<span><i style="background:'+c+'"></i>'+nv[3]+'</span>';}).join('')+'<span class="muted">· a aba muda de cor e de nome no menu</span></div></div></section>';}
 /* ---------- Metas ----------
-   Guardadas em perfis.preferencias.metas = {dias:5, v:[{desde:'2026-10', el, fat, cli}]}.
-   Cada edição vale a partir do mês escolhido; meses anteriores continuam com a meta que tinham. */
-var DEMO_METAS={dias:5,v:[{desde:'2000-01',el:60,fat:9000,cli:1}]};
+   Guardadas em perfis.preferencias.metas = {dias:5, v:[{desde:'2026-10', el, fat, prot, pla}]}.
+   Contagem automática pelos pedidos recebidos no mês, seguindo a tabela de trabalhos:
+   elementos = dentes de trabalhos por elemento (sem placa e protocolo); protocolo e placa contam por arcada.
+   Cada meta vale a partir do mês em que foi definida; meses anteriores continuam com a que tinham. */
+var DEMO_METAS={dias:5,v:[{desde:'2000-01',el:60,fat:9000,prot:1,pla:2}]};
+var METAS_K=[['el','Elementos'],['fat','Valor total'],['prot','Protocolos'],['pla','Placas de bruxismo']];
 function metasCfg(){return EM_DEMO?DEMO_METAS:((S.prefs&&S.prefs.metas)||{dias:5,v:[]});}
-function metaDe(m){var v=(metasCfg().v||[]).filter(function(x){return x.desde<=m;}).sort(function(a,b){return a.desde<b.desde?-1:1;});return v.length?v[v.length-1]:null;}
+function metaDe(m){var v=(metasCfg().v||[]).filter(function(x){return x.desde<=m;}).sort(function(a,b){return a.desde<b.desde?-1:1;});var x=v.length?v[v.length-1]:null;return x&&(x.el||x.fat||x.prot||x.pla)?x:null;}
 function cap1(t){return t.charAt(0).toUpperCase()+t.slice(1);}
 function nextMes(m){var y=+m.slice(0,4),mo=+m.slice(5,7)+1;if(mo>12){mo=1;y++;}return y+'-'+pad(mo);}
+function nomeMes(m){return cap1(MESES[+m.slice(5,7)-1]);}
 function diasNoMes(m){return new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();}
 function ehDiaTrab(d,n){var w=new Date(d+'T12:00:00').getDay();return n>=7?true:n===6?w!==0:(w!==0&&w!==6);}
 function diasTrab(m,ate,n){var t=0,dm=diasNoMes(m);for(var i=1;i<=dm;i++){var d=m+'-'+pad(i);if(ate&&d>ate)break;if(ehDiaTrab(d,n))t++;}return t;}
-function segundaDe(d){var w=new Date(d+'T12:00:00').getDay();return addDays(d,w===0?-6:1-w);}
-function primeiroPedido(){var m={};alive(S.pedidos).forEach(function(p){if(!p.clienteId||!p.recebido)return;if(!m[p.clienteId]||p.recebido<m[p.clienteId])m[p.clienteId]=p.recebido;});return m;}
-function realMes(m){var ps=alive(S.pedidos).filter(function(p){return monthOf(p.recebido)===m;}),pp=primeiroPedido();
-  var novos=Object.keys(pp).filter(function(cid){return monthOf(pp[cid])===m&&cliente(cid);}).map(function(cid){return {c:cliente(cid),d:pp[cid]};}).sort(function(a,b){return a.d<b.d?-1:1;});
-  return {el:elems(ps),fat:soma(ps),cli:novos.length,novos:novos,ps:ps};}
-/* ritmo do mês: quanto já deveria ter até hoje, quanto falta por dia de trabalho e onde termina no ritmo atual */
+function contaPed(p){var g={},o={el:0,prot:0,pla:0};itensDe(p).forEach(function(i){if(!i.t)return;(g[i.t]=g[i.t]||[]).push(i.d);});
+  Object.keys(g).forEach(function(tid){var t=tipo(tid),nm=t?t.nome:'';
+    if(/protocolo|placa/i.test(nm)){var arc=/completo|superior \+ inferior/i.test(nm)?2:[UP,LO].filter(function(a){return g[tid].some(function(d){return a.indexOf(+d)>=0;});}).length||1;o[/protocolo/i.test(nm)?'prot':'pla']+=arc;}
+    else o.el+=g[tid].length;});
+  return o;}
+function realMes(m){var ps=alive(S.pedidos).filter(function(p){return monthOf(p.recebido)===m;}),o={el:0,fat:soma(ps),prot:0,pla:0,n:ps.length};
+  ps.forEach(function(p){var c=contaPed(p);o.el+=c.el;o.prot+=c.prot;o.pla+=c.pla;});return o;}
 function ritmoMeta(m,real,meta,n,k){var t=today(),cm=monthOf(t),tot=diasTrab(m,null,n)||1;
   var feitos=m<cm?tot:m>cm?0:diasTrab(m,t,n),rest=m<cm?0:m>cm?tot:tot-diasTrab(m,addDays(t,-1),n);
   var esp=meta*feitos/tot,proj=feitos?real/feitos*tot:0,falta=Math.max(0,meta-real);
   var st=real>=meta&&meta>0?'ok':m<cm?'nao':m>cm?'fut':real>=esp*0.97?'ritmo':real>=esp*0.8?'perto':'atras';
-  if(k==='cli'&&m===cm&&st!=='ok')st=rest<=3?'atras':'and';
+  if((k==='prot'||k==='pla')&&m===cm&&st!=='ok'&&meta<=8)st=rest<=3?'atras':'and';
   return {tot:tot,feitos:feitos,rest:rest,esp:esp,proj:proj,falta:falta,porDia:rest?falta/rest:0,st:st,pct:meta?real/meta:0};}
 var ST_META={ok:['Meta batida 🎉','ok'],and:['Em andamento','a'],ritmo:['No ritmo','ok'],perto:['Um pouco atrás','w'],atras:['Atrasado','u'],nao:['Não bateu','u'],fut:['Ainda não começou','']};
-function anelMeta(p,cor){var r=34,c=2*Math.PI*r,v=Math.max(0,Math.min(1,p));
-  return '<svg class="mt-anel" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="'+r+'" class="mt-tr"/><circle cx="42" cy="42" r="'+r+'" class="mt-vl" style="stroke:'+cor+'" stroke-dasharray="'+(c*v).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 42 42)"/><text x="42" y="47" text-anchor="middle">'+Math.round(p*100)+'%</text></svg>';}
+function anelMeta(p,cor,sz){var r=34,c=2*Math.PI*r,v=Math.max(0,Math.min(1,p));
+  return '<svg class="mt-anel'+(sz?' '+sz:'')+'" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="'+r+'" class="mt-tr"/><circle cx="42" cy="42" r="'+r+'" class="mt-vl" style="stroke:'+cor+'" stroke-dasharray="'+(c*v).toFixed(1)+' '+c.toFixed(1)+'" transform="rotate(-90 42 42)"/><text x="42" y="47" text-anchor="middle">'+Math.round(p*100)+'%</text></svg>';}
 function fmtMeta(k,v){return k==='fat'?brl(v):String(Math.round(v));}
-function cartaoMeta(k,tit,m,real,meta,n,cor){
-  if(!meta)return '<article class="card mt-c"><div class="mt-top"><div><span class="lbl">'+tit+'</span><b class="mt-v">'+fmtMeta(k,real)+'</b></div></div><p class="small muted">Sem meta definida para este mês.</p><button class="btn sm" data-a="metasEd">Definir meta</button></article>';
-  var r=ritmoMeta(m,real,meta,n,k),st=ST_META[r.st],cm=monthOf(today());
-  var un=k==='fat'?'':k==='el'?' elementos':' cliente(s)';
-  var linhas=[];
-  if(m===cm&&r.st!=='ok'){
-    if(k!=='cli')linhas.push(['Esperado até hoje',fmtMeta(k,r.esp)+un]);
-    linhas.push(['Faltam',fmtMeta(k,r.falta)+un+(r.rest?' · <b>'+(k==='fat'?brl(r.porDia):(r.porDia<1&&k==='cli'?'1 a cada '+Math.max(1,Math.round(1/r.porDia))+' dias de trabalho':(r.porDia>=10?Math.round(r.porDia):r.porDia.toFixed(1).replace('.',','))+' por dia'))+'</b>':'')]);
-    if(r.feitos>=3&&k!=='cli')linhas.push(['No ritmo atual termina em',fmtMeta(k,r.proj)+un]);
-  }else if(m===cm){linhas.push(['Passou da meta em',fmtMeta(k,real-meta)+un]);}
-  else if(m<cm){linhas.push([r.st==='ok'?'Passou da meta em':'Ficou faltando',fmtMeta(k,Math.abs(real-meta))+un]);}
-  return '<article class="card mt-c"><div class="mt-top">'+anelMeta(r.pct,cor)+'<div><span class="lbl">'+tit+'</span><b class="mt-v">'+fmtMeta(k,real)+'</b><span class="small muted">de '+fmtMeta(k,meta)+un+'</span></div></div>'+
-    '<span class="tag '+st[1]+'" style="justify-self:start">'+st[0]+'</span>'+
-    (linhas.length?'<dl class="mt-dl">'+linhas.map(function(l){return '<div><dt>'+l[0]+'</dt><dd>'+l[1]+'</dd></div>';}).join('')+'</dl>':'')+'</article>';}
+function unMeta(k,v){return k==='fat'?'':k==='el'?' elemento'+(Math.round(v)===1?'':'s'):k==='prot'?' protocolo'+(Math.round(v)===1?'':'s'):' placa'+(Math.round(v)===1?'':'s');}
+function porDiaTxt(k,v){return k==='fat'?brl(v):(v>=10?Math.round(v):v.toFixed(1).replace('.',','));}
+/* cartão grande (elementos e valor) */
+function cartaoMetaG(k,tit,m,real,meta,n,cor){
+  if(!meta)return '<article class="card mt-c mt-g"><span class="lbl">'+tit+'</span><b class="mt-v">'+fmtMeta(k,real)+unMeta(k,real)+'</b><p class="small muted">Sem meta para este mês.</p></article>';
+  var r=ritmoMeta(m,real,meta,n),st=ST_META[r.st],cm=monthOf(today()),ln=[];
+  if(m===cm&&r.st!=='ok'){ln.push(['Faltam','<b>'+fmtMeta(k,r.falta)+unMeta(k,r.falta)+'</b>']);if(r.rest)ln.push(['Para bater','<b>'+porDiaTxt(k,r.porDia)+(k==='fat'?'':unMeta(k,r.porDia))+' por dia</b>']);if(r.feitos>=3)ln.push(['No ritmo atual termina com',fmtMeta(k,r.proj)+unMeta(k,r.proj)]);}
+  else if(r.st==='ok')ln.push(['Passou da meta em',fmtMeta(k,real-meta)+unMeta(k,real-meta)]);
+  else if(m<cm)ln.push(['Ficou faltando',fmtMeta(k,meta-real)+unMeta(k,meta-real)]);
+  return '<article class="card mt-c mt-g"><div class="mt-top">'+anelMeta(r.pct,cor,'lg')+'<div><span class="lbl">'+tit+'</span><b class="mt-v">'+fmtMeta(k,real)+'</b><span class="muted">de '+fmtMeta(k,meta)+unMeta(k,meta)+'</span><span class="tag '+st[1]+'" style="justify-self:start;margin-top:6px">'+st[0]+'</span></div></div>'+
+    (ln.length?'<dl class="mt-dl">'+ln.map(function(l){return '<div><dt>'+l[0]+'</dt><dd>'+l[1]+'</dd></div>';}).join('')+'</dl>':'')+'</article>';}
+/* cartão pequeno (protocolo e placa) */
+function cartaoMetaP(k,tit,m,real,meta,n,cor){
+  if(!meta)return '<article class="card mt-p"><div class="between"><span class="lbl">'+tit+'</span><b>'+fmtMeta(k,real)+'</b></div><span class="small muted">Sem meta</span></article>';
+  var r=ritmoMeta(m,real,meta,n,k),st=ST_META[r.st];
+  return '<article class="card mt-p"><div class="between"><span class="lbl">'+tit+'</span><span class="tag '+st[1]+'">'+st[0]+'</span></div><div class="row" style="gap:6px;align-items:baseline"><b class="mt-vp">'+fmtMeta(k,real)+'</b><span class="muted small">de '+fmtMeta(k,meta)+'</span></div>'+
+    '<div class="mt-bar"><i style="width:'+Math.min(100,r.pct*100).toFixed(1)+'%;background:'+cor+'"></i>'+(monthOf(today())===m?'<s style="left:'+Math.min(100,r.esp/meta*100).toFixed(1)+'%" title="Esperado até hoje"></s>':'')+'</div></article>';}
 function rMetasTab(){
   if(!ui.metaDemo)return rMetas();
   return '<div class="stack an-wrap" style="gap:16px"><section class="card an-demo-b"><div class="between wrap"><div><h2>Simulação</h2><p class="small muted">Metas e pedidos fictícios, só para você ver como a aba funciona. Nada aqui é salvo e seus dados reais não mudam.</p></div><button class="btn sm pri" data-a="metaDemo" data-v="0">Sair da simulação</button></div></section>'+comDemo(rMetas)+'</div>';}
-function rMetas(){var cfg=metasCfg(),n=cfg.dias||5,cm=monthOf(today()),m=ui.metaMes||cm,meta=metaDe(m),real=realMes(m),t=today();
-  var cores=['var(--p5)','var(--p3)','var(--p4)'];
-  var nav='<div class="row" style="gap:6px"><button class="icon-btn" data-a="metaMes" data-v="'+prevMonth(m)+'" aria-label="Mês anterior">‹</button><b style="min-width:150px;text-align:center">'+cap1(mesNome(m))+'</b><button class="icon-btn" data-a="metaMes" data-v="'+nextMes(m)+'" aria-label="Próximo mês">›</button></div>';
-  var head1='<section class="card"><div class="between wrap"><div><h2>Metas do mês</h2><p class="small muted">'+(meta?'Contando '+(n===7?'todos os dias':n===6?'segunda a sábado':'segunda a sexta')+' como dias de trabalho. Pedidos contam pela data de recebimento.':'Defina quantos elementos, quanto de faturamento e quantos clientes novos você quer por mês.')+'</p></div>'+
-    '<div class="row wrap" style="gap:8px">'+nav+(EM_DEMO?'':'<button class="btn sm pri" data-a="metasEd">'+(meta?'Editar metas':'Definir metas')+'</button>'+(ui.metaDemo?'':'<button class="btn sm" data-a="metaDemo" data-v="1">Ver simulação</button>'))+'</div></div></section>';
-  var cards='<div class="mt-grid">'+cartaoMeta('el','Elementos',m,real.el,meta&&meta.el,n,cores[0])+cartaoMeta('fat','Faturamento',m,real.fat,meta&&meta.fat,n,cores[1])+cartaoMeta('cli','Clientes novos',m,real.cli,meta&&meta.cli,n,cores[2])+'</div>';
-  // meta dividida
-  var div='';
-  if(meta){var tot=diasTrab(m,null,n)||1,sem=diasNoMes(m)/7,tk=real.el?real.fat/real.el:0,tk3=ticketEl3();
-    var row=function(nm,v,k){return '<tr><td><b>'+nm+'</b></td><td>'+(v?fmtMeta(k,v):'—')+'</td><td>'+(v?(k==='cli'?(v/sem<1?'1 a cada '+Math.round(sem/v*7)+' dias':(v/sem).toFixed(1).replace('.',',')):fmtMeta(k,v/sem)):'—')+'</td><td>'+(v?(k==='cli'?'—':k==='fat'?brl(v/tot):(v/tot).toFixed(1).replace('.',',')):'—')+'</td></tr>';};
-    var coer='';if(meta.fat&&meta.el&&tk3){var prec=Math.round(meta.fat/tk3);coer='<p class="small muted">Pelo seu valor médio por elemento nos últimos 3 meses (<b>'+brl(tk3)+'</b>), a meta de '+brl(meta.fat)+' pede cerca de <b>'+prec+' elementos</b>'+(prec>meta.el*1.1?'. Sua meta de elementos ('+meta.el+') está abaixo disso: ou aumente os elementos, ou o valor médio precisa subir.':prec<meta.el*0.9?'. Se bater os '+meta.el+' elementos, o faturamento deve passar da meta.':'. As duas metas estão coerentes.')+'</p>';}
-    div='<section class="card stack"><h2>Sua meta dividida</h2><div style="overflow-x:auto"><table class="an-t"><thead><tr><th></th><th>No mês</th><th>Por semana</th><th>Por dia de trabalho</th></tr></thead><tbody>'+
-      row('Elementos',meta.el,'el')+row('Faturamento',meta.fat,'fat')+row('Clientes novos',meta.cli,'cli')+'</tbody></table></div><p class="small muted">'+tot+' dias de trabalho em '+MESES[+m.slice(5,7)-1]+'.</p>'+coer+'</section>';}
-  // semana atual
-  var semana='';
-  if(m===cm&&meta&&meta.el){var seg=segundaDe(t),dias=[],mx=1,porDia=meta.el/(diasTrab(m,null,n)||1),nm=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
-    for(var i=0;i<7;i++){var d=addDays(seg,i),ps=alive(S.pedidos).filter(function(p){return p.recebido===d;}),e=elems(ps);dias.push({d:d,e:e,f:soma(ps),tr:ehDiaTrab(d,n)});if(e>mx)mx=e;}
-    var metaSem=porDia*dias.filter(function(x){return x.tr;}).length,feitoSem=dias.reduce(function(s2,x){return s2+x.e;},0),fatSem=dias.reduce(function(s2,x){return s2+x.f;},0);mx=Math.max(mx,porDia*1.3);
-    semana='<section class="card stack"><div class="between wrap"><div><h2>Esta semana</h2><p class="small muted">'+dmy(seg)+' a '+dmy(addDays(seg,6))+'</p></div><div class="row wrap" style="gap:16px"><span><span class="lbl">Elementos</span> <b>'+feitoSem+'</b> <span class="muted">de '+Math.round(metaSem)+'</span></span><span><span class="lbl">Faturamento</span> <b>'+brl(fatSem)+'</b>'+(meta.fat?' <span class="muted">de '+brl(meta.fat/(diasTrab(m,null,n)||1)*dias.filter(function(x){return x.tr;}).length)+'</span>':'')+'</span></div></div>'+
-      '<div class="mt-sem">'+dias.map(function(x,i){var h=Math.round(x.e/mx*100),hm=Math.round(porDia/mx*100),fut=x.d>t;
-        return '<div class="mt-dia'+(x.d===t?' hoje':'')+(x.tr?'':' folga')+'"><div class="mt-col"><i style="height:'+h+'%" class="'+(x.e>=porDia?'ok':'')+'"></i>'+(x.tr?'<s style="bottom:'+hm+'%"></s>':'')+'</div><b>'+(fut&&!x.e?'·':x.e)+'</b><span>'+nm[i]+'</span></div>';}).join('')+'</div>'+
-      '<p class="small muted">A linha tracejada é a meta do dia ('+(porDia>=10?Math.round(porDia):porDia.toFixed(1).replace('.',','))+' elementos). Barra verde: dia que bateu.</p></section>';}
-  // clientes novos do mês
-  var novos='<section class="card stack"><h2>Clientes novos em '+MESES[+m.slice(5,7)-1]+'</h2><p class="small muted">Contam como novos os clientes que mandaram o primeiro pedido neste mês.</p>'+
-    (real.novos.length?'<div class="mt-novos">'+real.novos.map(function(x){return '<button class="mt-novo" data-a="'+(EM_DEMO?'demoAviso':'verCliente')+'" data-id="'+x.c.id+'"><b>'+esc(x.c.nome)+'</b><span class="small muted">1º pedido em '+dmy(x.d)+'</span></button>';}).join('')+'</div>':'<p class="empty">Nenhum cliente novo ainda neste mês.</p>')+
-    (m===cm&&meta&&meta.cli>real.cli?'<p class="small">Faltam <b>'+(meta.cli-real.cli)+'</b>. Ideias: divulgue sua tabela de preços, peça indicação aos clientes atuais e confira na aba <button class="linkbtn" data-a="tab" data-v="analises">Análises</button> quem parou de mandar: recuperar um cliente parado também ajuda no faturamento.</p>':'')+'</section>';
-  // histórico
+function rMetas(){var cfg=metasCfg(),n=cfg.dias||5,t=today(),cm=monthOf(t),m=ui.metaMes||cm,meta=metaDe(m),real=realMes(m),nx=nextMes(cm),metaNx=(cfg.v||[]).some(function(x){return x.desde===nx;});
+  var rest=m===cm?diasTrab(m,null,n)-diasTrab(m,addDays(t,-1),n):0;
+  var sub=m===cm?(rest?'Faltam <b>'+rest+'</b> dia'+(rest===1?'':'s')+' de trabalho neste mês':'Último dia do mês'):m<cm?'Mês encerrado':'Mês que vem';
+  var hero='<section class="card mt-hero"><div class="mt-hero-m"><button class="icon-btn" data-a="metaMes" data-v="'+prevMonth(m)+'" aria-label="Mês anterior">‹</button>'+
+      '<div><span class="lbl">'+(m===cm?'Mês atual':'Metas de')+'</span><h2 class="mt-mes">'+nomeMes(m)+' <span>'+m.slice(0,4)+'</span></h2><p class="small muted">'+sub+'</p></div>'+
+      '<button class="icon-btn" data-a="metaMes" data-v="'+nextMes(m)+'" aria-label="Próximo mês">›</button></div>'+
+    '<div class="row wrap" style="gap:8px">'+(EM_DEMO?'':
+      '<button class="btn pri" data-a="metasEd" data-m="'+(m<cm?cm:m)+'">'+(metaDe(m<cm?cm:m)&&(m>=cm)?'Editar metas de '+nomeMes(m<cm?cm:m).toLowerCase():'Definir metas de '+nomeMes(m<cm?cm:m).toLowerCase())+'</button>'+
+      (m<=cm?'<button class="btn" data-a="metasEd" data-m="'+nx+'">Meta para '+nomeMes(nx).toLowerCase()+'</button>':'')+
+      (m!==cm?'<button class="btn" data-a="metaMes" data-v="'+cm+'">Voltar para o mês atual</button>':'')+
+      (ui.metaDemo?'':'<button class="btn sm" data-a="metaDemo" data-v="1">Ver simulação</button>'))+'</div></section>';
+  var vazio=!meta&&m>=cm&&!EM_DEMO?'<section class="card stack" style="align-items:start"><p>Você ainda não tem metas para '+nomeMes(m).toLowerCase()+'. Os números abaixo já contam sozinhos pelos pedidos recebidos.</p></section>':'';
+  var grandes='<div class="mt-grid2">'+cartaoMetaG('el','Elementos',m,real.el,meta&&meta.el,n,'var(--p5)')+cartaoMetaG('fat','Valor total (todos os trabalhos)',m,real.fat,meta&&meta.fat,n,'var(--p3)')+'</div>';
+  var peq='<div class="mt-grid2">'+cartaoMetaP('prot','Protocolos (por arcada)',m,real.prot,meta&&meta.prot,n,'#E0559B')+cartaoMetaP('pla','Placas de bruxismo (por arcada)',m,real.pla,meta&&meta.pla,n,'var(--p4)')+'</div>';
+  var info='<p class="small muted mt-info">Conta sozinho pelos pedidos recebidos no mês, seguindo sua tabela: cada dente de coroa, faceta, etc. é 1 elemento; protocolo e placa contam por arcada (e não entram em elementos). Valor total soma todos os trabalhos.'+
+    (m===cm&&metaNx?' · Meta de '+nomeMes(nx).toLowerCase()+' já definida.':m===cm&&meta?' · Em '+nomeMes(nx).toLowerCase()+' continuam as mesmas metas, a não ser que você defina outras.':'')+'</p>';
   var meses=[];for(var j=5,mm=m;j>=0;j--){meses.unshift(mm);mm=prevMonth(mm);}
-  var hist='<section class="card stack"><h2>Últimos 6 meses</h2><div style="overflow-x:auto"><table class="an-t"><thead><tr><th>Mês</th><th>Elementos</th><th>Faturamento</th><th>Clientes novos</th></tr></thead><tbody>'+
-    meses.map(function(mm){var r=realMes(mm),mt=metaDe(mm),c=function(k){var v=r[k],g=mt&&mt[k];return '<td>'+fmtMeta(k,v)+(g?' <span class="muted small">/ '+fmtMeta(k,g)+'</span> '+(v>=g?'<span class="up">✓</span>':mm<cm?'<span class="down">'+Math.round(v/g*100)+'%</span>':'<span class="muted small">'+Math.round(v/g*100)+'%</span>'):'')+'</td>';};
-      return '<tr'+(mm===m?' class="sel"':'')+'><td style="text-transform:capitalize"><b>'+MESES[+mm.slice(5,7)-1]+'</b> <span class="muted small">'+mm.slice(0,4)+'</span></td>'+c('el')+c('fat')+c('cli')+'</tr>';}).join('')+'</tbody></table></div></section>';
-  return '<div class="stack an-wrap" style="gap:16px">'+head1+cards+(meta?semana+div:'')+novos+hist+'</div>';}
-function ticketEl3(){var cm=monthOf(today()),ms=[prevMonth(cm),prevMonth(prevMonth(cm)),prevMonth(prevMonth(prevMonth(cm)))],ps=alive(S.pedidos).filter(function(p){return ms.indexOf(monthOf(p.recebido))>=0;}),e=elems(ps);return e?soma(ps)/e:0;}
-function sugMetas(){var cm=monthOf(today()),ms=[prevMonth(cm),prevMonth(prevMonth(cm)),prevMonth(prevMonth(prevMonth(cm)))],r=ms.map(realMes),k=r.filter(function(x){return x.el;}).length||1;
+  var hist='<section class="card stack"><h2 style="font-size:1rem">Últimos 6 meses</h2><div style="overflow-x:auto"><table class="an-t"><thead><tr><th>Mês</th>'+METAS_K.map(function(k){return '<th>'+k[1]+'</th>';}).join('')+'</tr></thead><tbody>'+
+    meses.map(function(mm){var r=realMes(mm),mt=metaDe(mm),c=function(k){var v=r[k],g=mt&&mt[k];return '<td>'+fmtMeta(k,v)+(g?' <span class="muted small">/ '+fmtMeta(k,g)+'</span> '+(v>=g?'<span class="up">✓</span>':mm<cm?'<span class="down">'+Math.round(v/g*100)+'%</span>':''):'')+'</td>';};
+      return '<tr'+(mm===m?' class="sel"':'')+'><td><b>'+nomeMes(mm)+'</b> <span class="muted small">'+mm.slice(0,4)+'</span></td>'+c('el')+c('fat')+c('prot')+c('pla')+'</tr>';}).join('')+'</tbody></table></div></section>';
+  return '<div class="stack an-wrap" style="gap:16px">'+hero+vazio+grandes+peq+info+hist+'</div>';}
+function sugMetas(){var cm=monthOf(today()),ms=[prevMonth(cm),prevMonth(prevMonth(cm)),prevMonth(prevMonth(prevMonth(cm)))],r=ms.map(realMes),k=r.filter(function(x){return x.n;}).length||1;
   var med=function(f){return r.reduce(function(s2,x){return s2+x[f];},0)/k;};
-  return {el:Math.ceil(med('el')*1.1),fat:Math.ceil(med('fat')*1.1/100)*100,cli:Math.max(1,Math.ceil(med('cli')))};}
+  return {el:Math.ceil(med('el')*1.1),fat:Math.ceil(med('fat')*1.1/100)*100,prot:Math.ceil(med('prot')),pla:Math.ceil(med('pla'))};}
 function secMetasMini(){var cm=monthOf(today()),meta=metaDe(cm);if(!meta)return '';var r=realMes(cm),n=metasCfg().dias||5;
   var bar=function(k,nm,cor){var g=meta[k];if(!g)return '';var rt=ritmoMeta(cm,r[k],g,n,k),st=ST_META[rt.st];
     return '<div class="mt-mini"><div class="between"><span><b>'+nm+'</b> <span class="muted small">'+fmtMeta(k,r[k])+' de '+fmtMeta(k,g)+'</span></span><span class="tag '+st[1]+'">'+st[0]+'</span></div><div class="mt-bar"><i style="width:'+Math.min(100,rt.pct*100).toFixed(1)+'%;background:'+cor+'"></i><s style="left:'+Math.min(100,rt.esp/g*100).toFixed(1)+'%" title="Esperado até hoje"></s></div></div>';};
   return '<section class="card stack" style="grid-column:span 12"><div class="between wrap"><div><h2>Metas de '+MESES[+cm.slice(5,7)-1]+'</h2><p class="small muted">O tracinho mostra onde você deveria estar hoje.</p></div><button class="btn sm pri" data-a="tab" data-v="metas">Ver Metas</button></div>'+
-    '<div class="mt-minis">'+bar('el','Elementos','var(--p5)')+bar('fat','Faturamento','var(--p3)')+bar('cli','Clientes novos','var(--p4)')+'</div></section>';}
-function fMetas(){var cm=monthOf(today()),m=ui.metaMes&&ui.metaMes>cm?ui.metaMes:cm,cfg=metasCfg(),at=metaDe(m)||{},sg=sugMetas(),n=cfg.dias||5;
-  return head('Metas por mês')+'<form data-form="metas" class="stack frm2" data-m="'+m+'">'+
-    '<label class="fld"><span>Elementos por mês</span><input name="el" type="number" min="0" step="1" inputmode="numeric" value="'+(at.el||'')+'" placeholder="'+sg.el+'"></label>'+
-    '<label class="fld"><span>Faturamento por mês (R$)</span><input name="fat" type="number" min="0" step="50" inputmode="decimal" value="'+(at.fat||'')+'" placeholder="'+sg.fat+'"></label>'+
-    '<label class="fld"><span>Clientes novos por mês</span><input name="cli" type="number" min="0" step="1" inputmode="numeric" value="'+(at.cli||'')+'" placeholder="'+sg.cli+'"></label>'+
+    '<div class="mt-minis">'+bar('el','Elementos','var(--p5)')+bar('fat','Valor total','var(--p3)')+bar('prot','Protocolos','#E0559B')+bar('pla','Placas','var(--p4)')+'</div></section>';}
+function fMetas(m){var cm=monthOf(today());m=m&&m>=cm?m:cm;var cfg=metasCfg(),at=metaDe(m)||{},sg=sugMetas(),n=cfg.dias||5;
+  var campo=function(k,lbl,step,ph,big){return '<label class="fld'+(big?' mt-fbig':'')+'"><span>'+lbl+'</span><input name="'+k+'" type="number" min="0" step="'+step+'" inputmode="'+(k==='fat'?'decimal':'numeric')+'" value="'+(at[k]||'')+'" placeholder="'+(ph||'')+'"></label>';};
+  return head('Metas de '+nomeMes(m).toLowerCase()+' '+m.slice(0,4))+'<form data-form="metas" class="stack frm2" data-m="'+m+'">'+
+    campo('el','Elementos no mês',1,sg.el||'',true)+campo('fat','Valor total no mês (R$)',50,sg.fat||'',true)+
+    campo('prot','Protocolos (arcadas)',1,sg.prot||'')+campo('pla','Placas de bruxismo (arcadas)',1,sg.pla||'')+
     '<div class="fld" style="grid-column:1/-1"><span>Dias de trabalho na semana</span><div class="seg" role="radiogroup" style="flex-wrap:wrap;gap:6px 0">'+[[5,'Seg a sex'],[6,'Seg a sáb'],[7,'Todos']].map(function(o){return '<label class="check" style="white-space:nowrap"><input type="radio" name="dias" value="'+o[0]+'" '+(n===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('<span style="width:10px"></span>')+'</div></div>'+
-    (sg.el?'<div class="banner" style="grid-column:1/-1"><span class="small">Sugestão pela média dos últimos 3 meses + 10%: <b>'+sg.el+' elementos</b>, <b>'+brl(sg.fat)+'</b>, <b>'+sg.cli+' cliente(s) novo(s)</b>.</span><button class="btn sm" type="button" data-a="metaSug" data-el="'+sg.el+'" data-fat="'+sg.fat+'" data-cli="'+sg.cli+'">Usar sugestão</button></div>':'')+
-    '<p class="small muted" style="grid-column:1/-1">Vale a partir de <b>'+mesNome(m)+'</b>. Os meses anteriores continuam com a meta que tinham.</p>'+
-    '<button class="btn pri block" type="submit" style="grid-column:1/-1">Salvar metas</button></form>';}
+    (sg.el||sg.fat?'<div class="banner" style="grid-column:1/-1"><span class="small">Sugestão (média dos últimos 3 meses + 10%): <b>'+sg.el+' elementos</b>, <b>'+brl(sg.fat)+'</b>, '+sg.prot+' protocolo(s), '+sg.pla+' placa(s).</span><button class="btn sm" type="button" data-a="metaSug" data-el="'+sg.el+'" data-fat="'+sg.fat+'" data-prot="'+sg.prot+'" data-pla="'+sg.pla+'">Usar sugestão</button></div>':'')+
+    '<p class="small muted" style="grid-column:1/-1">Vale para <b>'+nomeMes(m).toLowerCase()+'</b> e os meses seguintes, até você mudar de novo. Deixe em branco o que não quiser acompanhar.</p>'+
+    '<button class="btn pri block" type="submit" style="grid-column:1/-1">Salvar metas de '+nomeMes(m).toLowerCase()+'</button></form>';}
 /* ---------- Análises: simulação com clientes fictícios (nada é salvo) ----------
    Troca S.clientes/S.pedidos/S.tipos só durante o render (síncrono) e devolve os dados reais em seguida. */
 var DEMO_AN=null,EM_DEMO=false;
@@ -3254,9 +3262,9 @@ var A={
   relPdf:function(d,el){var cb=document.getElementById('rel-val'),v=!cb||cb.checked;ui.relVal=v;var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraRelProd(d.id,v).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
   sinF:function(d){ui.sinF=d.v;render();},
   metaMes:function(d){ui.metaMes=d.v;render();},
-  metasEd:function(){if(!guard())return;openSheet(fMetas);},
+  metasEd:function(d){if(!guard())return;openSheet(fMetas,d.m||null);},
   metaDemo:function(d){ui.metaDemo=d.v==='1';render();window.scrollTo(0,0);},
-  metaSug:function(d,el){var f=el.closest('form');['el','fat','cli'].forEach(function(k){f.elements[k].value=d[k];});},
+  metaSug:function(d,el){var f=el.closest('form');['el','fat','prot','pla'].forEach(function(k){f.elements[k].value=d[k];});},
   anDemo:function(d){ui.anDemo=d.v==='1';ui.sinF='todos';render();window.scrollTo(0,0);},
   demoMsg:function(d){openSheet(fDemoMsg,d.m);},
   demoAviso:function(){toast('Na simulação esse botão não abre nada. Com seus clientes reais ele funciona.');},
@@ -3374,10 +3382,10 @@ var F={
     save();render();toast(n?'Tabela salva ('+n+' alteração(ões)).':'Nada mudou na tabela.');
   },
   metas:function(fd,f){if(!guard())return;var m=f.dataset.m,num=function(k){var v=parseFloat(String(fd.get(k)||'').replace(',','.'));return v>0?Math.round(v*(k==='fat'?100:1))/(k==='fat'?100:1):0;};
-    var o={desde:m,el:num('el'),fat:num('fat'),cli:num('cli')};
+    var o={desde:m,el:num('el'),fat:num('fat'),prot:num('prot'),pla:num('pla')};
     S.prefs=S.prefs||{};var cfg=JSON.parse(JSON.stringify(S.prefs.metas||{dias:5,v:[]}));cfg.dias=+fd.get('dias')||5;
-    cfg.v=(cfg.v||[]).filter(function(x){return x.desde!==m;});if(o.el||o.fat||o.cli)cfg.v.push(o);
-    S.prefs.metas=cfg;save();closeSheet();render();toast(o.el||o.fat||o.cli?'Metas salvas.':'Metas removidas deste mês em diante.');},
+    cfg.v=(cfg.v||[]).filter(function(x){return x.desde!==m;});cfg.v.push(o);
+    S.prefs.metas=cfg;save();closeSheet();render();ui.metaMes=m;render();toast(o.el||o.fat||o.prot||o.pla?'Metas de '+nomeMes(m).toLowerCase()+' salvas.':'Metas removidas de '+nomeMes(m).toLowerCase()+' em diante.');},
   tipo:function(fd,f){
     if(!guard())return;var o={nome:fd.get('nome').trim(),forma:fd.get('forma'),valor:+fd.get('valor')||0,ativo:!!fd.get('ativo')};
     var id=f.dataset.id;if(id)Object.assign(tipo(id),o);else S.tipos.push(Object.assign({id:uid()},o));save();closeSheet();render();toast('Tipo de trabalho salvo.');
