@@ -1044,7 +1044,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 15h00';
+var VERSAO='15/10 · 15h30';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2574,8 +2574,27 @@ function relTempo(ts){if(!ts)return 'nunca';var d=(Date.now()-new Date(ts).getTi
 function vistoDe(a){var m=a.m||{};return m.visto_em||a.ultimo_acesso||null;}
 function atividade(a){var v=vistoDe(a);if(!v)return 'nunca';var d=(Date.now()-new Date(v).getTime())/864e5;return d<2/1440?'online':d<=7?'ativo':d<=30?'morno':'inativo';}
 var ATV={online:['Online agora','ok'],ativo:['Ativo','a'],morno:['Pouco ativo','w'],inativo:['Inativo','u'],nunca:['Nunca usou','']};
+/* ---------- Verificação em duas etapas do administrador (app autenticador) ---------- */
+function checaMfa(){ui.mfaBusy=true;Promise.all([sb.auth.mfa.listFactors(),sb.auth.mfa.getAuthenticatorAssuranceLevel()]).then(function(r){
+    var fs=((r[0].data&&r[0].data.totp)||[]).filter(function(x){return x.status==='verified';});
+    ui.mfa={fat:fs[0]||null,aal:(r[1].data&&r[1].data.currentLevel)||'aal1'};ui.mfaBusy=false;render();
+  },function(){ui.mfa={fat:null,aal:'aal1',erro:true};ui.mfaBusy=false;render();});}
+function fMfa(){var m=ui.mfaNovo;
+  if(!m)return head('Verificação em duas etapas')+'<p class="muted">Preparando…</p>';
+  if(m.erro)return head('Verificação em duas etapas')+'<div class="banner bad"><span>'+esc(m.erro)+'</span></div>';
+  return head('Verificação em duas etapas')+'<div class="stack">'+
+    '<p>1. Instale um app autenticador no celular: <b>Google Authenticator</b>, <b>Microsoft Authenticator</b> ou <b>Authy</b> (todos grátis).</p>'+
+    '<p>2. No app, toque em <b>+</b> e leia este QR Code:</p>'+
+    '<div style="background:#fff;padding:12px;border-radius:12px;justify-self:center;width:max-content"><img src="'+esc(m.qr)+'" alt="QR Code para o app autenticador" width="200" height="200"></div>'+
+    '<p class="small muted">Não consegue ler? Digite esta chave no app: <code class="mono" style="word-break:break-all">'+esc(m.secret)+'</code></p>'+
+    '<form data-form="mfaAtivar" class="stack"><label class="fld"><span>3. Digite o código de 6 números que aparece no app</span><input name="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required style="font-size:1.4rem;letter-spacing:.3em;text-align:center"></label>'+
+    '<button class="btn pri block" type="submit">Ativar</button></form>'+
+    '<p class="small muted">Depois de ativar, o painel Admin vai pedir o código do app sempre que você entrar. Guarde o celular com cuidado: se perder, fale comigo para liberar.</p></div>';}
 function rAdmin(){
   if(!S.admin)return '<div class="card empty">Esta área é só para o administrador do sistema.</div>';
+  if(!ui.mfa){if(!ui.mfaBusy)setTimeout(checaMfa,0);return '<div class="card empty">Verificando segurança…</div>';}
+  if(ui.mfa.fat&&ui.mfa.aal!=='aal2')return '<section class="card stack" style="max-width:420px;margin:24px auto"><h2>🔐 Código de verificação</h2><p class="muted">Abra o app autenticador no celular e digite o código do <b>Ideali CAD</b> para entrar no painel Admin.</p>'+
+    '<form data-form="mfaCodigo" class="stack"><input name="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required autofocus style="font-size:1.6rem;letter-spacing:.35em;text-align:center"><button class="btn pri block" type="submit">Entrar no Admin</button></form></section>';
   if(!ui.admLista&&!ui.admBusy&&!ui.admErro){setTimeout(carregaAdmin,0);}
   if(ui.admErro)return '<div class="banner bad">Não foi possível carregar os assinantes: '+esc(ui.admErro)+'</div><button class="btn" data-a="admRecarregar">Tentar de novo</button>';
   if(!ui.admLista)return '<div class="card empty">Carregando assinantes…</div>';
@@ -2595,6 +2614,7 @@ function rAdmin(){
   var ufL=Object.keys(ufs).sort(function(x,y){return ufs[y]-ufs[x];});
   var chipA=function(k,l,n){return '<button class="'+(fa===k?'on':'')+'" data-a="admAtv" data-v="'+k+'">'+l+(n!=null?' <b>'+n+'</b>':'')+'</button>';};
   return '<div class="stack an-wrap" style="gap:16px">'+
+    (ui.mfa&&!ui.mfa.fat?'<div class="banner bad"><span>🔐 <b>Proteja o painel Admin.</b> Ative a verificação em duas etapas: além da senha, vai pedir um código do seu celular. Se alguém descobrir sua senha, não entra aqui.</span><button class="btn sm pri" data-a="mfaIniciar">Ativar agora</button></div>':'<div class="small muted">🔐 Verificação em duas etapas ativa.</div>')+
     '<div class="banner"><span>🛡️ Conta mestre. Aqui aparecem só <b>cadastro, assinatura e números de uso</b> (tempo no sistema, último acesso, quantidade de pedidos e clientes). O conteúdo dos pedidos, clientes e pacientes de cada cadista continua privado.</span><button class="btn sm" data-a="admRecarregar">Atualizar</button></div>'+
     '<div class="adm-kpis">'+
       kpi('Cadastros',L.length,'<span>'+novos30+' novo(s) nos últimos 30 dias</span>')+
@@ -3390,6 +3410,12 @@ var A={
   temaQuiz:function(){openSheet(fTemaQuiz);},
   onbFechar:function(){S.prefs=S.prefs||{};S.prefs.onb='ok';save();render();toast('Primeiros passos ocultados.');},
   admAtv:function(d){ui.admAtv=d.v;render();},
+  mfaIniciar:function(){ui.mfaNovo=null;openSheet(fMfa);
+    sb.auth.mfa.listFactors().then(function(r){var velhos=((r.data&&r.data.all)||[]).filter(function(x){return x.status!=='verified';});
+      return Promise.all(velhos.map(function(x){return sb.auth.mfa.unenroll({factorId:x.id});}));})
+    .then(function(){return sb.auth.mfa.enroll({factorType:'totp',friendlyName:'Ideali CAD '+Date.now()});})
+    .then(function(r){if(r.error)throw r.error;ui.mfaNovo={id:r.data.id,qr:r.data.totp.qr_code,secret:r.data.totp.secret};renderSheet();})
+    .catch(function(e){ui.mfaNovo={erro:'Não foi possível iniciar: '+((e&&e.message)||e)};renderSheet();});},
   admRecarregar:function(){ui.admLista=null;ui.admErro=null;render();},
   admAbrir:function(d){openSheet(fAdmin,d.id);},
   admAcao:function(d){var a=(ui.admLista||[]).filter(function(x){return x.user_id===d.id;})[0];if(!a)return;
@@ -3555,6 +3581,12 @@ var F={
   temaQuiz:function(fd){var v={};[0,1,2].forEach(function(i){var x=fd.get('q'+i);if(x)v[x]=(v[x]||0)+(i===1?1.5:1);});
     var t=Object.keys(v).sort(function(a,b){return v[b]-v[a];})[0]||'ideali',m=fd.get('q3')||'auto',T=TEMAS.filter(function(x){return x[0]===t;})[0];
     S.prefs=S.prefs||{};S.prefs.tema=t;S.prefs.modo=m;aplicaTema(t,m);save();closeSheet();render();toast('Seu tema: '+T[1]+' ('+T[5].toLowerCase()+'). Dá para trocar em Configurações.');},
+  mfaAtivar:function(fd){var m=ui.mfaNovo;if(!m||!m.id)return;var c=String(fd.get('codigo')||'').trim();
+    sb.auth.mfa.challengeAndVerify({factorId:m.id,code:c}).then(function(r){if(r.error){toast('Código não confere. Confira no app e tente de novo.');return;}
+      closeSheet();ui.mfa=null;ui.admLista=null;render();toast('Verificação em duas etapas ativada.');});},
+  mfaCodigo:function(fd){var c=String(fd.get('codigo')||'').trim(),fid=ui.mfa&&ui.mfa.fat&&ui.mfa.fat.id;if(!fid)return;
+    sb.auth.mfa.challengeAndVerify({factorId:fid,code:c}).then(function(r){if(r.error){toast('Código não confere. Confira no app e tente de novo.');return;}
+      ui.mfa=null;ui.admLista=null;ui.admErro=null;render();});},
   metas:function(fd,f){if(!guard())return;var m=f.dataset.m,num=function(k){var v=parseFloat(String(fd.get(k)||'').replace(',','.'));return v>0?Math.round(v*(k==='fat'?100:1))/(k==='fat'?100:1):0;};
     var o={desde:m,el:num('el'),fat:num('fat'),prot:num('prot'),pla:num('pla')};
     S.prefs=S.prefs||{};var cfg=JSON.parse(JSON.stringify(S.prefs.metas||{dias:5,v:[]}));cfg.dias=+fd.get('dias')||5;

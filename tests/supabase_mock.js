@@ -27,7 +27,13 @@
       signUp:function(c){return Promise.resolve({data:{session:null,user:{id:U}},error:null});},
       signOut:function(){sessao=null;cbs.forEach(function(cb){cb('SIGNED_OUT',null);});return Promise.resolve({error:null});},
       resetPasswordForEmail:function(){return Promise.resolve({error:null});},
-      updateUser:function(){return Promise.resolve({error:null});}
+      updateUser:function(){return Promise.resolve({error:null});},
+      mfa:{_f:null,_aal:'aal1',
+        listFactors:function(){var f=this._f;return Promise.resolve({data:{all:f?[f]:[],totp:f?[f]:[]},error:null});},
+        getAuthenticatorAssuranceLevel:function(){return Promise.resolve({data:{currentLevel:this._aal,nextLevel:this._f&&this._f.status==='verified'?'aal2':'aal1'},error:null});},
+        enroll:function(){this._f={id:'fac1',status:'unverified',factor_type:'totp'};return Promise.resolve({data:{id:'fac1',totp:{qr_code:'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect width=%22200%22 height=%22200%22 fill=%22%23000%22/></svg>',secret:'ABCDEF123456'}},error:null});},
+        unenroll:function(){this._f=null;return Promise.resolve({error:null});},
+        challengeAndVerify:function(o){if(o.code!=='123456')return Promise.resolve({error:{message:'invalid'}});this._f.status='verified';this._aal='aal2';return Promise.resolve({data:{},error:null});}}
     },
     rpc:function(n,a){window.__ops.push({op:'rpc',name:n,args:a});
       if(n==='criar_link_cliente')return Promise.resolve({data:'TesteTokenSecreto_abcdefghijklmnopqrstuvwxyz012',error:null});
