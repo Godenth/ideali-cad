@@ -380,6 +380,34 @@ table.adm td{vertical-align:top}
 .qz{display:grid;gap:14px}.qz fieldset{border:0;margin:0;padding:0;display:grid;gap:8px}.qz legend{font-weight:700;margin-bottom:6px;font-family:var(--f-display)}
 .qz label{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:var(--surface)}
 .qz label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.lm-ver{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}.lm-ver p{margin:4px 0 0;max-width:62ch}
+.lm-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
+.lm-seg button{border:0;background:none;color:var(--muted);font:600 .92rem var(--f-body);padding:9px 16px;border-radius:999px;cursor:pointer}.lm-seg button.on{background:var(--accent);color:var(--accent-ink)}
+.lm{min-height:100vh}
+.lm-top{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--line)}
+.lm-main{max-width:880px;margin:0 auto;padding:20px 16px 60px;display:grid;gap:18px}
+.lm-aviso{margin:0;font-size:.88rem;color:var(--muted);text-align:center}
+.lm-hero{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.lm-hero h1{font-size:1.8rem;margin:0}.lm-hero p{margin:4px 0 0}
+.lm-big{font-size:1.05rem;padding:14px 24px}
+.lm-como{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.lm-como ol{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.lm-como li{display:flex;gap:10px;align-items:flex-start}.lm-como li i{font-style:normal;flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-weight:800;font-size:.85rem}
+.lm-como li div{display:grid;gap:2px}.lm-como li span{font-size:.82rem;color:var(--muted);line-height:1.35}
+@media (max-width:700px){.lm-como ol{grid-template-columns:1fr 1fr}}
+.lm-lista{display:grid;gap:12px}
+.lm-card{display:grid;gap:12px}.lm-card.lm-acao{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.lm-trab{font-family:var(--f-display);font-size:1.08rem}
+.lm-pas{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.lm-pas li{display:grid;justify-items:center;gap:4px;text-align:center;font-size:.72rem;color:var(--muted);position:relative}
+.lm-pas li i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--line);font-weight:700;font-size:.75rem;background:var(--surface);position:relative;z-index:1}
+.lm-pas li::before{content:"";position:absolute;top:11px;left:-50%;right:50%;height:2px;background:var(--line)}.lm-pas li:first-child::before{display:none}
+.lm-pas li.ok i{background:var(--ok);border-color:var(--ok);color:#fff}.lm-pas li.ok::before,.lm-pas li.on::before{background:var(--ok)}
+.lm-pas li.on i{border-color:var(--accent);color:var(--accent)}.lm-pas li.on span{color:var(--ink);font-weight:700}
+.lm-agora{padding:10px 12px;border-radius:12px;background:var(--bg)}
+.lm-bts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lm-prop{display:flex;gap:10px;align-items:center;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.lm-prop .t{flex:1;display:grid;gap:2px;min-width:0}
+.lm-mais summary{cursor:pointer;color:var(--accent);font-weight:600}
+@media (max-width:520px){.lm-pas span{font-size:.62rem}}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -1042,10 +1070,10 @@ var ICON={
 };
 var MENU=[
   ['Principal',[['dashboard','Dashboard'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
-  ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)'],['lab','Laboratório (prévia)']]],
+  ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 16h10';
+var VERSAO='15/10 · 16h40';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1055,6 +1083,7 @@ function render(){
   var app=document.getElementById('app');document.body.classList.toggle('sem-anim',animOff());setTimeout(rdDock,0);
   if(!S.sessao){app.innerHTML=rLogin();return;}
   if(S.carregando){app.innerHTML=rCarregando();return;}
+  if(ui.modoLab&&S.admin){app.innerHTML=rLabModo();return;}
   var a=S.assinatura,w=canWrite(),chip;
   if(!w) chip='<span class="tag u">Conta bloqueada</span>';
   else if(emGratis()) chip='<span class="tag">Essencial · R$ 0</span>';
@@ -2351,6 +2380,7 @@ function rdLer(){var R=ui.rede;if(!R)return;var a=document.getElementById('rd-re
 function rRede(){
   var R=redeIni(),tab=R.tab,nRec=R.mural.filter(function(o){return o.st==='aberto';}).length;
   var h='<div class="banner"><span><b>Prévia da Etapa 2 · Rede.</b> Tudo aqui é exemplo para ver como vai funcionar: nada é salvo e nenhum cadista real recebe nada.</span></div>'+
+    '<section class="card lm-ver"><div><b>Ver a prévia como:</b><p class="small muted">A Rede tem dois lados. O <b>cadista</b> pega trabalhos e delega quando está lotado. O <b>laboratório ou clínica</b> só pede projetos e acompanha.</p></div><div class="lm-seg"><button class="on">👩‍💻 Cadista</button><button data-a="labModo" data-v="1">🏥 Laboratório / clínica</button></div></section>'+
     '<nav class="cfg-tabs msg-tabs">'+[['delegar','Delegar um pedido'],['andamento','Enviados'],['pegar','Pegar trabalhos'+(nRec?' '+nRec:'')],['meus','Meus trabalhos'],['parceiros','Cadistas da rede']].map(function(a){return '<button class="'+(tab===a[0]?'on':'')+'" data-a="rdTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
   if(tab==='delegar')h+=rdDelegar(R);
   if(tab==='andamento')h+=rdEnviados(R);
@@ -2388,6 +2418,52 @@ function rdBusca(R,p){
     '<div class="rd-fila">'+lista.map(function(x,i){var st=b.ok===x.id?'aceitou':b.ok?'fechado':i<=b.t?'avisado':'fila';
       return '<div class="rd-cand '+st+'"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,40)+'</button><div class="t"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'"><b>'+esc(x.nome)+'</b></button><span class="small muted">'+esc(x.cidade)+' · '+estrelas(x.nota)+' '+x.nota+'</span></div><span class="rd-cst">'+({aceitou:'✓ Aceitou',fechado:'Encerrado',avisado:'<i class="rd-pulse"></i> Avisado',fila:'Na fila'})[st]+'</span></div>';}).join('')+'</div></section>';
 }
+/* ---------- Prévia: modo Laboratório / Clínica em tela própria (sem o menu do cadista) ---------- */
+var PASSOS_LAB=[['busca','Você pediu','Esperando um cadista aceitar'],['desenho','Cadista desenhando','Ele está fazendo o projeto'],['revisao','Para você revisar','Veja em 3D e aprove'],['aprovado','Pagar o cadista','Pix direto para ele'],['pago','Pronto','Concluído']];
+function labProximo(p){var c=p.cad?labCad(p.cad):null;
+  if(p.st==='busca')return p.props&&p.props.length?{t:p.props.length+' cadista(s) querem fazer. Escolha um.',cls:'a'}:{t:'Aguardando um cadista aceitar.',cls:''};
+  if(p.st==='desenho')return {t:esc(c.nome.split(' ')[0])+' está desenhando. Entrega '+prazoRede(p.prazo,p.hora).replace(/<[^>]+>/g,'').replace('⏰','').trim().replace(/^Entrega /,''),cls:''};
+  if(p.st==='revisao')return {t:'O projeto chegou. Revise e aprove.',cls:'a'};
+  if(p.st==='aprovado')return {t:'Pague '+brl(p.valor)+' no Pix de '+esc(c.nome.split(' ')[0])+'.',cls:'a'};
+  return {t:'Concluído.',cls:'ok'};}
+function labCardS(p){var c=p.cad?labCad(p.cad):null,nx=labProximo(p),i=PASSOS_LAB.map(function(e){return e[0];}).indexOf(p.st),bt='';
+  if(p.st==='busca')bt=p.props&&p.props.length?p.props.map(function(pr){var x=labCad(pr.cad);return '<div class="lm-prop"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,40)+'</button><div class="t"><b>'+esc(x.nome)+'</b> <span class="small">'+estrelas(x.nota)+'</span><span class="small muted">'+x.feitos+' trabalhos · '+esc(pr.obs)+'</span></div><button class="btn pri" data-a="labEscolhe" data-id="'+p.id+'" data-c="'+x.id+'">Escolher</button></div>';}).join(''):'<button class="btn sm ghost" data-a="labSim" data-id="'+p.id+'">Simular: chegaram propostas</button>';
+  if(p.st==='desenho')bt='<button class="btn sm ghost" data-a="labSt" data-id="'+p.id+'" data-v="revisao">Simular: cadista entregou</button>';
+  if(p.st==='revisao')bt='<button class="btn" data-a="rdVer">Ver em 3D</button><button class="btn" data-a="labSt" data-id="'+p.id+'" data-v="desenho">Pedir ajuste</button><button class="btn pri" data-a="labSt" data-id="'+p.id+'" data-v="aprovado">Aprovar</button>';
+  if(p.st==='aprovado')bt='<span class="rd-pix">Pix: <b class="mono">'+esc(c.pix)+'</b><button class="btn sm" data-a="rdCopiaPix" data-v="'+esc(c.pix)+'">Copiar</button></span><button class="btn pri" data-a="labSt" data-id="'+p.id+'" data-v="pago">Já paguei</button>';
+  if(p.st==='pago')bt='<span class="small muted">Sua nota:</span>'+[1,2,3,4,5].map(function(n){return '<button class="rd-star'+((p.nota||0)>=n?' on':'')+'" data-a="labNota" data-id="'+p.id+'" data-n="'+n+'" aria-label="'+n+' estrelas">★</button>';}).join('');
+  return '<article class="card lm-card'+(nx.cls==='a'?' lm-acao':'')+'" id="lab-'+p.id+'">'+
+    '<div class="between wrap"><div><b class="lm-trab">'+esc(p.trab)+'</b><div class="small muted">Dentes '+esc(p.dentes)+' · '+brl(p.valor)+(c?' · com '+esc(c.nome):'')+'</div></div><span class="mono small muted">'+p.id+'</span></div>'+
+    '<ol class="lm-pas">'+PASSOS_LAB.map(function(e,k){return '<li class="'+(k<i?'ok':k===i?'on':'')+'"><i>'+(k<i?'✓':k+1)+'</i><span>'+e[1]+'</span></li>';}).join('')+'</ol>'+
+    '<div class="lm-agora"><span class="small muted">Agora:</span> <b>'+nx.t+'</b></div>'+
+    (bt?'<div class="lm-bts">'+bt+'</div>':'')+'</article>';}
+function rLabModo(){var L=labIni(),P=L.pedidos,f=L.filtro||'abertos';
+  var acao=P.filter(function(p){return labProximo(p).cls==='a';}),lst=P.filter(function(p){return f==='abertos'?p.st!=='pago':p.st==='pago';});
+  lst.sort(function(a,b){return (labProximo(b).cls==='a')-(labProximo(a).cls==='a');});
+  return '<div class="lm">'+
+    '<header class="lm-top"><div class="row" style="gap:10px">'+logo(28)+'<b>Ideali CAD</b><span class="tag a">Laboratório · prévia</span></div><button class="btn sm" data-a="labModo" data-v="0">← Voltar para minha conta de cadista</button></header>'+
+    '<main class="lm-main">'+
+      '<p class="lm-aviso">Prévia: é assim que um <b>laboratório ou clínica</b> vai ver o sistema. Dados de exemplo, nada é salvo.</p>'+
+      '<section class="lm-hero"><div><h1>Olá, '+esc(L.perfil.resp.split(' ')[0])+'</h1><p class="muted">'+esc(L.perfil.nome)+(acao.length?' · <b>'+acao.length+' pedido(s) precisam de você</b>':' · tudo em dia')+'</p></div><button class="btn pri lm-big" data-a="labPedir">+ Pedir um projeto</button></section>'+
+      '<section class="lm-como"><b>Como funciona</b><ol>'+[['1','Você pede','Manda o escaneamento, o prazo e quanto paga.'],['2','Um cadista aceita','Você escolhe entre os que quiserem fazer.'],['3','Você aprova','Vê o projeto em 3D ou pede ajuste.'],['4','Você paga','Direto no Pix do cadista.']].map(function(x){return '<li><i>'+x[0]+'</i><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></li>';}).join('')+'</ol></section>'+
+      '<div class="between wrap" style="margin-top:8px"><h2>Meus pedidos</h2><div class="chips-f">'+[['abertos','Em andamento'],['pagos','Concluídos']].map(function(o){return '<button class="'+(f===o[0]?'on':'')+'" data-a="labFiltro" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
+      (lst.length?'<div class="lm-lista">'+lst.map(labCardS).join('')+'</div>':'<div class="card empty">Nenhum pedido aqui.</div>')+
+    '</main></div>';}
+function fLabPedir(){var n=labIni().novo,ts=['Coroa sobre dente','Coroa sobre implante','Facetas','Ponte fixa','Protocolo (superior)','Protocolo (inferior)','Placa de bruxismo','Provisório','Enceramento digital','Mockup','Modelo 3D'],favs=redeIni().parceiros;
+  return head('Pedir um projeto')+'<form data-form="labNovo" class="stack frm2">'+
+    '<label class="fld"><span>Trabalho</span><select name="trab">'+ts.map(function(x){return '<option'+(x===n.trab?' selected':'')+'>'+x+'</option>';}).join('')+'</select></label>'+
+    '<label class="fld"><span>Dentes</span><input name="dentes" placeholder="Ex.: 36 ou 11 a 21" value="'+esc(n.dentes)+'" required></label>'+
+    '<label class="fld"><span>Entregar até</span><input name="prazo" type="date" value="'+n.prazo+'"></label>'+
+    '<label class="fld"><span>Quanto você paga (R$)</span><input name="valor" type="number" min="0" step="5" inputmode="decimal" placeholder="Ex.: 45" value="'+esc(n.valor)+'" required></label>'+
+    '<label class="btn" style="position:relative;grid-column:1/-1;justify-self:start">📎 Anexar escaneamento (STL / ZIP)<input type="file" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
+    '<details class="lm-mais" style="grid-column:1/-1"><summary>Mais opções</summary><div class="stack" style="margin-top:10px">'+
+      '<div class="grid2"><label class="fld"><span>Material</span><input name="mat" value="'+esc(n.mat)+'"></label><label class="fld"><span>Software</span><select name="sw">'+['exocad','3Shape','DentalWings','qualquer'].map(function(x){return '<option'+(x===n.sw?' selected':'')+'>'+x+'</option>';}).join('')+'</select></label></div>'+
+      '<label class="fld"><span>Hora</span><input name="hora" type="time" value="'+n.hora+'"></label>'+
+      '<label class="fld"><span>Observações para o cadista</span><textarea name="obs" rows="2" placeholder="Ex.: cor A2">'+esc(n.obs)+'</textarea></label>'+
+      '<div class="fld"><span>Oferecer para</span><div class="stack" style="gap:6px">'+[['rede','Toda a rede'],['favoritos','Meus cadistas favoritos primeiro'],['um','Um cadista específico']].map(function(o){return '<label class="check"><input type="radio" name="quem" value="'+o[0]+'"'+(n.quem===o[0]?' checked':'')+' data-a2="labQuem"> '+o[1]+'</label>';}).join('')+'</div></div>'+
+      '<label class="fld" '+(n.quem==='um'?'':'hidden')+' id="lab-cad"><span>Cadista</span><select name="cad">'+favs.map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+' · '+esc(c.cidade)+'</option>';}).join('')+'</select></label></div></details>'+
+    '<p class="small muted" style="grid-column:1/-1">🔒 O nome do paciente nunca vai para o cadista.</p>'+
+    '<button class="btn pri block" type="submit" style="grid-column:1/-1">Publicar pedido</button></form>';}
 /* ---------- Prévia: conta de Laboratório / Clínica (quem procura cadista) ----------
    Tudo aqui é exemplo, guardado só na memória da página. Nenhum cadista real recebe nada. */
 var ETAPAS_LAB=[['busca','Procurando cadista'],['desenho','Em desenho'],['revisao','Para revisar'],['aprovado','Aprovado'],['pago','Pago']];
@@ -2530,7 +2606,7 @@ var ICO_CHAT='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke
 var RD_ST={oferta:'Aguardando aceite',desenho:'Desenhando',revisao:'Em revisão',aprovado:'Aprovado',pago:'Concluído',recusado:'Recusado'};
 function rdHora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
 function rdDock(){var el=document.getElementById('rd-dock');
-  if(!S.sessao||S.carregando||!S.admin){if(el)el.innerHTML='';return;}
+  if(!S.sessao||S.carregando||!S.admin||ui.modoLab){if(el)el.innerHTML='';return;}
   if(!el){el=document.createElement('div');el.id='rd-dock';document.body.appendChild(el);}
   var R=redeIni(),D=R.dock||(R.dock={open:false,conv:null}),cs=rdConversas(R),tot=cs.reduce(function(s,c){return s+(c.aberto?c.n:0);},0);
   var inp=document.getElementById('rd-msg-in'),foco=inp&&document.activeElement===inp;if(inp)D.rasc=inp.value;
@@ -3377,9 +3453,11 @@ var A={
   msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
+  labModo:function(d){ui.modoLab=d.v==='1';ui.ddOpen=null;closeSheet();if(ui.modoLab){labIni().filtro='abertos';}render();window.scrollTo(0,0);},
+  labPedir:function(){openSheet(fLabPedir);},
   labTab:function(d){labIni().tab=d.v;render();window.scrollTo(0,0);},
   labFiltro:function(d){labIni().filtro=d.v;render();},
-  labVer:function(d){var L=labIni();L.tab='pedidos';L.filtro='todos';render();setTimeout(function(){var e=document.getElementById('lab-'+d.id);if(e)e.scrollIntoView({behavior:'smooth',block:'center'});},50);},
+  labVer:function(d){var L=labIni();L.tab='pedidos';L.filtro=ui.modoLab?'abertos':'todos';render();setTimeout(function(){var e=document.getElementById('lab-'+d.id);if(e)e.scrollIntoView({behavior:'smooth',block:'center'});},50);},
   labSim:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.props=[{cad:'r1',em:'agora',obs:'Consigo entregar antes do prazo.'},{cad:'r5',em:'agora',obs:'Faço hoje à noite.'}];render();toast('2 cadistas mandaram proposta.');},
   labEscolhe:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.cad=d.c;p.st='desenho';p.props=[];render();toast(labCad(d.c).nome+' vai desenhar o '+p.id+'.');},
   labSt:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.st=d.v;render();toast(d.v==='aprovado'?'Projeto aprovado. Agora é só pagar o cadista.':d.v==='pago'?'Pagamento registrado.':d.v==='desenho'?'Ajuste pedido ao cadista.':'Projeto entregue para você revisar.');},
@@ -3672,7 +3750,7 @@ var F={
     if(!v('dentes')){toast('Diga quais dentes.');return;}if(!(+v('valor')>0)){toast('Diga quanto você paga pelo projeto.');return;}
     var q=v('quem'),c=q==='um'?v('cad'):null,num='L'+(105+L.pedidos.length);
     L.pedidos.unshift({id:num,trab:v('trab'),dentes:v('dentes'),mat:v('mat'),sw:v('sw'),prazo:v('prazo')||addDays(today(),1),hora:v('hora')||'18:00',valor:+v('valor'),st:'busca',cad:null,quem:q==='rede'?'Toda a rede':q==='favoritos'?'Favoritos':labCad(c).nome,criado:today(),props:q==='um'?[{cad:c,em:'agora',obs:'Recebi seu convite.'}]:[]});
-    L.novo.dentes='';L.novo.valor='';L.novo.obs='';L.tab='pedidos';L.filtro='todos';render();window.scrollTo(0,0);toast('Pedido '+num+' publicado na rede.');},
+    L.novo.dentes='';L.novo.valor='';L.novo.obs='';L.tab='pedidos';L.filtro=ui.modoLab?'abertos':'todos';closeSheet();render();window.scrollTo(0,0);toast('Pedido '+num+' publicado. Os cadistas da rede já podem ver.');},
   metas:function(fd,f){if(!guard())return;var m=f.dataset.m,num=function(k){var v=parseFloat(String(fd.get(k)||'').replace(',','.'));return v>0?Math.round(v*(k==='fat'?100:1))/(k==='fat'?100:1):0;};
     var o={desde:m,el:num('el'),fat:num('fat'),prot:num('prot'),pla:num('pla')};
     S.prefs=S.prefs||{};var cfg=JSON.parse(JSON.stringify(S.prefs.metas||{dias:5,v:[]}));cfg.dias=+fd.get('dias')||5;
