@@ -387,6 +387,7 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .pend small{width:100%;color:var(--muted);font-size:.72rem}
 .ask{display:grid;gap:8px;background:color-mix(in srgb,var(--c4) 12%,var(--surface));border-radius:10px;padding:10px;font-size:.85rem}
 .ask .row{justify-content:flex-end}
+.ask.env{background:color-mix(in srgb,var(--c-val) 12%,var(--surface))}.ask.env b{color:var(--c-val)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chipck{cursor:pointer}
 .chipck input{position:absolute;opacity:0;pointer-events:none}
@@ -665,14 +666,20 @@ async function carregar2(){
     S=novo;tiraFoto();
     try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
-  S.carregando=false;render();
+  S.carregando=false;ui.autoArqMes=null;autoArquivar();render();
 }
+setInterval(function(){if(autoArquivar())render();},3600000);
 var TRAB_REF=[['Elemento sobre dente','elemento'],['Elemento sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
   ['Provisório com aleta','elemento'],['Placa de bruxismo','elemento'],['Enceramento digital (planejamento)','elemento'],
   ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo 3D','trabalho']];
 function refFaltando(){var tem={};S.tipos.forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
 function toast(t){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){el.hidden=true;},2800);}
 function save(){agendaSync();}
+/* Enviado ao cliente: o pedido fica em Finalizado até o mês virar e então vai sozinho para o arquivo. */
+function proxMes(d){var y=+d.slice(0,4),m=+d.slice(5,7);if(m===12){y++;m=1;}else m++;return y+'-'+('0'+m).slice(-2)+'-01';}
+function autoArquivar(){if(!S.sessao||S.carregando||!canWrite())return;var mes=today().slice(0,7);if(ui.autoArqMes===mes)return;ui.autoArqMes=mes;
+  var n=0;alive(S.pedidos).forEach(function(p){if(p.status==='finalizado'&&p.entregue&&p.entregue.slice(0,7)<mes){p.status='arquivado';n++;}});
+  if(n){save();toast(n+' pedido(s) enviado(s) no mês passado foram para o arquivo.');}return n;}
 
 var STATUS=[['entrada','Entrada','A fazer'],['pendente','Pendência','Falta informação'],['aprovacao','Aguardando aprovação','Com o cliente'],['finalizado','Finalizado','Aprovado']];
 function stLabel(s){if(s==='arquivado')return 'Arquivado';for(var i=0;i<STATUS.length;i++)if(STATUS[i][0]===s)return STATUS[i][1];return s;}
@@ -798,7 +805,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 20h15';
+var VERSAO='14/10 · 22h00';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1246,7 +1253,8 @@ function acoes(p){
     extra='<span class="small '+(d>=3?'late':'muted')+'">Aguardando há '+d+' dia(s)'+(p.ajustes?' · '+p.ajustes+' ajuste(s)':'')+'</span>';
     acts='<button class="btn sm" data-a="ajuste" data-id="'+p.id+'" '+dis+'>Pediu ajuste</button><button class="btn sm pri" data-a="st" data-st="finalizado" data-id="'+p.id+'" '+dis+'>Aprovado ✓</button>';
   }else if(p.status==='finalizado'){
-    extra='<div class="ask"><b>Enviado para o cliente?</b><div class="row"><button class="btn sm" data-a="naoEnviado" data-id="'+p.id+'" '+dis+'>Não</button><button class="btn sm pri" data-a="st" data-st="arquivado" data-id="'+p.id+'" '+dis+'>Sim, arquivar</button></div></div>';
+    extra=p.entregue?'<div class="ask env"><b>✓ Enviado ao cliente em '+dmy(p.entregue)+'</b><span class="small muted">Fica aqui até o fim do mês e vai sozinho para o arquivo em '+dmy(proxMes(p.entregue))+'.</span><div class="row"><button class="btn sm" data-a="desfazEnvio" data-id="'+p.id+'" '+dis+'>Desfazer</button><button class="btn sm" data-a="st" data-st="arquivado" data-id="'+p.id+'" '+dis+'>Arquivar agora</button></div></div>':
+      '<div class="ask"><b>Enviado para o cliente?</b><div class="row"><button class="btn sm" data-a="naoEnviado" data-id="'+p.id+'" '+dis+'>Não</button><button class="btn sm pri" data-a="enviado" data-id="'+p.id+'" '+dis+'>Sim, enviado</button></div></div>';
   }
   return {extra:extra,acts:acts};
 }
@@ -2359,7 +2367,7 @@ function setStatus(id,st){
   var p=byId(S.pedidos,id); if(!p||p.status===st)return;
   if(st==='pendente'){openSheet(fPendencia,id);return;}
   if(st==='aprovacao')p.aprovDesde=today();
-  if(st==='arquivado')p.entregue=p.entregue||today(); else p.entregue=null;
+  if(st==='arquivado')p.entregue=p.entregue||today(); else if(st!=='finalizado')p.entregue=null;
   if(st!=='pendente')p.pendencia=null;
   p.status=st;save();render();if(ui.sheet)renderSheet();
   toast('#'+p.num+' → '+stLabel(st)+(st==='arquivado'?'. Arquivos STL expiram em '+dmy(addDays(p.entregue,60))+'.':''));
@@ -2465,6 +2473,9 @@ var A={
   st:function(d,el,e){e.stopPropagation();setStatus(d.id,d.st);},
   pendencia:function(d,el,e){e.stopPropagation();if(!guard())return;openSheet(fPendencia,d.id);},
   ajuste:function(d,el,e){e.stopPropagation();if(!guard())return;var p=byId(S.pedidos,d.id);p.ajustes=(p.ajustes||0)+1;setStatus(d.id,'entrada');},
+  enviado:function(d,el,e){if(e)e.stopPropagation();if(!guard())return;var p=byId(S.pedidos,d.id);if(!p)return;p.entregue=today();save();render();if(ui.sheet)renderSheet();
+    toast('#'+p.num+' enviado. Fica em Finalizado até o fim do mês e vai para o arquivo em '+dmy(proxMes(p.entregue))+'.');},
+  desfazEnvio:function(d,el,e){if(e)e.stopPropagation();if(!guard())return;var p=byId(S.pedidos,d.id);if(!p)return;p.entregue=null;save();render();if(ui.sheet)renderSheet();},
   naoEnviado:function(d,el,e){e.stopPropagation();toast('Ok, o pedido continua em Finalizado até você enviar.');},
   copiarPend:function(d,el,e){e.stopPropagation();var t=avisoPendencia(byId(S.pedidos,d.id));try{navigator.clipboard.writeText(t).then(function(){toast('Aviso copiado. Cole no WhatsApp do cliente.');},function(){openSheet(fTexto,'Aviso de pendência',t);});}catch(x){openSheet(fTexto,'Aviso de pendência',t);}},
   vista:function(d){ui.vista=d.v;render();},
