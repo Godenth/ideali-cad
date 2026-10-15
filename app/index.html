@@ -596,7 +596,10 @@ span.pd-it-t{cursor:default}
   .login{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);place-items:stretch;padding:0;min-height:100vh}
   .lg-main{padding:32px;position:relative;z-index:5}
   .lg-main .box{box-shadow:none;border:0;background:transparent}
-  .lg-side{display:block;position:relative;overflow:hidden;background:radial-gradient(60% 50% at 70% 65%,rgba(199,155,234,.25),transparent 70%),linear-gradient(150deg,#6A2C91,#3B1A5C 60%,#24103A);color:#fff}
+  .lg-side{display:block;position:relative;overflow:hidden;background:none;color:#fff;z-index:2}
+  .login::after{content:"";position:absolute;top:0;bottom:0;right:0;left:calc(47.62% - 300px);z-index:1;pointer-events:none;
+    background:radial-gradient(60% 50% at 70% 65%,rgba(199,155,234,.25),transparent 70%),linear-gradient(150deg,#6A2C91,#3B1A5C 60%,#24103A);
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.35) 150px,#000 360px);mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.35) 150px,#000 360px)}
   .lg-side-in{position:relative;z-index:4;padding:56px 56px 0 96px;max-width:560px;display:grid;gap:14px}
   .lg-eye{font:600 .78rem var(--f-mono);letter-spacing:.12em;color:#E6D3FA;opacity:.9}
   .lg-side h2{font-family:var(--f-display);font-size:clamp(1.9rem,2.8vw,2.7rem);line-height:1.08;letter-spacing:-.03em;margin:0}
@@ -907,7 +910,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 02h50';
+var VERSAO='15/10 · 03h00';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
