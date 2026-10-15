@@ -344,6 +344,13 @@ select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline
 .adm-st.online i{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 25%,transparent)}.adm-st.online{color:var(--ok)}
 .adm-st.ativo i{background:var(--accent)}.adm-st.morno i{background:var(--warn)}.adm-st.inativo i{background:var(--urgent)}
 table.adm td{vertical-align:top}
+.onb{display:grid;gap:12px;border-color:color-mix(in srgb,var(--accent) 40%,var(--line));background:linear-gradient(135deg,var(--accent-soft),var(--surface) 60%)}
+.onb-bar{height:8px;border-radius:99px;background:var(--soft);overflow:hidden}.onb-bar i{display:block;height:100%;background:var(--paint);border-radius:99px}
+.onb-l{list-style:none;margin:0;padding:0;display:grid;gap:6px}@media (min-width:1000px){.onb-l{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:20px}}
+.onb-l li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.onb-l li .t{flex:1;display:grid;min-width:0}.onb-l li.ok{opacity:.6}.onb-l li.ok b{text-decoration:line-through}.onb-l li.cur{border-color:var(--accent)}
+.onb-c{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.75rem;font-weight:800;flex:none}
+.onb-l li.ok .onb-c{background:var(--ok);border-color:var(--ok);color:#fff}.onb-l li.cur .onb-c{border-color:var(--accent)}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -794,7 +801,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -846,7 +853,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -1004,7 +1011,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 13h10';
+var VERSAO='15/10 · 13h30';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1501,6 +1508,20 @@ function secPrevisao(){var tot=alive(S.pedidos).length,par=ui.prevPar||(ui.prevP
       (queda.length?'<div><h3>Pedindo menos</h3><div class="list">'+queda.map(function(x){return li(x,'menos pedidos nos últimos 60 dias que nos 60 anteriores','w');}).join('')+'</div></div>':'')+
     '</div></section>';}
 /* ---------- Dashboard ---------- */
+/* ---------- Primeiros passos (some quando tudo estiver feito ou a pessoa fechar) ---------- */
+function passosOnb(){var p=S.perfil||{},pr=S.prefs||{};
+  return [
+    {ok:!!(p.nome&&p.telefone&&(p.cidade||p.uf)),t:'Complete seu perfil',d:'Nome, WhatsApp e cidade aparecem nos seus orçamentos e cobranças.',a:'tab',v:'config',b:'Abrir perfil'},
+    {ok:!!(pr.tab&&Object.keys(pr.tab).length),t:'Revise sua tabela de preços',d:'Os valores de cada trabalho entram sozinhos nos pedidos.',a:'tab',v:'tabela',b:'Abrir tabela'},
+    {ok:!!p.chave,t:'Cadastre sua chave Pix',d:'Para gerar cobranças com QR Code Pix em PDF.',a:'tab',v:'config',b:'Cadastrar Pix'},
+    {ok:alive(S.clientes).length>0,t:'Cadastre seu primeiro cliente',d:'Laboratório ou dentista que te manda trabalho.',a:'novoCliente',b:'Novo cliente'},
+    {ok:alive(S.pedidos).length>0,t:'Lance seu primeiro pedido',d:'Escolha os dentes, o tipo de trabalho e o prazo.',a:'novoPedido',b:'Novo pedido'},
+    {ok:!!metaDe(monthOf(today())),t:'Defina sua meta do mês',d:'Elementos e valor que você quer fazer neste mês.',a:'tab',v:'metas',b:'Abrir Metas'}];}
+function primeirosPassos(){if(EM_DEMO||(S.prefs&&S.prefs.onb==='ok'))return '';var L=passosOnb(),n=L.filter(function(x){return x.ok;}).length;if(n===L.length)return '';
+  var prox=L.filter(function(x){return !x.ok;})[0];
+  return '<section class="card onb"><div class="between wrap"><div><h2>Primeiros passos</h2><p class="small muted">'+n+' de '+L.length+' feitos · leva uns 5 minutos</p></div><button class="btn sm" data-a="onbFechar">Ocultar</button></div>'+
+    '<div class="onb-bar"><i style="width:'+Math.round(n/L.length*100)+'%"></i></div>'+
+    '<ol class="onb-l">'+L.map(function(x){var cur=x===prox;return '<li class="'+(x.ok?'ok':cur?'cur':'')+'"><span class="onb-c">'+(x.ok?'✓':'')+'</span><span class="t"><b>'+x.t+'</b>'+(cur?'<span class="small muted">'+x.d+'</span>':'')+'</span>'+(x.ok?'':'<button class="btn sm'+(cur?' pri':'')+'" data-a="'+x.a+'"'+(x.v?' data-v="'+x.v+'"':'')+'>'+x.b+'</button>')+'</li>';}).join('')+'</ol></section>';}
 function rDashboard(){
   var t=today(),G=geral(),ps=pedPer(),meses=chartMeses();
   var fat=soma(ps),rec=soma(ps.filter(function(p){return p.pago;})),el=elems(ps);
@@ -1514,8 +1535,8 @@ function rDashboard(){
   var fv=meses.map(fatMes),pv=meses.map(pagoMes);
   return '<section class="hero-clima '+cenaClima().tipo+'"><canvas id="ceu" aria-hidden="true"></canvas><div class="stack hero-in" style="gap:12px"><div class="between wrap"><div class="row wrap" style="gap:14px">'+saud.ic+'<div><h2 style="font-size:1.5rem">'+saud.t+(nome?', '+esc(nome):'')+'</h2><p class="muted small">Resumo de '+perNome()+'</p></div>'+infoDia()+'</div>'+
       '<div class="row wrap">'+(urg.length?'<span class="tag u">'+urg.length+' urgente(s)</span>':'')+(atr.length?'<span class="tag u">'+atr.length+' atrasado(s)</span>':'')+'</div></div>'+perPicker()+'</div></section>'+
-    lembretes()+
-    (!S.perfil.chave?'<div class="banner"><span>Cadastre sua chave Pix para cobrar seus clientes pelo QR Code.</span><button class="btn sm" data-a="tab" data-v="config">Cadastrar chave</button></div>':'')+
+    primeirosPassos()+lembretes()+
+    (!S.perfil.chave&&!primeirosPassos()?'<div class="banner"><span>Cadastre sua chave Pix para cobrar seus clientes pelo QR Code.</span><button class="btn sm" data-a="tab" data-v="config">Cadastrar chave</button></div>':'')+
     '<div class="dash">'+
       kpi(G?'Faturamento total':'Faturamento do mês',brl(fat),G?'<span>'+ps.length+' pedidos</span>':delta(fat,soma(prevPs)),spark(sparkM.map(fatMes)),'financeiro')+
       kpi('Recebido',brl(rec),'<span>'+(fat?Math.round(rec/fat*100):0)+'% do faturado '+perCurto()+'</span>','','financeiro')+
@@ -3280,6 +3301,7 @@ var A={
     S.perfil.cidade=d.n;S.perfil.uf=d.uf||'';S.perfil.cidadeGeo=d.lat?{nome:d.n,uf:d.uf,lat:+d.lat,lon:+d.lon}:null;ui.clima=null;ui.climaErr=null;save();
     if(ctx==='perfil'){toast('Cidade definida: '+d.n+(d.uf?' ('+d.uf+')':'')+'.');return;}
     if(ui.sheet&&ui.sheet.fn===fCidade)closeSheet();render();toast('Cidade definida: '+d.n+(d.uf?' ('+d.uf+')':'')+'.');},
+  onbFechar:function(){S.prefs=S.prefs||{};S.prefs.onb='ok';save();render();toast('Primeiros passos ocultados.');},
   admAtv:function(d){ui.admAtv=d.v;render();},
   admRecarregar:function(){ui.admLista=null;ui.admErro=null;render();},
   admAbrir:function(d){openSheet(fAdmin,d.id);},
