@@ -547,6 +547,8 @@ span.pd-it-t{cursor:default}
 .sheet{background:var(--surface);width:100%;max-width:620px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));display:grid;gap:14px;align-content:start;animation:up .22s ease}
 @keyframes up{from{transform:translateY(30px);opacity:.4}}
 @media (min-width:700px){.sheet-bg{align-items:center}.sheet{border-radius:20px;max-height:88%}}
+.pdet{display:grid;gap:14px;align-items:start}.pdet-a,.pdet-b{display:grid;gap:14px;align-content:start;min-width:0}
+@media (min-width:1100px){.sheet.wide{max-width:min(1240px,94vw);max-height:94vh}.pdet{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px}}
 .sheet-h{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:-18px;background:var(--surface);padding-block:4px;z-index:2}
 .qrbox{background:#fff;border-radius:14px;padding:14px;width:max-content;max-width:100%;margin-inline:auto}
 .qrbox img,.qrbox canvas{display:block;width:220px;height:220px;max-width:100%}
@@ -849,7 +851,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 01h15';
+var VERSAO='15/10 · 01h25';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2079,7 +2081,7 @@ function openSheet(fn){var args=[].slice.call(arguments,1);ui.sheet={fn:fn,args:
 function renderSheet(){
   var el=document.getElementById('sheet');
   if(!ui.sheet){el.innerHTML='';return;}
-  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
+  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+(ui.sheet.fn===fPedidoDet?' wide':'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
   if(ui.sheet.after)ui.sheet.after();
 }
 function closeSheet(){if(viewer)viewer.stop();ui.sheet=null;renderSheet();}
@@ -2242,6 +2244,7 @@ function fPedidoDet(id){
   var g=p.pagamentoId?byId(S.pagamentos,p.pagamentoId):null;
   return head('Pedido #'+p.num)+
     '<div class="row wrap"><span class="tag a">'+stLabel(p.status)+'</span>'+(p.pago?'<span class="tag ok">Pago</span>':!aberto(p)?'<span class="tag w">A receber</span>':'')+(p.urgente?'<span class="tag u">Urgente</span>':'')+'</div>'+
+    '<div class="pdet"><div class="pdet-a">'+
     '<div class="pd-quem">'+
       '<div class="pq pac"><span class="pq-l">'+ICO_PAC+' Paciente</span><b>'+esc(p.paciente)+'</b><button class="btn sm pq-cp" data-a="copiaTxt" data-v="'+esc(p.paciente)+'" aria-label="Copiar nome do paciente">Copiar</button></div>'+
       '<div class="pq cli"><span class="pq-l">'+ICO_CLI+' Cliente</span><b>'+esc(c?c.nome:'(cliente excluído)')+'</b>'+(c?'<button class="btn sm pq-cp" data-a="copiaTxt" data-v="'+esc(c.nome)+'" aria-label="Copiar nome do cliente">Copiar</button>':'')+'</div>'+
@@ -2257,6 +2260,7 @@ function fPedidoDet(id){
     (itensDe(p).length||(p.extras||[]).length?'<div class="pd-lista">'+itensDe(p).map(function(i){return '<div class="pd-it"><span class="pd-it-t">'+descItem(i)+'</span></div>';}).join('')+(p.extras||[]).map(function(x){var t=tipo(x.t);return '<div class="pd-it"><span class="pd-it-t">'+(t?esc(t.nome):'')+' · '+(x.q||1)+'×</span></div>';}).join('')+'</div>':'')+
     (p.obs?'<div class="calc"><b>Observações</b><span>'+esc(p.obs)+'</span></div>':'')+
     (p.status==='pendente'&&p.pendencia?'<div class="pend" style="padding:12px">'+p.pendencia.motivos.map(function(m){return '<span>'+esc(m)+'</span>';}).join('')+(p.pendencia.obs?'<em>'+esc(p.pendencia.obs)+'</em>':'')+'</div>':'')+
+    '</div><div class="pdet-b">'+
     (p.status!=='arquivado'?(function(){var x=acoes(p);return (p.status!=='pendente'?x.extra:'')+(x.acts?'<div class="acts">'+x.acts+'</div>':'');})():'<div class="acts"><button class="btn sm" data-a="restaurarFin" data-id="'+p.id+'" '+(w?'':'disabled')+'>↩ Restaurar para Finalizado</button></div>')+
     '<label class="fld"><span>Mover para</span><select id="pd-mover" data-id="'+id+'" '+(w?'':'disabled')+'>'+STATUS.concat([['arquivado','Arquivado (enviado ao cliente)']]).map(function(s){return '<option value="'+s[0]+'" '+(p.status===s[0]?'selected':'')+'>'+s[1]+'</option>';}).join('')+'</select></label>'+
     '<section class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div class="between"><h3>Arquivos</h3><span class="small muted">'+bytes(usado())+' de '+bytes(S.assinatura.limite)+'</span></div>'+
@@ -2266,7 +2270,7 @@ function fPedidoDet(id){
       '<div id="up-st" '+(ui.up&&ui.up.pid===id?'':'hidden')+' class="stack" style="gap:6px"><div class="prog"><i id="up-bar" style="width:'+(ui.up&&ui.up.pid===id?ui.up.pct:0)+'%"></i></div><span class="small muted" id="up-txt">'+(ui.up&&ui.up.pid===id?esc(ui.up.txt):'')+'</span></div>'+
       '<form data-form="link" data-id="'+id+'" class="row"><input class="search" id="lk-url" name="url" type="url" placeholder="Ou cole o link do Drive / WeTransfer" required '+(w?'':'disabled')+'><button class="btn" type="submit" '+(w?'':'disabled')+'>Salvar</button></form>'+
     '</section>'+
-    '<div class="row wrap" style="border-top:1px solid var(--line);padding-top:14px"><button class="btn" data-a="editPedido" data-id="'+id+'" '+(w?'':'disabled')+'>Editar</button><button class="btn" data-a="duplicar" data-id="'+id+'" '+(w?'':'disabled')+'>Duplicar</button><button class="btn danger" data-a="delPedido" data-id="'+id+'" '+(w?'':'disabled')+'>Excluir</button></div>';
+    '<div class="row wrap" style="border-top:1px solid var(--line);padding-top:14px"><button class="btn" data-a="editPedido" data-id="'+id+'" '+(w?'':'disabled')+'>Editar</button><button class="btn" data-a="duplicar" data-id="'+id+'" '+(w?'':'disabled')+'>Duplicar</button><button class="btn danger" data-a="delPedido" data-id="'+id+'" '+(w?'':'disabled')+'>Excluir</button></div>'+'</div></div>';
 }
 function kv(k,v){return '<div><div class="muted" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.05em">'+k+'</div><div>'+v+'</div></div>';}
 function liArq(a,w){
