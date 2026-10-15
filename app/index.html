@@ -807,7 +807,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='14/10 · 22h30';
+var VERSAO='14/10 · 22h45';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -922,6 +922,10 @@ var DD={
   tipoMet:{label:'Medir por',get:function(){return ui.tipoMet||'n';},set:function(v){ui.tipoMet=v;},opts:function(){return [['n','Pedidos'],['el','Elementos'],['v','Faturamento']];}},
   vista:{label:'Mostrar',get:function(){return ui.vista==='arq'?'arq':'kanban';},set:function(v){ui.vista=v;},
     opts:function(){return [['kanban','Produção (kanban)'],['arq','Arquivados ('+alive(S.pedidos).filter(function(p){return p.status==='arquivado';}).length+')']];}},
+  cliProd:{label:'Cliente',get:function(){return ui.cliProd||'todos';},set:function(v){ui.cliProd=v==='todos'?null:v;},
+    opts:function(){var m={};alive(S.pedidos).forEach(function(p){if(p.status!=='arquivado'&&p.clienteId)m[p.clienteId]=(m[p.clienteId]||0)+1;});
+      if(ui.cliProd&&!m[ui.cliProd])m[ui.cliProd]=0;
+      return [['todos','Todos os clientes']].concat(Object.keys(m).map(function(k){var c=cliente(k);return [k,(c?c.nome:'(cliente excluído)')+' ('+m[k]+')'];}).sort(function(a,b){return a[1].localeCompare(b[1],'pt');}));}},
   filtro:{label:'Pedidos',get:function(){return ui.filtro==='urg'?'urg':'todos';},set:function(v){ui.filtro=v;},
     opts:function(){return [['todos','Todos'],['urg','Só urgentes ('+alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length+')']];}}
 };
@@ -1204,6 +1208,7 @@ function rPedidos(){
   var q=ui.busca.trim().toLowerCase();
   function match(p){
     if(ui.filtro==='urg'&&!p.urgente)return false;
+    if(ui.cliProd&&p.clienteId!==ui.cliProd)return false;
     if(q){var c=cliente(p.clienteId),t=tipoPed(p);var hay=(p.paciente+' '+(c?c.nome:'')+' '+(t?t.nome:'')+' '+p.elementos.join(' ')+' #'+p.num).toLowerCase();if(hay.indexOf(q)<0)return false;}
     return true;}
   var ps=alive(S.pedidos).filter(match);
@@ -1213,7 +1218,7 @@ function rPedidos(){
       '<input class="search" id="busca" type="search" placeholder="Buscar paciente, cliente, dente ou nº" value="'+esc(ui.busca)+'" style="width:min(280px,100%)">'+
       '<span class="btn sm" style="cursor:default">Atrasados '+atr+'</span>'+
       '<button class="btn sm" data-a="tab" data-v="financeiro">A receber '+brl(rec)+'</button></div>'+
-      '<div class="row wrap">'+dd('filtro')+dd('vista')+'</div></div>';
+      '<div class="row wrap">'+dd('cliProd')+(ui.cliProd?'<button class="btn sm" data-a="limpaCliProd" aria-label="Mostrar todos os clientes">✕ Limpar</button>':'')+dd('filtro')+dd('vista')+'</div></div>';
   if(ui.vista==='arq'){
     arq.sort(function(a,b){return (b.entregue||'')<(a.entregue||'')?-1:1;});
     return head_+'<section class="card stack"><div><h2>Arquivados</h2><p class="small muted">Pedidos já enviados ao cliente. Os arquivos STL somem 60 dias após o envio.</p></div>'+
@@ -2594,6 +2599,7 @@ var A={
   novoPagamento:function(){if(!guard())return;openSheet(fPagamento,null);},
   verPagamento:function(d){openSheet(fPagDet,d.id);},
   delPagamento:function(d){if(!guard())return;excluirPagamento(byId(S.pagamentos,d.id));save();closeSheet();render();toast('Pagamento na lixeira. Pedidos voltaram para "Entregue".');},
+  limpaCliProd:function(){ui.cliProd=null;render();},
   cobranca:function(d,el,e){if(e)e.stopPropagation();ui.cobSel={};openSheet(fCobranca,d.id||null);},
   cobrancaCli:function(d){ui.cobSel={};ui.sheet.args=[d.id||null];renderSheet();},
   cobrancaPdf:function(d,el){var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraPdfCobranca(d.id).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
