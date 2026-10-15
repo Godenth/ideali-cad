@@ -1,0 +1,46 @@
+# Ideali CAD · Backup semanal do banco (toda segunda às 04h de Brasília) + botão para rodar na hora.
+# O arquivo sai CRIPTOGRAFADO (AES-256) antes de ser guardado: o repositório é público,
+# então sem a senha BACKUP_SENHA ninguém consegue abrir. Fica guardado 90 dias.
+# Precisa de dois "secrets" no GitHub (Settings → Secrets and variables → Actions):
+#   SUPABASE_DB_URL  → string de conexão do banco (Supabase → Connect → Session pooler)
+#   BACKUP_SENHA     → uma senha forte só sua, para abrir o backup
+name: Backup do banco
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Conferir secrets
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PW: ${{ secrets.BACKUP_SENHA }}
+        run: |
+          if [ -z "$DB" ] || [ -z "$PW" ]; then echo "Faltam os secrets SUPABASE_DB_URL e BACKUP_SENHA."; exit 1; fi
+      - name: Instalar pg_dump 17
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+      - name: Exportar e criptografar
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PW: ${{ secrets.BACKUP_SENHA }}
+        run: |
+          set -euo pipefail
+          D=$(TZ=America/Sao_Paulo date +%Y-%m-%d)
+          /usr/lib/postgresql/17/bin/pg_dump "$DB" --no-owner --no-privileges --schema=public --schema=auth -Fc -f banco.dump
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$PW" --symmetric --cipher-algo AES256 -o "ideali-backup-$D.dump.gpg" banco.dump
+          shred -u banco.dump
+          ls -la
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ideali-backup
+          path: ideali-backup-*.dump.gpg
+          retention-days: 90
