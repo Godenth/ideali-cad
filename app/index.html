@@ -936,7 +936,7 @@ var MENU=[
   ['Ferramentas',[['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 00h55';
+var VERSAO='15/10 · 01h00';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={analises:'Análises',rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1171,7 +1171,7 @@ function analisar(){var t=today(),ps=alive(S.pedidos).filter(function(p){return 
   return {sig:sig,tipos:tipos,cli:linhasCli,ajGeral:ajGeral};}
 function n2(n){return n;}
 var CAT_SIN={atraso:['Atenção: seus prazos','u'],frequencia:['Frequência do cliente','w'],mudanca:['Mudança de comportamento','a'],qualidade:['Qualidade','u'],financeiro:['Pagamento','w'],positivo:['Boa notícia','ok']};
-function msgSinal(s){var c=cliente(s.cid),nome=c?(c.pnome||c.nome):'';
+function msgSinal(s){var c=cliente(s.cid),nome=c?(((c.titulo==='Dr.'||c.titulo==='Dra.')?c.titulo+' ':'')+String(c.pnome||c.nome||'').split(' ')[0]):'';
   if(s.msg==='tipo')return 'Oi, '+nome+'! Tudo bem? Faz um tempo que não recebo '+s.tipo.toLowerCase()+' de você e queria saber se ficou alguma coisa a desejar nos últimos que fiz. Seu retorno me ajuda muito a melhorar! 🙏';
   if(s.msg==='sumiu')return 'Oi, '+nome+'! Tudo bem por aí? Senti falta dos seus casos 😊 Se precisar de algo, minha agenda está aberta. E se tiver algo que eu possa melhorar, me conta!';
   return 'Oi, '+nome+'! Tudo bem? Queria saber como estão sendo os trabalhos comigo e se tem algo que eu possa melhorar no atendimento ou nos projetos. Obrigado pela parceria!';}
