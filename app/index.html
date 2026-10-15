@@ -408,6 +408,10 @@ table.adm td{vertical-align:top}
 .lm-prop{display:flex;gap:10px;align-items:center;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.lm-prop .t{flex:1;display:grid;gap:2px;min-width:0}
 .lm-mais summary{cursor:pointer;color:var(--accent);font-weight:600}
 @media (max-width:520px){.lm-pas span{font-size:.62rem}}
+.lm-tabs{display:flex;gap:6px;padding:5px;border-radius:999px;background:var(--surface);border:1px solid var(--line);width:max-content;max-width:100%}
+.lm-tabs button{border:0;background:none;color:var(--muted);font:700 .98rem var(--f-body);padding:10px 18px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.lm-tabs button.on{background:var(--accent);color:var(--accent-ink)}.lm-tabs button b{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:99px;background:var(--urgent);color:#fff;font-size:.72rem;margin-left:4px}
+.lm-pub .frm2{margin-top:4px}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -1073,7 +1077,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 16h40';
+var VERSAO='15/10 · 17h00';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2380,10 +2384,11 @@ function rdLer(){var R=ui.rede;if(!R)return;var a=document.getElementById('rd-re
 function rRede(){
   var R=redeIni(),tab=R.tab,nRec=R.mural.filter(function(o){return o.st==='aberto';}).length;
   var h='<div class="banner"><span><b>Prévia da Etapa 2 · Rede.</b> Tudo aqui é exemplo para ver como vai funcionar: nada é salvo e nenhum cadista real recebe nada.</span></div>'+
-    '<section class="card lm-ver"><div><b>Ver a prévia como:</b><p class="small muted">A Rede tem dois lados. O <b>cadista</b> pega trabalhos e delega quando está lotado. O <b>laboratório ou clínica</b> só pede projetos e acompanha.</p></div><div class="lm-seg"><button class="on">👩‍💻 Cadista</button><button data-a="labModo" data-v="1">🏥 Laboratório / clínica</button></div></section>'+
-    '<nav class="cfg-tabs msg-tabs">'+[['delegar','Delegar um pedido'],['andamento','Enviados'],['pegar','Pegar trabalhos'+(nRec?' '+nRec:'')],['meus','Meus trabalhos'],['parceiros','Cadistas da rede']].map(function(a){return '<button class="'+(tab===a[0]?'on':'')+'" data-a="rdTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
+    '<section class="card lm-ver"><div><b>Ver a prévia como:</b><p class="small muted">A Rede tem dois lados. O <b>laboratório ou clínica</b> publica o trabalho. Ele aparece no <b>feed</b> dos cadistas, que aceitam ou recusam. O laboratório aceita um cadista e o trabalho começa.</p></div><div class="lm-seg"><button class="on">👩‍💻 Cadista</button><button data-a="labModo" data-v="1">🏥 Laboratório / clínica</button></div></section>'+
+    '<nav class="cfg-tabs msg-tabs">'+[['delegar','Delegar um pedido'],['andamento','Enviados'],['pegar','Feed de trabalhos'+(nRec?' '+nRec:'')],['meus','Meus trabalhos'],['parceiros','Cadistas da rede']].map(function(a){return '<button class="'+(tab===a[0]?'on':'')+'" data-a="rdTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
   if(tab==='delegar')h+=rdDelegar(R);
   if(tab==='andamento')h+=rdEnviados(R);
+  if(R.avisoEu&&(tab==='pegar'||tab==='meus')){h+='<div class="banner"><span>🔔 '+esc(R.avisoEu)+'</span></div>';R.avisoEu=null;}
   if(tab==='pegar')h+=rdPegar(R);
   if(tab==='meus')h+=rdMeus(R);
   if(tab==='parceiros')h+=rdParceiros(R);
@@ -2419,15 +2424,15 @@ function rdBusca(R,p){
       return '<div class="rd-cand '+st+'"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,40)+'</button><div class="t"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'"><b>'+esc(x.nome)+'</b></button><span class="small muted">'+esc(x.cidade)+' · '+estrelas(x.nota)+' '+x.nota+'</span></div><span class="rd-cst">'+({aceitou:'✓ Aceitou',fechado:'Encerrado',avisado:'<i class="rd-pulse"></i> Avisado',fila:'Na fila'})[st]+'</span></div>';}).join('')+'</div></section>';
 }
 /* ---------- Prévia: modo Laboratório / Clínica em tela própria (sem o menu do cadista) ---------- */
-var PASSOS_LAB=[['busca','Você pediu','Esperando um cadista aceitar'],['desenho','Cadista desenhando','Ele está fazendo o projeto'],['revisao','Para você revisar','Veja em 3D e aprove'],['aprovado','Pagar o cadista','Pix direto para ele'],['pago','Pronto','Concluído']];
+var PASSOS_LAB=[['busca','Publicado','No feed dos cadistas'],['desenho','Cadista desenhando','Ele está fazendo o projeto'],['revisao','Para você revisar','Veja em 3D e aprove'],['aprovado','Pagar o cadista','Pix direto para ele'],['pago','Pronto','Concluído']];
 function labProximo(p){var c=p.cad?labCad(p.cad):null;
-  if(p.st==='busca')return p.props&&p.props.length?{t:p.props.length+' cadista(s) querem fazer. Escolha um.',cls:'a'}:{t:'Aguardando um cadista aceitar.',cls:''};
+  if(p.st==='busca')return p.props&&p.props.length?{t:p.props.length+' cadista(s) aceitaram. Aceite um para começar.',cls:'a'}:{t:'Publicado no feed. Aguardando os cadistas.',cls:''};
   if(p.st==='desenho')return {t:esc(c.nome.split(' ')[0])+' está desenhando. Entrega '+prazoRede(p.prazo,p.hora).replace(/<[^>]+>/g,'').replace('⏰','').trim().replace(/^Entrega /,''),cls:''};
   if(p.st==='revisao')return {t:'O projeto chegou. Revise e aprove.',cls:'a'};
   if(p.st==='aprovado')return {t:'Pague '+brl(p.valor)+' no Pix de '+esc(c.nome.split(' ')[0])+'.',cls:'a'};
   return {t:'Concluído.',cls:'ok'};}
 function labCardS(p){var c=p.cad?labCad(p.cad):null,nx=labProximo(p),i=PASSOS_LAB.map(function(e){return e[0];}).indexOf(p.st),bt='';
-  if(p.st==='busca')bt=p.props&&p.props.length?p.props.map(function(pr){var x=labCad(pr.cad);return '<div class="lm-prop"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,40)+'</button><div class="t"><b>'+esc(x.nome)+'</b> <span class="small">'+estrelas(x.nota)+'</span><span class="small muted">'+x.feitos+' trabalhos · '+esc(pr.obs)+'</span></div><button class="btn pri" data-a="labEscolhe" data-id="'+p.id+'" data-c="'+x.id+'">Escolher</button></div>';}).join(''):'<button class="btn sm ghost" data-a="labSim" data-id="'+p.id+'">Simular: chegaram propostas</button>';
+  if(p.st==='busca')bt=p.props&&p.props.length?p.props.map(function(pr){var x=labCad(pr.cad);return '<div class="lm-prop"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,40)+'</button><div class="t"><b>'+esc(x.nome)+(pr.cad==='eu'?' <span class="tag a">você, na conta de cadista</span>':'')+'</b> <span class="small">'+estrelas(x.nota)+'</span><span class="small muted">'+x.feitos+' trabalhos · '+esc(pr.obs)+'</span></div><div class="row" style="gap:6px"><button class="btn sm" data-a="labRecusaProp" data-id="'+p.id+'" data-c="'+x.id+'">Recusar</button><button class="btn sm pri" data-a="labEscolhe" data-id="'+p.id+'" data-c="'+x.id+'">Aceitar</button></div></div>';}).join(''):'<span class="small muted">No feed dos cadistas há '+(p.min||'poucos')+' min.</span><button class="btn sm ghost" data-a="labSim" data-id="'+p.id+'">Simular: cadistas aceitaram</button>';
   if(p.st==='desenho')bt='<button class="btn sm ghost" data-a="labSt" data-id="'+p.id+'" data-v="revisao">Simular: cadista entregou</button>';
   if(p.st==='revisao')bt='<button class="btn" data-a="rdVer">Ver em 3D</button><button class="btn" data-a="labSt" data-id="'+p.id+'" data-v="desenho">Pedir ajuste</button><button class="btn pri" data-a="labSt" data-id="'+p.id+'" data-v="aprovado">Aprovar</button>';
   if(p.st==='aprovado')bt='<span class="rd-pix">Pix: <b class="mono">'+esc(c.pix)+'</b><button class="btn sm" data-a="rdCopiaPix" data-v="'+esc(c.pix)+'">Copiar</button></span><button class="btn pri" data-a="labSt" data-id="'+p.id+'" data-v="pago">Já paguei</button>';
@@ -2444,13 +2449,18 @@ function rLabModo(){var L=labIni(),P=L.pedidos,f=L.filtro||'abertos';
     '<header class="lm-top"><div class="row" style="gap:10px">'+logo(28)+'<b>Ideali CAD</b><span class="tag a">Laboratório · prévia</span></div><button class="btn sm" data-a="labModo" data-v="0">← Voltar para minha conta de cadista</button></header>'+
     '<main class="lm-main">'+
       '<p class="lm-aviso">Prévia: é assim que um <b>laboratório ou clínica</b> vai ver o sistema. Dados de exemplo, nada é salvo.</p>'+
-      '<section class="lm-hero"><div><h1>Olá, '+esc(L.perfil.resp.split(' ')[0])+'</h1><p class="muted">'+esc(L.perfil.nome)+(acao.length?' · <b>'+acao.length+' pedido(s) precisam de você</b>':' · tudo em dia')+'</p></div><button class="btn pri lm-big" data-a="labPedir">+ Pedir um projeto</button></section>'+
-      '<section class="lm-como"><b>Como funciona</b><ol>'+[['1','Você pede','Manda o escaneamento, o prazo e quanto paga.'],['2','Um cadista aceita','Você escolhe entre os que quiserem fazer.'],['3','Você aprova','Vê o projeto em 3D ou pede ajuste.'],['4','Você paga','Direto no Pix do cadista.']].map(function(x){return '<li><i>'+x[0]+'</i><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></li>';}).join('')+'</ol></section>'+
-      '<div class="between wrap" style="margin-top:8px"><h2>Meus pedidos</h2><div class="chips-f">'+[['abertos','Em andamento'],['pagos','Concluídos']].map(function(o){return '<button class="'+(f===o[0]?'on':'')+'" data-a="labFiltro" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
-      (lst.length?'<div class="lm-lista">'+lst.map(labCardS).join('')+'</div>':'<div class="card empty">Nenhum pedido aqui.</div>')+
+      '<section class="lm-hero"><div><h1>Olá, '+esc(L.perfil.resp.split(' ')[0])+'</h1><p class="muted">'+esc(L.perfil.nome)+(acao.length?' · <b>'+acao.length+' trabalho(s) precisam de você</b>':' · tudo em dia')+'</p></div></section>'+
+      '<nav class="lm-tabs">'+[['publicar','📢 Publicar trabalho'],['meus','📋 Meus trabalhos'+(acao.length?' <b>'+acao.length+'</b>':'')]].map(function(a){return '<button class="'+((L.aba||'meus')===a[0]?'on':'')+'" data-a="labAba" data-v="'+a[0]+'">'+a[1]+'</button>';}).join('')+'</nav>'+
+      ((L.aba||'meus')==='publicar'?labPublicar(L):labMeus(L,lst,f))+
     '</main></div>';}
-function fLabPedir(){var n=labIni().novo,ts=['Coroa sobre dente','Coroa sobre implante','Facetas','Ponte fixa','Protocolo (superior)','Protocolo (inferior)','Placa de bruxismo','Provisório','Enceramento digital','Mockup','Modelo 3D'],favs=redeIni().parceiros;
-  return head('Pedir um projeto')+'<form data-form="labNovo" class="stack frm2">'+
+function labMeus(L,lst,f){return ''+
+      '<section class="lm-como"><b>Como funciona</b><ol>'+[['1','Você publica','O trabalho vai para o feed dos cadistas.'],['2','Cadistas aceitam','Você aceita um deles (ou recusa).'],['3','Você aprova','Vê o projeto em 3D ou pede ajuste.'],['4','Você paga','Direto no Pix do cadista.']].map(function(x){return '<li><i>'+x[0]+'</i><div><b>'+x[1]+'</b><span>'+x[2]+'</span></div></li>';}).join('')+'</ol></section>'+
+
+      '<div class="between wrap"><div class="chips-f">'+[['abertos','Em andamento'],['pagos','Concluídos']].map(function(o){return '<button class="'+(f===o[0]?'on':'')+'" data-a="labFiltro" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><button class="btn pri" data-a="labAba" data-v="publicar">+ Publicar trabalho</button></div>'+
+      (lst.length?'<div class="lm-lista">'+lst.map(labCardS).join('')+'</div>':'<div class="card empty">Nenhum trabalho aqui.</div>');}
+function labPublicar(L){return '<section class="card stack lm-pub"><div><h2>Publicar trabalho</h2><p class="small muted">Assim que você publicar, o trabalho aparece no feed dos cadistas da rede. Eles aceitam ou recusam, e você escolhe quem vai fazer.</p></div>'+fLabPedir(true)+'</section>';}
+function fLabPedir(inline){var n=labIni().novo,ts=['Coroa sobre dente','Coroa sobre implante','Facetas','Ponte fixa','Protocolo (superior)','Protocolo (inferior)','Placa de bruxismo','Provisório','Enceramento digital','Mockup','Modelo 3D'],favs=redeIni().parceiros;
+  return (inline?'':head('Publicar trabalho'))+'<form data-form="labNovo" class="stack frm2">'+
     '<label class="fld"><span>Trabalho</span><select name="trab">'+ts.map(function(x){return '<option'+(x===n.trab?' selected':'')+'>'+x+'</option>';}).join('')+'</select></label>'+
     '<label class="fld"><span>Dentes</span><input name="dentes" placeholder="Ex.: 36 ou 11 a 21" value="'+esc(n.dentes)+'" required></label>'+
     '<label class="fld"><span>Entregar até</span><input name="prazo" type="date" value="'+n.prazo+'"></label>'+
@@ -2461,9 +2471,9 @@ function fLabPedir(){var n=labIni().novo,ts=['Coroa sobre dente','Coroa sobre im
       '<label class="fld"><span>Hora</span><input name="hora" type="time" value="'+n.hora+'"></label>'+
       '<label class="fld"><span>Observações para o cadista</span><textarea name="obs" rows="2" placeholder="Ex.: cor A2">'+esc(n.obs)+'</textarea></label>'+
       '<div class="fld"><span>Oferecer para</span><div class="stack" style="gap:6px">'+[['rede','Toda a rede'],['favoritos','Meus cadistas favoritos primeiro'],['um','Um cadista específico']].map(function(o){return '<label class="check"><input type="radio" name="quem" value="'+o[0]+'"'+(n.quem===o[0]?' checked':'')+' data-a2="labQuem"> '+o[1]+'</label>';}).join('')+'</div></div>'+
-      '<label class="fld" '+(n.quem==='um'?'':'hidden')+' id="lab-cad"><span>Cadista</span><select name="cad">'+favs.map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+' · '+esc(c.cidade)+'</option>';}).join('')+'</select></label></div></details>'+
+      '<label class="fld" '+(n.quem==='um'?'':'hidden')+' id="lab-cad"><span>Cadista</span><select name="cad"><option value="eu">'+esc(redeIni().eu.nome)+' (você, para testar)</option>'+favs.map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+' · '+esc(c.cidade)+'</option>';}).join('')+'</select></label></div></details>'+
     '<p class="small muted" style="grid-column:1/-1">🔒 O nome do paciente nunca vai para o cadista.</p>'+
-    '<button class="btn pri block" type="submit" style="grid-column:1/-1">Publicar pedido</button></form>';}
+    '<button class="btn pri block" type="submit" style="grid-column:1/-1">📢 Publicar no feed dos cadistas</button></form>';}
 /* ---------- Prévia: conta de Laboratório / Clínica (quem procura cadista) ----------
    Tudo aqui é exemplo, guardado só na memória da página. Nenhum cadista real recebe nada. */
 var ETAPAS_LAB=[['busca','Procurando cadista'],['desenho','Em desenho'],['revisao','Para revisar'],['aprovado','Aprovado'],['pago','Pago']];
@@ -2477,7 +2487,7 @@ function labIni(){if(ui.lab)return ui.lab;var h=today(),R=redeIni();
       {id:'L101',trab:'Placa de bruxismo',dentes:'Superior',mat:'PMMA',sw:'qualquer',prazo:addDays(h,-2),hora:'10:00',valor:35,st:'aprovado',cad:'r4',quem:'Toda a rede',criado:addDays(h,-4)},
       {id:'L100',trab:'Ponte fixa',dentes:'24, 25, 26',mat:'Zircônia',sw:'exocad',prazo:addDays(h,-6),hora:'16:00',valor:105,st:'pago',cad:'r1',quem:'Favoritos',criado:addDays(h,-8),nota:5}]};
   return ui.lab;}
-function labCad(id){var R=redeIni();return R.parceiros.filter(function(x){return x.id===id;})[0]||null;}
+function labCad(id){var R=redeIni();if(id==='eu')return R.eu;return R.parceiros.filter(function(x){return x.id===id;})[0]||null;}
 function etapasLab(st){var i=ETAPAS_LAB.map(function(e){return e[0];}).indexOf(st);
   return '<div class="rd-steps">'+ETAPAS_LAB.map(function(e,k){return '<span class="'+(k<i?'ok':k===i?'on':'')+'"><i></i>'+e[1]+'</span>';}).join('')+'</div>';}
 function rLab(){var L=labIni(),t=L.tab,P=L.pedidos;
@@ -2560,8 +2570,8 @@ function rdArqs(x,lado,quem){var a=x.arqs||(x.arqs=[]);
 function rdPegar(R){
   var f=R.filtro||'todos',o=R.ordem||'valor',me=R.eu;
   var tiposMural=[];R.mural.forEach(function(x){if(tiposMural.indexOf(x.trab)<0)tiposMural.push(x.trab);});
-  var lista=R.mural.filter(function(x){return x.st==='aberto'&&(f==='todos'||x.trab===f);});
-  lista.sort(function(a,b){if(a.paraMim!==b.paraMim)return a.paraMim?-1:1;return o==='valor'?b.repasse-a.repasse:o==='prazo'?(a.prazo+a.hora<b.prazo+b.hora?-1:1):(a.min-b.min);});
+  var lista=R.mural.filter(function(x){return (x.st==='aberto'||x.st==='proposta')&&(f==='todos'||x.trab===f);});
+  lista.sort(function(a,b){if(!!a.novo!==!!b.novo)return a.novo?-1:1;if(a.paraMim!==b.paraMim)return a.paraMim?-1:1;return o==='valor'?b.repasse-a.repasse:o==='prazo'?(a.prazo+a.hora<b.prazo+b.hora?-1:1):(a.min-b.min);});
   return '<section class="card rd-eu"><div class="row" style="gap:14px;flex-wrap:wrap">'+avRede(me,52)+
       '<div style="flex:1;min-width:200px"><b>Você na rede</b><div class="small muted">'+me.feitos+' trabalhos feitos · '+estrelas(me.nota)+' '+me.nota+' · '+me.sw.join(', ')+'</div></div>'+
       '<label class="check"><input type="checkbox" id="rd-disp" '+(me.on?'checked':'')+'> <b class="'+(me.on?'rd-on':'muted')+'">'+(me.on?'Disponível para pegar trabalhos':'Ocupado: não recebo ofertas')+'</b></label>'+
@@ -2570,12 +2580,13 @@ function rdPegar(R){
       '<label class="fld" style="min-width:200px"><span>Ordenar por</span><select id="rd-ordem">'+[['valor','Maior valor'],['prazo','Prazo mais curto'],['recentes','Mais recentes']].map(function(x){return '<option value="'+x[0]+'" '+(o===x[0]?'selected':'')+'>'+x[1]+'</option>';}).join('')+'</select></label>'+
       '<span class="small muted" style="align-self:end;padding-bottom:12px">'+lista.length+' trabalho(s) disponível(is)</span></div>'+
     (lista.length?'<div class="rd-mural">'+lista.map(function(x){var de=R.cadDe[x.de];
-      return '<div class="rd-oferta'+(x.paraMim?' mim':'')+'">'+(x.paraMim?'<span class="tag a">Oferecido direto para você</span>':'')+
+      return '<div class="rd-oferta'+(x.paraMim||x.novo?' mim':'')+'">'+(x.novo?'<span class="tag ok">Acabou de ser publicado</span>':'')+(x.paraMim?'<span class="tag a">Oferecido direto para você</span>':'')+
         '<div class="between"><b style="font-size:1.05rem">'+esc(x.trab)+'</b><span class="mono val" style="font-size:1.2rem">'+brl(x.repasse)+'</span></div>'+
         '<div class="small muted">'+x.cod+(x.dentes.length?' · dentes '+x.dentes.join(', '):'')+' · '+esc(x.mat)+' · '+esc(x.sw)+'</div>'+
         prazoRede(x.prazo,x.hora)+
         '<div class="between small"><button class="rd-de" data-a="rdPerfil" data-id="'+x.de+'">'+avRede(de,26)+'<span>'+esc(de.nome)+' · '+estrelas(de.nota)+'</span></button><span class="muted">há '+(x.min<60?x.min+' min':Math.round(x.min/60)+' h')+'</span></div>'+
-        '<div class="row" style="gap:8px"><button class="btn sm pri" data-a="rdPega" data-id="'+x.id+'" '+(me.on?'':'disabled')+'>Pegar trabalho</button>'+(x.paraMim?'<button class="btn sm" data-a="rdIgnora" data-id="'+x.id+'">Recusar</button>':'')+'</div></div>';}).join('')+'</div>'
+        (x.st==='proposta'?'<div class="lm-agora small"><b>✓ Você aceitou.</b> Aguardando '+esc(de.nome)+' confirmar você.</div>':
+        '<div class="row" style="gap:8px"><button class="btn sm pri" data-a="rdPega" data-id="'+x.id+'" '+(me.on?'':'disabled')+'>Aceitar</button><button class="btn sm" data-a="rdIgnora" data-id="'+x.id+'">Recusar</button></div>')+'</div>';}).join('')+'</div>'
       :'<div class="card empty">Nenhum trabalho disponível com esse filtro agora.</div>');
 }
 function rdMeus(R){
@@ -3454,12 +3465,19 @@ var A={
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
   labModo:function(d){ui.modoLab=d.v==='1';ui.ddOpen=null;closeSheet();if(ui.modoLab){labIni().filtro='abertos';}render();window.scrollTo(0,0);},
-  labPedir:function(){openSheet(fLabPedir);},
+  labPedir:function(){labIni().aba='publicar';render();window.scrollTo(0,0);},
+  labAba:function(d){labIni().aba=d.v;render();window.scrollTo(0,0);},
+  labRecusaProp:function(d){var L=labIni(),p=L.pedidos.filter(function(x){return x.id===d.id;})[0];p.props=p.props.filter(function(x){return x.cad!==d.c;});
+    if(d.c==='eu'){var R=redeIni(),m=R.mural.filter(function(x){return x.lab===p.id;})[0];if(m){m.st='recusado';}R.avisoEu='O laboratório escolheu outro cadista para o '+p.id+'.';}
+    render();toast('Proposta recusada.');},
   labTab:function(d){labIni().tab=d.v;render();window.scrollTo(0,0);},
   labFiltro:function(d){labIni().filtro=d.v;render();},
   labVer:function(d){var L=labIni();L.tab='pedidos';L.filtro=ui.modoLab?'abertos':'todos';render();setTimeout(function(){var e=document.getElementById('lab-'+d.id);if(e)e.scrollIntoView({behavior:'smooth',block:'center'});},50);},
   labSim:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.props=[{cad:'r1',em:'agora',obs:'Consigo entregar antes do prazo.'},{cad:'r5',em:'agora',obs:'Faço hoje à noite.'}];render();toast('2 cadistas mandaram proposta.');},
-  labEscolhe:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.cad=d.c;p.st='desenho';p.props=[];render();toast(labCad(d.c).nome+' vai desenhar o '+p.id+'.');},
+  labEscolhe:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.cad=d.c;p.st='desenho';p.props=[];
+    var R=redeIni(),m=R.mural.filter(function(x){return x.lab===p.id;})[0];
+    if(m){if(d.c==='eu'){m.st='pego';var k='k'+Date.now();R.meus.unshift({id:k,cod:m.cod,trab:m.trab,dentes:m.dentes,mat:m.mat,repasse:m.repasse,hora:m.hora,prazo:m.prazo,de:'lab',st:'desenho'});R.chat[k]=[{de:'sis',t:'O laboratório aceitou você no '+m.cod+'. Chat liberado.'}];R.avisoEu='O laboratório aceitou você no '+m.cod+'. Ele está em Meus trabalhos.';}else{m.st='fechado';}}
+    render();toast(labCad(d.c).nome+' vai desenhar o '+p.id+'.');},
   labSt:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.st=d.v;render();toast(d.v==='aprovado'?'Projeto aprovado. Agora é só pagar o cadista.':d.v==='pago'?'Pagamento registrado.':d.v==='desenho'?'Ajuste pedido ao cadista.':'Projeto entregue para você revisar.');},
   labNota:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.nota=+d.n;render();},
   labCancela:function(d){var L=labIni();L.pedidos=L.pedidos.filter(function(x){return x.id!==d.id;});render();toast('Pedido cancelado.');},
@@ -3498,11 +3516,13 @@ var A={
         R.chat[id].push({de:'outro',t:r[R.chat[id].length%r.length],h:rdHora()});
         if(!(R.dock.open&&R.dock.conv===id)){R.naoLidas=R.naoLidas||{};R.naoLidas[id]=(R.naoLidas[id]||0)+1;if(ui.tab==='rede')render();}
         rdDock();},1600);},900);},
-  rdPega:function(d){var R=redeIni(),x=R.mural.filter(function(q){return q.id===d.id;})[0];if(!x)return;x.st='pego';
+  rdPega:function(d){var R=redeIni(),x=R.mural.filter(function(q){return q.id===d.id;})[0];if(!x)return;
+    if(x.lab){var p=labIni().pedidos.filter(function(q){return q.id===x.lab;})[0];x.st='proposta';x.novo=false;if(p){p.props=(p.props||[]).concat([{cad:'eu',em:'agora',obs:'Aceitei pelo feed.'}]);}render();toast('Você aceitou. Agora o laboratório confirma quem vai fazer.');return;}
+    x.st='pego';
     R.meus.unshift({id:'k'+Date.now(),cod:x.cod,trab:x.trab,dentes:x.dentes,mat:x.mat,repasse:x.repasse,hora:x.hora,prazo:x.prazo,de:x.de,st:'desenho'});
     R.chat[R.meus[0].id]=[{de:'sis',t:'Você aceitou o '+x.cod+'. Chat liberado.'}];
     R.tab='meus';render();toast('Trabalho '+x.cod+' é seu! Arquivos e chat liberados.');},
-  rdIgnora:function(d){var R=redeIni(),x=R.mural.filter(function(q){return q.id===d.id;})[0];if(x){x.st='recusado';render();}},
+  rdIgnora:function(d){var R=redeIni(),x=R.mural.filter(function(q){return q.id===d.id;})[0];if(x){x.st='recusado';render();toast('Trabalho recusado. Ele some do seu feed.');}},
   rdMeuSt:function(d){var R=redeIni(),x=R.meus.filter(function(q){return q.id===d.id;})[0];if(!x)return;x.st=d.v;
     if(d.v==='recusado')x.motivo='Margem curta no 21';
     if(d.v==='pago'){var pt=R.eu.porTipo;pt[x.trab]=(pt[x.trab]||0)+1;R.eu.elementos+=Math.max(1,x.dentes.length);}
@@ -3749,8 +3769,10 @@ var F={
   labNovo:function(fd){var L=labIni(),v=function(k){return String(fd.get(k)||'').trim();};
     if(!v('dentes')){toast('Diga quais dentes.');return;}if(!(+v('valor')>0)){toast('Diga quanto você paga pelo projeto.');return;}
     var q=v('quem'),c=q==='um'?v('cad'):null,num='L'+(105+L.pedidos.length);
-    L.pedidos.unshift({id:num,trab:v('trab'),dentes:v('dentes'),mat:v('mat'),sw:v('sw'),prazo:v('prazo')||addDays(today(),1),hora:v('hora')||'18:00',valor:+v('valor'),st:'busca',cad:null,quem:q==='rede'?'Toda a rede':q==='favoritos'?'Favoritos':labCad(c).nome,criado:today(),props:q==='um'?[{cad:c,em:'agora',obs:'Recebi seu convite.'}]:[]});
-    L.novo.dentes='';L.novo.valor='';L.novo.obs='';L.tab='pedidos';L.filtro=ui.modoLab?'abertos':'todos';closeSheet();render();window.scrollTo(0,0);toast('Pedido '+num+' publicado. Os cadistas da rede já podem ver.');},
+    var R=redeIni();R.cadDe.lab={id:'lab',nome:L.perfil.nome,cidade:L.perfil.cidade,sw:L.perfil.sw,nota:4.8,av:12,cor:2};
+    R.mural.unshift({id:'m'+num,lab:num,cod:num,trab:v('trab'),dentes:v('dentes').split(/[^0-9]+/).filter(Boolean).map(Number),mat:v('mat')||'—',sw:v('sw')||'qualquer',repasse:+v('valor'),hora:v('hora')||'18:00',prazo:v('prazo')||addDays(today(),1),de:'lab',min:0,paraMim:q==='um'&&v('cad')==='eu',st:'aberto',novo:true});
+    L.pedidos.unshift({id:num,trab:v('trab'),dentes:v('dentes'),mat:v('mat'),sw:v('sw'),prazo:v('prazo')||addDays(today(),1),hora:v('hora')||'18:00',valor:+v('valor'),st:'busca',cad:null,quem:q==='rede'?'Toda a rede':q==='favoritos'?'Favoritos':labCad(c).nome,criado:today(),min:0,props:[]});
+    L.novo.dentes='';L.novo.valor='';L.novo.obs='';L.tab='pedidos';L.aba='meus';L.filtro=ui.modoLab?'abertos':'todos';closeSheet();render();window.scrollTo(0,0);toast('Trabalho '+num+' publicado. Já aparece no feed dos cadistas.');},
   metas:function(fd,f){if(!guard())return;var m=f.dataset.m,num=function(k){var v=parseFloat(String(fd.get(k)||'').replace(',','.'));return v>0?Math.round(v*(k==='fat'?100:1))/(k==='fat'?100:1):0;};
     var o={desde:m,el:num('el'),fat:num('fat'),prot:num('prot'),pla:num('pla')};
     S.prefs=S.prefs||{};var cfg=JSON.parse(JSON.stringify(S.prefs.metas||{dias:5,v:[]}));cfg.dias=+fd.get('dias')||5;
