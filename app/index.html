@@ -305,6 +305,7 @@ select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline
 .sin-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sin-pr{font:700 .68rem var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--urgent)}
 .chips-f{display:flex;gap:8px;flex-wrap:wrap}.chips-f button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:.4em .9em;font-weight:600;font-size:.86rem;cursor:pointer;color:var(--ink)}
 .chips-f button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.chips-f b{font-family:var(--f-mono);margin-left:4px}
+.main>.an-wrap,.an-wrap{display:flex!important;flex-direction:column}.an-wrap>section,.an-wrap>div{width:100%;box-sizing:border-box}.an-demo-b{border-color:rgba(167,139,250,.55)}
 .an-t{width:100%;border-collapse:collapse;font-size:.9rem;min-width:760px}.an-t th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);font-weight:600}
 .an-t td{padding:9px 10px;border-bottom:1px solid var(--line)}.an-t .up{color:var(--ok);font-weight:600}.an-t .down,.an-t td.down{color:var(--urgent);font-weight:600}
 .pv-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
@@ -936,7 +937,7 @@ var MENU=[
   ['Ferramentas',[['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 01h00';
+var VERSAO='15/10 · 01h20';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={analises:'Análises',rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -952,7 +953,7 @@ function render(){
   else if(a.status==='teste') chip='<span class="tag a">Teste · '+Math.max(0,daysBetween(today(),a.testeAte))+' dias</span>';
   else chip='<span class="tag ok">Ativa</span>';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
-    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,analises:rAnalises,config:rConfig,admin:rAdmin};
+    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,analises:rAnalisesTab,config:rConfig,admin:rAdmin};
   var body=(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
@@ -1176,27 +1177,52 @@ function msgSinal(s){var c=cliente(s.cid),nome=c?(((c.titulo==='Dr.'||c.titulo==
   if(s.msg==='sumiu')return 'Oi, '+nome+'! Tudo bem por aí? Senti falta dos seus casos 😊 Se precisar de algo, minha agenda está aberta. E se tiver algo que eu possa melhorar, me conta!';
   return 'Oi, '+nome+'! Tudo bem? Queria saber como estão sendo os trabalhos comigo e se tem algo que eu possa melhorar no atendimento ou nos projetos. Obrigado pela parceria!';}
 function cartaoSinal(s){var c=s.cid?cliente(s.cid):null,cat=CAT_SIN[s.cat];
+  if(EM_DEMO)return cartaoSinalBase(s,c,cat).replace(/data-a="(verCliente|cobranca|tab)"/g,'data-a="demoAviso"');
+  return cartaoSinalBase(s,c,cat);}
+function cartaoSinalBase(s,c,cat){
   return '<article class="sin n'+s.n+' c-'+s.cat+'"><div class="sin-h"><span class="tag '+cat[1]+'">'+cat[0]+'</span>'+(s.n>=3?'<span class="sin-pr">prioridade alta</span>':'')+'</div><b>'+esc(s.tit)+'</b><p>'+esc(s.txt)+'</p>'+
     '<div class="row wrap" style="gap:8px">'+(c?'<button class="btn sm" data-a="verCliente" data-id="'+c.id+'">Ver cliente</button>':'')+
-    (s.msg&&c?'<a class="btn sm pri" target="_blank" rel="noopener" href="'+waLink(msgSinal(s),c.telefone)+'">Pedir retorno no WhatsApp</a>':'')+
+    (s.msg&&c?(c.demo?'<button class="btn sm pri" data-a="demoMsg" data-m="'+esc(msgSinal(s))+'">Pedir retorno no WhatsApp</button>':'<a class="btn sm pri" target="_blank" rel="noopener" href="'+waLink(msgSinal(s),c.telefone)+'">Pedir retorno no WhatsApp</a>'):'')+
     (s.acao==='atrasados'?'<button class="btn sm pri" data-a="tab" data-v="pedidos">Abrir Produção</button>':'')+(s.acao==='cobrar'&&c?'<button class="btn sm pri" data-a="cobranca" data-id="'+c.id+'">Gerar cobrança</button>':'')+'</div></article>';}
 function secSinaisMini(){var an=analisar(),top=an.sig.filter(function(s){return s.n>=1;}).slice(0,3);
   return '<section class="card stack" style="grid-column:span 12"><div class="between wrap"><div><h2>Sinais e alertas</h2><p class="small muted">Mudanças de comportamento dos clientes e dos seus prazos.</p></div><button class="btn sm pri" data-a="tab" data-v="analises">Ver Análises</button></div>'+
     (top.length?'<div class="sin-grid">'+top.map(cartaoSinal).join('')+'</div>':'<p class="empty">Nenhum sinal de alerta agora. 👍</p>')+'</section>';}
+/* ---------- Análises: simulação com clientes fictícios (nada é salvo) ----------
+   Troca S.clientes/S.pedidos/S.tipos só durante o render (síncrono) e devolve os dados reais em seguida. */
+var DEMO_AN=null,EM_DEMO=false;
+function demoAnalises(){if(DEMO_AN&&DEMO_AN.dia===today())return DEMO_AN;var seed=11;function r(){seed=(seed*16807)%2147483647;return seed/2147483647;}
+  var tipos=[],T={},cli=[],peds=[],num=1000;
+  ['Coroa unitária','Faceta','Protocolo','Placa de bruxismo'].forEach(function(n,i){var t={id:'demo-t'+i,nome:n,valor:150};tipos.push(t);T[n]=t.id;});
+  [['Dr.','Ricardo','Alves',4,0,'protocolo'],['Dra.','Camila','Souza',6,0,'cresce'],['','Lab Sorriso','Perfeito',5,0,'normal'],['Dr.','Fernando','Reis',9,55,'sumiu'],['Dra.','Juliana','Prado',5,0,'queda'],['Dr.','Marcos','Tavares',7,0,'devendo']].forEach(function(d,ci){
+    var c={id:'demo-c'+ci,titulo:d[0],pnome:d[1],sobrenome:d[2],nome:(d[0]?d[0]+' ':'')+d[1]+' '+d[2],telefone:'',demo:true};cli.push(c);
+    for(var dia=180;dia>=d[4];){var gap=d[3]*(0.7+r()*0.6);if(d[5]==='queda'&&dia<90)gap*=2.6;if(d[5]==='cresce'&&dia<90)gap*=0.55;dia-=Math.max(1,Math.round(gap));if(dia<0)break;
+      var dt=addDays(today(),-dia),t=T['Coroa unitária'],aj=r()<.1?1:0,el=[11];
+      if(d[5]==='protocolo'&&dia>90&&r()<.5){t=T['Protocolo'];aj=r()<.7?2:1;el=[11,12,13,14,15,16,21,22,23,24,25,26];}
+      if(d[5]==='cresce'&&r()<.3)t=T['Faceta'];
+      if(d[5]==='normal'&&r()<.15)t=T['Placa de bruxismo'];
+      var late=dia<90&&r()<.45;
+      peds.push({id:'demo-p'+num,num:++num,clienteId:c.id,paciente:'P.S.',elementos:el,itens:el.map(function(e){return {d:e,t:t};}),extras:[],status:dia>6?'arquivado':'entrada',recebido:dt,prazo:addDays(dt,4),entregue:dia>6?addDays(dt,late?6:2):null,valor:150*el.length,pago:(d[5]==='devendo'&&dia<75)?null:(dia>12?addDays(dt,12):null),ajustes:aj});}});
+  return DEMO_AN={dia:today(),clientes:cli,pedidos:peds,tipos:tipos};}
+function comDemo(fn){var d=demoAnalises(),bk=[S.clientes,S.pedidos,S.tipos];S.clientes=d.clientes;S.pedidos=d.pedidos;S.tipos=d.tipos;EM_DEMO=true;
+  try{return fn();}finally{EM_DEMO=false;S.clientes=bk[0];S.pedidos=bk[1];S.tipos=bk[2];}}
+function rAnalisesTab(){
+  if(!ui.anDemo)return rAnalises();
+  return '<div class="stack an-wrap" style="gap:16px"><section class="card an-demo-b"><div class="between wrap"><div><h2>Simulação</h2><p class="small muted">Clientes e pedidos fictícios, só para você ver como a aba funciona. Nada aqui é salvo e seus dados reais não mudam.</p></div><button class="btn sm pri" data-a="anDemo" data-v="0">Sair da simulação</button></div></section>'+comDemo(rAnalises)+'</div>';}
+function fDemoMsg(m){return head('Mensagem que iria pelo WhatsApp')+'<p class="muted small">Na simulação o WhatsApp não abre. Com um cliente real, este botão abre a conversa com o texto pronto, e você ainda pode editar antes de enviar.</p><div class="card" style="white-space:pre-wrap">'+esc(m)+'</div><button class="btn block" data-a="fechar">Fechar</button>';}
 function rAnalises(){var an=analisar(),f=ui.sinF||'todos',cont={};an.sig.forEach(function(s){cont[s.cat]=(cont[s.cat]||0)+1;});
   var lista=an.sig.filter(function(s){return f==='todos'||s.cat===f;});
   var dlt=function(a,b){if(!b)return a?'<span class="up">novo</span>':'—';var v=Math.round((a-b)/b*100);return '<span class="'+(v>=0?'up':'down')+'">'+(v>=0?'+':'')+v+'%</span>';};
-  return '<div class="stack" style="gap:16px">'+
-    '<section class="card stack"><div class="between wrap"><div><h2>Sinais e alertas</h2><p class="small muted">Compara os últimos 90 dias com os 90 anteriores. São sinais para conferir com o cliente, não certezas.</p></div></div>'+
+  return '<div class="stack an-wrap" style="gap:16px">'+
+    '<section class="card stack"><div class="between wrap"><div><h2>Sinais e alertas</h2><p class="small muted">Compara os últimos 90 dias com os 90 anteriores. São sinais para conferir com o cliente, não certezas.</p></div>'+(ui.anDemo?'':'<button class="btn sm" data-a="anDemo" data-v="1">Ver simulação</button>')+'</div>'+
       '<div class="chips-f"><button class="'+(f==='todos'?'on':'')+'" data-a="sinF" data-v="todos">Todos <b>'+an.sig.length+'</b></button>'+Object.keys(CAT_SIN).filter(function(k){return cont[k];}).map(function(k){return '<button class="'+(f===k?'on':'')+'" data-a="sinF" data-v="'+k+'">'+CAT_SIN[k][0]+' <b>'+cont[k]+'</b></button>';}).join('')+'</div>'+
-      (lista.length?'<div class="sin-grid">'+lista.map(cartaoSinal).join('')+'</div>':'<p class="empty">Nenhum sinal por aqui. 👍</p>')+'</section>'+
+      (lista.length?'<div class="sin-grid">'+lista.map(cartaoSinal).join('')+'</div>':(an.cli.length||EM_DEMO?'<p class="empty">Nenhum sinal por aqui. 👍</p>':'<p class="empty">Os sinais aparecem conforme você registra pedidos. Quer ver como fica? <button class="linkbtn" data-a="anDemo" data-v="1">Ver simulação</button></p>'))+'</section>'+
     secPrevisao().replace('style="grid-column:span 12" id="prev-sec"','id="prev-sec"')+
     '<section class="card stack"><h2>Por tipo de trabalho</h2><p class="small muted">Últimos 6 meses. Variação compara os últimos 90 dias com os 90 anteriores.</p>'+
       (an.tipos.length?'<div style="overflow-x:auto"><table class="an-t"><thead><tr><th>Trabalho</th><th>Últimos 90 dias</th><th>90 dias antes</th><th>Variação</th><th>Ajustes por pedido</th><th>Tempo até enviar</th><th>No prazo</th></tr></thead><tbody>'+
         an.tipos.map(function(o){return '<tr><td><b>'+esc(o.n)+'</b></td><td>'+o.a+'</td><td>'+o.b+'</td><td>'+dlt(o.a,o.b)+'</td><td class="'+(o.ajm>=an.ajGeral*1.6&&o.ajm>=1.2?'down':'')+'">'+o.ajm.toFixed(1).replace('.',',')+'</td><td>'+(o.leadN?(o.lead/o.leadN).toFixed(1).replace('.',',')+' dias':'—')+'</td><td>'+(o.com?pct(o.com-o.late,o.com)+'%':'—')+'</td></tr>';}).join('')+'</tbody></table></div>':'<p class="empty">Sem pedidos nos últimos 6 meses.</p>')+'</section>'+
     '<section class="card stack"><h2>Por cliente</h2>'+
       (an.cli.length?'<div style="overflow-x:auto"><table class="an-t"><thead><tr><th>Cliente</th><th>Últimos 90 dias</th><th>90 dias antes</th><th>Variação</th><th>Costuma pedir a cada</th><th>Último pedido</th><th>Parou de mandar</th><th>Ajustes por pedido</th></tr></thead><tbody>'+
-        an.cli.map(function(l){return '<tr><td><button class="linkbtn" data-a="verCliente" data-id="'+l.c.id+'">'+esc(l.c.nome)+'</button></td><td>'+l.a+'</td><td>'+l.b+'</td><td>'+dlt(l.a,l.b)+'</td><td>'+(l.iv?Math.round(l.iv)+' dias':'—')+'</td><td>'+dmy(l.ult)+' <span class="muted small">('+l.dias+'d)</span></td><td>'+(l.parou.length?'<span class="down">'+esc(l.parou.join(', '))+'</span>':'—')+'</td><td>'+l.aj.toFixed(1).replace('.',',')+'</td></tr>';}).join('')+'</tbody></table></div>':'<p class="empty">Sem clientes com pedidos.</p>')+'</section>'+
+        an.cli.map(function(l){return '<tr><td><button class="linkbtn" data-a="'+(EM_DEMO?'demoAviso':'verCliente')+'" data-id="'+l.c.id+'">'+esc(l.c.nome)+'</button></td><td>'+l.a+'</td><td>'+l.b+'</td><td>'+dlt(l.a,l.b)+'</td><td>'+(l.iv?Math.round(l.iv)+' dias':'—')+'</td><td>'+dmy(l.ult)+' <span class="muted small">('+l.dias+'d)</span></td><td>'+(l.parou.length?'<span class="down">'+esc(l.parou.join(', '))+'</span>':'—')+'</td><td>'+l.aj.toFixed(1).replace('.',',')+'</td></tr>';}).join('')+'</tbody></table></div>':'<p class="empty">Sem clientes com pedidos.</p>')+'</section>'+
   '</div>';}
 /* ---------- Previsão de pedidos ----------
    Modelo simples e explicável: para cada cliente, ritmo recente de pedidos (últimos 30/60/90 dias com pesos 50/30/20%),
@@ -3054,6 +3080,9 @@ var A={
   relCli:function(d){ui.sheet.args=[d.id||null];renderSheet();},
   relPdf:function(d,el){var cb=document.getElementById('rel-val'),v=!cb||cb.checked;ui.relVal=v;var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraRelProd(d.id,v).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
   sinF:function(d){ui.sinF=d.v;render();},
+  anDemo:function(d){ui.anDemo=d.v==='1';ui.sinF='todos';render();window.scrollTo(0,0);},
+  demoMsg:function(d){openSheet(fDemoMsg,d.m);},
+  demoAviso:function(){toast('Na simulação esse botão não abre nada. Com seus clientes reais ele funciona.');},
   prevMod:function(d){ui.prevMod=d.v;var y=window.scrollY;render();window.scrollTo(0,y);},
   limpaCliProd:function(){ui.cliProd=null;render();},
   linkGerar:async function(d,el){if(!guard()||!sb)return;var tinha=ui.links&&ui.links[d.id]&&ui.links[d.id].token;
