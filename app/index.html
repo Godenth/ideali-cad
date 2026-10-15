@@ -498,6 +498,10 @@ details.mm[open]>summary::after{transform:rotate(180deg)}
 .od-par{fill:#A7B1BE;stroke:#6B7685;stroke-width:1}.od-rosca{stroke:#6B7685;stroke-width:1.2}.od-pil{fill:#7E8896}
 .od-fac{fill:var(--accent);fill-opacity:.3;stroke:var(--accent);stroke-width:2.6;stroke-linejoin:round}
 .od-gengiva{stroke:#E59AA6;stroke-width:3;stroke-dasharray:3 3;stroke-linecap:round}
+.od-pla{fill:var(--accent);fill-opacity:.18;stroke:none}
+.od-placa{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-dasharray:7 5}
+.od-placa-t{font:800 12px var(--f-mono);letter-spacing:.12em;fill:var(--accent);text-anchor:middle;paint-order:stroke;stroke:var(--bg);stroke-width:4px}
+.od-leg .od-i-pla{background:none;border:2px dashed var(--accent)}
 .od-uniao{fill:var(--accent);stroke:var(--surface);stroke-width:1.5}
 .od-meio{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4;opacity:.6}
 .od-num{font:600 11px var(--f-mono);fill:var(--muted);text-anchor:middle}.od-num.on{fill:var(--ink);font-weight:700}
@@ -841,7 +845,7 @@ var MENU=[
   ['Ferramentas',[['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['config','Configurações']]]
 ];
-var VERSAO='15/10 · 00h30';
+var VERSAO='15/10 · 00h45';
 var CFG=['config','tabela','arquivos','lixeira','admin'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={rede:'Rede',admin:'Configurações',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2092,8 +2096,10 @@ function tipoPed(p){var n=nomeTrab(p);return n?{nome:n}:null;}
 function calcItens(cid,itens,extras,data){
   var g={},linhas=[],bruto=0;
   itens.forEach(function(i){if(!i.t)return;g[i.t]=g[i.t]||{n:0,ds:[]};g[i.t].n++;g[i.t].ds.push(i.d);});
-  Object.keys(g).forEach(function(tid){var t=tipo(tid);if(!t)return;var u=precoUnit(cid,tid),q=t.forma==='elemento'?g[tid].n:1;bruto+=u*q;
-    linhas.push({l:t.nome+(t.forma==='elemento'?' · '+q+' × '+brl(u):' · valor fechado')+' <span class="muted small">('+g[tid].ds.join(', ')+')</span>',v:u*q});});
+  Object.keys(g).forEach(function(tid){var t=tipo(tid);if(!t)return;var u=precoUnit(cid,tid),pl=/placa/i.test(t.nome);
+    var arcos=pl?[UP,LO].filter(function(a){return g[tid].ds.some(function(d){return a.indexOf(d)>=0;});}):null;
+    var q=pl?arcos.length:t.forma==='elemento'?g[tid].n:1;bruto+=u*q;
+    linhas.push({l:t.nome+(pl?' · '+q+' arcada(s) × '+brl(u)+' <span class="muted small">('+arcos.map(function(a){return a===UP?'superior':'inferior';}).join(' + ')+')</span>':(t.forma==='elemento'?' · '+q+' × '+brl(u):' · valor fechado')+' <span class="muted small">('+g[tid].ds.join(', ')+')</span>'),v:u*q});});
   (extras||[]).forEach(function(x){var t=tipo(x.t);if(!t)return;var u=precoUnit(cid,x.t),q=Math.max(1,+x.q||1);bruto+=u*q;linhas.push({l:esc(t.nome)+' · '+q+' × '+brl(u),v:u*q});});
   var f=faixaDe(totalMes(cid,prevMonth(monthOf(data||today())))),pct=f?f.pct:0;
   return {linhas:linhas,bruto:bruto,pct:pct,total:Math.round(bruto*(100-pct))/100};
@@ -2131,19 +2137,24 @@ function fPedido(id,preCli){
 }
 function tiposOpts(sel){var ts=alive(S.tipos).filter(function(t){return t.ativo||t.id===sel;});
   return '<option value="">Escolha o trabalho…</option>'+ts.map(function(t){return '<option value="'+t.id+'" '+(t.id===sel?'selected':'')+'>'+esc(t.nome)+'</option>';}).join('');}
+function ehPlaca(tid){var t=tipo(tid);return !!(t&&/placa/i.test(t.nome));}
 function ehImplante(tid){var t=tipo(tid);return !!(t&&/implante|protocolo/i.test(t.nome));}
 function descItem(i){var t=tipo(i.t);return '<b class="mono">'+i.d+'</b> · '+(t?esc(t.nome):'<span style="color:var(--urgent)">escolha o trabalho</span>')+(i.imp?' · <span class="muted">'+esc([i.m,i.c].filter(Boolean).join(' · ')||'sobre implante')+'</span>':'');}
 function renderItens(){
   var f=document.querySelector('form[data-form="pedido"]');if(!f)return;
   var its=ui.pdItens||[],mapa={};its.forEach(function(i){mapa[i.d]=i;});
   [].forEach.call(f.querySelectorAll('.tooth'),function(b){var i=mapa[+b.dataset.n];b.classList.toggle('on',!!i);b.classList.toggle('imp',!!(i&&i.imp));b.classList.toggle('ed',ui.pdEd===+b.dataset.n);});
-  [UP,LO].forEach(function(list){list.forEach(function(n,k){var sp=f.querySelector('.conn span[data-cn="'+n+'"]'),b=sp&&sp.querySelector('.cn');if(!b)return;var nx=list[k+1],vis=!!(mapa[n]&&mapa[nx]),u=vis&&!!mapa[n].u;
+  [UP,LO].forEach(function(list){list.forEach(function(n,k){var sp=f.querySelector('.conn span[data-cn="'+n+'"]'),b=sp&&sp.querySelector('.cn');if(!b)return;var nx=list[k+1],vis=!!(mapa[n]&&mapa[nx])&&!ehPlaca(mapa[n].t)&&!ehPlaca(mapa[nx].t),u=vis&&!!mapa[n].u;
     b.classList.toggle('vis',vis);b.classList.toggle('u',u);sp.classList.toggle('u',u);b.setAttribute('aria-pressed',u);b.title=u?'Unidos (fixo). Toque para separar':'Separados. Toque para unir';});});
   var q=document.getElementById('pd-qtd');if(q)q.textContent='('+its.length+')';
   var ord=its.slice().sort(function(a,b){return UP.concat(LO).indexOf(a.d)-UP.concat(LO).indexOf(b.d);});
   var L=document.getElementById('pd-lista');
   var gu=gruposUniao(its);
-  if(L)L.innerHTML=(gu.length?'<div class="pd-uniao">'+gu.map(function(g){return '<span><b>Unidos (fixo):</b> '+g.join(' – ')+'</span>';}).join('')+'</div>':'')+(ord.length?ord.map(function(i){return '<div class="pd-it'+(i.t?'':' falta')+'"><button type="button" class="pd-it-t" data-a="tooth" data-n="'+i.d+'">'+descItem(i)+'</button><button type="button" class="tp-x" data-a="pdTira" data-n="'+i.d+'" aria-label="Tirar dente '+i.d+'">✕</button></div>';}).join(''):'')+
+  var placaArcos=[];[UP,LO].forEach(function(a){var pi=ord.filter(function(i){return a.indexOf(i.d)>=0&&ehPlaca(i.t);});if(pi.length>1)placaArcos.push({a:a,its:pi});});
+  var ocultos={};placaArcos.forEach(function(x){x.its.forEach(function(i){ocultos[i.d]=1;});});
+  var linhasPlaca=placaArcos.map(function(x){var tn=tipo(x.its[0].t);return '<div class="pd-it"><span class="pd-it-t"><b>Arcada '+(x.a===UP?'superior':'inferior')+'</b> · '+esc(tn?tn.nome:'Placa')+' <span class="muted">('+x.its.length+' elementos)</span></span><button type="button" class="tp-x" data-a="pdTiraPlaca" data-arco="'+(x.a===UP?'up':'lo')+'" aria-label="Tirar a placa">✕</button></div>';}).join('');
+  ord=ord.filter(function(i){return !ocultos[i.d];});
+  if(L)L.innerHTML=linhasPlaca+(gu.length?'<div class="pd-uniao">'+gu.map(function(g){return '<span><b>Unidos (fixo):</b> '+g.join(' – ')+'</span>';}).join('')+'</div>':'')+(ord.length?ord.map(function(i){return '<div class="pd-it'+(i.t?'':' falta')+'"><button type="button" class="pd-it-t" data-a="tooth" data-n="'+i.d+'">'+descItem(i)+'</button><button type="button" class="tp-x" data-a="pdTira" data-n="'+i.d+'" aria-label="Tirar dente '+i.d+'">✕</button></div>';}).join(''):'')+
     (ui.pdExtras||[]).map(function(x,k){return '<div class="pd-it ex"><select data-k="'+k+'" class="pd-ex-t" aria-label="Trabalho">'+tiposOpts(x.t)+'</select><input class="pd-ex-q" data-k="'+k+'" type="number" min="1" max="20" value="'+(x.q||1)+'" aria-label="Quantidade"><button type="button" class="tp-x" data-a="pdTiraEx" data-k="'+k+'" aria-label="Tirar">✕</button></div>';}).join('');
   atualizaCalc();
 }
@@ -2187,7 +2198,7 @@ function atualizaCalc(){
    sobre dente = coroa com o preparo aparecendo, pôntico = coroa sem raiz, faceta = lâmina na frente,
    unidos = barra ligando as coroas. Arcada superior com a coroa para baixo, inferior espelhada. */
 function tipoDesenho(i){var t=tipo(i.t),n=((t&&t.nome)||'').toLowerCase();
-  if(/p[oô]ntico/.test(n))return 'pon';if(i.imp||/implante|protocolo/.test(n))return 'imp';if(/faceta|lente/.test(n))return 'fac';
+  if(/placa/.test(n))return 'pla';if(/p[oô]ntico/.test(n))return 'pon';if(i.imp||/implante|protocolo/.test(n))return 'imp';if(/faceta|lente/.test(n))return 'fac';
   if(/sobre dente|coroa|inlay|onlay|provis|elemento/.test(n))return 'prep';return 'out';}
 function odontoSVG(p){
   var its=itensDe(p);if(!its.length)return '';var mapa={};its.forEach(function(i){mapa[i.d]=i;});
@@ -2196,17 +2207,21 @@ function odontoSVG(p){
     var k=tipoDesenho(i);usados[k]=1;
     if(k==='imp'){var r='<rect x="14.5" y="12" width="11" height="40" rx="3" class="od-par"/>';for(var y=17;y<50;y+=5)r+='<path d="M14.5 '+y+' L25.5 '+(y+3)+'" class="od-rosca"/>';
       return r+'<rect x="16" y="50" width="8" height="9" rx="1.5" class="od-pil"/><path d="'+coroa+'" class="od-c"/>';}
+    if(k==='pla')return '<path d="'+raiz+'" class="od-r"/><path d="'+coroa+'" class="od-r"/><path d="'+coroa+'" class="od-pla"/>';
     if(k==='pon')return '<path d="M6 57 H34" class="od-gengiva"/><path d="'+coroa+'" class="od-c"/>';
     if(k==='fac')return '<path d="'+raiz+'" class="od-r"/><path d="'+coroa+'" class="od-r"/><path d="M8.5 60 Q7 72 10 84 Q20 91 30 84 Q33 72 31.5 60 Q20 66 8.5 60 Z" class="od-fac"/>';
     if(k==='prep')return '<path d="'+raiz+'" class="od-r"/><path d="'+coroa+'" class="od-c od-trans"/><path d="M12.5 56 L14.5 73 Q20 78 25.5 73 L27.5 56 Z" class="od-prep"/>';
     return '<path d="'+raiz+'" class="od-r"/><path d="'+coroa+'" class="od-c"/>';}
-  function arco(list,inf){var g='',un=0;list.forEach(function(n,k){g+='<g transform="translate('+(k*W)+',0)">'+dente(n)+'</g>';
+  function arco(list,inf){var g='',un=0,pk=[];list.forEach(function(n,k){if(mapa[n]&&tipoDesenho(mapa[n])==='pla')pk.push(k);});
+    var lbl='';if(pk.length){var x0=pk[0]*W+2,x1=(pk[pk.length-1]+1)*W-2;g+='<rect x="'+x0+'" y="46" width="'+(x1-x0)+'" height="52" rx="14" class="od-placa"/>';
+      lbl='<text x="'+((x0+x1)/2)+'" y="'+(inf?236-36:42)+'" class="od-placa-t">PLACA DE BRUXISMO</text>';}
+    list.forEach(function(n,k){g+='<g transform="translate('+(k*W)+',0)">'+dente(n)+'</g>';
       var a=mapa[n],b=mapa[list[k+1]];if(a&&b&&a.u){un=1;g+='<rect x="'+(k*W+29)+'" y="65" width="22" height="9" rx="3" class="od-uniao"/>';}});
     if(un)usados.uni=1;
-    return '<g transform="'+(inf?'translate(0,236) scale(1,-1)':'')+'">'+g+'</g>'+list.map(function(n,k){return '<text x="'+(k*W+20)+'" y="'+(inf?131:111)+'" class="od-num'+(mapa[n]?' on':'')+'">'+n+'</text>';}).join('');}
+    return '<g transform="'+(inf?'translate(0,236) scale(1,-1)':'')+'">'+g+'</g>'+lbl+list.map(function(n,k){return '<text x="'+(k*W+20)+'" y="'+(inf?131:111)+'" class="od-num'+(mapa[n]?' on':'')+'">'+n+'</text>';}).join('');}
   var svg='<svg class="odonto" viewBox="0 0 640 236" role="img" aria-label="Arcadas com os elementos do pedido">'+
     '<line x1="320" y1="4" x2="320" y2="232" class="od-meio"/>'+arco(UP,false)+arco(LO,true)+'</svg>';
-  var LEG={imp:'Sobre implante (parafuso)',prep:'Sobre dente (preparo)',pon:'Pôntico',fac:'Faceta',out:'Outro trabalho',uni:'Unidos (fixo)'};
+  var LEG={pla:'Placa de bruxismo',imp:'Sobre implante (parafuso)',prep:'Sobre dente (preparo)',pon:'Pôntico',fac:'Faceta',out:'Outro trabalho',uni:'Unidos (fixo)'};
   return '<div class="odonto-box">'+svg+'<div class="od-leg">'+Object.keys(LEG).filter(function(k){return usados[k];}).map(function(k){return '<span><i class="od-i-'+k+'"></i>'+LEG[k]+'</span>';}).join('')+'</div></div>';
 }
 function fPedidoDet(id){
@@ -2730,6 +2745,7 @@ var A={
   tipoMet:function(d){ui.tipoMet=d.v;render();},
   delSel:function(){if(!guard())return;var ids=Object.keys(ui.arqSel||{}),n=0,tam=0;ids.forEach(function(id){var a=byId(S.arquivos,id);if(a&&!a.deleted&&!a.removido){softDel(a);blobs.delete(id);n++;tam+=a.tamZip||0;}});ui.arqSel={};save();render();toast(n+' arquivo(s) na lixeira. '+bytes(tam)+' liberados.');},
   cliTipo:function(d){ui.cliTipo=d.v;render();},
+  pdTiraPlaca:function(d){var a=d.arco==='up'?UP:LO;ui.pdItens=(ui.pdItens||[]).filter(function(i){return !(a.indexOf(i.d)>=0&&ehPlaca(i.t));});if(ui.pdEd!=null&&a.indexOf(ui.pdEd)>=0)fechaEditor();else renderItens();},
   pdUne:function(d){var n=+d.n,i=(ui.pdItens||[]).filter(function(x){return x.d===n;})[0];if(!i)return;i.u=!i.u;renderItens();},
   tooth:function(d){var n=+d.n;if(ui.pdEd!=null&&ui.pdEd!==n&&!lerEditor()){var a=ui.pdEd;toast('Escolha o trabalho do dente '+a+' primeiro.');return;}abreEditorDente(n);},
   pdOk:function(){if(!lerEditor()){toast('Escolha o trabalho deste dente.');var s=document.getElementById('ed-t');if(s)s.focus();return;}fechaEditor();},
@@ -2980,6 +2996,8 @@ document.addEventListener('change',function(e){
   if(t.id==='rd-disp'){redeIni().eu.on=t.checked;render();}
   if(t.id==='rd-prazo'||t.id==='rd-hora'){rdLer();var y2=window.scrollY;render();window.scrollTo(0,y2);}
   if(/^pd-ed[MC]/.test(t.id||'')){lerEditor();renderItens();}
+  if(t.id==='ed-t'&&ehPlaca(t.value)){lerEditor();var arco=UP.indexOf(ui.pdEd)>=0?UP:LO,nov=0;arco.forEach(function(d){if(!ui.pdItens.some(function(x){return x.d===d;})){ui.pdItens.push({d:d,t:t.value,imp:false,m:'',c:''});nov++;}});
+    fechaEditor();toast('Placa de bruxismo: arcada '+(arco===UP?'superior':'inferior')+' inteira marcada'+(nov?'':'')+'.');return;}
   if(t.id==='ed-t'){if(ehImplante(t.value)){var cb=document.getElementById('ed-imp');if(cb&&!cb.checked){cb.checked=true;document.getElementById('ed-impbox').hidden=false;}}lerEditor();renderItens();}
   if(t.classList&&(t.classList.contains('pd-ex-t')||t.classList.contains('pd-ex-q'))){var x=ui.pdExtras[+t.dataset.k];if(x){if(t.classList.contains('pd-ex-t'))x.t=t.value;else x.q=Math.max(1,Math.min(20,parseInt(t.value,10)||1));atualizaCalc();}}
   if(t.dataset&&t.dataset.outro){var oi=document.getElementById(t.dataset.outro);if(oi){oi.hidden=t.value!=='__outro';if(!oi.hidden)oi.focus();}}
