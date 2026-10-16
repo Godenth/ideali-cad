@@ -487,6 +487,17 @@ table.adm td{vertical-align:top}
 .tour-dots{display:flex;gap:5px}.tour-dots b{width:7px;height:7px;border-radius:50%;background:var(--line)}.tour-dots b.on{background:var(--accent);width:18px;border-radius:99px}
 .tour-nav{display:flex;gap:8px;justify-content:space-between;align-items:center}
 @media (max-width:899px){.tour-card{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
+.pr-av{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.pr-av .rd-av,.pr-av img{flex:none}
+.rd-av.img{padding:0;overflow:hidden;background:var(--soft)}.rd-av.img img{width:100%;height:100%;object-fit:cover;display:block}
+.pr-chips{display:flex;flex-wrap:wrap;gap:6px}
+.pr-chips label{display:inline-flex!important;white-space:nowrap;width:auto;grid-template-columns:none;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.88rem;background:var(--surface)}
+.pr-chips label:has(input:checked){border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.pr-chips input{accent-color:var(--accent)}
+.pr-pub{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:4px;background:var(--bg)}
+.pr-bio{white-space:pre-wrap;margin:0}
+.pr-vid{display:inline-flex;gap:8px;align-items:center}
+.rd-port .up-load{display:grid;place-items:center;font-size:.8rem;color:var(--muted);border:1px dashed var(--line);border-radius:12px;aspect-ratio:4/3}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -1153,7 +1164,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 22h50';
+var VERSAO='15/10 · 23h10';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2539,7 +2550,7 @@ function lembretes(){var out=[],t=today(),dow=new Date().getDay(),fora=function(
 
 /* ===================== Rede (PRÉVIA · dados de exemplo, nada é salvo) ===================== */
 function redeIni(){
-  if(ui.rede)return ui.rede;
+  if(ui.rede){sincEu(ui.rede);return ui.rede;}
   var hoje=today();
   ui.rede={tab:'delegar',passo:1,pid:null,repasse:'',prazo:addDays(hoje,1),hora:'18:00',quem:'favoritos',cadista:'',busca:null,obs:'',
     parceiros:[
@@ -2581,7 +2592,7 @@ function redeIni(){
       {id:'o2',cod:'R-2488',trab:'Placa de bruxismo',dentes:[],mat:'PMMA',repasse:35,hora:'09:00',prazo:addDays(hoje,2),de:'Cadista de Salvador, BA',nota:4.6,st:'oferta'},
       {id:'o3',cod:'R-2470',trab:'Enceramento digital',dentes:[11,21],mat:'Cera',repasse:30,hora:'19:00',prazo:hoje,de:'Cadista de Natal, RN',nota:4.9,st:'aceito'}
     ]};
-  return ui.rede;
+  sincEu(ui.rede);if(!S.rede)carregaPerfilRede();return ui.rede;
 }
 var ETAPAS_REDE=[['oferta','Ofertado'],['desenho','Em desenho'],['revisao','Para revisar'],['aprovado','Aprovado'],['pago','Repasse pago']];
 function prazoRede(d,h){var t=today(),dd=daysBetween(t,d),dia=dd===0?'hoje':dd===1?'amanhã':dd===-1?'ontem':DIAS[new Date(d+'T12:00:00').getDay()]+' '+dmy(d).slice(0,5);
@@ -2589,7 +2600,7 @@ function prazoRede(d,h){var t=today(),dd=daysBetween(t,d),dia=dd===0?'hoje':dd==
   if(h){var fim=new Date(d+'T'+h+':00'),ms=fim-new Date();if(ms<0){cls='late';txt+=' · atrasado';}else if(ms<6*36e5){cls='rd-urg';var hh=Math.floor(ms/36e5),mm=Math.floor(ms%36e5/6e4);txt+=' · faltam '+(hh?hh+'h':'')+(mm<10&&hh?'0':'')+mm+'min';}}
   return '<span class="rd-prazo '+cls+'">⏰ '+txt+'</span>';}
 function somaTipos(x){var pt=x.porTipo||{};return Object.keys(pt).reduce(function(t,k){return t+pt[k];},0);}
-function avRede(p,z){z=z||44;var ini=p.nome.split(' ').map(function(x){return x[0];}).slice(0,2).join('');
+function avRede(p,z){z=z||44;if(p.fotoUrl)return '<span class="rd-av img" style="width:'+z+'px;height:'+z+'px"><img src="'+p.fotoUrl+'" alt=""></span>';var ini=p.nome.split(' ').map(function(x){return x[0];}).slice(0,2).join('');
   return '<span class="rd-av" style="width:'+z+'px;height:'+z+'px;background:linear-gradient(135deg,var(--p'+p.cor+'),var(--p'+((p.cor%6)+1)+'))">'+ini+'</span>';}
 function estrelas(n){var s='';for(var i=1;i<=5;i++)s+='<span style="color:'+(n>=i-0.25?'#F0A53A':'var(--line)')+'">★</span>';return '<span class="rd-st">'+s+'</span>';}
 function etapasRede(st){var i=ETAPAS_REDE.map(function(e){return e[0];}).indexOf(st);
@@ -2874,22 +2885,71 @@ function rdPortItem(x,f,i){var u=RD_PORT.get(f.id),mid=f.ex?rdArte(f.t,x.id+i):f
 function rdPortfolio(x){var p=rdPortDe(x),eu=x.id==='eu',nv=p.filter(function(f){return f.tipo==='video';}).length;
   if(!eu&&!p.length)return '';
   return '<div class="stack" style="gap:8px"><div class="between"><h3 style="margin:6px 0 0">'+(eu?'Meu portfólio':'Portfólio')+'</h3><span class="small muted">'+p.filter(function(f){return f.tipo==='foto';}).length+' foto(s) · '+nv+' vídeo</span></div>'+
-    (eu?'<p class="small muted" style="margin:0">Até 12 fotos ou prints e 1 vídeo de até 1 minuto. <b>Não mostre nome de paciente</b> nos prints.</p>':'')+
+    (eu?'<p class="small muted" style="margin:0">Até 12 fotos ou prints, salvos na sua conta. O vídeo entra como link em <b>Editar meu perfil</b>. <b>Não mostre nome de paciente</b> nos prints.</p>':'')+
     '<div class="rd-port">'+p.map(function(f,i){return rdPortItem(x,f,i);}).join('')+
-    (eu&&p.length<13?'<label class="rd-padd">'+ICO_PLAY.replace('fill="currentColor"','fill="none" stroke="currentColor" stroke-width="2"')+'+ Fotos ou vídeo<input class="rd-port-up" type="file" multiple accept="image/*,video/*" aria-label="Adicionar fotos ou vídeo ao portfólio"></label>':'')+'</div></div>';}
+    (eu&&ui.prSubindo?'<div class="up-load">Enviando '+ui.prSubindo+'…</div>':'')+(eu&&p.filter(function(f){return f.tipo==='foto';}).length<12&&!ui.prSubindo?'<label class="rd-padd">+ Fotos<input class="rd-port-up" type="file" multiple accept="image/*" aria-label="Adicionar fotos ao portfólio"></label>':'')+'</div></div>';}
 function rdLightbox(id,i){var R=redeIni(),x=id==='eu'?R.eu:(R.parceiros.filter(function(q){return q.id===id;})[0]||R.cadDe[id]),p=x&&rdPortDe(x),f=p&&p[i];var el=document.getElementById('rd-lb');
   if(!f){if(el)el.remove();return;}
   if(!el){el=document.createElement('div');el.id='rd-lb';el.className='rd-lb';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');document.body.appendChild(el);}
   var u=RD_PORT.get(f.id),mid=f.ex?rdArte(f.t,'lb'+i):f.tipo==='video'?'<video src="'+u+'" controls autoplay playsinline></video>':'<img src="'+u+'" alt="'+esc(f.t)+'">';
   el.innerHTML='<button class="fecha" data-a="rdLbFecha" aria-label="Fechar">×</button><div class="box">'+mid+'</div><p><b>'+esc(f.t)+'</b>'+(f.ex?' <span class="small" style="opacity:.7">· '+(f.tipo==='video'?'vídeo':'imagem')+' de exemplo</span>':'')+'</p>'+
     (p.length>1?'<div class="nav"><button class="btn sm" data-a="rdPortVer" data-id="'+id+'" data-i="'+((i-1+p.length)%p.length)+'">‹ Anterior</button><span style="color:#fff;align-self:center" class="small">'+(i+1)+' / '+p.length+'</span><button class="btn sm" data-a="rdPortVer" data-id="'+id+'" data-i="'+((i+1)%p.length)+'">Próxima ›</button></div>':'');}
+/* ---------- Perfil da Rede (salvo no banco) ----------
+   Tabela perfil_rede (dono = user_id, RLS). Fotos no bucket PRIVADO "portfolio", pasta = id do dono, por URL assinada.
+   Fotos são comprimidas no aparelho (até 1600 px, < 700 KB). Vídeo: só o link (YouTube, Instagram, Vimeo, TikTok, Drive).
+   "Publicado" = outros usuários logados podem ver o perfil e as fotos. Nunca pedidos, clientes ou valores. */
+var SOFTS=['exocad','3Shape','DentalWings','Blender for Dental','inLab (Dentsply Sirona)','Medit','Outro'];
+var ESPECS=['Coroas','Facetas','Protocolos','Sobre implante','Pontes fixas','Placas','Provisórios','Mockups','Enceramento','Barras','Guias cirúrgicos','Modelos','Prótese total','PPR'];
+var PRAZOS=['Mesmo dia','1 dia','1–2 dias','2–3 dias','3–5 dias'];
+var VIDEO_RX=/^https:\/\/([a-z0-9-]+\.)*(youtube\.com|youtu\.be|instagram\.com|vimeo\.com|tiktok\.com|drive\.google\.com)\//i;
+function perfilRedeVazio(){var p=S.perfil||{};return {nome:(p.nome||'').slice(0,80),cidade:(p.cidade||'').slice(0,80),uf:(p.uf||'').slice(0,2),softwares:[],especialidades:[],prazo:'',bio:'',video_url:null,foto_perfil:null,fotos:[],publicado:false};}
+function carregaPerfilRede(){if(!S.sessao||EM_DEMO)return;S.rede=S.rede||{row:null,v:0,urls:{},carregando:true};
+  sb.from('perfil_rede').select('*').eq('user_id',S.sessao.id).maybeSingle().then(function(r){S.rede.carregando=false;if(r.error){S.rede.erro=true;return;}
+    S.rede.row=r.data||null;S.rede.v++;assinaUrls().then(function(){if(ui.sheet)renderSheet();if(ui.tab==='rede'||ui.tab==='config')render();});});}
+function prRow(){return (S.rede&&S.rede.row)||perfilRedeVazio();}
+function assinaUrls(){var r=prRow(),ps=(r.fotos||[]).map(function(f){return f.p;});if(r.foto_perfil)ps.push(r.foto_perfil);
+  ps=ps.filter(function(p){return p&&!S.rede.urls[p];});if(!ps.length)return Promise.resolve();
+  return sb.storage.from('portfolio').createSignedUrls(ps,3600).then(function(x){(x.data||[]).forEach(function(d){if(d.signedUrl)S.rede.urls[d.path]=d.signedUrl;});S.rede.v++;});}
+function sincEu(R){if(!R||!R.eu||!S.rede||!S.rede.row||R._prv===S.rede.v)return;var r=S.rede.row,e=R.eu;R._prv=S.rede.v;
+  e.nome=r.nome||e.nome;e.cidade=(r.cidade||'')+(r.uf?', '+r.uf:'')||e.cidade;if(r.softwares.length)e.sw=r.softwares.slice();if(r.especialidades.length)e.esp=r.especialidades.slice();if(r.prazo)e.prazo=r.prazo;
+  e.bio=r.bio||'';e.video=r.video_url||'';e.fotoUrl=r.foto_perfil?S.rede.urls[r.foto_perfil]:'';e.publicado=r.publicado;
+  e.port=(r.fotos||[]).map(function(f){if(S.rede.urls[f.p])RD_PORT.set(f.p,S.rede.urls[f.p]);return {id:f.p,tipo:'foto',t:f.t||'Trabalho'};});}
+function salvaPerfilRede(row,msg){row=Object.assign({},row,{user_id:S.sessao.id,atualizado_em:new Date().toISOString()});delete row.criado_em;
+  return sb.from('perfil_rede').upsert(row).then(function(r){if(r.error){toast('Não foi possível salvar o perfil: '+r.error.message);return false;}
+    S.rede=S.rede||{urls:{},v:0};S.rede.row=row;S.rede.v++;return assinaUrls().then(function(){if(msg)toast(msg);if(ui.sheet)renderSheet();render();return true;});});}
+function comprime(file,lado){lado=lado||1600;return new Promise(function(ok,ko){var img=new Image(),u=URL.createObjectURL(file);
+  img.onload=function(){URL.revokeObjectURL(u);var sc=Math.min(1,lado/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);var q=0.82;
+    (function tenta(){c.toBlob(function(b){if(!b)return ko(new Error('Não foi possível ler a imagem.'));if(b.type!=='image/webp'&&b.type!=='image/jpeg'){c.toBlob(function(j){j&&j.size<700*1024?ok(j):ko(new Error('Imagem grande demais.'));},'image/jpeg',0.8);return;}
+      if(b.size<=690*1024)return ok(b);if(q>0.45){q-=0.12;tenta();return;}ko(new Error('Imagem grande demais mesmo comprimida.'));},'image/webp',q);})();};
+  img.onerror=function(){URL.revokeObjectURL(u);ko(new Error('Arquivo não é uma imagem válida.'));};img.src=u;});}
+function sobeFoto(file,nome){return comprime(file,nome==='avatar'?600:1600).then(function(b){var ext=b.type==='image/webp'?'webp':'jpg',path=S.sessao.id+'/'+(nome||(Date.now().toString(36)+Math.random().toString(36).slice(2,6)))+'.'+ext;
+  return sb.storage.from('portfolio').upload(path,b,{contentType:b.type,upsert:true,cacheControl:'3600'}).then(function(r){if(r.error)throw new Error(r.error.message);delete (S.rede&&S.rede.urls||{})[path];return path;});});}
+function fPerfilRede(){var r=prRow(),u=r.foto_perfil&&S.rede?S.rede.urls[r.foto_perfil]:'',nm=r.nome||'?',ini=nm.split(' ').map(function(x){return x[0];}).slice(0,2).join('');
+  var chips=function(nome,L,sel){return '<div class="pr-chips">'+L.map(function(o){return '<label><input type="checkbox" name="'+nome+'" value="'+esc(o)+'"'+(sel.indexOf(o)>=0?' checked':'')+'> '+esc(o)+'</label>';}).join('')+'</div>';};
+  return head('Editar meu perfil na Rede')+'<form data-form="perfilRede" class="stack">'+
+    '<div class="pr-av">'+(u?'<span class="rd-av img" style="width:72px;height:72px"><img src="'+u+'" alt="Sua foto"></span>':'<span class="rd-av" style="width:72px;height:72px;background:linear-gradient(135deg,var(--p5),var(--p6))">'+esc(ini)+'</span>')+
+      '<label class="btn sm">'+(u?'Trocar foto':'Colocar foto de perfil')+'<input id="pr-foto" type="file" accept="image/*" hidden></label>'+(u?'<button type="button" class="btn sm" data-a="prFotoTira">Tirar foto</button>':'')+'</div>'+
+    '<label class="fld"><span>Nome que aparece na Rede</span><input name="nome" required maxlength="80" value="'+esc(r.nome)+'"></label>'+
+    '<div class="g2"><label class="fld"><span>Cidade</span><input name="cidade" maxlength="80" value="'+esc(r.cidade)+'"></label><label class="fld"><span>UF</span><input name="uf" maxlength="2" value="'+esc(r.uf)+'" style="text-transform:uppercase"></label></div>'+
+    '<div class="fld"><span>Softwares que você usa</span>'+chips('sw',SOFTS,r.softwares||[])+'</div>'+
+    '<div class="fld"><span>Especialidades</span>'+chips('esp',ESPECS,r.especialidades||[])+'</div>'+
+    '<label class="fld"><span>Prazo médio de entrega</span><select name="prazo"><option value="">Escolha</option>'+PRAZOS.map(function(o){return '<option'+(r.prazo===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></label>'+
+    '<label class="fld"><span>Sobre você</span><textarea name="bio" maxlength="600" rows="4" placeholder="Anos de experiência, o que você mais gosta de desenhar, horários…">'+esc(r.bio)+'</textarea><small>Até 600 caracteres.</small></label>'+
+    '<label class="fld"><span>Vídeo de apresentação (link)</span><input name="video" type="url" maxlength="300" inputmode="url" placeholder="https://youtube.com/… ou instagram.com/…" value="'+esc(r.video_url||'')+'"><small>Suba o vídeo no YouTube, Instagram, Vimeo, TikTok ou Google Drive e cole o link aqui.</small></label>'+
+    '<div class="pr-pub"><label class="check"><input type="checkbox" name="publicado"'+(r.publicado?' checked':'')+'> <b>Publicar meu perfil</b></label><small class="muted">Outros usuários logados no Ideali CAD poderão ver seu nome, cidade, especialidades, fotos e vídeo. Nunca seus pedidos, clientes ou valores.</small></div>'+
+    '<p class="small muted">As fotos do portfólio você adiciona em <b>Ver meu perfil</b>, na seção Meu portfólio. Não mostre nome de paciente nos prints.</p>'+
+    '<button class="btn pri block" type="submit">Salvar perfil</button></form>';}
 function fPerfilCad(id){
   var R=redeIni(),x=id==='eu'?R.eu:(R.parceiros.filter(function(q){return q.id===id;})[0]||R.cadDe[id]);if(!x)return head('Cadista')+'<p class="empty">Não encontrado.</p>';
   var pt=x.porTipo||{},tipos=Object.keys(pt).sort(function(a,b){return pt[b]-pt[a];}),tot=tipos.reduce(function(s,k){return s+pt[k];},0);
-  return head(id==='eu'?'Meu perfil na rede':'Perfil do cadista')+
+  var euTop=id==='eu'?'<div class="between wrap" style="gap:8px"><span class="tag '+(x.publicado?'ok':'')+'">'+(x.publicado?'Perfil publicado':'Perfil não publicado (só você vê)')+'</span><button class="btn sm pri" data-a="prEditar">Editar meu perfil</button></div>':'';
+  return head(id==='eu'?'Meu perfil na rede':'Perfil do cadista')+euTop+
     '<div class="row" style="gap:14px;align-items:center">'+avRede(x,64)+'<div style="min-width:0"><h2 style="margin:0">'+esc(x.nome)+'</h2><div class="small muted">'+esc(x.cidade)+(x.desde?' · na rede desde '+x.desde:'')+'</div><div>'+estrelas(x.nota)+' <b>'+x.nota+'</b> <span class="small muted">('+x.av+' avaliações)</span></div></div></div>'+
     '<div class="rd-chips">'+x.sw.map(function(s){return '<span class="sw">'+esc(s)+'</span>';}).join('')+(x.esp||[]).map(function(s){return '<span>'+esc(s)+'</span>';}).join('')+'</div>'+
     '<div class="rd-kpis"><div><b>'+tot+'</b><span>trabalhos feitos</span></div><div><b>'+(x.elementos||0)+'</b><span>elementos</span></div><div><b>'+(x.noPrazo||0)+'%</b><span>entregues no prazo</span></div><div><b>'+(x.prazo||'—')+'</b><span>prazo médio</span></div></div>'+
+    (x.bio?'<p class="pr-bio">'+esc(x.bio)+'</p>':'')+
+    (x.video?'<a class="btn sm pr-vid" style="justify-self:start" href="'+esc(x.video)+'" target="_blank" rel="noopener">'+ICO_PLAY+' Ver vídeo de apresentação</a>':'')+
     rdPortfolio(x)+
     '<div class="stack" style="gap:6px"><h3 style="margin:6px 0 0">Trabalhos feitos pela rede</h3><p class="small muted" style="margin:0">Contados a cada trabalho delegado e aprovado.</p>'+
       hbars(tipos.map(function(k){return {l:esc(k),r:pt[k]+'',v:pt[k]};}),'Ainda sem trabalhos pela rede.')+'</div>'+
@@ -3074,6 +3134,7 @@ function rConfig(){
     '<div class="stack cfg-lado">'+
     '<section class="card stack"><h2>Use como aplicativo</h2>'+(window._instalar?'<p class="small muted">Coloque o Ideali CAD na tela inicial e abra como um app, sem a barra do navegador.</p><button class="btn pri" data-a="instalarApp">Instalar no celular / computador</button>':
       (window.matchMedia&&matchMedia('(display-mode: standalone)').matches?'<p class="small muted">Você já está usando como aplicativo. ✓</p>':'<p class="small muted"><b>Android (Chrome):</b> menu ⋮ → <b>Adicionar à tela inicial</b>.<br><b>iPhone (Safari):</b> botão Compartilhar → <b>Adicionar à Tela de Início</b>.</p>'))+'</section>'+
+    '<section class="card stack"><h2>Perfil na Rede</h2><p class="small muted">Foto, especialidades, softwares, portfólio e vídeo. Você escolhe se publica para outros usuários verem.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="prEditar">Editar perfil na Rede</button><button class="btn" data-a="rdPerfil" data-id="eu">Ver como fica</button></div></section>'+
     secTema()+
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Plano</h2>'+
@@ -3725,9 +3786,13 @@ var A={
     var u=URL.createObjectURL(file);if(f.tipo==='html')window.open(u,'_blank');else{var l=document.createElement('a');l.href=u;l.download=f.nome;document.body.appendChild(l);l.click();l.remove();}
     setTimeout(function(){URL.revokeObjectURL(u);},60000);},
   rdPerfil:function(d){openSheet(fPerfilCad,d.id);},
+  prEditar:function(){if(!S.rede)carregaPerfilRede();openSheet(fPerfilRede);},
+  prFotoTira:function(){var row=Object.assign({},prRow()),p=row.foto_perfil;if(!p)return;row.foto_perfil=null;sb.storage.from('portfolio').remove([p]).then(function(){salvaPerfilRede(row,'Foto de perfil removida.');});},
   rdPortVer:function(d){rdLightbox(d.id,+d.i);},
   rdLbFecha:function(){var el=document.getElementById('rd-lb');if(el)el.remove();},
-  rdPortDel:function(d){var R=redeIni(),p=rdPortDe(R.eu),f=p[+d.i];if(!f)return;if(RD_PORT.get(f.id)){URL.revokeObjectURL(RD_PORT.get(f.id));RD_PORT.delete(f.id);}p.splice(+d.i,1);renderSheet();},
+  rdPortDel:function(d){var R=redeIni(),p=rdPortDe(R.eu),f=p[+d.i];if(!f)return;
+    if(S.rede&&S.rede.row&&(S.rede.row.fotos||[]).some(function(q){return q.p===f.id;})){var row=Object.assign({},S.rede.row);row.fotos=row.fotos.filter(function(q){return q.p!==f.id;});
+      sb.storage.from('portfolio').remove([f.id]).then(function(){return salvaPerfilRede(row,'Foto removida.');});return;}if(RD_PORT.get(f.id)){URL.revokeObjectURL(RD_PORT.get(f.id));RD_PORT.delete(f.id);}p.splice(+d.i,1);renderSheet();},
   rdConversa:function(d){rdAbreConv(d.id);},
   rdDock:function(){var R=redeIni(),D=R.dock||(R.dock={});D.open=!D.open;if(!D.open)D.conv=null;rdDock();},
   rdDockConv:function(d){rdAbreConv(d.id);},
@@ -3902,7 +3967,7 @@ var A={
   assinar:function(){toast('A assinatura pelo Mercado Pago será liberada em breve. Seu teste grátis continua valendo.');},
   animTog:function(d,el){S.prefs=S.prefs||{};S.prefs.anim=el.checked?'on':'off';save();render();toast(el.checked?'Animações ligadas.':'Animações desligadas.');},
   simVencida:function(d,el){S.assinatura.simularVencida=el.checked;save();render();},
-  exportar:function(){var o=JSON.parse(JSON.stringify(S));delete o.sessao;openSheet(fTexto,'Exportar meus dados',JSON.stringify(o,null,2));},
+  exportar:function(){var o=JSON.parse(JSON.stringify(S));delete o.sessao;if(o.rede){o.perfilRede=o.rede.row;delete o.rede;}openSheet(fTexto,'Exportar meus dados',JSON.stringify(o,null,2));},
   exemplos:function(){openSheet(fConfirm,'Recomeçar com exemplos','Isso apaga tudo o que você cadastrou neste navegador e coloca os dados de exemplo de volta.','Recomeçar',function(){var s=S.sessao,pf=S.perfil;S=seed();S.sessao=s;S.perfil=pf;save();closeSheet();ui.tab='dashboard';ui.sub=null;render();toast('Dados de exemplo restaurados.');});},
   excluirConta:function(){openSheet(fConfirm,'Excluir minha conta','Sua conta e todos os seus clientes, pedidos, pagamentos e arquivos serão apagados de vez. Não dá para desfazer. Antes, se quiser, exporte seus dados.','Excluir tudo',function(){
     closeSheet();toast('Excluindo sua conta…');
@@ -3911,7 +3976,7 @@ var A={
     sb.auth.resend({type:'signup',email:ce.email,options:{emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){ui.loginBusy=false;ui.loginMsg=r.error?msgAuth(r.error):'Enviamos de novo. Pode levar 1 minuto.';render();});},
   jaConfirmei:function(){var ce=ui.checaEmail;ui.checaEmail=null;ui.loginCriar=false;ui.loginMsg='';if(ce)ui.loginEmail=ce.email;render();},
   confirmar:function(d){if(d.dig){var v=(document.getElementById('cf-dig').value||'').trim().toUpperCase();if(v!==d.dig){toast('Digite '+d.dig+' para confirmar.');return;}}var f=ui.confirmAcao;ui.confirmAcao=null;if(f)f();},
-  sair:function(){sb.auth.signOut().then(function(){S=estadoVazio();ui.tab='dashboard';ui.sub=null;render();});},
+  sair:function(){sb.auth.signOut().then(function(){S=estadoVazio();ui.rede=null;ui.tab='dashboard';ui.sub=null;render();});},
   fechar:function(){closeSheet();},
   bg:function(d,el,e){if(e.target===el)closeSheet();}
 };
@@ -3986,6 +4051,10 @@ var F={
     S.prefs=S.prefs||{};var pv=S.prefs.tab||{};if(JSON.stringify(tb)!==JSON.stringify({modelos:pv.modelos==null?null:pv.modelos,prazo:pv.prazo||'',pagamento:pv.pagamento||'',info:pv.info||''})){S.prefs.tab=tb;n++;}
     save();render();toast(n?'Tabela salva ('+n+' alteração(ões)).':'Nada mudou na tabela.');
   },
+  perfilRede:function(fd){var v=String(fd.get('video')||'').trim();if(v&&!VIDEO_RX.test(v)){toast('O link do vídeo precisa ser do YouTube, Instagram, Vimeo, TikTok ou Google Drive (começando com https://).');return;}
+    var row=Object.assign({},prRow(),{nome:String(fd.get('nome')||'').trim().slice(0,80),cidade:String(fd.get('cidade')||'').trim().slice(0,80),uf:String(fd.get('uf')||'').trim().toUpperCase().slice(0,2),
+      softwares:fd.getAll('sw').slice(0,10),especialidades:fd.getAll('esp').slice(0,15),prazo:String(fd.get('prazo')||''),bio:String(fd.get('bio')||'').trim().slice(0,600),video_url:v||null,publicado:!!fd.get('publicado')});
+    salvaPerfilRede(row,row.publicado?'Perfil salvo e publicado.':'Perfil salvo. Só você vê enquanto não publicar.').then(function(ok){if(ok)openSheet(fPerfilCad,'eu');});},
   temaQuiz:function(fd){var v={};[0,1,2].forEach(function(i){var x=fd.get('q'+i);if(x)v[x]=(v[x]||0)+(i===1?1.5:1);});
     var t=Object.keys(v).sort(function(a,b){return v[b]-v[a];})[0]||'ideali',m=fd.get('q3')||'auto',T=TEMAS.filter(function(x){return x[0]===t;})[0];
     S.prefs=S.prefs||{};S.prefs.tema=t;S.prefs.modo=m;aplicaTema(t,m);save();closeSheet();render();toast('Seu tema: '+T[1]+' ('+T[5].toLowerCase()+'). Dá para trocar em Configurações.');},
@@ -4123,16 +4192,13 @@ document.addEventListener('change',function(e){
   if(t.classList&&t.classList.contains('rd-up')&&t.files.length){var R1=redeIni(),it=R1.enviados.concat(R1.meus).filter(function(q){return q.id===t.dataset.id;})[0];
     if(it){it.arqs=it.arqs||[];[].forEach.call(t.files,function(f){var tp=/\.html?$/i.test(f.name)?'html':'stl';it.arqs.push({nome:f.name,tipo:tp,de:'eu'});RD_FILES.set(it.id+':'+(it.arqs.length-1),f);});
       render();toast(t.files.length+' arquivo(s) anexado(s). O outro cadista já consegue abrir.');}}
-  if(t.classList&&t.classList.contains('rd-port-up')&&t.files.length){var Rp=redeIni(),pp=rdPortDe(Rp.eu),av=[];
-    [].forEach.call(t.files,function(f){var vid=/^video\//.test(f.type),fotos=pp.filter(function(q){return q.tipo==='foto';}).length;
-      if(!vid&&!/^image\//.test(f.type))return;
-      if(vid&&pp.some(function(q){return q.tipo==='video';})){av.push('Só cabe 1 vídeo. Apague o atual para trocar.');return;}
-      if(!vid&&fotos>=12){av.push('Limite de 12 fotos.');return;}
-      if(f.size>(vid?100:10)*1048576){av.push(f.name+' é grande demais (máx. '+(vid?'100':'10')+' MB).');return;}
-      var it={id:'p'+Date.now()+Math.random().toString(36).slice(2,6),tipo:vid?'video':'foto',t:f.name.replace(/\.[^.]+$/,'')};RD_PORT.set(it.id,URL.createObjectURL(f));
-      if(vid){var v=document.createElement('video');v.preload='metadata';v.onloadedmetadata=function(){if(v.duration>61){var k=pp.indexOf(it);if(k>=0)pp.splice(k,1);toast('O vídeo tem mais de 1 minuto. Corte e envie de novo.');if(ui.sheet)renderSheet();}};v.src=RD_PORT.get(it.id);}
-      pp.push(it);});
-    renderSheet();if(av.length)toast(av[0]);else toast('Adicionado ao seu portfólio.');}
+  if(t.classList&&t.classList.contains('rd-port-up')&&t.files.length){var row0=prRow(),livres=12-(row0.fotos||[]).length,fs=[].filter.call(t.files,function(f){return /^image\//.test(f.type);}).slice(0,Math.max(0,livres));
+    if(!fs.length){toast(livres<=0?'Limite de 12 fotos. Apague uma para colocar outra.':'Escolha fotos (o vídeo entra como link em Editar meu perfil).');return;}
+    var novas=[],k=0;ui.prSubindo=fs.length+' foto(s)';renderSheet();
+    (function proxima(){if(k>=fs.length){ui.prSubindo=null;var row=Object.assign({},prRow());row.fotos=(row.fotos||[]).concat(novas).slice(0,12);
+        if(!novas.length){renderSheet();return;}salvaPerfilRede(row,novas.length+' foto(s) adicionada(s) ao portfólio.');return;}
+      var f=fs[k++];sobeFoto(f).then(function(p){novas.push({p:p,t:f.name.replace(/\.[^.]+$/,'').slice(0,60)});proxima();}).catch(function(e){toast(f.name+': '+e.message);proxima();});})();}
+  if(t.id==='pr-foto'&&t.files.length){var fa=t.files[0];toast('Enviando foto…');sobeFoto(fa,'avatar').then(function(p){var row=Object.assign({},prRow(),{foto_perfil:p});return salvaPerfilRede(row,'Foto de perfil salva.');}).catch(function(e){toast(e.message);});}
   if(t.id==='rd-filtro'||t.id==='rd-ordem'){var R0=redeIni();if(t.id==='rd-filtro')R0.filtro=t.value;else R0.ordem=t.value;render();}
   if(t.id==='rd-disp'){redeIni().eu.on=t.checked;render();}
   if(t.id==='rd-prazo'||t.id==='rd-hora'){rdLer();var y2=window.scrollY;render();window.scrollTo(0,y2);}

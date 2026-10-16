@@ -46,6 +46,13 @@ Deno.serve(async (req: Request) => {
     }
   }
 
+  // Apaga as fotos do portfólio da Rede (bucket privado "portfolio", pasta do usuário).
+  const { data: fotos } = await admin.storage.from("portfolio").list(user.id, { limit: 100 });
+  if (fotos && fotos.length) {
+    const { error: e3 } = await admin.storage.from("portfolio").remove(fotos.map((f) => `${user.id}/${f.name}`));
+    if (e3) return json(502, { erro: "Não foi possível apagar suas fotos agora. Tente de novo mais tarde." });
+  }
+
   const { error: e2 } = await admin.auth.admin.deleteUser(user.id);
   if (e2) return json(500, { erro: "Não foi possível excluir a conta" });
 
