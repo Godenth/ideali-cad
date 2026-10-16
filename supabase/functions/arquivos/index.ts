@@ -92,7 +92,8 @@ Deno.serve(async (req: Request) => {
     const { data, error } = await admin.from("arquivos").insert({
       user_id: user.id, pedido_id: pid, origem: "upload", nome: limpaNome(body.nome), storage_key: key,
       tamanho_zip: tamanho, tamanho_original: Number.isFinite(orig) && orig >= 0 ? Math.round(orig) : null,
-    }).select("id,pedido_id,origem,nome,tamanho_original,tamanho_zip,criado_em").single();
+      categoria: ["scan", "html", "fres"].includes(String(body.categoria)) ? String(body.categoria) : null,
+    }).select("id,pedido_id,origem,nome,tamanho_original,tamanho_zip,criado_em,categoria").single();
     if (error) { await apaga(); return json(500, { erro: "Não foi possível registrar o arquivo." }); }
     return json(200, data);
   }

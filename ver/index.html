@@ -145,6 +145,7 @@ function ficha(pid){
       (p.material?'<div><small>Material</small><b>'+esc(p.material)+'</b></div>':'')+(p.fresadora?'<div><small>Fresadora</small><b>'+esc(p.fresadora)+'</b></div>':'')+
       '<div><small>Recebido</small><b>'+dmy(p.recebido_em)+'</b></div><div><small>Prazo</small><b>'+dmy(p.prazo)+'</b></div>'+
       '<div><small>Valor</small><b class="val">'+brl(p.valor)+'</b></div><div><small>Pagamento</small><b>'+(p.pago_em?'Pago em '+dmy(p.pago_em):'Em aberto')+'</b></div></div>'+
+    (p.scanbody_url?'<h3>Scanbody</h3><a href="'+esc(p.scanbody_url)+'" target="_blank" rel="noopener noreferrer"><img src="'+esc(p.scanbody_url)+'" alt="Print do scanbody" style="display:block;width:100%;max-height:340px;object-fit:contain;border-radius:12px;background:#0b0b10"></a>':'')+
     '<h3>Arquivos</h3><div class="arqs">'+(as.length?as.map(function(a){
       if(a.origem==='link')return '<div class="arq"><span class="ft">LINK</span><span class="n"><b>'+esc(a.nome)+'</b><span>link externo</span></span><a class="btn" href="'+esc(a.url_externa)+'" target="_blank" rel="noopener noreferrer">Abrir</a></div>';
       return '<div class="arq"><span class="ft">ZIP</span><span class="n"><b>'+esc(a.nome)+'</b><span>'+(a.tamanho_zip?(a.tamanho_zip/1048576).toFixed(1).replace('.',',')+' MB · ':'')+'STL, HTML e imagens</span></span><button class="btn pri" data-ver="'+a.id+'">Visualizar</button><button class="btn" data-baixar="'+a.id+'">Baixar</button></div>';}).join(''):'<p class="small">Nenhum arquivo neste caso ainda.</p>')+'</div>'+

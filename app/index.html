@@ -577,6 +577,23 @@ table.adm td{vertical-align:top}
 .rd-neon svg{width:12px;height:12px}
 @media (prefers-reduced-motion:no-preference){.rd-neon{animation:neon 2.6s ease-in-out infinite}@keyframes neon{50%{box-shadow:0 0 16px color-mix(in srgb,var(--p6) 85%,transparent),0 0 30px -4px color-mix(in srgb,var(--p5) 80%,transparent)}}}
 .kcard.rede .pb-cd{padding:6px 8px}.kcard.rede .pb-cd b{font-size:1rem}
+.slots{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:560px){.slots{grid-template-columns:1fr}}
+.slot{display:grid;gap:8px;align-content:start;border:1.5px dashed color-mix(in srgb,var(--sc,var(--accent)) 55%,var(--line));border-radius:14px;padding:12px;background:color-mix(in srgb,var(--sc,var(--accent)) 6%,transparent);min-width:0}
+.slot.tem{border-style:solid}
+.slot-h{display:flex;gap:10px;align-items:center;min-width:0}.slot-h i{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,transparent);font-style:normal}
+.slot-h i svg{width:19px;height:19px}.slot-h b{display:block;line-height:1.2}.slot-h small{color:var(--muted);font-size:.76rem;line-height:1.25;display:block}
+.slot-f{display:flex;gap:6px;align-items:center;min-width:0;padding:6px 8px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+.slot-f button.nm{flex:1;min-width:0;text-align:left;border:0;background:none;color:var(--ink);font:inherit;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:2px}
+.slot-f button.nm:hover{color:var(--accent)}
+.slot-f .icon-btn{width:28px;height:28px;flex:none}
+.slot .up{position:relative;justify-self:start}.slot .up input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.sb-zona{display:grid;place-items:center;text-align:center;gap:4px;min-height:96px;border-radius:10px;border:1px dashed var(--line);background:var(--surface);color:var(--muted);font-size:.84rem;cursor:pointer;padding:10px}
+.sb-zona:focus,.sb-zona.on{outline:2px solid var(--accent);color:var(--ink)}
+.sb-img{display:block;width:100%;max-height:220px;object-fit:contain;border-radius:10px;background:#0b0b10;cursor:zoom-in}
+.sheet.full{max-width:min(1280px,97vw)!important;width:97vw}
+.sheet.full .viewer3d{aspect-ratio:auto;height:72vh}
+.htmlv{width:100%;height:76vh;border:0;border-radius:12px;background:#fff}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -1020,13 +1037,13 @@ var MAP={
   pedidos:{t:'pedidos',
     to:function(x){var p=x.pendencia||{};return {numero:x.num,cliente_id:x.clienteId,paciente:x.paciente,elementos:x.elementos||[],tipo_trabalho_id:nn(x.tipoId),cor:nn(x.cor),observacoes:nn(x.obs),
       valor:+x.valor||0,urgente:!!x.urgente,status:x.status,pendencia_motivos:p.motivos||[],pendencia_obs:nn(p.obs),pendencia_desde:x.pendencia?nn(p.desde):null,aprovacao_desde:nn(x.aprovDesde),
-      ajustes:x.ajustes||0,ajustes_motivos:(x.ajMotivos||[]).slice(-60),recebido_em:x.recebido,prazo:nn(x.prazo),enviado_em:nn(x.entregue),pago_em:nn(x.pago),pagamento_id:nn(x.pagamentoId),implante_marca:nn(x.impMarca),implante_tipo:nn(x.impTipo),itens:x.itens||[],extras:x.extras||[],material:nn(x.material),fresadora:nn(x.fresadora),deleted_at:ts(x.deleted)};},
+      ajustes:x.ajustes||0,ajustes_motivos:(x.ajMotivos||[]).slice(-60),recebido_em:x.recebido,prazo:nn(x.prazo),enviado_em:nn(x.entregue),pago_em:nn(x.pago),pagamento_id:nn(x.pagamentoId),implante_marca:nn(x.impMarca),implante_tipo:nn(x.impTipo),scanbody_img:nn(x.sbImg),itens:x.itens||[],extras:x.extras||[],material:nn(x.material),fresadora:nn(x.fresadora),deleted_at:ts(x.deleted)};},
     from:function(r){return {id:r.id,num:r.numero,clienteId:r.cliente_id,paciente:nomeProprio(r.paciente),elementos:r.elementos||[],tipoId:r.tipo_trabalho_id,cor:r.cor||'',obs:r.observacoes||'',
       valor:+r.valor,urgente:r.urgente,status:r.status,pendencia:r.status==='pendente'?{motivos:r.pendencia_motivos||[],obs:r.pendencia_obs||'',desde:dia(r.pendencia_desde)}:null,
-      aprovDesde:dia(r.aprovacao_desde),ajustes:r.ajustes,ajMotivos:r.ajustes_motivos||[],recebido:dia(r.recebido_em),prazo:dia(r.prazo),entregue:dia(r.enviado_em),pago:dia(r.pago_em),pagamentoId:r.pagamento_id,impMarca:r.implante_marca||'',impTipo:r.implante_tipo||'',itens:r.itens||[],extras:r.extras||[],material:r.material||'',fresadora:r.fresadora||'',deleted:dia(r.deleted_at)};}},
+      aprovDesde:dia(r.aprovacao_desde),ajustes:r.ajustes,ajMotivos:r.ajustes_motivos||[],recebido:dia(r.recebido_em),prazo:dia(r.prazo),entregue:dia(r.enviado_em),pago:dia(r.pago_em),pagamentoId:r.pagamento_id,impMarca:r.implante_marca||'',sbImg:r.scanbody_img||'',impTipo:r.implante_tipo||'',itens:r.itens||[],extras:r.extras||[],material:r.material||'',fresadora:r.fresadora||'',deleted:dia(r.deleted_at)};}},
   arquivos:{t:'arquivos',
-    to:function(x){return x.origem==='link'?{pedido_id:x.pedidoId,origem:'link',nome:x.nome,url_externa:x.url,deleted_at:ts(x.deleted)}:{deleted_at:ts(x.deleted)};},
-    from:function(r){return {id:r.id,pedidoId:r.pedido_id,origem:r.origem,nome:r.nome,url:r.url_externa,tamOrig:+r.tamanho_original||0,tamZip:+r.tamanho_zip||0,criado:dia(r.criado_em),removido:dia(r.removido_em),deleted:dia(r.deleted_at)};}}
+    to:function(x){return x.origem==='link'?{pedido_id:x.pedidoId,origem:'link',nome:x.nome,url_externa:x.url,categoria:x.cat||null,deleted_at:ts(x.deleted)}:{deleted_at:ts(x.deleted)};},
+    from:function(r){return {id:r.id,pedidoId:r.pedido_id,origem:r.origem,cat:r.categoria||null,nome:r.nome,url:r.url_externa,tamOrig:+r.tamanho_original||0,tamZip:+r.tamanho_zip||0,criado:dia(r.criado_em),removido:dia(r.removido_em),deleted:dia(r.deleted_at)};}}
 };
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
@@ -1243,7 +1260,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 01h10';
+var VERSAO='16/10 · 01h40';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2976,11 +2993,16 @@ function envDetalhe(R,d,x){
 var RD_FILES=new Map();
 function rdNaoLidas(id){var R=redeIni(),n=(R.naoLidas||{})[id]||0;return n?' <span class="tag">'+n+' nova'+(n>1?'s':'')+'</span>':'';}
 function rdArqs(x,lado,quem){var a=x.arqs||(x.arqs=[]);
-  return '<div class="rd-arqs"><div class="between small"><b>Arquivos</b><span class="muted">'+(lado==='env'?'você ⇄ '+esc(quem):esc(quem)+' ⇄ você')+'</span></div>'+
-    (a.length?a.map(function(f,i){var meu=f.de==='eu';return '<div class="rd-arq'+(meu?' meu':'')+'"><span class="rd-ft '+f.tipo+'">'+(f.tipo==='html'?'HTML':'STL')+'</span><span class="t"><b>'+esc(f.nome)+'</b><span class="small muted">'+(meu?'enviado por você':'enviado por '+esc(quem))+(f.tipo==='html'?' · visualização 3D no navegador':'')+'</span></span>'+
-      (f.tipo==='html'?'<button class="btn sm" data-a="rdAbreArq" data-k="'+x.id+':'+i+'">Visualizar</button>':'<button class="btn sm" data-a="rdAbreArq" data-k="'+x.id+':'+i+'">Baixar</button>')+'</div>';}).join(''):'<p class="small muted">Nenhum arquivo ainda.</p>')+
-    '<div class="row wrap" style="gap:8px"><label class="btn sm" style="position:relative">+ STL / ZIP<input class="rd-up" data-id="'+x.id+'" data-t="stl" type="file" multiple accept=".stl,.zip,.ply,.obj" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
-      '<label class="btn sm" style="position:relative">+ HTML (visualização)<input class="rd-up" data-id="'+x.id+'" data-t="html" type="file" multiple accept=".html,.htm" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label></div></div>';}
+  var cat=function(f){if(f.cat)return f.cat;if(f.tipo==='html')return 'html';var meuEnvio=f.de==='eu';return lado==='meu'?(meuEnvio?'fres':'scan'):(meuEnvio?'scan':'fres');};
+  return '<div class="stack" style="gap:8px"><div class="between small"><b>Arquivos</b><span class="muted">'+(lado==='env'?'você ⇄ '+esc(quem):esc(quem)+' ⇄ você')+'</span></div><div class="slots">'+SLOTS.map(function(sl){
+    if(sl[0]==='sb')return '<div class="slot'+(x.sbUrl?' tem':'')+'" style="--sc:'+sl[4]+'">'+slotHead(sl)+(x.sbUrl?'<img class="sb-img" src="'+x.sbUrl+'" alt="Print do scanbody" data-a="rdSbVer" data-id="'+x.id+'"><div class="row wrap" style="gap:6px"><label class="btn sm up">Trocar<input type="file" accept="image/*" class="rd-sb-up" data-id="'+x.id+'"></label><button class="btn sm danger" data-a="rdSbTira" data-id="'+x.id+'">Remover</button></div>':
+      '<div class="sb-zona" tabindex="0" data-a="sbFoco"><b>Cole aqui (Ctrl+V)</b><span>o print do scanbody do exocad</span><label class="btn sm up" style="margin-top:4px">ou escolher imagem<input type="file" accept="image/*" class="rd-sb-up" data-id="'+x.id+'"></label></div>')+'</div>';
+    var L=a.map(function(f,i){return {f:f,i:i};}).filter(function(o){return cat(o.f)===sl[0];});
+    return '<div class="slot'+(L.length?' tem':'')+'" style="--sc:'+sl[4]+'">'+slotHead(sl)+
+      L.map(function(o){return '<div class="slot-f"><button class="nm" data-a="rdAbreArq" data-k="'+x.id+':'+o.i+'" data-v="'+sl[0]+'" title="Abrir em tela grande">'+esc(o.f.nome)+'</button><span class="small muted" style="flex:none">'+(o.f.de==='eu'?'você':esc(quem.split(' ')[0]))+'</span></div>';}).join('')+
+      '<label class="btn sm up">+ Enviar<input class="rd-up" data-id="'+x.id+'" data-t="'+(sl[0]==='html'?'html':'stl')+'" data-cat="'+sl[0]+'" type="file" multiple accept="'+sl[3]+'"></label></div>';}).join('')+'</div></div>';}
+function rdSbCola(id,file){var R=redeIni(),x=R.enviados.concat(R.meus).filter(function(q){return q.id===id;})[0];if(!x||!file)return;if(!/^image\//.test(file.type)){toast('Cole ou escolha uma imagem.');return;}
+  if(x.sbUrl)URL.revokeObjectURL(x.sbUrl);x.sbUrl=URL.createObjectURL(file);render();if(ui.sheet)renderSheet();toast('Print do scanbody anexado (prévia: não fica salvo).');}
 var QUEM_PUB={den:['Dentista','<svg class="qp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4c-2 0-3.5 1.6-3.5 4.2 0 2 .9 3.3 1.4 5 .5 1.9.6 4.2 1 6.4.3 1.4 1.9 1.6 2.3.2l1-3.5c.3-1.2 2.1-1.2 2.4 0l1 3.5c.4 1.4 2 1.2 2.3-.2.4-2.2.5-4.5 1-6.4.5-1.7 1.4-3 1.4-5C17.3 5.6 15.8 4 13.8 4c-1.5 0-2.3.8-3.4.8S8.5 4 7 4z" transform="translate(1.6 0)"/></svg>','Dentistas'],lab:['Laboratório','<svg class="qp-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V10l5 3V10l5 3V6l8 4v11z"/><path d="M7 17h2M12 17h2M17 17h2"/></svg>','Laboratórios'],cad:['Cadista','<svg class="qp-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>','Cadistas']};
 function rdPegar(R){
   var f=R.filtro||'todos',o=R.ordem||'valor',me=R.eu;
@@ -3417,7 +3439,7 @@ function openSheet(fn){var args=[].slice.call(arguments,1);ui.sheet={fn:fn,args:
 function renderSheet(){
   var el=document.getElementById('sheet');
   if(!ui.sheet){el.innerHTML='';return;}
-  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+({fPedidoDet:' wide',fTrabRede:' wide',fPedido:' wide',fCliente:' frm',fPagamento:' mid',fCobranca:' mid',fRelProd:' mid'}[ui.sheet.fn.name]||'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
+  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+({fPedidoDet:' wide',fTrabRede:' wide',fViewer:' full',fBlobView:' full',fImgView:' full',fPedido:' wide',fCliente:' frm',fPagamento:' mid',fCobranca:' mid',fRelProd:' mid'}[ui.sheet.fn.name]||'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
   if(ui.sheet.after)ui.sheet.after();
 }
 function closeSheet(){if(viewer)viewer.stop();ui.sheet=null;renderSheet();}
@@ -3606,11 +3628,9 @@ function fPedidoDet(id){
     (p.status!=='arquivado'?(function(){var x=acoes(p);return (p.status!=='pendente'?x.extra:'')+(x.acts?'<div class="acts">'+x.acts+'</div>':'');})():'<div class="acts"><button class="btn sm" data-a="restaurarFin" data-id="'+p.id+'" '+(w?'':'disabled')+'>↩ Restaurar para Finalizado</button></div>')+
     '<label class="fld"><span>Mover para</span><select id="pd-mover" data-id="'+id+'" '+(w?'':'disabled')+'>'+STATUS.concat([['arquivado','Arquivado (enviado ao cliente)']]).map(function(s){return '<option value="'+s[0]+'" '+(p.status===s[0]?'selected':'')+'>'+s[1]+'</option>';}).join('')+'</select></label>'+
     '<section class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div class="between"><h3>Arquivos</h3><span class="small muted">'+bytes(usado())+' de '+bytes(S.assinatura.limite)+'</span></div>'+
-      (arqs.length?'<div class="list">'+arqs.map(function(a){return liArq(a,w);}).join('')+'</div>':'<p class="small muted">Nenhum arquivo. Envie o STL ou cole um link.</p>')+
-      (canFile()?'<label class="btn block" style="position:relative">Enviar arquivos (viram zip)<input id="up-file" type="file" multiple accept=".stl,.ply,.obj,.zip,.html,.htm,.png,.jpg,.jpeg,.webp" data-id="'+id+'" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>':
-        (w?'<p class="small muted">No Essencial não dá para guardar arquivos. Cole o link abaixo ou <button type="button" class="linkbtn" data-a="assinar">assine</button>.</p>':''))+
+      slotsPedido(p,w)+
       '<div id="up-st" '+(ui.up&&ui.up.pid===id?'':'hidden')+' class="stack" style="gap:6px"><div class="prog"><i id="up-bar" style="width:'+(ui.up&&ui.up.pid===id?ui.up.pct:0)+'%"></i></div><span class="small muted" id="up-txt">'+(ui.up&&ui.up.pid===id?esc(ui.up.txt):'')+'</span></div>'+
-      '<form data-form="link" data-id="'+id+'" class="row"><input class="search" id="lk-url" name="url" type="url" placeholder="Ou cole o link do Drive / WeTransfer" required '+(w?'':'disabled')+'><button class="btn" type="submit" '+(w?'':'disabled')+'>Salvar</button></form>'+
+      '<form data-form="link" data-id="'+id+'" class="row wrap" style="gap:6px"><select name="cat" aria-label="Onde guardar o link" style="max-width:150px">'+SLOTS.slice(0,3).map(function(x){return '<option value="'+x[0]+'">'+x[1].replace(' do cliente','').replace(' do exocad','')+'</option>';}).join('')+'</select><input class="search" id="lk-url" name="url" type="url" placeholder="Ou cole o link do Drive / WeTransfer" required '+(w?'':'disabled')+' style="flex:1;min-width:160px"><button class="btn" type="submit" '+(w?'':'disabled')+'>Salvar</button></form>'+
     '</section>'+
     '<div class="row wrap" style="border-top:1px solid var(--line);padding-top:14px"><button class="btn" data-a="editPedido" data-id="'+id+'" '+(w?'':'disabled')+'>Editar</button><button class="btn" data-a="duplicar" data-id="'+id+'" '+(w?'':'disabled')+'>Duplicar</button><button class="btn danger" data-a="delPedido" data-id="'+id+'" '+(w?'':'disabled')+'>Excluir</button></div>'+'</div></div>';
 }
@@ -3877,6 +3897,54 @@ function desenhaPix(){
   else box.innerHTML='<p class="small" style="color:#333;width:220px">Não foi possível carregar o gerador de QR Code. Use o código copia e cola.</p>';
 }
 
+/* ---------- Arquivos do pedido em caixas (padrão do pedido e da Rede) ----------
+   1) Escaneamento do cliente  2) HTML do exocad  3) STL para fresagem  4) Print do scanbody (Ctrl+V).
+   Tocar no arquivo abre a visualização grande (3D para STL, moldura isolada para HTML). O print do scanbody
+   fica no bucket privado "pedido-img" e o cliente vê no link de acompanhamento. */
+var SLOTS=[['scan','Escaneamento do cliente','STL, PLY, OBJ ou ZIP','.stl,.ply,.obj,.zip','#2F7FE0','<path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M8 10c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5H8zM9.5 10.2c.2 2.6.6 5 1.4 6.1.4.5 1.1.2 1.1-.4v-2.2"/>'],
+  ['html','HTML do exocad','Projeto para ver no navegador','.html,.htm,.zip','#E08A1E','<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>'],
+  ['fres','STL para fresagem','Arquivo final do elemento','.stl,.zip','#1DAE8A','<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/>'],
+  ['sb','Print do scanbody','Cole com Ctrl+V · o cliente vê','image/*','#C2367A','<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/>']];
+function catArq(a){if(a.cat)return a.cat;return /\.html?($|\.zip$)/i.test(a.nome)?'html':'scan';}
+function slotHead(sl){return '<div class="slot-h"><i>'+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+sl[5]+'</svg></i><span><b>'+sl[1]+'</b><small>'+sl[2]+'</small></span></div>';}
+var SBURL={};
+function sbUrl(path,depois){if(!path)return '';var c=SBURL[path];if(c&&c.u&&Date.now()-c.t<50*6e4)return c.u;if(c&&c.busy)return '';
+  SBURL[path]={busy:true};sb.storage.from('pedido-img').createSignedUrl(path,3600).then(function(r){SBURL[path]={u:r.data&&r.data.signedUrl,t:Date.now()};if(depois)depois();},function(){SBURL[path]={t:Date.now()};});return '';}
+function slotsPedido(p,w){var arqs=alive(S.arquivos).filter(function(a){return a.pedidoId===p.id&&!a.removido;});
+  return '<div class="slots">'+SLOTS.map(function(sl){
+    if(sl[0]==='sb'){var u=p.sbImg?sbUrl(p.sbImg,function(){if(ui.sheet)renderSheet();}):'';
+      return '<div class="slot'+(p.sbImg?' tem':'')+'" style="--sc:'+sl[4]+'">'+slotHead(sl)+
+        (p.sbImg?(u?'<img class="sb-img" src="'+u+'" alt="Print do scanbody" data-a="sbVer" data-id="'+p.id+'">':'<p class="small muted">Carregando a imagem…</p>')+
+          '<div class="row wrap" style="gap:6px"><label class="btn sm up">Trocar<input type="file" accept="image/*" class="sb-up" data-id="'+p.id+'" '+(w?'':'disabled')+'></label><button class="btn sm danger" data-a="sbTira" data-id="'+p.id+'" '+(w?'':'disabled')+'>Remover</button></div>'
+         :'<div class="sb-zona" tabindex="0" data-a="sbFoco" data-id="'+p.id+'"><b>Cole aqui (Ctrl+V)</b><span>o print do scanbody do exocad</span><label class="btn sm up" style="margin-top:4px">ou escolher imagem<input type="file" accept="image/*" class="sb-up" data-id="'+p.id+'" '+(w?'':'disabled')+'></label></div>')+
+        '</div>';}
+    var L=arqs.filter(function(a){return catArq(a)===sl[0];});
+    return '<div class="slot'+(L.length?' tem':'')+'" style="--sc:'+sl[4]+'">'+slotHead(sl)+
+      L.map(function(a){var lk=a.origem==='link';return '<div class="slot-f">'+(lk?'<a class="nm" style="flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" href="'+esc(a.url)+'" target="_blank" rel="noopener">🔗 '+esc(a.nome)+'</a>':'<button class="nm" data-a="'+(sl[0]==='html'?'verHtml':'ver3d')+'" data-id="'+a.id+'" title="Abrir em tela grande">'+esc(a.nome)+'</button><button class="icon-btn" data-a="baixarArq" data-id="'+a.id+'" aria-label="Baixar" title="Baixar">⤓</button>')+
+        '<button class="icon-btn" data-a="delArq" data-id="'+a.id+'" aria-label="Excluir" title="Excluir" '+(w?'':'disabled')+'>🗑</button></div>';}).join('')+
+      (canFile()?'<label class="btn sm up">+ Enviar<input type="file" multiple accept="'+sl[3]+'" class="slot-up" data-slot="'+sl[0]+'" data-id="'+p.id+'" '+(w?'':'disabled')+'></label>':'')+'</div>';}).join('')+'</div>';}
+function sbProcessa(pid,file){if(!guard())return;var p=byId(S.pedidos,pid);if(!p||!file)return;if(!/^image\//.test(file.type)){toast('Cole ou escolha uma imagem.');return;}
+  toast('Enviando o print do scanbody…');
+  comprime(file,1600).then(function(b){var ext=b.type==='image/webp'?'webp':'jpg',path=S.sessao.id+'/'+pid+'/scanbody-'+Date.now().toString(36)+'.'+ext,ant=p.sbImg;
+    return sb.storage.from('pedido-img').upload(path,b,{contentType:b.type,upsert:false}).then(function(r){if(r.error)throw new Error(r.error.message);
+      if(ant)sb.storage.from('pedido-img').remove([ant]);SBURL[path]={u:URL.createObjectURL(b),t:Date.now()};p.sbImg=path;save();if(ui.sheet)renderSheet();toast('Print do scanbody salvo. O cliente vê no link de acompanhamento.');});})
+  .catch(function(e){toast('Não deu para salvar a imagem: '+e.message);});}
+function fImgView(src){return head('Print do scanbody')+'<img src="'+src+'" alt="Print do scanbody" style="width:100%;max-height:80vh;object-fit:contain;border-radius:12px;background:#0b0b10">';}
+/* Visualização grande a partir de um arquivo (zip, STL ou HTML) */
+function fBlobView(){var v=ui.bv||{};return head(esc(v.nome||'Arquivo'))+(v.kind==='html'?'<div id="bvh" class="stack"><p class="small muted">Abrindo…</p></div>':'<div class="viewer3d" id="v3"><canvas id="v3c"></canvas><div class="msg" id="v3m">Abrindo o arquivo…</div></div><p class="small muted">Arraste para girar. Use dois dedos ou a roda do mouse para zoom.</p>');}
+function abreBlob(blob,nome,kind){ui.bv={nome:nome,kind:kind};openSheet(fBlobView);var go=function(){mostraBlob(blob,kind);};ui.sheet.after=go;go();}
+function mostraBlob(blob,kind){var isZip=/zip/i.test(blob.type)||/\.zip$/i.test((ui.bv||{}).nome||'');
+  var pega=isZip&&window.JSZip?JSZip.loadAsync(blob).then(function(z){var nomes=Object.keys(z.files).filter(function(n){return !z.files[n].dir&&!/(^|\/)\._/.test(n);});
+      var f=nomes.filter(function(n){return kind==='html'?/\.html?$/i.test(n):/\.stl$/i.test(n);})[0];if(!f)throw new Error(kind==='html'?'Nenhum HTML dentro do zip.':'Nenhum STL dentro do zip.');return z.files[f].async(kind==='html'?'string':'arraybuffer');})
+    :(kind==='html'?blob.text():blob.arrayBuffer());
+  pega.then(function(c){if(kind==='html'){var el=document.getElementById('bvh');if(!el)return;var u=URL.createObjectURL(new Blob([c],{type:'text/html'}));
+      el.innerHTML='<iframe class="htmlv" sandbox="allow-scripts" src="'+u+'" title="Visualização do projeto"></iframe><p class="small muted">Visualização isolada: o arquivo não acessa seus dados.</p>';setTimeout(function(){URL.revokeObjectURL(u);},120000);return;}
+    if(!window.THREE)throw new Error('o visualizador 3D não carregou. Verifique a internet e tente de novo');var pos=parseSTL(c);if(!pos.length)throw new Error('Arquivo STL sem triângulos.');var m=document.getElementById('v3m');if(!m)return;if(viewer)viewer.stop();viewer=montaViewer(pos);m.hidden=true;})
+  .catch(function(e){var m=document.getElementById(kind==='html'?'bvh':'v3m');if(m)m.textContent='Não consegui abrir: '+e.message;});}
+function verHtmlArq(id){var a=byId(S.arquivos,id);if(!a)return;var b=blobs.get(id);
+  if(b){abreBlob(b,a.nome,'html');return;}
+  toast('Baixando o arquivo…');fnArq('baixar',{arquivo_id:id}).then(function(r){return fetch(r.url);}).then(function(res){if(!res.ok)throw new Error('download recusado');return res.blob();})
+    .then(function(bl){blobs.set(id,bl);abreBlob(bl,a.nome,'html');}).catch(function(e){toast('Não consegui abrir: '+e.message+'.');});}
 /* Visualizador 3D */
 var viewer=null;
 function fViewer(id){var a=byId(S.arquivos,id);return head(esc(a?a.nome:'Arquivo'))+'<div class="viewer3d" id="v3"><canvas id="v3c"></canvas><div class="msg" id="v3m">Abrindo o arquivo…</div></div><p class="small muted">Arraste para girar. Use dois dedos ou a roda do mouse para zoom.</p>';}
@@ -3943,7 +4011,7 @@ function upProg(pid,txt,pct){ui.up=txt==null?null:{pid:pid,txt:txt,pct:pct||0};v
 function putComProgresso(url,blob,onp){return new Promise(function(ok,ko){var x=new XMLHttpRequest();x.open('PUT',url);x.setRequestHeader('Content-Type','application/zip');
   x.upload.onprogress=function(e){if(e.lengthComputable)onp(e.loaded/e.total);};x.onload=function(){x.status>=200&&x.status<300?ok():ko(new Error('o armazenamento recusou o envio ('+x.status+')'));};
   x.onerror=function(){ko(new Error('sem conexão com o armazenamento'));};x.send(blob);});}
-async function enviaArquivo(pid,files){
+async function enviaArquivo(pid,files,cat){
   if(!guardArq())return;files=[].slice.call(files||[]).filter(Boolean);var fi=document.getElementById('up-file');if(fi)fi.value='';if(!files.length)return;
   if(ui.up){toast('Espere o envio atual terminar.');return;}
   if(files.some(function(f){return !/\.(stl|ply|obj|zip|html?|png|jpe?g|webp)$/i.test(f.name);})){toast('Envie STL, PLY, OBJ, ZIP, HTML ou imagens (PNG, JPG).');return;}
@@ -3962,8 +4030,8 @@ async function enviaArquivo(pid,files){
     var pr=await fnArq('preparar',{pedido_id:pid,tamanho:blob.size});
     await putComProgresso(pr.url,blob,function(f){upProg(pid,'Enviando '+bytes(blob.size)+'… '+Math.round(f*100)+'%',f*100);});
     upProg(pid,'Conferindo…',100);
-    var r=await fnArq('confirmar',{pedido_id:pid,key:pr.key,nome:nome,tamanho_original:tot});
-    var a=MAP.arquivos.from(r);S.arquivos.push(a);SNAP.arquivos=SNAP.arquivos||{};SNAP.arquivos[a.id]=JSON.stringify(MAP.arquivos.to(a));blobs.set(a.id,blob);
+    var r=await fnArq('confirmar',{pedido_id:pid,key:pr.key,nome:nome,tamanho_original:tot,categoria:cat||null});
+    var a=MAP.arquivos.from(r);if(cat&&!a.cat)a.cat=cat;S.arquivos.push(a);SNAP.arquivos=SNAP.arquivos||{};SNAP.arquivos[a.id]=JSON.stringify(MAP.arquivos.to(a));blobs.set(a.id,blob);
     upProg(pid,null);toast(umZip?'Zip enviado: '+bytes(blob.size)+'.':'Enviado: '+bytes(tot)+' → '+bytes(blob.size)+' ('+Math.max(0,Math.round((1-blob.size/tot)*100))+'% menor).');
   }catch(e){upProg(pid,null);toast('Não deu para enviar: '+e.message+'.');}
   if(ui.sheet)renderSheet();render();
@@ -4058,9 +4126,8 @@ var A={
       if(ui.tab==='rede')render();},1500);},
   rdAbreArq:function(d){var k=d.k.split(':'),R=redeIni(),x=R.enviados.concat(R.meus).filter(function(q){return q.id===k[0];})[0],f=x&&x.arqs[+k[1]];if(!f)return;
     var file=RD_FILES.get(d.k);
-    if(!file){toast(f.tipo==='html'?'Arquivo de exemplo. Anexe um HTML de verdade para ver a visualização abrindo.':'Arquivo de exemplo: na versão final, baixa o arquivo.');return;}
-    var u=URL.createObjectURL(file);if(f.tipo==='html')window.open(u,'_blank');else{var l=document.createElement('a');l.href=u;l.download=f.nome;document.body.appendChild(l);l.click();l.remove();}
-    setTimeout(function(){URL.revokeObjectURL(u);},60000);},
+    if(!file){toast('Arquivo de exemplo, sem conteúdo. Envie um arquivo seu na caixa para ver em tela grande.');return;}
+    abreBlob(file,f.nome,(d.v==='html'||f.tipo==='html')?'html':'stl');},
   rdPerfil:function(d){openSheet(fPerfilCad,d.id);},
   prEditar:function(){if(!S.rede)carregaPerfilRede();openSheet(fPerfilRede);},
   prPickCid:function(d){var i=document.getElementById('pr-cidade');if(i)i.value=d.n;var b=document.getElementById('pr-sug');if(b){b.hidden=true;b.innerHTML='';}},
@@ -4245,6 +4312,12 @@ var A={
     var ok=function(){toast('Copiado.');},fail=function(){var el=document.getElementById(d.t==='tx'?'tx-out':'px-code');var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);toast('Texto selecionado. Copie com o menu do aparelho.');};
     try{navigator.clipboard.writeText(t).then(ok,fail);}catch(e){fail();}},
   ver3d:function(d){openSheet(fViewer,d.id);ui.sheet.after=function(){abreViewer(d.id);};abreViewer(d.id);},
+  rdSbVer:function(d){var R=redeIni(),x=R.enviados.concat(R.meus).filter(function(q){return q.id===d.id;})[0];if(x&&x.sbUrl)openSheet(fImgView,x.sbUrl);},
+  rdSbTira:function(d){var R=redeIni(),x=R.enviados.concat(R.meus).filter(function(q){return q.id===d.id;})[0];if(x&&x.sbUrl){URL.revokeObjectURL(x.sbUrl);x.sbUrl=null;}render();if(ui.sheet)renderSheet();},
+  verHtml:function(d){verHtmlArq(d.id);},
+  sbVer:function(d){var p=byId(S.pedidos,d.id);var u=p&&p.sbImg&&SBURL[p.sbImg]&&SBURL[p.sbImg].u;if(u)openSheet(fImgView,u);},
+  sbFoco:function(d,el){el.focus();},
+  sbTira:function(d){if(!guard())return;var p=byId(S.pedidos,d.id);if(!p||!p.sbImg)return;var ant=p.sbImg;p.sbImg='';save();sb.storage.from('pedido-img').remove([ant]);renderSheet();toast('Print do scanbody removido.');},
   delArq:function(d){if(!guard())return;var a=byId(S.arquivos,d.id);softDel(a);save();renderSheet();render();toast('Arquivo foi para a lixeira.');},
   baixarArq:function(d){if(blobs.has(d.id)&&byId(S.arquivos,d.id)){var a=byId(S.arquivos,d.id),u=URL.createObjectURL(blobs.get(d.id)),l=document.createElement('a');l.href=u;l.download=a.nome;document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u);},5000);return;}
     toast('Preparando o download…');fnArq('baixar',{arquivo_id:d.id,salvar:true}).then(function(r){location.href=r.url;}).catch(function(e){toast('Não deu para baixar: '+e.message+'.');});},
@@ -4388,7 +4461,7 @@ var F={
   link:function(fd,f){
     if(!guard())return;var u=(fd.get('url')||'').trim();if(!/^https?:\/\//i.test(u)){toast('Cole um link que comece com https://');return;}
     var host;try{host=new URL(u).hostname.replace(/^www\./,'');}catch(e){toast('Link inválido.');return;}
-    S.arquivos.push({id:uid(),pedidoId:f.dataset.id,origem:'link',nome:host,url:u,criado:today()});save();renderSheet();render();toast('Link salvo no pedido.');
+    var cat=fd.get('cat');S.arquivos.push({id:uid(),pedidoId:f.dataset.id,origem:'link',cat:['scan','html','fres'].indexOf(cat)>=0?cat:null,nome:host,url:u,criado:today()});save();renderSheet();render();toast('Link salvo no pedido.');
   },
   perfil:function(fd){
     if(!guard())return;['nome','telefone','tipoChave','chave','recebedor','cidade','uf'].forEach(function(k){S.perfil[k]=(fd.get(k)||'').trim();});S.perfil.nome=nomeProprio(S.perfil.nome);
@@ -4467,7 +4540,14 @@ document.addEventListener('input',function(e){
   if(t.id==='px-valor')desenhaPix();
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
+document.addEventListener('paste',function(e){if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it)return;
+  var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.type!=='file')return;
+  var f=it.getAsFile();if(!f)return;e.preventDefault();
+  if(ui.sheet.fn===fPedidoDet)sbProcessa(ui.sheet.args[0],f);else if(ui.sheet.fn===fTrabRede)rdSbCola(ui.sheet.args[0],f);});
 document.addEventListener('change',function(e){
+  if(e.target&&e.target.classList&&e.target.classList.contains('slot-up')&&e.target.files.length){var fs=[].slice.call(e.target.files);e.target.value='';enviaArquivo(e.target.dataset.id,fs,e.target.dataset.slot);}
+  if(e.target&&e.target.classList&&e.target.classList.contains('sb-up')&&e.target.files.length){var f0=e.target.files[0];e.target.value='';sbProcessa(e.target.dataset.id,f0);}
+  if(e.target&&e.target.classList&&e.target.classList.contains('rd-sb-up')&&e.target.files.length){rdSbCola(e.target.dataset.id,e.target.files[0]);e.target.value='';}
   if(e.target&&e.target.id==='ed-t'&&ui.pdRede){var tt=tipo(e.target.value);if(tt&&/implante/.test(semAcento(tt.nome))){var cb=document.getElementById('ed-imp');if(cb&&!cb.checked){cb.checked=true;var bx=document.getElementById('ed-impbox');if(bx)bx.hidden=false;}}}
   if(e.target&&e.target.id==='pr-uf'){var ci=document.getElementById('pr-cidade');if(ci){ci.disabled=!e.target.value;ci.value='';ci.placeholder=e.target.value?'Comece a digitar…':'Escolha o estado primeiro';var sb2=document.getElementById('pr-sug');if(sb2){sb2.hidden=true;sb2.innerHTML='';}if(e.target.value)ci.focus();}}
   if(e.target.dataset&&e.target.dataset.a2==='labQuem'){labIni().novo.quem=e.target.value;var lc=document.getElementById('lab-cad');if(lc)lc.hidden=e.target.value!=='um';return;}
@@ -4482,7 +4562,7 @@ document.addEventListener('change',function(e){
   if(t.id==='ed-imp'){var bx=document.getElementById('ed-impbox');if(bx)bx.hidden=!t.checked;lerEditor();renderItens();}
   if(t.id==='rd-rep'||t.id==='rd-cad')rdLer();
   if(t.classList&&t.classList.contains('rd-up')&&t.files.length){var R1=redeIni(),it=R1.enviados.concat(R1.meus).filter(function(q){return q.id===t.dataset.id;})[0];
-    if(it){it.arqs=it.arqs||[];[].forEach.call(t.files,function(f){var tp=/\.html?$/i.test(f.name)?'html':'stl';it.arqs.push({nome:f.name,tipo:tp,de:'eu'});RD_FILES.set(it.id+':'+(it.arqs.length-1),f);});
+    if(it){it.arqs=it.arqs||[];[].forEach.call(t.files,function(f){var tp=/\.html?$/i.test(f.name)?'html':'stl';it.arqs.push({nome:f.name,tipo:tp,de:'eu',cat:t.dataset.cat||null});RD_FILES.set(it.id+':'+(it.arqs.length-1),f);});
       render();if(ui.sheet&&ui.sheet.fn===fTrabRede)renderSheet();toast(t.files.length+' arquivo(s) anexado(s). O outro cadista já consegue abrir.');}}
   if(t.classList&&t.classList.contains('rd-port-up')&&t.files.length){var row0=prRow(),livres=12-(row0.fotos||[]).length,fs=[].filter.call(t.files,function(f){return /^image\//.test(f.type);}).slice(0,Math.max(0,livres));
     if(!fs.length){toast(livres<=0?'Limite de 12 fotos. Apague uma para colocar outra.':'Escolha fotos (o vídeo entra como link em Editar meu perfil).');return;}

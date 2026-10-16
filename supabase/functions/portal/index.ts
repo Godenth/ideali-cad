@@ -35,11 +35,21 @@ Deno.serve(async (req: Request) => {
     if (!cli) return json(404, { erro: "Este link não está mais disponível." });
     const { data: perfil } = await admin.from("perfis").select("nome,telefone").eq("user_id", dono).maybeSingle();
     const { data: peds } = await admin.from("pedidos")
-      .select("id,numero,paciente,elementos,itens,extras,tipo_trabalho_id,status,urgente,recebido_em,prazo,enviado_em,pago_em,valor,pendencia_motivos,pendencia_obs,aprovacao_desde,ajustes,material,fresadora")
+      .select("id,numero,paciente,elementos,itens,extras,tipo_trabalho_id,status,urgente,recebido_em,prazo,enviado_em,pago_em,valor,pendencia_motivos,pendencia_obs,aprovacao_desde,ajustes,material,fresadora,scanbody_img")
       .eq("user_id", dono).eq("cliente_id", cid).is("deleted_at", null)
       .in("status", VISIVEIS)
       .order("numero", { ascending: false }).limit(300);
-    const lista = peds ?? [];
+    // deno-lint-ignore no-explicit-any
+    const lista = (peds ?? []) as any[];
+    // Print do scanbody: URL assinada (1 hora) do bucket privado "pedido-img", só da pasta do dono.
+    for (const p of lista) {
+      const path = String(p.scanbody_img ?? "");
+      delete p.scanbody_img;
+      if (path && path.startsWith(dono + "/")) {
+        const { data: su } = await admin.storage.from("pedido-img").createSignedUrl(path, 3600);
+        if (su?.signedUrl) p.scanbody_url = su.signedUrl;
+      }
+    }
     const tipoIds = new Set<string>();
     for (const p of lista) {
       if (p.tipo_trabalho_id) tipoIds.add(p.tipo_trabalho_id);
@@ -49,7 +59,7 @@ Deno.serve(async (req: Request) => {
     const ids = [...tipoIds].filter((x) => UUID.test(x));
     const { data: tipos } = ids.length ? await admin.from("tipos_trabalho").select("id,nome").eq("user_id", dono).in("id", ids) : { data: [] };
     const pids = lista.map((p) => p.id);
-    const { data: arqs } = pids.length ? await admin.from("arquivos").select("id,pedido_id,origem,nome,url_externa,tamanho_zip,criado_em")
+    const { data: arqs } = pids.length ? await admin.from("arquivos").select("id,pedido_id,origem,nome,url_externa,tamanho_zip,criado_em,categoria")
       .eq("user_id", dono).in("pedido_id", pids).is("deleted_at", null).is("removido_em", null) : { data: [] };
     await admin.from("links_cliente").update({ ultimo_acesso: new Date().toISOString() }).eq("id", link.id);
     const nomeCli = (cli.empresa || "").trim() || [cli.titulo, cli.nome, cli.sobrenome].filter(Boolean).join(" ");
