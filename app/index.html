@@ -244,7 +244,9 @@ select.auto-ok{outline:2px solid var(--ok);outline-offset:1px;transition:outline
 .rd-de{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left}
 .rd-de:hover b,.rd-de:hover span{text-decoration:underline}
 .rd-mural{display:grid;gap:12px}
-@media (min-width:900px){.rd-mural{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:760px){.rd-mural{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1280px){.rd-mural{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.rd-of-h{display:flex;gap:10px;align-items:center;min-width:0}.rd-of-h b{flex:1;min-width:0;font-size:1.05rem;line-height:1.2}
 .rd-oferta.mim{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .rd-eu{background:linear-gradient(100deg,color-mix(in srgb,var(--p5) 12%,var(--surface)),var(--surface) 70%)}
 .rd-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
@@ -525,6 +527,28 @@ table.adm td{vertical-align:top}
 .dl-mais{justify-self:center}
 #rd-passo2{scroll-margin-top:84px}
 @media (max-width:600px){#rd-passo2 .grid2{grid-template-columns:1fr}.rd-dh{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}}
+.md{display:grid;gap:16px;align-items:start}
+@media (min-width:960px){.md{grid-template-columns:minmax(300px,380px) minmax(0,1fr)}.md-side{position:sticky;top:150px}}
+.md-list{display:grid;gap:8px;align-content:start}
+.md-row{display:flex;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;width:100%;min-width:0}
+.md-row:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.md-row.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.md-row .t{flex:1;min-width:0;display:grid;gap:2px}
+.md-row .t b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.md-row .t span{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.md-row .r{display:grid;justify-items:end;gap:4px;flex:none}
+.md-row .r b{font:700 .9rem var(--f-mono);color:var(--c-val,var(--ok))}
+.md-st{font-size:.68rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--soft);color:var(--muted)}
+.md-st.oferta{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.md-st.desenho{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.md-st.revisao{background:color-mix(in srgb,var(--urgent) 16%,transparent);color:var(--urgent)}
+.md-st.aprovado,.md-st.pago{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.md-st.recusado{background:var(--soft);color:var(--muted)}
+.md-mini{display:flex;gap:3px;margin-top:3px}.md-mini i{height:4px;flex:1;border-radius:99px;background:var(--line)}.md-mini i.ok{background:var(--accent)}
+.md-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.md-head .ico-trab{width:52px;height:52px;border-radius:14px}.md-head .ico-trab svg{width:34px;height:34px}
+.md-head .t{flex:1;min-width:180px;display:grid;gap:3px}.md-head .t b{font-family:var(--f-display);font-size:1.2rem}
+.md-head .t span{font-size:.86rem;color:var(--muted)}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -1191,7 +1215,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 23h55';
+var VERSAO='16/10 · 00h10';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2806,9 +2830,20 @@ function labPerfil(L){var p=L.perfil;
       '<li>Você publica o pedido com o escaneamento, o prazo e quanto paga.</li><li>Cadistas da rede veem e mandam proposta (ou o primeiro aceita, se você escolher "toda a rede").</li>'+
       '<li>Você escolhe o cadista e conversa com ele pelo chat do pedido.</li><li>Ele entrega o projeto, você revisa em 3D e aprova ou pede ajuste.</li><li>Você paga direto no Pix dele e avalia com estrelas.</li></ol>'+
       '<p class="small muted">O laboratório não precisa do resto do sistema do cadista (produção, metas, cobrança). A conta dele é só para pedir e acompanhar projetos.</p></section></div>';}
-function rdEnviados(R){
-  return '<div class="rd-trabs">'+R.enviados.map(function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};if(d.st==='apagado')return '';
-    return '<section class="card stack"><div class="between wrap"><div class="row" style="gap:12px">'+(x.nome?'<button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x)+'</button>':'')+'<div><b>'+esc(d.trab)+'</b><div class="small muted">'+d.cod+(d.dentes.length?' · dentes '+d.dentes.join(', '):'')+' · '+(x.nome?'com '+esc(x.nome):'oferecido para: '+esc(d.para||'a rede'))+'</div></div></div><span class="mono val">'+brl(d.repasse)+'</span></div>'+
+/* ---------- Lista + detalhe (Enviados / Meus trabalhos) ----------
+   Computador: lista compacta à esquerda e o trabalho escolhido aberto à direita. Celular: o escolhido abre logo abaixo dele. */
+function icoNome(nome){var n=semAcento(String(nome||'')).toLowerCase(),k=/implante/.test(n)?'imp':/faceta/.test(n)?'fac':/protocolo/.test(n)?'pro':/placa/.test(n)?'pla':/ponte|fixa/.test(n)?'pon':/provis/.test(n)?'prov':/modelo/.test(n)?'mod':/encer/.test(n)?'enc':/coroa|dente|elemento/.test(n)?'prep':'out',c=ICO_TRAB[k];
+  return '<span class="ico-trab" style="--ic:'+c[1]+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+c[2]+'</svg></span>';}
+function mdLayout(itens,sel,linha,detalhe,acao){if(!itens.length)return '';var cel=window.innerWidth<960,on=itens.filter(function(x){return x.id===sel;})[0]||itens[0];
+  var lista='<div class="md-list">'+itens.map(function(x){var ativo=x===on;return '<button class="md-row'+(ativo?' on':'')+'" data-a="'+acao+'" data-id="'+x.id+'" aria-pressed="'+ativo+'">'+linha(x)+'</button>'+(cel&&ativo?detalhe(x):'');}).join('')+'</div>';
+  return '<div class="md">'+lista+(cel?'':'<div class="md-side">'+detalhe(on)+'</div>')+'</div>';}
+function miniEtapas(st,L){var i=L.indexOf(st);return '<span class="md-mini">'+L.map(function(e,k){return '<i class="'+(k<=i?'ok':'')+'"></i>';}).join('')+'</span>';}
+function rdEnviados(R){var ps=function(d){return R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};},L=R.enviados.filter(function(d){return d.st!=='apagado';}),ET=ETAPAS_REDE.map(function(e){return e[0];});
+  if(!L.length)return '<div class="card empty">Você ainda não delegou nenhum pedido.</div>';
+  var linha=function(d){var x=ps(d),et=ETAPAS_REDE.filter(function(e){return e[0]===d.st;})[0];return icoNome(d.trab)+'<span class="t"><b>'+esc(d.trab)+'</b><span>'+d.cod+' · '+(x.nome?'com '+esc(x.nome):'aguardando cadista')+'</span>'+(d.st!=='recusado'?miniEtapas(d.st,ET):'')+'</span><span class="r"><b>'+brl(d.repasse)+'</b><span class="md-st '+d.st+'">'+(d.st==='recusado'?'Recusado':et?et[1]:d.st)+'</span></span>';};
+  return mdLayout(L,R.envSel,linha,function(d){return envDetalhe(R,d,ps(d));},'rdEnvSel');}
+function envDetalhe(R,d,x){
+    return '<section class="card stack"><div class="md-head">'+(x.nome?'<button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,52)+'</button>':icoNome(d.trab))+'<span class="t"><b>'+esc(d.trab)+'</b><span>'+d.cod+(d.dentes.length?' · dentes '+d.dentes.join(', '):'')+' · '+(x.nome?'com '+esc(x.nome):'oferecido para: '+esc(d.para||'a rede'))+'</span></span><span class="mono val" style="font-size:1.15rem">'+brl(d.repasse)+'</span></div>'+
       (d.st==='recusado'?'<div class="banner bad"><span>Você recusou este trabalho'+(d.motivo?': '+esc(d.motivo):'')+'. Não há repasse a pagar.</span><button class="btn sm" data-a="rdReoferecer" data-id="'+d.id+'">Oferecer de novo</button></div>':etapasRede(d.st))+
       '<div class="row wrap" style="gap:8px">'+
         (d.st==='oferta'?prazoRede(d.prazo,d.hora)+'<span class="small muted"><i class="rd-pulse"></i> Aguardando alguém aceitar</span><button class="btn sm" data-a="rdSim" data-id="'+d.id+'" data-v="desenho">Simular: alguém aceitou</button><button class="btn sm danger" data-a="rdApagar" data-id="'+d.id+'">Apagar oferta</button>':'')+
@@ -2818,7 +2853,7 @@ function rdEnviados(R){
         (d.st==='pago'?'<span class="tag ok">Concluído</span>':'')+
       '</div>'+
       (d.st!=='oferta'&&d.st!=='apagado'?rdArqs(d,'env',x.nome||'parceiro')+(x.id?'<div><button class="btn sm" data-a="rdConversa" data-id="'+d.id+'">💬 Chat do '+d.cod+rdNaoLidas(d.id)+'</button></div>':''):'')+
-      '</section>';}).join('')+'</div>';
+      '</section>';
 }
 var RD_FILES=new Map();
 function rdNaoLidas(id){var R=redeIni(),n=(R.naoLidas||{})[id]||0;return n?' <span class="tag">'+n+' nova'+(n>1?'s':'')+'</span>':'';}
@@ -2845,7 +2880,7 @@ function rdPegar(R){
     (lista.length?'<div class="rd-mural">'+lista.map(function(x){var de=R.cadDe[x.de];
       var tp=QUEM_PUB[de.tipo||'cad'];
       return '<div class="rd-oferta qp-'+(de.tipo||'cad')+(x.paraMim||x.novo?' mim':'')+'"><span class="qp-tag">'+tp[1]+tp[0]+'</span>'+(x.novo?'<span class="tag ok">Acabou de ser publicado</span>':'')+(x.paraMim?'<span class="tag a">Oferecido direto para você</span>':'')+
-        '<div class="between"><b style="font-size:1.05rem">'+esc(x.trab)+'</b><span class="mono val" style="font-size:1.2rem">'+brl(x.repasse)+'</span></div>'+
+        '<div class="rd-of-h">'+icoNome(x.trab)+'<b>'+esc(x.trab)+'</b><span class="mono val" style="font-size:1.15rem">'+brl(x.repasse)+'</span></div>'+
         '<div class="small muted">'+x.cod+(x.dentes.length?' · dentes '+x.dentes.join(', '):'')+' · '+esc(x.mat)+' · '+esc(x.sw)+'</div>'+
         prazoRede(x.prazo,x.hora)+
         '<div class="between small"><button class="rd-de" data-a="rdPerfil" data-id="'+x.de+'">'+avRede(de,26)+'<span>'+esc(de.nome)+'</span></button><span class="muted">há '+(x.min<60?x.min+' min':Math.round(x.min/60)+' h')+'</span></div>'+
@@ -2854,9 +2889,12 @@ function rdPegar(R){
       :'<div class="card empty">Nenhum trabalho disponível com esse filtro agora.</div>');
 }
 function rdMeus(R){
-  var ms=R.meus;
-  return ms.length?'<div class="rd-trabs">'+ms.map(function(x){var de=R.cadDe[x.de];
-    return '<section class="card stack"><div class="between wrap"><div><b>'+esc(x.trab)+'</b><div class="small muted">'+x.cod+(x.dentes.length?' · dentes '+x.dentes.join(', '):'')+' · '+esc(x.mat)+' · para <button class="rd-de" data-a="rdPerfil" data-id="'+x.de+'">'+esc(de.nome)+'</button></div></div><span class="mono val">'+brl(x.repasse)+'</span></div>'+
+  var ms=R.meus,ET=['desenho','revisao','aprovado','pago'],NM={desenho:'Desenhando',revisao:'Em revisão',aprovado:'Aprovado',pago:'Recebido',recusado:'Recusado'};
+  if(!ms.length)return '<div class="card empty">Você ainda não pegou nenhum trabalho. Veja no Feed de trabalhos.</div>';
+  var linha=function(x){var de=R.cadDe[x.de]||{};return icoNome(x.trab)+'<span class="t"><b>'+esc(x.trab)+'</b><span>'+x.cod+' · para '+esc(de.nome||'')+'</span>'+(x.st!=='recusado'?miniEtapas(x.st,ET):'')+'</span><span class="r"><b>'+brl(x.repasse)+'</b><span class="md-st '+x.st+'">'+(NM[x.st]||x.st)+'</span></span>';};
+  return mdLayout(ms,R.meuSel,linha,function(x){return meuDetalhe(R,x);},'rdMeuSel');}
+function meuDetalhe(R,x){var de=R.cadDe[x.de]||{nome:''};
+    return '<section class="card stack"><div class="md-head">'+icoNome(x.trab)+'<span class="t"><b>'+esc(x.trab)+'</b><span>'+x.cod+(x.dentes.length?' · dentes '+x.dentes.join(', '):'')+' · '+esc(x.mat)+' · para <button class="rd-de" data-a="rdPerfil" data-id="'+x.de+'">'+esc(de.nome)+'</button></span></span><span class="mono val" style="font-size:1.15rem">'+brl(x.repasse)+'</span></div>'+
       (x.st==='recusado'?'<div class="banner bad"><span>Quem delegou recusou o projeto'+(x.motivo?': '+esc(x.motivo):'')+'. Sem repasse.</span></div>':
         '<div class="rd-steps" style="grid-template-columns:repeat(4,minmax(0,1fr))">'+[['desenho','Desenhando'],['revisao','Em revisão'],['aprovado','Aprovado'],['pago','Repasse recebido']].map(function(e,k,arr){var i=arr.map(function(z){return z[0];}).indexOf(x.st);return '<span class="'+(k<i?'ok':k===i?'on':'')+'"><i></i>'+e[1]+'</span>';}).join('')+'</div>')+
       '<div class="row wrap" style="gap:8px">'+
@@ -2866,7 +2904,7 @@ function rdMeus(R){
         (x.st==='pago'?'<span class="tag ok">Concluído · conta no seu perfil</span>':'')+
       '</div>'+
       rdArqs(x,'meu',de.nome)+'<div><button class="btn sm" data-a="rdConversa" data-id="'+x.id+'">💬 Chat do '+x.cod+rdNaoLidas(x.id)+'</button></div>'+
-      '</section>';}).join('')+'</div>':'<div class="card empty">Você ainda não pegou nenhum trabalho. Veja em “Pegar trabalhos”.</div>';
+      '</section>';
 }
 function rdConversas(R){var l=[];
   R.enviados.forEach(function(d){if(d.st==='apagado')return;var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||null;l.push({id:d.id,cod:d.cod,trab:d.trab,quem:x,lado:'env',aberto:d.st!=='oferta'&&!!x,st:d.st});});
@@ -3855,6 +3893,8 @@ var A={
   labNota:function(d){var p=labIni().pedidos.filter(function(x){return x.id===d.id;})[0];p.nota=+d.n;render();},
   labCancela:function(d){var L=labIni();L.pedidos=L.pedidos.filter(function(x){return x.id!==d.id;});render();toast('Pedido cancelado.');},
   labChat:function(){toast('Na versão final, o chat do pedido abre aqui (igual ao da Rede).');},
+  rdEnvSel:function(d){redeIni().envSel=d.id;render();},
+  rdMeuSel:function(d){redeIni().meuSel=d.id;render();},
   rdTab:function(d){var R=redeIni();R.tab=d.v;if(d.v==='delegar'&&R.passo===3&&R.busca&&R.busca.ok){R.passo=1;R.pid=null;R.busca=null;}render();},
   rdPed:function(d){var R=redeIni();rdLer();R.pid=d.id;R.repasse='';R.passo=2;render();if(window.innerWidth<960){var e=document.getElementById('rd-passo2');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});}},
   rdPedLimpa:function(){var R=redeIni();R.pid=null;R.passo=1;render();},
