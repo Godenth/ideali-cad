@@ -2174,8 +2174,10 @@ function rPedidos(){
 var ICO_REDE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7.5l3 8.5M16 7.5l-3 8.5M8.5 6h7"/></svg>';
 var COL_REDE={desenho:'entrada',revisao:'aprovacao',aprovado:'finalizado'};
 function redeNaProducao(st){var R=ui.rede;if(!R||!R.meus)return [];return R.meus.filter(function(x){return COL_REDE[x.st]===st;});}
+function fTrabRede(id){var R=redeIni(),x=R.meus.filter(function(q){return q.id===id;})[0];if(!x)return head('Trabalho da Rede')+'<p class="empty">Trabalho não encontrado.</p>';
+  return head('<span class="rd-neon" style="font-size:.7rem">'+ICO_REDE+'Trabalho da Rede</span> '+x.cod)+(x.st!=='pago'&&x.st!=='recusado'&&x.st!=='aprovado'?cdHtml(x.prazo,x.hora):'')+meuDetalhe(R,x);}
 function kcardRede(x){var R=ui.rede,de=(R.cadDe||{})[x.de]||{nome:''};
-  return '<div class="kcard rede" data-a="rdAbreMeu" data-id="'+x.id+'" role="button" tabindex="0">'+
+  return '<div class="kcard rede" data-a="rdTrabDet" data-id="'+x.id+'" role="button" tabindex="0">'+
     '<div class="r"><span class="rd-neon">'+ICO_REDE+'Trabalho da Rede</span><span class="mono small muted">'+x.cod+'</span></div>'+
     '<div class="kc-who">'+icoNome(x.trab)+'<div class="kc-nm"><span class="pac">'+esc(x.trab)+'</span><span class="who cli" title="Quem publicou">'+ICO_CLI+esc(de.nome)+'</span></div></div>'+
     '<div class="r small"><span class="mono">'+(x.dentes&&x.dentes.length?'dentes '+x.dentes.join(', '):esc(x.mat||''))+'</span><span class="mono val">'+brl(x.repasse)+'</span></div>'+
@@ -4047,7 +4049,7 @@ var A={
   rdPortDel:function(d){var R=redeIni(),p=rdPortDe(R.eu),f=p[+d.i];if(!f)return;
     if(S.rede&&S.rede.row&&(S.rede.row.fotos||[]).some(function(q){return q.p===f.id;})){var row=Object.assign({},S.rede.row);row.fotos=row.fotos.filter(function(q){return q.p!==f.id;});
       sb.storage.from('portfolio').remove([f.id]).then(function(){return salvaPerfilRede(row,'Foto removida.');});return;}if(RD_PORT.get(f.id)){URL.revokeObjectURL(RD_PORT.get(f.id));RD_PORT.delete(f.id);}p.splice(+d.i,1);renderSheet();},
-  rdConversa:function(d){rdAbreConv(d.id);},
+  rdConversa:function(d){if(ui.sheet&&ui.sheet.fn===fTrabRede)closeSheet();rdAbreConv(d.id);},
   rdDock:function(){var R=redeIni(),D=R.dock||(R.dock={});D.open=!D.open;if(!D.open)D.conv=null;rdDock();},
   rdDockConv:function(d){rdAbreConv(d.id);},
   rdDockVolta:function(){var R=redeIni();R.dock.conv=null;R.dock.rasc='';rdDock();},
@@ -4064,13 +4066,14 @@ var A={
     R.meus.unshift({id:'k'+Date.now(),cod:x.cod,trab:x.trab,dentes:x.dentes,mat:x.mat,repasse:x.repasse,hora:x.hora,prazo:x.prazo,de:x.de,st:'desenho'});
     R.chat[R.meus[0].id]=[{de:'sis',t:'Você aceitou o '+x.cod+'. Chat liberado.'}];
     R.tab='meus';R.meuSel=R.meus[0].id;ui.tab='pedidos';ui.vista=ui.vista==='arq'?'kanban':ui.vista;render();window.scrollTo(0,0);toast('Trabalho '+x.cod+' é seu! Está na sua Produção, destacado como Trabalho da Rede.');},
+  rdTrabDet:function(d){openSheet(fTrabRede,d.id);},
   rdAbreMeu:function(d){var R=redeIni();ui.tab='rede';R.tab='meus';R.meuSel=d.id;render();window.scrollTo(0,0);},
   rdQuem:function(d){redeIni().quemF=d.v;render();},
   rdIgnora:function(d){var R=redeIni(),x=R.mural.filter(function(q){return q.id===d.id;})[0];if(x){x.st='recusado';render();toast('Trabalho recusado. Ele some do seu feed.');}},
   rdMeuSt:function(d){var R=redeIni(),x=R.meus.filter(function(q){return q.id===d.id;})[0];if(!x)return;x.st=d.v;
     if(d.v==='recusado')x.motivo='Margem curta no 21';
     if(d.v==='pago'){var pt=R.eu.porTipo;pt[x.trab]=(pt[x.trab]||0)+1;R.eu.elementos+=Math.max(1,x.dentes.length);}
-    render();toast({revisao:'Projeto enviado para revisão.',aprovado:'Projeto aprovado! Aguarde o Pix.',recusado:'Quem delegou recusou o projeto.',pago:'Repasse recebido. O trabalho entrou no seu perfil.'}[d.v]);},
+    render();if(ui.sheet&&ui.sheet.fn===fTrabRede)renderSheet();toast({revisao:'Projeto enviado para revisão.',aprovado:'Projeto aprovado! Aguarde o Pix.',recusado:'Quem delegou recusou o projeto.',pago:'Repasse recebido. O trabalho entrou no seu perfil.'}[d.v]);},
   rdDelegarPara:function(d){var R=redeIni();closeSheet();R.tab='delegar';R.quem='um';R.cadista=d.id;if(R.passo===3)R.passo=R.pid?2:1;render();toast('Escolha o pedido para delegar.');},
   rdDia:function(d){var R=redeIni();rdLer();R.prazo=addDays(today(),+d.v);render();},
   rdDeixar:function(){var R=redeIni();clearInterval(ui.rdTimer);var b=R.busca,p=byId(S.pedidos,R.pid)||{elementos:[36]},t=tipoPed(p);
@@ -4457,7 +4460,7 @@ document.addEventListener('change',function(e){
   if(t.id==='rd-rep'||t.id==='rd-cad')rdLer();
   if(t.classList&&t.classList.contains('rd-up')&&t.files.length){var R1=redeIni(),it=R1.enviados.concat(R1.meus).filter(function(q){return q.id===t.dataset.id;})[0];
     if(it){it.arqs=it.arqs||[];[].forEach.call(t.files,function(f){var tp=/\.html?$/i.test(f.name)?'html':'stl';it.arqs.push({nome:f.name,tipo:tp,de:'eu'});RD_FILES.set(it.id+':'+(it.arqs.length-1),f);});
-      render();toast(t.files.length+' arquivo(s) anexado(s). O outro cadista já consegue abrir.');}}
+      render();if(ui.sheet&&ui.sheet.fn===fTrabRede)renderSheet();toast(t.files.length+' arquivo(s) anexado(s). O outro cadista já consegue abrir.');}}
   if(t.classList&&t.classList.contains('rd-port-up')&&t.files.length){var row0=prRow(),livres=12-(row0.fotos||[]).length,fs=[].filter.call(t.files,function(f){return /^image\//.test(f.type);}).slice(0,Math.max(0,livres));
     if(!fs.length){toast(livres<=0?'Limite de 12 fotos. Apague uma para colocar outra.':'Escolha fotos (o vídeo entra como link em Editar meu perfil).');return;}
     var novas=[],k=0;ui.prSubindo=fs.length+' foto(s)';renderSheet();
