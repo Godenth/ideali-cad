@@ -1854,11 +1854,12 @@ var SECS=[
   {id:'ger',nome:'Sr. Otávio',cargo:'Gerente',papel:'Gerente · cobra as metas do mês e do dia (e dá presente quando vai bem)',cor:'#4B5263',av:{pele:'#E8B897',cab:'#9AA0AB',olho:'#3B3F4A',est:'social',roupa:'#3A3F4B',det:'gravata',bigode:1,bravo:1}},
   {id:'ven',nome:'Ana',cargo:'Vendas',foto:'equipe/ana-av.webp',corpo:'equipe/ana-tranquila.webp',humores:{triste:'ana-preocupada',irritada:'ana-impaciente',presente:'ana-feliz',feliz:'ana-feliz',tranquila:'ana-tranquila',preocupada:'ana-preocupada',assustada:'ana-assustada',impaciente:'ana-impaciente',pensativa:'ana-pensativa',determinada:'ana-determinada'},papel:'Vendas · conta os pedidos novos, os prazos e o ritmo do mês',cor:'#2F6FD6',av:{pele:'#F2C6A0',cab:'#2B2440',olho:'#2F6FD6',est:'espetado',roupa:'#2F6FD6',det:'gravata'}},
   {id:'fin',nome:'Bia',cargo:'Financeiro',foto:'equipe/bia-av-contente.webp',corpo:'equipe/bia-contente.webp',humores:{contente:'bia-contente',dinheiro:'bia-dinheiro',desconfiada:'bia-desconfiada',brava:'bia-brava',triste:'bia-triste',focada:'bia-focada',aliviada:'bia-contente'},papel:'Financeiro · quanto entrou, quanto falta receber e quem cobrar',cor:'#1E8A5A',av:{pele:'#C98B62',cab:'#141218',olho:'#3B2A22',est:'chanel',roupa:'#1E8A5A',det:'gola'}},
-  {id:'mkt',nome:'Nina',cargo:'Marketing',papel:'Marketing · mensagens prontas, clientes sumidos, novos e perdidos',cor:'#C2367A',av:{pele:'#F6D2B8',cab:'#E45C9C',olho:'#8E3BD8',est:'coque',roupa:'#C2367A',det:'estrela'}},
+  {id:'mkt',nome:'Mica',cargo:'Marketing',papel:'Marketing · mensagens prontas, clientes sumidos, novos e perdidos',cor:'#2F6FD6',av:{pele:'#F2CDB0',cab:'#141218',olho:'#2F6FD6',est:'liso',roupa:'#2B2F3A',det:'bone',mecha:'#3B82F6'}},
   {id:'dad',nome:'Téo',cargo:'Análise de dados',papel:'Análise · entregas no prazo, ajustes e satisfação dos clientes',cor:'#6A4DE0',av:{pele:'#C98E66',cab:'#1C1A2E',olho:'#4FC8FF',est:'baguncado',roupa:'#6A4DE0',det:'oculos'}}];
 /* retrato em estilo anime desenhado em SVG (fundo transparente); dá para trocar por uma imagem em g.foto */
 function retrato(a){var h='',P=a.pele,C=a.cab,O=a.olho;
   if(a.est==='longo')h+='<path d="M13 31C11 11 53 11 51 31L53 53C47 55 43 51 43 46H21C21 51 17 55 11 53Z" fill="'+C+'"/>';
+  if(a.est==='liso')h+='<path d="M14 30C12 12 52 12 50 30L51 50C47 52 44 49 43 45H21C20 49 17 52 13 50Z" fill="'+C+'"/><path d="M15 34L13 49L17 47Z" fill="'+a.mecha+'"/><path d="M49 34L51 49L47 47Z" fill="'+a.mecha+'"/>';
   if(a.est==='chanel')h+='<path d="M14 30C12 11 52 11 50 30L51 41C47 43 43 41 42 38L22 38C21 41 17 43 13 41Z" fill="'+C+'"/>';
   if(a.est==='coque')h+='<circle cx="44" cy="10" r="7" fill="'+C+'"/><path d="M15 30C14 14 50 13 49 30L49 40H15Z" fill="'+C+'"/>';
   h+='<path d="M10 66C12 52 21 47 32 47S52 52 54 66Z" fill="'+a.roupa+'"/><path d="M27 37h10v12c-2 2-8 2-10 0Z" fill="'+P+'"/><path d="M27 43c3 2 7 2 10 0v3c-3 2-7 2-10 0Z" fill="#000" opacity=".12"/>';
@@ -1881,6 +1882,8 @@ function retrato(a){var h='',P=a.pele,C=a.cab,O=a.olho;
   if(a.est==='social')h+='<path d="M17 26C15 12 47 9 47 25C45 19 40 16 33 17C27 17 21 20 17 26Z" fill="'+C+'"/><path d="M17 26c0 3 .6 5 1.6 6l.4-7Z" fill="'+C+'"/><path d="M47 25c0 3-.6 5-1.6 6l-.4-7Z" fill="'+C+'"/>';
   if(a.bigode)h+='<path d="M27 35.4q5-2.6 10 0q-5 1.6-10 0Z" fill="#7A7F89"/>';
   if(a.bravo)h+='<path d="M22 23.2l7 2M42 23.2l-7 2" stroke="#4A4F5A" stroke-width="1.8" stroke-linecap="round"/>';
+  if(a.est==='liso')h+='<path d="M18 27C18 18 25 17 30 19C27 22 24 24 18 27Z" fill="'+C+'"/><path d="M44 22c1 3 2 5 3 6" stroke="'+a.mecha+'" stroke-width="2.4" stroke-linecap="round"/>';
+  if(a.det==='bone')h+='<path d="M16 21C16 9 48 9 48 21Z" fill="#1E3A8A"/><path d="M14 21h38c0 2-2 3-4 3H16c-1.5 0-2-1.5-2-3Z" fill="#2F6FD6"/><circle cx="32" cy="10.5" r="1.6" fill="#2F6FD6"/>';
   if(a.est==='baguncado')h+='<path d="M16 26C13 11 30 5 38 8C49 10 51 20 48 27C46 22 43 19 40 21C37 16 30 20 27 17C25 22 20 21 16 26Z" fill="'+C+'"/>';
   if(a.det==='oculos')h+='<g fill="none" stroke="#1B1830" stroke-width="1.4"><rect x="20.6" y="25.2" width="10" height="8.6" rx="3"/><rect x="33.4" y="25.2" width="10" height="8.6" rx="3"/><path d="M30.6 28.6h2.8"/></g>';
   return '<svg viewBox="0 0 64 64" aria-hidden="true">'+h+'</svg>';}
@@ -2035,7 +2038,7 @@ function rSecretarios(){var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth
   var conv=c?'<div class="zap-c'+(c.g.corpo?' com-char':'')+'"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+avSec(c.g,1)+'<span class="tx"><b>'+c.g.nome+' · '+c.g.cargo+'</b><span>'+c.g.papel.replace(/^[^·]+· /,'')+'</span></span></div>'+
       '<div class="zap-b" id="zap-b"><span class="zdia">Hoje</span>'+c.ms.map(bolha).join('')+'</div>'+
       (c.g.corpo?(function(){var h=humorDe(c.ms);return '<div class="zfala'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zfala">'+esc(HUMOR_FALA[h])+'</div><img class="zchar'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zchar" data-g="'+c.g.id+'" src="'+corpoDe(c.g,h)+'" alt="" aria-hidden="true">';})():'')+'</div>':
-    '<div class="zap-c"><div class="zap-vazio">'+avSec(SECS[0])+'<b>Escolha uma conversa</b><span>Ana, Bia, Nina e Téo cuidam cada um de uma parte do seu negócio.</span></div></div>';
+    '<div class="zap-c"><div class="zap-vazio">'+avSec(SECS[0])+'<b>Escolha uma conversa</b><span>Ana, Bia, Mica e Téo cuidam cada um de uma parte do seu negócio.</span></div></div>';
   return '<div class="zap'+(c?' aberto':'')+'">'+lista+conv+'</div>';}
 function secMini(){var C=secChats();
   return '<section class="card stack" style="grid-column:span 12"><div class="between wrap"><div><h2>Sua equipe</h2><p class="small muted">Recados de hoje: vendas, financeiro, marketing e análise.</p></div><button class="btn sm pri" data-a="tab" data-v="secretarios">Abrir conversas</button></div>'+
@@ -2056,7 +2059,7 @@ function secAbreDia(){if(EM_DEMO||ui.modoLab||ui.tour!=null||precisaBoas()||(S.p
 function precisaBoas(){return !!(S.sessao&&!EM_DEMO&&!(S.prefs&&(S.prefs.boas==='ok'||S.prefs.onb==='ok'))&&!alive(S.pedidos).length&&!alive(S.clientes).length);}
 var TOUR=[
   ['dashboard','Dashboard','Seu resumo do mês: quanto faturou, quanto já recebeu, quem está devendo e os próximos prazos. Lá em cima dá para trocar o período.'],
-  ['secretarios','Secretários','Sua equipe conversa com você como no WhatsApp: Ana (vendas), Bia (financeiro), Nina (marketing) e Téo (análise de dados). Todo dia eles avisam o que precisa de atenção.'],
+  ['secretarios','Secretários','Sua equipe conversa com você como no WhatsApp: Ana (vendas), Bia (financeiro), Mica (marketing) e Téo (análise de dados). Todo dia eles avisam o que precisa de atenção.'],
   ['pedidos','Produção','Seus pedidos em colunas: a fazer, pendência, aguardando aprovação e finalizado. Toque num card para ver, mudar a etapa ou anexar o STL.'],
   ['clientes','Clientes','Dentistas e laboratórios que te mandam trabalho, com histórico, preços especiais e mensagens prontas para o WhatsApp.'],
   ['financeiro','Financeiro','Quem pagou e quem deve. A cobrança sai em PDF com QR Code Pix, pronta para mandar.'],
