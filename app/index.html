@@ -558,6 +558,17 @@ table.adm td{vertical-align:top}
 .pub-op i svg{width:22px;height:22px}.pub-op b{font-family:var(--f-display);font-size:1.1rem}.pub-op span{color:var(--muted);font-size:.9rem}
 .pub-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .req{color:var(--urgent)}
+.pb-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.pb-card{--pc:var(--muted);display:grid;gap:10px;align-content:start;text-align:left;border:1px solid color-mix(in srgb,var(--pc) 45%,var(--line));border-left:0;border-radius:16px;padding:14px;background:color-mix(in srgb,var(--pc) 9%,var(--surface));color:var(--ink);font:inherit;cursor:pointer;width:100%;position:relative;overflow:hidden}
+.pb-card.on{box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 45%,transparent)}
+.pb-card:hover{box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 25%,transparent)}
+.pb-card.nao{--pc:var(--urgent)}.pb-card.aceito{--pc:#D9A21E}.pb-card.fim{--pc:#2F7FE0}.pb-card.recusado{--pc:var(--muted)}
+.pb-st{justify-self:start;font-size:.68rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:99px;background:var(--pc);color:#fff}
+.pb-card.aceito .pb-st{color:#1d1600}
+.pb-cd{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:8px 10px;border-radius:12px;background:var(--bg)}
+.pb-cd b{font:800 1.15rem var(--f-mono);font-variant-numeric:tabular-nums}.pb-cd span{font-size:.8rem;color:var(--muted)}
+.pb-cd.late b{color:var(--urgent)}.pb-cd.perto b{color:#D9A21E}
+.pb-leg{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}.pb-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -1224,7 +1235,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 00h50';
+var VERSAO='16/10 · 01h10';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2672,9 +2683,9 @@ function rRede(){
   var h='<div class="banner"><span><b>Prévia da Etapa 2 · Rede.</b> Tudo aqui é exemplo para ver como vai funcionar: nada é salvo e nenhum cadista real recebe nada.</span></div>'+
     '<section class="card lm-ver"><div><b>Ver a prévia como:</b><p class="small muted">A Rede tem dois lados. O <b>laboratório ou clínica</b> publica o trabalho. Ele aparece no <b>feed</b> dos cadistas, que aceitam ou recusam. O laboratório aceita um cadista e o trabalho começa.</p></div><div class="lm-seg"><button class="on">👩‍💻 Cadista</button><button data-a="labModo" data-v="1">🏥 Laboratório / clínica</button></div></section>'+
     '<div class="pub-bar"><span class="small muted">Tem um trabalho para passar adiante?</span><button class="btn pri" data-a="publicar">+ Publicar um trabalho</button></div>'+
-    '<nav class="cfg-tabs msg-tabs">'+[['delegar','Delegar um pedido'],['andamento','Enviados'],['pegar','Feed de trabalhos'+(nRec?' '+nRec:'')],['meus','Meus trabalhos'],['parceiros','Cadistas da rede']].map(function(a){return '<button class="'+(tab===a[0]?'on':'')+'" data-a="rdTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
+    '<nav class="cfg-tabs msg-tabs">'+[['delegar','Publicados'],['pegar','Feed de trabalhos'+(nRec?' '+nRec:'')],['meus','Meus trabalhos'],['parceiros','Cadistas da rede']].map(function(a){return '<button class="'+(tab===a[0]?'on':'')+'" data-a="rdTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
   if(tab==='delegar')h+=rdDelegar(R);
-  if(tab==='andamento')h+=rdEnviados(R);
+  if(tab==='andamento'){R.tab='delegar';tab='delegar';}
   if(R.avisoEu&&(tab==='pegar'||tab==='meus')){h+='<div class="banner"><span>🔔 '+esc(R.avisoEu)+'</span></div>';R.avisoEu=null;}
   if(tab==='pegar')h+=rdPegar(R);
   if(tab==='meus')h+=rdMeus(R);
@@ -2699,23 +2710,48 @@ function fPublicar(){var R=redeIni();
 function vaiDelegar(pid){var R=redeIni();ui.pdRede=false;ui.pubVer=null;closeSheet();ui.tab='rede';R.tab='delegar';R.pid=pid;R.repasse='';R.passo=2;render();
   setTimeout(function(){var e=document.getElementById('rd-passo2');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});},50);}
 function itemImplante(i){var t=tipo(i.t),n=semAcento((t&&t.nome)||'').toLowerCase();return !!i.imp||/implante/.test(n);}
+/* ---------- Trabalhos publicados (aba Publicados) ----------
+   Vermelho = ninguém aceitou ainda · Amarelo = aceito, em andamento · Azul = finalizado. Contador até o prazo combinado. */
+function contador(d,h){if(!d)return {t:'sem prazo',c:''};var fim=new Date(d+'T'+(h||'23:59')+':00'),ms=fim-new Date(),neg=ms<0;ms=Math.abs(ms);
+  var dd=Math.floor(ms/864e5),hh=Math.floor(ms%864e5/36e5),mm=Math.floor(ms%36e5/6e4),t=(dd?dd+'d ':'')+(dd||hh?hh+'h ':'')+(mm<10&&(dd||hh)?'0':'')+mm+'min';
+  return {t:neg?'atrasado '+t:t,c:neg?'late':ms<6*36e5?'perto':''};}
+function cdHtml(d,h){var c=contador(d,h);return '<span class="pb-cd '+c.c+'" data-cd="'+(d||'')+'|'+(h||'')+'"><b>'+c.t+'</b><span>'+(c.c==='late'?'passou do prazo ':'para o prazo · ')+(d?prazoTxt(d,h):'')+'</span></span>';}
+function prazoTxt(d,h){var dd=daysBetween(today(),d);return (dd===0?'hoje':dd===1?'amanhã':dd===-1?'ontem':dmy(d).slice(0,5))+(h?' às '+h:'');}
+function atualizaContadores(){[].forEach.call(document.querySelectorAll('[data-cd]'),function(el){var p=el.getAttribute('data-cd').split('|');if(!p[0])return;var c=contador(p[0],p[1]);el.className='pb-cd '+c.c;var b=el.querySelector('b');if(b)b.textContent=c.t;});}
+setInterval(function(){if(document.querySelector('[data-cd]'))atualizaContadores();},30000);
+function rdPublicados(R){var L=R.enviados.filter(function(d){return d.st!=='apagado';});
+  var cls=function(st){return st==='oferta'?'nao':st==='pago'?'fim':st==='recusado'?'recusado':'aceito';},nm={nao:'Não aceito ainda',aceito:'Aceito',fim:'Finalizado',recusado:'Recusado'};
+  var ord={nao:0,aceito:1,fim:2,recusado:3};L=L.slice().sort(function(a,b){return ord[cls(a.st)]-ord[cls(b.st)];});
+  return '<section class="card stack"><div class="between wrap"><div><h2>Trabalhos publicados</h2><p class="small muted">Toque num card para ver arquivos, chat e etapas.</p></div><div class="pb-leg"><span><i style="background:var(--urgent)"></i>Não aceito</span><span><i style="background:#D9A21E"></i>Aceito</span><span><i style="background:#2F7FE0"></i>Finalizado</span></div></div>'+
+    (L.length?(function(){var sel=L.filter(function(d){return d.id===R.envSel;})[0],cel=window.innerWidth<960;
+      var cardH=function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{},k=cls(d.st),et=ETAPAS_REDE.filter(function(e){return e[0]===d.st;})[0];
+      return '<button class="pb-card '+k+(d.id===R.envSel?' on':'')+'" data-a="rdAbreEnv" data-id="'+d.id+'"><span class="pb-st">'+nm[k]+(k==='aceito'&&et?' · '+et[1]:'')+'</span>'+
+        '<span class="dl-top">'+icoNome(d.trab)+'<span class="t"><b>'+esc(d.trab)+'</b><span>'+d.cod+(d.dentes.length?' · dentes '+d.dentes.join(', '):'')+'</span></span></span>'+
+        (k==='fim'||k==='recusado'?'':cdHtml(d.prazo,d.hora))+
+        '<span class="dl-bot"><span class="pz">'+(x.nome?'com '+esc(x.nome):'oferecido para '+esc(d.para||'a rede'))+'</span><span class="v">'+brl(d.repasse)+'</span></span></button>';};
+      var det=function(d){var x=R.parceiros.filter(function(q){return q.id===d.parceiro;})[0]||{};return '<div id="pb-det" class="stack" style="gap:8px"><div class="between"><b>Detalhes</b><button class="btn sm" data-a="rdFechaEnv">Fechar</button></div>'+envDetalhe(R,d,x)+'</div>';};
+      if(!sel)return '<div class="pb-grid">'+L.map(cardH).join('')+'</div>';
+      if(cel)return '<div class="pb-grid">'+L.map(function(d){return cardH(d)+(d===sel?det(d):'');}).join('')+'</div>';
+      return '<div class="md"><div class="md-list">'+L.map(cardH).join('')+'</div><div class="md-side">'+det(sel)+'</div></div>';})()
+     :'<p class="empty">Você ainda não publicou nenhum trabalho. Toque em <b>+ Publicar um trabalho</b>.</p>')+'</section>';}
 function rdDelegar(R){
   var abertos=alive(S.pedidos).filter(function(p){return aberto(p)&&p.status!=='finalizado';});
   if(!abertos.length)abertos=[{id:'ex1',num:142,paciente:'M.A.S.',clienteId:null,elementos:[36],valor:90,exemplo:true,itens:[{d:36,t:null}],tipoId:null}];
   var p=R.pid?(byId(S.pedidos,R.pid)||abertos.filter(function(x){return x.id===R.pid;})[0]):null;
   if(R.passo===3)return rdBusca(R,p);
+  if(!p)return rdPublicados(R);
   var mx=R.verTodos?abertos.length:(p?abertos.length:9),t0=today();
   var card=function(x){var t=tipoPed(x),c=cliente(x.clienteId),late=x.prazo&&x.prazo<t0,dd=x.elementos||[];
     return '<button class="dl-card'+(R.pid===x.id?' on':'')+'" data-a="rdPed" data-id="'+x.id+'" aria-pressed="'+(R.pid===x.id)+'">'+
       '<span class="dl-top">'+iconeTrab(x)+'<span class="t"><b>'+esc(nomeTrab(x)||(t?t.nome:'Elemento sobre implante'))+'</b><span><span class="pac-i">'+esc(x.paciente)+'</span> · <span class="cli-i">'+esc(c?c.nome:'Lab. Exemplo')+'</span></span></span></span>'+
       (dd.length?'<span class="dl-dentes">'+dd.slice(0,10).map(function(d){return '<i>'+d+'</i>';}).join('')+(dd.length>10?'<i>+'+(dd.length-10)+'</i>':'')+'</span>':'')+
       '<span class="dl-bot"><span class="pz'+(late?' late':'')+'">'+(x.urgente?'<span class="tag u">Urgente</span> ':'')+(x.prazo?(late?'Atrasado · ':'Prazo ')+dm(x.prazo):'Sem prazo')+'</span><span class="v">'+brl(x.valor)+'</span></span></button>';};
-  var h='<div class="rd-grid dl'+(p?' sel':'')+'"><section class="card stack"><div class="between wrap"><div><h2>1. Qual pedido?</h2><p class="small muted">Toque num pedido em aberto para mandar para outro cadista desenhar.</p></div><span class="small muted">'+abertos.length+' em aberto</span></div>'+
+  var h0='<div class="rd-grid dl'+(p?' sel':'')+'"><section class="card stack"><div class="between wrap"><div><h2>1. Qual pedido?</h2><p class="small muted">Toque num pedido em aberto para mandar para outro cadista desenhar.</p></div><span class="small muted">'+abertos.length+' em aberto</span></div>'+
     '<div class="dl-cards">'+abertos.slice(0,mx).map(card).join('')+'</div>'+(abertos.length>mx?'<button class="btn sm dl-mais" data-a="rdVerTodos">Ver todos ('+abertos.length+')</button>':'')+'</section>';
-  if(!p){return h+'</div>';}
+  var h='<div class="stack" style="gap:16px;max-width:980px">';
   var sug=Math.round((+p.valor||0)*0.6),rep=R.repasse===''?sug:+R.repasse,lucro=(+p.valor||0)-rep;
   var tp=tipoPed(p),cp=cliente(p.clienteId);
-  h+='<section class="card stack" id="rd-passo2"><div class="dl-sel">'+iconeTrab(p)+'<span class="t"><b>'+esc(nomeTrab(p)||(tp?tp.nome:'Elemento sobre implante'))+'</b><span><span class="pac-i">'+esc(p.paciente)+'</span> · <span class="cli-i">'+esc(cp?cp.nome:'Lab. Exemplo')+'</span>'+(p.num?' · #'+p.num:'')+'</span><span>'+((p.elementos||[]).length?'Dentes '+p.elementos.join(', '):'Sem dentes')+(p.prazo?' · prazo '+dm(p.prazo):'')+'</span></span><button class="btn sm" data-a="rdPedLimpa">Trocar</button></div>'+
+  h+='<section class="card stack" id="rd-passo2"><div class="dl-sel">'+iconeTrab(p)+'<span class="t"><b>'+esc(nomeTrab(p)||(tp?tp.nome:'Elemento sobre implante'))+'</b><span><span class="pac-i">'+esc(p.paciente)+'</span> · <span class="cli-i">'+esc(cp?cp.nome:'Lab. Exemplo')+'</span>'+(p.num?' · #'+p.num:'')+'</span><span>'+((p.elementos||[]).length?'Dentes '+p.elementos.join(', '):'Sem dentes')+(p.prazo?' · prazo '+dm(p.prazo):'')+'</span></span><button class="btn sm" data-a="publicar">Trocar</button><button class="btn sm" data-a="rdPedLimpa">Cancelar</button></div>'+
     '<div><h2>2. Como delegar</h2><p class="small muted">Você cobra <b class="val">'+brl(p.valor)+'</b> do seu cliente.</p></div>'+
     '<div class="grid2"><label class="fld"><span>Repasse para o parceiro (R$)</span><input id="rd-rep" type="number" min="0" step="1" value="'+rep+'"><small>Sugestão: 60% do valor.</small></label>'+
     '<div class="fld"><span>Entrega pelo parceiro</span><div class="rd-dias">'+[[0,'Hoje'],[1,'Amanhã'],[2,'Depois de amanhã']].map(function(o){var v=addDays(today(),o[0]);return '<button type="button" class="'+(R.prazo===v?'on':'')+'" data-a="rdDia" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
@@ -2732,7 +2768,7 @@ function rdBusca(R,p){
   var lista=R.quem==='um'?R.parceiros.filter(function(x){return x.id===R.cadista;}):R.quem==='favoritos'?R.parceiros.filter(function(x){return x.fav;}):R.parceiros.filter(function(x){return x.on;});
   var b=R.busca||{t:0,ok:null};b.t=99;
   return '<section class="card stack rd-busca"><div class="between wrap"><div><h2>'+(b.ok?'Pedido aceito!':'Procurando um cadista…')+'</h2><p class="small muted">Código '+b.cod+' · repasse <b class="val">'+brl(b.rep)+'</b> · '+prazoRede(R.prazo,R.hora)+'</p>'+(b.ok?'':'<p class="small muted">Todos foram avisados ao mesmo tempo. A oferta fica aberta até alguém aceitar ou você apagar.</p>')+'</div>'+
-    (b.ok?'<button class="btn pri" data-a="rdTab" data-v="andamento">Acompanhar em Enviados</button>':'<span class="row" style="gap:8px"><button class="btn" data-a="rdDeixar">Deixar aberta e sair</button><button class="btn danger" data-a="rdCancelar">Apagar oferta</button></span>')+'</div>'+
+    (b.ok?'<button class="btn pri" data-a="rdTab" data-v="delegar">Ver em Publicados</button>':'<span class="row" style="gap:8px"><button class="btn" data-a="rdDeixar">Deixar aberta e sair</button><button class="btn danger" data-a="rdCancelar">Apagar oferta</button></span>')+'</div>'+
     '<div class="rd-fila">'+lista.map(function(x,i){var st=b.ok===x.id?'aceitou':b.ok?'fechado':i<=b.t?'avisado':'fila';
       return '<div class="rd-cand '+st+'"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'">'+avRede(x,40)+'</button><div class="t"><button class="rd-de" data-a="rdPerfil" data-id="'+x.id+'"><b>'+esc(x.nome)+'</b></button><span class="small muted">'+esc(x.cidade)+'</span></div><span class="rd-cst">'+({aceitou:'✓ Aceitou',fechado:'Encerrado',avisado:'<i class="rd-pulse"></i> Avisado',fila:'Na fila'})[st]+'</span></div>';}).join('')+'</div></section>';
 }
@@ -3948,6 +3984,8 @@ var A={
   rdMeuSel:function(d){redeIni().meuSel=d.id;render();},
   rdTab:function(d){var R=redeIni();R.tab=d.v;if(d.v==='delegar'&&R.passo===3&&R.busca&&R.busca.ok){R.passo=1;R.pid=null;R.busca=null;}render();},
   rdPed:function(d){var R=redeIni();rdLer();R.pid=d.id;R.repasse='';R.passo=2;render();if(window.innerWidth<960){var e=document.getElementById('rd-passo2');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});}},
+  rdAbreEnv:function(d){var R=redeIni();R.envSel=R.envSel===d.id?null:d.id;render();if(window.innerWidth<960){var e=document.getElementById('pb-det');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});}},
+  rdFechaEnv:function(){redeIni().envSel=null;render();},
   rdPedLimpa:function(){var R=redeIni();R.pid=null;R.passo=1;render();},
   rdVerTodos:function(){redeIni().verTodos=true;render();},
   rdQuem:function(d,el){var R=redeIni();rdLer();R.quem=el.value;render();},
@@ -4005,7 +4043,7 @@ var A={
   rdDia:function(d){var R=redeIni();rdLer();R.prazo=addDays(today(),+d.v);render();},
   rdDeixar:function(){var R=redeIni();clearInterval(ui.rdTimer);var b=R.busca,p=byId(S.pedidos,R.pid)||{elementos:[36]},t=tipoPed(p);
     if(b&&!b.ok)R.enviados.unshift({id:'d'+Date.now(),cod:b.cod,trab:t?t.nome:'Elemento sobre implante',dentes:p.elementos||[],repasse:b.rep,prazo:R.prazo,hora:R.hora,parceiro:null,st:'oferta',quando:today(),para:R.quem==='rede'?'Toda a rede':R.quem==='favoritos'?'Favoritos':'Um cadista'});
-    R.passo=1;R.pid=null;R.busca=null;R.tab='andamento';render();toast('Oferta aberta. Ela fica em Enviados até alguém aceitar ou você apagar.');},
+    R.passo=1;R.pid=null;R.busca=null;R.tab='delegar';render();toast('Oferta aberta. Ela fica em Publicados, em vermelho, até alguém aceitar ou você apagar.');},
   rdApagar:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(x){x.st='apagado';render();toast('Oferta apagada. Ninguém mais consegue aceitar.');}},
   rdRecusaTrab:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(!x)return;var m=prompt('Por que você está recusando o trabalho? (o parceiro vai ver)','');if(m===null)return;x.st='recusado';x.motivo=m.trim();render();toast('Trabalho recusado. Não há repasse a pagar.');},
   rdReoferecer:function(d){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===d.id;})[0];if(x){x.st='oferta';x.parceiro=null;x.para='Toda a rede';x.motivo='';render();toast('Oferecido de novo para a rede.');}},
