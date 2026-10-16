@@ -1217,7 +1217,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 00h10';
+var VERSAO='16/10 · 00h30';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2872,7 +2872,7 @@ function rdPegar(R){
   var qf=R.quemF||'todos';var lista=R.mural.filter(function(x){return (x.st==='aberto'||x.st==='proposta')&&(f==='todos'||x.trab===f)&&(qf==='todos'||(R.cadDe[x.de].tipo||'cad')===qf);});
   lista.sort(function(a,b){if(!!a.novo!==!!b.novo)return a.novo?-1:1;if(a.paraMim!==b.paraMim)return a.paraMim?-1:1;return o==='valor'?b.repasse-a.repasse:o==='prazo'?(a.prazo+a.hora<b.prazo+b.hora?-1:1):(a.min-b.min);});
   return '<section class="card rd-eu"><div class="row" style="gap:14px;flex-wrap:wrap">'+avRede(me,52)+
-      '<div style="flex:1;min-width:200px"><b>Você na rede</b><div class="small muted">'+me.feitos+' trabalhos feitos · '+me.sw.join(', ')+'</div></div>'+
+      '<div style="flex:1;min-width:200px"><b>Você na rede</b><div class="small muted">'+(function(){var st=S.rede&&S.rede.row?statsRede(S.sessao.id):null;return st?st.trabalhos+' trabalhos feitos · ':'';})()+me.sw.join(', ')+'</div></div>'+
       '<label class="check"><input type="checkbox" id="rd-disp" '+(me.on?'checked':'')+'> <b class="'+(me.on?'rd-on':'muted')+'">'+(me.on?'Disponível para pegar trabalhos':'Ocupado: não recebo ofertas')+'</b></label>'+
       '<button class="btn sm" data-a="rdPerfil" data-id="eu">Ver meu perfil</button></div></section>'+
     '<div class="row wrap" style="gap:10px"><label class="fld" style="min-width:200px"><span>Trabalho</span><select id="rd-filtro"><option value="todos">Todos</option>'+tiposMural.map(function(t){return '<option '+(f===t?'selected':'')+'>'+esc(t)+'</option>';}).join('')+'</select></label>'+
@@ -3031,14 +3031,26 @@ function secCadistasReais(){carregaListaRede();var L=S.redeLista||{rows:[]},eu=S
     (L.busy&&!rows.length?'<p class="empty">Carregando…</p>':rows.length?'<div class="cr-grid">'+rows.map(function(x){var es=x.especialidades||[];
       return '<button class="cr-card" data-a="pubPerfil" data-id="'+x.user_id+'"><span class="cr-top">'+avPub(x,48)+'<span><b>'+esc(x.nome||'Cadista')+(x.user_id===eu?' <span class="tag a">você</span>':'')+'</b><small>'+esc((x.cidade||'')+(x.uf?', '+x.uf:''))+(x.prazo?' · '+esc(x.prazo):'')+'</small></span></span>'+
         (es.length||(x.softwares||[]).length?'<span class="rd-chips">'+(x.softwares||[]).slice(0,2).map(function(q){return '<span class="sw">'+esc(q)+'</span>';}).join('')+es.slice(0,3).map(function(q){return '<span>'+esc(q)+'</span>';}).join('')+(es.length>3?'<span>+'+(es.length-3)+'</span>':'')+'</span>':'')+
-        '<span class="small muted">'+((x.fotos||[]).length?(x.fotos.length+' foto'+(x.fotos.length>1?'s':'')+' no portfólio'):'Sem fotos ainda')+(x.video_url?' · com vídeo':'')+'</span></button>';}).join('')+'</div>'
+        '<span class="small muted">'+(function(){var st=statsRede(x.user_id);return st?st.trabalhos+' trabalho'+(st.trabalhos===1?'':'s')+' feito'+(st.trabalhos===1?'':'s')+(st.no_prazo!=null?' · '+st.no_prazo+'% no prazo':'')+' · ':'';})()+((x.fotos||[]).length?(x.fotos.length+' foto'+(x.fotos.length>1?'s':'')):'sem fotos')+(x.video_url?' · vídeo':'')+'</span></button>';}).join('')+'</div>'
       :'<p class="empty">Nenhum cadista publicou o perfil ainda. Seja o primeiro: em Editar perfil, marque "Publicar meu perfil".</p>')+'</section>';}
+/* Números reais do perfil (rpc rede_stats, calculado no servidor, só de perfis publicados ou do próprio usuário). */
+function statsRede(uid){S.redeStats=S.redeStats||{};var c=S.redeStats[uid];if(c&&(c.busy||Date.now()-c.t<120000))return c.d;
+  S.redeStats[uid]={busy:true,t:Date.now(),d:c&&c.d};
+  sb.rpc('rede_stats',{alvo:uid}).then(function(r){S.redeStats[uid]={t:Date.now(),d:r.error?null:r.data};if(ui.sheet)renderSheet();if(ui.tab==='rede')render();},function(){S.redeStats[uid]={t:Date.now(),d:null};});
+  return c&&c.d;}
+function diasTxt(d){if(d==null)return '—';if(d<0.75)return 'mesmo dia';var n=Math.round(d);return n<=1?'1 dia':n+' dias';}
+function blocoStats(uid){var st=statsRede(uid);if(st===undefined)return '<p class="small muted">Carregando números…</p>';if(!st)return '';
+  var mes=st.desde?MESES[+st.desde.slice(5,7)-1].slice(0,3)+'/'+st.desde.slice(0,4):'—',tp=st.tipos||[];
+  return '<div class="rd-kpis"><div><b>'+st.trabalhos+'</b><span>trabalhos feitos</span></div><div><b>'+st.elementos+'</b><span>elementos</span></div><div><b>'+(st.no_prazo==null?'—':st.no_prazo+'%')+'</b><span>entregues no prazo</span></div><div><b>'+diasTxt(st.dias_medio)+'</b><span>entrega média</span></div></div>'+
+    '<div class="stack" style="gap:6px"><div class="between"><h3 style="margin:6px 0 0">Tipos de trabalho que mais faz</h3><span class="small muted">no Ideali desde '+mes+'</span></div>'+
+    hbars(tp.map(function(x){return {l:esc(x.nome),r:x.n+'',v:x.n};}),'Ainda sem trabalhos entregues.')+'<p class="small muted" style="margin:0">Números calculados pelo sistema a partir dos pedidos entregues. Nunca mostram clientes, pacientes ou valores.</p></div>';}
 function fPerfilPub(id){var L=S.redeLista||{rows:[]},x=(L.rows||[]).filter(function(q){return q.user_id===id;})[0];if(!x)return head('Cadista')+'<p class="empty">Perfil não encontrado ou não está mais publicado.</p>';
   var fs=x.fotos||[],falta=fs.map(function(f){return f.p;}).filter(function(p){return p&&!L.urls[p];});
   if(falta.length&&!x._ass){x._ass=1;sb.storage.from('portfolio').createSignedUrls(falta,3600).then(function(r){(r.data||[]).forEach(function(d){if(d.signedUrl)L.urls[d.path]=d.signedUrl;});if(ui.sheet)renderSheet();});}
   return head('Perfil do cadista')+
     '<div class="row" style="gap:14px;align-items:center">'+avPub(x,64)+'<div style="min-width:0"><h2 style="margin:0">'+esc(x.nome||'Cadista')+'</h2><div class="small muted">'+esc((x.cidade||'')+(x.uf?', '+x.uf:''))+(x.prazo?' · prazo médio '+esc(x.prazo):'')+'</div></div></div>'+
     '<div class="rd-chips">'+(x.softwares||[]).map(function(q){return '<span class="sw">'+esc(q)+'</span>';}).join('')+(x.especialidades||[]).map(function(q){return '<span>'+esc(q)+'</span>';}).join('')+'</div>'+
+    blocoStats(x.user_id)+
     (x.bio?'<p class="pr-bio">'+esc(x.bio)+'</p>':'')+
     (x.video_url?'<a class="btn sm pr-vid" style="justify-self:start" href="'+esc(x.video_url)+'" target="_blank" rel="noopener">'+ICO_PLAY+' Ver vídeo de apresentação</a>':'')+
     (fs.length?'<div class="stack" style="gap:8px"><h3 style="margin:6px 0 0">Portfólio</h3><div class="rd-port">'+fs.map(function(f,i){var u=L.urls[f.p];
@@ -3065,11 +3077,12 @@ function fPerfilEu(){if(!S.rede)carregaPerfilRede();var r=prRow(),R=redeIni(),x=
   return head('Meu perfil na Rede')+'<div class="between wrap" style="gap:8px"><span class="tag '+(r.publicado?'ok':'')+'">'+(r.publicado?'Perfil publicado':'Perfil não publicado (só você vê)')+'</span><button class="btn sm pri" data-a="prEditar">Editar meu perfil</button></div>'+
     '<div class="row" style="gap:14px;align-items:center">'+avEu(r,64)+'<div style="min-width:0"><h2 style="margin:0">'+esc(r.nome||'Seu nome')+'</h2><div class="small muted">'+esc((r.cidade||'')+(r.uf?', '+r.uf:''))+(r.prazo?' · prazo médio '+esc(r.prazo):'')+'</div></div></div>'+
     ((r.softwares.length||r.especialidades.length)?'<div class="rd-chips">'+r.softwares.map(function(s){return '<span class="sw">'+esc(s)+'</span>';}).join('')+r.especialidades.map(function(s){return '<span>'+esc(s)+'</span>';}).join('')+'</div>':'<p class="small muted">Marque seus softwares e especialidades em Editar meu perfil.</p>')+
+    (S.rede&&S.rede.row?blocoStats(S.sessao.id):'<p class="small muted">Salve seu perfil uma vez para os números de trabalhos aparecerem.</p>')+
     (r.bio?'<p class="pr-bio">'+esc(r.bio)+'</p>':'')+
     (r.video_url?'<a class="btn sm pr-vid" style="justify-self:start" href="'+esc(r.video_url)+'" target="_blank" rel="noopener">'+ICO_PLAY+' Ver vídeo de apresentação</a>':'')+
     rdPortfolio(x);}
 function fPerfilCad(id){
-  if(id==='eu'&&!S.admin)return fPerfilEu();
+  if(id==='eu')return fPerfilEu();
   var R=redeIni(),x=id==='eu'?R.eu:(R.parceiros.filter(function(q){return q.id===id;})[0]||R.cadDe[id]);if(!x)return head('Cadista')+'<p class="empty">Não encontrado.</p>';
   var pt=x.porTipo||{},tipos=Object.keys(pt).sort(function(a,b){return pt[b]-pt[a];}),tot=tipos.reduce(function(s,k){return s+pt[k];},0);
   var euTop=id==='eu'?'<div class="between wrap" style="gap:8px"><span class="tag '+(x.publicado?'ok':'')+'">'+(x.publicado?'Perfil publicado':'Perfil não publicado (só você vê)')+'</span><button class="btn sm pri" data-a="prEditar">Editar meu perfil</button></div>':'';

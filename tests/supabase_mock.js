@@ -40,6 +40,7 @@
     },
     rpc:function(n,a){window.__ops.push({op:'rpc',name:n,args:a});
       if(n==='criar_link_cliente')return Promise.resolve({data:'TesteTokenSecreto_abcdefghijklmnopqrstuvwxyz012',error:null});
+      if(n==='rede_stats')return Promise.resolve({data:{trabalhos:8,elementos:34,no_prazo:100,dias_medio:0.4,desde:'2026-09-02',tipos:[{nome:'Coroa sobre implante',n:4},{nome:'Faceta',n:2},{nome:'Placa de bruxismo',n:1},{nome:'Protocolo',n:1}]},error:null});
       if(n==='sou_admin')return Promise.resolve({data:true,error:null});
       if(n==='admin_metricas')return Promise.resolve({data:[
         {user_id:U,visto_em:new Date().toISOString(),dispositivo:'computador',seg_hoje:5400,seg_7d:36000,seg_30d:140000,seg_total:260000,dias_ativos_30:22,pedidos_total:312,pedidos_30d:48,clientes_total:27,cidade:'São Paulo',uf:'SP'},
