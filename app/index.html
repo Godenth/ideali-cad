@@ -3001,13 +3001,17 @@ function comprime(file,lado){lado=lado||1600;return new Promise(function(ok,ko){
   img.onerror=function(){URL.revokeObjectURL(u);ko(new Error('Arquivo não é uma imagem válida.'));};img.src=u;});}
 function sobeFoto(file,nome){return comprime(file,nome==='avatar'?600:1600).then(function(b){var ext=b.type==='image/webp'?'webp':'jpg',path=S.sessao.id+'/'+(nome||(Date.now().toString(36)+Math.random().toString(36).slice(2,6)))+'.'+ext;
   return sb.storage.from('portfolio').upload(path,b,{contentType:b.type,upsert:true,cacheControl:'3600'}).then(function(r){if(r.error)throw new Error(r.error.message);delete (S.rede&&S.rede.urls||{})[path];return path;});});}
-function fPerfilRede(){var r=prRow(),u=r.foto_perfil&&S.rede?S.rede.urls[r.foto_perfil]:'',nm=r.nome||'?',ini=nm.split(' ').map(function(x){return x[0];}).slice(0,2).join('');
+var UF_NOME={AC:'Acre',AL:'Alagoas',AM:'Amazonas',AP:'Amapá',BA:'Bahia',CE:'Ceará',DF:'Distrito Federal',ES:'Espírito Santo',GO:'Goiás',MA:'Maranhão',MG:'Minas Gerais',MS:'Mato Grosso do Sul',MT:'Mato Grosso',PA:'Pará',PB:'Paraíba',PE:'Pernambuco',PI:'Piauí',PR:'Paraná',RJ:'Rio de Janeiro',RN:'Rio Grande do Norte',RO:'Rondônia',RR:'Roraima',RS:'Rio Grande do Sul',SC:'Santa Catarina',SE:'Sergipe',SP:'São Paulo',TO:'Tocantins'};
+function cidadesDaUf(uf){var dl=document.getElementById('pr-cidades');if(!dl||!uf)return;municipios().then(function(L){if(!document.getElementById('pr-cidades'))return;
+  dl.innerHTML=L.filter(function(c){return c.uf===uf;}).sort(function(a,b){return (b.cap-a.cap)||a.k.localeCompare(b.k);}).map(function(c){return '<option value="'+esc(c.n)+'">';}).join('');}).catch(function(){});}
+function fPerfilRede(){setTimeout(function(){var u=document.getElementById('pr-uf');if(u&&u.value)cidadesDaUf(u.value);},0);var r=prRow(),u=r.foto_perfil&&S.rede?S.rede.urls[r.foto_perfil]:'',nm=r.nome||'?',ini=nm.split(' ').map(function(x){return x[0];}).slice(0,2).join('');
   var chips=function(nome,L,sel){return '<div class="pr-chips">'+L.map(function(o){return '<label><input type="checkbox" name="'+nome+'" value="'+esc(o)+'"'+(sel.indexOf(o)>=0?' checked':'')+'> '+esc(o)+'</label>';}).join('')+'</div>';};
   return head('Editar meu perfil na Rede')+'<form data-form="perfilRede" class="stack">'+
     '<div class="pr-av">'+(u?'<span class="rd-av img" style="width:72px;height:72px"><img src="'+u+'" alt="Sua foto"></span>':'<span class="rd-av" style="width:72px;height:72px;background:linear-gradient(135deg,var(--p5),var(--p6))">'+esc(ini)+'</span>')+
       '<label class="btn sm">'+(u?'Trocar foto':'Colocar foto de perfil')+'<input id="pr-foto" type="file" accept="image/*" hidden></label>'+(u?'<button type="button" class="btn sm" data-a="prFotoTira">Tirar foto</button>':'')+'</div>'+
     '<label class="fld"><span>Nome que aparece na Rede</span><input name="nome" required maxlength="80" value="'+esc(r.nome)+'"></label>'+
-    '<div class="g2"><label class="fld"><span>Cidade</span><input name="cidade" maxlength="80" value="'+esc(r.cidade)+'"></label><label class="fld"><span>UF</span><input name="uf" maxlength="2" value="'+esc(r.uf)+'" style="text-transform:uppercase"></label></div>'+
+    '<div class="g2"><label class="fld"><span>Estado</span><select name="uf" id="pr-uf"><option value="">Escolha o estado</option>'+UFS.map(function(u){return '<option value="'+u+'"'+(r.uf===u?' selected':'')+'>'+u+' · '+UF_NOME[u]+'</option>';}).join('')+'</select></label>'+
+      '<label class="fld"><span>Cidade</span><input name="cidade" id="pr-cidade" maxlength="80" list="pr-cidades" autocomplete="off" value="'+esc(r.cidade)+'" placeholder="'+(r.uf?'Comece a digitar…':'Escolha o estado primeiro')+'"'+(r.uf?'':' disabled')+'><datalist id="pr-cidades"></datalist></label></div>'+
     '<div class="fld"><span>Softwares que você usa</span>'+chips('sw',SOFTS,r.softwares||[])+'</div>'+
     '<div class="fld"><span>Especialidades</span>'+chips('esp',ESPECS,r.especialidades||[])+'</div>'+
     '<label class="fld"><span>Prazo médio de entrega</span><select name="prazo"><option value="">Escolha</option>'+PRAZOS.map(function(o){return '<option'+(r.prazo===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></label>'+
@@ -4199,7 +4203,8 @@ var F={
     S.prefs=S.prefs||{};var pv=S.prefs.tab||{};if(JSON.stringify(tb)!==JSON.stringify({modelos:pv.modelos==null?null:pv.modelos,prazo:pv.prazo||'',pagamento:pv.pagamento||'',info:pv.info||''})){S.prefs.tab=tb;n++;}
     save();render();toast(n?'Tabela salva ('+n+' alteração(ões)).':'Nada mudou na tabela.');
   },
-  perfilRede:function(fd){var v=String(fd.get('video')||'').trim();if(v&&!VIDEO_RX.test(v)){toast('O link do vídeo precisa ser do YouTube, Instagram, Vimeo, TikTok ou Google Drive (começando com https://).');return;}
+  perfilRede:function(fd){var v=String(fd.get('video')||'').trim(),ufv=String(fd.get('uf')||''),cv=String(fd.get('cidade')||'').trim();
+    if(cv&&MUN){var ach=MUN.filter(function(c){return c.uf===ufv&&c.k===semAcento(cv);})[0];if(!ach){toast('Escolha uma cidade da lista de '+(UF_NOME[ufv]||'seu estado')+'.');return;}fd.set('cidade',ach.n);}if(v&&!VIDEO_RX.test(v)){toast('O link do vídeo precisa ser do YouTube, Instagram, Vimeo, TikTok ou Google Drive (começando com https://).');return;}
     var row=Object.assign({},prRow(),{nome:String(fd.get('nome')||'').trim().slice(0,80),cidade:String(fd.get('cidade')||'').trim().slice(0,80),uf:String(fd.get('uf')||'').trim().toUpperCase().slice(0,2),
       softwares:fd.getAll('sw').slice(0,10),especialidades:fd.getAll('esp').slice(0,15),prazo:String(fd.get('prazo')||''),bio:String(fd.get('bio')||'').trim().slice(0,600),video_url:v||null,publicado:!!fd.get('publicado')});
     salvaPerfilRede(row,row.publicado?'Perfil salvo e publicado.':'Perfil salvo. Só você vê enquanto não publicar.').then(function(ok){if(ok)openSheet(fPerfilCad,'eu');});},
@@ -4326,6 +4331,7 @@ document.addEventListener('input',function(e){
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
 document.addEventListener('change',function(e){
+  if(e.target&&e.target.id==='pr-uf'){var ci=document.getElementById('pr-cidade');if(ci){ci.disabled=!e.target.value;ci.value='';ci.placeholder=e.target.value?'Comece a digitar…':'Escolha o estado primeiro';if(e.target.value){cidadesDaUf(e.target.value);ci.focus();}}}
   if(e.target.dataset&&e.target.dataset.a2==='labQuem'){labIni().novo.quem=e.target.value;var lc=document.getElementById('lab-cad');if(lc)lc.hidden=e.target.value!=='um';return;}
   if(e.target.dataset&&e.target.dataset.a2==='labTipo'){labIni().perfil.tipo=e.target.value;toast('Na conta final, isso muda o texto do painel (clínica ou laboratório).');return;}
   if(e.target.name==='titulo'&&e.target.type==='radio'){var to=document.getElementById('pd-titulo-o');if(to){to.hidden=e.target.value!=='__outro';if(!to.hidden)to.focus();}}
