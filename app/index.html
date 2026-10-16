@@ -2175,7 +2175,30 @@ var ICO_REDE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 var COL_REDE={desenho:'entrada',revisao:'aprovacao',aprovado:'finalizado'};
 function redeNaProducao(st){var R=ui.rede;if(!R||!R.meus)return [];return R.meus.filter(function(x){return COL_REDE[x.st]===st;});}
 function fTrabRede(id){var R=redeIni(),x=R.meus.filter(function(q){return q.id===id;})[0];if(!x)return head('Trabalho da Rede')+'<p class="empty">Trabalho não encontrado.</p>';
-  return head('<span class="rd-neon" style="font-size:.7rem">'+ICO_REDE+'Trabalho da Rede</span> '+x.cod)+(x.st!=='pago'&&x.st!=='recusado'&&x.st!=='aprovado'?cdHtml(x.prazo,x.hora):'')+meuDetalhe(R,x);}
+  var de=(R.cadDe||{})[x.de]||{nome:''},ET=[['desenho','Desenhando'],['revisao','Em revisão'],['aprovado','Aprovado'],['pago','Repasse recebido']],et=ET.filter(function(e){return e[0]===x.st;})[0];
+  var fake={id:'__rd',nome:x.trab,valor:0,ativo:true},imp=/implante/i.test(x.trab),odo='';
+  S.tipos.push(fake);try{odo=(x.dentes||[]).length?odontoSVG({id:'__rdp',elementos:x.dentes,itens:x.dentes.map(function(d){return {d:d,t:'__rd',imp:imp};}),extras:[]}):'';}catch(e){odo='';}finally{S.tipos.splice(S.tipos.indexOf(fake),1);}
+  var acts=x.st==='desenho'?'<button class="btn sm pri" data-a="rdMeuSt" data-id="'+x.id+'" data-v="revisao">Enviar projeto</button>':
+    x.st==='revisao'?'<span class="small muted">Aguardando '+esc(de.nome)+' revisar.</span><button class="btn sm" data-a="rdMeuSt" data-id="'+x.id+'" data-v="aprovado">Simular: aprovado</button><button class="btn sm" data-a="rdMeuSt" data-id="'+x.id+'" data-v="recusado">Simular: recusado</button>':
+    x.st==='aprovado'?'<span class="small">Aguardando o Pix de '+esc(de.nome)+'.</span><button class="btn sm pri" data-a="rdMeuSt" data-id="'+x.id+'" data-v="pago">Recebi o repasse</button>':
+    x.st==='pago'?'<span class="tag ok">Concluído · conta no seu perfil</span>':x.st==='recusado'?'<span class="tag u">Recusado'+(x.motivo?': '+esc(x.motivo):'')+'</span>':'';
+  return head('Trabalho da Rede · '+x.cod)+
+    '<div class="row wrap"><span class="rd-neon">'+ICO_REDE+'Trabalho da Rede</span><span class="tag a">'+(et?et[1]:x.st)+'</span></div>'+
+    '<div class="pdet"><div class="pdet-a">'+
+      '<div class="pd-quem">'+
+        '<div class="pq cli"><span class="pq-l">'+ICO_CLI+' Publicado por</span><b>'+esc(de.nome)+'</b><button class="btn sm pq-cp" data-a="rdPerfil" data-id="'+x.de+'">Ver perfil</button></div>'+
+        '<div class="pq trab"><span class="pq-l">Trabalho</span><b>'+esc(x.trab)+'</b></div>'+
+      '</div>'+odo+
+      '<div class="grid2 small">'+kv('Elementos',(x.dentes||[]).length?x.dentes.join(', '):'—')+(x.mat?kv('Material',esc(x.mat)):'')+(x.sw?kv('Software',esc(x.sw)):'')+
+        kv('Prazo',x.prazo?prazoTxt(x.prazo,x.hora):'—')+kv('Repasse','<span class="mono" style="font-size:1.1rem"><b>'+brl(x.repasse)+'</b></span>')+'</div>'+
+      '<p class="small muted" style="margin:0">🔒 Sigilo da Rede: o nome do paciente e do cliente de quem publicou não aparecem para você.</p>'+
+    '</div><div class="pdet-b">'+
+      (x.st!=='pago'&&x.st!=='recusado'&&x.st!=='aprovado'?cdHtml(x.prazo,x.hora):'')+
+      '<div class="acts">'+acts+'</div>'+
+      '<div class="rd-steps" style="grid-template-columns:repeat(4,minmax(0,1fr))">'+ET.map(function(e,k){var i=ET.map(function(z){return z[0];}).indexOf(x.st);return '<span class="'+(k<i?'ok':k===i?'on':'')+'"><i></i>'+e[1]+'</span>';}).join('')+'</div>'+
+      '<section class="stack" style="border-top:1px solid var(--line);padding-top:14px">'+rdArqs(x,'meu',de.nome)+'</section>'+
+      '<div class="row wrap" style="border-top:1px solid var(--line);padding-top:14px"><button class="btn" data-a="rdConversa" data-id="'+x.id+'">💬 Chat com '+esc(de.nome)+rdNaoLidas(x.id)+'</button></div>'+
+    '</div></div>';}
 function kcardRede(x){var R=ui.rede,de=(R.cadDe||{})[x.de]||{nome:''};
   return '<div class="kcard rede" data-a="rdTrabDet" data-id="'+x.id+'" role="button" tabindex="0">'+
     '<div class="r"><span class="rd-neon">'+ICO_REDE+'Trabalho da Rede</span><span class="mono small muted">'+x.cod+'</span></div>'+
@@ -3394,7 +3417,7 @@ function openSheet(fn){var args=[].slice.call(arguments,1);ui.sheet={fn:fn,args:
 function renderSheet(){
   var el=document.getElementById('sheet');
   if(!ui.sheet){el.innerHTML='';return;}
-  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+({fPedidoDet:' wide',fPedido:' wide',fCliente:' frm',fPagamento:' mid',fCobranca:' mid',fRelProd:' mid'}[ui.sheet.fn.name]||'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
+  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+({fPedidoDet:' wide',fTrabRede:' wide',fPedido:' wide',fCliente:' frm',fPagamento:' mid',fCobranca:' mid',fRelProd:' mid'}[ui.sheet.fn.name]||'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
   if(ui.sheet.after)ui.sheet.after();
 }
 function closeSheet(){if(viewer)viewer.stop();ui.sheet=null;renderSheet();}
