@@ -373,6 +373,13 @@ table.adm td{vertical-align:top}
 :root[data-tema="grafite"]{--accent:#2B2F36;--accent-soft:#ECEDEF;--accent-ink:#FFFFFF;--bg:#F5F5F6;--surface:#FFFFFF;--line:#E2E3E6;--soft:#EEF1F3}
 @media (prefers-color-scheme: dark){:root[data-tema="grafite"]:not([data-theme="light"]){--accent:#E5E7EB;--accent-soft:#2A2C31;--accent-ink:#111214;--bg:#101113;--surface:#1A1B1E;--line:#2C2E33;--soft:#2A2C31}}
 :root[data-tema="grafite"][data-theme="dark"]{--accent:#E5E7EB;--accent-soft:#2A2C31;--accent-ink:#111214;--bg:#101113;--surface:#1A1B1E;--line:#2C2E33;--soft:#2A2C31}
+/* Neon: azul elétrico, violeta e magenta */
+:root[data-tema="neon"]{--accent:#3D4BF2;--accent-soft:#E7E9FF;--accent-ink:#FFFFFF;--bg:#F4F5FF;--surface:#FFFFFF;--line:#DDE0FA;--soft:#EEF0FF}
+@media (prefers-color-scheme: dark){:root[data-tema="neon"]:not([data-theme="light"]){--accent:#4FC8FF;--accent-soft:#18245E;--accent-ink:#08081F;--bg:#0A0A24;--surface:#13123A;--line:#29285E;--soft:#1A1A4A;--p4:#4FC8FF;--p5:#8B6BFF;--p6:#E45CFF}}
+:root[data-tema="neon"][data-theme="dark"]{--accent:#4FC8FF;--accent-soft:#18245E;--accent-ink:#08081F;--bg:#0A0A24;--surface:#13123A;--line:#29285E;--soft:#1A1A4A;--p4:#4FC8FF;--p5:#8B6BFF;--p6:#E45CFF}
+html[data-tema="neon"] .btn.pri{background:linear-gradient(115deg,#2A8BFF 0%,#4D5BFF 45%,#A44DFF 85%,#D44DF0 100%);border-color:transparent;color:#fff;box-shadow:0 6px 22px -8px rgba(110,80,255,.7)}
+html[data-tema="neon"] .btn.pri:hover{filter:brightness(1.08)}
+html[data-tema="neon"] body{background:radial-gradient(1100px 620px at 100% -10%,rgba(228,92,255,.13),transparent 62%),radial-gradient(1000px 700px at -10% 110%,rgba(79,200,255,.12),transparent 60%),radial-gradient(900px 600px at 50% 40%,rgba(61,75,242,.07),transparent 70%),var(--bg);background-attachment:fixed}
 .tm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .tm{display:grid;gap:6px;padding:8px;border-radius:14px;border:2px solid var(--line);background:var(--surface);cursor:pointer;text-align:left;color:var(--ink);font:inherit}
 .tm.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
@@ -1283,7 +1290,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 03h50';
+var VERSAO='16/10 · 04h20';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1792,7 +1799,7 @@ function secPrevisao(){var tot=alive(S.pedidos).length,par=ui.prevPar||(ui.prevP
 /* ---------- Dashboard ---------- */
 /* ---------- Temas (cor do sistema por personalidade) + modo claro/escuro ----------
    Guardado em perfis.preferencias (tema, modo) e copiado no navegador para abrir já com o tema certo. */
-var TEMAS=[['ideali','Ideali','#5B45E0','#F6F5F8','#E2DFEA','Criativo'],['oceano','Oceano','#1F6FD1','#F4F7FB','#DCE5F0','Calmo'],['esmeralda','Esmeralda','#138A63','#F4F8F6','#DCE8E2','Equilibrado'],['brasa','Brasa','#D9531E','#FBF6F3','#F0E1D9','Energético'],['rose','Rosé','#C2367A','#FBF5F8','#F0DEE7','Acolhedor'],['dourado','Dourado','#9A7419','#F8F6F1','#E9E3D3','Elegante'],['grafite','Grafite','#2B2F36','#F5F5F6','#E2E3E6','Focado']];
+var TEMAS=[['ideali','Ideali','#5B45E0','#F6F5F8','#E2DFEA','Criativo'],['oceano','Oceano','#1F6FD1','#F4F7FB','#DCE5F0','Calmo'],['esmeralda','Esmeralda','#138A63','#F4F8F6','#DCE8E2','Equilibrado'],['brasa','Brasa','#D9531E','#FBF6F3','#F0E1D9','Energético'],['rose','Rosé','#C2367A','#FBF5F8','#F0DEE7','Acolhedor'],['dourado','Dourado','#9A7419','#F8F6F1','#E9E3D3','Elegante'],['grafite','Grafite','#2B2F36','#F5F5F6','#E2E3E6','Focado'],['neon','Neon','linear-gradient(135deg,#4FC8FF,#3D4BF2 45%,#B44DFF 75%,#E45CFF)','#0A0A24','#29285E','Vibrante']];
 function temaAtual(){return (S.prefs&&S.prefs.tema)||'ideali';}
 function modoAtual(){return (S.prefs&&S.prefs.modo)||'auto';}
 function aplicaTema(t,m){var r=document.documentElement;if(!t||t==='ideali')r.removeAttribute('data-tema');else r.setAttribute('data-tema',t);
@@ -1809,7 +1816,7 @@ function secTema(){var m=modoAtual();
     '<button class="btn" data-a="temaQuiz">✨ Descobrir meu tema (3 perguntas)</button></section>';}
 var QUIZ=[
   ['Como é o seu jeito de trabalhar?',[['brasa','Rápido e intenso, gosto de ritmo'],['oceano','Calmo e organizado'],['grafite','Detalhista e focado'],['ideali','Criativo, cada caso é um projeto']]],
-  ['O que mais combina com você?',[['esmeralda','Equilíbrio e natureza'],['dourado','Sofisticação e capricho'],['rose','Leveza e simpatia'],['ideali','Tecnologia e novidade']]],
+  ['O que mais combina com você?',[['esmeralda','Equilíbrio e natureza'],['dourado','Sofisticação e capricho'],['rose','Leveza e simpatia'],['ideali','Tecnologia e novidade'],['neon','Brilho e ousadia']]],
   ['No dia a dia você prefere…',[['oceano','Tranquilidade'],['brasa','Energia'],['grafite','Simplicidade, sem distrações'],['dourado','Acabamento impecável']]],
   ['Tela clara ou escura?',[['claro','Clara'],['escuro','Escura'],['auto','Tanto faz, segue o celular']]]];
 function fTemaQuiz(){return head('Descobrir meu tema')+'<form data-form="temaQuiz" class="qz">'+QUIZ.map(function(q,i){return '<fieldset><legend>'+(i+1)+'. '+q[0]+'</legend>'+q[1].map(function(o,j){return '<label><input type="radio" name="q'+i+'" value="'+o[0]+'" '+(j===0&&i===3?'':'')+' required> '+o[1]+'</label>';}).join('')+'</fieldset>';}).join('')+
