@@ -517,6 +517,9 @@ body.sem-anim .deco *{animation:none!important}
 .dent{display:flex;flex-direction:column;gap:6px}
 .dent-it{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--ink);font:inherit;cursor:pointer}
 .dent-it:hover{border-color:var(--accent)}.dent-it .tx{min-width:0}.dent-it b{display:block;font-size:.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dent-it .tag{flex-shrink:0}
+.imp-res{display:flex;flex-wrap:wrap;gap:8px}.imp-res span{padding:6px 10px;border:1px solid var(--line);border-radius:10px;font-size:.85rem}
+.imp-l{display:flex;flex-direction:column;gap:4px}.imp-l>div{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:10px;font-size:.86rem}.imp-l span{color:var(--muted)}
+.imp-t{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:10px}.imp-t table{width:100%;border-collapse:collapse;font-size:.8rem}.imp-t th,.imp-t td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.imp-t th{position:sticky;top:0;background:var(--surface)}.imp-t tr.pula{opacity:.45}
 .passeio{position:fixed;right:14px;bottom:0;z-index:43;display:flex;align-items:flex-end;gap:0;pointer-events:none;max-width:calc(100vw - 28px)}
 .passeio>*{pointer-events:auto}
 .ps-img{height:230px;width:auto;margin-left:-18px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35));animation:psEntra .55s cubic-bezier(.2,.9,.3,1.2) both;transform-origin:bottom center}
@@ -1406,7 +1409,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 19h25';
+var VERSAO='16/10 · 19h45';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3727,6 +3730,43 @@ function fMfa(){var m=ui.mfaNovo;
     '<form data-form="mfaAtivar" class="stack"><label class="fld"><span>3. Digite o código de 6 números que aparece no app</span><input name="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required style="font-size:1.4rem;letter-spacing:.3em;text-align:center"></label>'+
     '<button class="btn pri block" type="submit">Ativar</button></form>'+
     '<p class="small muted">Depois de ativar, o painel Admin vai pedir o código do app sempre que você entrar. Guarde o celular com cuidado: se perder, fale comigo para liberar.</p></div>';}
+/* Importar dados de outro sistema (arquivo .json no formato ideali-import-1). Roda na conta de quem está logado; mostra a prévia antes de gravar. */
+function impNorm(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\b(dra?|lab|laboratorio)\b\.?/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
+function impCliAcha(c){var tel=soDig(c.telefone).slice(-8),nm=impNorm(c.empresa||((c.pnome||'')+' '+(c.sobrenome||'')));
+  return alive(S.clientes).filter(function(x){var t=soDig(x.telefone).slice(-8);return (tel&&t&&tel===t)||impNorm(x.nome)===nm||(nm&&impNorm(x.nome).indexOf(nm)===0&&nm.length>5);})[0]||null;}
+function impTipoAcha(n){var k=impNorm(n);return k?alive(S.tipos).filter(function(t){return impNorm(t.nome)===k;})[0]||null:null;}
+function impPlano(D){var cm={},novosT={};
+  (D.clientes||[]).forEach(function(c){cm[c.ref]={c:c,ex:impCliAcha(c)};});
+  var ja={};alive(S.pedidos).forEach(function(p){var m=/\[Estúdio CAD nº (\d+)\]/.exec(p.obs||'');if(m)ja[m[1]]=1;});
+  var P=(D.pedidos||[]).map(function(p){var st=p.status_orig==='finalizado'?(p.pago?'arquivado':'finalizado'):'entrada';if(p.tipo&&!impTipoAcha(p.tipo))novosT[p.tipo]=1;return {p:p,st:st,pula:!!ja[p.n]};});
+  return {cm:cm,P:P,G:D.pagamentos||[],novosT:Object.keys(novosT),fonte:D.fonte||'outro sistema'};}
+function fImport(){var X=ui.imp;if(!X)return head('Importar');var pl=impPlano(X),novos=0,P=pl.P.filter(function(x){return !x.pula;}),pul=pl.P.length-P.length;
+  Object.keys(pl.cm).forEach(function(k){if(!pl.cm[k].ex)novos++;});
+  var stN={arquivado:'Arquivado (entregue e pago)',finalizado:'Finalizado (a receber)',entrada:'Entrada (a fazer)'};
+  var nomeC=function(r){var c=pl.cm[r];return c?(c.ex?c.ex.nome:(c.c.empresa||((c.c.titulo?c.c.titulo+' ':'')+c.c.pnome+' '+c.c.sobrenome))):r;};
+  return head('Importar do '+esc(pl.fonte))+'<div class="stack">'+
+    '<p class="small muted" style="margin:0">Confira antes de gravar. Nada foi salvo ainda. Pacientes vêm só com as iniciais (LGPD).</p>'+
+    '<div class="imp-res"><span><b>'+P.length+'</b> pedidos</span><span><b>'+novos+'</b> clientes novos</span><span><b>'+(Object.keys(pl.cm).length-novos)+'</b> já cadastrados</span><span><b>'+pl.G.length+'</b> pagamentos</span>'+(pl.novosT.length?'<span><b>'+pl.novosT.length+'</b> tipos novos</span>':'')+'</div>'+
+    (pul?'<div class="banner">'+pul+' pedido(s) já foram importados antes e serão pulados.</div>':'')+
+    '<h3 style="margin:6px 0 0">Clientes</h3><div class="imp-l">'+Object.keys(pl.cm).map(function(k){var c=pl.cm[k];return '<div><b>'+esc(nomeC(k))+'</b><span class="tag '+(c.ex?'':'a')+'">'+(c.ex?'já existe: usa o cadastro':'novo')+'</span></div>';}).join('')+'</div>'+
+    (pl.novosT.length?'<p class="small muted" style="margin:0">Tipos de trabalho que serão criados: '+esc(pl.novosT.join(', '))+'.</p>':'')+
+    '<h3 style="margin:6px 0 0">Pedidos</h3><div class="imp-t"><table><thead><tr><th>Nº</th><th>Cliente</th><th>Paciente</th><th>Trabalho</th><th>Dentes</th><th>Valor</th><th>Fica como</th></tr></thead><tbody>'+
+      pl.P.map(function(x){var p=x.p;return '<tr'+(x.pula?' class="pula"':'')+'><td>'+p.n+'</td><td>'+esc(nomeC(p.cli))+'</td><td>'+esc(p.paciente)+'</td><td>'+esc(p.tipo||'—')+'</td><td>'+(p.dentes.length?p.dentes.join(', '):p.elem+' elem.')+'</td><td>'+brl(p.valor)+'</td><td>'+(x.pula?'já importado':stN[x.st]+(p.pago?' · pago '+dmy(p.pago).slice(0,5):''))+'</td></tr>';}).join('')+'</tbody></table></div>'+
+    '<h3 style="margin:6px 0 0">Pagamentos</h3><div class="imp-l">'+pl.G.map(function(g){return '<div><b>'+esc(nomeC(g.cli))+'</b><span>'+dmy(g.data)+' · '+brl(g.valor)+(g.forma?' · '+formaNome(g.forma):'')+' · '+plural(g.pedidos.length,'pedido','pedidos')+'</span></div>';}).join('')+'</div>'+
+    '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="impGrava"'+(P.length?'':' disabled')+'>Importar '+plural(P.length,'pedido','pedidos')+'</button><button class="btn" data-a="fechar">Cancelar</button></div></div>';}
+function impGrava(){if(!guard())return;var X=ui.imp;if(!X)return;var pl=impPlano(X),cid={},tid={},pid={},nP=0,nC=0,nG=0,nT=0;
+  Object.keys(pl.cm).forEach(function(k){var m=pl.cm[k];if(m.ex){cid[k]=m.ex.id;return;}var c=m.c,o=nomeia({id:uid(),pnome:c.pnome||'',sobrenome:c.sobrenome||'',titulo:c.titulo||'',empresa:c.empresa||'',doc:'',cidade:'',uf:'',tipo:c.tipo||'den',telefone:c.telefone||'',email:'',obs:c.obs||'',criado:today()});S.clientes.push(o);cid[k]=o.id;nC++;});
+  pl.novosT.forEach(function(n){var t={id:uid(),nome:n,forma:/protocolo/i.test(n)?'trabalho':'elemento',valor:0,ativo:true};S.tipos.push(t);tid[impNorm(n)]=t.id;nT++;});
+  pl.P.forEach(function(x){if(x.pula)return;var p=x.p,t=p.tipo?(impTipoAcha(p.tipo)||{id:tid[impNorm(p.tipo)]}).id:null;
+    var o={id:uid(),num:++S.seq,clienteId:cid[p.cli],paciente:p.paciente,elementos:p.dentes.slice(),itens:p.dentes.map(function(d){return {d:d,t:t};}),extras:[],tipoId:t||null,cor:'',
+      obs:'[Estúdio CAD nº '+p.n+']'+(!p.dentes.length&&p.elem>1?' '+p.elem+' elementos (dentes não informados).':''),valor:+p.valor||0,urgente:false,status:x.st,pendencia:null,aprovDesde:null,ajustes:0,ajMotivos:[],
+      recebido:p.criado,prazo:null,entregue:x.st==='entrada'?null:p.criado,pago:p.pago||null,pagamentoId:null,impMarca:'',impTipo:'',sbImg:'',material:'',fresadora:''};
+    S.pedidos.push(o);pid[p.n]=o;nP++;});
+  pl.G.forEach(function(g){var ps=g.pedidos.map(function(n){return pid[n];}).filter(Boolean);if(!ps.length)return;
+    var o={id:uid(),clienteId:cid[g.cli],valor:+g.valor,data:g.data,forma:g.forma||'',obs:g.obs||'',pedidos:ps.map(function(p){return p.id;}),comprovante:null};
+    ps.forEach(function(p){p.pago=g.data;p.pagamentoId=o.id;});S.pagamentos.push(o);nG++;});
+  ui.imp=null;save();closeSheet();ui.tab='pedidos';render();
+  toast('Importado: '+plural(nP,'pedido','pedidos')+', '+plural(nC,'cliente novo','clientes novos')+', '+plural(nG,'pagamento','pagamentos')+(nT?', '+plural(nT,'tipo novo','tipos novos'):'')+'.');}
 /* Admin: testar as decorações de datas e a equipe passeando sem esperar a data chegar */
 function admTestes(){var at=ui.decoTeste,b=decoAtual(at),y=+today().slice(0,4);
   return '<section class="card stack" style="margin-bottom:14px"><div class="between wrap"><h2 style="margin:0">🎨 Testes de aparência</h2>'+(at?'<span class="tag a">Teste ligado: '+esc(b?b.x.nome:'nenhuma data')+'</span>':'<span class="tag">Mostrando a data real</span>')+'</div>'+
@@ -3845,7 +3885,7 @@ function rConfig(){
     '<section class="card stack"><h2>Use como aplicativo</h2>'+(window._instalar?'<p class="small muted">Coloque o Ideali CAD na tela inicial e abra como um app, sem a barra do navegador.</p><button class="btn pri" data-a="instalarApp">Instalar no celular / computador</button>':
       (window.matchMedia&&matchMedia('(display-mode: standalone)').matches?'<p class="small muted">Você já está usando como aplicativo. ✓</p>':'<p class="small muted"><b>Android (Chrome):</b> menu ⋮ → <b>Adicionar à tela inicial</b>.<br><b>iPhone (Safari):</b> botão Compartilhar → <b>Adicionar à Tela de Início</b>.</p>'))+'</section>'+
     '<section class="card stack"><h2>Perfil na Rede</h2><p class="small muted">Foto, especialidades, softwares, portfólio e vídeo. Você escolhe se publica para outros usuários verem.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="prEditar">Editar perfil na Rede</button><button class="btn" data-a="rdPerfil" data-id="eu">Ver como fica</button></div></section>'+
-    secTema()+'<section class="card stack"><h2>Apresentação</h2><p class="small muted">Veja de novo as boas-vindas, o tour e a sua equipe, do jeito que aparece para quem acabou de criar a conta. Seus dados não mudam.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="novaConta">Ver como conta nova</button><button class="btn" data-a="eqIr" data-v="rever">Só a equipe</button></div><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="passeioTg"'+(passeioOff()?'':' checked')+'><span>Equipe passeando pelo sistema <span class="muted small">(de vez em quando alguém aparece no canto da tela com um aviso ou dica)</span></span></label><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="decoTg"'+(decoOff()?'':' checked')+'><span>Decorações de datas especiais <span class="muted small">(Halloween, Natal, Dia do Dentista… aparecem 10 dias antes)</span></span></label></section>'+
+    secTema()+'<section class="card stack"><h2>Apresentação</h2><p class="small muted">Veja de novo as boas-vindas, o tour e a sua equipe, do jeito que aparece para quem acabou de criar a conta. Seus dados não mudam.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="novaConta">Ver como conta nova</button><button class="btn" data-a="eqIr" data-v="rever">Só a equipe</button></div><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="passeioTg"'+(passeioOff()?'':' checked')+'><span>Equipe passeando pelo sistema <span class="muted small">(de vez em quando alguém aparece no canto da tela com um aviso ou dica)</span></span></label><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="decoTg"'+(decoOff()?'':' checked')+'><span>Decorações de datas especiais <span class="muted small">(Halloween, Natal, Dia do Dentista… aparecem 10 dias antes)</span></span></label></section><section class="card stack"><h2>Importar dados</h2><p class="small muted">Traga clientes, pedidos e pagamentos de outro sistema (arquivo .json de importação). Antes de gravar, você confere tudo numa prévia.</p><div><label class="btn up">Escolher arquivo .json<input type="file" accept=".json,application/json" id="imp-file" hidden></label></div></section>'+
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Plano</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
@@ -3861,7 +3901,7 @@ function openSheet(fn){if(window.passeioTira)passeioTira();var args=[].slice.cal
 function renderSheet(){
   var el=document.getElementById('sheet');
   if(!ui.sheet){el.innerHTML='';return;}
-  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+({fPedidoDet:' wide',fTrabRede:' wide',fImgView:' full',fPedido:' wide',fCliente:' frm',fPagamento:' mid',fCobranca:' mid',fRelProd:' mid'}[ui.sheet.fn.name]||'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
+  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+({fPedidoDet:' wide',fTrabRede:' wide',fImgView:' full',fPedido:' wide',fCliente:' frm',fPagamento:' mid',fCobranca:' mid',fImport:' wide',fRelProd:' mid'}[ui.sheet.fn.name]||'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
   if(ui.sheet.after)ui.sheet.after();
 }
 function closeSheet(){if(viewer)viewer.stop();ui.sheet=null;renderSheet();}
@@ -4518,6 +4558,7 @@ waArq:async function(d,el){var p=byId(S.pedidos,d.id),c=p&&cliente(p.clienteId);
     navigator.share({files:[f],text:t}).then(function(){if(mv&&mv.checked)setStatus(pid,mv.value);},function(){});},
 admDeco:function(d){ui.decoTeste=d.v||null;try{if(d.v)localStorage.setItem('idealicad_decoteste',d.v);else localStorage.removeItem('idealicad_decoteste');}catch(e){}render();toast(d.v?'Teste ligado. A decoração aparece em todas as telas até você desativar.':'Teste desligado. Voltou a data real.');},
   admPasseio:function(){try{var v=psLe();v.t=0;v.n=0;v.k={};psGrava(v);}catch(e){}var r=Math.random;Math.random=function(){return 0;};var tb=ui.tab;ui.tab='dashboard';try{passeioTira();var e=document.getElementById('passeio');if(e)e.remove();passeioTenta();}finally{Math.random=r;ui.tab=tb;}if(!document.getElementById('passeio'))toast('Ninguém apareceu: confira se a equipe passeando está ligada em Configurações.');},
+impGrava:function(){impGrava();},
   msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   secOk:function(d){try{localStorage.setItem('idealicad_sec_'+d.k+'_'+today(),'1');}catch(e){}if(document.querySelector('.sheet'))renderSheet();render();},
@@ -5015,6 +5056,7 @@ document.addEventListener('change',function(e){
   var t=e.target;
   if(t.classList&&t.classList.contains('arqck')){ui.arqSel=ui.arqSel||{};if(t.checked)ui.arqSel[t.dataset.id]=1;else delete ui.arqSel[t.dataset.id];render();}
   if(t.id==='up-file'&&t.files.length)enviaArquivo(t.dataset.id,t.files);
+  if(t.id==='imp-file'&&t.files.length){var fr=new FileReader(),f0=t.files[0];t.value='';fr.onload=function(){try{var D=JSON.parse(fr.result);if(D.formato!=='ideali-import-1')throw 0;ui.imp=D;openSheet(fImport);}catch(e){toast('Este arquivo não é um arquivo de importação do Ideali CAD.');}};fr.readAsText(f0);}
   if(t.id==='pd-files'){var inf=document.getElementById('pd-files-info');if(inf)inf.textContent=t.files.length?t.files.length+' arquivo(s) · '+bytes([].reduce.call(t.files,function(s,f){return s+f.size;},0))+' · vão ser compactados e enviados ao salvar':'STL, HTML do exocad, prints/fotos ou ZIP. Vários arquivos viram um zip só.';}
   if(t.id==='ed-imp'){var bx=document.getElementById('ed-impbox');if(bx)bx.hidden=!t.checked;lerEditor();renderItens();}
   if(t.id==='rd-rep'||t.id==='rd-cad')rdLer();
