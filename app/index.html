@@ -421,6 +421,20 @@ table.adm td{vertical-align:top}
 .lm-tabs button{border:0;background:none;color:var(--muted);font:700 .98rem var(--f-body);padding:10px 18px;border-radius:999px;cursor:pointer;white-space:nowrap}
 .lm-tabs button.on{background:var(--accent);color:var(--accent-ink)}.lm-tabs button b{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:99px;background:var(--urgent);color:#fff;font-size:.72rem;margin-left:4px}
 .lm-pub .frm2{margin-top:4px}
+.sec{display:grid;gap:12px;grid-column:span 12}
+.sec-h{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.sec-av{flex:none;width:44px;height:44px;border-radius:14px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.sec-av svg{width:22px;height:22px}
+.sec-h .tx{flex:1;min-width:180px}.sec-h .tx p{margin:2px 0 0}
+.sec-l{display:grid;gap:8px}
+.rec{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.rec i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:7px;background:var(--muted)}
+.rec.alta i{background:var(--urgent)}.rec.media i{background:var(--warn)}.rec.info i{background:var(--accent)}
+.rec .t{flex:1;min-width:0;display:grid;gap:2px}.rec .t b{font-weight:600;line-height:1.35}.rec .t span{font-size:.84rem;color:var(--muted)}
+.rec .ac{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.rec .ac .icon-btn{width:30px;height:30px}
+@media (max-width:560px){.rec{flex-wrap:wrap}.rec .ac{width:100%;padding-left:19px;justify-content:flex-start}}
+.sec-ok{display:flex;gap:10px;align-items:center;color:var(--muted)}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -875,7 +889,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -927,7 +941,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -937,7 +951,7 @@ async function carregar2(){
     S=novo;tiraFoto();
     try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
-  S.carregando=false;ui.autoArqMes=null;aplicaTema(temaAtual(),modoAtual());autoArquivar();render();iniciaUso();
+  S.carregando=false;ui.autoArqMes=null;aplicaTema(temaAtual(),modoAtual());autoArquivar();render();iniciaUso();secAbreDia();
 }
 setInterval(function(){if(autoArquivar())render();},3600000);
 var TRAB_REF=[['Elemento sobre dente','elemento'],['Elemento sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
@@ -1086,7 +1100,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 18h55';
+var VERSAO='15/10 · 22h10';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1608,6 +1622,49 @@ var QUIZ=[
   ['Tela clara ou escura?',[['claro','Clara'],['escuro','Escura'],['auto','Tanto faz, segue o celular']]]];
 function fTemaQuiz(){return head('Descobrir meu tema')+'<form data-form="temaQuiz" class="qz">'+QUIZ.map(function(q,i){return '<fieldset><legend>'+(i+1)+'. '+q[0]+'</legend>'+q[1].map(function(o,j){return '<label><input type="radio" name="q'+i+'" value="'+o[0]+'" '+(j===0&&i===3?'':'')+' required> '+o[1]+'</label>';}).join('')+'</fieldset>';}).join('')+
   '<button class="btn pri block" type="submit">Ver meu tema</button></form>';}
+/* ---------- Secretário ----------
+   Regras fixas, calculadas no próprio aparelho com os dados do cadista (nada sai do sistema, sem custo).
+   Olha: pedidos atrasados, que vencem hoje/amanhã, parados em pendência ou aprovação, pedidos novos e clientes que não pagaram.
+   "Ok" esconde o recado só por hoje (neste aparelho). O recado abre sozinho na 1ª entrada do dia (dá para desligar). */
+var ICO_SEC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>';
+function nomeCurtoCli(c){if(!c)return 'Cliente';var t=(c.titulo==='Dr.'||c.titulo==='Dra.')?c.titulo+' ':'';return t?t+String(c.pnome||c.nome||'').split(' ')[0]:String(c.nome||c.pnome||'Cliente');}
+function pedTxt(p){var tp=tipoPed(p);return (tp?tp.nome:'Pedido')+(p.paciente?' · '+p.paciente:'')+' ('+nomeCurtoCli(cliente(p.clienteId))+')';}
+function quandoTxt(n){return n===0?'hoje':n===1?'há 1 dia':'há '+n+' dias';}
+function secretario(){var t=today(),am=addDays(t,1),P=alive(S.pedidos),ab=P.filter(aberto),R=[];
+  var ord=function(a,b){return (a.prazo||'')<(b.prazo||'')?-1:1;};
+  ab.filter(function(p){return p.prazo&&p.prazo<t;}).sort(ord).forEach(function(p){var d=daysBetween(p.prazo,t);
+    R.push({k:'atr_'+p.id,n:'alta',tit:pedTxt(p),sub:'Atrasado '+(d===1?'1 dia':d+' dias')+' · prazo era '+dm(p.prazo),a:'verPedido',id:p.id,bt:'Abrir'});});
+  ab.filter(function(p){return p.prazo===t;}).forEach(function(p){R.push({k:'hoje_'+p.id,n:'alta',tit:pedTxt(p),sub:'Vence hoje'+(p.urgente?' · urgente':''),a:'verPedido',id:p.id,bt:'Abrir'});});
+  ab.filter(function(p){return p.prazo===am;}).forEach(function(p){R.push({k:'am_'+p.id,n:'media',tit:pedTxt(p),sub:'Vence amanhã ('+dm(am)+')'+(p.status==='pendente'?' e ainda está com pendência':''),a:'verPedido',id:p.id,bt:'Abrir'});});
+  var ja={};R.forEach(function(r){ja[r.id]=1;});
+  P.filter(function(p){return !ja[p.id]&&p.status==='pendente'&&p.pendencia&&p.pendencia.desde&&daysBetween(p.pendencia.desde,t)>=2;}).forEach(function(p){
+    R.push({k:'pend_'+p.id,n:'media',tit:pedTxt(p),sub:'Esperando informação do cliente '+quandoTxt(daysBetween(p.pendencia.desde,t))+'. Vale cobrar a resposta.',a:'verPedido',id:p.id,bt:'Abrir'});});
+  P.filter(function(p){return !ja[p.id]&&p.status==='aprovacao'&&p.aprovDesde&&daysBetween(p.aprovDesde,t)>=3;}).forEach(function(p){
+    R.push({k:'apr_'+p.id,n:'media',tit:pedTxt(p),sub:'Aguardando aprovação '+quandoTxt(daysBetween(p.aprovDesde,t))+'. Dê um toque no cliente.',a:'verPedido',id:p.id,bt:'Abrir'});});
+  devedores().forEach(function(d){var ps=aReceber(d.c.id),velho=ps.map(function(p){return p.entregue||p.recebido;}).filter(Boolean).sort()[0];if(!velho)return;var dias=daysBetween(velho,t);if(dias<7)return;
+    R.push({k:'pag_'+d.c.id,n:dias>=30?'alta':'media',tit:nomeCurtoCli(d.c)+' ainda não pagou '+brl(d.v),sub:(d.n===1?'1 pedido entregue '+quandoTxt(dias):d.n+' pedidos entregues, o mais antigo '+quandoTxt(dias))+'.',a:'cobranca',id:d.c.id,bt:'Cobrar'});});
+  var nv=P.filter(function(p){return p.recebido&&p.recebido>=addDays(t,-1);});
+  if(nv.length)R.push({k:'novos_'+nv.length,n:'info',tit:(nv.length===1?'Entrou 1 pedido novo':'Entraram '+nv.length+' pedidos novos')+' desde ontem',sub:nv.slice(0,3).map(pedTxt).join(' · ')+(nv.length>3?' e mais '+(nv.length-3):''),a:'tab',v:'pedidos',bt:'Ver produção'});
+  var pes={alta:0,media:1,info:2};R.sort(function(a,b){return pes[a.n]-pes[b.n];});
+  return R.filter(function(r){try{return localStorage.getItem('idealicad_sec_'+r.k+'_'+t)!=='1';}catch(e){return true;}});}
+function resumoSec(R){var c={atr:0,hoje:0,am:0,pag:0};R.forEach(function(r){var k=r.k.split('_')[0];if(c[k]!=null)c[k]++;});
+  var p=[];if(c.atr)p.push(c.atr+' atrasado'+(c.atr>1?'s':''));if(c.hoje)p.push(c.hoje+' vence'+(c.hoje>1?'m':'')+' hoje');if(c.am)p.push(c.am+' vence'+(c.am>1?'m':'')+' amanhã');if(c.pag)p.push(c.pag+' cliente'+(c.pag>1?'s':'')+' sem pagar');
+  return p.length?p.join(' · '):R.length?'Alguns lembretes para hoje.':'Tudo em dia.';}
+function cartaoRec(r){return '<div class="rec '+r.n+'"><i aria-hidden="true"></i><span class="t"><b>'+esc(r.tit)+'</b><span>'+esc(r.sub)+'</span></span><span class="ac"><button class="btn sm'+(r.n==='alta'?' pri':'')+'" data-a="'+r.a+'"'+(r.id?' data-id="'+r.id+'"':'')+(r.v?' data-v="'+r.v+'"':'')+'>'+r.bt+'</button><button class="icon-btn" data-a="secOk" data-k="'+r.k+'" aria-label="Ok, visto por hoje" title="Ok, visto por hoje">✓</button></span></div>';}
+function secSecretario(){var R=secretario(),mx=ui.secTudo?99:4,nome=primeiroNome();
+  return '<section class="card sec"><div class="sec-h"><span class="sec-av">'+ICO_SEC+'</span><div class="tx"><h2>Secretário</h2><p class="small muted">'+esc(resumoSec(R))+'</p></div>'+(R.length?'<button class="btn sm" data-a="secAbrir">Ver recado</button>':'')+'</div>'+
+    (R.length?'<div class="sec-l">'+R.slice(0,mx).map(cartaoRec).join('')+'</div>'+(R.length>mx?'<button class="btn sm" data-a="secMais">Ver mais '+(R.length-mx)+'</button>':''):
+      '<p class="sec-ok">Nenhum prazo apertado e ninguém devendo'+(nome?', '+esc(nome):'')+'. Bom trabalho.</p>')+'</section>';}
+function fSecretario(){var R=secretario(),sd=saudacao(),nome=primeiroNome(),auto=!(S.prefs&&S.prefs.secAuto===false);
+  return head('Recado do secretário')+'<div class="stack"><p>'+sd.t+(nome?', '+esc(nome):'')+'! '+(R.length?'Separei o que precisa da sua atenção hoje: <b>'+esc(resumoSec(R))+'</b>.':'Está tudo em dia hoje.')+'</p>'+
+    (R.length?'<div class="sec-l">'+R.map(cartaoRec).join('')+'</div>':'')+
+    '<label class="row" style="gap:8px;cursor:pointer"><input type="checkbox" id="secAutoChk" data-a="secAuto"'+(auto?' checked':'')+'> <span class="small">Mostrar este recado quando eu entrar no sistema (1 vez por dia)</span></label>'+
+    '<button class="btn pri block" data-a="fechar">Entendi</button></div>';}
+function secAbreDia(){if(EM_DEMO||ui.modoLab||(S.prefs&&S.prefs.secAuto===false))return;var t=today();
+  try{if(localStorage.getItem('idealicad_sec_dia')===t)return;}catch(e){return;}
+  var R=secretario().filter(function(r){return r.n!=='info';});if(!R.length)return;
+  try{localStorage.setItem('idealicad_sec_dia',t);}catch(e){}
+  setTimeout(function(){if(!document.querySelector('.sheet'))openSheet(fSecretario);},600);}
 /* ---------- Primeiros passos (some quando tudo estiver feito ou a pessoa fechar) ---------- */
 function passosOnb(){var p=S.perfil||{},pr=S.prefs||{};
   return [
@@ -1636,7 +1693,7 @@ function rDashboard(){
   var fv=meses.map(fatMes),pv=meses.map(pagoMes);
   return '<section class="hero-clima '+cenaClima().tipo+'"><canvas id="ceu" aria-hidden="true"></canvas><div class="stack hero-in" style="gap:12px"><div class="between wrap"><div class="row wrap" style="gap:14px">'+saud.ic+'<div><h2 style="font-size:1.5rem">'+saud.t+(nome?', '+esc(nome):'')+'</h2><p class="muted small">Resumo de '+perNome()+'</p></div>'+infoDia()+'</div>'+
       '<div class="row wrap">'+(urg.length?'<span class="tag u">'+urg.length+' urgente(s)</span>':'')+(atr.length?'<span class="tag u">'+atr.length+' atrasado(s)</span>':'')+'</div></div>'+perPicker()+'</div></section>'+
-    primeirosPassos()+lembretes()+
+    primeirosPassos()+lembretes()+'<div class="dash" style="margin-bottom:16px">'+secSecretario()+'</div>'+
     (!S.perfil.chave&&!primeirosPassos()?'<div class="banner"><span>Cadastre sua chave Pix para cobrar seus clientes pelo QR Code.</span><button class="btn sm" data-a="tab" data-v="config">Cadastrar chave</button></div>':'')+
     '<div class="dash">'+
       kpi(G?'Faturamento total':'Faturamento do mês',brl(fat),G?'<span>'+ps.length+' pedidos</span>':delta(fat,soma(prevPs)),spark(sparkM.map(fatMes)),'financeiro')+
@@ -3477,6 +3534,10 @@ var A={
   mmDel:function(d,el){var li=el.closest('.mm-li');if(li)li.remove();toast('Mensagem removida. Clique em “Salvar minhas mensagens” para confirmar.');},
   msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
+  secOk:function(d){try{localStorage.setItem('idealicad_sec_'+d.k+'_'+today(),'1');}catch(e){}if(document.querySelector('.sheet'))renderSheet();render();},
+  secAbrir:function(){openSheet(fSecretario);},
+  secMais:function(){ui.secTudo=true;render();},
+  secAuto:function(d,el){S.prefs=S.prefs||{};S.prefs.secAuto=el&&el.checked?null:false;save();toast(el&&el.checked?'O secretário vai abrir o recado 1 vez por dia.':'Ok, o recado fica só no Dashboard.');},
   lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
   labModo:function(d){ui.modoLab=d.v==='1';ui.ddOpen=null;closeSheet();if(ui.modoLab){labIni().filtro='abertos';}render();window.scrollTo(0,0);},
   labPedir:function(){labIni().aba='publicar';render();window.scrollTo(0,0);},
