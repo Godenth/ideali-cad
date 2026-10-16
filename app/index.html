@@ -456,6 +456,9 @@ html[data-tema="neon"] body{background:radial-gradient(1100px 620px at 100% -10%
 @keyframes zpop{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:none}}
 @keyframes ztroca{from{opacity:.4;transform:scale(.97)}to{opacity:1;transform:none}}
 .zb[data-h]{cursor:pointer}
+.zb.resp{align-self:flex-end;display:flex;gap:8px;align-items:center;background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:14px 4px 14px 14px;padding:7px 12px 7px 7px}
+.zb.resp small{display:block;font-size:.72rem;font-weight:700;color:var(--muted)}.zb.resp b{font-size:.9rem}
+.zb.resp .zav.sm{width:34px;height:34px}
 @media (max-width:820px){.zfala{bottom:calc(32% - 4px);max-width:60%;font-size:.84rem}}
 @keyframes zentra{from{opacity:0;transform:translateY(40px) scale(.94)}to{opacity:1;transform:none}}
 @keyframes zfala{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-4px) rotate(-.6deg)}60%{transform:translateY(-1px) rotate(.4deg)}}
@@ -1312,7 +1315,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 12h15';
+var VERSAO='16/10 · 12h45';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1848,7 +1851,8 @@ function fTemaQuiz(){return head('Descobrir meu tema')+'<form data-form="temaQui
    do próprio cadista (nada sai do sistema, sem custo). "Ok" esconde a mensagem só por hoje; abrir a conversa marca como lida. */
 /* Equipe: um personagem para cada cargo. Tudo por regras fixas sobre os dados do próprio usuário (não usa IA paga). */
 var SECS=[
-  {id:'ven',nome:'Ana',cargo:'Vendas',foto:'equipe/ana-av.webp',corpo:'equipe/ana-tranquila.webp',humores:{feliz:'ana-feliz',tranquila:'ana-tranquila',preocupada:'ana-preocupada',assustada:'ana-assustada',impaciente:'ana-impaciente',pensativa:'ana-pensativa',determinada:'ana-determinada'},papel:'Vendas · conta os pedidos novos, os prazos e o ritmo do mês',cor:'#2F6FD6',av:{pele:'#F2C6A0',cab:'#2B2440',olho:'#2F6FD6',est:'espetado',roupa:'#2F6FD6',det:'gravata'}},
+  {id:'ger',nome:'Sr. Otávio',cargo:'Gerente',papel:'Gerente · cobra as metas do mês e do dia (e dá presente quando vai bem)',cor:'#4B5263',av:{pele:'#E8B897',cab:'#9AA0AB',olho:'#3B3F4A',est:'social',roupa:'#3A3F4B',det:'gravata',bigode:1,bravo:1}},
+  {id:'ven',nome:'Ana',cargo:'Vendas',foto:'equipe/ana-av.webp',corpo:'equipe/ana-tranquila.webp',humores:{triste:'ana-preocupada',irritada:'ana-impaciente',presente:'ana-feliz',feliz:'ana-feliz',tranquila:'ana-tranquila',preocupada:'ana-preocupada',assustada:'ana-assustada',impaciente:'ana-impaciente',pensativa:'ana-pensativa',determinada:'ana-determinada'},papel:'Vendas · conta os pedidos novos, os prazos e o ritmo do mês',cor:'#2F6FD6',av:{pele:'#F2C6A0',cab:'#2B2440',olho:'#2F6FD6',est:'espetado',roupa:'#2F6FD6',det:'gravata'}},
   {id:'fin',nome:'Bia',cargo:'Financeiro',papel:'Financeiro · quanto entrou, quanto falta receber e quem cobrar',cor:'#1E8A5A',av:{pele:'#E9B48C',cab:'#5A3422',olho:'#1E8A5A',est:'longo',roupa:'#1E8A5A',det:'gola'}},
   {id:'mkt',nome:'Nina',cargo:'Marketing',papel:'Marketing · mensagens prontas, clientes sumidos, novos e perdidos',cor:'#C2367A',av:{pele:'#F6D2B8',cab:'#E45C9C',olho:'#8E3BD8',est:'coque',roupa:'#C2367A',det:'estrela'}},
   {id:'dad',nome:'Téo',cargo:'Análise de dados',papel:'Análise · entregas no prazo, ajustes e satisfação dos clientes',cor:'#6A4DE0',av:{pele:'#C98E66',cab:'#1C1A2E',olho:'#4FC8FF',est:'baguncado',roupa:'#6A4DE0',det:'oculos'}}];
@@ -1866,23 +1870,27 @@ function retrato(a){var h='',P=a.pele,C=a.cab,O=a.olho;
   h+='<ellipse cx="25.6" cy="29.5" rx="3.3" ry="4.4" fill="#1B1830"/><ellipse cx="38.4" cy="29.5" rx="3.3" ry="4.4" fill="#1B1830"/>'+
      '<ellipse cx="25.6" cy="30.6" rx="2.3" ry="3" fill="'+O+'"/><ellipse cx="38.4" cy="30.6" rx="2.3" ry="3" fill="'+O+'"/>'+
      '<circle cx="26.7" cy="28" r="1.25" fill="#fff"/><circle cx="39.5" cy="28" r="1.25" fill="#fff"/><circle cx="24.8" cy="32" r=".6" fill="#fff"/><circle cx="37.6" cy="32" r=".6" fill="#fff"/>'+
-     '<path d="M22.4 24.2q3.2-1.6 6.4 0M35.2 24.2q3.2-1.6 6.4 0" fill="none" stroke="'+C+'" stroke-width="1.3" stroke-linecap="round"/>'+
+     (a.bravo?'':'<path d="M22.4 24.2q3.2-1.6 6.4 0M35.2 24.2q3.2-1.6 6.4 0" fill="none" stroke="'+C+'" stroke-width="1.3" stroke-linecap="round"/>')+
      '<ellipse cx="22.5" cy="35" rx="2.4" ry="1.3" fill="#FF7B9C" opacity=".35"/><ellipse cx="41.5" cy="35" rx="2.4" ry="1.3" fill="#FF7B9C" opacity=".35"/>'+
      '<path d="M29.6 37.4q2.4 1.8 4.8 0" fill="none" stroke="#7A3B3B" stroke-width="1.1" stroke-linecap="round"/>';
   if(a.est==='espetado')h+='<path d="M16 27C13 12 25 6 33 7C44 7 51 15 48 28L45 20L42 25L39 17L35 23L32 15L28 23L25 17L22 24L19 19Z" fill="'+C+'"/>';
   if(a.est==='longo')h+='<path d="M18 27C17 12 47 11 46 27C42 20 37 18 33 22C29 17 22 20 18 27Z" fill="'+C+'"/>';
   if(a.est==='coque')h+='<path d="M17 28C16 12 45 9 48 25C41 23 35 17 29 21C26 23 21 24 17 28Z" fill="'+C+'"/>';
+  if(a.est==='social')h+='<path d="M17 26C15 12 47 9 47 25C45 19 40 16 33 17C27 17 21 20 17 26Z" fill="'+C+'"/><path d="M17 26c0 3 .6 5 1.6 6l.4-7Z" fill="'+C+'"/><path d="M47 25c0 3-.6 5-1.6 6l-.4-7Z" fill="'+C+'"/>';
+  if(a.bigode)h+='<path d="M27 35.4q5-2.6 10 0q-5 1.6-10 0Z" fill="#7A7F89"/>';
+  if(a.bravo)h+='<path d="M22 23.2l7 2M42 23.2l-7 2" stroke="#4A4F5A" stroke-width="1.8" stroke-linecap="round"/>';
   if(a.est==='baguncado')h+='<path d="M16 26C13 11 30 5 38 8C49 10 51 20 48 27C46 22 43 19 40 21C37 16 30 20 27 17C25 22 20 21 16 26Z" fill="'+C+'"/>';
   if(a.det==='oculos')h+='<g fill="none" stroke="#1B1830" stroke-width="1.4"><rect x="20.6" y="25.2" width="10" height="8.6" rx="3"/><rect x="33.4" y="25.2" width="10" height="8.6" rx="3"/><path d="M30.6 28.6h2.8"/></g>';
   return '<svg viewBox="0 0 64 64" aria-hidden="true">'+h+'</svg>';}
 /* humor do personagem: o mais urgente entre os recados ainda não vistos hoje */
-var HUMOR_ORD=['assustada','preocupada','impaciente','pensativa','determinada','feliz','tranquila'];
-var HUMOR_FALA={feliz:'Oba! As vendas estão indo bem! 🎉',tranquila:'Tudo em dia por aqui. Bom trabalho!',preocupada:'Tem pedido vencendo, hein! Fica de olho.',assustada:'Atrasou! O cliente está esperando!',
+var HUMOR_ORD=['assustada','triste','preocupada','irritada','impaciente','pensativa','determinada','presente','feliz','tranquila'];
+var HUMOR_FALA={triste:'O chefe me deu uma bronca... 😢 Bora melhorar as vendas.',irritada:'O chefe está no meu pé de novo! 😤',presente:'Ganhei presente do chefe! 🎁🥰',feliz:'Oba! As vendas estão indo bem! 🎉',tranquila:'Tudo em dia por aqui. Bom trabalho!',preocupada:'Tem pedido vencendo, hein! Fica de olho.',assustada:'Atrasou! O cliente está esperando!',
   impaciente:'Tem pedido parado faz dias. Cobra o cliente!',pensativa:'O mês está mais fraco. Que tal chamar os clientes sumidos?',determinada:'Falta pouco para a meta, bora! 💪'};
 function humorDe(ms){var hs=ms.filter(function(m){return m.h&&!secOkHoje(m.k);}).map(function(m){return m.h;});
   for(var i=0;i<HUMOR_ORD.length;i++)if(hs.indexOf(HUMOR_ORD[i])>=0)return HUMOR_ORD[i];return 'tranquila';}
 function corpoDe(g,h){return g.humores&&g.humores[h]?'equipe/'+g.humores[h]+'.webp':g.corpo;}
-function avSec(g,sm){return '<span class="zav pf'+(sm?' sm':'')+'" style="--zc:'+g.cor+'" aria-hidden="true">'+(g.foto?'<img src="'+esc(g.foto)+'" alt="">':retrato(g.av))+'</span>';}
+function rostoDe(g,h){return g.humores&&h&&g.humores[h]?'equipe/'+g.humores[h].replace(/^(\w+)-/,'$1-av-')+'.webp':g.foto;}
+function avSec(g,sm,h){var f=rostoDe(g,h);return '<span class="zav pf'+(sm?' sm':'')+'" style="--zc:'+g.cor+'" aria-hidden="true">'+(f?'<img src="'+esc(f)+'" alt="">':retrato(g.av))+'</span>';}
 function nomeCurtoCli(c){if(!c)return 'Cliente';var t=(c.titulo==='Dr.'||c.titulo==='Dra.')?c.titulo+' ':'';return t?t+String(c.pnome||c.nome||'').split(' ')[0]:String(c.nome||c.pnome||'Cliente');}
 function pedTxt(p){var tp=tipoPed(p);return (tp?tp.nome:'Pedido')+(p.paciente?' · '+p.paciente:'')+' ('+nomeCurtoCli(cliente(p.clienteId))+')';}
 function quandoTxt(n){return n===0?'hoje':n===1?'há 1 dia':'há '+n+' dias';}
@@ -1905,6 +1913,7 @@ function msgsPed(){var t=today(),am=addDays(t,1),P=alive(S.pedidos),ab=P.filter(
   if(nv.length)R.push({k:'novos_'+nv.length,h:'feliz',n:'info',tit:(nv.length===1?'Entrou 1 pedido novo':'Entraram '+nv.length+' pedidos novos')+' desde ontem',sub:nv.slice(0,3).map(pedTxt).join(' · ')+(nv.length>3?' e mais '+(nv.length-3)+'.':'.')});
   return R;}
 function msgsFin(){var t=today(),R=[],dv=devedores(),tot=dv.reduce(function(s,d){return s+d.v;},0);
+  try{var gf=gerFin();if(gf.vv)R.push({k:'bia_ger',h:'triste',n:'media',tit:'O Sr. Otávio me cobrou hoje 😣',sub:'Quer as cobranças de '+brl(gf.vv)+' (mais de 30 dias) enviadas hoje.',a:'secChat',v:'ger',bt:'Ver conversa com o gerente'});}catch(e){}
   var mes=monthOf(t),rec=alive(S.pagamentos).filter(function(g){return g.data&&monthOf(g.data)===mes;}).reduce(function(s,g){return s+(+g.valor||0);},0);
   R.push({k:'fin_mes',n:'info',tit:'Recebido em '+MESES[+mes.slice(5,7)-1]+': '+brl(rec),sub:rec?'Somando todos os pagamentos registrados neste mês.':'Nenhum pagamento registrado neste mês ainda.'});
   R.unshift({k:'fin_oi',n:'info',tit:tot?'Você tem '+brl(tot)+' para receber':'Ninguém está devendo',sub:tot?plural(dv.length,'cliente','clientes')+' com trabalho entregue e ainda não pago.':'Todos os trabalhos entregues estão pagos. 👏',a:tot?'tab':'',v:'financeiro',bt:'Abrir financeiro'});
@@ -1913,7 +1922,43 @@ function msgsFin(){var t=today(),R=[],dv=devedores(),tot=dv.reduce(function(s,d)
   alive(S.pagamentos).filter(function(g){return g.data&&g.data>=addDays(t,-1);}).forEach(function(g){var c=cliente(g.clienteId);
     R.push({k:'rec_'+g.id,n:'info',tit:nomeCurtoCli(c)+' pagou '+brl(g.valor),sub:(g.data===t?'Hoje':'Ontem')+(g.forma?' · '+g.forma:'')+'. 🎉'});});
   return R;}
-function msgsVen(){var A=[],B=[];try{A=msgsPed();}catch(e){}try{B=msgsFat();}catch(e){}return A.concat(B);}
+function msgsVen(){var A=[],B=[];try{A=msgsPed();}catch(e){}try{B=msgsFat();}catch(e){}
+  var g=null;try{g=gerSit();}catch(e){}
+  if(g&&g.ana)A.splice(1,0,{k:'ana_ger_'+g.tipo,h:g.ana.h,n:g.ana.h==='triste'?'media':'info',tit:g.ana.h==='presente'?'Ganhei presente do chefe! 🎁':g.ana.h==='triste'?'Levei bronca do Sr. Otávio hoje 😢':g.ana.h==='irritada'?'O Sr. Otávio está cobrando a meta 😤':'O Sr. Otávio gostou do ritmo 😊',sub:g.resumo,a:'secChat',v:'ger',bt:'Ver conversa com o gerente'});
+  return A.concat(B);}
+/* Gerente: cobra a meta do mês e a meta do dia; quando vai bem, dá presente para a Ana */
+function gerSit(){var t=today(),m=monthOf(t),d=+t.slice(8),nd=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate(),meta=metaDe(m),P=alive(S.pedidos);
+  if(!meta||!meta.fat)return {tipo:'semmeta',resumo:'Ainda não tem meta de faturamento cadastrada.'};
+  var fa=soma(P.filter(function(p){return monthOf(p.recebido)===m;})),ritmo=d?fa/d*nd:0,pct=Math.round(fa/meta.fat*100),rp=meta.fat?ritmo/meta.fat:0;
+  var falta=Math.max(0,meta.fat-fa),rest=Math.max(1,nd-d+1),porDia=Math.ceil(falta/rest),metaDia=meta.fat/nd;
+  var o={meta:meta.fat,fa:fa,pct:pct,ritmo:ritmo,rp:rp,porDia:porDia,metaDia:metaDia,d:d,nd:nd};
+  if(fa>=meta.fat){o.tipo='batida';o.ana={h:'presente'};o.resumo='Meta de '+brl(meta.fat)+' batida: '+brl(fa)+' no mês.';}
+  else if(d<5){o.tipo='inicio';o.resumo='Começo de mês: '+brl(fa)+' de '+brl(meta.fat)+'.';}
+  else if(rp>=1){o.tipo='ritmo';o.ana={h:'feliz'};o.resumo='No ritmo atual o mês fecha em '+brl(Math.round(ritmo/10)*10)+', acima da meta.';}
+  else if(rp>=0.85){o.tipo='perto';o.ana={h:'irritada'};o.resumo='Um pouco abaixo do ritmo: precisa de '+brl(porDia)+' por dia.';}
+  else {o.tipo='abaixo';o.ana={h:'triste'};o.resumo=Math.round((1-rp)*100)+'% abaixo do ritmo da meta. Precisa de '+brl(porDia)+' por dia.';}
+  var ont=addDays(t,-1);if(monthOf(ont)===m){o.ontem=soma(P.filter(function(p){return p.recebido===ont;}));o.dowOnt=new Date(ont+'T12:00:00').getDay();}
+  return o;}
+function gerFin(){var t=today(),dv=devedores(),tot=0,velho=0,vv=0;
+  dv.forEach(function(d){tot+=d.v;var ps=aReceber(d.c.id),v=ps.map(function(p){return p.entregue||p.recebido;}).filter(Boolean).sort()[0];if(v){var dias=daysBetween(v,t);if(dias>=30){velho++;vv+=d.v;}}});
+  return {tot:tot,n:dv.length,velho:velho,vv:vv};}
+function msgsGer(){var g=gerSit(),R=[],t=today();
+  var fz=function(){var f=gerFin(),bia=function(k,h,txt){R.push({k:k,de:'fin',h:h,n:'info',tit:txt});};
+    if(f.vv){R.push({k:'ger_fin_velho',h:'bravo',n:'alta',tit:'BIA! Tem '+brl(f.vv)+' parado há mais de 30 dias!',sub:plural(f.velho,'cliente','clientes')+' sem pagar há mais de um mês. Dinheiro na rua não paga conta. Quero essas cobranças enviadas hoje.',a:'tab',v:'financeiro',bt:'Abrir financeiro'});bia('ger_fin_velho_r','triste','Já vou mandar as cobranças agora, chefe! 📲');}
+    else if(f.tot){R.push({k:'ger_fin_rec',h:'serio',n:'media',tit:'Bia, ainda temos '+brl(f.tot)+' para receber.',sub:'De '+plural(f.n,'cliente','clientes')+'. Fica de olho para não virar atraso.',a:'tab',v:'financeiro',bt:'Abrir financeiro'});bia('ger_fin_rec_r','serio','Pode deixar, estou acompanhando. 👀');}
+    else if(alive(S.pedidos).length){R.push({k:'ger_fin_ok',h:'satisfeito',n:'info',tit:'Ninguém devendo. Muito bem, Bia.',sub:'Todos os trabalhos entregues estão pagos.'});bia('ger_fin_ok_r','feliz','Tudo em dia, chefe! 💚');}};
+  if(g.tipo==='semmeta'){R.push({k:'ger_semmeta',h:'bravo',n:'alta',tit:'Sem meta não dá para cobrar ninguém!',sub:'Cadastre a meta de faturamento do mês que eu acompanho todo dia e cobro a Ana quando precisar.',a:'tab',v:'metas',bt:'Criar meta'});fz();return R;}
+  R.push({k:'ger_oi',h:'serio',n:'info',tit:'Relatório do mês: '+brl(g.fa)+' de '+brl(g.meta)+' ('+g.pct+'%)',sub:'Meta diária: '+brl(Math.round(g.metaDia))+'. '+(g.d>=5?'No ritmo atual o mês fecha em '+brl(Math.round(g.ritmo/10)*10)+'.':'Ainda é começo de mês.'),a:'tab',v:'metas',bt:'Ver metas'});
+  var ana=function(k,h,txt){R.push({k:k,de:'ven',h:h,n:'info',tit:txt});};
+  if(g.tipo==='batida'){R.push({k:'ger_batida',h:'presente',n:'info',tit:'Meta do mês batida! Ana, isso merece um presente 🎁',sub:brl(g.fa)+' no mês, '+(g.pct-100)+'% acima da meta. Bom trabalho, equipe.'});ana('ger_batida_r','presente','Aaaah! Obrigada, chefe! 🥰🎁');}
+  else if(g.tipo==='ritmo'){R.push({k:'ger_ritmo',h:'satisfeito',n:'info',tit:'Ritmo bom, Ana. Continue assim que no fim do mês tem presente 🎁',sub:'Faltam '+brl(g.meta-g.fa)+' para a meta.'});ana('ger_ritmo_r','feliz','Pode deixar, chefe! 💪');}
+  else if(g.tipo==='perto'){R.push({k:'ger_perto',h:'serio',n:'media',tit:'Ana, estamos abaixo do ritmo. Quero '+brl(g.porDia)+' por dia até o fim do mês.',sub:'Faltam '+brl(g.meta-g.fa)+' em '+plural(g.nd-g.d+1,'dia','dias')+'.'});ana('ger_perto_r','irritada','Tá bom, tá bom... vou correr atrás. 😤');}
+  else if(g.tipo==='abaixo'){R.push({k:'ger_abaixo',h:'bravo',n:'alta',tit:'ANA! Estamos '+Math.round((1-g.rp)*100)+'% abaixo da meta!',sub:'Quero ver '+brl(g.porDia)+' por dia, sem desculpa. Chama os clientes sumidos, oferece o fim de semana, faz alguma coisa!',a:'tab',v:'clientes',bt:'Ver clientes sumidos'});ana('ger_abaixo_r','triste','Desculpa, chefe... vou chamar os clientes sumidos hoje mesmo. 😢');}
+  else R.push({k:'ger_inicio',h:'serio',n:'info',tit:'Começo de mês. Não quero ver ninguém parado.',sub:'A meta diária é '+brl(Math.round(g.metaDia))+'.'});
+  if(g.ontem!=null&&g.dowOnt!==0){
+    if(g.ontem>=g.metaDia){R.push({k:'ger_ontem_ok',h:'satisfeito',n:'info',tit:'Ontem faturamos '+brl(g.ontem)+'. Acima da meta diária. Gostei!',sub:'Meta diária: '+brl(Math.round(g.metaDia))+'.'});ana('ger_ontem_ok_r','feliz','Eba! Hoje tem mais! 🎉');}
+    else{R.push({k:'ger_ontem_baixo',h:'serio',n:'media',tit:'Ontem foram só '+brl(g.ontem)+'. A meta diária é '+brl(Math.round(g.metaDia))+'.',sub:'Hoje precisa compensar.'});ana('ger_ontem_baixo_r','irritada','Ontem foi devagar, hoje eu compenso!');}}
+  fz();return R;}
 function msgsFat(){var t=today(),m=monthOf(t),pm=prevMonth(m),d=+t.slice(8),R=[];
   var ate=function(mm,dd){return alive(S.pedidos).filter(function(p){return monthOf(p.recebido)===mm&&+p.recebido.slice(8)<=dd;});};
   var A=ate(m,d),B=ate(pm,d),fa=soma(A),fb=soma(B),el=elems(A),nd=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();
@@ -1968,14 +2013,16 @@ function msgsDad(){var t=today(),R=[],P=alive(S.pedidos);
 function secVistos(){try{var v=JSON.parse(localStorage.getItem('idealicad_secv')||'{}');return v.d===today()?v:{d:today(),k:{}};}catch(e){return {d:today(),k:{}};}}
 function secMarca(ks){var v=secVistos();ks.forEach(function(k){v.k[k]=1;});try{localStorage.setItem('idealicad_secv',JSON.stringify(v));}catch(e){}}
 function secOkHoje(k){try{return localStorage.getItem('idealicad_sec_'+k+'_'+today())==='1';}catch(e){return false;}}
-function secChats(){var F={ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},v=secVistos().k;
+function secChats(){var F={ger:msgsGer,ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},v=secVistos().k;
   return SECS.map(function(g){var ms=[];try{ms=F[g.id]();}catch(e){ms=[];}
     var nl=ms.filter(function(m){return !v[m.k]&&!secOkHoje(m.k)&&m.k.slice(-3)!=='_oi';}).length,urg=ms.some(function(m){return m.n==='alta'&&!secOkHoje(m.k);});
     var ult=ms.filter(function(m){return !secOkHoje(m.k);});ult=ult.filter(function(m){return m.n==='alta';})[0]||ult[ult.length-1]||ms[0];
     return {g:g,ms:ms,nl:nl,urg:urg,prev:ult?ult.tit:''};});}
 function secNaoLidas(){try{return secChats().reduce(function(s,c){return s+c.nl;},0);}catch(e){return 0;}}
-function linhaChat(c,on){return '<button class="zc'+(on?' on':'')+'" data-a="secChat" data-v="'+c.g.id+'">'+avSec(c.g)+'<span class="tx"><b>'+c.g.nome+' <i class="zcargo">'+c.g.cargo+'</i></b><span>'+(c.urg?'🔴 ':'')+esc(c.prev)+'</span></span><span class="meta"><span>hoje</span>'+(c.nl?'<span class="zbadge">'+c.nl+'</span>':'')+'</span></button>';}
+function linhaChat(c,on){return '<button class="zc'+(on?' on':'')+'" data-a="secChat" data-v="'+c.g.id+'">'+avSec(c.g,0,c.g.humores?humorDe(c.ms):null)+'<span class="tx"><b>'+c.g.nome+' <i class="zcargo">'+c.g.cargo+'</i></b><span>'+(c.urg?'🔴 ':'')+esc(c.prev)+'</span></span><span class="meta"><span>hoje</span>'+(c.nl?'<span class="zbadge">'+c.nl+'</span>':'')+'</span></button>';}
 function bolha(m){var ok=secOkHoje(m.k);
+  if(m.de){var q=SECS.filter(function(x){return x.id===m.de;})[0];
+    return '<div class="zb resp">'+(q?avSec(q,1,m.h):'')+'<span><small>'+(q?q.nome:'')+'</small><b>'+esc(m.tit)+'</b></span></div>';}
   return '<div class="zb '+m.n+(ok?' vista':'')+'"'+(m.h?' data-h="'+m.h+'"':'')+'>'+(m.n==='alta'?'<span class="pr">Urgente</span>':m.n==='media'?'<span class="pr">Atenção</span>':'')+'<b>'+esc(m.tit)+'</b>'+(m.sub?'<p>'+esc(m.sub)+'</p>':'')+
     ((m.a&&m.bt)||m.href?'<span class="ac">'+(m.a&&m.bt?'<button class="btn sm'+(m.n==='alta'?' pri':'')+'" data-a="'+m.a+'"'+(m.id?' data-id="'+m.id+'"':'')+(m.v?' data-v="'+m.v+'"':'')+'>'+m.bt+'</button>':'')+
       (m.href?'<a class="btn sm" target="_blank" rel="noopener" href="'+m.href+'">WhatsApp do cliente</a>':'')+'</span>':'')+
