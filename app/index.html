@@ -498,6 +498,12 @@ table.adm td{vertical-align:top}
 .pr-bio{white-space:pre-wrap;margin:0}
 .pr-vid{display:inline-flex;gap:8px;align-items:center}
 .rd-port .up-load{display:grid;place-items:center;font-size:.8rem;color:var(--muted);border:1px dashed var(--line);border-radius:12px;aspect-ratio:4/3}
+.cr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.cr-card{display:grid;gap:8px;text-align:left;border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;width:100%}
+.cr-card:hover{border-color:var(--accent)}
+.cr-top{display:flex;gap:12px;align-items:center;min-width:0}.cr-top>span:last-child{min-width:0}
+.cr-top b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cr-top small{color:var(--muted)}
+.cr-n{font:700 .8rem var(--f-mono);color:var(--muted)}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -1164,7 +1170,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 23h20';
+var VERSAO='15/10 · 23h40';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2617,7 +2623,7 @@ function rRede(){
   if(R.avisoEu&&(tab==='pegar'||tab==='meus')){h+='<div class="banner"><span>🔔 '+esc(R.avisoEu)+'</span></div>';R.avisoEu=null;}
   if(tab==='pegar')h+=rdPegar(R);
   if(tab==='meus')h+=rdMeus(R);
-  if(tab==='parceiros')h+=rdParceiros(R);
+  if(tab==='parceiros')h+=secCadistasReais()+'<h3 style="margin:8px 0 0">Exemplos da prévia</h3>'+rdParceiros(R);
   return '<div class="stack" style="gap:16px">'+h+'</div>';
 }
 function rdDelegar(R){
@@ -2723,7 +2729,7 @@ function rLab(){var L=labIni(),t=L.tab,P=L.pedidos;
   if(t==='painel')h+=labPainel(L,nRev,nProp,nPag);
   if(t==='novo')h+=labNovo(L);
   if(t==='pedidos')h+=labPedidos(L);
-  if(t==='cadistas')h+='<p class="small muted">Cadistas disponíveis na rede. Marque ★ nos favoritos: eles recebem seus pedidos primeiro.</p>'+rdParceiros(redeIni()).replace(/Cadistas que estão na rede\.[^<]*/,'');
+  if(t==='cadistas')h+=secCadistasReais()+'<h3 style="margin:8px 0 0">Exemplos da prévia</h3><p class="small muted">Cadistas disponíveis na rede. Marque ★ nos favoritos: eles recebem seus pedidos primeiro.</p>'+rdParceiros(redeIni()).replace(/Cadistas que estão na rede\.[^<]*/,'');
   if(t==='perfil')h+=labPerfil(L);
   return '<div class="stack" style="gap:16px">'+h+'</div>';}
 function labPainel(L,nRev,nProp,nPag){var P=L.pedidos,m=monthOf(today());
@@ -2917,7 +2923,7 @@ function sincEu(R){if(!R||!R.eu||!S.rede||!S.rede.row||R._prv===S.rede.v)return;
   e.port=(r.fotos||[]).map(function(f){if(S.rede.urls[f.p])RD_PORT.set(f.p,S.rede.urls[f.p]);return {id:f.p,tipo:'foto',t:f.t||'Trabalho'};});}
 function salvaPerfilRede(row,msg){row=Object.assign({},row,{user_id:S.sessao.id,atualizado_em:new Date().toISOString()});delete row.criado_em;
   return sb.from('perfil_rede').upsert(row).then(function(r){if(r.error){toast('Não foi possível salvar o perfil: '+r.error.message);return false;}
-    S.rede=S.rede||{urls:{},v:0};S.rede.row=row;S.rede.v++;return assinaUrls().then(function(){if(msg)toast(msg);if(ui.sheet)renderSheet();render();return true;});});}
+    S.rede=S.rede||{urls:{},v:0};S.rede.row=row;S.rede.v++;carregaListaRede(true);return assinaUrls().then(function(){if(msg)toast(msg);if(ui.sheet)renderSheet();render();return true;});});}
 function comprime(file,lado){lado=lado||1600;return new Promise(function(ok,ko){var img=new Image(),u=URL.createObjectURL(file);
   img.onload=function(){URL.revokeObjectURL(u);var sc=Math.min(1,lado/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
     c.getContext('2d').drawImage(img,0,0,c.width,c.height);var q=0.82;
@@ -2941,6 +2947,38 @@ function fPerfilRede(){var r=prRow(),u=r.foto_perfil&&S.rede?S.rede.urls[r.foto_
     '<div class="pr-pub"><label class="check"><input type="checkbox" name="publicado"'+(r.publicado?' checked':'')+'> <b>Publicar meu perfil</b></label><small class="muted">Outros usuários logados no Ideali CAD poderão ver seu nome, cidade, especialidades, fotos e vídeo. Nunca seus pedidos, clientes ou valores.</small></div>'+
     '<p class="small muted">As fotos do portfólio você adiciona em <b>Ver meu perfil</b>, na seção Meu portfólio. Não mostre nome de paciente nos prints.</p>'+
     '<button class="btn pri block" type="submit">Salvar perfil</button></form>';}
+/* ---------- Cadistas reais publicados na Rede ----------
+   Só perfis que o dono marcou "Publicar" (RLS: perfil_rede_publicados). Fotos por URL assinada (política do bucket portfolio). */
+function carregaListaRede(forca){if(!S.sessao||EM_DEMO)return;if(S.redeLista&&(S.redeLista.busy||(!forca&&Date.now()-S.redeLista.t<60000)))return;
+  S.redeLista=Object.assign(S.redeLista||{rows:[],urls:{}},{busy:true,t:Date.now()});
+  try{sb.from('perfil_rede').select('user_id,nome,cidade,uf,softwares,especialidades,prazo,bio,video_url,foto_perfil,fotos,atualizado_em').eq('publicado',true).order('atualizado_em',{ascending:false}).limit(200).then(function(r){
+    var L=S.redeLista;L.busy=false;if(r.error){L.erro=true;return;}L.rows=r.data||[];
+    var ps=L.rows.map(function(x){return x.foto_perfil;}).filter(function(p){return p&&!L.urls[p];});
+    (ps.length?sb.storage.from('portfolio').createSignedUrls(ps,3600).then(function(x){(x.data||[]).forEach(function(d){if(d.signedUrl)L.urls[d.path]=d.signedUrl;});}):Promise.resolve()).then(function(){if(ui.tab==='rede'||ui.modoLab)render();if(ui.sheet)renderSheet();});},function(){S.redeLista.busy=false;S.redeLista.erro=true;render();});}catch(e){S.redeLista.busy=false;S.redeLista.erro=true;}}
+function avPub(x,z){var u=x.foto_perfil&&S.redeLista?S.redeLista.urls[x.foto_perfil]:'',ini=(x.nome||'?').split(' ').map(function(q){return q[0]||'';}).slice(0,2).join('');
+  return u?'<span class="rd-av img" style="width:'+z+'px;height:'+z+'px"><img src="'+u+'" alt=""></span>':'<span class="rd-av" style="width:'+z+'px;height:'+z+'px;background:linear-gradient(135deg,var(--p4),var(--p6))">'+esc(ini)+'</span>';}
+function secCadistasReais(){carregaListaRede();var L=S.redeLista||{rows:[]},eu=S.sessao&&S.sessao.id,rows=L.rows||[];
+  return '<section class="card stack"><div class="between wrap"><div><h2>Cadistas na Rede</h2><p class="small muted">Perfis reais que os próprios cadistas publicaram.</p></div><span class="cr-n">'+rows.length+' publicado'+(rows.length===1?'':'s')+'</span></div>'+
+    (L.busy&&!rows.length?'<p class="empty">Carregando…</p>':rows.length?'<div class="cr-grid">'+rows.map(function(x){var es=x.especialidades||[];
+      return '<button class="cr-card" data-a="pubPerfil" data-id="'+x.user_id+'"><span class="cr-top">'+avPub(x,48)+'<span><b>'+esc(x.nome||'Cadista')+(x.user_id===eu?' <span class="tag a">você</span>':'')+'</b><small>'+esc((x.cidade||'')+(x.uf?', '+x.uf:''))+(x.prazo?' · '+esc(x.prazo):'')+'</small></span></span>'+
+        (es.length||(x.softwares||[]).length?'<span class="rd-chips">'+(x.softwares||[]).slice(0,2).map(function(q){return '<span class="sw">'+esc(q)+'</span>';}).join('')+es.slice(0,3).map(function(q){return '<span>'+esc(q)+'</span>';}).join('')+(es.length>3?'<span>+'+(es.length-3)+'</span>':'')+'</span>':'')+
+        '<span class="small muted">'+((x.fotos||[]).length?(x.fotos.length+' foto'+(x.fotos.length>1?'s':'')+' no portfólio'):'Sem fotos ainda')+(x.video_url?' · com vídeo':'')+'</span></button>';}).join('')+'</div>'
+      :'<p class="empty">Nenhum cadista publicou o perfil ainda. Seja o primeiro: em Editar perfil, marque "Publicar meu perfil".</p>')+'</section>';}
+function fPerfilPub(id){var L=S.redeLista||{rows:[]},x=(L.rows||[]).filter(function(q){return q.user_id===id;})[0];if(!x)return head('Cadista')+'<p class="empty">Perfil não encontrado ou não está mais publicado.</p>';
+  var fs=x.fotos||[],falta=fs.map(function(f){return f.p;}).filter(function(p){return p&&!L.urls[p];});
+  if(falta.length&&!x._ass){x._ass=1;sb.storage.from('portfolio').createSignedUrls(falta,3600).then(function(r){(r.data||[]).forEach(function(d){if(d.signedUrl)L.urls[d.path]=d.signedUrl;});if(ui.sheet)renderSheet();});}
+  return head('Perfil do cadista')+
+    '<div class="row" style="gap:14px;align-items:center">'+avPub(x,64)+'<div style="min-width:0"><h2 style="margin:0">'+esc(x.nome||'Cadista')+'</h2><div class="small muted">'+esc((x.cidade||'')+(x.uf?', '+x.uf:''))+(x.prazo?' · prazo médio '+esc(x.prazo):'')+'</div></div></div>'+
+    '<div class="rd-chips">'+(x.softwares||[]).map(function(q){return '<span class="sw">'+esc(q)+'</span>';}).join('')+(x.especialidades||[]).map(function(q){return '<span>'+esc(q)+'</span>';}).join('')+'</div>'+
+    (x.bio?'<p class="pr-bio">'+esc(x.bio)+'</p>':'')+
+    (x.video_url?'<a class="btn sm pr-vid" style="justify-self:start" href="'+esc(x.video_url)+'" target="_blank" rel="noopener">'+ICO_PLAY+' Ver vídeo de apresentação</a>':'')+
+    (fs.length?'<div class="stack" style="gap:8px"><h3 style="margin:6px 0 0">Portfólio</h3><div class="rd-port">'+fs.map(function(f,i){var u=L.urls[f.p];
+      return '<div class="rd-pw"><button class="rd-pi" data-a="pubFoto" data-id="'+x.user_id+'" data-i="'+i+'" aria-label="Abrir '+esc(f.t||'foto')+'">'+(u?'<img src="'+u+'" alt="'+esc(f.t||'')+'">':'')+'<span class="cap">'+esc(f.t||'')+'</span></button></div>';}).join('')+'</div></div>':'<p class="small muted">Ainda sem fotos no portfólio.</p>');}
+function pubLightbox(id,i){var L=S.redeLista||{rows:[]},x=(L.rows||[]).filter(function(q){return q.user_id===id;})[0],fs=x?x.fotos||[]:[],f=fs[i],el=document.getElementById('rd-lb');
+  if(!f){if(el)el.remove();return;}
+  if(!el){el=document.createElement('div');el.id='rd-lb';el.className='rd-lb';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');document.body.appendChild(el);}
+  el.innerHTML='<button class="fecha" data-a="rdLbFecha" aria-label="Fechar">×</button><div class="box"><img src="'+(L.urls[f.p]||'')+'" alt="'+esc(f.t||'')+'"></div><p><b>'+esc(f.t||'')+'</b></p>'+
+    (fs.length>1?'<div class="nav"><button class="btn sm" data-a="pubFoto" data-id="'+id+'" data-i="'+((i-1+fs.length)%fs.length)+'">‹ Anterior</button><span style="color:#fff;align-self:center" class="small">'+(i+1)+' / '+fs.length+'</span><button class="btn sm" data-a="pubFoto" data-id="'+id+'" data-i="'+((i+1)%fs.length)+'">Próxima ›</button></div>':'');}
 /* ---------- Rede para usuários reais (sem dados de exemplo) ----------
    A prévia com cadistas e trabalhos fictícios fica só para o administrador. O cadista vê só o que é real: o próprio perfil. */
 function checkPerfil(r){return [[!!r.foto_perfil,'Foto de perfil'],[!!(r.cidade&&r.uf),'Cidade e UF'],[r.softwares.length>0,'Softwares'],[r.especialidades.length>0,'Especialidades'],[!!r.prazo,'Prazo médio'],[(r.bio||'').length>=40,'Texto sobre você'],[(r.fotos||[]).length>=3,'3 fotos no portfólio'],[!!r.video_url,'Vídeo de apresentação'],[!!r.publicado,'Perfil publicado']];}
@@ -2953,7 +2991,7 @@ function rRedeReal(){if(!S.rede)carregaPerfilRede();var r=prRow(),L=checkPerfil(
       '<span class="tag '+(r.publicado?'ok':'')+'" style="margin-top:6px;display:inline-block">'+(r.publicado?'Perfil publicado':'Não publicado (só você vê)')+'</span></div>'+
       '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="prEditar">Editar perfil</button><button class="btn" data-a="rdPerfil" data-id="eu">Ver meu perfil</button></div></div>'+
       '<div class="between"><b>Perfil completo</b><span class="small muted">'+ok+' de '+L.length+'</span></div><div class="onb-bar"><i style="width:'+Math.round(ok/L.length*100)+'%"></i></div>'+
-      '<div class="pr-chips">'+L.map(function(x){return '<span class="tag'+(x[0]?' ok':'')+'">'+(x[0]?'✓ ':'')+x[1]+'</span>';}).join('')+'</div></section></div>';}
+      '<div class="pr-chips">'+L.map(function(x){return '<span class="tag'+(x[0]?' ok':'')+'">'+(x[0]?'✓ ':'')+x[1]+'</span>';}).join('')+'</div></section>'+secCadistasReais()+'</div>';}
 function fPerfilEu(){if(!S.rede)carregaPerfilRede();var r=prRow(),R=redeIni(),x=R.eu;
   return head('Meu perfil na Rede')+'<div class="between wrap" style="gap:8px"><span class="tag '+(r.publicado?'ok':'')+'">'+(r.publicado?'Perfil publicado':'Perfil não publicado (só você vê)')+'</span><button class="btn sm pri" data-a="prEditar">Editar meu perfil</button></div>'+
     '<div class="row" style="gap:14px;align-items:center">'+avEu(r,64)+'<div style="min-width:0"><h2 style="margin:0">'+esc(r.nome||'Seu nome')+'</h2><div class="small muted">'+esc((r.cidade||'')+(r.uf?', '+r.uf:''))+(r.prazo?' · prazo médio '+esc(r.prazo):'')+'</div></div></div>'+
@@ -3811,6 +3849,8 @@ var A={
   prEditar:function(){if(!S.rede)carregaPerfilRede();openSheet(fPerfilRede);},
   prFotoTira:function(){var row=Object.assign({},prRow()),p=row.foto_perfil;if(!p)return;row.foto_perfil=null;sb.storage.from('portfolio').remove([p]).then(function(){salvaPerfilRede(row,'Foto de perfil removida.');});},
   rdPortVer:function(d){rdLightbox(d.id,+d.i);},
+  pubPerfil:function(d){carregaListaRede();openSheet(fPerfilPub,d.id);},
+  pubFoto:function(d){pubLightbox(d.id,+d.i);},
   rdLbFecha:function(){var el=document.getElementById('rd-lb');if(el)el.remove();},
   rdPortDel:function(d){var R=redeIni(),p=rdPortDe(R.eu),f=p[+d.i];if(!f)return;
     if(S.rede&&S.rede.row&&(S.rede.row.fotos||[]).some(function(q){return q.p===f.id;})){var row=Object.assign({},S.rede.row);row.fotos=row.fotos.filter(function(q){return q.p!==f.id;});
