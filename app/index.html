@@ -449,6 +449,14 @@ html[data-tema="neon"] body{background:radial-gradient(1100px 620px at 100% -10%
 .zchar{position:absolute;right:10px;bottom:0;height:min(80%,600px);max-width:42%;object-fit:contain;object-position:bottom right;pointer-events:none;z-index:2;
   filter:drop-shadow(0 10px 24px rgba(0,0,0,.35));transform-origin:50% 100%;animation:zfala 3.2s ease-in-out infinite}
 .zchar.entra{animation:zentra .5s cubic-bezier(.2,.8,.3,1.2) both,zfala 3.2s ease-in-out .5s infinite}
+.zfala{position:absolute;right:14px;bottom:calc(min(80%,600px) - 6px);max-width:min(300px,40%);z-index:3;background:var(--surface);color:var(--ink);border:1px solid var(--line);
+  border-radius:16px 16px 4px 16px;padding:9px 13px;font-weight:600;font-size:.92rem;line-height:1.3;box-shadow:0 8px 24px rgba(0,0,0,.25);pointer-events:none}
+.zfala.entra,.zfala.troca{animation:zpop .35s cubic-bezier(.2,.8,.3,1.3) both}
+.zchar.troca{animation:ztroca .3s ease both,zfala 3.2s ease-in-out .3s infinite}
+@keyframes zpop{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes ztroca{from{opacity:.4;transform:scale(.97)}to{opacity:1;transform:none}}
+.zb[data-h]{cursor:pointer}
+@media (max-width:820px){.zfala{bottom:calc(32% - 4px);max-width:60%;font-size:.84rem}}
 @keyframes zentra{from{opacity:0;transform:translateY(40px) scale(.94)}to{opacity:1;transform:none}}
 @keyframes zfala{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-4px) rotate(-.6deg)}60%{transform:translateY(-1px) rotate(.4deg)}}
 .zap-c.com-char .zap-b{padding-right:min(38%,330px)}
@@ -1301,7 +1309,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 11h45';
+var VERSAO='16/10 · 11h55';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1837,7 +1845,7 @@ function fTemaQuiz(){return head('Descobrir meu tema')+'<form data-form="temaQui
    do próprio cadista (nada sai do sistema, sem custo). "Ok" esconde a mensagem só por hoje; abrir a conversa marca como lida. */
 /* Equipe: um personagem para cada cargo. Tudo por regras fixas sobre os dados do próprio usuário (não usa IA paga). */
 var SECS=[
-  {id:'ven',nome:'Ana',cargo:'Vendas',foto:'equipe/ana-av.webp',corpo:'equipe/ana.webp',papel:'Vendas · conta os pedidos novos, os prazos e o ritmo do mês',cor:'#2F6FD6',av:{pele:'#F2C6A0',cab:'#2B2440',olho:'#2F6FD6',est:'espetado',roupa:'#2F6FD6',det:'gravata'}},
+  {id:'ven',nome:'Ana',cargo:'Vendas',foto:'equipe/ana-av.webp',corpo:'equipe/ana-tranquila.webp',humores:{feliz:'ana-feliz',tranquila:'ana-tranquila',preocupada:'ana-preocupada',assustada:'ana-assustada',impaciente:'ana-preocupada',pensativa:'ana-preocupada',determinada:'ana-feliz'},papel:'Vendas · conta os pedidos novos, os prazos e o ritmo do mês',cor:'#2F6FD6',av:{pele:'#F2C6A0',cab:'#2B2440',olho:'#2F6FD6',est:'espetado',roupa:'#2F6FD6',det:'gravata'}},
   {id:'fin',nome:'Bia',cargo:'Financeiro',papel:'Financeiro · quanto entrou, quanto falta receber e quem cobrar',cor:'#1E8A5A',av:{pele:'#E9B48C',cab:'#5A3422',olho:'#1E8A5A',est:'longo',roupa:'#1E8A5A',det:'gola'}},
   {id:'mkt',nome:'Nina',cargo:'Marketing',papel:'Marketing · mensagens prontas, clientes sumidos, novos e perdidos',cor:'#C2367A',av:{pele:'#F6D2B8',cab:'#E45C9C',olho:'#8E3BD8',est:'coque',roupa:'#C2367A',det:'estrela'}},
   {id:'dad',nome:'Téo',cargo:'Análise de dados',papel:'Análise · entregas no prazo, ajustes e satisfação dos clientes',cor:'#6A4DE0',av:{pele:'#C98E66',cab:'#1C1A2E',olho:'#4FC8FF',est:'baguncado',roupa:'#6A4DE0',det:'oculos'}}];
@@ -1864,6 +1872,13 @@ function retrato(a){var h='',P=a.pele,C=a.cab,O=a.olho;
   if(a.est==='baguncado')h+='<path d="M16 26C13 11 30 5 38 8C49 10 51 20 48 27C46 22 43 19 40 21C37 16 30 20 27 17C25 22 20 21 16 26Z" fill="'+C+'"/>';
   if(a.det==='oculos')h+='<g fill="none" stroke="#1B1830" stroke-width="1.4"><rect x="20.6" y="25.2" width="10" height="8.6" rx="3"/><rect x="33.4" y="25.2" width="10" height="8.6" rx="3"/><path d="M30.6 28.6h2.8"/></g>';
   return '<svg viewBox="0 0 64 64" aria-hidden="true">'+h+'</svg>';}
+/* humor do personagem: o mais urgente entre os recados ainda não vistos hoje */
+var HUMOR_ORD=['assustada','preocupada','impaciente','pensativa','determinada','feliz','tranquila'];
+var HUMOR_FALA={feliz:'Oba! As vendas estão indo bem! 🎉',tranquila:'Tudo em dia por aqui. Bom trabalho!',preocupada:'Tem pedido vencendo, hein! Fica de olho.',assustada:'Atrasou! O cliente está esperando!',
+  impaciente:'Tem pedido parado faz dias. Cobra o cliente!',pensativa:'O mês está mais fraco. Que tal chamar os clientes sumidos?',determinada:'Falta pouco para a meta, bora! 💪'};
+function humorDe(ms){var hs=ms.filter(function(m){return m.h&&!secOkHoje(m.k);}).map(function(m){return m.h;});
+  for(var i=0;i<HUMOR_ORD.length;i++)if(hs.indexOf(HUMOR_ORD[i])>=0)return HUMOR_ORD[i];return 'tranquila';}
+function corpoDe(g,h){return g.humores&&g.humores[h]?'equipe/'+g.humores[h]+'.webp':g.corpo;}
 function avSec(g,sm){return '<span class="zav pf'+(sm?' sm':'')+'" style="--zc:'+g.cor+'" aria-hidden="true">'+(g.foto?'<img src="'+esc(g.foto)+'" alt="">':retrato(g.av))+'</span>';}
 function nomeCurtoCli(c){if(!c)return 'Cliente';var t=(c.titulo==='Dr.'||c.titulo==='Dra.')?c.titulo+' ':'';return t?t+String(c.pnome||c.nome||'').split(' ')[0]:String(c.nome||c.pnome||'Cliente');}
 function pedTxt(p){var tp=tipoPed(p);return (tp?tp.nome:'Pedido')+(p.paciente?' · '+p.paciente:'')+' ('+nomeCurtoCli(cliente(p.clienteId))+')';}
@@ -1873,16 +1888,16 @@ function msgsPed(){var t=today(),am=addDays(t,1),P=alive(S.pedidos),ab=P.filter(
   var ord=function(a,b){return (a.prazo||'')<(b.prazo||'')?-1:1;},cnt={};STATUS.forEach(function(x){cnt[x[0]]=ab.filter(function(p){return p.status===x[0];}).length;});
   R.push({k:'ped_oi',n:'info',tit:ab.length?'Você tem '+plural(ab.length,'pedido','pedidos')+' em produção':'Nenhum pedido em produção agora',sub:ab.length?[cnt.entrada?cnt.entrada+' a fazer':'',cnt.pendente?cnt.pendente+' com pendência':'',cnt.aprovacao?cnt.aprovacao+' aguardando aprovação':''].filter(Boolean).join(' · ')+'.':'Quando chegar pedido novo eu aviso por aqui.',a:ab.length?'tab':'',v:'pedidos',bt:'Ver produção'});
   ab.filter(function(p){return p.prazo&&p.prazo<t;}).sort(ord).forEach(function(p){var d=daysBetween(p.prazo,t);
-    R.push({k:'atr_'+p.id,n:'alta',tit:pedTxt(p),sub:'Está atrasado '+(d===1?'1 dia':d+' dias')+'. O prazo era '+dm(p.prazo)+'.',a:'verPedido',id:p.id,bt:'Abrir pedido'});});
-  ab.filter(function(p){return p.prazo===t;}).forEach(function(p){R.push({k:'hoje_'+p.id,n:'alta',tit:pedTxt(p),sub:'Vence hoje'+(p.urgente?' e está marcado como urgente':'')+'.',a:'verPedido',id:p.id,bt:'Abrir pedido'});});
-  ab.filter(function(p){return p.prazo===am;}).forEach(function(p){R.push({k:'am_'+p.id,n:'media',tit:pedTxt(p),sub:'Vence amanhã ('+dm(am)+')'+(p.status==='pendente'?' e ainda está com pendência.':'.'),a:'verPedido',id:p.id,bt:'Abrir pedido'});});
+    R.push({k:'atr_'+p.id,h:'assustada',n:'alta',tit:pedTxt(p),sub:'Está atrasado '+(d===1?'1 dia':d+' dias')+'. O prazo era '+dm(p.prazo)+'.',a:'verPedido',id:p.id,bt:'Abrir pedido'});});
+  ab.filter(function(p){return p.prazo===t;}).forEach(function(p){R.push({k:'hoje_'+p.id,h:'preocupada',n:'alta',tit:pedTxt(p),sub:'Vence hoje'+(p.urgente?' e está marcado como urgente':'')+'.',a:'verPedido',id:p.id,bt:'Abrir pedido'});});
+  ab.filter(function(p){return p.prazo===am;}).forEach(function(p){R.push({k:'am_'+p.id,h:p.status==='pendente'?'preocupada':'tranquila',n:'media',tit:pedTxt(p),sub:'Vence amanhã ('+dm(am)+')'+(p.status==='pendente'?' e ainda está com pendência.':'.'),a:'verPedido',id:p.id,bt:'Abrir pedido'});});
   var ja={};R.forEach(function(r){if(r.id)ja[r.id]=1;});
   P.filter(function(p){return !ja[p.id]&&p.status==='pendente'&&p.pendencia&&p.pendencia.desde&&daysBetween(p.pendencia.desde,t)>=2;}).forEach(function(p){
-    R.push({k:'pend_'+p.id,n:'media',tit:pedTxt(p),sub:'Esperando informação do cliente '+quandoTxt(daysBetween(p.pendencia.desde,t))+'. Vale cobrar a resposta.',a:'verPedido',id:p.id,bt:'Abrir pedido'});});
+    R.push({k:'pend_'+p.id,h:'impaciente',n:'media',tit:pedTxt(p),sub:'Esperando informação do cliente '+quandoTxt(daysBetween(p.pendencia.desde,t))+'. Vale cobrar a resposta.',a:'verPedido',id:p.id,bt:'Abrir pedido'});});
   P.filter(function(p){return !ja[p.id]&&p.status==='aprovacao'&&p.aprovDesde&&daysBetween(p.aprovDesde,t)>=3;}).forEach(function(p){
-    R.push({k:'apr_'+p.id,n:'media',tit:pedTxt(p),sub:'Aguardando aprovação '+quandoTxt(daysBetween(p.aprovDesde,t))+'. Dê um toque no cliente.',a:'verPedido',id:p.id,bt:'Abrir pedido'});});
+    R.push({k:'apr_'+p.id,h:'impaciente',n:'media',tit:pedTxt(p),sub:'Aguardando aprovação '+quandoTxt(daysBetween(p.aprovDesde,t))+'. Dê um toque no cliente.',a:'verPedido',id:p.id,bt:'Abrir pedido'});});
   var nv=P.filter(function(p){return p.recebido&&p.recebido>=addDays(t,-1);});
-  if(nv.length)R.push({k:'novos_'+nv.length,n:'info',tit:(nv.length===1?'Entrou 1 pedido novo':'Entraram '+nv.length+' pedidos novos')+' desde ontem',sub:nv.slice(0,3).map(pedTxt).join(' · ')+(nv.length>3?' e mais '+(nv.length-3)+'.':'.')});
+  if(nv.length)R.push({k:'novos_'+nv.length,h:'feliz',n:'info',tit:(nv.length===1?'Entrou 1 pedido novo':'Entraram '+nv.length+' pedidos novos')+' desde ontem',sub:nv.slice(0,3).map(pedTxt).join(' · ')+(nv.length>3?' e mais '+(nv.length-3)+'.':'.')});
   return R;}
 function msgsFin(){var t=today(),R=[],dv=devedores(),tot=dv.reduce(function(s,d){return s+d.v;},0);
   var mes=monthOf(t),rec=alive(S.pagamentos).filter(function(g){return g.data&&monthOf(g.data)===mes;}).reduce(function(s,g){return s+(+g.valor||0);},0);
@@ -1899,12 +1914,12 @@ function msgsFat(){var t=today(),m=monthOf(t),pm=prevMonth(m),d=+t.slice(8),R=[]
   var A=ate(m,d),B=ate(pm,d),fa=soma(A),fb=soma(B),el=elems(A),nd=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();
   var dif=fb?Math.round((fa-fb)/fb*100):null;
   R.push({k:'fat_oi',n:'info',tit:capMes(m)+' até agora: '+brl(fa),sub:plural(A.length,'pedido','pedidos')+' e '+plural(el,'elemento','elementos')+'.'+(fb?' No mesmo ponto de '+MESES[+pm.slice(5,7)-1]+' eram '+brl(fb)+' ('+(dif>=0?'+':'')+dif+'%).':''),a:'tab',v:'dashboard',bt:'Ver Dashboard'});
-  if(fb&&dif<=-20)R.push({k:'fat_caiu',n:'media',tit:'O mês está mais fraco que o anterior',sub:'Faturamento '+Math.abs(dif)+'% abaixo do mesmo período de '+MESES[+pm.slice(5,7)-1]+'. Pode ser uma boa hora de chamar clientes que andam sumidos.',a:'tab',v:'analises',bt:'Ver Análises'});
-  if(fb&&dif>=20)R.push({k:'fat_subiu',n:'info',tit:'O mês está melhor que o anterior 🚀',sub:'Faturamento '+dif+'% acima do mesmo período de '+MESES[+pm.slice(5,7)-1]+'.'});
+  if(fb&&dif<=-20)R.push({k:'fat_caiu',h:'pensativa',n:'media',tit:'O mês está mais fraco que o anterior',sub:'Faturamento '+Math.abs(dif)+'% abaixo do mesmo período de '+MESES[+pm.slice(5,7)-1]+'. Pode ser uma boa hora de chamar clientes que andam sumidos.',a:'tab',v:'analises',bt:'Ver Análises'});
+  if(fb&&dif>=20)R.push({k:'fat_subiu',h:'feliz',n:'info',tit:'O mês está melhor que o anterior 🚀',sub:'Faturamento '+dif+'% acima do mesmo período de '+MESES[+pm.slice(5,7)-1]+'.'});
   if(d>=5&&fa){var proj=fa/d*nd;R.push({k:'fat_proj',n:'info',tit:'Neste ritmo, o mês fecha perto de '+brl(Math.round(proj/10)*10),sub:'Conta simples: média por dia até hoje vezes os '+nd+' dias do mês.'});}
   var meta=metaDe(m);if(meta&&meta.fat){var falta=meta.fat-fa,rest=nd-d;
-    R.push(falta>0?{k:'fat_meta',n:d>=5&&fa/d*nd<meta.fat?'media':'info',tit:'Faltam '+brl(falta)+' para a meta de '+brl(meta.fat),sub:(rest>0?'Dá '+brl(Math.ceil(falta/rest))+' por dia nos '+plural(rest,'dia que falta','dias que faltam')+'.':'Hoje é o último dia do mês.')+(d>=5&&fa/d*nd<meta.fat?' No ritmo atual não chega lá, então vale buscar mais trabalho.':''),a:'tab',v:'metas',bt:'Ver metas'}:
-      {k:'fat_meta',n:'info',tit:'Meta do mês batida! 🎯',sub:'Você já passou dos '+brl(meta.fat)+' de meta.',a:'tab',v:'metas',bt:'Ver metas'});}
+    R.push(falta>0?{k:'fat_meta',h:falta/meta.fat<=0.2?'determinada':d>=5&&fa/d*nd<meta.fat?'pensativa':'tranquila',n:d>=5&&fa/d*nd<meta.fat?'media':'info',tit:'Faltam '+brl(falta)+' para a meta de '+brl(meta.fat),sub:(rest>0?'Dá '+brl(Math.ceil(falta/rest))+' por dia nos '+plural(rest,'dia que falta','dias que faltam')+'.':'Hoje é o último dia do mês.')+(d>=5&&fa/d*nd<meta.fat?' No ritmo atual não chega lá, então vale buscar mais trabalho.':''),a:'tab',v:'metas',bt:'Ver metas'}:
+      {k:'fat_meta',h:'feliz',n:'info',tit:'Meta do mês batida! 🎯',sub:'Você já passou dos '+brl(meta.fat)+' de meta.',a:'tab',v:'metas',bt:'Ver metas'});}
   else R.push({k:'fat_semmeta',n:'info',tit:'Você ainda não tem meta de faturamento',sub:'Com uma meta eu consigo dizer quanto falta por dia.',a:'tab',v:'metas',bt:'Criar meta'});
   var por={};A.forEach(function(p){por[p.clienteId]=(por[p.clienteId]||0)+(+p.valor||0);});var top=Object.keys(por).sort(function(x,y){return por[y]-por[x];})[0];
   if(top&&cliente(top)&&A.length>=3)R.push({k:'fat_top',n:'info',tit:'Maior cliente do mês: '+nomeCurtoCli(cliente(top)),sub:brl(por[top])+' até agora ('+Math.round(por[top]/fa*100)+'% do mês).',a:'verCliente',id:top,bt:'Ver cliente'});
@@ -1956,7 +1971,7 @@ function secChats(){var F={ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},v=se
 function secNaoLidas(){try{return secChats().reduce(function(s,c){return s+c.nl;},0);}catch(e){return 0;}}
 function linhaChat(c,on){return '<button class="zc'+(on?' on':'')+'" data-a="secChat" data-v="'+c.g.id+'">'+avSec(c.g)+'<span class="tx"><b>'+c.g.nome+' <i class="zcargo">'+c.g.cargo+'</i></b><span>'+(c.urg?'🔴 ':'')+esc(c.prev)+'</span></span><span class="meta"><span>hoje</span>'+(c.nl?'<span class="zbadge">'+c.nl+'</span>':'')+'</span></button>';}
 function bolha(m){var ok=secOkHoje(m.k);
-  return '<div class="zb '+m.n+(ok?' vista':'')+'">'+(m.n==='alta'?'<span class="pr">Urgente</span>':m.n==='media'?'<span class="pr">Atenção</span>':'')+'<b>'+esc(m.tit)+'</b>'+(m.sub?'<p>'+esc(m.sub)+'</p>':'')+
+  return '<div class="zb '+m.n+(ok?' vista':'')+'"'+(m.h?' data-h="'+m.h+'"':'')+'>'+(m.n==='alta'?'<span class="pr">Urgente</span>':m.n==='media'?'<span class="pr">Atenção</span>':'')+'<b>'+esc(m.tit)+'</b>'+(m.sub?'<p>'+esc(m.sub)+'</p>':'')+
     ((m.a&&m.bt)||m.href?'<span class="ac">'+(m.a&&m.bt?'<button class="btn sm'+(m.n==='alta'?' pri':'')+'" data-a="'+m.a+'"'+(m.id?' data-id="'+m.id+'"':'')+(m.v?' data-v="'+m.v+'"':'')+'>'+m.bt+'</button>':'')+
       (m.href?'<a class="btn sm" target="_blank" rel="noopener" href="'+m.href+'">WhatsApp do cliente</a>':'')+'</span>':'')+
     '<span class="hr">'+(m.k.slice(-3)==='_oi'?'':ok?'✓ visto':'<button class="okb" data-a="secOk" data-k="'+m.k+'">Ok, visto ✓</button>')+'</span></div>';}
@@ -1965,7 +1980,7 @@ function rSecretarios(){var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth
   var lista='<div class="zap-l"><div class="zap-lh"><h2>Sua equipe</h2><p class="small muted">Um personagem para cada cargo. Eles olham seus dados todo dia e avisam aqui.</p></div>'+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+'</div>';
   var conv=c?'<div class="zap-c'+(c.g.corpo?' com-char':'')+'"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+avSec(c.g,1)+'<span class="tx"><b>'+c.g.nome+' · '+c.g.cargo+'</b><span>'+c.g.papel.replace(/^[^·]+· /,'')+'</span></span></div>'+
       '<div class="zap-b" id="zap-b"><span class="zdia">Hoje</span>'+c.ms.map(bolha).join('')+'</div>'+
-      (c.g.corpo?'<img class="zchar'+(ui.secCharVisto===c.g.id?'':' entra')+'" src="'+c.g.corpo+'" alt="" aria-hidden="true">':'')+'</div>':
+      (c.g.corpo?(function(){var h=humorDe(c.ms);return '<div class="zfala'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zfala">'+esc(HUMOR_FALA[h])+'</div><img class="zchar'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zchar" data-g="'+c.g.id+'" src="'+corpoDe(c.g,h)+'" alt="" aria-hidden="true">';})():'')+'</div>':
     '<div class="zap-c"><div class="zap-vazio">'+avSec(SECS[0])+'<b>Escolha uma conversa</b><span>Ana, Bia, Nina e Téo cuidam cada um de uma parte do seu negócio.</span></div></div>';
   return '<div class="zap'+(c?' aberto':'')+'">'+lista+conv+'</div>';}
 function secMini(){var C=secChats();
@@ -4566,7 +4581,10 @@ document.addEventListener('pointerdown',function(e){window._downBg=ehFundo(e.tar
 document.addEventListener('mousedown',function(e){window._downBg=ehFundo(e.target);window._upBg=null;},true);
 document.addEventListener('pointerup',function(e){window._upBg=ehFundo(e.target);},true);
 document.addEventListener('mouseup',function(e){window._upBg=ehFundo(e.target);},true);
-document.addEventListener('click',function(e){
+document.addEventListener('click',function(e){var zb=e.target.closest&&e.target.closest('.zb[data-h]');
+  if(zb&&!e.target.closest('button,a')){var im=document.getElementById('zchar'),fa=document.getElementById('zfala'),g=im&&SECS.filter(function(x){return x.id===im.dataset.g;})[0];
+    if(im&&g){var h=zb.dataset.h;im.src=corpoDe(g,h);im.classList.remove('entra','troca');void im.offsetWidth;im.classList.add('troca');if(fa){fa.textContent=HUMOR_FALA[h];fa.classList.remove('entra','troca');void fa.offsetWidth;fa.classList.add('troca');}}}
+
   if(ui.ddOpen&&!(e.target.closest&&e.target.closest('.dd'))&&!(e.target.closest&&e.target.closest('[data-a]'))){ui.ddOpen=null;render();return;}
   var el=e.target.closest('[data-a]');if(!el)return;
   if(ui.ddOpen&&!e.target.closest('.dd')){ui.ddOpen=null;render();}
