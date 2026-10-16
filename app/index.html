@@ -502,6 +502,13 @@ html[data-tema="neon"] body{background:radial-gradient(1100px 620px at 100% -10%
   .dc-tag{display:none}.dc-teia{width:80px;height:80px}.dc-aranha{right:38px}.dc-v1,.dc-v2{display:none}}
 @media (prefers-reduced-motion:reduce){.deco *{animation:none!important}}
 body.sem-anim .deco *{animation:none!important}
+.msg-lay{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.msg-mika{position:sticky;top:140px;display:flex;flex-direction:column;align-items:center}
+.msg-mika img{width:100%;max-height:min(520px,calc(100vh - 260px));object-fit:contain;object-position:bottom;filter:drop-shadow(0 8px 22px rgba(0,0,0,.35));animation:psEntra .55s cubic-bezier(.2,.9,.3,1.2) both}
+.msg-mika-fala{position:relative;background:var(--surface);border:1.5px solid var(--zc);border-radius:16px;padding:10px 14px;margin-bottom:10px;font-size:.88rem;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.msg-mika-fala b{color:var(--zc)}.msg-mika-fala p{margin:4px 0 0;line-height:1.4}
+.msg-mika-fala:after{content:"";position:absolute;bottom:-8px;left:50%;width:14px;height:14px;background:var(--surface);border-right:1.5px solid var(--zc);border-bottom:1.5px solid var(--zc);transform:translateX(-50%) rotate(45deg)}
+@media (max-width:1100px){.msg-lay{grid-template-columns:1fr}.msg-mika{position:static;order:-1;flex-direction:row-reverse;align-items:flex-end;gap:6px}.msg-mika img{width:90px;max-height:120px;object-fit:cover;object-position:top}.msg-mika-fala{flex:1;margin-bottom:12px}.msg-mika-fala:after{left:-8px;bottom:18px;transform:rotate(135deg)}}
 .passeio{position:fixed;right:14px;bottom:0;z-index:43;display:flex;align-items:flex-end;gap:0;pointer-events:none;max-width:calc(100vw - 28px)}
 .passeio>*{pointer-events:auto}
 .ps-img{height:230px;width:auto;margin-left:-18px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35));animation:psEntra .55s cubic-bezier(.2,.9,.3,1.2) both;transform-origin:bottom center}
@@ -1391,7 +1398,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 19h00';
+var VERSAO='16/10 · 19h10';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3054,7 +3061,13 @@ function rMensagens(){
   if(tab==='fds')h+='<p class="small muted">Ideal para mandar na quinta ou na sexta-feira.</p><div class="msg-grid">'+cartaoMsg('fds',comMinhas('fds',MSG.fds),{},'','',minhas('fds').length)+'</div>'+editorMinhas(['fds']);
   if(tab==='divulga')h+='<p class="small muted">Para chamar novos trabalhos quando a agenda estiver tranquila.</p><div class="msg-grid">'+cartaoMsg('divulga',comMinhas('divulga',MSG.divulga),{},'','Agenda e novidades',minhas('divulga').length)+
     '<div class="msg-card"><div class="msg-tit">Sua tabela de preços</div><div class="msg-txt">'+esc(tabelaTexto())+'</div><div class="msg-acts"><button type="button" class="btn sm" data-a="tab" data-v="tabela">Editar tabela</button><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><a class="btn sm pri" href="'+esc(waLink(tabelaTexto(),''))+'" target="_blank" rel="noopener">WhatsApp</a></span></div></div></div>'+editorMinhas(['divulga']);
-  return '<div class="stack" style="gap:14px">'+h+'</div>';
+  var g=SECS.filter(function(x){return x.id==='mkt';})[0],nin=inat.length,
+    MK={inativos:nin?['megafone',nin===1?'Tem 1 cliente sumido. Manda essa mensagem e chama ele de volta! 📣':'Tem '+nin+' clientes sumidos. Bora chamar todo mundo de volta! 📣']:['animada','Ninguém sumido! Todo mundo mandando trabalho. 😎'],
+      datas:['ideia',evs.length?'💡 '+evs[0].nome+' está chegando. Mensagem em data especial faz o cliente lembrar de você!':'💡 Sem datas nos próximos dias. Aproveite a aba Divulgação!'],
+      fds:['gravando','Quinta ou sexta é o dia certo: avisa que você trabalha no fim de semana! 📲'],
+      divulga:['megafone','Agenda tranquila? Manda sua tabela e chama trabalho novo! 🔥']}[tab]||['animada','Bora mandar mensagem! 😎'];
+  var mk=g?'<aside class="msg-mika" style="--zc:'+g.cor+'"><div class="msg-mika-fala"><b>Mika</b> · Marketing<p>'+esc(MK[1])+'</p></div><img src="'+esc(corpoDe(g,MK[0]))+'" alt="Mika, do marketing"></aside>':'';
+  return '<div class="msg-lay"><div class="stack" style="gap:14px;min-width:0">'+h+'</div>'+mk+'</div>';
 }
 /* Lembretes no Dashboard: datas dos próximos 7 dias e sexta-feira */
 function lembretes(){var out=[],t=today(),dow=new Date().getDay(),fora=function(k){try{return localStorage.getItem('idealicad_lemb_'+k)==='1';}catch(e){return false;}};
