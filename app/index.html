@@ -569,6 +569,9 @@ table.adm td{vertical-align:top}
 .pb-cd b{font:800 1.15rem var(--f-mono);font-variant-numeric:tabular-nums}.pb-cd span{font-size:.8rem;color:var(--muted)}
 .pb-cd.late b{color:var(--urgent)}.pb-cd.perto b{color:#D9A21E}
 .pb-leg{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}.pb-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.pz-box{display:grid;gap:10px;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--bg)}
+.pz-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pz-row input{padding:.5em .7em;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:inherit;font:inherit;min-width:0}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -2719,6 +2722,16 @@ function cdHtml(d,h){var c=contador(d,h);return '<span class="pb-cd '+c.c+'" dat
 function prazoTxt(d,h){var dd=daysBetween(today(),d);return (dd===0?'hoje':dd===1?'amanhã':dd===-1?'ontem':dmy(d).slice(0,5))+(h?' às '+h:'');}
 function atualizaContadores(){[].forEach.call(document.querySelectorAll('[data-cd]'),function(el){var p=el.getAttribute('data-cd').split('|');if(!p[0])return;var c=contador(p[0],p[1]);el.className='pb-cd '+c.c;var b=el.querySelector('b');if(b)b.textContent=c.t;});}
 setInterval(function(){if(document.querySelector('[data-cd]'))atualizaContadores();},30000);
+function blocoPrazo(d){var bt=function(v,l,t){return '<button class="btn sm" data-a="rdPrazo" data-id="'+d.id+'" data-v="'+v+'" title="'+t+'">'+l+'</button>';};
+  return '<div class="pz-box"><div class="between wrap"><b>Prazo</b>'+cdHtml(d.prazo,d.hora)+'</div>'+
+    '<div class="pz-row"><span class="small muted">Diminuir</span>'+bt(-24,'−1 dia','Antecipar 1 dia')+bt(-1,'−1h','Antecipar 1 hora')+'<span class="small muted" style="margin-left:6px">Prorrogar</span>'+bt(1,'+1h','Prorrogar 1 hora')+bt(3,'+3h','Prorrogar 3 horas')+bt(24,'+1 dia','Prorrogar 1 dia')+'</div>'+
+    '<div class="pz-row"><input type="date" id="pz-d-'+d.id+'" value="'+(d.prazo||today())+'" aria-label="Nova data"><input type="time" id="pz-h-'+d.id+'" value="'+(d.hora||'18:00')+'" step="900" aria-label="Novo horário"><button class="btn sm pri" data-a="rdPrazoSet" data-id="'+d.id+'">Mudar prazo</button></div>'+
+    (d.st!=='oferta'?'<p class="small muted" style="margin:0">O cadista é avisado no chat sempre que o prazo muda.</p>':'')+'</div>';}
+function mudaPrazo(id,dt){var R=redeIni(),x=R.enviados.filter(function(q){return q.id===id;})[0];if(!x)return;
+  if(dt<new Date(Date.now()+30*6e4)){toast('O novo prazo precisa ser daqui a pelo menos 30 minutos.');return;}
+  var ant=x.prazo&&prazoTxt(x.prazo,x.hora);x.prazo=iso(dt);x.hora=pad(dt.getHours())+':'+pad(dt.getMinutes());
+  var novo=prazoTxt(x.prazo,x.hora);if(R.chat&&x.parceiro){(R.chat[x.id]=R.chat[x.id]||[]).push({de:'sis',t:'Prazo alterado: '+(ant?ant+' → ':'')+novo+'.'});}
+  render();toast('Prazo agora: '+novo+'.');}
 function rdPublicados(R){var L=R.enviados.filter(function(d){return d.st!=='apagado';});
   var cls=function(st){return st==='oferta'?'nao':st==='pago'?'fim':st==='recusado'?'recusado':'aceito';},nm={nao:'Não aceito ainda',aceito:'Aceito',fim:'Finalizado',recusado:'Recusado'};
   var ord={nao:0,aceito:1,fim:2,recusado:3};L=L.slice().sort(function(a,b){return ord[cls(a.st)]-ord[cls(b.st)];});
@@ -2916,6 +2929,7 @@ function envDetalhe(R,d,x){
         (d.st==='aprovado'?(x.pix?'<span class="rd-pix">Pague por fora no Pix: <b class="mono">'+esc(x.pix)+'</b><button class="btn sm" data-a="rdCopiaPix" data-v="'+esc(x.pix)+'">Copiar</button></span>':'')+'<button class="btn sm pri" data-a="rdSim" data-id="'+d.id+'" data-v="pago">Já paguei</button>':'')+
         (d.st==='pago'?'<span class="tag ok">Concluído</span>':'')+
       '</div>'+
+      (['oferta','desenho','revisao'].indexOf(d.st)>=0?blocoPrazo(d):'')+
       (d.st!=='oferta'&&d.st!=='apagado'?rdArqs(d,'env',x.nome||'parceiro')+(x.id?'<div><button class="btn sm" data-a="rdConversa" data-id="'+d.id+'">💬 Chat do '+d.cod+rdNaoLidas(d.id)+'</button></div>':''):'')+
       '</section>';
 }
@@ -3985,6 +3999,8 @@ var A={
   rdTab:function(d){var R=redeIni();R.tab=d.v;if(d.v==='delegar'&&R.passo===3&&R.busca&&R.busca.ok){R.passo=1;R.pid=null;R.busca=null;}render();},
   rdPed:function(d){var R=redeIni();rdLer();R.pid=d.id;R.repasse='';R.passo=2;render();if(window.innerWidth<960){var e=document.getElementById('rd-passo2');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});}},
   rdAbreEnv:function(d){var R=redeIni();R.envSel=R.envSel===d.id?null:d.id;render();if(window.innerWidth<960){var e=document.getElementById('pb-det');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});}},
+  rdPrazo:function(d){var x=redeIni().enviados.filter(function(q){return q.id===d.id;})[0];if(!x)return;var dt=new Date((x.prazo||today())+'T'+(x.hora||'18:00')+':00');dt=new Date(dt.getTime()+(+d.v)*36e5);mudaPrazo(d.id,dt);},
+  rdPrazoSet:function(d){var a=document.getElementById('pz-d-'+d.id),b=document.getElementById('pz-h-'+d.id);if(!a||!a.value){toast('Escolha a data.');return;}mudaPrazo(d.id,new Date(a.value+'T'+((b&&b.value)||'18:00')+':00'));},
   rdFechaEnv:function(){redeIni().envSel=null;render();},
   rdPedLimpa:function(){var R=redeIni();R.pid=null;R.passo=1;render();},
   rdVerTodos:function(){redeIni().verTodos=true;render();},
