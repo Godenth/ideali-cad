@@ -211,7 +211,7 @@ document.addEventListener('click',function(e){var t=e.target.closest('[data-f],[
   else if(t.dataset.ent!=null)mostra(+t.dataset.ent);});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')fechaFicha();});
 if(!TOKEN){erro('Este link está incompleto. Peça o link de novo ao seu cadista.');return;}
-api({acao:'listar'}).then(function(d){D=d;document.title=d.cliente+' · Seus casos';render();}).catch(function(e){erro(e.message);});
+api({acao:'listar'}).then(function(d){D=d;document.title=d.cliente+' · Seus casos';render();var pp=(location.hash.match(/[&#]p=([A-Za-z0-9-]{8,64})/)||[])[1];if(pp&&(D.pedidos||[]).some(function(x){return x.id===pp;}))ficha(pp);}).catch(function(e){erro(e.message);});
 })();
 </script>
 </body>

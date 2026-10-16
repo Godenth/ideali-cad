@@ -473,6 +473,8 @@ html[data-tema="neon"] body{background:radial-gradient(1100px 620px at 100% -10%
 .fw-it:hover:not(:disabled){border-color:var(--accent)}.fw-it:disabled{opacity:.5;cursor:default}
 .fw-it b{display:block}.fw-it small{display:block;color:var(--muted);font-size:.78rem}
 .fw-st{font-size:.82rem;font-weight:700;color:var(--accent);white-space:nowrap}.fw-it.env{border-color:#1E8A5A}.fw-it.env .fw-st{color:#1E8A5A}
+.wa-cli{padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}.wa-cli b{display:block}.wa-cli small{color:var(--muted)}
+.wa-bt{border-color:#1E8A5A;color:#1E8A5A}
 .passeio{position:fixed;right:14px;bottom:0;z-index:43;display:flex;align-items:flex-end;gap:0;pointer-events:none;max-width:calc(100vw - 28px)}
 .passeio>*{pointer-events:auto}
 .ps-img{height:230px;width:auto;margin-left:-18px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35));animation:psEntra .55s cubic-bezier(.2,.9,.3,1.2) both;transform-origin:bottom center}
@@ -1362,7 +1364,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 17h20';
+var VERSAO='16/10 · 17h50';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -4246,7 +4248,33 @@ function slotsPedido(p,w){var arqs=alive(S.arquivos).filter(function(a){return a
     return '<div class="slot'+(L.length?' tem':'')+'" style="--sc:'+sl[4]+'">'+slotHead(sl)+
       L.map(function(a){var lk=a.origem==='link';return '<div class="slot-f">'+(lk?'<a class="nm" style="flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" href="'+esc(a.url)+'" target="_blank" rel="noopener">🔗 '+esc(a.nome)+'</a>':'<button class="nm" data-a="'+(sl[0]==='html'?'verHtml':'ver3d')+'" data-id="'+a.id+'" title="Abrir em tela grande">'+esc(a.nome)+'</button><button class="icon-btn" data-a="baixarArq" data-id="'+a.id+'" aria-label="Baixar" title="Baixar">⤓</button>')+
         '<button class="icon-btn" data-a="delArq" data-id="'+a.id+'" aria-label="Excluir" title="Excluir" '+(w?'':'disabled')+'>🗑</button></div>';}).join('')+
-      (canFile()?'<label class="btn sm up">+ Enviar<input type="file" multiple accept="'+sl[3]+'" class="slot-up" data-slot="'+sl[0]+'" data-id="'+p.id+'" '+(w?'':'disabled')+'></label>':'')+'</div>';}).join('')+'</div>';}
+      ((sl[0]==='html'||sl[0]==='fres')&&p.clienteId&&L.some(function(a){return a.origem!=='link';})?'<button class="btn sm wa-bt" data-a="waArq" data-id="'+p.id+'" data-tipo="'+sl[0]+'">📲 Mandar no WhatsApp</button>':'')+(canFile()?'<label class="btn sm up">+ Enviar<input type="file" multiple accept="'+sl[3]+'" class="slot-up" data-slot="'+sl[0]+'" data-id="'+p.id+'" '+(w?'':'disabled')+'></label>':'')+'</div>';}).join('')+'</div>';}
+/* Mandar o HTML (aprovação) ou o STL de fresagem (finalizado) para o cliente pelo WhatsApp:
+   abre a conversa no número dele com a frase pronta e o link de acompanhamento já no caso */
+function nomeSaud(c){if(!c)return '';return (c.titulo==='Dr.'||c.titulo==='Dra.')?nomeCurtoCli(c):/^(lab|laborat)/i.test(String(c.nome||''))?String(c.nome).trim():nomeContato(c);}
+function waArqTexto(p,tipo,link){var c=cliente(p.clienteId),n=nomeSaud(c),tp=tipoPed(p),eu=(S.perfil.nome||'').trim()||'seu cadista',caso=(p.paciente?p.paciente+' ':'')+'#'+p.num+(tp?' ('+tp.nome+')':'');
+  var oi=saudTxt()+(n?', '+n:'')+'!';
+  return tipo==='html'?oi+' O projeto do caso '+caso+' está pronto para sua aprovação. 🦷\nDá para ver em 3D por aqui: '+link+'\nSe estiver tudo certo, me dá o ok que eu finalizo. — '+eu
+    :oi+' Caso '+caso+' finalizado ✅\nO STL para fresagem está aqui: '+link+'\nQualquer coisa, é só chamar! — '+eu;}
+function fWaArq(pid,tipo,link){var p=byId(S.pedidos,pid);if(!p)return head('Pedido não encontrado');var c=cliente(p.clienteId),tel=c&&soDig(c.telefone);
+  var mover=tipo==='html'?(p.status==='entrada'||p.status==='pendente'?'aprovacao':''):(p.status!=='finalizado'&&p.status!=='arquivado'?'finalizado':'');
+  var share=!!(navigator.canShare&&window.File);
+  return head(tipo==='html'?'Mandar o projeto para aprovação':'Mandar o STL de fresagem')+
+    '<div class="wa-cli">'+(c?'<b>'+esc(c.nome)+'</b><small>'+(tel?esc(c.telefone):'sem WhatsApp cadastrado: você escolhe a conversa no WhatsApp')+'</small>':'<b>Pedido sem cliente</b>')+'</div>'+
+    '<textarea id="wa-txt" rows="6" style="width:100%">'+esc(waArqTexto(p,tipo,link))+'</textarea>'+
+    '<p class="small muted" style="margin:4px 0 8px">O link abre a página de acompanhamento de '+esc(c?c.nome:'cliente')+' já neste caso: ele vê o '+(tipo==='html'?'projeto':'trabalho')+' em 3D e pode baixar o arquivo. É o mesmo link fixo do cliente, que você cancela quando quiser na ficha dele.</p>'+
+    (mover?'<label class="row small" style="gap:6px;align-items:center;margin-bottom:10px"><input type="checkbox" id="wa-mover" value="'+mover+'" checked> Mover o pedido para <b>'+esc(stLabel(mover))+'</b>'+(tipo==='html'?' (só aparece para o cliente nessa etapa)':'')+'</label>':'')+
+    '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="waArqEnvia" data-id="'+pid+'">📲 Abrir WhatsApp'+(tel?' de '+esc(nomeSaud(c)||c.nome):'')+'</button>'+
+    (share?'<button class="btn" data-a="waArqShare" data-id="'+pid+'" data-tipo="'+tipo+'" id="wa-share" disabled>Preparando o arquivo…</button>':'')+'</div>'+
+    (share?'<p class="small muted" style="margin-top:8px">“Mandar o arquivo junto” abre o compartilhar do celular: escolha o WhatsApp e o contato, e o arquivo vai anexado com a frase.</p>':'');}
+async function waLinkCaso(c,pid){if(!sb)throw new Error('sem conexão');ui.links=ui.links||{};var k=ui.links[c.id];
+  if(!(k&&k.token)){var r=await sb.from('links_cliente').select('token,criado_em,ultimo_acesso').eq('cliente_id',c.id).is('revogado_em',null).maybeSingle();k=r&&r.data;
+    if(!k){var g=await sb.rpc('criar_link_cliente',{cid:c.id});if(g.error)throw g.error;k={token:g.data,criado_em:new Date().toISOString(),ultimo_acesso:null};}ui.links[c.id]=k;}
+  return urlLink(k.token)+'&p='+pid;}
+function waArqFile(pid,tipo){var a=alive(S.arquivos).filter(function(x){return x.pedidoId===pid&&x.origem!=='link'&&catArq(x)===tipo;}).pop();if(!a)return Promise.reject(new Error('arquivo não encontrado'));
+  return vzBlob(a.id).then(function(bl){return bl.slice(0,2).text().then(function(h){if(h!=='PK'||!window.JSZip)return new File([bl],a.nome);
+    return JSZip.loadAsync(bl).then(function(z){var fs=Object.keys(z.files).filter(function(n){return !z.files[n].dir;});if(fs.length!==1)return new File([bl],a.nome);
+      return z.files[fs[0]].async('blob').then(function(b){return new File([b],fs[0].split('/').pop(),{type:/\.html?$/i.test(fs[0])?'text/html':'application/octet-stream'});});});});});}
 function sbProcessa(pid,file){if(!guard())return;var p=byId(S.pedidos,pid);if(!p||!file)return;if(!/^image\//.test(file.type)){toast('Cole ou escolha uma imagem.');return;}
   toast('Enviando o print do scanbody…');
   comprime(file,1600).then(function(b){var ext=b.type==='image/webp'?'webp':'jpg',path=S.sessao.id+'/'+pid+'/scanbody-'+Date.now().toString(36)+'.'+ext,ant=p.sbImg;
@@ -4381,6 +4409,16 @@ fraseWa:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').t
     if(c&&nm&&nm.checked)t=fraseNome(t,c);window.open(waLink(t,c?c.telefone:''),'_blank','noopener');
     if(c){ui.fraseEnv=ui.fraseEnv||{};ui.fraseEnv[c.id]=1;el.classList.add('env');var st=el.querySelector('.fw-st');if(st)st.textContent='✓ enviado';}},
   fraseCopia:function(){var tx=document.getElementById('fw-txt');try{navigator.clipboard.writeText(tx.value).then(function(){toast('Frase copiada.');});}catch(e){}},
+waArq:async function(d,el){var p=byId(S.pedidos,d.id),c=p&&cliente(p.clienteId);if(!p||!c){toast('Este pedido não tem cliente.');return;}
+    if(el)el.disabled=true;toast('Preparando a mensagem…');
+    try{var link=await waLinkCaso(c,p.id);ui.waFile=null;openSheet(fWaArq,p.id,d.tipo,link);
+      if(navigator.canShare)waArqFile(p.id,d.tipo).then(function(f){ui.waFile=f;var b=document.getElementById('wa-share');if(b){b.disabled=!(navigator.canShare({files:[f]}));b.textContent=b.disabled?'Este aparelho não manda arquivo':'Mandar o arquivo junto';}},function(){var b=document.getElementById('wa-share');if(b)b.textContent='Arquivo indisponível';});}
+    catch(x){toast('Não consegui preparar o link: '+((x&&x.message)||x)+'.');}
+    if(el)el.disabled=false;},
+  waArqEnvia:function(d){var p=byId(S.pedidos,d.id),c=p&&cliente(p.clienteId),t=document.getElementById('wa-txt').value,mv=document.getElementById('wa-mover');
+    window.open(waLink(t,c?c.telefone:''),'_blank','noopener');if(mv&&mv.checked)setStatus(p.id,mv.value);},
+  waArqShare:function(d){var f=ui.waFile,t=document.getElementById('wa-txt').value,mv=document.getElementById('wa-mover'),pid=d.id;if(!f)return;
+    navigator.share({files:[f],text:t}).then(function(){if(mv&&mv.checked)setStatus(pid,mv.value);},function(){});},
   msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   secOk:function(d){try{localStorage.setItem('idealicad_sec_'+d.k+'_'+today(),'1');}catch(e){}if(document.querySelector('.sheet'))renderSheet();render();},
