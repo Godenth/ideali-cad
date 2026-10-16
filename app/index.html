@@ -1175,7 +1175,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -1227,7 +1227,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -1391,7 +1391,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 18h50';
+var VERSAO='16/10 · 19h00';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2083,14 +2083,16 @@ function mikaDia(){var t=today(),dow=new Date(t+'T12:00:00').getDay(),n=Math.flo
 function fraseBox(txt){return '<div class="msg-card zfrase"><div class="msg-txt">'+esc(txt)+'</div><div class="msg-acts"><span></span><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><button type="button" class="btn sm pri" data-a="fraseWa">WhatsApp</button></span></div></div>';}
 /* escolher o cliente e abrir o WhatsApp já no número dele, com a frase */
 function fraseNome(t,c){var n=!c?'':(c.titulo==='Dr.'||c.titulo==='Dra.')?nomeCurtoCli(c):/^(lab|laborat)/i.test(String(c.nome||''))?String(c.nome).trim():nomeContato(c);if(!n)return t;var r=t.replace(/^(Oi|Olá|Bom dia|Boa tarde|Boa noite)!/,'$1, '+n+'!');return r!==t?r:'Oi, '+n+'! '+t;}
-function fFraseWa(txt){ui.fraseEnv=ui.fraseEnv||{};var ult={};alive(S.pedidos).forEach(function(p){var d=p.recebido||'';if(!ult[p.clienteId]||d>ult[p.clienteId])ult[p.clienteId]=d;});
-  var C=alive(S.clientes).slice().sort(function(a,b){var ta=soDig(a.telefone)?1:0,tb=soDig(b.telefone)?1:0;if(ta!==tb)return tb-ta;return (ult[b.id]||'')>(ult[a.id]||'')?1:(ult[b.id]||'')<(ult[a.id]||'')?-1:String(a.nome).localeCompare(String(b.nome));});
-  return head('Mandar para quem?')+'<p class="small muted" style="margin-top:0">Toque no cliente: o WhatsApp abre direto na conversa dele, com a frase pronta e o nome dele no começo. Dá para editar a frase aqui antes.</p>'+
+function fraseEnvMap(){var m=(S.prefs&&S.prefs.fraseEnv)||{},o={},lim=addDays(today(),-6);Object.keys(m).forEach(function(k){if(m[k]>=lim)o[k]=m[k];});return o;}
+function fFraseWa(txt){var EV=fraseEnvMap();ui.fraseEnv=EV;var ult={};alive(S.pedidos).forEach(function(p){var d=p.recebido||'';if(!ult[p.clienteId]||d>ult[p.clienteId])ult[p.clienteId]=d;});
+  var C=alive(S.clientes).slice().sort(function(a,b){var ta=soDig(a.telefone)?(EV[a.id]?1:2):0,tb=soDig(b.telefone)?(EV[b.id]?1:2):0;if(ta!==tb)return tb-ta;return (ult[b.id]||'')>(ult[a.id]||'')?1:(ult[b.id]||'')<(ult[a.id]||'')?-1:String(a.nome).localeCompare(String(b.nome));});
+  var nEnv=Object.keys(EV).length;
+  return head('Mandar para quem?')+'<p class="small muted" style="margin-top:0">Toque no cliente: o WhatsApp abre direto na conversa dele, com a frase pronta e o nome dele no começo. Dá para editar a frase aqui antes. Quem já recebeu nos últimos 7 dias fica marcado em verde, para não mandar demais.'+(nEnv?' <b>Enviado esta semana: '+nEnv+'.</b>':'')+'</p>'+
     '<textarea id="fw-txt" rows="4" style="width:100%">'+esc(txt)+'</textarea>'+
     '<label class="row small" style="gap:6px;align-items:center;margin:6px 0"><input type="checkbox" id="fw-nome" checked> Colocar o nome do cliente no começo</label>'+
     (C.length?'<input class="search" id="fw-busca" type="search" placeholder="Buscar cliente…" autocomplete="off" style="width:100%;margin:6px 0">'+
     '<div class="fw-lista">'+C.map(function(c){var tel=soDig(c.telefone),env=ui.fraseEnv[c.id];
-      return '<button type="button" class="fw-it'+(env?' env':'')+'" data-a="fraseEnvia" data-id="'+c.id+'" data-n="'+esc(String(c.nome||'').toLowerCase())+'"'+(tel?'':' disabled')+'><span><b>'+esc(c.nome||'Cliente')+'</b><small>'+(tel?esc(c.telefone):'sem WhatsApp cadastrado')+'</small></span><span class="fw-st">'+(env?'✓ enviado':tel?'Enviar ›':'')+'</span></button>';}).join('')+'</div>'
+      return '<button type="button" class="fw-it'+(env?' env':'')+'" data-a="fraseEnvia" data-id="'+c.id+'" data-n="'+esc(String(c.nome||'').toLowerCase())+'"'+(tel?'':' disabled')+'><span><b>'+esc(c.nome||'Cliente')+'</b><small>'+(tel?esc(c.telefone):'sem WhatsApp cadastrado')+'</small></span><span class="fw-st">'+(env?'✓ enviado '+(env===today()?'hoje':dmy(env).slice(0,5)):tel?'Enviar ›':'')+'</span></button>';}).join('')+'</div>'
     :'<div class="card empty">Você ainda não tem clientes cadastrados.</div>')+
     '<div class="row wrap" style="gap:8px;margin-top:10px"><button class="btn" data-a="fraseEnvia" data-id="">Abrir WhatsApp sem escolher</button><button class="btn" data-a="fraseCopia">Copiar frase</button></div>';}
 function msgsMkt(){var t=today(),R=[],dow=new Date(t+'T12:00:00').getDay(),C=alive(S.clientes),P=alive(S.pedidos).filter(function(p){return p.recebido;});
@@ -4471,9 +4473,10 @@ var A={
   mmNova:function(d){if(!guard())return;var l=document.querySelector('.mm-list[data-c="'+d.c+'"]');if(!l)return;l.insertAdjacentHTML('beforeend',linhaMinha(d.c,'',''));var t=l.lastElementChild.querySelector('textarea');window._mmTa=t;t.focus();},
   mmDel:function(d,el){var li=el.closest('.mm-li');if(li)li.remove();toast('Mensagem removida. Clique em “Salvar minhas mensagens” para confirmar.');},
 fraseWa:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;openSheet(fFraseWa,t);},
-  fraseEnvia:function(d,el){var tx=document.getElementById('fw-txt'),t=tx?tx.value:'',c=d.id?byId(S.clientes,d.id):null,nm=document.getElementById('fw-nome');
+  fraseEnvia:function(d,el){var tx=document.getElementById('fw-txt'),t=tx?tx.value:'',c=d.id?byId(S.clientes,d.id):null,nm=document.getElementById('fw-nome'),EV=fraseEnvMap();
+    if(c&&EV[c.id]&&!confirm('Você já mandou mensagem para '+c.nome+' '+(EV[c.id]===today()?'hoje':'em '+dmy(EV[c.id]).slice(0,5))+'. O ideal é uma vez por semana. Mandar de novo mesmo assim?'))return;
     if(c&&nm&&nm.checked)t=fraseNome(t,c);window.open(waLink(t,c?c.telefone:''),'_blank','noopener');
-    if(c){ui.fraseEnv=ui.fraseEnv||{};ui.fraseEnv[c.id]=1;el.classList.add('env');var st=el.querySelector('.fw-st');if(st)st.textContent='✓ enviado';}},
+    if(c){EV[c.id]=today();S.prefs=S.prefs||{};S.prefs.fraseEnv=EV;ui.fraseEnv=EV;save();el.classList.add('env');var st=el.querySelector('.fw-st');if(st)st.textContent='✓ enviado hoje';}},
   fraseCopia:function(){var tx=document.getElementById('fw-txt');try{navigator.clipboard.writeText(tx.value).then(function(){toast('Frase copiada.');});}catch(e){}},
 waArq:async function(d,el){var p=byId(S.pedidos,d.id),c=p&&cliente(p.clienteId);if(!p||!c){toast('Este pedido não tem cliente.');return;}
     if(el)el.disabled=true;toast('Preparando a mensagem…');
