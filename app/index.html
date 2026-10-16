@@ -572,6 +572,11 @@ table.adm td{vertical-align:top}
 .pz-box{display:grid;gap:10px;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--bg)}
 .pz-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .pz-row input{padding:.5em .7em;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:inherit;font:inherit;min-width:0}
+.kcard.rede{border:1.5px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(135deg,var(--p5),var(--p6),var(--p3)) border-box;box-shadow:0 0 22px -8px color-mix(in srgb,var(--p5) 75%,transparent)}
+.rd-neon{display:inline-flex;gap:5px;align-items:center;font:800 .64rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;color:#fff;background:linear-gradient(90deg,var(--p5),var(--p6),var(--p3));text-shadow:0 0 6px rgba(255,255,255,.7);box-shadow:0 0 10px color-mix(in srgb,var(--p5) 80%,transparent),0 0 22px -4px color-mix(in srgb,var(--p6) 70%,transparent)}
+.rd-neon svg{width:12px;height:12px}
+@media (prefers-reduced-motion:no-preference){.rd-neon{animation:neon 2.6s ease-in-out infinite}@keyframes neon{50%{box-shadow:0 0 16px color-mix(in srgb,var(--p6) 85%,transparent),0 0 30px -4px color-mix(in srgb,var(--p5) 80%,transparent)}}}
+.kcard.rede .pb-cd{padding:6px 8px}.kcard.rede .pb-cd b{font-size:1rem}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -2159,12 +2164,22 @@ function rPedidos(){
         '<span class="row">'+(p.pago?'<span class="tag ok">Pago</span>':'<span class="tag w">A receber</span>')+'<span class="mono small">'+brl(p.valor)+'</span><button class="btn sm" data-a="restaurarFin" data-id="'+p.id+'" '+(canWrite()?'':'disabled')+' title="Voltar para Finalizado">↩ Restaurar</button></span></div>';}).join('')+'</div>':'<p class="empty">Nenhum pedido arquivado.</p>')+'</section>';
   }
   return head_+'<div class="kanban">'+STATUS.map(function(s){
-      var col=ps.filter(function(p){return p.status===s[0];}).sort(function(a,b){return (b.urgente-a.urgente)||((a.prazo||'9')<(b.prazo||'9')?-1:1);});
-      return '<section class="kcol" data-st="'+s[0]+'" aria-label="'+s[1]+'"><div class="kcol-h st-'+s[0]+'"><span><b>'+s[1]+'</b><small>'+s[2]+'</small></span><span class="cnt">'+col.length+'</span></div>'+
-        '<div class="kcol-b">'+(col.length?col.map(kcard).join(''):'<p class="empty small">Nenhum pedido aqui</p>')+'</div></section>';
+      var col=ps.filter(function(p){return p.status===s[0];}).sort(function(a,b){return (b.urgente-a.urgente)||((a.prazo||'9')<(b.prazo||'9')?-1:1);}),rd=q||ui.cliProd||ui.filtro==='urg'?[]:redeNaProducao(s[0]);
+      return '<section class="kcol" data-st="'+s[0]+'" aria-label="'+s[1]+'"><div class="kcol-h st-'+s[0]+'"><span><b>'+s[1]+'</b><small>'+s[2]+'</small></span><span class="cnt">'+(col.length+rd.length)+'</span></div>'+
+        '<div class="kcol-b">'+(col.length||rd.length?rd.map(kcardRede).join('')+col.map(kcard).join(''):'<p class="empty small">Nenhum pedido aqui</p>')+'</div></section>';
     }).join('')+'</div>'+
     '<p class="proto">No computador, arraste o cartão entre as colunas. No celular, use os botões do cartão.</p>';
 }
+/* Trabalhos que eu aceitei na Rede aparecem na Produção, destacados (prévia: só nesta sessão, nada é salvo). */
+var ICO_REDE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7.5l3 8.5M16 7.5l-3 8.5M8.5 6h7"/></svg>';
+var COL_REDE={desenho:'entrada',revisao:'aprovacao',aprovado:'finalizado'};
+function redeNaProducao(st){var R=ui.rede;if(!R||!R.meus)return [];return R.meus.filter(function(x){return COL_REDE[x.st]===st;});}
+function kcardRede(x){var R=ui.rede,de=(R.cadDe||{})[x.de]||{nome:''};
+  return '<div class="kcard rede" data-a="rdAbreMeu" data-id="'+x.id+'" role="button" tabindex="0">'+
+    '<div class="r"><span class="rd-neon">'+ICO_REDE+'Trabalho da Rede</span><span class="mono small muted">'+x.cod+'</span></div>'+
+    '<div class="kc-who">'+icoNome(x.trab)+'<div class="kc-nm"><span class="pac">'+esc(x.trab)+'</span><span class="who cli" title="Quem publicou">'+ICO_CLI+esc(de.nome)+'</span></div></div>'+
+    '<div class="r small"><span class="mono">'+(x.dentes&&x.dentes.length?'dentes '+x.dentes.join(', '):esc(x.mat||''))+'</span><span class="mono val">'+brl(x.repasse)+'</span></div>'+
+    (x.st==='aprovado'?'<span class="tag ok" style="justify-self:start">Aprovado · aguardando o Pix</span>':cdHtml(x.prazo,x.hora))+'</div>';}
 function kcard(p){
   var c=cliente(p.clienteId),t=tipoPed(p),w=canWrite(),dis=w?'':'disabled',late=p.prazo&&p.prazo<today()&&aberto(p);
   var nf=alive(S.arquivos).filter(function(a){return a.pedidoId===p.id&&!a.removido;}).length;
@@ -4048,7 +4063,8 @@ var A={
     x.st='pego';
     R.meus.unshift({id:'k'+Date.now(),cod:x.cod,trab:x.trab,dentes:x.dentes,mat:x.mat,repasse:x.repasse,hora:x.hora,prazo:x.prazo,de:x.de,st:'desenho'});
     R.chat[R.meus[0].id]=[{de:'sis',t:'Você aceitou o '+x.cod+'. Chat liberado.'}];
-    R.tab='meus';render();toast('Trabalho '+x.cod+' é seu! Arquivos e chat liberados.');},
+    R.tab='meus';R.meuSel=R.meus[0].id;ui.tab='pedidos';ui.vista=ui.vista==='arq'?'kanban':ui.vista;render();window.scrollTo(0,0);toast('Trabalho '+x.cod+' é seu! Está na sua Produção, destacado como Trabalho da Rede.');},
+  rdAbreMeu:function(d){var R=redeIni();ui.tab='rede';R.tab='meus';R.meuSel=d.id;render();window.scrollTo(0,0);},
   rdQuem:function(d){redeIni().quemF=d.v;render();},
   rdIgnora:function(d){var R=redeIni(),x=R.mural.filter(function(q){return q.id===d.id;})[0];if(x){x.st='recusado';render();toast('Trabalho recusado. Ele some do seu feed.');}},
   rdMeuSt:function(d){var R=redeIni(),x=R.meus.filter(function(q){return q.id===d.id;})[0];if(!x)return;x.st=d.v;
