@@ -1405,14 +1405,14 @@ var ICON={
   rede:ic('<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M10.8 7.2 6.3 15.8M13.2 7.2l4.5 8.6M7.5 18h9"/>')
 };
 var MENU=[
-  ['Principal',[['dashboard','Dashboard'],['secretarios','Secretários'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
+  ['Principal',[['dashboard','Dashboard'],['secretarios','Agentes IA'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 20h00';
+var VERSAO='16/10 · 20h40';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
-var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
+var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAplica)decoAplica();},0);
@@ -2177,7 +2177,7 @@ var PASSEIO_TAB={dashboard:['ger','ven','fin','mkt'],pedidos:['ven'],financeiro:
 var DICAS={
   ger:[{tit:'Meta cadastrada é meta cobrada',sub:'Sem meta do mês eu não tenho como cobrar ninguém. Cadastre a sua.',a:'tab',v:'metas',bt:'Ver metas'},
        {tit:'Cinco minutos por dia',sub:'Olhe o Dashboard toda manhã. Cinco minutos evitam muita dor de cabeça.'},
-       {tit:'Equipe avisada trabalha melhor',sub:'Os recados de todo mundo ficam na aba Secretários. Passe lá de vez em quando.',a:'secChat',v:'',bt:'Ver recados'}],
+       {tit:'Equipe avisada trabalha melhor',sub:'Os recados de todo mundo ficam na aba Agentes IA. Passe lá de vez em quando.',a:'secChat',v:'',bt:'Ver recados'}],
   ven:[{h:'determinada',tit:'Responda rápido',sub:'Responda orçamento no mesmo dia. Quem responde primeiro costuma fechar o trabalho.'},
        {h:'pensativa',tit:'Prazo em todo pedido',sub:'Coloque o prazo em todos os pedidos. Assim eu aviso antes de vencer.'},
        {h:'feliz',tit:'Seus melhores clientes',sub:'Quem manda trabalho toda semana merece atenção especial. Veja quem são no Ranking.',a:'tab',v:'ranking',bt:'Ver ranking'},
@@ -2248,7 +2248,7 @@ function bolha(m){var ok=secOkHoje(m.k);
     '<span class="hr">'+(m.k.slice(-3)==='_oi'?'':ok?'✓ visto':'<button class="okb" data-a="secOk" data-k="'+m.k+'">Ok, visto ✓</button>')+'</span></div>';}
 function rSecretarios(){var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth>820){var pr=C.filter(function(x){return x.urg;})[0]||C.filter(function(x){return x.nl;})[0]||C[0];sel=pr.g.id;}var c=C.filter(function(x){return x.g.id===sel;})[0];
   if(c)setTimeout(function(){secMarca(c.ms.map(function(m){return m.k;}));ui.secCharVisto=c.g.id;},0);
-  var lista='<div class="zap-l"><div class="zap-lh"><h2>Sua equipe</h2><p class="small muted">Um personagem para cada cargo. Eles olham seus dados todo dia e avisam aqui.</p></div>'+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+'</div>';
+  var lista='<div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia e avisam aqui.</p></div>'+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+'</div>';
   var conv=c?'<div class="zap-c'+(c.g.corpo?' com-char':'')+'"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+avSec(c.g,1)+'<span class="tx"><b>'+c.g.nome+' · '+c.g.cargo+'</b><span>'+c.g.papel.replace(/^[^·]+· /,'')+'</span></span></div>'+
       '<div class="zap-b" id="zap-b"><span class="zdia">Hoje</span>'+c.ms.map(bolha).join('')+'</div>'+
       (c.g.corpo?(function(){var h=humorDe(c.ms);return '<div class="zfala'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zfala">'+esc(HUMOR_FALA[h])+'</div><img class="zchar'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zchar" data-g="'+c.g.id+'" src="'+corpoDe(c.g,h)+'" alt="" aria-hidden="true">';})():'')+'</div>':
@@ -2263,10 +2263,10 @@ function secEntregasCard(){var t=today(),am=addDays(t,1),ab=alive(S.pedidos).fil
     (L.length?'<div class="dent">'+L.map(function(p){var x=q(p);return '<button class="dent-it" data-a="verPedido" data-id="'+p.id+'"><span class="tx"><b>'+esc(pedTxt(p))+'</b></span><span class="tag '+x[0]+'">'+x[1]+'</span></button>';}).join('')+'</div>'+(ab.length>5?'<p class="small muted" style="margin:0">e mais '+(ab.length-5)+' na Produção.</p>':'')
       :'<div class="empty" style="padding:18px 6px;text-align:center"><p class="muted" style="margin:0 0 10px">Nenhuma entrega pendente. 🎉</p><button class="btn sm pri" data-a="novoPedido">+ Novo pedido</button></div>')+'</section>';}
 function secMini(){var C=secChats();
-  return '<section class="card stack tres"><div class="between wrap"><div><h2>Sua equipe</h2><p class="small muted">Recados de hoje: vendas, financeiro, marketing e análise.</p></div><button class="btn sm pri" data-a="tab" data-v="secretarios">Abrir conversas</button></div>'+
+  return '<section class="card stack tres"><div class="between wrap"><div><h2>Agentes de IA</h2><p class="small muted">Recados de hoje: gerente, vendas, financeiro, marketing e análise.</p></div><button class="btn sm pri" data-a="tab" data-v="secretarios">Abrir conversas</button></div>'+
     '<div class="zmini">'+C.map(function(x){return linhaChat(x,false);}).join('')+'</div></section>';}
 function fSecretario(){var C=secChats(),sd=saudacao(),nome=primeiroNome(),auto=!(S.prefs&&S.prefs.secAuto===false),n=C.reduce(function(s,c){return s+c.nl;},0);
-  return head('Sua equipe')+'<div class="stack"><p>'+sd.t+(nome?', '+esc(nome):'')+'! '+(n?'Você tem <b>'+plural(n,'recado novo','recados novos')+'</b> hoje.':'Nada novo hoje.')+'</p>'+
+  return head('Seus agentes de IA')+'<div class="stack"><p>'+sd.t+(nome?', '+esc(nome):'')+'! '+(n?'Você tem <b>'+plural(n,'recado novo','recados novos')+'</b> hoje.':'Nada novo hoje.')+'</p>'+
     '<div class="zmini">'+C.map(function(x){return linhaChat(x,false);}).join('')+'</div>'+
     '<label class="row" style="gap:8px;cursor:pointer"><input type="checkbox" id="secAutoChk" data-a="secAuto"'+(auto?' checked':'')+'> <span class="small">Mostrar ao entrar no sistema (1 vez por dia)</span></label>'+
     '<button class="btn block" data-a="fechar">Depois eu vejo</button></div>';}
@@ -2280,9 +2280,10 @@ function secAbreDia(){if(EM_DEMO||ui.modoLab||ui.tour!=null||precisaBoas()||(S.p
    nada é salvo) e, no fim, o Dashboard com os cartões de Primeiros passos para completar o perfil. Guardado em preferencias.boas. */
 function precisaBoas(){if(ui.novaConta)return true;return !!(S.sessao&&!EM_DEMO&&!(S.prefs&&(S.prefs.boas==='ok'||S.prefs.onb==='ok'))&&!alive(S.pedidos).length&&!alive(S.clientes).length);}
 var TOUR=[
-  ['dashboard','Dashboard','Seu resumo do mês: quanto faturou, quanto já recebeu, quem está devendo e os próximos prazos. Lá em cima dá para trocar o período.'],
-  ['secretarios','Secretários','Sua equipe conversa com você como no WhatsApp: Ana (vendas), Bia (financeiro), Mika (marketing) e Klose (análise de dados). Todo dia eles avisam o que precisa de atenção.'],
-  ['pedidos','Produção','Seus pedidos em colunas: a fazer, pendência, aguardando aprovação e finalizado. Toque num card para ver, mudar a etapa ou anexar o STL.'],
+  ['dashboard','Dashboard','Seu resumo do mês: quanto faturou, quanto já recebeu, quem está devendo e os próximos prazos. Aqui também ficam os recados dos agentes de IA e a frase do dia da Mika, pronta para mandar no WhatsApp.'],
+  ['secretarios','Agentes de IA','Seus agentes de IA conversam com você como no WhatsApp: Sr. Otávio (gerente), Ana (vendas), Bia (financeiro), Mika (marketing) e Klose (análise de dados). Eles analisam seus dados todo dia, avisam o que precisa de atenção e aparecem pelas telas com dicas.'],
+  ['pedidos','Produção','Seus pedidos em colunas: a fazer, pendência, aguardando aprovação e finalizado. Toque num card para ver, mudar a etapa ou anexar o STL. Anexou o HTML ou o STL de fresagem? Um botão manda para o WhatsApp do cliente com o link do caso em 3D.'],
+  ['visu','Visualizador 3D','Abra STL, PLY, OBJ, ZIP e o HTML do exocad direto no navegador. Gire, meça em milímetros, anote e tire foto ou vídeo do caso. Os arquivos dos seus pedidos aparecem do lado.'],
   ['clientes','Clientes','Dentistas e laboratórios que te mandam trabalho, com histórico, preços especiais e mensagens prontas para o WhatsApp.'],
   ['financeiro','Financeiro','Quem pagou e quem deve. A cobrança sai em PDF com QR Code Pix, pronta para mandar.'],
   ['metas','Metas','Diga quantos elementos e quanto quer faturar no mês. O sistema mostra o ritmo por dia e avisa se está ficando para trás.'],
@@ -2290,7 +2291,7 @@ var TOUR=[
   ['ranking','Ranking','Seus melhores clientes por valor e por quantidade de trabalho.'],
   ['tipos','Tipos de trabalho','Coroas, facetas, protocolos e o resto, com preço padrão e quanto cada tipo rende para você.'],
   ['rede','Rede','Monte aqui seu perfil profissional, com fotos e vídeo. Em breve laboratórios, clínicas e cadistas vão trocar trabalho por aqui, e quem chegar primeiro aparece primeiro.'],
-  ['config','Configurações','Seu perfil, chave Pix, tabela de preços, tema e espaço para arquivos. É por aqui que você deixa tudo do seu jeito.']];
+  ['config','Perfil e conta','Seu perfil, chave Pix, tabela de preços, tema e espaço para arquivos. Também dá para ligar ou desligar os agentes pelas telas e as decorações de datas especiais.']];
 function rBoasVindas(){var nome=primeiroNome(),cores=['var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)','var(--p6)','var(--accent)'],cf='';
   for(var i=0;i<34;i++)cf+='<span style="left:'+((i*37)%100)+'%;background:'+cores[i%cores.length]+';animation-duration:'+(2.6+(i%7)*0.35)+'s;animation-delay:'+((i%9)*0.12)+'s"></span>';
   var semNome=!(S.perfil.nome||'').trim();
@@ -2300,7 +2301,7 @@ function rBoasVindas(){var nome=primeiroNome(),cores=['var(--p1)','var(--p2)','v
     '<h1>'+(nome&&!semNome?'Seja bem-vindo, <em>'+esc(nome)+'</em>!':'Seja bem-vindo ao <em>Ideali CAD</em>!')+'</h1>'+
     '<p class="sub">Sua conta está pronta. Em 1 minuto eu te mostro onde fica cada coisa.</p>'+
     (semNome?'<div class="bv-nome"><label class="fld"><span>Nome</span><input id="bv-nome" maxlength="40" autocomplete="given-name"></label><label class="fld"><span>Sobrenome</span><input id="bv-sobrenome" maxlength="40" autocomplete="family-name"></label></div>':'')+
-    '<div class="bv-l">'+it(ICON.pedidos,'Pedidos e prazos','Tudo o que entra, em que etapa está e o que vence.')+it(ICON.financeiro,'Cobrança com Pix','Quem deve, quanto, e o PDF de cobrança pronto.')+it(ICON.analises,'Saúde do negócio','Metas, sinais de alerta e secretários que avisam.')+'</div>'+
+    '<div class="bv-l">'+it(ICON.pedidos,'Pedidos e prazos','Tudo o que entra, em que etapa está e o que vence.')+it(ICON.financeiro,'Cobrança com Pix','Quem deve, quanto, e o PDF de cobrança pronto.')+it(ICON.analises,'Saúde do negócio','Metas, sinais de alerta e agentes de IA que avisam.')+'</div>'+
     '<div class="bv-acts"><button class="btn pri block" data-a="boasIr" data-v="tour">Conhecer o sistema</button><button class="btn block" data-a="boasIr" data-v="pular">Pular e começar a usar</button></div>'+
   '</div></div>';}
 function tourCard(){var i=ui.tour,st=TOUR[i],n=TOUR.length,ult=i===n-1;
@@ -2321,14 +2322,14 @@ function rEquipeIntro(){var i=ui.equipe,st=EQ_INTRO[i],g=SECS.filter(function(x)
   var fig=img?'<img class="eq-img" src="'+img+'" alt="'+esc(g.nome)+'">':'<span class="eq-ret" style="--zc:'+g.cor+'">'+retrato(g.av)+'</span>';
   return '<div class="bv eq" style="--zc:'+g.cor+'"><div class="eq-in" key="'+i+'">'+
     '<div class="eq-fig">'+fig+'</div>'+
-    '<div class="eq-tx"><span class="eq-n">'+(i===0?'Conheça sua equipe':'Sua equipe')+' · '+(i+1)+' de '+n+'</span>'+
+    '<div class="eq-tx"><span class="eq-n">'+(i===0?'Conheça seus agentes de IA':'Agentes de IA')+' · '+(i+1)+' de '+n+'</span>'+
       '<div class="eq-fala">'+esc(st.fala)+'</div>'+
       '<h2>'+esc(g.nome)+' <small>'+esc(g.cargo)+'</small></h2><p>'+esc(st.txt)+'</p>'+
       '<div class="tour-dots">'+EQ_INTRO.map(function(x,j){return '<b class="'+(j===i?'on':'')+'"></b>';}).join('')+'</div>'+
       '<div class="eq-acts">'+(i?'<button class="btn" data-a="eqIr" data-v="voltar">Voltar</button>':'')+'<button class="btn pri" data-a="eqIr" data-v="'+(ult?'fim':'prox')+'">'+(ult?'Bora trabalhar! 🚀':'Próximo')+'</button></div>'+
       (ult?'':'<button class="eq-pula" data-a="eqIr" data-v="fim">Pular apresentação</button>')+
     '</div></div></div>';}
-function fimEquipe(){ui.equipe=null;S.prefs=S.prefs||{};S.prefs.equipe='ok';save();ui.tab='dashboard';render();window.scrollTo(0,0);toast('Sua equipe já está trabalhando. Os recados aparecem na aba Secretários.');}
+function fimEquipe(){ui.equipe=null;S.prefs=S.prefs||{};S.prefs.equipe='ok';save();ui.tab='dashboard';render();window.scrollTo(0,0);toast('Sua equipe já está trabalhando. Os recados aparecem na aba Agentes IA.');}
 /* ---------- Primeiros passos (some quando tudo estiver feito ou a pessoa fechar) ---------- */
 function passosOnb(){var p=S.perfil||{},pr=S.prefs||{};
   return [
@@ -4572,7 +4573,7 @@ impGrava:function(){impGrava();},
   novaConta:function(){ui.novaConta=true;ui.tour=null;ui.equipe=null;closeSheet();render();window.scrollTo(0,0);},
   tourIr:function(d){if(d.v==='fim'){fimTour();return;}var i=(ui.tour||0)+(d.v==='voltar'?-1:1);if(i<0)i=0;if(i>=TOUR.length){fimTour();return;}vaiTour(i);},
   secChat:function(d){ui.tab='secretarios';ui.secAg=d.v||null;ui.drawer=false;closeSheet();render();var b=document.getElementById('zap-b');if(b)b.scrollTop=0;},
-  secAuto:function(d,el){S.prefs=S.prefs||{};S.prefs.secAuto=el&&el.checked?null:false;save();toast(el&&el.checked?'Os secretários vão aparecer 1 vez por dia ao entrar.':'Ok, os recados ficam só na aba Secretários.');},
+  secAuto:function(d,el){S.prefs=S.prefs||{};S.prefs.secAuto=el&&el.checked?null:false;save();toast(el&&el.checked?'Os agentes de IA vão aparecer 1 vez por dia ao entrar.':'Ok, os recados ficam só na aba Agentes IA.');},
   lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
   labModo:function(d){ui.modoLab=d.v==='1';ui.ddOpen=null;closeSheet();if(ui.modoLab){labIni().filtro='abertos';}render();window.scrollTo(0,0);},
   labPedir:function(){labIni().aba='publicar';render();window.scrollTo(0,0);},

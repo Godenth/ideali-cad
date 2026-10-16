@@ -712,6 +712,31 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
     </div>
   </section>
 
+  <section class="agentes" id="agentes">
+    <style>
+      .agentes .wrap{display:block}
+      .ag-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:26px}
+      .ag{position:relative;border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:0 14px 16px;overflow:hidden;display:flex;flex-direction:column}
+      .ag-img{height:210px;display:flex;align-items:flex-end;justify-content:center;background:radial-gradient(70% 70% at 50% 100%,color-mix(in srgb,var(--c) 28%,transparent),transparent 70%);margin:0 -14px 12px}
+      .ag-img img{max-height:200px;max-width:100%;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}
+      .ag-img .ag-em{font-size:84px;line-height:200px}
+      .ag b{font-size:1.05rem}.ag small{display:block;color:var(--c);font-weight:700;font-size:.8rem;margin-bottom:6px}.ag p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.45}
+      @media (max-width:900px){.ag-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ag:last-child{grid-column:1/-1}.ag-img{height:170px}.ag-img img{max-height:160px}}
+    </style>
+    <div class="wrap">
+      <span class="eyebrow">Agentes de IA</span>
+      <h2 style="margin-top:12px">Uma equipe inteira olhando o seu negócio.</h2>
+      <p class="lead" style="margin-top:14px;max-width:760px">Cinco agentes de IA analisam seus pedidos, clientes e pagamentos todo dia. Eles conversam com você como no WhatsApp, aparecem pelas telas com avisos e dicas e mudam de expressão conforme o que está acontecendo.</p>
+      <div class="ag-grid">
+        <div class="ag" style="--c:#6B7385"><div class="ag-img"><span class="ag-em" aria-hidden="true">👔</span></div><b>Sr. Otávio</b><small>Gerente</small><p>Cobra a meta do dia e do mês. Quando a meta é batida, dá presente para a equipe.</p></div>
+        <div class="ag" style="--c:#E5A33A"><div class="ag-img"><img src="app/equipe/ana-feliz.webp" alt="Ana, agente de vendas" loading="lazy" decoding="async"></div><b>Ana</b><small>Vendas</small><p>Avisa prazo vencendo, pedido atrasado e o ritmo das vendas no mês.</p></div>
+        <div class="ag" style="--c:#1E8A5A"><div class="ag-img"><img src="app/equipe/bia-dinheiro.webp" alt="Bia, agente de financeiro" loading="lazy" decoding="async"></div><b>Bia</b><small>Financeiro</small><p>Sabe quem está devendo, lembra de cobrar e comemora quando o Pix cai.</p></div>
+        <div class="ag" style="--c:#2F6FD6"><div class="ag-img"><img src="app/equipe/mica-gravando.webp" alt="Mika, agente de marketing" loading="lazy" decoding="async"></div><b>Mika</b><small>Marketing</small><p>Traz a frase do dia pronta e avisa quem sumiu, quem é novo e quem parou.</p></div>
+        <div class="ag" style="--c:#7A5AE0"><div class="ag-img"><img src="app/equipe/klose-explicando.webp" alt="Klose, agente de análise de dados" loading="lazy" decoding="async"></div><b>Klose</b><small>Análise de dados</small><p>Mede entregas no prazo, ajustes e se um cliente só está pesando demais.</p></div>
+      </div>
+    </div>
+  </section>
+
   <section class="msgs" id="mensagens">
     <div class="wrap">
       <div>
@@ -724,6 +749,8 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
           <li>Datas especiais: Dia do Dentista, Dia da Secretária, Natal, Páscoa e outras.</li>
           <li>Fim de semana, agenda livre e a sua tabela de preços pronta para mandar.</li>
           <li>Lembrete no painel quando uma data está chegando.</li>
+          <li>Escolha o cliente e o WhatsApp abre direto na conversa dele, com o nome no começo.</li>
+          <li>Mande o HTML do exocad ou o STL de fresagem com um toque, já com o link do caso em 3D.</li>
         </ul>
       </div>
       <div class="chat" aria-label="Exemplo de mensagens prontas">
