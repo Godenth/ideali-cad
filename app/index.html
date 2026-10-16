@@ -1409,7 +1409,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 19h50';
+var VERSAO='16/10 · 20h00';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3755,7 +3755,7 @@ function fImport(){var X=ui.imp;if(!X)return head('Importar');var pl=impPlano(X)
     '<h3 style="margin:6px 0 0">Pagamentos</h3><div class="imp-l">'+pl.G.map(function(g){return '<div><b>'+esc(nomeC(g.cli))+'</b><span>'+dmy(g.data)+' · '+brl(g.valor)+(g.forma?' · '+formaNome(g.forma):'')+' · '+plural(g.pedidos.length,'pedido','pedidos')+'</span></div>';}).join('')+'</div>'+
     '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="impGrava"'+(P.length?'':' disabled')+'>Importar '+plural(P.length,'pedido','pedidos')+'</button><button class="btn" data-a="fechar">Cancelar</button></div></div>';}
 function impGrava(){if(!guard())return;var X=ui.imp;if(!X)return;var pl=impPlano(X),cid={},tid={},pid={},nP=0,nC=0,nG=0,nT=0;
-  Object.keys(pl.cm).forEach(function(k){var m=pl.cm[k];if(m.ex){cid[k]=m.ex.id;return;}var c=m.c,o=nomeia({id:uid(),pnome:c.pnome||'',sobrenome:c.sobrenome||'',titulo:c.titulo||'',empresa:c.empresa||'',doc:'',cidade:'',uf:'',tipo:c.tipo||'den',telefone:c.telefone||'',email:'',obs:c.obs||'',criado:today()});S.clientes.push(o);cid[k]=o.id;nC++;});
+  Object.keys(pl.cm).forEach(function(k){var m=pl.cm[k];if(m.ex){cid[k]=m.ex.id;return;}var c=m.c,o=nomeia({id:uid(),pnome:(c.pnome||c.empresa||'Cliente').slice(0,80),sobrenome:c.sobrenome||'',titulo:c.titulo||'',empresa:c.empresa||'',doc:'',cidade:'',uf:'',tipo:/^lab/.test(c.tipo||'')?'laboratorio':'dentista',telefone:c.telefone||'',email:'',obs:c.obs||'',criado:today()});S.clientes.push(o);cid[k]=o.id;nC++;});
   pl.novosT.forEach(function(n){var t={id:uid(),nome:n,forma:/protocolo/i.test(n)?'trabalho':'elemento',valor:0,ativo:true};S.tipos.push(t);tid[impNorm(n)]=t.id;nT++;});
   pl.P.forEach(function(x){if(x.pula)return;var p=x.p,t=p.tipo?(impTipoAcha(p.tipo)||{id:tid[impNorm(p.tipo)]}).id:null;
     var o={id:uid(),num:++S.seq,clienteId:cid[p.cli],paciente:p.paciente,elementos:p.dentes.slice(),itens:p.dentes.map(function(d){return {d:d,t:t};}),extras:[],tipoId:t||null,cor:'',
@@ -3763,7 +3763,7 @@ function impGrava(){if(!guard())return;var X=ui.imp;if(!X)return;var pl=impPlano
       recebido:p.criado,prazo:null,entregue:x.st==='entrada'?null:p.criado,pago:p.pago||null,pagamentoId:null,impMarca:'',impTipo:'',sbImg:'',material:'',fresadora:''};
     S.pedidos.push(o);pid[p.n]=o;nP++;});
   pl.G.forEach(function(g){var ps=g.pedidos.map(function(n){return pid[n];}).filter(Boolean);if(!ps.length)return;
-    var o={id:uid(),clienteId:cid[g.cli],valor:+g.valor,data:g.data,forma:g.forma||'',obs:g.obs||'',pedidos:ps.map(function(p){return p.id;}),comprovante:null};
+    var fm=['pix','transferencia','dinheiro','cartao'].indexOf(g.forma)>=0?g.forma:'pix',o={id:uid(),clienteId:cid[g.cli],valor:+g.valor,data:g.data,forma:fm,obs:(g.obs||'')+(fm!==g.forma?' Forma marcada como Pix por padrão.':''),pedidos:ps.map(function(p){return p.id;}),comprovante:null};
     ps.forEach(function(p){p.pago=g.data;p.pagamentoId=o.id;});S.pagamentos.push(o);nG++;});
   ui.imp=null;save();closeSheet();ui.tab='pedidos';render();
   toast('Importado: '+plural(nP,'pedido','pedidos')+', '+plural(nC,'cliente novo','clientes novos')+', '+plural(nG,'pagamento','pagamentos')+(nT?', '+plural(nT,'tipo novo','tipos novos'):'')+'.');}
