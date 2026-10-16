@@ -508,6 +508,8 @@ table.adm td{vertical-align:top}
 .cr-n{font:700 .8rem var(--f-mono);color:var(--muted)}
 .dl-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
 .rd-grid.sel .dl-cards{grid-template-columns:1fr}
+@media (min-width:960px){.rd-grid.dl{grid-template-columns:1fr}.rd-grid.dl.sel{grid-template-columns:minmax(300px,380px) minmax(0,1fr)}.rd-grid.dl.sel>section:first-child{position:sticky;top:150px;max-height:calc(100vh - 170px);overflow:auto}}
+.rd-grid.dl:not(.sel) .dl-cards{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
 .dl-card{display:grid;gap:10px;text-align:left;border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer;width:100%;transition:border-color .15s,box-shadow .15s,transform .15s}
 .dl-card:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));transform:translateY(-1px)}
 .dl-card.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);background:var(--surface)}
@@ -2682,9 +2684,9 @@ function rdDelegar(R){
       '<span class="dl-top">'+iconeTrab(x)+'<span class="t"><b>'+esc(nomeTrab(x)||(t?t.nome:'Elemento sobre implante'))+'</b><span><span class="pac-i">'+esc(x.paciente)+'</span> · <span class="cli-i">'+esc(c?c.nome:'Lab. Exemplo')+'</span></span></span></span>'+
       (dd.length?'<span class="dl-dentes">'+dd.slice(0,10).map(function(d){return '<i>'+d+'</i>';}).join('')+(dd.length>10?'<i>+'+(dd.length-10)+'</i>':'')+'</span>':'')+
       '<span class="dl-bot"><span class="pz'+(late?' late':'')+'">'+(x.urgente?'<span class="tag u">Urgente</span> ':'')+(x.prazo?(late?'Atrasado · ':'Prazo ')+dm(x.prazo):'Sem prazo')+'</span><span class="v">'+brl(x.valor)+'</span></span></button>';};
-  var h='<div class="rd-grid'+(p?' sel':'')+'"><section class="card stack"><div class="between wrap"><div><h2>1. Qual pedido?</h2><p class="small muted">Escolha um pedido em aberto para mandar para outro cadista desenhar.</p></div><span class="small muted">'+abertos.length+' em aberto</span></div>'+
+  var h='<div class="rd-grid dl'+(p?' sel':'')+'"><section class="card stack"><div class="between wrap"><div><h2>1. Qual pedido?</h2><p class="small muted">Toque num pedido em aberto para mandar para outro cadista desenhar.</p></div><span class="small muted">'+abertos.length+' em aberto</span></div>'+
     '<div class="dl-cards">'+abertos.slice(0,mx).map(card).join('')+'</div>'+(abertos.length>mx?'<button class="btn sm dl-mais" data-a="rdVerTodos">Ver todos ('+abertos.length+')</button>':'')+'</section>';
-  if(!p){return h+'<section class="card empty">Toque num pedido para ver os detalhes e delegar.</section></div>';}
+  if(!p){return h+'</div>';}
   var sug=Math.round((+p.valor||0)*0.6),rep=R.repasse===''?sug:+R.repasse,lucro=(+p.valor||0)-rep;
   var tp=tipoPed(p),cp=cliente(p.clienteId);
   h+='<section class="card stack" id="rd-passo2"><div class="dl-sel">'+iconeTrab(p)+'<span class="t"><b>'+esc(nomeTrab(p)||(tp?tp.nome:'Elemento sobre implante'))+'</b><span><span class="pac-i">'+esc(p.paciente)+'</span> · <span class="cli-i">'+esc(cp?cp.nome:'Lab. Exemplo')+'</span>'+(p.num?' · #'+p.num:'')+'</span><span>'+((p.elementos||[]).length?'Dentes '+p.elementos.join(', '):'Sem dentes')+(p.prazo?' · prazo '+dm(p.prazo):'')+'</span></span><button class="btn sm" data-a="rdPedLimpa">Trocar</button></div>'+
