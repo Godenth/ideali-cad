@@ -551,6 +551,13 @@ table.adm td{vertical-align:top}
 .md-head .ico-trab{width:52px;height:52px;border-radius:14px}.md-head .ico-trab svg{width:34px;height:34px}
 .md-head .t{flex:1;min-width:180px;display:grid;gap:3px}.md-head .t b{font-family:var(--f-display);font-size:1.2rem}
 .md-head .t span{font-size:.86rem;color:var(--muted)}
+.pub-ops{display:grid;gap:12px}@media (min-width:560px){.pub-ops{grid-template-columns:1fr 1fr}}
+.pub-op{display:grid;gap:8px;text-align:left;border:1px solid var(--line);border-radius:18px;padding:18px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer}
+.pub-op:hover{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.pub-op i{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-style:normal}
+.pub-op i svg{width:22px;height:22px}.pub-op b{font-family:var(--f-display);font-size:1.1rem}.pub-op span{color:var(--muted);font-size:.9rem}
+.pub-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.req{color:var(--urgent)}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -1217,7 +1224,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 00h30';
+var VERSAO='16/10 · 00h50';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2664,6 +2671,7 @@ function rRede(){
   var R=redeIni(),tab=R.tab,nRec=R.mural.filter(function(o){return o.st==='aberto';}).length;
   var h='<div class="banner"><span><b>Prévia da Etapa 2 · Rede.</b> Tudo aqui é exemplo para ver como vai funcionar: nada é salvo e nenhum cadista real recebe nada.</span></div>'+
     '<section class="card lm-ver"><div><b>Ver a prévia como:</b><p class="small muted">A Rede tem dois lados. O <b>laboratório ou clínica</b> publica o trabalho. Ele aparece no <b>feed</b> dos cadistas, que aceitam ou recusam. O laboratório aceita um cadista e o trabalho começa.</p></div><div class="lm-seg"><button class="on">👩‍💻 Cadista</button><button data-a="labModo" data-v="1">🏥 Laboratório / clínica</button></div></section>'+
+    '<div class="pub-bar"><span class="small muted">Tem um trabalho para passar adiante?</span><button class="btn pri" data-a="publicar">+ Publicar um trabalho</button></div>'+
     '<nav class="cfg-tabs msg-tabs">'+[['delegar','Delegar um pedido'],['andamento','Enviados'],['pegar','Feed de trabalhos'+(nRec?' '+nRec:'')],['meus','Meus trabalhos'],['parceiros','Cadistas da rede']].map(function(a){return '<button class="'+(tab===a[0]?'on':'')+'" data-a="rdTab" data-v="'+a[0]+'"><span>'+a[1]+'</span></button>';}).join('')+'</nav>';
   if(tab==='delegar')h+=rdDelegar(R);
   if(tab==='andamento')h+=rdEnviados(R);
@@ -2673,6 +2681,24 @@ function rRede(){
   if(tab==='parceiros')h+=secCadistasReais()+'<h3 style="margin:8px 0 0">Exemplos da prévia</h3>'+rdParceiros(R);
   return '<div class="stack" style="gap:16px">'+h+'</div>';
 }
+/* ---------- Publicar um trabalho na Rede ----------
+   Botão único: pedido novo (abre o formulário de pedido, com escaneamento e scanbody obrigatório em sobre implante)
+   ou um pedido que já está na produção (lista). Depois cai no passo "Como delegar" com o pedido escolhido. */
+function fPublicar(){var R=redeIni();
+  if(ui.pubVer==='lista'){var abertos=alive(S.pedidos).filter(function(p){return aberto(p)&&p.status!=='finalizado';}),t0=today();
+    return head('Publicar um trabalho')+'<div class="stack"><div class="pub-bar"><p class="muted" style="margin:0">Escolha o pedido que vai para a Rede.</p><button class="btn sm" data-a="pubVolta">‹ Voltar</button></div>'+
+      (abertos.length?'<div class="dl-cards">'+abertos.map(function(x){var t=tipoPed(x),c=cliente(x.clienteId),late=x.prazo&&x.prazo<t0;
+        return '<button class="dl-card" data-a="pubEscolhe" data-id="'+x.id+'"><span class="dl-top">'+iconeTrab(x)+'<span class="t"><b>'+esc(nomeTrab(x)||(t?t.nome:'Trabalho'))+'</b><span><span class="pac-i">'+esc(x.paciente)+'</span> · <span class="cli-i">'+esc(c?c.nome:'')+'</span></span></span></span>'+
+          '<span class="dl-bot"><span class="pz'+(late?' late':'')+'">'+(x.prazo?(late?'Atrasado · ':'Prazo ')+dm(x.prazo):'Sem prazo')+'</span><span class="v">'+brl(x.valor)+'</span></span></button>';}).join('')+'</div>'
+       :'<p class="empty">Nenhum pedido em produção agora.</p><button class="btn pri" data-a="pubNovo">Cadastrar um pedido novo</button>')+'</div>';}
+  var ic=function(p){return '<i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg></i>';};
+  return head('Publicar um trabalho')+'<div class="stack"><p class="muted" style="margin:0">O trabalho vai para a Rede e outro cadista pode pegar para desenhar.</p><div class="pub-ops">'+
+    '<button class="pub-op" data-a="pubNovo">'+ic('<path d="M12 5v14M5 12h14"/>')+'<b>Pedido novo</b><span>Cadastre agora: dentes, trabalho, escaneamento e scanbody.</span></button>'+
+    '<button class="pub-op" data-a="pubLista">'+ic('<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/>')+'<b>Já está na produção</b><span>Escolha um pedido que você já cadastrou.</span></button>'+
+  '</div></div>';}
+function vaiDelegar(pid){var R=redeIni();ui.pdRede=false;ui.pubVer=null;closeSheet();ui.tab='rede';R.tab='delegar';R.pid=pid;R.repasse='';R.passo=2;render();
+  setTimeout(function(){var e=document.getElementById('rd-passo2');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});},50);}
+function itemImplante(i){var t=tipo(i.t),n=semAcento((t&&t.nome)||'').toLowerCase();return !!i.imp||/implante/.test(n);}
 function rdDelegar(R){
   var abertos=alive(S.pedidos).filter(function(p){return aberto(p)&&p.status!=='finalizado';});
   if(!abertos.length)abertos=[{id:'ex1',num:142,paciente:'M.A.S.',clienteId:null,elementos:[36],valor:90,exemplo:true,itens:[{d:36,t:null}],tipoId:null}];
@@ -3002,16 +3028,20 @@ function comprime(file,lado){lado=lado||1600;return new Promise(function(ok,ko){
 function sobeFoto(file,nome){return comprime(file,nome==='avatar'?600:1600).then(function(b){var ext=b.type==='image/webp'?'webp':'jpg',path=S.sessao.id+'/'+(nome||(Date.now().toString(36)+Math.random().toString(36).slice(2,6)))+'.'+ext;
   return sb.storage.from('portfolio').upload(path,b,{contentType:b.type,upsert:true,cacheControl:'3600'}).then(function(r){if(r.error)throw new Error(r.error.message);delete (S.rede&&S.rede.urls||{})[path];return path;});});}
 var UF_NOME={AC:'Acre',AL:'Alagoas',AM:'Amazonas',AP:'Amapá',BA:'Bahia',CE:'Ceará',DF:'Distrito Federal',ES:'Espírito Santo',GO:'Goiás',MA:'Maranhão',MG:'Minas Gerais',MS:'Mato Grosso do Sul',MT:'Mato Grosso',PA:'Pará',PB:'Paraíba',PE:'Pernambuco',PI:'Piauí',PR:'Paraná',RJ:'Rio de Janeiro',RN:'Rio Grande do Norte',RO:'Rondônia',RR:'Roraima',RS:'Rio Grande do Sul',SC:'Santa Catarina',SE:'Sergipe',SP:'São Paulo',TO:'Tocantins'};
-function cidadesDaUf(uf){var dl=document.getElementById('pr-cidades');if(!dl||!uf)return;municipios().then(function(L){if(!document.getElementById('pr-cidades'))return;
-  dl.innerHTML=L.filter(function(c){return c.uf===uf;}).sort(function(a,b){return (b.cap-a.cap)||a.k.localeCompare(b.k);}).map(function(c){return '<option value="'+esc(c.n)+'">';}).join('');}).catch(function(){});}
-function fPerfilRede(){setTimeout(function(){var u=document.getElementById('pr-uf');if(u&&u.value)cidadesDaUf(u.value);},0);var r=prRow(),u=r.foto_perfil&&S.rede?S.rede.urls[r.foto_perfil]:'',nm=r.nome||'?',ini=nm.split(' ').map(function(x){return x[0];}).slice(0,2).join('');
+function cidadesDaUf(){municipios().catch(function(){});}
+function sugPrCidade(){var inp=document.getElementById('pr-cidade'),box=document.getElementById('pr-sug'),u=document.getElementById('pr-uf');if(!inp||!box)return;var q=inp.value.trim(),uf=u&&u.value;
+  if(!uf||q.length<1){box.hidden=true;box.innerHTML='';return;}
+  municipios().then(function(L){var k=semAcento(q),ini=[],meio=[];L.forEach(function(c){if(c.uf!==uf)return;if(c.k.indexOf(k)===0)ini.push(c);else if(k.length>=3&&c.k.indexOf(' '+k)>0)meio.push(c);});
+    var ord=function(a,b){return (b.cap-a.cap)||a.k.localeCompare(b.k);},rs=ini.sort(ord).concat(meio.sort(ord)).slice(0,8);
+    box.hidden=false;box.innerHTML=rs.length?rs.map(function(c){return '<button type="button" data-a="prPickCid" data-n="'+esc(c.n)+'"><b>'+esc(c.n)+'</b><span>'+c.uf+'</span></button>';}).join(''):'<p class="small muted" style="padding:8px 10px">Nenhuma cidade com esse nome em '+esc(UF_NOME[uf]||uf)+'.</p>';}).catch(function(){});}
+function fPerfilRede(){cidadesDaUf();var r=prRow(),u=r.foto_perfil&&S.rede?S.rede.urls[r.foto_perfil]:'',nm=r.nome||'?',ini=nm.split(' ').map(function(x){return x[0];}).slice(0,2).join('');
   var chips=function(nome,L,sel){return '<div class="pr-chips">'+L.map(function(o){return '<label><input type="checkbox" name="'+nome+'" value="'+esc(o)+'"'+(sel.indexOf(o)>=0?' checked':'')+'> '+esc(o)+'</label>';}).join('')+'</div>';};
   return head('Editar meu perfil na Rede')+'<form data-form="perfilRede" class="stack">'+
     '<div class="pr-av">'+(u?'<span class="rd-av img" style="width:72px;height:72px"><img src="'+u+'" alt="Sua foto"></span>':'<span class="rd-av" style="width:72px;height:72px;background:linear-gradient(135deg,var(--p5),var(--p6))">'+esc(ini)+'</span>')+
       '<label class="btn sm">'+(u?'Trocar foto':'Colocar foto de perfil')+'<input id="pr-foto" type="file" accept="image/*" hidden></label>'+(u?'<button type="button" class="btn sm" data-a="prFotoTira">Tirar foto</button>':'')+'</div>'+
     '<label class="fld"><span>Nome que aparece na Rede</span><input name="nome" required maxlength="80" value="'+esc(r.nome)+'"></label>'+
-    '<div class="g2"><label class="fld"><span>Estado</span><select name="uf" id="pr-uf"><option value="">Escolha o estado</option>'+UFS.map(function(u){return '<option value="'+u+'"'+(r.uf===u?' selected':'')+'>'+u+' · '+UF_NOME[u]+'</option>';}).join('')+'</select></label>'+
-      '<label class="fld"><span>Cidade</span><input name="cidade" id="pr-cidade" maxlength="80" list="pr-cidades" autocomplete="off" value="'+esc(r.cidade)+'" placeholder="'+(r.uf?'Comece a digitar…':'Escolha o estado primeiro')+'"'+(r.uf?'':' disabled')+'><datalist id="pr-cidades"></datalist></label></div>'+
+    '<div style="display:grid;gap:12px;grid-template-columns:96px minmax(0,1fr);align-items:start"><label class="fld"><span>Estado</span><select name="uf" id="pr-uf"><option value="">UF</option>'+UFS.map(function(u){return '<option value="'+u+'"'+(r.uf===u?' selected':'')+'>'+u+'</option>';}).join('')+'</select></label>'+
+      '<div class="fld"><span>Cidade</span><input name="cidade" id="pr-cidade" maxlength="80" autocomplete="off" value="'+esc(r.cidade)+'" placeholder="'+(r.uf?'Comece a digitar…':'Escolha o estado primeiro')+'"'+(r.uf?'':' disabled')+'><div class="cid-sug" id="pr-sug" hidden></div></div></div>'+
     '<div class="fld"><span>Softwares que você usa</span>'+chips('sw',SOFTS,r.softwares||[])+'</div>'+
     '<div class="fld"><span>Especialidades</span>'+chips('esp',ESPECS,r.especialidades||[])+'</div>'+
     '<label class="fld"><span>Prazo médio de entrega</span><select name="prazo"><option value="">Escolha</option>'+PRAZOS.map(function(o){return '<option'+(r.prazo===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select></label>'+
@@ -3333,7 +3363,8 @@ function fPedido(id,preCli){
   var mat=p?p.material||'':'',fr=p?p.fresadora||'':'';
   function arch(list){return '<div class="arch">'+list.map(function(n,i){return '<button type="button" class="tooth '+(i===8?'mid':'')+'" data-a="tooth" data-n="'+n+'">'+n+'</button>';}).join('')+'</div>';}
   function conn(list){return '<div class="conn" aria-label="Uniões entre dentes">'+list.map(function(n,i){return '<span data-cn="'+n+'">'+(i<15?'<button type="button" class="cn" data-a="pdUne" data-n="'+n+'" aria-label="Unir '+n+' e '+list[i+1]+'"></button>':'')+'</span>';}).join('')+'</div>';}
-  return head(p?'Editar pedido #'+p.num:'Novo pedido')+
+  return head(p?'Editar pedido #'+p.num:(ui.pdRede?'Publicar trabalho novo':'Novo pedido'))+
+  (ui.pdRede&&!p?'<div class="banner"><span><b>Vai para a Rede.</b> Anexe o escaneamento. Em dente sobre implante, a <b>marca do implante</b> e o <b>scanbody</b> são obrigatórios. Depois de salvar, você escolhe o repasse e o prazo.</span></div>':'')+
   '<form data-form="pedido" data-id="'+(id||'')+'" class="stack">'+
     '<div class="pdf"><div class="pdf-b1">'+
     '<label class="fld"><span>Cliente</span><select id="pd-cli" name="clienteId" required><option value="">Escolha…</option>'+cs.map(function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select>'+(cs.length?'':'<small>Cadastre um cliente primeiro.</small>')+'</label>'+
@@ -3393,12 +3424,13 @@ function gruposUniao(its){var mapa={},out=[];(its||[]).forEach(function(i){mapa[
 function abreEditorDente(n){
   var its=ui.pdItens,i=its.filter(function(x){return x.d===n;})[0],novo=!i;
   if(novo){var ult=its[its.length-1];i={d:n,t:ult?ult.t:'',imp:ult?ult.imp:false,m:ult?ult.m:'',c:ult?ult.c:''};its.push(i);}
+  if(ui.pdRede&&i.t&&itemImplante(i))i.imp=true;
   ui.pdEd=n;
   var box=document.getElementById('pd-ed');
   box.innerHTML='<div class="pd-ed"><div class="between"><b>Dente '+n+'</b>'+(novo&&its.length>1?'<span class="small muted">Copiado do dente anterior. Mude se precisar.</span>':'')+'</div>'+
     '<label class="fld"><span>Trabalho deste dente</span><select id="ed-t">'+tiposOpts(i.t)+'</select></label>'+
     '<label class="check"><input type="checkbox" id="ed-imp" '+(i.imp?'checked':'')+'> Sobre implante (scanbody)</label>'+
-    '<div id="ed-impbox" class="grid2" '+(i.imp?'':'hidden')+'><div class="fld"><span>Marca do implante</span>'+selOutro('edM',MARCAS_IMP,i.m,'Digite a marca')+'</div><div class="fld"><span>Conexão / scanbody</span>'+selOutro('edC',CONEX_IMP,i.c,'Digite o tipo')+'</div></div>'+
+    '<div id="ed-impbox" class="grid2" '+(i.imp?'':'hidden')+'><div class="fld"><span>Marca do implante'+(ui.pdRede?' <b class="req">*</b>':'')+'</span>'+selOutro('edM',MARCAS_IMP,i.m,'Digite a marca')+'</div><div class="fld"><span>Conexão / scanbody'+(ui.pdRede?' <b class="req">*</b>':'')+'</span>'+selOutro('edC',CONEX_IMP,i.c,'Digite o tipo')+'</div></div>'+
     '<div class="row wrap"><button type="button" class="btn pri sm" data-a="pdOk">Pronto</button><button type="button" class="btn sm danger" data-a="pdTira" data-n="'+n+'">Tirar este dente</button></div></div>';
   renderItens();var s=document.getElementById('ed-t');if(s&&!i.t)s.focus();box.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
@@ -3937,6 +3969,7 @@ var A={
     setTimeout(function(){URL.revokeObjectURL(u);},60000);},
   rdPerfil:function(d){openSheet(fPerfilCad,d.id);},
   prEditar:function(){if(!S.rede)carregaPerfilRede();openSheet(fPerfilRede);},
+  prPickCid:function(d){var i=document.getElementById('pr-cidade');if(i)i.value=d.n;var b=document.getElementById('pr-sug');if(b){b.hidden=true;b.innerHTML='';}},
   prFotoTira:function(){var row=Object.assign({},prRow()),p=row.foto_perfil;if(!p)return;row.foto_perfil=null;sb.storage.from('portfolio').remove([p]).then(function(){salvaPerfilRede(row,'Foto de perfil removida.');});},
   rdPortVer:function(d){rdLightbox(d.id,+d.i);},
   pubPerfil:function(d){carregaListaRede();openSheet(fPerfilPub,d.id);},
@@ -4001,7 +4034,12 @@ var A={
   loginModo:function(){ui.loginCriar=!ui.loginCriar;render();},
   esqueci:function(){var e=(document.getElementById('lg-email')||{}).value||'';e=e.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast('Digite seu e-mail no campo acima e toque de novo em "Esqueci a senha".');return;}
     sb.auth.resetPasswordForEmail(e,{redirectTo:location.href.split('#')[0].split('?')[0]}).then(function(r){ui.loginEmail=e;ui.loginMsg=r.error?'Não foi possível enviar agora. Tente de novo em alguns minutos.':'Se existir uma conta com <b>'+esc(e)+'</b>, enviamos um link para criar uma nova senha. Veja também o spam.';render();});},
-  novoPedido:function(){if(!guard())return;ui.pdInit=true;openSheet(fPedido,null,ui.tab==='clientes'?ui.sub:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
+  publicar:function(){if(!guard())return;ui.pubVer=null;openSheet(fPublicar);},
+  pubLista:function(){ui.pubVer='lista';renderSheet();},
+  pubVolta:function(){ui.pubVer=null;renderSheet();},
+  pubEscolhe:function(d){vaiDelegar(d.id);},
+  pubNovo:function(){if(!guard())return;ui.pubVer=null;ui.pdRede=true;ui.pdInit=true;openSheet(fPedido,null,null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
+  novoPedido:function(){if(!guard())return;ui.pdRede=false;ui.pdInit=true;openSheet(fPedido,null,ui.tab==='clientes'?ui.sub:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
   editPedido:function(d){if(!guard())return;ui.pdInit=true;openSheet(fPedido,d.id);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
   verPedido:function(d){openSheet(fPedidoDet,d.id);},
   st:function(d,el,e){e.stopPropagation();setStatus(d.id,d.st);},
@@ -4154,6 +4192,7 @@ var F={
     var its=(ui.pdItens||[]).slice(),ex=(ui.pdExtras||[]).filter(function(x){return x.t;});
     var sem=its.filter(function(i){return !i.t;})[0];if(sem){toast('Falta escolher o trabalho do dente '+sem.d+'.');abreEditorDente(sem.d);return;}
     if(!its.length&&!ex.length){toast('Marque pelo menos um dente ou um trabalho sem dente.');return;}
+    if(ui.pdRede){var fi=its.filter(function(i){return itemImplante(i)&&(!i.m||!i.c);})[0];if(fi){fi.imp=true;toast('Dente '+fi.d+' é sobre implante: informe a marca do implante e o scanbody.');abreEditorDente(fi.d);return;}}
     var ordem=UP.concat(LO);its.sort(function(a,b){return ordem.indexOf(a.d)-ordem.indexOf(b.d);});
     var mat=valOutro(fd,'material'),fr=fd.get('fresadora')||'';
     var o={clienteId:fd.get('clienteId'),paciente:nomeProprio(fd.get('paciente').trim()),tipoId:(its[0]||ex[0]).t,elementos:its.map(function(i){return i.d;}),itens:its,extras:ex,material:mat,fresadora:fr,cor:'',
@@ -4164,6 +4203,7 @@ var F={
     if(sl){if(!/^https:\/\//i.test(sl)){toast('O link do escaneamento precisa começar com https://');var si=document.getElementById('pd-scan');if(si)si.focus();return;}try{host=new URL(sl).hostname.replace(/^www\./,'');}catch(x){toast('Link do escaneamento inválido.');return;}}
     if(id){p=byId(S.pedidos,id);Object.assign(p,o);}else{p=Object.assign({id:uid(),num:++S.seq,status:'entrada',entregue:null,pago:null,pagamentoId:null},o);S.pedidos.push(p);}
     if(sl)S.arquivos.push({id:uid(),pedidoId:p.id,origem:'link',nome:'Escaneamento · '+host,url:sl,criado:today()});
+    if(ui.pdRede&&!id){save();if(anexos.length)enviaArquivo(p.id,anexos);toast('Pedido #'+p.num+' criado. Agora defina o repasse e o prazo.');vaiDelegar(p.id);return;}
     save();render();openSheet(fPedidoDet,p.id);toast(id?'Pedido salvo.':'Pedido #'+p.num+' criado.');
     if(anexos.length)enviaArquivo(p.id,anexos);
   },
@@ -4311,6 +4351,7 @@ document.addEventListener('submit',function(e){var f=e.target;if(!f.dataset.form
 document.addEventListener('toggle',function(e){if(e.target.classList&&e.target.classList.contains('mm'))ui.mmAberto=e.target.open;},true);
 document.addEventListener('focusin',function(e){if(e.target.closest&&e.target.closest('.mm-li'))window._mmTa=e.target;});
 document.addEventListener('input',function(e){
+  if(e.target&&e.target.id==='pr-cidade')sugPrCidade();
   if(e.target.classList&&e.target.classList.contains('pv-in')){(ui.prevPar=ui.prevPar||{})[e.target.dataset.k]=+e.target.value;clearTimeout(ui.prevT);ui.prevT=setTimeout(function(){var y=window.scrollY,ab=!!document.querySelector('.pv-ajuste[open]');render();var d=document.querySelector('.pv-ajuste');if(d&&ab)d.open=true;window.scrollTo(0,y);},180);}
   if(e.target.classList&&e.target.classList.contains('nome-p')){var el=e.target,st=el.selectionStart,en=el.selectionEnd,nv=nomeProprio(el.value,el.id==='cl-sobrenome');if(nv!==el.value){el.value=nv;try{el.setSelectionRange(st,en);}catch(x){}}}
   if(e.target.classList&&(e.target.classList.contains('tel-ddd')||e.target.classList.contains('tel-num'))){var pr=e.target.dataset.pre,dd=document.getElementById(pr+'-ddd'),nu=document.getElementById(pr+'-num');
@@ -4331,7 +4372,8 @@ document.addEventListener('input',function(e){
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
 document.addEventListener('change',function(e){
-  if(e.target&&e.target.id==='pr-uf'){var ci=document.getElementById('pr-cidade');if(ci){ci.disabled=!e.target.value;ci.value='';ci.placeholder=e.target.value?'Comece a digitar…':'Escolha o estado primeiro';if(e.target.value){cidadesDaUf(e.target.value);ci.focus();}}}
+  if(e.target&&e.target.id==='ed-t'&&ui.pdRede){var tt=tipo(e.target.value);if(tt&&/implante/.test(semAcento(tt.nome))){var cb=document.getElementById('ed-imp');if(cb&&!cb.checked){cb.checked=true;var bx=document.getElementById('ed-impbox');if(bx)bx.hidden=false;}}}
+  if(e.target&&e.target.id==='pr-uf'){var ci=document.getElementById('pr-cidade');if(ci){ci.disabled=!e.target.value;ci.value='';ci.placeholder=e.target.value?'Comece a digitar…':'Escolha o estado primeiro';var sb2=document.getElementById('pr-sug');if(sb2){sb2.hidden=true;sb2.innerHTML='';}if(e.target.value)ci.focus();}}
   if(e.target.dataset&&e.target.dataset.a2==='labQuem'){labIni().novo.quem=e.target.value;var lc=document.getElementById('lab-cad');if(lc)lc.hidden=e.target.value!=='um';return;}
   if(e.target.dataset&&e.target.dataset.a2==='labTipo'){labIni().perfil.tipo=e.target.value;toast('Na conta final, isso muda o texto do painel (clínica ou laboratório).');return;}
   if(e.target.name==='titulo'&&e.target.type==='radio'){var to=document.getElementById('pd-titulo-o');if(to){to.hidden=e.target.value!=='__outro';if(!to.hidden)to.focus();}}
