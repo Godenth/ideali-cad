@@ -6,20 +6,23 @@
   var CHAVE = 'ideali_cookies'; // 'sim' | 'nao'
   function le(){ try { return localStorage.getItem(CHAVE); } catch(e){ return null; } }
   function grava(v){ try { localStorage.setItem(CHAVE, v); } catch(e){} }
-  function carrega(){
+  var naApp = /\/app\//.test(location.pathname);
+  function carrega(semPageView){
     if (!PIXEL_ID || window.fbq) return;
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
       if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
       t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    window.fbq('set', 'autoConfig', false, PIXEL_ID);
     window.fbq('init', PIXEL_ID);
-    window.fbq('track', 'PageView');
+    if (!semPageView) window.fbq('track', 'PageView');
   }
-  // Evento para o sistema chamar depois de um cadastro (só envia se a pessoa aceitou).
-  window.idealiEvento = function(nome){ if (le() === 'sim' && PIXEL_ID) { carrega(); window.fbq && window.fbq('track', nome); } };
+  // Evento para o sistema chamar no momento do cadastro (só envia se a pessoa aceitou).
+  // Dentro do sistema o Pixel nunca carrega sozinho nem registra visitas de tela: só este evento, na tela de cadastro.
+  window.idealiEvento = function(nome){ if (le() === 'sim' && PIXEL_ID) { carrega(naApp); window.fbq && window.fbq('track', nome); } };
 
-  var naApp = /\/app\//.test(location.pathname);
+  if (naApp) return;
   if (le() === 'sim') { carrega(); return; }
-  if (le() === 'nao' || naApp || !PIXEL_ID) return; // no sistema não mostramos o aviso; sem ID não há o que pedir
+  if (le() === 'nao' || !PIXEL_ID) return; // no sistema não mostramos o aviso; sem ID não há o que pedir
 
   function aviso(){
     var d = document.createElement('div');
