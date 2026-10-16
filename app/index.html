@@ -442,6 +442,9 @@ html[data-tema="neon"] body{background:radial-gradient(1100px 620px at 100% -10%
 .zbadge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--ok);color:#fff;font-size:.72rem;font-weight:800;display:grid;place-items:center}
 .zav{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;background:var(--zc,var(--accent))}
 .zav svg{width:22px;height:22px}.zav.sm{width:38px;height:38px}.zav.sm svg{width:19px;height:19px}
+.zav.pf{overflow:hidden;align-items:end;background:radial-gradient(circle at 50% 30%,color-mix(in srgb,var(--zc) 35%,#fff),var(--zc))}
+.zav.pf svg,.zav.pf.sm svg{width:112%;height:112%;margin-bottom:-6%}.zav.pf img{width:100%;height:100%;object-fit:cover}
+.zcargo{font-style:normal;font-weight:500;font-size:.78em;color:var(--muted);margin-left:2px}
 .zap-c{display:flex;flex-direction:column;min-height:0;min-width:0}
 .zap-ch{display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
 .zap-ch .tx{min-width:0}.zap-ch b{display:block}.zap-ch span{font-size:.8rem;color:var(--muted)}
@@ -1290,7 +1293,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 04h20';
+var VERSAO='16/10 · 11h30';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1824,12 +1827,36 @@ function fTemaQuiz(){return head('Descobrir meu tema')+'<form data-form="temaQui
 /* ---------- Secretários (estilo WhatsApp) ----------
    Uma conversa por assunto: Pedidos, Financeiro, Faturamento e Clientes. Regras fixas, calculadas no aparelho com os dados
    do próprio cadista (nada sai do sistema, sem custo). "Ok" esconde a mensagem só por hoje; abrir a conversa marca como lida. */
+/* Equipe: um personagem para cada cargo. Tudo por regras fixas sobre os dados do próprio usuário (não usa IA paga). */
 var SECS=[
-  {id:'ped',nome:'Pedidos',papel:'Cuida dos prazos e da produção',cor:'#2F6FD6',ic:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/>'},
-  {id:'fin',nome:'Financeiro',papel:'Avisa quem pagou e quem está devendo',cor:'#1E8A5A',ic:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/>'},
-  {id:'fat',nome:'Faturamento',papel:'Acompanha o mês e as metas',cor:'#B7791F',ic:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'},
-  {id:'cli',nome:'Clientes',papel:'Percebe quem sumiu, quem mudou e quem cresceu',cor:'#C2367A',ic:'<circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5M16 5.5a3 3 0 0 1 0 5.6M18 14.5c1.6.6 2.7 2.2 3 4.5"/>'}];
-function avSec(g,sm){return '<span class="zav'+(sm?' sm':'')+'" style="--zc:'+g.cor+'" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+g.ic+'</svg></span>';}
+  {id:'ven',nome:'Léo',cargo:'Vendas',papel:'Vendas · conta os pedidos novos, os prazos e o ritmo do mês',cor:'#2F6FD6',av:{pele:'#F2C6A0',cab:'#2B2440',olho:'#2F6FD6',est:'espetado',roupa:'#2F6FD6',det:'gravata'}},
+  {id:'fin',nome:'Bia',cargo:'Financeiro',papel:'Financeiro · quanto entrou, quanto falta receber e quem cobrar',cor:'#1E8A5A',av:{pele:'#E9B48C',cab:'#5A3422',olho:'#1E8A5A',est:'longo',roupa:'#1E8A5A',det:'gola'}},
+  {id:'mkt',nome:'Nina',cargo:'Marketing',papel:'Marketing · mensagens prontas, clientes sumidos, novos e perdidos',cor:'#C2367A',av:{pele:'#F6D2B8',cab:'#E45C9C',olho:'#8E3BD8',est:'coque',roupa:'#C2367A',det:'estrela'}},
+  {id:'dad',nome:'Téo',cargo:'Análise de dados',papel:'Análise · entregas no prazo, ajustes e satisfação dos clientes',cor:'#6A4DE0',av:{pele:'#C98E66',cab:'#1C1A2E',olho:'#4FC8FF',est:'baguncado',roupa:'#6A4DE0',det:'oculos'}}];
+/* retrato em estilo anime desenhado em SVG (fundo transparente); dá para trocar por uma imagem em g.foto */
+function retrato(a){var h='',P=a.pele,C=a.cab,O=a.olho;
+  if(a.est==='longo')h+='<path d="M13 31C11 11 53 11 51 31L53 53C47 55 43 51 43 46H21C21 51 17 55 11 53Z" fill="'+C+'"/>';
+  if(a.est==='coque')h+='<circle cx="44" cy="10" r="7" fill="'+C+'"/><path d="M15 30C14 14 50 13 49 30L49 40H15Z" fill="'+C+'"/>';
+  h+='<path d="M10 66C12 52 21 47 32 47S52 52 54 66Z" fill="'+a.roupa+'"/><path d="M27 37h10v12c-2 2-8 2-10 0Z" fill="'+P+'"/><path d="M27 43c3 2 7 2 10 0v3c-3 2-7 2-10 0Z" fill="#000" opacity=".12"/>';
+  if(a.det==='gravata')h+='<path d="M27 47l5 5 5-5" fill="#fff"/><path d="M30.6 50.5h2.8l1.2 9-2.6 3-2.6-3Z" fill="#1B1830"/>';
+  if(a.det==='gola')h+='<path d="M24 48l8 7 8-7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/>';
+  if(a.det==='estrela')h+='<path d="M41 55l1.3 2.7 3 .4-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.4Z" fill="#FFD84D"/>';
+  if(a.det==='oculos')h+='<path d="M26 47l6 5 6-5" fill="none" stroke="#fff" stroke-width="2" opacity=".85"/>';
+  h+='<ellipse cx="18.5" cy="30" rx="2.6" ry="3.6" fill="'+P+'"/><ellipse cx="45.5" cy="30" rx="2.6" ry="3.6" fill="'+P+'"/>';
+  h+='<path d="M19 25C19 13 45 13 45 25C45 35 39 42.5 32 43.5C25 42.5 19 35 19 25Z" fill="'+P+'"/>';
+  h+='<ellipse cx="25.6" cy="29.5" rx="3.3" ry="4.4" fill="#1B1830"/><ellipse cx="38.4" cy="29.5" rx="3.3" ry="4.4" fill="#1B1830"/>'+
+     '<ellipse cx="25.6" cy="30.6" rx="2.3" ry="3" fill="'+O+'"/><ellipse cx="38.4" cy="30.6" rx="2.3" ry="3" fill="'+O+'"/>'+
+     '<circle cx="26.7" cy="28" r="1.25" fill="#fff"/><circle cx="39.5" cy="28" r="1.25" fill="#fff"/><circle cx="24.8" cy="32" r=".6" fill="#fff"/><circle cx="37.6" cy="32" r=".6" fill="#fff"/>'+
+     '<path d="M22.4 24.2q3.2-1.6 6.4 0M35.2 24.2q3.2-1.6 6.4 0" fill="none" stroke="'+C+'" stroke-width="1.3" stroke-linecap="round"/>'+
+     '<ellipse cx="22.5" cy="35" rx="2.4" ry="1.3" fill="#FF7B9C" opacity=".35"/><ellipse cx="41.5" cy="35" rx="2.4" ry="1.3" fill="#FF7B9C" opacity=".35"/>'+
+     '<path d="M29.6 37.4q2.4 1.8 4.8 0" fill="none" stroke="#7A3B3B" stroke-width="1.1" stroke-linecap="round"/>';
+  if(a.est==='espetado')h+='<path d="M16 27C13 12 25 6 33 7C44 7 51 15 48 28L45 20L42 25L39 17L35 23L32 15L28 23L25 17L22 24L19 19Z" fill="'+C+'"/>';
+  if(a.est==='longo')h+='<path d="M18 27C17 12 47 11 46 27C42 20 37 18 33 22C29 17 22 20 18 27Z" fill="'+C+'"/>';
+  if(a.est==='coque')h+='<path d="M17 28C16 12 45 9 48 25C41 23 35 17 29 21C26 23 21 24 17 28Z" fill="'+C+'"/>';
+  if(a.est==='baguncado')h+='<path d="M16 26C13 11 30 5 38 8C49 10 51 20 48 27C46 22 43 19 40 21C37 16 30 20 27 17C25 22 20 21 16 26Z" fill="'+C+'"/>';
+  if(a.det==='oculos')h+='<g fill="none" stroke="#1B1830" stroke-width="1.4"><rect x="20.6" y="25.2" width="10" height="8.6" rx="3"/><rect x="33.4" y="25.2" width="10" height="8.6" rx="3"/><path d="M30.6 28.6h2.8"/></g>';
+  return '<svg viewBox="0 0 64 64" aria-hidden="true">'+h+'</svg>';}
+function avSec(g,sm){return '<span class="zav pf'+(sm?' sm':'')+'" style="--zc:'+g.cor+'" aria-hidden="true">'+(g.foto?'<img src="'+esc(g.foto)+'" alt="">':retrato(g.av))+'</span>';}
 function nomeCurtoCli(c){if(!c)return 'Cliente';var t=(c.titulo==='Dr.'||c.titulo==='Dra.')?c.titulo+' ':'';return t?t+String(c.pnome||c.nome||'').split(' ')[0]:String(c.nome||c.pnome||'Cliente');}
 function pedTxt(p){var tp=tipoPed(p);return (tp?tp.nome:'Pedido')+(p.paciente?' · '+p.paciente:'')+' ('+nomeCurtoCli(cliente(p.clienteId))+')';}
 function quandoTxt(n){return n===0?'hoje':n===1?'há 1 dia':'há '+n+' dias';}
@@ -1850,12 +1877,15 @@ function msgsPed(){var t=today(),am=addDays(t,1),P=alive(S.pedidos),ab=P.filter(
   if(nv.length)R.push({k:'novos_'+nv.length,n:'info',tit:(nv.length===1?'Entrou 1 pedido novo':'Entraram '+nv.length+' pedidos novos')+' desde ontem',sub:nv.slice(0,3).map(pedTxt).join(' · ')+(nv.length>3?' e mais '+(nv.length-3)+'.':'.')});
   return R;}
 function msgsFin(){var t=today(),R=[],dv=devedores(),tot=dv.reduce(function(s,d){return s+d.v;},0);
-  R.push({k:'fin_oi',n:'info',tit:tot?'Você tem '+brl(tot)+' para receber':'Ninguém está devendo',sub:tot?plural(dv.length,'cliente','clientes')+' com trabalho entregue e ainda não pago.':'Todos os trabalhos entregues estão pagos. 👏',a:tot?'tab':'',v:'financeiro',bt:'Abrir financeiro'});
+  var mes=monthOf(t),rec=alive(S.pagamentos).filter(function(g){return g.data&&monthOf(g.data)===mes;}).reduce(function(s,g){return s+(+g.valor||0);},0);
+  R.push({k:'fin_mes',n:'info',tit:'Recebido em '+MESES[+mes.slice(5,7)-1]+': '+brl(rec),sub:rec?'Somando todos os pagamentos registrados neste mês.':'Nenhum pagamento registrado neste mês ainda.'});
+  R.unshift({k:'fin_oi',n:'info',tit:tot?'Você tem '+brl(tot)+' para receber':'Ninguém está devendo',sub:tot?plural(dv.length,'cliente','clientes')+' com trabalho entregue e ainda não pago.':'Todos os trabalhos entregues estão pagos. 👏',a:tot?'tab':'',v:'financeiro',bt:'Abrir financeiro'});
   dv.forEach(function(d){var ps=aReceber(d.c.id),velho=ps.map(function(p){return p.entregue||p.recebido;}).filter(Boolean).sort()[0];if(!velho)return;var dias=daysBetween(velho,t);if(dias<7)return;
     R.push({k:'pag_'+d.c.id,n:dias>=30?'alta':'media',tit:nomeCurtoCli(d.c)+' ainda não pagou '+brl(d.v),sub:(d.n===1?'1 pedido entregue '+quandoTxt(dias):d.n+' pedidos entregues, o mais antigo '+quandoTxt(dias))+'.',a:'cobranca',id:d.c.id,bt:'Gerar cobrança'});});
   alive(S.pagamentos).filter(function(g){return g.data&&g.data>=addDays(t,-1);}).forEach(function(g){var c=cliente(g.clienteId);
     R.push({k:'rec_'+g.id,n:'info',tit:nomeCurtoCli(c)+' pagou '+brl(g.valor),sub:(g.data===t?'Hoje':'Ontem')+(g.forma?' · '+g.forma:'')+'. 🎉'});});
   return R;}
+function msgsVen(){var A=[],B=[];try{A=msgsPed();}catch(e){}try{B=msgsFat();}catch(e){}return A.concat(B);}
 function msgsFat(){var t=today(),m=monthOf(t),pm=prevMonth(m),d=+t.slice(8),R=[];
   var ate=function(mm,dd){return alive(S.pedidos).filter(function(p){return monthOf(p.recebido)===mm&&+p.recebido.slice(8)<=dd;});};
   var A=ate(m,d),B=ate(pm,d),fa=soma(A),fb=soma(B),el=elems(A),nd=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();
@@ -1878,16 +1908,45 @@ function msgsCli(){var t=today(),R=[],sig=[];try{sig=analisar().sig;}catch(e){}
   L.forEach(function(x,i){var c=cliente(x.cid);if(!c)return;var m={k:'sin_'+x.cid+'_'+i,n:x.n>=3?'alta':x.n>=2?'media':'info',tit:x.tit,sub:x.txt,a:'verCliente',id:x.cid,bt:'Ver cliente'};
     if(x.msg&&c.telefone)m.href=waLink(msgSinal(x),c.telefone);R.push(m);});
   return R;}
+function msgsMkt(){var t=today(),R=[],dow=new Date(t+'T12:00:00').getDay(),C=alive(S.clientes),P=alive(S.pedidos).filter(function(p){return p.recebido;});
+  try{R=msgsCli();}catch(e){R=[];}
+  R.forEach(function(m){if(m.k==='cli_oi')m.k='mkt_oi';});
+  if(dow===4||dow===5)R.splice(1,0,{k:'mkt_fds_'+t,n:'media',tit:(dow===5?'Sexta-feira':'Quinta-feira')+': hora de avisar que você trabalha no fim de semana',sub:'Separei mensagens prontas para mandar no WhatsApp dos seus clientes. Quem manda caso no sábado começa a semana adiantado.',a:'msgAbrir',v:'datas',bt:'Ver mensagens prontas'});
+  var mes=monthOf(t),pm=prevMonth(mes),nov=C.filter(function(c){return c.criado&&monthOf(c.criado)===mes;}).length,novA=C.filter(function(c){return c.criado&&monthOf(c.criado)===pm;}).length;
+  R.push({k:'mkt_nov_'+nov,n:nov<novA?'media':'info',tit:nov?(nov===1?'1 cliente novo':nov+' clientes novos')+' em '+MESES[+mes.slice(5,7)-1]:'Nenhum cliente novo em '+MESES[+mes.slice(5,7)-1]+' ainda',
+    sub:'No mês passado foram '+novA+'.'+(nov>novA?' Está melhor que o mês passado. 👏':nov<novA?' Vale divulgar seu trabalho: poste um antes e depois ou peça indicação a quem já é cliente.':''),a:'tab',v:'clientes',bt:'Ver clientes'});
+  var ult={};P.forEach(function(p){if(!ult[p.clienteId]||p.recebido>ult[p.clienteId])ult[p.clienteId]=p.recebido;});
+  var perd=C.filter(function(c){var u=ult[c.id];return u&&u<addDays(t,-60)&&u>=addDays(t,-180);});
+  if(perd.length)R.push({k:'mkt_perd_'+perd.length,n:perd.length>=3?'alta':'media',tit:plural(perd.length,'cliente parou','clientes pararam')+' de mandar trabalho',sub:'Sem pedido há mais de 60 dias: '+perd.slice(0,4).map(nomeCurtoCli).join(', ')+(perd.length>4?' e mais '+(perd.length-4):'')+'. Uma mensagem simples perguntando como estão já traz muita gente de volta.',a:'msgAbrir',v:'inativos',bt:'Mensagem para inativos'});
+  else if(C.length&&!R.some(function(m){return m.n==='alta';}))R.push({k:'mkt_perd_0',n:'info',tit:'Nenhum cliente perdido nos últimos meses',sub:'Todo mundo que mandava trabalho continua mandando. 💪'});
+  return R;}
+function msgsDad(){var t=today(),R=[],P=alive(S.pedidos);
+  var ent=function(a,b){return P.filter(function(p){return p.entregue&&p.entregue>=a&&p.entregue<b;});};
+  var A=ent(addDays(t,-30),addDays(t,1)),B=ent(addDays(t,-60),addDays(t,-30));
+  var noPr=function(L){var c=L.filter(function(p){return p.prazo;});return c.length?Math.round(c.filter(function(p){return p.entregue<=p.prazo;}).length/c.length*100):null;};
+  var lead=function(L){var c=L.filter(function(p){return p.recebido;});return c.length?c.reduce(function(s,p){return s+daysBetween(p.recebido,p.entregue);},0)/c.length:null;};
+  var aj=function(L){return L.length?L.filter(function(p){return !(p.ajustes>0);}).length/L.length*100:null;};
+  var pa=noPr(A),pb=noPr(B),la=lead(A),lb=lead(B),qa=aj(A),qb=aj(B),f1=function(v){return v.toFixed(1).replace('.',',');};
+  R.push({k:'dad_oi',n:'info',tit:A.length?'Analisei '+plural(A.length,'entrega','entregas')+' dos últimos 30 dias':'Ainda não há entregas nos últimos 30 dias',sub:A.length?'Comparo com os 30 dias anteriores para ver se está melhorando.':'Quando você marcar pedidos como enviados eu começo a medir prazo, ajustes e satisfação.',a:'tab',v:'analises',bt:'Ver Análises'});
+  if(pa!=null)R.push({k:'dad_prazo',n:pa<80?'alta':pa<95?'media':'info',tit:'Entregas no prazo: '+pa+'%',sub:(pb!=null?'Antes eram '+pb+'%. '+(pa>pb?'Melhorou. 👏':pa<pb?'Piorou, vale olhar a fila de produção.':'Igual ao período anterior.'):'')+(pa<95?' Atraso é o que mais faz o cliente procurar outro cadista.':' Ótimo, prazo cumprido passa confiança.')});
+  if(la!=null)R.push({k:'dad_lead',n:'info',tit:'Tempo médio de entrega: '+f1(la)+' '+(la>=1.95||la<0.95?'dias':'dia'),sub:'Do recebimento até o envio.'+(lb!=null?' Antes era '+f1(lb)+' dias'+(la<lb?', está mais rápido.':la>lb?', está mais lento.':'.'):'')});
+  if(qa!=null){var q=Math.round(qa);R.push({k:'dad_aj',n:q<70?'alta':q<85?'media':'info',tit:'Aprovados de primeira: '+q+'%',sub:'Pedidos que não voltaram para ajuste.'+(qb!=null?' Antes eram '+Math.round(qb)+'%.':'')+(q<85?' Muito ajuste costuma indicar cliente insatisfeito ou pedido mal explicado: confira os motivos em Análises.':' Sinal de clientes satisfeitos.')});}
+  var sig=[];try{sig=analisar().sig;}catch(e){}
+  sig.filter(function(x){return x.cat==='qualidade';}).slice(0,2).forEach(function(x,i){R.push({k:'dad_q'+i,n:x.n>=3?'alta':'media',tit:x.tit,sub:x.txt,a:'tab',v:'analises',bt:'Ver Análises'});});
+  var por={},tot=0;P.filter(function(p){return p.recebido&&p.recebido>=addDays(t,-90);}).forEach(function(p){por[p.clienteId]=(por[p.clienteId]||0)+(+p.valor||0);tot+=+p.valor||0;});
+  var top=Object.keys(por).sort(function(a,b){return por[b]-por[a];})[0];
+  if(top&&tot&&por[top]/tot>=0.5&&Object.keys(por).length>=2)R.push({k:'dad_conc',n:'media',tit:'Metade do faturamento vem de um cliente só',sub:nomeCurtoCli(cliente(top))+' respondeu por '+Math.round(por[top]/tot*100)+'% nos últimos 90 dias. Se ele parar, o mês sente. Vale buscar outros clientes.',a:'verCliente',id:top,bt:'Ver cliente'});
+  return R;}
 function secVistos(){try{var v=JSON.parse(localStorage.getItem('idealicad_secv')||'{}');return v.d===today()?v:{d:today(),k:{}};}catch(e){return {d:today(),k:{}};}}
 function secMarca(ks){var v=secVistos();ks.forEach(function(k){v.k[k]=1;});try{localStorage.setItem('idealicad_secv',JSON.stringify(v));}catch(e){}}
 function secOkHoje(k){try{return localStorage.getItem('idealicad_sec_'+k+'_'+today())==='1';}catch(e){return false;}}
-function secChats(){var F={ped:msgsPed,fin:msgsFin,fat:msgsFat,cli:msgsCli},v=secVistos().k;
+function secChats(){var F={ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},v=secVistos().k;
   return SECS.map(function(g){var ms=[];try{ms=F[g.id]();}catch(e){ms=[];}
     var nl=ms.filter(function(m){return !v[m.k]&&!secOkHoje(m.k)&&m.k.slice(-3)!=='_oi';}).length,urg=ms.some(function(m){return m.n==='alta'&&!secOkHoje(m.k);});
     var ult=ms.filter(function(m){return !secOkHoje(m.k);});ult=ult.filter(function(m){return m.n==='alta';})[0]||ult[ult.length-1]||ms[0];
     return {g:g,ms:ms,nl:nl,urg:urg,prev:ult?ult.tit:''};});}
 function secNaoLidas(){try{return secChats().reduce(function(s,c){return s+c.nl;},0);}catch(e){return 0;}}
-function linhaChat(c,on){return '<button class="zc'+(on?' on':'')+'" data-a="secChat" data-v="'+c.g.id+'">'+avSec(c.g)+'<span class="tx"><b>'+c.g.nome+'</b><span>'+(c.urg?'🔴 ':'')+esc(c.prev)+'</span></span><span class="meta"><span>hoje</span>'+(c.nl?'<span class="zbadge">'+c.nl+'</span>':'')+'</span></button>';}
+function linhaChat(c,on){return '<button class="zc'+(on?' on':'')+'" data-a="secChat" data-v="'+c.g.id+'">'+avSec(c.g)+'<span class="tx"><b>'+c.g.nome+' <i class="zcargo">'+c.g.cargo+'</i></b><span>'+(c.urg?'🔴 ':'')+esc(c.prev)+'</span></span><span class="meta"><span>hoje</span>'+(c.nl?'<span class="zbadge">'+c.nl+'</span>':'')+'</span></button>';}
 function bolha(m){var ok=secOkHoje(m.k);
   return '<div class="zb '+m.n+(ok?' vista':'')+'">'+(m.n==='alta'?'<span class="pr">Urgente</span>':m.n==='media'?'<span class="pr">Atenção</span>':'')+'<b>'+esc(m.tit)+'</b>'+(m.sub?'<p>'+esc(m.sub)+'</p>':'')+
     ((m.a&&m.bt)||m.href?'<span class="ac">'+(m.a&&m.bt?'<button class="btn sm'+(m.n==='alta'?' pri':'')+'" data-a="'+m.a+'"'+(m.id?' data-id="'+m.id+'"':'')+(m.v?' data-v="'+m.v+'"':'')+'>'+m.bt+'</button>':'')+
@@ -1895,16 +1954,16 @@ function bolha(m){var ok=secOkHoje(m.k);
     '<span class="hr">'+(m.k.slice(-3)==='_oi'?'':ok?'✓ visto':'<button class="okb" data-a="secOk" data-k="'+m.k+'">Ok, visto ✓</button>')+'</span></div>';}
 function rSecretarios(){var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth>820){var pr=C.filter(function(x){return x.urg;})[0]||C.filter(function(x){return x.nl;})[0]||C[0];sel=pr.g.id;}var c=C.filter(function(x){return x.g.id===sel;})[0];
   if(c)setTimeout(function(){secMarca(c.ms.map(function(m){return m.k;}));},0);
-  var lista='<div class="zap-l"><div class="zap-lh"><h2>Secretários</h2><p class="small muted">Um para cada assunto. Eles olham seus dados todo dia e avisam aqui.</p></div>'+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+'</div>';
-  var conv=c?'<div class="zap-c"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+avSec(c.g,1)+'<span class="tx"><b>'+c.g.nome+'</b><span>'+c.g.papel+'</span></span></div>'+
+  var lista='<div class="zap-l"><div class="zap-lh"><h2>Sua equipe</h2><p class="small muted">Um personagem para cada cargo. Eles olham seus dados todo dia e avisam aqui.</p></div>'+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+'</div>';
+  var conv=c?'<div class="zap-c"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+avSec(c.g,1)+'<span class="tx"><b>'+c.g.nome+' · '+c.g.cargo+'</b><span>'+c.g.papel.replace(/^[^·]+· /,'')+'</span></span></div>'+
       '<div class="zap-b" id="zap-b"><span class="zdia">Hoje</span>'+c.ms.map(bolha).join('')+'</div></div>':
-    '<div class="zap-c"><div class="zap-vazio">'+avSec(SECS[0])+'<b>Escolha uma conversa</b><span>Cada secretário cuida de um assunto do seu dia.</span></div></div>';
+    '<div class="zap-c"><div class="zap-vazio">'+avSec(SECS[0])+'<b>Escolha uma conversa</b><span>Léo, Bia, Nina e Téo cuidam cada um de uma parte do seu negócio.</span></div></div>';
   return '<div class="zap'+(c?' aberto':'')+'">'+lista+conv+'</div>';}
 function secMini(){var C=secChats();
-  return '<section class="card stack" style="grid-column:span 12"><div class="between wrap"><div><h2>Secretários</h2><p class="small muted">Recados de hoje, um por assunto.</p></div><button class="btn sm pri" data-a="tab" data-v="secretarios">Abrir conversas</button></div>'+
+  return '<section class="card stack" style="grid-column:span 12"><div class="between wrap"><div><h2>Sua equipe</h2><p class="small muted">Recados de hoje: vendas, financeiro, marketing e análise.</p></div><button class="btn sm pri" data-a="tab" data-v="secretarios">Abrir conversas</button></div>'+
     '<div class="zmini">'+C.map(function(x){return linhaChat(x,false);}).join('')+'</div></section>';}
 function fSecretario(){var C=secChats(),sd=saudacao(),nome=primeiroNome(),auto=!(S.prefs&&S.prefs.secAuto===false),n=C.reduce(function(s,c){return s+c.nl;},0);
-  return head('Seus secretários')+'<div class="stack"><p>'+sd.t+(nome?', '+esc(nome):'')+'! '+(n?'Você tem <b>'+plural(n,'recado novo','recados novos')+'</b> hoje.':'Nada novo hoje.')+'</p>'+
+  return head('Sua equipe')+'<div class="stack"><p>'+sd.t+(nome?', '+esc(nome):'')+'! '+(n?'Você tem <b>'+plural(n,'recado novo','recados novos')+'</b> hoje.':'Nada novo hoje.')+'</p>'+
     '<div class="zmini">'+C.map(function(x){return linhaChat(x,false);}).join('')+'</div>'+
     '<label class="row" style="gap:8px;cursor:pointer"><input type="checkbox" id="secAutoChk" data-a="secAuto"'+(auto?' checked':'')+'> <span class="small">Mostrar ao entrar no sistema (1 vez por dia)</span></label>'+
     '<button class="btn block" data-a="fechar">Depois eu vejo</button></div>';}
@@ -1919,7 +1978,7 @@ function secAbreDia(){if(EM_DEMO||ui.modoLab||ui.tour!=null||precisaBoas()||(S.p
 function precisaBoas(){return !!(S.sessao&&!EM_DEMO&&!(S.prefs&&(S.prefs.boas==='ok'||S.prefs.onb==='ok'))&&!alive(S.pedidos).length&&!alive(S.clientes).length);}
 var TOUR=[
   ['dashboard','Dashboard','Seu resumo do mês: quanto faturou, quanto já recebeu, quem está devendo e os próximos prazos. Lá em cima dá para trocar o período.'],
-  ['secretarios','Secretários','Quatro secretários conversam com você como no WhatsApp: Pedidos, Financeiro, Faturamento e Clientes. Todo dia eles avisam o que precisa de atenção.'],
+  ['secretarios','Secretários','Sua equipe conversa com você como no WhatsApp: Léo (vendas), Bia (financeiro), Nina (marketing) e Téo (análise de dados). Todo dia eles avisam o que precisa de atenção.'],
   ['pedidos','Produção','Seus pedidos em colunas: a fazer, pendência, aguardando aprovação e finalizado. Toque num card para ver, mudar a etapa ou anexar o STL.'],
   ['clientes','Clientes','Dentistas e laboratórios que te mandam trabalho, com histórico, preços especiais e mensagens prontas para o WhatsApp.'],
   ['financeiro','Financeiro','Quem pagou e quem deve. A cobrança sai em PDF com QR Code Pix, pronta para mandar.'],
