@@ -509,6 +509,14 @@ body.sem-anim .deco *{animation:none!important}
 .msg-mika-fala b{color:var(--zc)}.msg-mika-fala p{margin:4px 0 0;line-height:1.4}
 .msg-mika-fala:after{content:"";position:absolute;bottom:-8px;left:50%;width:14px;height:14px;background:var(--surface);border-right:1.5px solid var(--zc);border-bottom:1.5px solid var(--zc);transform:translateX(-50%) rotate(45deg)}
 @media (max-width:1100px){.msg-lay{grid-template-columns:1fr}.msg-mika{position:static;order:-1;flex-direction:row-reverse;align-items:flex-end;gap:6px}.msg-mika img{width:90px;max-height:120px;object-fit:cover;object-position:top}.msg-mika-fala{flex:1;margin-bottom:12px}.msg-mika-fala:after{left:-8px;bottom:18px;transform:rotate(135deg)}}
+.dash .tres,.dash .tres2{grid-column:span 12;align-content:start}.dash .tres2>*{flex:none}.dfrase>.between.wrap{margin-top:auto}
+@media (min-width:700px){.dash .tres2{grid-column:span 6}}
+@media (min-width:1100px){.dash .tres,.dash .tres2{grid-column:span 4}}
+.dash .tres .zc .meta{display:none}
+.dfrase .zfrase{margin-top:0}.dfrase .zfrase .msg-txt{max-height:132px}
+.dent{display:flex;flex-direction:column;gap:6px}
+.dent-it{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--ink);font:inherit;cursor:pointer}
+.dent-it:hover{border-color:var(--accent)}.dent-it .tx{min-width:0}.dent-it b{display:block;font-size:.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dent-it .tag{flex-shrink:0}
 .passeio{position:fixed;right:14px;bottom:0;z-index:43;display:flex;align-items:flex-end;gap:0;pointer-events:none;max-width:calc(100vw - 28px)}
 .passeio>*{pointer-events:auto}
 .ps-img{height:230px;width:auto;margin-left:-18px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35));animation:psEntra .55s cubic-bezier(.2,.9,.3,1.2) both;transform-origin:bottom center}
@@ -1398,7 +1406,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 19h10';
+var VERSAO='16/10 · 19h25';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2243,8 +2251,16 @@ function rSecretarios(){var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth
       (c.g.corpo?(function(){var h=humorDe(c.ms);return '<div class="zfala'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zfala">'+esc(HUMOR_FALA[h])+'</div><img class="zchar'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zchar" data-g="'+c.g.id+'" src="'+corpoDe(c.g,h)+'" alt="" aria-hidden="true">';})():'')+'</div>':
     '<div class="zap-c"><div class="zap-vazio">'+avSec(SECS[0])+'<b>Escolha uma conversa</b><span>Ana, Bia, Mika e Klose cuidam cada um de uma parte do seu negócio.</span></div></div>';
   return '<div class="zap'+(c?' aberto':'')+'">'+lista+conv+'</div>';}
+function secFraseCard(){var g=SECS.filter(function(x){return x.id==='mkt';})[0],md=null;try{md=mikaDia();}catch(e){}if(!g||!md)return '';var n=Object.keys(fraseEnvMap()).length;
+  return '<section class="card stack tres2 dfrase" style="--zc:'+g.cor+'"><div class="between" style="gap:10px;align-items:flex-start"><div class="row" style="gap:10px;align-items:center;min-width:0">'+avSec(g,0,md.h)+'<div style="min-width:0"><h2 style="margin:0">Frase do dia</h2><p class="small muted" style="margin:2px 0 0">da Mika · '+esc(md.tit)+'</p></div></div></div>'+
+    fraseBox(md.txt)+'<div class="between wrap small"><span class="muted">'+(n?'Enviada para '+plural(n,'cliente','clientes')+' esta semana':'Ainda não mandou esta semana')+'</span><button class="btn sm" data-a="'+md.a+'" data-v="'+esc(md.v)+'">Mais mensagens</button></div></section>';}
+function secEntregasCard(){var t=today(),am=addDays(t,1),ab=alive(S.pedidos).filter(function(p){return aberto(p)&&p.prazo;}).sort(function(a,b){return a.prazo<b.prazo?-1:a.prazo>b.prazo?1:0;}),L=ab.slice(0,5);
+  var q=function(p){if(esperaCli(p))return ['','Esperando o cliente'];if(p.prazo<t)return ['u','Atrasado'];if(p.prazo===t)return ['a','Hoje'];if(p.prazo===am)return ['','Amanhã'];return ['',DIAS[new Date(p.prazo+'T12:00:00').getDay()].slice(0,3)+', '+dmy(p.prazo).slice(0,5)];};
+  return '<section class="card stack tres2"><div class="between"><div><h2 style="margin:0">Próximas entregas</h2><p class="small muted" style="margin:2px 0 0">'+(ab.length?plural(ab.length,'pedido','pedidos')+' em produção com prazo':'Nada com prazo agora')+'</p></div><button class="btn sm" data-a="tab" data-v="pedidos">Produção</button></div>'+
+    (L.length?'<div class="dent">'+L.map(function(p){var x=q(p);return '<button class="dent-it" data-a="verPedido" data-id="'+p.id+'"><span class="tx"><b>'+esc(pedTxt(p))+'</b></span><span class="tag '+x[0]+'">'+x[1]+'</span></button>';}).join('')+'</div>'+(ab.length>5?'<p class="small muted" style="margin:0">e mais '+(ab.length-5)+' na Produção.</p>':'')
+      :'<div class="empty" style="padding:18px 6px;text-align:center"><p class="muted" style="margin:0 0 10px">Nenhuma entrega pendente. 🎉</p><button class="btn sm pri" data-a="novoPedido">+ Novo pedido</button></div>')+'</section>';}
 function secMini(){var C=secChats();
-  return '<section class="card stack" style="grid-column:span 12"><div class="between wrap"><div><h2>Sua equipe</h2><p class="small muted">Recados de hoje: vendas, financeiro, marketing e análise.</p></div><button class="btn sm pri" data-a="tab" data-v="secretarios">Abrir conversas</button></div>'+
+  return '<section class="card stack tres"><div class="between wrap"><div><h2>Sua equipe</h2><p class="small muted">Recados de hoje: vendas, financeiro, marketing e análise.</p></div><button class="btn sm pri" data-a="tab" data-v="secretarios">Abrir conversas</button></div>'+
     '<div class="zmini">'+C.map(function(x){return linhaChat(x,false);}).join('')+'</div></section>';}
 function fSecretario(){var C=secChats(),sd=saudacao(),nome=primeiroNome(),auto=!(S.prefs&&S.prefs.secAuto===false),n=C.reduce(function(s,c){return s+c.nl;},0);
   return head('Sua equipe')+'<div class="stack"><p>'+sd.t+(nome?', '+esc(nome):'')+'! '+(n?'Você tem <b>'+plural(n,'recado novo','recados novos')+'</b> hoje.':'Nada novo hoje.')+'</p>'+
@@ -2338,7 +2354,7 @@ function rDashboard(){
   var fv=meses.map(fatMes),pv=meses.map(pagoMes);
   return '<section class="hero-clima '+cenaClima().tipo+'"><canvas id="ceu" aria-hidden="true"></canvas><div class="stack hero-in" style="gap:12px"><div class="between wrap"><div class="row wrap" style="gap:14px">'+saud.ic+'<div><h2 style="font-size:1.5rem">'+saud.t+(nome?', '+esc(nome):'')+'</h2><p class="muted small">Resumo de '+perNome()+'</p></div>'+infoDia()+'</div>'+
       '<div class="row wrap">'+(urg.length?'<span class="tag u">'+urg.length+' urgente(s)</span>':'')+(atr.length?'<span class="tag u">'+atr.length+' atrasado(s)</span>':'')+'</div></div>'+perPicker()+'</div></section>'+
-    primeirosPassos()+lembretes()+'<div class="dash" style="margin-bottom:16px">'+secMini()+'</div>'+
+    primeirosPassos()+lembretes()+'<div class="dash" style="margin-bottom:16px">'+secMini()+secFraseCard()+secEntregasCard()+'</div>'+
     (!S.perfil.chave&&!primeirosPassos()?'<div class="banner"><span>Cadastre sua chave Pix para cobrar seus clientes pelo QR Code.</span><button class="btn sm" data-a="tab" data-v="config">Cadastrar chave</button></div>':'')+
     '<div class="dash">'+
       kpi(G?'Faturamento total':'Faturamento do mês',brl(fat),G?'<span>'+ps.length+' pedidos</span>':delta(fat,soma(prevPs)),spark(sparkM.map(fatMes)),'financeiro')+
@@ -3073,7 +3089,6 @@ function rMensagens(){
 function lembretes(){var out=[],t=today(),dow=new Date().getDay(),fora=function(k){try{return localStorage.getItem('idealicad_lemb_'+k)==='1';}catch(e){return false;}};
   proximosEventos(7).forEach(function(e){var k=e.id+'_'+e.d;if(fora(k))return;var dd=daysBetween(t,e.d),q=dd===0?'é hoje':dd===1?'é amanhã':'em '+dd+' dias';
     out.push('<div class="banner lemb"><span>'+(e.fer?'📅 Feriado: ':'💐 ')+'<b>'+esc(e.nome)+'</b> '+q+' ('+dmy(e.d).slice(0,5)+'). '+(e.fer?'Avise seus clientes se vai trabalhar.':'Que tal mandar uma mensagem?')+'</span><span class="row" style="gap:6px"><button class="btn sm pri" data-a="msgAbrir" data-v="datas">Ver mensagens</button><button class="icon-btn" data-a="lembFora" data-k="'+k+'" aria-label="Dispensar" title="Dispensar">✕</button></span></div>');});
-  if((dow===4||dow===5)&&!fora('fds_'+t))out.push('<div class="banner lemb"><span>🗓️ '+(dow===5?'Sexta-feira':'Quinta-feira')+': bom momento para avisar que você recebe trabalhos no fim de semana.</span><span class="row" style="gap:6px"><button class="btn sm pri" data-a="msgAbrir" data-v="fds">Ver mensagem</button><button class="icon-btn" data-a="lembFora" data-k="fds_'+t+'" aria-label="Dispensar" title="Dispensar">✕</button></span></div>');
   return out.join('');
 }
 
