@@ -594,32 +594,21 @@ table.adm td{vertical-align:top}
 .sheet.full{max-width:min(1280px,97vw)!important;width:97vw}
 .sheet.full .viewer3d{aspect-ratio:auto;height:72vh}
 .htmlv{width:100%;height:76vh;border:0;border-radius:12px;background:#fff}
-.vz{display:grid;gap:16px;grid-template-columns:minmax(260px,330px) minmax(0,1fr);align-items:start}
-@media (max-width:900px){.vz{grid-template-columns:1fr}}
-.vz-side{display:grid;gap:12px;align-content:start;min-width:0}
-.vz-drop{position:relative;display:grid;gap:4px;justify-items:center;text-align:center;padding:18px 14px;border:2px dashed color-mix(in srgb,var(--accent) 50%,var(--line));border-radius:16px;background:var(--accent-soft);cursor:pointer}
-.vz-drop.on{border-style:solid;background:color-mix(in srgb,var(--accent) 22%,var(--surface))}
-.vz-drop span{font-size:.84rem;color:var(--muted)}.vz-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.vz-lys{display:grid;gap:8px}
-.vz-ly{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface);min-width:0}
-.vz-ly input[type=color]{flex:none;width:30px;height:30px;border:0;padding:0;border-radius:8px;background:none;cursor:pointer}
-.vz-ly .t{flex:1;min-width:0;display:grid;gap:5px}.vz-ly .t b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.9rem}.vz-ly .t>span{font-size:.75rem;color:var(--muted)}
-.vz-ly select{font:inherit;font-size:.82rem;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);min-width:0}
-.vz-op{display:grid;gap:2px;font-size:.74rem;color:var(--muted)}.vz-op input{width:100%;accent-color:var(--accent)}
-.vz-ly .b{display:grid;gap:4px}.vz-ly .b .icon-btn{width:30px;height:30px}
-.vz-main{display:grid;gap:10px;min-width:0}
-.vz-bar{display:flex;gap:8px;flex-wrap:wrap}
-.vz-slot{height:calc(100vh - 230px);min-height:420px;border-radius:18px;overflow:hidden;background:radial-gradient(circle at 50% 30%,#2a2740,#121019);position:relative}
-.vz-cv{position:absolute;inset:0;touch-action:none;cursor:grab}.vz-cv canvas{width:100%;height:100%;display:block}
-.vz-hint{position:absolute;left:12px;bottom:10px;font-size:.74rem;color:rgba(255,255,255,.6);pointer-events:none}
-.vz-rot{position:absolute;inset:0;pointer-events:none}.vz-rot span{position:absolute;transform:translate(-50%,-130%);background:#7c5cff;color:#fff;font:700 .78rem var(--f-mono);padding:3px 8px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,.4)}
-.vz-vazio{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:8px;text-align:center;color:rgba(255,255,255,.75);padding:24px}.vz-vazio svg{width:64px;height:64px;opacity:.7}.vz-vazio span{font-size:.88rem;max-width:380px;opacity:.8}
-.vz-html{width:100%;height:calc(100vh - 230px);min-height:420px;border:0;border-radius:18px;background:#fff}
-.vz-achs{display:grid;gap:6px}
-.vz-ach{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:var(--bg)}.vz-ach i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:6px;background:var(--muted)}
-.vz-ach.alta i{background:var(--urgent)}.vz-ach.media i{background:var(--warn)}.vz-ach.ok i{background:var(--ok)}.vz-ach.info i{background:var(--accent)}
-.vz-ach b{display:block;font-size:.88rem;line-height:1.3}.vz-ach small{display:block;color:var(--muted);font-size:.78rem;line-height:1.3}
-.vz-leg{display:flex;gap:10px;flex-wrap:wrap;font-size:.75rem;color:var(--muted)}.vz-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.vz2{display:grid;gap:14px;grid-template-columns:minmax(230px,290px) minmax(0,1fr);align-items:start}
+.vz2.fecha{grid-template-columns:46px minmax(0,1fr)}
+@media (max-width:900px){.vz2,.vz2.fecha{grid-template-columns:1fr}}
+.vz2-side{display:grid;gap:10px;align-content:start;min-width:0}
+.vz2.fecha .vz2-side{padding:6px;background:none;border:0;box-shadow:none}
+@media (min-width:901px){.vz2-abre span{display:none}}
+.vz2-slot{height:calc(100vh - 168px);min-height:460px;border-radius:18px;background:#121019}
+@media (max-width:900px){.vz2-slot{height:calc(100vh - 210px);height:calc(100dvh - 210px);min-height:420px}}
+.vz-float{position:fixed;z-index:15;border-radius:18px;overflow:hidden;background:#121019;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.vz-float iframe,.vz-pop iframe{width:100%;height:100%;border:0;display:block}
+.vz-pop{position:fixed;inset:0;z-index:2000;background:rgba(10,8,16,.72);display:grid;padding:14px;backdrop-filter:blur(4px)}
+.vz-pop>div{display:grid;grid-template-rows:auto minmax(0,1fr);border-radius:18px;overflow:hidden;background:#121019;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.vz-pop header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px 8px 16px;background:#1B1826;color:#ECEAF4}
+.vz-pop header b{font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:600px){.vz-pop{padding:0}.vz-pop>div{border-radius:0}}
 .vz-peds{display:grid;gap:6px;max-height:50vh;overflow:auto}
 .vz-ped{border:1px solid var(--line);border-radius:12px;background:var(--surface)}.vz-ped.on{border-color:var(--accent)}
 .vz-ped-h{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;color:var(--ink);font:inherit;text-align:left;padding:8px 10px;cursor:pointer}.vz-ped-h span{min-width:0}.vz-ped-h b{display:block;font-size:.88rem}.vz-ped-h small{color:var(--muted);font-size:.76rem}
@@ -822,9 +811,12 @@ table.adm td{vertical-align:top}
 .chip-i.lk{cursor:pointer;font:inherit;font-size:.88rem;color:var(--accent)}
 @media (max-width:700px){.chip-i{white-space:normal}}
 
-.hero-clima{position:relative;overflow:hidden;margin:-16px -16px 0;padding:18px 16px 16px;border-bottom:1px solid var(--line)}
+.hero-clima{position:relative;z-index:0;margin:-16px -16px 0;padding:18px 16px 16px}
 @media (min-width:960px){.hero-clima{margin:-24px -28px 0;padding:22px 28px 18px}}
-.hero-clima canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+/* o céu continua por baixo da página e some aos poucos no fundo escuro, sem linha reta */
+.hero-clima canvas{position:absolute;left:0;right:0;top:0;width:100%;height:calc(100% + 340px);pointer-events:none;z-index:-1;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 30%,rgba(0,0,0,.55) 55%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0,#000 30%,rgba(0,0,0,.55) 55%,transparent 100%)}
+.hero-clima~*{position:relative;z-index:1}
 .hero-in{position:relative}
 .chip-i.lk2{cursor:pointer;font:inherit;font-size:.88rem;color:inherit}
 .chip-i.lk2:hover{border-color:var(--accent)}
@@ -1291,13 +1283,13 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 02h10';
+var VERSAO='16/10 · 03h50';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
-function render(){
+function render(){setTimeout(function(){if(window.vzPos)vzPos();},0);
   var app=document.getElementById('app');document.body.classList.toggle('sem-anim',animOff());setTimeout(rdDock,0);
   if(!S.sessao){app.innerHTML=rLogin();return;}
   if(S.carregando){app.innerHTML=rCarregando();return;}
@@ -3470,7 +3462,7 @@ function openSheet(fn){var args=[].slice.call(arguments,1);ui.sheet={fn:fn,args:
 function renderSheet(){
   var el=document.getElementById('sheet');
   if(!ui.sheet){el.innerHTML='';return;}
-  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+({fPedidoDet:' wide',fTrabRede:' wide',fViewer:' full',fBlobView:' full',fImgView:' full',fPedido:' wide',fCliente:' frm',fPagamento:' mid',fCobranca:' mid',fRelProd:' mid'}[ui.sheet.fn.name]||'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
+  el.innerHTML='<div class="sheet-bg'+(ui.sheet.fn===fCidade?' topo':'')+'" data-a="bg"><div class="sheet'+({fPedidoDet:' wide',fTrabRede:' wide',fImgView:' full',fPedido:' wide',fCliente:' frm',fPagamento:' mid',fCobranca:' mid',fRelProd:' mid'}[ui.sheet.fn.name]||'')+'" role="dialog" aria-modal="true">'+ui.sheet.fn.apply(null,ui.sheet.args)+'</div></div>';
   if(ui.sheet.after)ui.sheet.after();
 }
 function closeSheet(){if(viewer)viewer.stop();ui.sheet=null;renderSheet();}
@@ -3961,260 +3953,53 @@ function sbProcessa(pid,file){if(!guard())return;var p=byId(S.pedidos,pid);if(!p
       if(ant)sb.storage.from('pedido-img').remove([ant]);SBURL[path]={u:URL.createObjectURL(b),t:Date.now()};p.sbImg=path;save();if(ui.sheet)renderSheet();toast('Print do scanbody salvo. O cliente vê no link de acompanhamento.');});})
   .catch(function(e){toast('Não deu para salvar a imagem: '+e.message);});}
 function fImgView(src){return head('Print do scanbody')+'<img src="'+src+'" alt="Print do scanbody" style="width:100%;max-height:80vh;object-fit:contain;border-radius:12px;background:#0b0b10">';}
-/* Visualização grande a partir de um arquivo (zip, STL ou HTML) */
-function fBlobView(){var v=ui.bv||{};return head(esc(v.nome||'Arquivo'))+(v.kind==='html'?'<div id="bvh" class="stack"><p class="small muted">Abrindo…</p></div>':'<div class="viewer3d" id="v3"><canvas id="v3c"></canvas><div class="msg" id="v3m">Abrindo o arquivo…</div></div><p class="small muted">Arraste para girar. Use dois dedos ou a roda do mouse para zoom.</p>');}
-function abreBlob(blob,nome,kind){ui.bv={nome:nome,kind:kind};openSheet(fBlobView);var go=function(){mostraBlob(blob,kind);};ui.sheet.after=go;go();}
-function mostraBlob(blob,kind){var isZip=/zip/i.test(blob.type)||/\.zip$/i.test((ui.bv||{}).nome||'');
-  var pega=isZip&&window.JSZip?JSZip.loadAsync(blob).then(function(z){var nomes=Object.keys(z.files).filter(function(n){return !z.files[n].dir&&!/(^|\/)\._/.test(n);});
-      var f=nomes.filter(function(n){return kind==='html'?/\.html?$/i.test(n):/\.stl$/i.test(n);})[0];if(!f)throw new Error(kind==='html'?'Nenhum HTML dentro do zip.':'Nenhum STL dentro do zip.');return z.files[f].async(kind==='html'?'string':'arraybuffer');})
-    :(kind==='html'?blob.text():blob.arrayBuffer());
-  pega.then(function(c){if(kind==='html'){var el=document.getElementById('bvh');if(!el)return;var u=URL.createObjectURL(new Blob([c],{type:'text/html'}));
-      el.innerHTML='<iframe class="htmlv" sandbox="allow-scripts" src="'+u+'" title="Visualização do projeto"></iframe><p class="small muted">Visualização isolada: o arquivo não acessa seus dados.</p>';setTimeout(function(){URL.revokeObjectURL(u);},120000);return;}
-    if(!window.THREE)throw new Error('o visualizador 3D não carregou. Verifique a internet e tente de novo');var pos=parseSTL(c);if(!pos.length)throw new Error('Arquivo STL sem triângulos.');var m=document.getElementById('v3m');if(!m)return;if(viewer)viewer.stop();viewer=montaViewer(pos);m.hidden=true;})
-  .catch(function(e){var m=document.getElementById(kind==='html'?'bvh':'v3m');if(m)m.textContent='Não consegui abrir: '+e.message;});}
-function verHtmlArq(id){var a=byId(S.arquivos,id);if(!a)return;var b=blobs.get(id);
-  if(b){abreBlob(b,a.nome,'html');return;}
-  toast('Baixando o arquivo…');fnArq('baixar',{arquivo_id:id}).then(function(r){return fetch(r.url);}).then(function(res){if(!res.ok)throw new Error('download recusado');return res.blob();})
-    .then(function(bl){blobs.set(id,bl);abreBlob(bl,a.nome,'html');}).catch(function(e){toast('Não consegui abrir: '+e.message+'.');});}
-/* ===================== Visualizador (STL / HTML) + análise automática por geometria =====================
-   Tudo roda no próprio aparelho: os arquivos não saem do computador e nada é salvo.
-   Camadas: Superior, Inferior, Trabalho (coroa/elemento) ou Outro, cada uma com cor, transparência e visibilidade.
-   Análise (sinais, não certezas): contato oclusal com o antagonista, contatos proximais com a própria arcada,
-   equilíbrio da mordida (esquerda x direita), arcadas que não se tocam ou se invadem e buracos no escaneamento.
-   Distâncias em mm, pelo vértice mais próximo (precisão boa para escaneamentos densos). */
-var VZ={layers:[],seq:0,html:null,vista:'3d',res:null,busy:null,el:null,three:null,medidas:[],medir:false,pA:null,lado:'arq',rec:null};
-var VZ_CORES={sup:'#E8DCC6',inf:'#D9CBB2',trab:'#F4F1EA',outro:'#9FB4D0'};
-var VZ_ROLES=[['sup','Arcada superior'],['inf','Arcada inferior'],['trab','Trabalho (coroa / elemento)'],['outro','Outro']];
-function vzGuessRole(nome,bb){var n=semAcento(nome);
-  if(/upper|superior|maxil|_up\b|\bsup\b/.test(n))return 'sup';if(/lower|inferior|mandib|_low\b|\binf\b/.test(n))return 'inf';
-  var m=n.match(/(?:^|[^0-9])([1-4][1-8])(?:[^0-9]|$)/);if(m)return 'trab';
-  var sz=Math.max(bb.max.x-bb.min.x,bb.max.y-bb.min.y,bb.max.z-bb.min.z);return sz<25?'trab':'outro';}
-function vzArcoDente(nome){var m=semAcento(nome).match(/(?:^|[^0-9])([1-4][1-8])(?:[^0-9]|$)/);if(!m)return null;return +m[1][0]<=2?'sup':'inf';}
-function rVisu(){
-  setTimeout(vzMonta,0);
-  var L=VZ.layers,an=VZ.res,temSup=L.some(function(l){return l.role==='sup';}),temInf=L.some(function(l){return l.role==='inf';}),temTrab=L.some(function(l){return l.role==='trab';});
-  var lista=L.map(function(l){return '<div class="vz-ly"><input type="color" value="'+l.cor+'" data-vzc="'+l.id+'" aria-label="Cor de '+esc(l.nome)+'">'+
-    '<div class="t"><b title="'+esc(l.nome)+'">'+esc(l.nome)+'</b><span>'+(l.tris/1000).toFixed(0)+' mil triângulos</span>'+
-    '<select data-vzr="'+l.id+'" aria-label="O que é este arquivo">'+VZ_ROLES.map(function(r){return '<option value="'+r[0]+'"'+(l.role===r[0]?' selected':'')+'>'+r[1]+'</option>';}).join('')+'</select>'+
-    (l.role==='trab'?'<select data-vza="'+l.id+'" aria-label="Arcada do trabalho"><option value="sup"'+(l.arco==='sup'?' selected':'')+'>na arcada superior</option><option value="inf"'+(l.arco==='inf'?' selected':'')+'>na arcada inferior</option></select>':'')+
-    '<label class="vz-op">Transparência<input type="range" min="15" max="100" value="'+Math.round(l.op*100)+'" data-vzo="'+l.id+'"></label></div>'+
-    '<div class="b"><button class="icon-btn" data-a="vzVis" data-id="'+l.id+'" aria-label="'+(l.vis?'Esconder':'Mostrar')+'" title="'+(l.vis?'Esconder':'Mostrar')+'">'+(l.vis?'👁':'—')+'</button><button class="icon-btn" data-a="vzTira" data-id="'+l.id+'" aria-label="Tirar" title="Tirar">✕</button></div></div>';}).join('');
-  var achados=an?an.itens.map(function(x){return '<div class="vz-ach '+x.n+'"><i></i><span><b>'+esc(x.t)+'</b>'+(x.d?'<small>'+esc(x.d)+'</small>':'')+'</span></div>';}).join(''):'';
-  return '<div class="vz">'+
-    '<aside class="vz-side"><div class="chips-f"><button class="'+(VZ.lado==='arq'?'on':'')+'" data-a="vzLado" data-v="arq">Arquivos</button><button class="'+(VZ.lado==='ped'?'on':'')+'" data-a="vzLado" data-v="ped">Meus pedidos</button></div>'+
-      (VZ.lado==='ped'?vzPedidosHtml():'')+
-      '<label class="vz-drop" id="vz-drop"'+(VZ.lado==='ped'?' hidden':'')+'><b>Arraste os arquivos aqui</b><span>STL, ZIP ou HTML do exocad · vários de uma vez (superior, inferior e coroas)</span><span class="btn sm pri" style="margin-top:6px">Escolher arquivos</span><input type="file" id="vz-in" multiple accept=".stl,.zip,.html,.htm"></label>'+
-      (VZ.busy?'<p class="small muted">'+esc(VZ.busy)+'</p>':'')+
-      (VZ.medidas.length?'<section class="card stack" style="gap:6px"><div class="between"><h3 style="margin:0">Medidas</h3><button class="btn sm" data-a="vzMedLimpa">Apagar</button></div>'+VZ.medidas.map(function(m,i){return '<div class="between small"><span>Medida '+(i+1)+'</span><b class="mono">'+vzMedTxt(m.d)+'</b></div>';}).join('')+'</section>':'')+
-      (L.length?'<div class="between"><h3 style="margin:0">Camadas</h3><button class="btn sm" data-a="vzLimpa">Limpar tudo</button></div><div class="vz-lys">'+lista+'</div>':'<p class="small muted">Os arquivos abrem só aqui no seu aparelho. Nada é enviado nem salvo.</p>')+
-      (L.length?'<section class="card stack vz-an"><div class="between"><h3 style="margin:0">Análise automática</h3><button class="btn sm pri" data-a="vzAnalisa" '+(VZ.busy?'disabled':'')+'>'+(an?'Analisar de novo':'Analisar')+'</button></div>'+
-        (!temTrab&&!(temSup&&temInf)?'<p class="small muted">Marque um arquivo como <b>Trabalho</b> (e as arcadas) para checar oclusão e proximais, ou carregue superior e inferior para checar a mordida.</p>':'')+
-        (an?'<div class="vz-achs">'+achados+'</div>'+(an.mapa?'<div class="vz-leg"><span><i style="background:#E5484D"></i>invade</span><span><i style="background:#F59E0B"></i>contato</span><span><i style="background:#FACC15"></i>até 0,2</span><span><i style="background:#34D399"></i>até 0,5 mm</span></div>':'')+
-          '<p class="small muted" style="margin:0">Sinais automáticos por geometria, não certezas. Confira sempre no exocad.</p>':'')+'</section>':'')+
-    '</aside>'+
-    '<div class="vz-main">'+(L.length?'<div class="vz-bar"><button class="btn sm'+(VZ.medir?' pri':'')+'" data-a="vzMedir" aria-pressed="'+VZ.medir+'">📏 '+(VZ.medir?'Medindo: clique em 2 pontos':'Medir')+'</button>'+
-        '<button class="btn sm'+(VZ.rec?' danger':'')+'" data-a="vzGrava">'+(VZ.rec?'■ Parar <span id="vz-rect" class="mono">0:00</span>':'● Gravar vídeo')+'</button><button class="btn sm" data-a="vzCentro">Centralizar</button></div>':'')+(VZ.html&&L.length?'<div class="chips-f"><button class="'+(VZ.vista==='3d'?'on':'')+'" data-a="vzVista" data-v="3d">3D</button><button class="'+(VZ.vista==='html'?'on':'')+'" data-a="vzVista" data-v="html">HTML do exocad</button></div>':'')+
-      '<div id="vz-slot" class="vz-slot"'+(VZ.vista==='html'&&VZ.html?' hidden':'')+'>'+(L.length?'':'<div class="vz-vazio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg><b>Visualizador 3D</b><span>Arraste STL ou HTML do exocad. Girar: arrastar · Mover: botão direito ou Shift · Zoom: roda ou pinça.</span></div>')+'</div>'+
-      (VZ.html?'<iframe class="vz-html" sandbox="allow-scripts" src="'+VZ.html.url+'" title="HTML do exocad"'+(VZ.vista==='html'||!L.length?'':' hidden')+'></iframe>':'')+
-    '</div></div>';}
-/* ---- cena 3D persistente (o canvas sobrevive aos render()) ---- */
-function vzMonta(){var slot=document.getElementById('vz-slot');if(!slot||!VZ.layers.length)return;
-  if(!window.THREE){slot.innerHTML='<div class="vz-vazio"><b>O visualizador 3D não carregou.</b><span>Verifique a internet e recarregue a página.</span></div>';return;}
-  if(!VZ.el){var el=document.createElement('div');el.className='vz-cv';el.innerHTML='<canvas></canvas><div class="vz-rot"></div><div class="vz-hint">Arrastar: girar · Shift/botão direito: mover · Roda: zoom · Duplo clique: centralizar</div>';VZ.el=el;vzCena(el);}
-  if(VZ.el.parentNode!==slot){slot.innerHTML='';slot.appendChild(VZ.el);}VZ.three.size();}
-function vzCena(el){var cv=el.querySelector('canvas'),r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});r.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
-  var scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(30,1,0.5,5000),root=new THREE.Group(),piv=new THREE.Group();piv.add(root);scene.add(piv);
-  scene.add(new THREE.HemisphereLight(0xffffff,0x556070,0.75));var dl=new THREE.DirectionalLight(0xffffff,0.75);dl.position.set(30,60,90);cam.add(dl);var dl2=new THREE.DirectionalLight(0xffffff,0.3);dl2.position.set(-40,-30,40);cam.add(dl2);scene.add(cam);
-  var T={r:r,scene:scene,cam:cam,root:root,piv:piv,dist:120,pan:new THREE.Vector3(),pts:{},lastD:0,mode:null};VZ.three=T;
-  T.size=function(){var w=el.clientWidth||600,h=el.clientHeight||400;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();};
-  T.cam_=function(){cam.position.set(T.pan.x,T.pan.y,T.dist);cam.lookAt(T.pan.x,T.pan.y,0);};
-  T.enquadra=function(){var bb=new THREE.Box3();root.children.forEach(function(m){if(m.visible){m.geometry.computeBoundingBox();bb.union(m.geometry.boundingBox);}});if(bb.isEmpty())return;
-    var c=new THREE.Vector3();bb.getCenter(c);root.position.set(-c.x,-c.y,-c.z);var s=new THREE.Vector3();bb.getSize(s);T.dist=Math.max(s.x,s.y,s.z)*2.1+10;T.pan.set(0,0,0);T.cam_();};
-  if(window.ResizeObserver)new ResizeObserver(T.size).observe(el);
-  el.addEventListener('contextmenu',function(e){e.preventDefault();});
-  el.addEventListener('pointerdown',function(e){T.pts[e.pointerId]={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY};T.mode=(e.button===2||e.shiftKey)?'pan':'rot';el.setPointerCapture(e.pointerId);});
-  el.addEventListener('pointermove',function(e){var p=T.pts[e.pointerId];if(!p)return;var ids=Object.keys(T.pts),dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
-    if(ids.length===2){var a=T.pts[ids[0]],b=T.pts[ids[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(T.lastD)T.dist=Math.min(2000,Math.max(5,T.dist*T.lastD/d));T.lastD=d;T.cam_();return;}
-    if(T.mode==='pan'){var k=T.dist/600;T.pan.x-=dx*k;T.pan.y+=dy*k;T.cam_();}
-    else{var q=new THREE.Quaternion();q.setFromEuler(new THREE.Euler(dy*0.008,dx*0.008,0,'XYZ'));piv.quaternion.premultiply(q);}});
-  var up=function(e){var p=T.pts[e.pointerId];if(p&&e.type==='pointerup'&&VZ.medir&&Object.keys(T.pts).length===1&&Math.hypot(e.clientX-p.x0,e.clientY-p.y0)<5)vzClique(e);delete T.pts[e.pointerId];T.lastD=0;};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
-  el.addEventListener('wheel',function(e){e.preventDefault();T.dist=Math.min(2000,Math.max(5,T.dist*(e.deltaY>0?1.1:0.9)));T.cam_();},{passive:false});
-  el.addEventListener('dblclick',function(){piv.quaternion.set(0,0,0,1);T.enquadra();});
-  (function loop(){if(VZ.el&&document.body.contains(VZ.el)){r.render(scene,cam);vzRotulos();}requestAnimationFrame(loop);})();
-  T.size();T.cam_();}
-function vzMat(l){return new THREE.MeshStandardMaterial({color:l.cor,roughness:.55,metalness:0,transparent:l.op<1,opacity:l.op,side:THREE.DoubleSide,vertexColors:!!l.colorido,depthWrite:l.op>=.99});}
-function vzAddMesh(l){if(!window.THREE)return;if(!VZ.el){var s=document.getElementById('vz-slot');if(s)vzMonta();}if(!VZ.three)return;
-  var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(l.pos,3));g.computeVertexNormals();l.mesh=new THREE.Mesh(g,vzMat(l));l.mesh.visible=l.vis;VZ.three.root.add(l.mesh);}
-function vzAtualizaMat(l){if(!l.mesh)return;l.mesh.material.dispose();l.mesh.material=vzMat(l);l.mesh.visible=l.vis;}
-/* ---- leitura de arquivos ---- */
-function vzArquivos(files){files=[].slice.call(files||[]);if(!files.length)return;VZ.busy='Abrindo '+files.length+' arquivo(s)…';render();
-  var fila=[];var abre=function(nome,buf){var pos=parseSTL(buf);if(!pos.length){toast(nome+': STL sem triângulos.');return;}fila.push({nome:nome,pos:pos});};
-  var ps=files.map(function(f){if(/\.html?$/i.test(f.name))return f.text().then(function(t){vzHtml(t,f.name);});
-    if(/\.zip$/i.test(f.name)){if(!window.JSZip)return Promise.resolve(toast('O leitor de ZIP não carregou.'));return JSZip.loadAsync(f).then(function(z){var ns=Object.keys(z.files).filter(function(n){return !z.files[n].dir&&!/(^|\/)\._/.test(n);});
-      return Promise.all(ns.map(function(n){if(/\.stl$/i.test(n))return z.files[n].async('arraybuffer').then(function(b){abre(n.split('/').pop(),b);});if(/\.html?$/i.test(n))return z.files[n].async('string').then(function(t){vzHtml(t,n.split('/').pop());});}));});}
-    if(/\.stl$/i.test(f.name))return f.arrayBuffer().then(function(b){abre(f.name,b);});
-    toast(f.name+': formato não suportado (use STL, ZIP ou HTML).');return Promise.resolve();});
-  Promise.all(ps).then(function(){fila.forEach(function(x){var bb={min:{x:1e9,y:1e9,z:1e9},max:{x:-1e9,y:-1e9,z:-1e9}},p=x.pos;
-      for(var i=0;i<p.length;i+=3){if(p[i]<bb.min.x)bb.min.x=p[i];if(p[i]>bb.max.x)bb.max.x=p[i];if(p[i+1]<bb.min.y)bb.min.y=p[i+1];if(p[i+1]>bb.max.y)bb.max.y=p[i+1];if(p[i+2]<bb.min.z)bb.min.z=p[i+2];if(p[i+2]>bb.max.z)bb.max.z=p[i+2];}
-      var role=vzGuessRole(x.nome,bb),l={id:'L'+(++VZ.seq),nome:x.nome,pos:x.pos,tris:x.pos.length/9,bb:bb,role:role,arco:vzArcoDente(x.nome)||'sup',cor:VZ_CORES[role],op:role==='trab'?1:.92,vis:true};
-      VZ.layers.push(l);vzAddMesh(l);});
-    vzArcosAuto();VZ.res=null;VZ.busy=null;if(fila.length)VZ.vista='3d';render();setTimeout(function(){if(VZ.three)VZ.three.enquadra();},30);})
-  .catch(function(e){VZ.busy=null;render();toast('Não consegui abrir: '+e.message);});}
-function vzHtml(txt,nome){if(VZ.html)URL.revokeObjectURL(VZ.html.url);VZ.html={nome:nome,url:URL.createObjectURL(new Blob([txt],{type:'text/html'}))};if(!VZ.layers.length)VZ.vista='html';}
-function vzCentro(l){return {x:(l.bb.min.x+l.bb.max.x)/2,y:(l.bb.min.y+l.bb.max.y)/2,z:(l.bb.min.z+l.bb.max.z)/2};}
-function vzArcosAuto(){var s=VZ.layers.filter(function(l){return l.role==='sup';})[0],i=VZ.layers.filter(function(l){return l.role==='inf';})[0];if(!s||!i)return;
-  var cs=vzCentro(s),ci=vzCentro(i);VZ.layers.forEach(function(l){if(l.role!=='trab'||vzArcoDente(l.nome))return;var c=vzCentro(l),ds=Math.hypot(c.x-cs.x,c.y-cs.y,c.z-cs.z),di=Math.hypot(c.x-ci.x,c.y-ci.y,c.z-ci.z);l.arco=ds<di?'sup':'inf';});}
-/* ---- geometria para a análise ---- */
-function vzIndexa(l){if(l.ix)return l.ix;var p=l.pos,n=p.length/3,map=new Map(),remap=new Uint32Array(n),vs=[],q=1000;
-  for(var i=0;i<n;i++){var k=Math.round(p[i*3]*q)+','+Math.round(p[i*3+1]*q)+','+Math.round(p[i*3+2]*q),j=map.get(k);if(j===undefined){j=vs.length/3;map.set(k,j);vs.push(p[i*3],p[i*3+1],p[i*3+2]);}remap[i]=j;}
-  var V=new Float32Array(vs),N=new Float32Array(V.length);
-  for(var t=0;t<n;t+=3){var a=remap[t],b=remap[t+1],c=remap[t+2],ax=V[b*3]-V[a*3],ay=V[b*3+1]-V[a*3+1],az=V[b*3+2]-V[a*3+2],bx=V[c*3]-V[a*3],by=V[c*3+1]-V[a*3+1],bz=V[c*3+2]-V[a*3+2],nx=ay*bz-az*by,ny=az*bx-ax*bz,nz=ax*by-ay*bx;
-    [a,b,c].forEach(function(v){N[v*3]+=nx;N[v*3+1]+=ny;N[v*3+2]+=nz;});}
-  for(var v=0;v<N.length;v+=3){var L=Math.hypot(N[v],N[v+1],N[v+2])||1;N[v]/=L;N[v+1]/=L;N[v+2]/=L;}
-  l.ix={V:V,N:N,remap:remap,nv:V.length/3};return l.ix;}
-function vzGrade(l){if(l.grid)return l.grid;var ix=vzIndexa(l),V=ix.V,g=new Map(),c=1.0;
-  for(var i=0;i<ix.nv;i++){var k=Math.floor(V[i*3]/c)+','+Math.floor(V[i*3+1]/c)+','+Math.floor(V[i*3+2]/c),a=g.get(k);if(!a){a=[];g.set(k,a);}a.push(i);}
-  l.grid={g:g,c:c};return l.grid;}
-/* distância com sinal do ponto ao alvo (negativo = dentro do alvo), até 1,5 mm; Infinity se longe */
-function vzDist(alvo,x,y,z){var G=vzGrade(alvo),ix=alvo.ix,V=ix.V,N=ix.N,c=G.c,cx=Math.floor(x/c),cy=Math.floor(y/c),cz=Math.floor(z/c),best=Infinity,bi=-1;
-  for(var i=-1;i<=1;i++)for(var j=-1;j<=1;j++)for(var k=-1;k<=1;k++){var a=G.g.get((cx+i)+','+(cy+j)+','+(cz+k));if(!a)continue;
-    for(var m=0;m<a.length;m++){var v=a[m],dx=x-V[v*3],dy=y-V[v*3+1],dz=z-V[v*3+2],d=dx*dx+dy*dy+dz*dz;if(d<best){best=d;bi=v;}}}
-  if(bi<0||best>2.25)return Infinity;var s=(x-V[bi*3])*N[bi*3]+(y-V[bi*3+1])*N[bi*3+1]+(z-V[bi*3+2])*N[bi*3+2];return s;} /* distância até o plano da superfície no vértice mais próximo (sinal: negativo = dentro) */
-function vzCor(d){return d<-0.05?[0.9,0.28,0.3]:d<=0.05?[0.96,0.62,0.04]:d<=0.2?[0.98,0.8,0.08]:d<=0.5?[0.2,0.83,0.6]:null;}
-function vzPinta(l,dv){var ix=l.ix,base=new THREE.Color(l.cor),n=l.pos.length/3,cols=new Float32Array(n*3);
-  for(var i=0;i<n;i++){var c=vzCor(dv[ix.remap[i]]);cols[i*3]=c?c[0]:base.r;cols[i*3+1]=c?c[1]:base.g;cols[i*3+2]=c?c[2]:base.b;}
-  l.mesh.geometry.setAttribute('color',new THREE.BufferAttribute(cols,3));l.colorido=true;vzAtualizaMat(l);}
-function vzBordas(l){var ix=vzIndexa(l),r=ix.remap,ed=new Map();for(var t=0;t<r.length;t+=3){for(var e=0;e<3;e++){var a=r[t+e],b=r[t+(e+1)%3],k=a<b?a+'_'+b:b+'_'+a;ed.set(k,(ed.get(k)||0)+1);}}
-  var par={},ac=function(x){while(par[x]!==undefined&&par[x]!==x)x=par[x];return x;},bord=0;
-  ed.forEach(function(c,k){if(c!==1)return;bord++;var ab=k.split('_'),a=ac(+ab[0]),b=ac(+ab[1]);if(par[a]===undefined)par[a]=a;if(par[b]===undefined)par[b]=b;if(a!==b)par[a]=b;});
-  var raizes={};Object.keys(par).forEach(function(v){var r0=ac(+v);raizes[r0]=(raizes[r0]||0)+1;});var tam=Object.keys(raizes).map(function(k){return raizes[k];}).sort(function(a,b){return b-a;});
-  return {bord:bord,aberturas:tam.length,pequenas:tam.slice(1).filter(function(n){return n>=6;}).length};}
-function vzAnalisa(){var L=VZ.layers,sup=L.filter(function(l){return l.role==='sup';})[0],inf=L.filter(function(l){return l.role==='inf';})[0],trabs=L.filter(function(l){return l.role==='trab';}),it=[],mapa=false;
-  L.forEach(function(l){if(l.colorido){l.mesh.geometry.deleteAttribute('color');l.colorido=false;vzAtualizaMat(l);}});
-  var fmt=function(v){return Math.abs(v).toFixed(2).replace('.',',');};
-  /* 1. trabalhos: oclusal e proximais */
-  trabs.forEach(function(t){var ix=vzIndexa(t),V=ix.V,N=ix.N,nv=ix.nv,cx=0,cy=0,cz=0;for(var i=0;i<nv;i++){cx+=V[i*3];cy+=V[i*3+1];cz+=V[i*3+2];}cx/=nv;cy/=nv;cz/=nv;
-    var dv=new Float32Array(nv).fill(Infinity),ant=t.arco==='sup'?inf:sup,mesma=t.arco==='sup'?sup:inf,nm=t.nome.replace(/\.stl$/i,'');
-    var ext=function(i){return (V[i*3]-cx)*N[i*3]+(V[i*3+1]-cy)*N[i*3+1]+(V[i*3+2]-cz)*N[i*3+2]>0;};
-    if(ant){var mn=Infinity,inv=0,cont=0;for(var i=0;i<nv;i++){if(!ext(i))continue;var d=vzDist(ant,V[i*3],V[i*3+1],V[i*3+2]);if(d<dv[i])dv[i]=d;if(d<mn)mn=d;if(d<-0.05)inv++;else if(d<=0.05)cont++;}
-      if(mn===Infinity)it.push({n:'media',t:nm+': nenhum contato oclusal',d:'O antagonista está a mais de 1,5 mm. Confira a altura da coroa ou o registro de mordida.'});
-      else if(mn<-0.15)it.push({n:'alta',t:nm+': oclusal invadindo o antagonista até '+fmt(mn)+' mm',d:inv+' pontos dentro do antagonista. Provável ajuste oclusal na boca.'});
-      else if(mn<-0.05)it.push({n:'media',t:nm+': leve invasão oclusal ('+fmt(mn)+' mm)',d:'Dentro do que muitos aceitam, mas vale conferir.'});
-      else if(mn<=0.05)it.push({n:'ok',t:nm+': contato oclusal presente',d:cont+' pontos de contato com o antagonista.'});
-      else it.push({n:mn>0.25?'media':'info',t:nm+': sem contato oclusal (falta '+fmt(mn)+' mm)',d:'A coroa não toca o antagonista. Se for intencional, ignore.'});}
-    else it.push({n:'info',t:nm+': sem arcada antagonista carregada',d:'Carregue a arcada '+(t.arco==='sup'?'inferior':'superior')+' para checar a oclusão.'});
-    if(mesma){var ux,uy,uz;var ca=vzCentro(ant||mesma),cm=vzCentro(mesma);if(ant){ux=ca.x-cm.x;uy=ca.y-cm.y;uz=ca.z-cm.z;}else{ux=0;uy=0;uz=t.arco==='sup'?-1:1;}var ul=Math.hypot(ux,uy,uz)||1;ux/=ul;uy/=ul;uz/=ul;
-      var hmin=Infinity,hmax=-Infinity;for(i=0;i<nv;i++){var h=(V[i*3]-cx)*ux+(V[i*3+1]-cy)*uy+(V[i*3+2]-cz)*uz;if(h<hmin)hmin=h;if(h>hmax)hmax=h;}
-      var lim=hmin+(hmax-hmin)*0.4,lados={a:[],b:[]},hx=null;
-      for(i=0;i<nv;i++){if(!ext(i))continue;var hh=(V[i*3]-cx)*ux+(V[i*3+1]-cy)*uy+(V[i*3+2]-cz)*uz;if(hh<lim)continue;var nd=Math.abs(N[i*3]*ux+N[i*3+1]*uy+N[i*3+2]*uz);if(nd>0.6)continue;
-        var d2=vzDist(mesma,V[i*3],V[i*3+1],V[i*3+2]);if(d2===Infinity)continue;if(d2<dv[i])dv[i]=d2;
-        var px=V[i*3]-cx,py=V[i*3+1]-cy,pz=V[i*3+2]-cz;if(!hx){var k2=px*ux+py*uy+pz*uz;hx=[px-k2*ux,py-k2*uy,pz-k2*uz];var hl=Math.hypot(hx[0],hx[1],hx[2])||1;hx=[hx[0]/hl,hx[1]/hl,hx[2]/hl];}
-        (px*hx[0]+py*hx[1]+pz*hx[2]>=0?lados.a:lados.b).push(d2);}
-      [['a','Proximal lado 1'],['b','Proximal lado 2']].forEach(function(s){var arr=lados[s[0]];if(!arr.length){it.push({n:'info',t:nm+': '+s[1]+' sem vizinho perto',d:'Nenhum dente vizinho a menos de 1,5 mm deste lado.'});return;}
-        var m=Math.min.apply(null,arr);if(m<-0.1)it.push({n:'alta',t:nm+': '+s[1]+' apertado, invadindo '+fmt(m)+' mm',d:'A coroa pode não assentar. Alivie o contato proximal.'});
-        else if(m<=0.05)it.push({n:'ok',t:nm+': '+s[1]+' com contato',d:'Distância mínima '+fmt(m)+' mm.'});
-        else if(m<=0.2)it.push({n:'media',t:nm+': '+s[1]+' quase sem contato ('+fmt(m)+' mm)',d:'Contato leve demais pode deixar o alimento entrar.'});
-        else it.push({n:'alta',t:nm+': '+s[1]+' aberto ('+fmt(m)+' mm)',d:'Falta contato com o vizinho.'});});}
-    vzPinta(t,dv);mapa=true;});
-  /* 2. mordida entre as arcadas */
-  if(sup&&inf){var ix2=vzIndexa(inf),V2=ix2.V,n2=ix2.nv,passo=Math.max(1,Math.floor(n2/60000)),cxm=(inf.bb.min.x+inf.bb.max.x)/2,esq=0,dir=0,mn2=Infinity,inv2=0,am=0,dv2=new Float32Array(n2).fill(Infinity);
-    for(var v=0;v<n2;v+=passo){am++;var d3=vzDist(sup,V2[v*3],V2[v*3+1],V2[v*3+2]);dv2[v]=d3;if(d3<mn2)mn2=d3;if(d3<-0.3)inv2++;if(d3<=0.1){if(V2[v*3]<cxm)esq++;else dir++;}}
-    if(mn2===Infinity||mn2>0.3)it.push({n:'alta',t:'Mordida: as arcadas não se tocam'+(mn2===Infinity?' (mais de 1,5 mm)':' ('+fmt(mn2)+' mm)'),d:'Mordida aberta ou registro de mordida mal feito. Confira o escaneamento da mordida.'});
-    else if(inv2/am>0.02)it.push({n:'alta',t:'Mordida: arcadas se invadindo até '+fmt(mn2)+' mm',d:'Um pedaço grande de uma arcada está dentro da outra. Provável erro no registro de mordida.'});
-    else{var tot=esq+dir,pe=tot?Math.round(esq/tot*100):0;if(tot&&(pe<25||pe>75))it.push({n:'media',t:'Mordida parece torta: contato quase só de um lado',d:'Esquerda '+pe+'% · direita '+(100-pe)+'% dos contatos (lados pela posição no arquivo). Confira o registro de mordida.'});
-      else it.push({n:'ok',t:'Mordida com contatos dos dois lados',d:tot?'Esquerda '+pe+'% · direita '+(100-pe)+'%.':''});}
-    if(!trabs.length){vzPinta(inf,dv2);mapa=true;}}
-  else if(sup||inf)it.push({n:'info',t:'Mordida: carregue as duas arcadas para checar',d:''});
-  /* 3. buracos no escaneamento */
-  [sup,inf].forEach(function(j){if(!j)return;var b=vzBordas(j);if(b.pequenas>0)it.push({n:b.pequenas>3?'alta':'media',t:'Escaneamento '+(j.role==='sup'?'superior':'inferior')+': '+b.pequenas+' buraco(s) além da borda',d:'Regiões sem escaneamento podem esconder o término ou o contato.'});
-    else it.push({n:'ok',t:'Escaneamento '+(j.role==='sup'?'superior':'inferior')+': sem buracos aparentes',d:''});});
-  var ord={alta:0,media:1,info:2,ok:3};it.sort(function(a,b){return ord[a.n]-ord[b.n];});
-  VZ.res={itens:it,mapa:mapa};}
-/* ---- régua: clique em dois pontos do modelo ---- */
-function vzClique(e){var T=VZ.three;if(!VZ.medir||!T)return;var r=VZ.el.getBoundingClientRect(),m=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),rc=new THREE.Raycaster();rc.setFromCamera(m,T.cam);
-  var hits=rc.intersectObjects(T.root.children.filter(function(o){return o.visible&&o.isMesh;}),false);if(!hits.length){toast('Clique em cima do modelo.');return;}
-  var p=T.root.worldToLocal(hits[0].point.clone());
-  if(!VZ.pA){VZ.pA=p;vzMarca(p);toast('Agora clique no segundo ponto.');return;}
-  var a=VZ.pA,d=a.distanceTo(p);VZ.pA=null;var g=new THREE.Group();g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([a,p]),new THREE.LineBasicMaterial({color:0x7c5cff,depthTest:false})));
-  [a,p].forEach(function(q){var s=new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.12,d*0.02),12,12),new THREE.MeshBasicMaterial({color:0x7c5cff,depthTest:false}));s.position.copy(q);s.renderOrder=9;g.add(s);});
-  g.children[0].renderOrder=9;T.root.add(g);if(VZ.tmp){T.root.remove(VZ.tmp);VZ.tmp=null;}
-  VZ.medidas.push({g:g,a:a,b:p,d:d});render();}
-function vzMarca(p){var T=VZ.three;if(VZ.tmp)T.root.remove(VZ.tmp);var s=new THREE.Mesh(new THREE.SphereGeometry(0.25,12,12),new THREE.MeshBasicMaterial({color:0x7c5cff,depthTest:false}));s.position.copy(p);s.renderOrder=9;VZ.tmp=s;T.root.add(s);}
-function vzMedTxt(d){return d.toFixed(2).replace('.',',')+' mm'+(d>=10?' · '+(d/10).toFixed(2).replace('.',',')+' cm':'');}
-function vzRotulos(){var box=VZ.el&&VZ.el.querySelector('.vz-rot');if(!box)return;var T=VZ.three;if(!VZ.medidas.length){box.innerHTML='';return;}var r=VZ.el.getBoundingClientRect(),h='';
-  VZ.medidas.forEach(function(m,i){var c=m.a.clone().add(m.b).multiplyScalar(0.5);T.root.localToWorld(c);c.project(T.cam);if(c.z>1)return;h+='<span style="left:'+((c.x+1)/2*r.width)+'px;top:'+((1-c.y)/2*r.height)+'px">'+(i+1)+' · '+vzMedTxt(m.d)+'</span>';});box.innerHTML=h;}
-/* ---- gravar a tela do visualizador (vídeo para mandar ao cliente) ---- */
-function vzGrava(){if(VZ.rec){VZ.rec.stop();return;}var cv=VZ.el&&VZ.el.querySelector('canvas');if(!cv||!cv.captureStream||!window.MediaRecorder){toast('Este navegador não grava vídeo. Use o Chrome ou o Edge no computador.');return;}
-  var tipos=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'],tp=tipos.filter(function(t){return MediaRecorder.isTypeSupported(t);})[0]||'';
-  var st=cv.captureStream(30),pd=[],rec=new MediaRecorder(st,tp?{mimeType:tp,videoBitsPerSecond:6e6}:undefined);VZ.rec=rec;VZ.recIni=Date.now();
-  rec.ondataavailable=function(e){if(e.data&&e.data.size)pd.push(e.data);};
-  rec.onstop=function(){var b=new Blob(pd,{type:rec.mimeType||'video/webm'}),ext=/mp4/.test(b.type)?'mp4':'webm',u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='visualizacao-'+today()+'.'+ext;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},60000);
-    VZ.rec=null;clearInterval(VZ.recT);render();toast('Vídeo salvo ('+ext.toUpperCase()+', '+bytes(b.size)+'). Mande pelo WhatsApp ou e-mail.'+(ext==='webm'?' Se o celular do cliente não abrir WEBM, mande pelo computador.':''));};
-  rec.start(500);VZ.recT=setInterval(function(){var el=document.getElementById('vz-rect');if(el){var s=Math.round((Date.now()-VZ.recIni)/1000);el.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}if(Date.now()-VZ.recIni>180000)vzGrava();},500);render();toast('Gravando. Gire e mostre o trabalho; toque em Parar quando terminar (máx. 3 min).');}
+/* Visualização grande a partir de um arquivo (zip, STL ou HTML): abre o visualizador próprio por cima da tela */
+function abreBlob(blob,nome,kind){vzPop(blob,nome);}
+function verHtmlArq(id){vzArqGrande(id);}
+/* ===================== Visualizador 3D (página própria: app/visualizador.html) =====================
+   Abre o HTML do exocad, STL, ZIP, PLY e OBJ no próprio aparelho: camadas, modelagem, análise automática,
+   régua, anotações, foto e vídeo. Na aba ele fica num quadro fixo (não recarrega quando a tela redesenha);
+   ao abrir um arquivo de um pedido, abre numa janela grande por cima. */
+var VZ={box:null,ifr:null,pedAberto:null,lado:window.innerWidth>900};
+function vzBox(){if(VZ.box)return VZ.box;var b=document.createElement('div');b.className='vz-float';b.hidden=true;
+  b.innerHTML='<iframe title="Visualizador 3D" src="visualizador.html"></iframe>';document.body.appendChild(b);VZ.box=b;VZ.ifr=b.querySelector('iframe');return b;}
+function vzPosiciona(){vzPos();requestAnimationFrame(vzPosiciona);}
+function vzPos(){var b=VZ.box;if(b){var s=ui.tab==='visu'&&!ui.sheet&&!document.querySelector('.vz-pop')?document.getElementById('vz-slot'):null;
+    if(s){var r=s.getBoundingClientRect();b.hidden=false;b.style.left=r.left+'px';b.style.top=r.top+'px';b.style.width=r.width+'px';b.style.height=r.height+'px';}else if(!b.hidden)b.hidden=true;}}
+requestAnimationFrame(vzPosiciona);
+function vzEspera(ifr,fn){var n=0;(function w(){var V=null;try{V=ifr.contentWindow&&ifr.contentWindow.VD;}catch(e){}
+  if(V)fn(V);else if(n++<300)setTimeout(w,100);else toast('O visualizador não carregou. Verifique a internet e tente de novo.');})();}
+/* nomeia o arquivo pelo conteúdo: os guardados no armazenamento vêm compactados em ZIP */
+function vzArquivo(bl,nome){return bl.slice(0,2).arrayBuffer().then(function(b){var u=new Uint8Array(b),zip=u[0]===0x50&&u[1]===0x4B;
+  var n=nome||'arquivo';if(zip&&!/\.zip$/i.test(n))n+='.zip';else if(!zip&&!/\.(stl|html?|ply|obj|zip)$/i.test(n))n+=(/text\/html/.test(bl.type)?'.html':'.stl');return new File([bl],n,{type:bl.type});});}
+function vzNaAba(files,limpar){vzBox();vzEspera(VZ.ifr,function(V){V.abrir(files,{limpar:!!limpar});});}
+function vzPop(bl,nome){vzArquivo(bl,nome).then(function(f){var old=document.querySelector('.vz-pop');if(old)old.remove();
+  var d=document.createElement('div');d.className='vz-pop';d.setAttribute('role','dialog');d.setAttribute('aria-label','Visualizador 3D');
+  d.innerHTML='<div><header><b></b><button class="btn sm" type="button">Fechar</button></header><iframe title="Visualizador 3D" src="visualizador.html"></iframe></div>';
+  d.querySelector('b').textContent=nome||'Arquivo';d.querySelector('button').onclick=function(){d.remove();};
+  d.addEventListener('click',function(e){if(e.target===d)d.remove();});document.body.appendChild(d);
+  vzEspera(d.querySelector('iframe'),function(V){V.abrir([f]);});});}
+function vzBlob(id){var a=byId(S.arquivos,id);if(!a)return Promise.reject(new Error('arquivo não encontrado'));if(blobs.has(id))return Promise.resolve(blobs.get(id));
+  if(a.exemplo)return Promise.reject(new Error('este é um arquivo de exemplo, sem conteúdo'));
+  return fnArq('baixar',{arquivo_id:id}).then(function(r){return fetch(r.url);}).then(function(res){if(!res.ok)throw new Error('download recusado');return res.blob();}).then(function(bl){blobs.set(id,bl);return bl;});}
+function rVisu(){setTimeout(vzBox,0);
+  var side=VZ.lado?'<div class="between"><h3 style="margin:0">Meus pedidos</h3><button class="icon-btn" data-a="vzLado" aria-label="Recolher a lista" title="Recolher">‹</button></div>'+
+    '<p class="small muted" style="margin:0">Abra os arquivos de um pedido direto no visualizador. Ou arraste os arquivos do computador para a tela ao lado.</p>'+vzPedidosHtml()
+    :'<button class="btn sm vz2-abre" data-a="vzLado" aria-label="Mostrar meus pedidos" title="Meus pedidos">›<span> Meus pedidos</span></button>';
+  return '<div class="vz2'+(VZ.lado?'':' fecha')+'"><aside class="card vz2-side">'+side+'</aside><div class="vz2-slot" id="vz-slot"></div></div>';}
 /* ---- pedidos com arquivos (menu lateral) ---- */
 function vzPedidosHtml(){var ps=alive(S.pedidos).filter(function(p){return alive(S.arquivos).some(function(a){return a.pedidoId===p.id&&!a.removido;});}).sort(function(a,b){return (b.recebido||'')<(a.recebido||'')?-1:1;}).slice(0,60);
   if(!ps.length)return '<p class="small muted">Nenhum pedido com STL ou HTML ainda. Envie arquivos nas caixas do pedido.</p>';
-  return '<div class="vz-peds">'+ps.map(function(p){var c=cliente(p.clienteId),as=alive(S.arquivos).filter(function(a){return a.pedidoId===p.id&&!a.removido;}),ab=VZ.pedAberto===p.id;
+  return '<div class="vz-peds">'+ps.map(function(p){var c=cliente(p.clienteId),as=alive(S.arquivos).filter(function(a){return a.pedidoId===p.id&&!a.removido;}),ab=VZ.pedAberto===p.id,locais=as.filter(function(a){return a.origem!=='link';});
     return '<div class="vz-ped'+(ab?' on':'')+'"><button class="vz-ped-h" data-a="vzPed" data-id="'+p.id+'">'+iconeTrab(p)+'<span><b>#'+p.num+' · '+esc(p.paciente)+'</b><small>'+esc(c?c.nome:'')+' · '+as.length+' arquivo(s)</small></span></button>'+
-      (ab?'<div class="vz-ped-f">'+as.map(function(a){var cat=catArq(a);return a.origem==='link'?'<a class="btn sm" href="'+esc(a.url)+'" target="_blank" rel="noopener">🔗 '+esc(a.nome)+'</a>':'<button class="btn sm" data-a="vzAbreArq" data-id="'+a.id+'">'+(cat==='html'?'HTML':cat==='fres'?'Fresagem':'Escaneamento')+' · '+esc(a.nome)+'</button>';}).join('')+'</div>':'')+'</div>';}).join('')+'</div>';}
-function vzAbreArq(id){var a=byId(S.arquivos,id);if(!a)return;var vai=function(bl){vzArquivos([new File([bl],/\.zip$/i.test(a.nome)?a.nome:a.nome+'.zip',{type:'application/zip'})]);};
-  if(blobs.has(id)){vai(blobs.get(id));return;}VZ.busy='Baixando '+a.nome+'…';render();
-  fnArq('baixar',{arquivo_id:id}).then(function(r){return fetch(r.url);}).then(function(res){if(!res.ok)throw new Error('download recusado');return res.blob();}).then(function(bl){blobs.set(id,bl);VZ.busy=null;vai(bl);})
-  .catch(function(e){VZ.busy=null;render();toast('Não consegui baixar: '+e.message+'.');});}
+      (ab?'<div class="vz-ped-f">'+(locais.length>1?'<button class="btn sm primary" data-a="vzTodos" data-id="'+p.id+'">Abrir todos juntos</button>':'')+as.map(function(a){var cat=catArq(a);return a.origem==='link'?'<a class="btn sm" href="'+esc(a.url)+'" target="_blank" rel="noopener">🔗 '+esc(a.nome)+'</a>':'<button class="btn sm" data-a="vzAbreArq" data-id="'+a.id+'">'+(cat==='html'?'HTML':cat==='fres'?'Fresagem':'Escaneamento')+' · '+esc(a.nome)+'</button>';}).join('')+'</div>':'')+'</div>';}).join('')+'</div>';}
+function vzAbreArq(id,limpar){var a=byId(S.arquivos,id);if(!a)return;toast('Abrindo '+a.nome+'…');
+  vzBlob(id).then(function(bl){return vzArquivo(bl,a.nome);}).then(function(f){vzNaAba([f],limpar);}).catch(function(e){toast('Não consegui abrir: '+e.message+'.');});}
+function vzTodos(pid){var as=alive(S.arquivos).filter(function(a){return a.pedidoId===pid&&!a.removido&&a.origem!=='link';});toast('Abrindo '+as.length+' arquivos…');
+  Promise.all(as.map(function(a){return vzBlob(a.id).then(function(bl){return vzArquivo(bl,a.nome);});})).then(function(fs){vzNaAba(fs,true);}).catch(function(e){toast('Não consegui abrir: '+e.message+'.');});}
+function vzArqGrande(id){var a=byId(S.arquivos,id);if(!a)return;toast('Abrindo '+a.nome+'…');vzBlob(id).then(function(bl){vzPop(bl,a.nome);}).catch(function(e){toast('Não consegui abrir: '+e.message+'.');});}
 
-/* Visualizador 3D */
 var viewer=null;
-function fViewer(id){var a=byId(S.arquivos,id);return head(esc(a?a.nome:'Arquivo'))+'<div class="viewer3d" id="v3"><canvas id="v3c"></canvas><div class="msg" id="v3m">Abrindo o arquivo…</div></div><p class="small muted">Arraste para girar. Use dois dedos ou a roda do mouse para zoom.</p>';}
-function parseSTL(buf){
-  var dv=new DataView(buf);
-  if(buf.byteLength>84){var n=dv.getUint32(80,true);if(84+n*50===buf.byteLength){var pos=new Float32Array(n*9);for(var i=0;i<n;i++){var o=84+i*50+12;for(var k=0;k<9;k++)pos[i*9+k]=dv.getFloat32(o+k*4,true);}return pos;}}
-  var txt=new TextDecoder().decode(buf),re=/vertex\s+([-+\d.eE]+)\s+([-+\d.eE]+)\s+([-+\d.eE]+)/g,m,arr=[];
-  while((m=re.exec(txt)))arr.push(+m[1],+m[2],+m[3]);return new Float32Array(arr);
-}
-function abreViewer(id){
-  var a=byId(S.arquivos,id),msg=document.getElementById('v3m');
-  var b=blobs.get(id);
-  if(!b){if(a&&a.exemplo){msg.textContent='Este é um arquivo de exemplo, sem conteúdo. Envie um STL seu no pedido para ver em 3D.';return;}
-    msg.textContent='Baixando o arquivo…';
-    fnArq('baixar',{arquivo_id:id}).then(function(r){return fetch(r.url);}).then(function(res){if(!res.ok)throw new Error('download recusado');return res.blob();})
-      .then(function(bl){blobs.set(id,bl);if(document.getElementById('v3m'))abreViewer(id);}).catch(function(e){var m=document.getElementById('v3m');if(m)m.textContent='Não consegui abrir: '+e.message+'.';});
-    return;}
-  if(!window.THREE||!window.JSZip){msg.textContent='Não foi possível carregar o visualizador.';return;}
-  JSZip.loadAsync(b).then(function(z){
-    var f=Object.keys(z.files).filter(function(n){return /\.stl$/i.test(n)&&!z.files[n].dir;})[0];
-    if(!f)throw new Error('Nenhum STL dentro do zip.');
-    return z.files[f].async('arraybuffer');
-  }).then(function(buf){
-    var pos=parseSTL(buf); if(!pos.length)throw new Error('Arquivo STL sem triângulos.');
-    msg.hidden=true; viewer=montaViewer(pos);
-  }).catch(function(e){msg.textContent='Não consegui abrir: '+e.message;});
-}
-function montaViewer(pos){
-  var cv=document.getElementById('v3c'),wrap=document.getElementById('v3');
-  var r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
-  r.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
-  var scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(35,1,0.1,1000);
-  var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.computeVertexNormals();g.computeBoundingBox();
-  var bb=g.boundingBox,ctr=new THREE.Vector3();bb.getCenter(ctr);g.translate(-ctr.x,-ctr.y,-ctr.z);
-  var sz=new THREE.Vector3();bb.getSize(sz);var s=2/Math.max(sz.x,sz.y,sz.z);
-  var mesh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0xEDE6D8,roughness:.5,metalness:0}));mesh.scale.setScalar(s);
-  var grp=new THREE.Group();grp.add(mesh);grp.rotation.x=-0.6;scene.add(grp);
-  scene.add(new THREE.HemisphereLight(0xffffff,0x667788,0.8));var dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(2,3,4);cam.add(dl);scene.add(cam);
-  cam.position.set(0,0,4.2);
-  var run=true,pts={},lastD=0;
-  function size(){var w=wrap.clientWidth,h=wrap.clientHeight;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
-  size();var ro=window.ResizeObserver?new ResizeObserver(size):null;if(ro)ro.observe(wrap);
-  wrap.addEventListener('pointerdown',function(e){pts[e.pointerId]={x:e.clientX,y:e.clientY};wrap.setPointerCapture(e.pointerId);});
-  wrap.addEventListener('pointermove',function(e){var p=pts[e.pointerId];if(!p)return;var ids=Object.keys(pts);
-    if(ids.length===1){grp.rotation.y+=(e.clientX-p.x)*0.01;grp.rotation.x+=(e.clientY-p.y)*0.01;}
-    p.x=e.clientX;p.y=e.clientY;
-    if(ids.length===2){var a=pts[ids[0]],b=pts[ids[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(lastD)cam.position.z=Math.min(12,Math.max(1.5,cam.position.z*lastD/d));lastD=d;}});
-  function up(e){delete pts[e.pointerId];lastD=0;}
-  wrap.addEventListener('pointerup',up);wrap.addEventListener('pointercancel',up);
-  wrap.addEventListener('wheel',function(e){e.preventDefault();cam.position.z=Math.min(12,Math.max(1.5,cam.position.z*(e.deltaY>0?1.1:0.9)));},{passive:false});
-  (function loop(){if(!run)return;r.render(scene,cam);requestAnimationFrame(loop);})();
-  return {stop:function(){run=false;if(ro)ro.disconnect();g.dispose();r.dispose();viewer=null;}};
-}
 
 /* Envio de arquivos: compacta em zip no navegador e manda direto para o armazenamento (Cloudflare R2).
    O servidor (função "arquivos") confere dono, assinatura e espaço e devolve um link que vale por pouco tempo. */
@@ -4528,21 +4313,13 @@ var A={
   copiar:function(d){var t=d.t==='code'?ui.pixCode:d.t==='msg'?(ui.pixMsg+'\n\n'+ui.pixCode):document.getElementById('tx-out').value;
     var ok=function(){toast('Copiado.');},fail=function(){var el=document.getElementById(d.t==='tx'?'tx-out':'px-code');var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);toast('Texto selecionado. Copie com o menu do aparelho.');};
     try{navigator.clipboard.writeText(t).then(ok,fail);}catch(e){fail();}},
-  ver3d:function(d){openSheet(fViewer,d.id);ui.sheet.after=function(){abreViewer(d.id);};abreViewer(d.id);},
+  ver3d:function(d){vzArqGrande(d.id);},
   rdSbVer:function(d){var R=redeIni(),x=R.enviados.concat(R.meus).filter(function(q){return q.id===d.id;})[0];if(x&&x.sbUrl)openSheet(fImgView,x.sbUrl);},
   rdSbTira:function(d){var R=redeIni(),x=R.enviados.concat(R.meus).filter(function(q){return q.id===d.id;})[0];if(x&&x.sbUrl){URL.revokeObjectURL(x.sbUrl);x.sbUrl=null;}render();if(ui.sheet)renderSheet();},
-  vzVis:function(d){var l=VZ.layers.filter(function(x){return x.id===d.id;})[0];if(!l)return;l.vis=!l.vis;vzAtualizaMat(l);render();},
-  vzTira:function(d){var l=VZ.layers.filter(function(x){return x.id===d.id;})[0];if(!l)return;if(l.mesh){VZ.three.root.remove(l.mesh);l.mesh.geometry.dispose();l.mesh.material.dispose();}VZ.layers=VZ.layers.filter(function(x){return x!==l;});VZ.res=null;render();},
-  vzLimpa:function(){VZ.layers.forEach(function(l){if(l.mesh&&VZ.three){VZ.three.root.remove(l.mesh);l.mesh.geometry.dispose();l.mesh.material.dispose();}});VZ.medidas.forEach(function(m){if(VZ.three)VZ.three.root.remove(m.g);});VZ.layers=[];VZ.medidas=[];VZ.res=null;if(VZ.html){URL.revokeObjectURL(VZ.html.url);VZ.html=null;}render();},
-  vzAnalisa:function(){VZ.busy='Analisando… pode levar alguns segundos em arquivos grandes.';render();setTimeout(function(){try{vzAnalisa();}catch(e){toast('A análise falhou: '+e.message);}VZ.busy=null;render();},40);},
-  vzVista:function(d){VZ.vista=d.v;render();},
-  vzLado:function(d){VZ.lado=d.v;render();},
+  vzLado:function(){VZ.lado=!VZ.lado;render();},
   vzPed:function(d){VZ.pedAberto=VZ.pedAberto===d.id?null:d.id;render();},
   vzAbreArq:function(d){vzAbreArq(d.id);},
-  vzMedir:function(){VZ.medir=!VZ.medir;VZ.pA=null;if(!VZ.medir&&VZ.tmp&&VZ.three){VZ.three.root.remove(VZ.tmp);VZ.tmp=null;}render();if(VZ.medir)toast('Clique em dois pontos do modelo para medir.');},
-  vzMedLimpa:function(){VZ.medidas.forEach(function(m){if(VZ.three)VZ.three.root.remove(m.g);});VZ.medidas=[];render();},
-  vzGrava:function(){vzGrava();},
-  vzCentro:function(){if(VZ.three){VZ.three.piv.quaternion.set(0,0,0,1);VZ.three.enquadra();}},
+  vzTodos:function(d){vzTodos(d.id);},
   verHtml:function(d){verHtmlArq(d.id);},
   sbVer:function(d){var p=byId(S.pedidos,d.id);var u=p&&p.sbImg&&SBURL[p.sbImg]&&SBURL[p.sbImg].u;if(u)openSheet(fImgView,u);},
   sbFoco:function(d,el){el.focus();},
@@ -4749,8 +4526,6 @@ document.addEventListener('submit',function(e){var f=e.target;if(!f.dataset.form
 document.addEventListener('toggle',function(e){if(e.target.classList&&e.target.classList.contains('mm'))ui.mmAberto=e.target.open;},true);
 document.addEventListener('focusin',function(e){if(e.target.closest&&e.target.closest('.mm-li'))window._mmTa=e.target;});
 document.addEventListener('input',function(e){
-  if(e.target&&e.target.dataset&&e.target.dataset.vzo){var l3=VZ.layers.filter(function(x){return x.id===e.target.dataset.vzo;})[0];if(l3){l3.op=(+e.target.value)/100;vzAtualizaMat(l3);}}
-  if(e.target&&e.target.dataset&&e.target.dataset.vzc){var l4=VZ.layers.filter(function(x){return x.id===e.target.dataset.vzc;})[0];if(l4){l4.cor=e.target.value;vzAtualizaMat(l4);}}
   if(e.target&&e.target.id==='pr-cidade')sugPrCidade();
   if(e.target.classList&&e.target.classList.contains('pv-in')){(ui.prevPar=ui.prevPar||{})[e.target.dataset.k]=+e.target.value;clearTimeout(ui.prevT);ui.prevT=setTimeout(function(){var y=window.scrollY,ab=!!document.querySelector('.pv-ajuste[open]');render();var d=document.querySelector('.pv-ajuste');if(d&&ab)d.open=true;window.scrollTo(0,y);},180);}
   if(e.target.classList&&e.target.classList.contains('nome-p')){var el=e.target,st=el.selectionStart,en=el.selectionEnd,nv=nomeProprio(el.value,el.id==='cl-sobrenome');if(nv!==el.value){el.value=nv;try{el.setSelectionRange(st,en);}catch(x){}}}
@@ -4771,17 +4546,11 @@ document.addEventListener('input',function(e){
   if(t.id==='px-valor')desenhaPix();
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
-['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){if(ui.tab!=='visu')return;e.preventDefault();var d=document.getElementById('vz-drop');if(d)d.classList.add('on');});});
-document.addEventListener('dragleave',function(e){if(ui.tab!=='visu')return;if(!e.relatedTarget){var d=document.getElementById('vz-drop');if(d)d.classList.remove('on');}});
-document.addEventListener('drop',function(e){if(ui.tab!=='visu')return;e.preventDefault();var d=document.getElementById('vz-drop');if(d)d.classList.remove('on');if(e.dataTransfer&&e.dataTransfer.files.length)vzArquivos(e.dataTransfer.files);});
 document.addEventListener('paste',function(e){if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it)return;
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.type!=='file')return;
   var f=it.getAsFile();if(!f)return;e.preventDefault();
   if(ui.sheet.fn===fPedidoDet)sbProcessa(ui.sheet.args[0],f);else if(ui.sheet.fn===fTrabRede)rdSbCola(ui.sheet.args[0],f);});
 document.addEventListener('change',function(e){
-  if(e.target&&e.target.id==='vz-in'&&e.target.files.length){var fz=[].slice.call(e.target.files);e.target.value='';vzArquivos(fz);}
-  if(e.target&&e.target.dataset&&e.target.dataset.vzr){var l1=VZ.layers.filter(function(x){return x.id===e.target.dataset.vzr;})[0];if(l1){l1.role=e.target.value;l1.cor=VZ_CORES[l1.role];if(l1.role==='trab'&&!vzArcoDente(l1.nome))vzArcosAuto();vzAtualizaMat(l1);VZ.res=null;render();}}
-  if(e.target&&e.target.dataset&&e.target.dataset.vza){var l2=VZ.layers.filter(function(x){return x.id===e.target.dataset.vza;})[0];if(l2){l2.arco=e.target.value;VZ.res=null;render();}}
   if(e.target&&e.target.classList&&e.target.classList.contains('slot-up')&&e.target.files.length){var fs=[].slice.call(e.target.files);e.target.value='';enviaArquivo(e.target.dataset.id,fs,e.target.dataset.slot);}
   if(e.target&&e.target.classList&&e.target.classList.contains('sb-up')&&e.target.files.length){var f0=e.target.files[0];e.target.value='';sbProcessa(e.target.dataset.id,f0);}
   if(e.target&&e.target.classList&&e.target.classList.contains('rd-sb-up')&&e.target.files.length){rdSbCola(e.target.dataset.id,e.target.files[0]);e.target.value='';}
