@@ -451,6 +451,42 @@ table.adm td{vertical-align:top}
 .zmini{display:grid;gap:0}.zmini .zc{padding:10px 4px}.zmini .zc:last-child{border-bottom:0}
 @media (max-width:820px){.zap{grid-template-columns:1fr;height:calc(100vh - 150px);min-height:480px;border-radius:14px}
   .zap.aberto .zap-l{display:none}.zap:not(.aberto) .zap-c{display:none}.zap-ch .voltar{display:grid}}
+.lg-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ck{display:grid;gap:14px;justify-items:center;text-align:center}
+.ck-ic{width:76px;height:76px;border-radius:24px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+.ck-ic svg{width:38px;height:38px}
+.ck h1{margin:0;font-size:1.5rem;text-wrap:balance}.ck p{margin:0}
+.ck .em{font-weight:700;color:var(--ink);overflow-wrap:anywhere}
+.ck ol{text-align:left;margin:0;padding-left:20px;display:grid;gap:6px;color:var(--muted);font-size:.92rem}
+.ck .acts{display:grid;gap:8px;width:100%}
+.bv{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:32px max(16px,env(safe-area-inset-right,0px)) 32px max(16px,env(safe-area-inset-left,0px));background:radial-gradient(1200px 600px at 50% -10%,var(--accent-soft),transparent 70%),var(--bg);position:relative;overflow:hidden}
+.bv-in{position:relative;z-index:1;width:100%;max-width:520px;display:grid;gap:22px;justify-items:center;text-align:center}
+.bv h1{font-size:clamp(1.8rem,6vw,2.6rem);line-height:1.1;margin:0;text-wrap:balance}
+.bv h1 em{font-style:normal;color:var(--accent)}
+.bv .sub{color:var(--muted);font-size:1.05rem;max-width:420px;margin:0}
+.bv-l{display:grid;gap:10px;width:100%;text-align:left}
+.bv-l div{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.bv-l i{flex:none;width:36px;height:36px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-style:normal}
+.bv-l i svg{width:19px;height:19px}.bv-l b{display:block}.bv-l span{font-size:.86rem;color:var(--muted)}
+.bv-acts{display:grid;gap:8px;width:100%}
+.bv-nome{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;text-align:left}
+.bv-cf{position:absolute;inset:0;pointer-events:none}
+.bv-cf span{position:absolute;top:-12px;width:8px;height:14px;border-radius:3px;opacity:.85;animation:cai linear forwards}
+@keyframes cai{to{transform:translateY(110vh) rotate(540deg);opacity:.9}}
+.bv-logo{animation:pula 1.2s ease-out both}
+@keyframes pula{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.bv-cf{display:none}.bv-logo{animation:none}}
+.tour-scrim{position:fixed;inset:0;z-index:90;background:rgba(10,8,20,.12)}
+.tour-card{position:fixed;z-index:91;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100% - 32px));background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 24px 60px rgba(20,10,60,.28);display:grid;gap:10px}
+.tour-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.tour-top .n{font:600 .78rem var(--f-mono);color:var(--muted)}
+.tour-top .sk{margin-left:auto;border:0;background:none;color:var(--muted);font:inherit;font-size:.85rem;cursor:pointer;text-decoration:underline}
+.tour-card h3{margin:0;display:flex;gap:10px;align-items:center;font-size:1.2rem}
+.tour-card h3 i{flex:none;width:34px;height:34px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+.tour-card h3 i svg{width:18px;height:18px}
+.tour-card p{margin:0;color:var(--muted)}
+.tour-dots{display:flex;gap:5px}.tour-dots b{width:7px;height:7px;border-radius:50%;background:var(--line)}.tour-dots b.on{background:var(--accent);width:18px;border-radius:99px}
+.tour-nav{display:flex;gap:8px;justify-content:space-between;align-items:center}
+@media (max-width:899px){.tour-card{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -905,7 +941,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -957,7 +993,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -1078,8 +1114,8 @@ function calcValor(cid,tid,qtd,data){
 /* Plano grátis: quem não está em teste nem com assinatura ativa usa o sistema normalmente, só não guarda arquivos.
    'vencida' no banco = conta bloqueada pelo administrador (aí fica só leitura). */
 function canWrite(){return S.assinatura.status!=='vencida';}
-function canFile(){var a=S.assinatura;if(a.status==='ativa')return !a.venceEm||today()<=a.venceEm;return a.status==='teste'&&!!a.testeAte&&today()<=a.testeAte;}
-function emGratis(){return canWrite()&&!canFile();}
+function canFile(){return canWrite();} /* lançamento: tudo liberado para todos (só conta bloqueada pelo admin fica só leitura) */
+function emGratis(){return false;}
 function guard(){if(!canWrite()){toast('Conta bloqueada: você pode ver e exportar, mas não alterar.');return false;}return true;}
 function guardArq(){if(!guard())return false;if(!canFile()){toast('No Essencial não dá para guardar arquivos. Cole um link ou assine.');return false;}return true;}
 function avisoGratis(){return '<div class="banner"><span><b>Plano Essencial (de R$ 9 por R$ 0 no lançamento).</b> Você usa clientes, pedidos e financeiro à vontade. Para guardar escaneamentos e arquivos STL aqui, assine. Enquanto isso, cole o link do Drive ou WeTransfer no pedido.</span><button class="btn sm pri" data-a="assinar">Assinar</button></div>';}
@@ -1117,7 +1153,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 22h30';
+var VERSAO='15/10 · 22h50';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1128,14 +1164,13 @@ function render(){
   if(!S.sessao){app.innerHTML=rLogin();return;}
   if(S.carregando){app.innerHTML=rCarregando();return;}
   if(ui.modoLab&&S.admin){app.innerHTML=rLabModo();return;}
+  if(ui.tour==null&&precisaBoas()){app.innerHTML=rBoasVindas();return;}
   var a=S.assinatura,w=canWrite(),chip;
   if(!w) chip='<span class="tag u">Conta bloqueada</span>';
-  else if(emGratis()) chip='<span class="tag">Essencial · R$ 0</span>';
-  else if(a.status==='teste') chip='<span class="tag a">Teste · '+Math.max(0,daysBetween(today(),a.testeAte))+' dias</span>';
-  else chip='<span class="tag ok">Ativa</span>';
+  else chip='<span class="tag ok">Grátis no lançamento</span>';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
     ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,lab:rLab,analises:rAnalisesTab,metas:rMetasTab,secretarios:rSecretarios,config:rConfig,admin:rAdmin};
-  var body=(R[ui.tab]||rDashboard)();
+  var body=ui.tour!=null&&ui.tab!=='config'?comDemo(R[ui.tab]||rDashboard):(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
   var u=usado(),lim=a.limite,pct=Math.min(100,u/lim*100);
@@ -1144,16 +1179,16 @@ function render(){
   var NL=secNaoLidas();
   var itSd=function(id,lbl){return id==='analises'&&SD?{c:' sd sd-'+SD.nivel,st:' style="--sd:'+SD.cor+'" title="Saúde do negócio: '+SD.nota+'/100"',l:SD.nome}:{c:'',st:'',l:lbl};};
   var side='<aside class="side" aria-label="Menu"><div class="brand">'+logo(30)+'<span>Ideali CAD</span></div>'+
-    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return (it[0]!=='admin'&&it[0]!=='rede'&&it[0]!=='lab')||S.admin;}).map(function(it){
+    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return (it[0]!=='admin'&&it[0]!=='lab')||S.admin;}).map(function(it){
       var badge=it[0]==='secretarios'&&NL?'<span class="badge" style="background:var(--ok)">'+NL+'</span>':it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':it[0]==='config'&&lix?'<span class="badge" style="background:var(--muted)">'+lix+'</span>':'';
       var z=itSd(it[0],it[1]);return '<button class="it'+z.c+' '+(ui.tab===it[0]||(it[0]==='config'&&emCfg())?'on':'')+'"'+z.st+' data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+z.l+'</span>'+badge+'</button>';}).join('');}).join('')+
-    '<div class="plan"><div class="between"><b>Plano '+a.plano+'</b>'+chip+'</div>'+
+    '<div class="plan"><div class="between"><b>Plano</b>'+chip+'</div>'+
       '<div class="bar '+(pct>90?'full':pct>75?'warn':'')+'" style="height:8px"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
       '<span class="muted mono" style="font-size:.75rem">'+bytes(u)+' de '+bytes(lim)+'</span>'+
-      (a.status==='teste'&&w?'<button class="btn sm pri" data-a="tab" data-v="config">Assinar</button>':'')+'</div>'+
+      '</div>'+
     '<div class="me"><span class="av">'+esc((nome[0]||'?').toUpperCase())+'</span><span class="nm">'+esc(nome)+'</span><button class="icon-btn" data-a="sair" aria-label="Sair" title="Sair" style="width:32px;height:32px">'+ICON.sair+'</button></div></aside>';
   var titulo=ui.tab==='analises'&&SD?'<span style="color:'+SD.cor+'">'+SD.nome+'</span>':(TITULOS[ui.tab]||'');
-  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config'&&((it[0]!=='rede'&&it[0]!=='admin'&&it[0]!=='lab')||S.admin))flat.push(it);});});
+  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config'&&((it[0]!=='admin'&&it[0]!=='lab')||S.admin))flat.push(it);});});
   var top='<header class="top"><div class="top-in">'+
     '<button class="icon-btn menu-btn" data-a="drawer" aria-label="Abrir menu">'+ICON.menu+'</button>'+
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
@@ -1162,7 +1197,7 @@ function render(){
     '<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
     '<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>'+
     contaMenu(nome,lix)+
-    '<span class="menu-btn">'+chip+'</span></div>'+
+    '<span class="menu-btn">'+chip.replace('Grátis no lançamento','Grátis')+'</span></div>'+
     '<nav class="tnav" aria-label="Menu principal"><div class="tnav-in">'+flat.map(function(it){
       var badge=it[0]==='secretarios'&&NL?'<span class="badge" style="background:var(--ok)">'+NL+'</span>':it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':'';
       var z=itSd(it[0],it[1]);return '<button class="'+(ui.tab===it[0]?'on':'')+z.c+'"'+z.st+' data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+z.l+'</span>'+badge+'</button>';}).join('')+'</div></nav></header>';
@@ -1174,7 +1209,7 @@ function render(){
   app.innerHTML='<div class="shell '+(ui.drawer?'open':'')+'">'+side+'<div class="scrim" data-a="drawer"></div>'+
     '<div class="content">'+top+'<main class="main">'+
     (w?'':'<div class="banner bad"><span><b>Conta bloqueada.</b> Seus dados estão guardados. Você pode ver e exportar, mas não pode criar nem alterar.</span><button class="btn sm" data-a="tab" data-v="config">Ver assinatura</button></div>')+
-    (emCfg()?'<div class="cfg">'+cfgTabs(lix)+body+'</div>':body)+'</main></div>'+bnav+'</div>';
+    (emCfg()?'<div class="cfg">'+cfgTabs(lix)+body+'</div>':body)+'</main></div>'+bnav+'</div>'+(ui.tour!=null?tourCard():'');
 }
 function contaMenu(nome,lix){
   var it=[['config','Perfil e conta'],['tabela','Tabela de preços'],['arquivos','Arquivos STL'],['lixeira','Lixeira']];if(S.admin)it.push(['admin','Administração']);
@@ -1210,12 +1245,21 @@ function rLogin(){
     '<div class="row">'+logo(36)+'<h1>Nova senha</h1></div><p class="muted">Digite a nova senha da sua conta.</p>'+
     '<label class="fld"><span>Nova senha</span><input id="ns-senha" name="senha" type="password" required minlength="8" autocomplete="new-password"><small>Mínimo de 8 caracteres.</small></label>'+
     '<button class="btn pri block" type="submit">Salvar nova senha</button></form></div>'+painelMapa()+'</div>';
+  if(ui.checaEmail){var ce=ui.checaEmail,gm=/@(gmail|googlemail)\.com$/i.test(ce.email),ol=/@(hotmail|outlook|live)\./i.test(ce.email);
+    return '<div class="login"><div class="lg-main"><div class="box card ck" style="padding:28px 24px">'+
+      '<span class="ck-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></svg></span>'+
+      '<h1>Quase lá'+(ce.nome?', '+esc(ce.nome):'')+'!</h1><p class="muted">Mandamos um link de confirmação para</p><p class="em">'+esc(ce.email)+'</p>'+
+      '<ol><li>Abra o e-mail <b>"Confirme seu cadastro no Ideali CAD"</b>.</li><li>Toque em <b>Confirmar meu e-mail</b>.</li><li>Pronto: o sistema abre já com a sua conta.</li></ol>'+
+      (ui.loginMsg?'<div class="banner">'+ui.loginMsg+'</div>':'')+
+      '<div class="acts">'+(gm?'<a class="btn pri block" href="https://mail.google.com/mail/u/0/#search/Ideali+CAD" target="_blank" rel="noopener">Abrir o Gmail</a>':ol?'<a class="btn pri block" href="https://outlook.live.com/mail/" target="_blank" rel="noopener">Abrir o Outlook</a>':'')+
+      '<button class="btn block" data-a="reenviaConf" '+(ui.loginBusy?'disabled':'')+'>Não chegou? Reenviar e-mail</button><button class="btn block" data-a="jaConfirmei">Já confirmei, quero entrar</button></div>'+
+      '<p class="small muted">Não achou? Olhe também a pasta de spam ou promoções.</p></div></div>'+painelMapa()+'</div>';}
   var criar=ui.loginCriar;
   return '<div class="login"><div class="lg-main"><form class="box card" data-form="login" style="padding:24px">'+
     '<div class="row">'+logo(36)+'<h1>Ideali CAD</h1></div>'+
-    '<p class="muted">'+(criar?'Crie sua conta. São 14 dias grátis, sem cartão.':'Entre para ver seus pedidos.')+'</p>'+
+    '<p class="muted">'+(criar?'Crie sua conta. Grátis no lançamento, com tudo liberado e sem cartão.':'Entre para ver seus pedidos.')+'</p>'+
     (ui.loginMsg?'<div class="banner">'+ui.loginMsg+'</div>':'')+
-    (criar?'<label class="fld"><span>Seu nome</span><input id="lg-nome" name="nome" required maxlength="80" autocomplete="name"></label>':'')+
+    (criar?'<div class="lg-2"><label class="fld"><span>Nome</span><input id="lg-nome" name="nome" required maxlength="40" autocomplete="given-name"></label><label class="fld"><span>Sobrenome</span><input id="lg-sobrenome" name="sobrenome" required maxlength="40" autocomplete="family-name"></label></div>':'')+
     '<label class="fld"><span>E-mail</span><input id="lg-email" name="email" type="email" required autocomplete="email" value="'+esc(ui.loginEmail||'')+'"></label>'+
     '<label class="fld"><span>Senha</span><input id="lg-senha" name="senha" type="password" required minlength="'+(criar?8:6)+'" autocomplete="'+(criar?'new-password':'current-password')+'"><small>'+(criar?'Mínimo de 8 caracteres.':'')+'</small></label>'+
     (criar?'<label class="check small"><input type="checkbox" required id="lg-termos"> Li e aceito os <a href="../termos.html" target="_blank" rel="noopener">termos de uso</a> e a <a href="../privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</label>':'')+
@@ -1727,11 +1771,46 @@ function fSecretario(){var C=secChats(),sd=saudacao(),nome=primeiroNome(),auto=!
     '<div class="zmini">'+C.map(function(x){return linhaChat(x,false);}).join('')+'</div>'+
     '<label class="row" style="gap:8px;cursor:pointer"><input type="checkbox" id="secAutoChk" data-a="secAuto"'+(auto?' checked':'')+'> <span class="small">Mostrar ao entrar no sistema (1 vez por dia)</span></label>'+
     '<button class="btn block" data-a="fechar">Depois eu vejo</button></div>';}
-function secAbreDia(){if(EM_DEMO||ui.modoLab||(S.prefs&&S.prefs.secAuto===false))return;var t=today();
+function secAbreDia(){if(EM_DEMO||ui.modoLab||ui.tour!=null||precisaBoas()||(S.prefs&&S.prefs.secAuto===false))return;var t=today();
   try{if(localStorage.getItem('idealicad_sec_dia')===t)return;}catch(e){return;}
   if(!secChats().some(function(c){return c.urg||c.nl;}))return;
   try{localStorage.setItem('idealicad_sec_dia',t);}catch(e){}
   setTimeout(function(){if(!document.querySelector('.sheet'))openSheet(fSecretario);},600);}
+/* ---------- Boas-vindas + tour (contas novas) ----------
+   Depois de confirmar o e-mail e entrar pela 1ª vez: tela "Seja bem-vindo(a)", tour por todas as abas (com dados fictícios,
+   nada é salvo) e, no fim, o Dashboard com os cartões de Primeiros passos para completar o perfil. Guardado em preferencias.boas. */
+function precisaBoas(){return !!(S.sessao&&!EM_DEMO&&!(S.prefs&&(S.prefs.boas==='ok'||S.prefs.onb==='ok'))&&!alive(S.pedidos).length&&!alive(S.clientes).length);}
+var TOUR=[
+  ['dashboard','Dashboard','Seu resumo do mês: quanto faturou, quanto já recebeu, quem está devendo e os próximos prazos. Lá em cima dá para trocar o período.'],
+  ['secretarios','Secretários','Quatro secretários conversam com você como no WhatsApp: Pedidos, Financeiro, Faturamento e Clientes. Todo dia eles avisam o que precisa de atenção.'],
+  ['pedidos','Produção','Seus pedidos em colunas: a fazer, pendência, aguardando aprovação e finalizado. Toque num card para ver, mudar a etapa ou anexar o STL.'],
+  ['clientes','Clientes','Dentistas e laboratórios que te mandam trabalho, com histórico, preços especiais e mensagens prontas para o WhatsApp.'],
+  ['financeiro','Financeiro','Quem pagou e quem deve. A cobrança sai em PDF com QR Code Pix, pronta para mandar.'],
+  ['metas','Metas','Diga quantos elementos e quanto quer faturar no mês. O sistema mostra o ritmo por dia e avisa se está ficando para trás.'],
+  ['analises','Análises','Um radar que percebe quando um cliente some, manda menos ou muda o tipo de trabalho. O nome da aba muda de cor conforme a saúde do seu negócio.'],
+  ['ranking','Ranking','Seus melhores clientes por valor e por quantidade de trabalho.'],
+  ['tipos','Tipos de trabalho','Coroas, facetas, protocolos e o resto, com preço padrão e quanto cada tipo rende para você.'],
+  ['rede','Rede (prévia)','Em breve: laboratórios, clínicas e cadistas trocando trabalho num feed. Aqui você vê como vai ser.'],
+  ['config','Configurações','Seu perfil, chave Pix, tabela de preços, tema e espaço para arquivos. É por aqui que você deixa tudo do seu jeito.']];
+function rBoasVindas(){var nome=primeiroNome(),cores=['var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)','var(--p6)','var(--accent)'],cf='';
+  for(var i=0;i<34;i++)cf+='<span style="left:'+((i*37)%100)+'%;background:'+cores[i%cores.length]+';animation-duration:'+(2.6+(i%7)*0.35)+'s;animation-delay:'+((i%9)*0.12)+'s"></span>';
+  var semNome=!(S.perfil.nome||'').trim();
+  var it=function(ic,t,d){return '<div><i>'+ic+'</i><span><b>'+t+'</b><span>'+d+'</span></span></div>';};
+  return '<div class="bv"><div class="bv-cf" aria-hidden="true">'+cf+'</div><div class="bv-in">'+
+    '<span class="bv-logo">'+logo(64)+'</span>'+
+    '<h1>'+(nome&&!semNome?'Seja bem-vindo, <em>'+esc(nome)+'</em>!':'Seja bem-vindo ao <em>Ideali CAD</em>!')+'</h1>'+
+    '<p class="sub">Sua conta está pronta. Em 1 minuto eu te mostro onde fica cada coisa.</p>'+
+    (semNome?'<div class="bv-nome"><label class="fld"><span>Nome</span><input id="bv-nome" maxlength="40" autocomplete="given-name"></label><label class="fld"><span>Sobrenome</span><input id="bv-sobrenome" maxlength="40" autocomplete="family-name"></label></div>':'')+
+    '<div class="bv-l">'+it(ICON.pedidos,'Pedidos e prazos','Tudo o que entra, em que etapa está e o que vence.')+it(ICON.financeiro,'Cobrança com Pix','Quem deve, quanto, e o PDF de cobrança pronto.')+it(ICON.analises,'Saúde do negócio','Metas, sinais de alerta e secretários que avisam.')+'</div>'+
+    '<div class="bv-acts"><button class="btn pri block" data-a="boasIr" data-v="tour">Conhecer o sistema</button><button class="btn block" data-a="boasIr" data-v="pular">Pular e começar a usar</button></div>'+
+  '</div></div>';}
+function tourCard(){var i=ui.tour,st=TOUR[i],n=TOUR.length,ult=i===n-1;
+  return '<div class="tour-scrim" aria-hidden="true"></div><div class="tour-card" role="dialog" aria-label="Tour do sistema"><div class="tour-top"><span class="n">'+(i+1)+' de '+n+'</span>'+(st[0]!=='config'?'<span class="tag">Exemplo com dados fictícios</span>':'')+'<button class="sk" data-a="tourIr" data-v="fim">Pular tour</button></div>'+
+    '<h3><i>'+ICON[st[0]]+'</i>'+st[1]+'</h3><p>'+st[2]+'</p>'+
+    '<div class="tour-nav"><div class="tour-dots">'+TOUR.map(function(x,j){return '<b class="'+(j===i?'on':'')+'"></b>';}).join('')+'</div><span class="row" style="gap:6px">'+(i?'<button class="btn sm" data-a="tourIr" data-v="voltar">Voltar</button>':'')+
+    '<button class="btn sm pri" data-a="tourIr" data-v="'+(ult?'fim':'prox')+'">'+(ult?'Concluir':'Próximo')+'</button></span></div></div>';}
+function vaiTour(i){ui.tour=i;ui.tab=TOUR[i][0];ui.secAg=null;ui.sub=null;ui.msgs=false;ui.drawer=false;ui.ddOpen=null;closeSheet();render();window.scrollTo(0,0);}
+function fimTour(){ui.tour=null;S.prefs=S.prefs||{};S.prefs.boas='ok';ui.tab='dashboard';save();render();window.scrollTo(0,0);toast('Agora é só seguir os Primeiros passos para completar seu perfil.');}
 /* ---------- Primeiros passos (some quando tudo estiver feito ou a pessoa fechar) ---------- */
 function passosOnb(){var p=S.perfil||{},pr=S.prefs||{};
   return [
@@ -2755,7 +2834,7 @@ var ICO_CHAT='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke
 var RD_ST={oferta:'Aguardando aceite',desenho:'Desenhando',revisao:'Em revisão',aprovado:'Aprovado',pago:'Concluído',recusado:'Recusado'};
 function rdHora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
 function rdDock(){var el=document.getElementById('rd-dock');
-  if(!S.sessao||S.carregando||!S.admin||ui.modoLab){if(el)el.innerHTML='';return;}
+  if(!S.sessao||S.carregando||!S.admin||ui.modoLab||ui.tour!=null||precisaBoas()){if(el)el.innerHTML='';return;}
   if(!el){el=document.createElement('div');el.id='rd-dock';document.body.appendChild(el);}
   var R=redeIni(),D=R.dock||(R.dock={open:false,conv:null}),cs=rdConversas(R),tot=cs.reduce(function(s,c){return s+(c.aberto?c.n:0);},0);
   var inp=document.getElementById('rd-msg-in'),foco=inp&&document.activeElement===inp;if(inp)D.rasc=inp.value;
@@ -2997,13 +3076,10 @@ function rConfig(){
       (window.matchMedia&&matchMedia('(display-mode: standalone)').matches?'<p class="small muted">Você já está usando como aplicativo. ✓</p>':'<p class="small muted"><b>Android (Chrome):</b> menu ⋮ → <b>Adicionar à tela inicial</b>.<br><b>iPhone (Safari):</b> botão Compartilhar → <b>Adicionar à Tela de Início</b>.</p>'))+'</section>'+
     secTema()+
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
-    '<section class="card stack"><h2>Assinatura</h2>'+
+    '<section class="card stack"><h2>Plano</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
-      '<div class="between"><span>Plano</span><b>'+(emGratis()?'Essencial · <s class="muted">R$ 9</s> R$ 0/mês':esc((typeof NOME_PLANO!=='undefined'&&NOME_PLANO[a.plano])||a.plano)+(a.plano==='plus'?' · R$ 59,90/mês':a.plano==='basico'?' · R$ 29,90/mês':''))+'</b></div>'+
-      '<div class="between"><span>Situação</span>'+(!canWrite()?'<span class="tag u">Bloqueada</span>':emGratis()?'<span class="tag ok">Preço de lançamento</span>':a.status==='teste'?'<span class="tag a">Teste até '+dmy(a.testeAte)+'</span>':'<span class="tag ok">Ativa</span>')+'</div>'+
-      '<div class="between"><span>Espaço para arquivos</span><b>'+(emGratis()?'Não incluso':bytes(a.limite))+'</b></div>'+
-      (emGratis()?'<p class="small muted">No Essencial você usa tudo, menos guardar arquivos. Assinando, ganha '+bytes(a.limite)+' para escaneamentos e STL.</p>':'')+
-      '<button class="btn pri" data-a="assinar">Assinar agora</button></section>'+
+      '<div class="between"><span>Plano</span>'+(!canWrite()?'<span class="tag u">Bloqueada</span>':'<span class="tag ok">Grátis no lançamento</span>')+'</div>'+
+      '<p class="small muted">No lançamento o Ideali CAD é gratuito, com todos os recursos liberados. Se um dia houver planos pagos, você recebe um aviso antes e nada do que cadastrou é apagado.</p></section>'+
     '<section class="card stack"><h2>Seus dados</h2><p class="small muted">Você pode levar seus dados ou apagar tudo quando quiser.</p>'+
       '<div class="row wrap"><button class="btn" data-a="exportar">Exportar meus dados</button><button class="btn danger" data-a="excluirConta">Excluir minha conta</button></div>'+'<p class="small muted"><a href="../termos.html" target="_blank" rel="noopener">Termos de uso</a> · <a href="../privacidade.html" target="_blank" rel="noopener">Política de privacidade</a></p></section>'+
     '<button class="btn" data-a="sair">Sair da conta</button><p class="small muted" style="text-align:center">Versão '+VERSAO+'</p></div></div>';
@@ -3604,6 +3680,10 @@ var A={
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   secOk:function(d){try{localStorage.setItem('idealicad_sec_'+d.k+'_'+today(),'1');}catch(e){}if(document.querySelector('.sheet'))renderSheet();render();},
   secAbrir:function(){openSheet(fSecretario);},
+  boasIr:function(d){var n=document.getElementById('bv-nome'),sn=document.getElementById('bv-sobrenome');
+    if(n){var a=nomeProprio((n.value||'').trim()),b=nomeProprio(((sn&&sn.value)||'').trim());if(!a){toast('Digite seu nome.');n.focus();return;}S.perfil.nome=(a+' '+b).trim();save();}
+    if(d.v==='tour')vaiTour(0);else fimTour();},
+  tourIr:function(d){if(d.v==='fim'){fimTour();return;}var i=(ui.tour||0)+(d.v==='voltar'?-1:1);if(i<0)i=0;if(i>=TOUR.length){fimTour();return;}vaiTour(i);},
   secChat:function(d){ui.tab='secretarios';ui.secAg=d.v||null;ui.drawer=false;closeSheet();render();var b=document.getElementById('zap-b');if(b)b.scrollTop=0;},
   secAuto:function(d,el){S.prefs=S.prefs||{};S.prefs.secAuto=el&&el.checked?null:false;save();toast(el&&el.checked?'Os secretários vão aparecer 1 vez por dia ao entrar.':'Ok, os recados ficam só na aba Secretários.');},
   lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
@@ -3827,6 +3907,9 @@ var A={
   excluirConta:function(){openSheet(fConfirm,'Excluir minha conta','Sua conta e todos os seus clientes, pedidos, pagamentos e arquivos serão apagados de vez. Não dá para desfazer. Antes, se quiser, exporte seus dados.','Excluir tudo',function(){
     closeSheet();toast('Excluindo sua conta…');
     sb.functions.invoke('excluir-conta',{body:{confirmacao:'EXCLUIR'}}).then(function(r){if(r.error){toast('Não foi possível excluir agora. Tente de novo.');return;}sb.auth.signOut().then(function(){S=estadoVazio();ui.loginMsg='Sua conta e seus dados foram excluídos.';render();});});},'EXCLUIR');},
+  reenviaConf:function(){var ce=ui.checaEmail;if(!ce)return;ui.loginBusy=true;ui.loginMsg='';render();
+    sb.auth.resend({type:'signup',email:ce.email,options:{emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){ui.loginBusy=false;ui.loginMsg=r.error?msgAuth(r.error):'Enviamos de novo. Pode levar 1 minuto.';render();});},
+  jaConfirmei:function(){var ce=ui.checaEmail;ui.checaEmail=null;ui.loginCriar=false;ui.loginMsg='';if(ce)ui.loginEmail=ce.email;render();},
   confirmar:function(d){if(d.dig){var v=(document.getElementById('cf-dig').value||'').trim().toUpperCase();if(v!==d.dig){toast('Digite '+d.dig+' para confirmar.');return;}}var f=ui.confirmAcao;ui.confirmAcao=null;if(f)f();},
   sair:function(){sb.auth.signOut().then(function(){S=estadoVazio();ui.tab='dashboard';ui.sub=null;render();});},
   fechar:function(){closeSheet();},
@@ -3837,10 +3920,11 @@ var F={
     var email=String(fd.get('email')||'').trim(),senha=String(fd.get('senha')||'');ui.loginEmail=email;ui.loginMsg='';ui.loginBusy=true;render();
     var fim=function(msg){ui.loginBusy=false;if(msg)ui.loginMsg=msg;render();};
     if(ui.loginCriar){
-      sb.auth.signUp({email:email,password:senha,options:{data:{nome:String(fd.get('nome')||'').trim()},emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){
+      var pn=nomeProprio(String(fd.get('nome')||'').trim()),sn=nomeProprio(String(fd.get('sobrenome')||'').trim());
+      sb.auth.signUp({email:email,password:senha,options:{data:{nome:(pn+' '+sn).trim()},emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){
         if(r.error)return fim(msgAuth(r.error));
         try{window.idealiEvento&&window.idealiEvento('CompleteRegistration');}catch(x){}
-        if(!r.data.session){ui.loginCriar=false;return fim('Conta criada! Enviamos um e-mail para <b>'+esc(email)+'</b>. Clique no link de confirmação e depois entre aqui. Veja também o spam.');}
+        if(!r.data.session){ui.loginCriar=false;ui.checaEmail={email:email,nome:pn};return fim();}
         ui.loginBusy=false;});
     }else{
       sb.auth.signInWithPassword({email:email,password:senha}).then(function(r){if(r.error)return fim(msgAuth(r.error));ui.loginBusy=false;});
@@ -4078,11 +4162,13 @@ function msgAuth(e){var m=(e&&e.message)||'';
   return 'Não foi possível concluir: '+m;}
 function boot(){
   if(location.hash==='#criar'){ui.loginCriar=true;history.replaceState(null,'',location.pathname);}
+  if(/error_code=otp_expired|error=access_denied/.test(location.hash)){ui.loginMsg='Esse link de confirmação expirou ou já foi usado. Entre com seu e-mail e senha; se pedir confirmação, crie a conta de novo para receber outro link.';history.replaceState(null,'',location.pathname);}
   if(!sb){document.getElementById('app').innerHTML='<div class="login"><div class="box card" style="padding:24px"><h1>Ideali CAD</h1><p>Não foi possível carregar o sistema. Verifique sua internet e recarregue a página.</p></div></div>';return;}
   sb.auth.onAuthStateChange(function(ev,session){
     if(ev==='PASSWORD_RECOVERY'){ui.recuperar=true;S=estadoVazio();render();return;}
     if(ev==='SIGNED_OUT'){S=estadoVazio();render();return;}
-    if(session&&(!S.sessao||S.sessao.id!==session.user.id)&&!ui.recuperar){
+    if(session&&/access_token|type=signup/.test(location.hash))history.replaceState(null,'',location.pathname);
+    if(session&&(!S.sessao||S.sessao.id!==session.user.id)&&!ui.recuperar){ui.checaEmail=null;
       S.sessao={id:session.user.id,email:session.user.email};ui.loginMsg='';ui.tab='dashboard';setTimeout(carregar,0);
     }
   });

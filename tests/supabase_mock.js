@@ -25,6 +25,7 @@
       getSession:function(){return Promise.resolve({data:{session:sessao}});},
       signInWithPassword:function(c){sessao={user:{id:U,email:c.email}};cbs.forEach(function(cb){cb('SIGNED_IN',sessao);});return Promise.resolve({data:{session:sessao},error:null});},
       signUp:function(c){return Promise.resolve({data:{session:null,user:{id:U}},error:null});},
+      resend:function(c){return Promise.resolve({data:{},error:null});},
       signOut:function(){sessao=null;cbs.forEach(function(cb){cb('SIGNED_OUT',null);});return Promise.resolve({error:null});},
       resetPasswordForEmail:function(){return Promise.resolve({error:null});},
       updateUser:function(){return Promise.resolve({error:null});},
