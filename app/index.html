@@ -1161,10 +1161,10 @@ var ICON={
 };
 var MENU=[
   ['Principal',[['dashboard','Dashboard'],['secretarios','Secretários'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
-  ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede (prévia)']]],
+  ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 23h10';
+var VERSAO='15/10 · 23h20';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1584,16 +1584,16 @@ function demoAnalises(){if(DEMO_AN&&DEMO_AN.dia===today())return DEMO_AN;var see
 function comDemo(fn){var d=demoAnalises(),bk=[S.clientes,S.pedidos,S.tipos];S.clientes=d.clientes;S.pedidos=d.pedidos;S.tipos=d.tipos;EM_DEMO=true;
   try{return fn();}finally{EM_DEMO=false;S.clientes=bk[0];S.pedidos=bk[1];S.tipos=bk[2];}}
 function rAnalisesTab(){
-  if(!ui.anDemo)return rAnalises();
+  if(!ui.anDemo||!S.admin)return rAnalises();
   return '<div class="stack an-wrap" style="gap:16px"><section class="card an-demo-b"><div class="between wrap"><div><h2>Simulação</h2><p class="small muted">Clientes e pedidos fictícios, só para você ver como a aba funciona. Nada aqui é salvo e seus dados reais não mudam.</p></div><button class="btn sm pri" data-a="anDemo" data-v="0">Sair da simulação</button></div></section>'+comDemo(rAnalises)+'</div>';}
 function fDemoMsg(m){return head('Mensagem que iria pelo WhatsApp')+'<p class="muted small">Na simulação o WhatsApp não abre. Com um cliente real, este botão abre a conversa com o texto pronto, e você ainda pode editar antes de enviar.</p><div class="card" style="white-space:pre-wrap">'+esc(m)+'</div><button class="btn block" data-a="fechar">Fechar</button>';}
 function rAnalises(){var an=analisar(),f=ui.sinF||'todos',cont={};an.sig.forEach(function(s){cont[s.cat]=(cont[s.cat]||0)+1;});
   var lista=an.sig.filter(function(s){return f==='todos'||s.cat===f;});
   var dlt=function(a,b){if(!b)return a?'<span class="up">novo</span>':'—';var v=Math.round((a-b)/b*100);return '<span class="'+(v>=0?'up':'down')+'">'+(v>=0?'+':'')+v+'%</span>';};
   return '<div class="stack an-wrap" style="gap:16px">'+secSaude()+
-    '<section class="card stack"><div class="between wrap"><div><h2>Sinais e alertas</h2><p class="small muted">Compara os últimos 90 dias com os 90 anteriores. São sinais para conferir com o cliente, não certezas.</p></div>'+(ui.anDemo?'':'<button class="btn sm" data-a="anDemo" data-v="1">Ver simulação</button>')+'</div>'+
+    '<section class="card stack"><div class="between wrap"><div><h2>Sinais e alertas</h2><p class="small muted">Compara os últimos 90 dias com os 90 anteriores. São sinais para conferir com o cliente, não certezas.</p></div>'+(ui.anDemo||!S.admin?'':'<button class="btn sm" data-a="anDemo" data-v="1">Ver simulação</button>')+'</div>'+
       '<div class="chips-f"><button class="'+(f==='todos'?'on':'')+'" data-a="sinF" data-v="todos">Todos <b>'+an.sig.length+'</b></button>'+Object.keys(CAT_SIN).filter(function(k){return cont[k];}).map(function(k){return '<button class="'+(f===k?'on':'')+'" data-a="sinF" data-v="'+k+'">'+CAT_SIN[k][0]+' <b>'+cont[k]+'</b></button>';}).join('')+'</div>'+
-      (lista.length?'<div class="sin-grid">'+lista.map(cartaoSinal).join('')+'</div>':(an.cli.length||EM_DEMO?'<p class="empty">Nenhum sinal por aqui. 👍</p>':'<p class="empty">Os sinais aparecem conforme você registra pedidos. Quer ver como fica? <button class="linkbtn" data-a="anDemo" data-v="1">Ver simulação</button></p>'))+'</section>'+
+      (lista.length?'<div class="sin-grid">'+lista.map(cartaoSinal).join('')+'</div>':(an.cli.length||EM_DEMO?'<p class="empty">Nenhum sinal por aqui. 👍</p>':'<p class="empty">Os sinais aparecem conforme você registra pedidos.'+(S.admin?' Quer ver como fica? <button class="linkbtn" data-a="anDemo" data-v="1">Ver simulação</button>':'')+'</p>'))+'</section>'+
     secPrevisao().replace('style="grid-column:span 12" id="prev-sec"','id="prev-sec"')+
     '<section class="card stack"><h2>Por tipo de trabalho</h2><p class="small muted">Últimos 6 meses. Variação compara os últimos 90 dias com os 90 anteriores.</p>'+
       (an.tipos.length?'<div style="overflow-x:auto"><table class="an-t"><thead><tr><th>Trabalho</th><th>Últimos 90 dias</th><th>90 dias antes</th><th>Variação</th><th>Ajustes por pedido</th><th>Tempo até enviar</th><th>No prazo</th></tr></thead><tbody>'+
@@ -1801,7 +1801,7 @@ var TOUR=[
   ['analises','Análises','Um radar que percebe quando um cliente some, manda menos ou muda o tipo de trabalho. O nome da aba muda de cor conforme a saúde do seu negócio.'],
   ['ranking','Ranking','Seus melhores clientes por valor e por quantidade de trabalho.'],
   ['tipos','Tipos de trabalho','Coroas, facetas, protocolos e o resto, com preço padrão e quanto cada tipo rende para você.'],
-  ['rede','Rede (prévia)','Em breve: laboratórios, clínicas e cadistas trocando trabalho num feed. Aqui você vê como vai ser.'],
+  ['rede','Rede','Monte aqui seu perfil profissional, com fotos e vídeo. Em breve laboratórios, clínicas e cadistas vão trocar trabalho por aqui, e quem chegar primeiro aparece primeiro.'],
   ['config','Configurações','Seu perfil, chave Pix, tabela de preços, tema e espaço para arquivos. É por aqui que você deixa tudo do seu jeito.']];
 function rBoasVindas(){var nome=primeiroNome(),cores=['var(--p1)','var(--p2)','var(--p3)','var(--p4)','var(--p5)','var(--p6)','var(--accent)'],cf='';
   for(var i=0;i<34;i++)cf+='<span style="left:'+((i*37)%100)+'%;background:'+cores[i%cores.length]+';animation-duration:'+(2.6+(i%7)*0.35)+'s;animation-delay:'+((i%9)*0.12)+'s"></span>';
@@ -2607,6 +2607,7 @@ function etapasRede(st){var i=ETAPAS_REDE.map(function(e){return e[0];}).indexOf
   return '<div class="rd-steps">'+ETAPAS_REDE.map(function(e,k){return '<span class="'+(k<i?'ok':k===i?'on':'')+'"><i></i>'+e[1]+'</span>';}).join('')+'</div>';}
 function rdLer(){var R=ui.rede;if(!R)return;var a=document.getElementById('rd-rep'),b=document.getElementById('rd-prazo'),c=document.getElementById('rd-cad');if(a)R.repasse=a.value;if(b&&b.value)R.prazo=b.value;var hh=document.getElementById('rd-hora');if(hh&&hh.value)R.hora=hh.value;if(c)R.cadista=c.value;}
 function rRede(){
+  if(!S.admin&&!EM_DEMO)return rRedeReal();
   var R=redeIni(),tab=R.tab,nRec=R.mural.filter(function(o){return o.st==='aberto';}).length;
   var h='<div class="banner"><span><b>Prévia da Etapa 2 · Rede.</b> Tudo aqui é exemplo para ver como vai funcionar: nada é salvo e nenhum cadista real recebe nada.</span></div>'+
     '<section class="card lm-ver"><div><b>Ver a prévia como:</b><p class="small muted">A Rede tem dois lados. O <b>laboratório ou clínica</b> publica o trabalho. Ele aparece no <b>feed</b> dos cadistas, que aceitam ou recusam. O laboratório aceita um cadista e o trabalho começa.</p></div><div class="lm-seg"><button class="on">👩‍💻 Cadista</button><button data-a="labModo" data-v="1">🏥 Laboratório / clínica</button></div></section>'+
@@ -2940,7 +2941,28 @@ function fPerfilRede(){var r=prRow(),u=r.foto_perfil&&S.rede?S.rede.urls[r.foto_
     '<div class="pr-pub"><label class="check"><input type="checkbox" name="publicado"'+(r.publicado?' checked':'')+'> <b>Publicar meu perfil</b></label><small class="muted">Outros usuários logados no Ideali CAD poderão ver seu nome, cidade, especialidades, fotos e vídeo. Nunca seus pedidos, clientes ou valores.</small></div>'+
     '<p class="small muted">As fotos do portfólio você adiciona em <b>Ver meu perfil</b>, na seção Meu portfólio. Não mostre nome de paciente nos prints.</p>'+
     '<button class="btn pri block" type="submit">Salvar perfil</button></form>';}
+/* ---------- Rede para usuários reais (sem dados de exemplo) ----------
+   A prévia com cadistas e trabalhos fictícios fica só para o administrador. O cadista vê só o que é real: o próprio perfil. */
+function checkPerfil(r){return [[!!r.foto_perfil,'Foto de perfil'],[!!(r.cidade&&r.uf),'Cidade e UF'],[r.softwares.length>0,'Softwares'],[r.especialidades.length>0,'Especialidades'],[!!r.prazo,'Prazo médio'],[(r.bio||'').length>=40,'Texto sobre você'],[(r.fotos||[]).length>=3,'3 fotos no portfólio'],[!!r.video_url,'Vídeo de apresentação'],[!!r.publicado,'Perfil publicado']];}
+function avEu(r,z){var u=r.foto_perfil&&S.rede?S.rede.urls[r.foto_perfil]:'',ini=(r.nome||'?').split(' ').map(function(x){return x[0]||'';}).slice(0,2).join('');
+  return u?'<span class="rd-av img" style="width:'+z+'px;height:'+z+'px"><img src="'+u+'" alt=""></span>':'<span class="rd-av" style="width:'+z+'px;height:'+z+'px;background:linear-gradient(135deg,var(--p5),var(--p6))">'+esc(ini)+'</span>';}
+function rRedeReal(){if(!S.rede)carregaPerfilRede();var r=prRow(),L=checkPerfil(r),ok=L.filter(function(x){return x[0];}).length;
+  return '<div class="stack" style="gap:16px;max-width:860px">'+
+    '<section class="card stack"><h2>A Rede está chegando</h2><p class="muted" style="margin:0">Em breve laboratórios, clínicas e outros cadistas vão publicar trabalhos e encontrar cadistas por aqui. Enquanto isso, monte seu perfil profissional: quem chegar primeiro aparece primeiro.</p></section>'+
+    '<section class="card stack"><div class="row" style="gap:14px;flex-wrap:wrap">'+avEu(r,60)+'<div style="flex:1;min-width:180px"><b style="font-size:1.1rem">'+esc(r.nome||'Seu nome')+'</b><div class="small muted">'+esc((r.cidade||'Cidade')+(r.uf?', '+r.uf:''))+'</div>'+
+      '<span class="tag '+(r.publicado?'ok':'')+'" style="margin-top:6px;display:inline-block">'+(r.publicado?'Perfil publicado':'Não publicado (só você vê)')+'</span></div>'+
+      '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="prEditar">Editar perfil</button><button class="btn" data-a="rdPerfil" data-id="eu">Ver meu perfil</button></div></div>'+
+      '<div class="between"><b>Perfil completo</b><span class="small muted">'+ok+' de '+L.length+'</span></div><div class="onb-bar"><i style="width:'+Math.round(ok/L.length*100)+'%"></i></div>'+
+      '<div class="pr-chips">'+L.map(function(x){return '<span class="tag'+(x[0]?' ok':'')+'">'+(x[0]?'✓ ':'')+x[1]+'</span>';}).join('')+'</div></section></div>';}
+function fPerfilEu(){if(!S.rede)carregaPerfilRede();var r=prRow(),R=redeIni(),x=R.eu;
+  return head('Meu perfil na Rede')+'<div class="between wrap" style="gap:8px"><span class="tag '+(r.publicado?'ok':'')+'">'+(r.publicado?'Perfil publicado':'Perfil não publicado (só você vê)')+'</span><button class="btn sm pri" data-a="prEditar">Editar meu perfil</button></div>'+
+    '<div class="row" style="gap:14px;align-items:center">'+avEu(r,64)+'<div style="min-width:0"><h2 style="margin:0">'+esc(r.nome||'Seu nome')+'</h2><div class="small muted">'+esc((r.cidade||'')+(r.uf?', '+r.uf:''))+(r.prazo?' · prazo médio '+esc(r.prazo):'')+'</div></div></div>'+
+    ((r.softwares.length||r.especialidades.length)?'<div class="rd-chips">'+r.softwares.map(function(s){return '<span class="sw">'+esc(s)+'</span>';}).join('')+r.especialidades.map(function(s){return '<span>'+esc(s)+'</span>';}).join('')+'</div>':'<p class="small muted">Marque seus softwares e especialidades em Editar meu perfil.</p>')+
+    (r.bio?'<p class="pr-bio">'+esc(r.bio)+'</p>':'')+
+    (r.video_url?'<a class="btn sm pr-vid" style="justify-self:start" href="'+esc(r.video_url)+'" target="_blank" rel="noopener">'+ICO_PLAY+' Ver vídeo de apresentação</a>':'')+
+    rdPortfolio(x);}
 function fPerfilCad(id){
+  if(id==='eu'&&!S.admin)return fPerfilEu();
   var R=redeIni(),x=id==='eu'?R.eu:(R.parceiros.filter(function(q){return q.id===id;})[0]||R.cadDe[id]);if(!x)return head('Cadista')+'<p class="empty">Não encontrado.</p>';
   var pt=x.porTipo||{},tipos=Object.keys(pt).sort(function(a,b){return pt[b]-pt[a];}),tot=tipos.reduce(function(s,k){return s+pt[k];},0);
   var euTop=id==='eu'?'<div class="between wrap" style="gap:8px"><span class="tag '+(x.publicado?'ok':'')+'">'+(x.publicado?'Perfil publicado':'Perfil não publicado (só você vê)')+'</span><button class="btn sm pri" data-a="prEditar">Editar meu perfil</button></div>':'';
