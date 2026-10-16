@@ -1391,7 +1391,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 18h20';
+var VERSAO='16/10 · 18h40';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2147,12 +2147,13 @@ function decoHtml(b){var x=b.x,h='',k;
   h+='<div class="dc-canto">'+x.canto.map(function(s,i){return '<i class="dc-o dc-o'+i+'">'+DECO_SVG[s]+'</i>';}).join('')+tag+'</div>';
   h+=x.voa.map(function(s,i){return '<i class="dc-voa dc-v'+i+'">'+DECO_SVG[s]+'</i>';}).join('');
   return h;}
-function decoAplica(){var el=document.getElementById('deco'),b=(!S.sessao||S.carregando||decoOff()||ui.equipe!=null)?null:decoAtual(ui.decoTeste);
+function decoAplica(){var el=document.getElementById('deco'),b=(!S.sessao||S.carregando||(decoOff()&&!ui.decoTeste)||ui.equipe!=null)?null:decoAtual(ui.decoTeste);
   if(!b){if(el)el.remove();return;}
   var id=b.x.id+'_'+b.n;if(!el){el=document.createElement('div');el.id='deco';el.setAttribute('aria-hidden','true');document.body.appendChild(el);}
   if(el.dataset.id!==id){el.dataset.id=id;el.className='deco dc-'+b.x.id;el.innerHTML=decoHtml(b);}
   var hd=document.querySelector('header.top');el.style.setProperty('--dt',(hd?Math.max(0,hd.getBoundingClientRect().bottom):0)+'px');}
 window.addEventListener('resize',function(){if(window.decoAplica)decoAplica();});
+try{ui.decoTeste=localStorage.getItem('idealicad_decoteste')||null;}catch(e){}
 /* Equipe passeando: de vez em quando um personagem entra no canto da tela com um aviso ou dica do setor da aba aberta */
 var PASSEIO_TAB={dashboard:['ger','ven','fin','mkt'],pedidos:['ven'],financeiro:['fin'],clientes:['mkt'],ranking:['mkt','dad'],analises:['dad'],metas:['ger','dad'],visu:['mkt']};
 var DICAS={
@@ -3698,7 +3699,16 @@ function fMfa(){var m=ui.mfaNovo;
     '<form data-form="mfaAtivar" class="stack"><label class="fld"><span>3. Digite o código de 6 números que aparece no app</span><input name="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required style="font-size:1.4rem;letter-spacing:.3em;text-align:center"></label>'+
     '<button class="btn pri block" type="submit">Ativar</button></form>'+
     '<p class="small muted">Depois de ativar, o painel Admin vai pedir o código do app sempre que você entrar. Guarde o celular com cuidado: se perder, fale comigo para liberar.</p></div>';}
-function rAdmin(){
+/* Admin: testar as decorações de datas e a equipe passeando sem esperar a data chegar */
+function admTestes(){var at=ui.decoTeste,b=decoAtual(at),y=+today().slice(0,4);
+  return '<section class="card stack" style="margin-bottom:14px"><div class="between wrap"><h2 style="margin:0">🎨 Testes de aparência</h2>'+(at?'<span class="tag a">Teste ligado: '+esc(b?b.x.nome:'nenhuma data')+'</span>':'<span class="tag">Mostrando a data real</span>')+'</div>'+
+    '<p class="small muted" style="margin:0">Liga a decoração de uma data agora, só neste navegador, para ver como fica. Os assinantes continuam vendo a data real.</p>'+
+    '<div class="row wrap" style="gap:8px">'+DECOS.map(function(x){var d=y+'-'+pad(x.m)+'-'+pad(x.d);if(d<today())d=(y+1)+'-'+pad(x.m)+'-'+pad(x.d);var on=b&&at&&b.x.id===x.id;
+      return '<button class="btn sm'+(on?' pri':'')+'" data-a="admDeco" data-v="'+addDays(d,-3)+'">'+x.emoji+' '+esc(x.nome)+'</button>';}).join('')+
+    '<button class="btn sm danger" data-a="admDeco" data-v=""'+(at?'':' disabled')+'>Desativar teste</button></div>'+
+    '<div class="row wrap" style="gap:8px;align-items:center"><button class="btn sm" data-a="admPasseio">🚶 Fazer alguém da equipe aparecer agora</button>'+(decoOff()?'<span class="small muted">As decorações estão desligadas em Configurações; o teste liga mesmo assim.</span>':'')+'</div></section>';}
+function rAdmin(){var h=rAdmin0();return (S.admin&&ui.mfa&&ui.admLista&&!(ui.mfa.fat&&ui.mfa.aal!=='aal2')?admTestes():'')+h;}
+function rAdmin0(){
   if(!S.admin)return '<div class="card empty">Esta área é só para o administrador do sistema.</div>';
   if(!ui.mfa){if(!ui.mfaBusy)setTimeout(checaMfa,0);return '<div class="card empty">Verificando segurança…</div>';}
   if(ui.mfa.fat&&ui.mfa.aal!=='aal2')return '<section class="card stack" style="max-width:420px;margin:24px auto"><h2>🔐 Código de verificação</h2><p class="muted">Abra o app autenticador no celular e digite o código do <b>Ideali CAD</b> para entrar no painel Admin.</p>'+
@@ -4477,6 +4487,8 @@ waArq:async function(d,el){var p=byId(S.pedidos,d.id),c=p&&cliente(p.clienteId);
     window.open(waLink(t,c?c.telefone:''),'_blank','noopener');if(mv&&mv.checked)setStatus(p.id,mv.value);},
   waArqShare:function(d){var f=ui.waFile,t=document.getElementById('wa-txt').value,mv=document.getElementById('wa-mover'),pid=d.id;if(!f)return;
     navigator.share({files:[f],text:t}).then(function(){if(mv&&mv.checked)setStatus(pid,mv.value);},function(){});},
+admDeco:function(d){ui.decoTeste=d.v||null;try{if(d.v)localStorage.setItem('idealicad_decoteste',d.v);else localStorage.removeItem('idealicad_decoteste');}catch(e){}render();toast(d.v?'Teste ligado. A decoração aparece em todas as telas até você desativar.':'Teste desligado. Voltou a data real.');},
+  admPasseio:function(){try{var v=psLe();v.t=0;v.n=0;v.k={};psGrava(v);}catch(e){}var r=Math.random;Math.random=function(){return 0;};var tb=ui.tab;ui.tab='dashboard';try{passeioTira();var e=document.getElementById('passeio');if(e)e.remove();passeioTenta();}finally{Math.random=r;ui.tab=tb;}if(!document.getElementById('passeio'))toast('Ninguém apareceu: confira se a equipe passeando está ligada em Configurações.');},
   msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   secOk:function(d){try{localStorage.setItem('idealicad_sec_'+d.k+'_'+today(),'1');}catch(e){}if(document.querySelector('.sheet'))renderSheet();render();},
