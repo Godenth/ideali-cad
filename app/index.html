@@ -504,6 +504,27 @@ table.adm td{vertical-align:top}
 .cr-top{display:flex;gap:12px;align-items:center;min-width:0}.cr-top>span:last-child{min-width:0}
 .cr-top b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cr-top small{color:var(--muted)}
 .cr-n{font:700 .8rem var(--f-mono);color:var(--muted)}
+.dl-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.rd-grid.sel .dl-cards{grid-template-columns:1fr}
+.dl-card{display:grid;gap:10px;text-align:left;border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer;width:100%;transition:border-color .15s,box-shadow .15s,transform .15s}
+.dl-card:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));transform:translateY(-1px)}
+.dl-card.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);background:var(--surface)}
+.dl-top{display:flex;gap:12px;align-items:center;min-width:0}
+.dl-top .t{min-width:0;display:grid;gap:2px}
+.dl-top .t b{font-family:var(--f-display);font-size:1rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-top .t span{font-size:.84rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-dentes{display:flex;flex-wrap:wrap;gap:4px}
+.dl-dentes i{font:600 .72rem var(--f-mono);font-style:normal;padding:2px 7px;border-radius:99px;background:var(--soft);color:var(--ink)}
+.dl-bot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.dl-bot .pz{font-size:.8rem;color:var(--muted)}.dl-bot .pz.late{color:var(--urgent);font-weight:700}
+.dl-bot .v{font:700 1rem var(--f-mono);color:var(--c-val,var(--ok))}
+.dl-sel{display:flex;gap:14px;align-items:center;padding:14px;border-radius:16px;background:var(--accent-soft);flex-wrap:wrap}
+.dl-sel .ico-trab{width:56px;height:56px;border-radius:14px}.dl-sel .ico-trab svg{width:38px;height:38px}
+.dl-sel .t{flex:1;min-width:180px;display:grid;gap:3px}.dl-sel .t b{font-family:var(--f-display);font-size:1.2rem}
+.dl-sel .t span{font-size:.88rem;color:var(--muted)}
+.dl-mais{justify-self:center}
+#rd-passo2{scroll-margin-top:84px}
+@media (max-width:600px){#rd-passo2 .grid2{grid-template-columns:1fr}.rd-dh{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}}
 .mt-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .mt-c{display:grid;gap:10px;align-content:start}
 .mt-top{display:flex;gap:14px;align-items:center}.mt-top>div{display:grid;gap:2px}
@@ -1170,7 +1191,7 @@ var MENU=[
   ['Ferramentas',[['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='15/10 · 23h40';
+var VERSAO='15/10 · 23h55';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2631,11 +2652,19 @@ function rdDelegar(R){
   if(!abertos.length)abertos=[{id:'ex1',num:142,paciente:'M.A.S.',clienteId:null,elementos:[36],valor:90,exemplo:true,itens:[{d:36,t:null}],tipoId:null}];
   var p=R.pid?(byId(S.pedidos,R.pid)||abertos.filter(function(x){return x.id===R.pid;})[0]):null;
   if(R.passo===3)return rdBusca(R,p);
-  var h='<div class="rd-grid"><section class="card stack"><div><h2>1. Qual pedido?</h2><p class="small muted">Escolha um pedido em aberto para mandar para outro cadista desenhar.</p></div><div class="list">'+
-    abertos.slice(0,8).map(function(x){var t=tipoPed(x),c=cliente(x.clienteId);return '<button class="li'+(R.pid===x.id?' rd-sel':'')+'" data-a="rdPed" data-id="'+x.id+'"><span class="t"><b><span class="pac-i">'+esc(x.paciente)+'</span> · '+esc(t?t.nome:'Elemento sobre implante')+'</b><span><span class="cli-i">'+esc(c?c.nome:'Lab. Exemplo')+'</span> · dentes '+(x.elementos||[]).join(', ')+'</span></span><span class="mono small val">'+brl(x.valor)+'</span></button>';}).join('')+'</div></section>';
-  if(!p){return h+'<section class="card empty">Escolha o pedido ao lado para continuar.</section></div>';}
+  var mx=R.verTodos?abertos.length:(p?abertos.length:9),t0=today();
+  var card=function(x){var t=tipoPed(x),c=cliente(x.clienteId),late=x.prazo&&x.prazo<t0,dd=x.elementos||[];
+    return '<button class="dl-card'+(R.pid===x.id?' on':'')+'" data-a="rdPed" data-id="'+x.id+'" aria-pressed="'+(R.pid===x.id)+'">'+
+      '<span class="dl-top">'+iconeTrab(x)+'<span class="t"><b>'+esc(nomeTrab(x)||(t?t.nome:'Elemento sobre implante'))+'</b><span><span class="pac-i">'+esc(x.paciente)+'</span> · <span class="cli-i">'+esc(c?c.nome:'Lab. Exemplo')+'</span></span></span></span>'+
+      (dd.length?'<span class="dl-dentes">'+dd.slice(0,10).map(function(d){return '<i>'+d+'</i>';}).join('')+(dd.length>10?'<i>+'+(dd.length-10)+'</i>':'')+'</span>':'')+
+      '<span class="dl-bot"><span class="pz'+(late?' late':'')+'">'+(x.urgente?'<span class="tag u">Urgente</span> ':'')+(x.prazo?(late?'Atrasado · ':'Prazo ')+dm(x.prazo):'Sem prazo')+'</span><span class="v">'+brl(x.valor)+'</span></span></button>';};
+  var h='<div class="rd-grid'+(p?' sel':'')+'"><section class="card stack"><div class="between wrap"><div><h2>1. Qual pedido?</h2><p class="small muted">Escolha um pedido em aberto para mandar para outro cadista desenhar.</p></div><span class="small muted">'+abertos.length+' em aberto</span></div>'+
+    '<div class="dl-cards">'+abertos.slice(0,mx).map(card).join('')+'</div>'+(abertos.length>mx?'<button class="btn sm dl-mais" data-a="rdVerTodos">Ver todos ('+abertos.length+')</button>':'')+'</section>';
+  if(!p){return h+'<section class="card empty">Toque num pedido para ver os detalhes e delegar.</section></div>';}
   var sug=Math.round((+p.valor||0)*0.6),rep=R.repasse===''?sug:+R.repasse,lucro=(+p.valor||0)-rep;
-  h+='<section class="card stack"><div><h2>2. Como delegar</h2><p class="small muted">Pedido #'+p.num+' · você cobra <b class="val">'+brl(p.valor)+'</b> do seu cliente.</p></div>'+
+  var tp=tipoPed(p),cp=cliente(p.clienteId);
+  h+='<section class="card stack" id="rd-passo2"><div class="dl-sel">'+iconeTrab(p)+'<span class="t"><b>'+esc(nomeTrab(p)||(tp?tp.nome:'Elemento sobre implante'))+'</b><span><span class="pac-i">'+esc(p.paciente)+'</span> · <span class="cli-i">'+esc(cp?cp.nome:'Lab. Exemplo')+'</span>'+(p.num?' · #'+p.num:'')+'</span><span>'+((p.elementos||[]).length?'Dentes '+p.elementos.join(', '):'Sem dentes')+(p.prazo?' · prazo '+dm(p.prazo):'')+'</span></span><button class="btn sm" data-a="rdPedLimpa">Trocar</button></div>'+
+    '<div><h2>2. Como delegar</h2><p class="small muted">Você cobra <b class="val">'+brl(p.valor)+'</b> do seu cliente.</p></div>'+
     '<div class="grid2"><label class="fld"><span>Repasse para o parceiro (R$)</span><input id="rd-rep" type="number" min="0" step="1" value="'+rep+'"><small>Sugestão: 60% do valor.</small></label>'+
     '<div class="fld"><span>Entrega pelo parceiro</span><div class="rd-dias">'+[[0,'Hoje'],[1,'Amanhã'],[2,'Depois de amanhã']].map(function(o){var v=addDays(today(),o[0]);return '<button type="button" class="'+(R.prazo===v?'on':'')+'" data-a="rdDia" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
       '<div class="rd-dh"><input id="rd-prazo" type="date" value="'+R.prazo+'" aria-label="Data"><span>até</span><input id="rd-hora" type="time" value="'+R.hora+'" step="900" aria-label="Hora"></div></div></div>'+
@@ -3827,7 +3856,9 @@ var A={
   labCancela:function(d){var L=labIni();L.pedidos=L.pedidos.filter(function(x){return x.id!==d.id;});render();toast('Pedido cancelado.');},
   labChat:function(){toast('Na versão final, o chat do pedido abre aqui (igual ao da Rede).');},
   rdTab:function(d){var R=redeIni();R.tab=d.v;if(d.v==='delegar'&&R.passo===3&&R.busca&&R.busca.ok){R.passo=1;R.pid=null;R.busca=null;}render();},
-  rdPed:function(d){var R=redeIni();rdLer();R.pid=d.id;R.repasse='';R.passo=2;render();},
+  rdPed:function(d){var R=redeIni();rdLer();R.pid=d.id;R.repasse='';R.passo=2;render();if(window.innerWidth<960){var e=document.getElementById('rd-passo2');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});}},
+  rdPedLimpa:function(){var R=redeIni();R.pid=null;R.passo=1;render();},
+  rdVerTodos:function(){redeIni().verTodos=true;render();},
   rdQuem:function(d,el){var R=redeIni();rdLer();R.quem=el.value;render();},
   rdOferecer:function(){var R=redeIni();rdLer();if(R.quem==='um'&&!R.cadista){toast('Escolha o cadista.');return;}
     var p=byId(S.pedidos,R.pid)||{valor:90,num:142,elementos:[36],paciente:'M.A.S.'},rep=R.repasse===''?Math.round((+p.valor||0)*0.6):+R.repasse;
