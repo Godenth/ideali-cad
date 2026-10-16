@@ -500,6 +500,22 @@ html[data-tema="neon"] body{background:radial-gradient(1100px 620px at 100% -10%
 .bv-l i{flex:none;width:36px;height:36px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-style:normal}
 .bv-l i svg{width:19px;height:19px}.bv-l b{display:block}.bv-l span{font-size:.86rem;color:var(--muted)}
 .bv-acts{display:grid;gap:8px;width:100%}
+.eq{background:radial-gradient(900px 600px at 30% 40%,color-mix(in srgb,var(--zc) 22%,transparent),transparent 70%),var(--bg)}
+.eq-in{position:relative;z-index:1;width:100%;max-width:980px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center;animation:eqEntra .45s cubic-bezier(.2,.8,.3,1.1) both}
+.eq-fig{display:flex;justify-content:center;align-items:flex-end;height:min(72vh,640px);min-height:0}
+.eq-img{height:100%;width:auto;max-width:100%;object-fit:contain;object-position:bottom;filter:drop-shadow(0 18px 40px rgba(0,0,0,.35));animation:eqImg .6s cubic-bezier(.2,.8,.3,1.2) both,zfala 3.2s ease-in-out .6s infinite;transform-origin:50% 100%}
+.eq-ret{width:min(320px,70vw);aspect-ratio:1;border-radius:50%;overflow:hidden;display:grid;align-items:end;background:radial-gradient(circle at 50% 30%,color-mix(in srgb,var(--zc) 35%,#fff),var(--zc));align-self:center;box-shadow:0 18px 50px rgba(0,0,0,.3);animation:eqImg .6s cubic-bezier(.2,.8,.3,1.2) both}
+.eq-ret svg{width:112%;height:112%;margin-bottom:-6%}
+.eq-tx{display:grid;gap:14px;justify-items:start;text-align:left}
+.eq-n{font:700 .74rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.eq-fala{background:var(--surface);border:1px solid var(--line);border-radius:18px 18px 18px 4px;padding:12px 16px;font-weight:700;font-size:1.15rem;box-shadow:0 10px 30px rgba(0,0,0,.15);animation:zpop .4s .25s cubic-bezier(.2,.8,.3,1.3) both}
+.eq-tx h2{margin:0;font-size:2rem;line-height:1.1}.eq-tx h2 small{display:block;font-size:.95rem;font-weight:600;color:var(--zc);margin-top:4px}
+.eq-tx p{margin:0;color:var(--muted);font-size:1.02rem;line-height:1.5;max-width:440px}
+.eq-acts{display:flex;gap:8px;flex-wrap:wrap}.eq-acts .btn{min-width:130px}
+.eq-pula{background:none;border:0;color:var(--muted);font:inherit;font-size:.85rem;text-decoration:underline;cursor:pointer;padding:0}
+@keyframes eqEntra{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes eqImg{from{opacity:0;transform:translateY(40px) scale(.95)}to{opacity:1;transform:none}}
+@media (max-width:760px){.eq-in{grid-template-columns:1fr;gap:12px}.eq-fig{height:38vh}.eq-ret{width:min(240px,60vw)}.eq-tx{justify-items:center;text-align:center}.eq-tx p{max-width:none}.eq-fala{font-size:1rem}.eq-tx h2{font-size:1.6rem}}
 .bv-nome{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;text-align:left}
 .bv-cf{position:absolute;inset:0;pointer-events:none}
 .bv-cf span{position:absolute;top:-12px;width:8px;height:14px;border-radius:3px;opacity:.85;animation:cai linear forwards}
@@ -1315,7 +1331,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 12h45';
+var VERSAO='16/10 · 14h40';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1326,7 +1342,9 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();},0);
   if(!S.sessao){app.innerHTML=rLogin();return;}
   if(S.carregando){app.innerHTML=rCarregando();return;}
   if(ui.modoLab&&S.admin){app.innerHTML=rLabModo();return;}
+  if(ui.equipe!=null&&EQ_INTRO[ui.equipe]){app.innerHTML=rEquipeIntro();return;}
   if(ui.tour==null&&precisaBoas()){app.innerHTML=rBoasVindas();return;}
+  if(ui.tour==null&&!EM_DEMO&&S.sessao&&S.prefs&&(S.prefs.boas==='ok'||S.prefs.onb==='ok')&&S.prefs.equipe!=='ok'&&!ui.eqVisto){ui.eqVisto=true;ui.equipe=0;app.innerHTML=rEquipeIntro();return;}
   var a=S.assinatura,w=canWrite(),chip;
   if(!w) chip='<span class="tag u">Conta bloqueada</span>';
   else chip='<span class="tag ok">Grátis no lançamento</span>';
@@ -2057,7 +2075,7 @@ function secAbreDia(){if(EM_DEMO||ui.modoLab||ui.tour!=null||precisaBoas()||(S.p
 /* ---------- Boas-vindas + tour (contas novas) ----------
    Depois de confirmar o e-mail e entrar pela 1ª vez: tela "Seja bem-vindo(a)", tour por todas as abas (com dados fictícios,
    nada é salvo) e, no fim, o Dashboard com os cartões de Primeiros passos para completar o perfil. Guardado em preferencias.boas. */
-function precisaBoas(){return !!(S.sessao&&!EM_DEMO&&!(S.prefs&&(S.prefs.boas==='ok'||S.prefs.onb==='ok'))&&!alive(S.pedidos).length&&!alive(S.clientes).length);}
+function precisaBoas(){if(ui.novaConta)return true;return !!(S.sessao&&!EM_DEMO&&!(S.prefs&&(S.prefs.boas==='ok'||S.prefs.onb==='ok'))&&!alive(S.pedidos).length&&!alive(S.clientes).length);}
 var TOUR=[
   ['dashboard','Dashboard','Seu resumo do mês: quanto faturou, quanto já recebeu, quem está devendo e os próximos prazos. Lá em cima dá para trocar o período.'],
   ['secretarios','Secretários','Sua equipe conversa com você como no WhatsApp: Ana (vendas), Bia (financeiro), Mika (marketing) e Téo (análise de dados). Todo dia eles avisam o que precisa de atenção.'],
@@ -2088,7 +2106,26 @@ function tourCard(){var i=ui.tour,st=TOUR[i],n=TOUR.length,ult=i===n-1;
     '<div class="tour-nav"><div class="tour-dots">'+TOUR.map(function(x,j){return '<b class="'+(j===i?'on':'')+'"></b>';}).join('')+'</div><span class="row" style="gap:6px">'+(i?'<button class="btn sm" data-a="tourIr" data-v="voltar">Voltar</button>':'')+
     '<button class="btn sm pri" data-a="tourIr" data-v="'+(ult?'fim':'prox')+'">'+(ult?'Concluir':'Próximo')+'</button></span></div></div>';}
 function vaiTour(i){ui.tour=i;ui.tab=TOUR[i][0];ui.secAg=null;ui.sub=null;ui.msgs=false;ui.drawer=false;ui.ddOpen=null;closeSheet();render();window.scrollTo(0,0);}
-function fimTour(){ui.tour=null;S.prefs=S.prefs||{};S.prefs.boas='ok';ui.tab='dashboard';save();render();window.scrollTo(0,0);toast('Agora é só seguir os Primeiros passos para completar seu perfil.');}
+function fimTour(){ui.tour=null;S.prefs=S.prefs||{};if(!ui.novaConta)S.prefs.boas='ok';ui.novaConta=false;ui.tab='dashboard';save();ui.equipe=0;render();window.scrollTo(0,0);}
+/* ---------- Apresentação da equipe (depois das boas-vindas e do tour, um personagem por vez) ---------- */
+var EQ_INTRO=[
+  {id:'ven',h:'feliz',fala:'Oi! Eu sou a Ana, das vendas. 💛',txt:'Fico de olho nos seus pedidos, nos prazos e no ritmo do mês. Se algum pedido atrasar ou a meta ficar para trás, eu te aviso na hora.'},
+  {id:'fin',h:'dinheiro',fala:'Prazer, Bia do financeiro! 🤑',txt:'Eu sei quem te deve e quanto. Te lembro de cobrar quem está atrasado e comemoro com você quando o dinheiro cai na conta.'},
+  {id:'mkt',h:'gravando',fala:'E aí! Sou a Mika, do marketing. 😎',txt:'Percebo quem sumiu, quem diminuiu o ritmo e quem é cliente novo. E te dou mensagens prontas para mandar no WhatsApp.'},
+  {id:'dad',h:null,fala:'Olá, eu sou o Téo, da análise de dados. 📊',txt:'Meço se você está entregando no prazo, quantos trabalhos voltam para ajuste e se os clientes estão satisfeitos.'},
+  {id:'ger',h:null,fala:'E eu sou o Sr. Otávio, o gerente. 😤',txt:'Cadastre a sua meta do mês, porque eu vou cobrar a equipe todo dia. Mas se a meta for batida... tem presente! 🎁'}];
+function rEquipeIntro(){var i=ui.equipe,st=EQ_INTRO[i],g=SECS.filter(function(x){return x.id===st.id;})[0],n=EQ_INTRO.length,ult=i===n-1,img=g.humores&&st.h?corpoDe(g,st.h):g.corpo;
+  var fig=img?'<img class="eq-img" src="'+img+'" alt="'+esc(g.nome)+'">':'<span class="eq-ret" style="--zc:'+g.cor+'">'+retrato(g.av)+'</span>';
+  return '<div class="bv eq" style="--zc:'+g.cor+'"><div class="eq-in" key="'+i+'">'+
+    '<div class="eq-fig">'+fig+'</div>'+
+    '<div class="eq-tx"><span class="eq-n">'+(i===0?'Conheça sua equipe':'Sua equipe')+' · '+(i+1)+' de '+n+'</span>'+
+      '<div class="eq-fala">'+esc(st.fala)+'</div>'+
+      '<h2>'+esc(g.nome)+' <small>'+esc(g.cargo)+'</small></h2><p>'+esc(st.txt)+'</p>'+
+      '<div class="tour-dots">'+EQ_INTRO.map(function(x,j){return '<b class="'+(j===i?'on':'')+'"></b>';}).join('')+'</div>'+
+      '<div class="eq-acts">'+(i?'<button class="btn" data-a="eqIr" data-v="voltar">Voltar</button>':'')+'<button class="btn pri" data-a="eqIr" data-v="'+(ult?'fim':'prox')+'">'+(ult?'Bora trabalhar! 🚀':'Próximo')+'</button></div>'+
+      (ult?'':'<button class="eq-pula" data-a="eqIr" data-v="fim">Pular apresentação</button>')+
+    '</div></div></div>';}
+function fimEquipe(){ui.equipe=null;S.prefs=S.prefs||{};S.prefs.equipe='ok';save();ui.tab='dashboard';render();window.scrollTo(0,0);toast('Sua equipe já está trabalhando. Os recados aparecem na aba Secretários.');}
 /* ---------- Primeiros passos (some quando tudo estiver feito ou a pessoa fechar) ---------- */
 function passosOnb(){var p=S.perfil||{},pr=S.prefs||{};
   return [
@@ -3594,7 +3631,7 @@ function rConfig(){
     '<section class="card stack"><h2>Use como aplicativo</h2>'+(window._instalar?'<p class="small muted">Coloque o Ideali CAD na tela inicial e abra como um app, sem a barra do navegador.</p><button class="btn pri" data-a="instalarApp">Instalar no celular / computador</button>':
       (window.matchMedia&&matchMedia('(display-mode: standalone)').matches?'<p class="small muted">Você já está usando como aplicativo. ✓</p>':'<p class="small muted"><b>Android (Chrome):</b> menu ⋮ → <b>Adicionar à tela inicial</b>.<br><b>iPhone (Safari):</b> botão Compartilhar → <b>Adicionar à Tela de Início</b>.</p>'))+'</section>'+
     '<section class="card stack"><h2>Perfil na Rede</h2><p class="small muted">Foto, especialidades, softwares, portfólio e vídeo. Você escolhe se publica para outros usuários verem.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="prEditar">Editar perfil na Rede</button><button class="btn" data-a="rdPerfil" data-id="eu">Ver como fica</button></div></section>'+
-    secTema()+
+    secTema()+'<section class="card stack"><h2>Apresentação</h2><p class="small muted">Veja de novo as boas-vindas, o tour e a sua equipe, do jeito que aparece para quem acabou de criar a conta. Seus dados não mudam.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="novaConta">Ver como conta nova</button><button class="btn" data-a="eqIr" data-v="rever">Só a equipe</button></div></section>'+
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Plano</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
@@ -4230,6 +4267,8 @@ var A={
   boasIr:function(d){var n=document.getElementById('bv-nome'),sn=document.getElementById('bv-sobrenome');
     if(n){var a=nomeProprio((n.value||'').trim()),b=nomeProprio(((sn&&sn.value)||'').trim());if(!a){toast('Digite seu nome.');n.focus();return;}S.perfil.nome=(a+' '+b).trim();save();}
     if(d.v==='tour')vaiTour(0);else fimTour();},
+  eqIr:function(d){if(d.v==='rever'){ui.equipe=0;closeSheet();render();window.scrollTo(0,0);return;}if(d.v==='fim'){fimEquipe();return;}var i=(ui.equipe||0)+(d.v==='voltar'?-1:1);if(i<0)i=0;if(i>=EQ_INTRO.length){fimEquipe();return;}ui.equipe=i;render();window.scrollTo(0,0);},
+  novaConta:function(){ui.novaConta=true;ui.tour=null;ui.equipe=null;closeSheet();render();window.scrollTo(0,0);},
   tourIr:function(d){if(d.v==='fim'){fimTour();return;}var i=(ui.tour||0)+(d.v==='voltar'?-1:1);if(i<0)i=0;if(i>=TOUR.length){fimTour();return;}vaiTour(i);},
   secChat:function(d){ui.tab='secretarios';ui.secAg=d.v||null;ui.drawer=false;closeSheet();render();var b=document.getElementById('zap-b');if(b)b.scrollTop=0;},
   secAuto:function(d,el){S.prefs=S.prefs||{};S.prefs.secAuto=el&&el.checked?null:false;save();toast(el&&el.checked?'Os secretários vão aparecer 1 vez por dia ao entrar.':'Ok, os recados ficam só na aba Secretários.');},
