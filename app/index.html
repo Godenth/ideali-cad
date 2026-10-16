@@ -464,6 +464,10 @@ html[data-tema="neon"] body{background:radial-gradient(1100px 620px at 100% -10%
 @keyframes zfala{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-4px) rotate(-.6deg)}60%{transform:translateY(-1px) rotate(.4deg)}}
 .zap-c.com-char .zap-b{padding-right:min(38%,330px)}
 @media (max-width:820px){.zchar{height:32%;max-width:46%}.zap-c.com-char .zap-b{padding-right:16px;padding-bottom:calc(32vh - 40px)}}
+.zfrase{margin-top:8px;padding:10px 12px;background:color-mix(in srgb,var(--zc,var(--accent)) 8%,var(--surface));border:1px dashed color-mix(in srgb,var(--zc,var(--accent)) 45%,var(--line));border-radius:12px}
+.zfrase .msg-txt{background:none;border:0;padding:0;box-shadow:none;white-space:pre-wrap;font-size:.86rem;line-height:1.45;color:var(--text);max-height:150px;overflow:auto}
+.zfrase .msg-acts{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.ps-fala .zfrase{margin-top:8px}
 .passeio{position:fixed;right:14px;bottom:0;z-index:43;display:flex;align-items:flex-end;gap:0;pointer-events:none;max-width:calc(100vw - 28px)}
 .passeio>*{pointer-events:auto}
 .ps-img{height:230px;width:auto;margin-left:-18px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35));animation:psEntra .55s cubic-bezier(.2,.9,.3,1.2) both;transform-origin:bottom center}
@@ -1353,7 +1357,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 16h30';
+var VERSAO='16/10 · 17h00';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2027,10 +2031,26 @@ function msgsCli(){var t=today(),R=[],sig=[];try{sig=analisar().sig;}catch(e){}
   L.forEach(function(x,i){var c=cliente(x.cid);if(!c)return;var m={k:'sin_'+x.cid+'_'+i,n:x.n>=3?'alta':x.n>=2?'media':'info',tit:x.tit,sub:x.txt,a:'verCliente',id:x.cid,bt:'Ver cliente'};
     if(x.msg&&c.telefone)m.href=waLink(msgSinal(x),c.telefone);R.push(m);});
   return R;}
+/* Mika: lembrete do dia com uma frase pronta para mandar aos clientes (dia da semana ou data especial) */
+var FRASES_DIA={
+  1:{tit:'Segunda-feira: avise que a agenda da semana está aberta',h:'animada',f:['{saudacao}! Semana começando e agenda aberta. 🦷 Pode mandar os escaneamentos que eu já coloco na fila e te devolvo rapidinho. — {eu}','Bom dia! Nova semana, projetos no prazo de sempre. Manda seus casos que hoje mesmo eu começo. 💻 — {eu}']},
+  2:{tit:'Terça-feira: lembre seus clientes do que você faz',h:'ideia',f:['{saudacao}! Lembrando que faço coroas, facetas, protocolos, placas e muito mais no digital. 🦷 Tem algum caso para esta semana? — {eu}','Oi! Precisando de projeto rápido e caprichado? Me manda o escaneamento que eu cuido do resto. 😉 — {eu}']},
+  3:{tit:'Quarta-feira: meio da semana, hora de puxar casos',h:'megafone',f:['{saudacao}! Meio da semana e ainda dá tempo: casos enviados hoje ficam prontos antes do fim de semana. 📅 — {eu}','Oi! Tem caso parado esperando projeto? Manda hoje que eu entrego antes de sexta. 💪 — {eu}']},
+  4:{tit:'Quinta-feira: chame os casos antes da sexta',h:'megafone',f:['{saudacao}! Amanhã já é sexta. Manda seus casos hoje que amanhã você recebe os projetos prontos para fresar. 🦷 — {eu}','Oi! Quer fechar a semana com tudo fresado? Envie hoje os escaneamentos que eu priorizo. ⚡ — {eu}']},
+  5:{tit:'Sexta-feira: avise que você trabalha no fim de semana',h:'gravando',f:['Sextou! 🙌 Pode mandar seus trabalhos no fim de semana: na segunda-feira já está tudo pronto para fresagem. — {eu}','{saudacao}! Vou estar trabalhando no fim de semana. Envie seus casos que segunda cedo os projetos estão prontos para fresar. 🦷 — {eu}','Escaneou na sexta? Manda pra mim! No fim de semana eu desenho e na segunda você já começa fresando. 💻 — {eu}']},
+  6:{tit:'Sábado: mostre que você está on-line',h:'gravando',f:['{saudacao}! Estou trabalhando hoje. 💻 Manda o caso que na segunda já está pronto para fresagem. — {eu}','Sábado também é dia! Envie seus escaneamentos que eu entrego tudo pronto para segunda. 🦷 — {eu}']},
+  0:{tit:'Domingo: garanta a segunda-feira cheia',h:'ideia',f:['{saudacao}! Manda hoje os escaneamentos da semana que segunda cedo está tudo pronto para fresagem. 🦷 — {eu}','Oi! Comece a semana adiantado: casos enviados hoje saem amanhã cedinho. ⚡ — {eu}']}};
+function mikaDia(){var t=today(),dow=new Date(t+'T12:00:00').getDay(),n=Math.floor(new Date(t+'T12:00:00').getTime()/864e5),ev=null;
+  try{ev=proximosEventos(3).filter(function(e){return e.com||e.fer;})[0];}catch(e){}
+  if(ev){var dd=daysBetween(t,ev.d),q=dd===0?'é hoje':dd===1?'é amanhã':'é em '+dd+' dias',L=ev.com?comMinhas('datas',MSG_DATAS[ev.com]||[]):comMinhas('feriado',dd===0?MSG.feriadoHoje:MSG.feriado);
+    if(L.length)return {k:'mkt_dia_'+t,h:'megafone',n:'media',tit:(ev.fer?'📅 Feriado: ':'💐 ')+ev.nome+' '+q+'! Mande uma mensagem para seus clientes',sub:'Já deixei uma pronta. Copie e mande no WhatsApp (ou veja outras opções).',txt:preenche(L[0],{ev:ev}),a:'msgAbrir',v:'datas',bt:'Mais opções'};}
+  var F=FRASES_DIA[dow],L2=(dow===5||dow===6)&&minhas('fds').length?minhas('fds'):F.f;
+  return {k:'mkt_dia_'+t,h:F.h,n:'media',tit:F.tit,sub:'Frase do dia pronta. Copie e mande para seus clientes no WhatsApp ou poste no status.',txt:preenche(L2[n%L2.length],{}),a:'msgAbrir',v:dow===5||dow===6?'fds':'divulga',bt:'Mais opções'};}
+function fraseBox(txt){return '<div class="msg-card zfrase"><div class="msg-txt">'+esc(txt)+'</div><div class="msg-acts"><span></span><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><a class="btn sm pri" href="'+esc(waLink(txt,''))+'" target="_blank" rel="noopener">WhatsApp</a></span></div></div>';}
 function msgsMkt(){var t=today(),R=[],dow=new Date(t+'T12:00:00').getDay(),C=alive(S.clientes),P=alive(S.pedidos).filter(function(p){return p.recebido;});
   try{R=msgsCli();}catch(e){R=[];}
   R.forEach(function(m){if(m.k==='cli_oi'){m.k='mkt_oi';m.h=R.length>1?'sumiu':'animada';}else if(!m.h)m.h=m.n==='info'?'ideia':'sumiu';});
-  if(dow===4||dow===5)R.splice(1,0,{k:'mkt_fds_'+t,h:'gravando',n:'media',tit:(dow===5?'Sexta-feira':'Quinta-feira')+': hora de avisar que você trabalha no fim de semana',sub:'Separei mensagens prontas para mandar no WhatsApp dos seus clientes. Quem manda caso no sábado começa a semana adiantado.',a:'msgAbrir',v:'datas',bt:'Ver mensagens prontas'});
+  try{R.splice(1,0,mikaDia());}catch(e){}
   var mes=monthOf(t),pm=prevMonth(mes),nov=C.filter(function(c){return c.criado&&monthOf(c.criado)===mes;}).length,novA=C.filter(function(c){return c.criado&&monthOf(c.criado)===pm;}).length;
   R.push({k:'mkt_nov_'+nov,h:nov>novA?'novo':nov<novA?'ideia':'animada',n:nov<novA?'media':'info',tit:nov?(nov===1?'1 cliente novo':nov+' clientes novos')+' em '+MESES[+mes.slice(5,7)-1]:'Nenhum cliente novo em '+MESES[+mes.slice(5,7)-1]+' ainda',
     sub:'No mês passado foram '+novA+'.'+(nov>novA?' Está melhor que o mês passado. 👏':nov<novA?' Vale divulgar seu trabalho: poste um antes e depois ou peça indicação a quem já é cliente.':''),a:'tab',v:'clientes',bt:'Ver clientes'});
@@ -2057,7 +2077,7 @@ function msgsDad(){var t=today(),R=[],P=alive(S.pedidos);
   if(top&&tot&&por[top]/tot>=0.5&&Object.keys(por).length>=2)R.push({k:'dad_conc',h:'preocupado',n:'media',tit:'Metade do faturamento vem de um cliente só',sub:nomeCurtoCli(cliente(top))+' respondeu por '+Math.round(por[top]/tot*100)+'% nos últimos 90 dias. Se ele parar, o mês sente. Vale buscar outros clientes.',a:'verCliente',id:top,bt:'Ver cliente'});
   return R;}
 /* Equipe passeando: de vez em quando um personagem entra no canto da tela com um aviso ou dica do setor da aba aberta */
-var PASSEIO_TAB={dashboard:['ger','ven','fin'],pedidos:['ven'],financeiro:['fin'],clientes:['mkt'],ranking:['mkt','dad'],analises:['dad'],metas:['ger','dad'],visu:['mkt']};
+var PASSEIO_TAB={dashboard:['ger','ven','fin','mkt'],pedidos:['ven'],financeiro:['fin'],clientes:['mkt'],ranking:['mkt','dad'],analises:['dad'],metas:['ger','dad'],visu:['mkt']};
 var DICAS={
   ger:[{tit:'Meta cadastrada é meta cobrada',sub:'Sem meta do mês eu não tenho como cobrar ninguém. Cadastre a sua.',a:'tab',v:'metas',bt:'Ver metas'},
        {tit:'Cinco minutos por dia',sub:'Olhe o Dashboard toda manhã. Cinco minutos evitam muita dor de cabeça.'},
@@ -2093,22 +2113,24 @@ function passeioTira(){var e=document.getElementById('passeio');if(e){clearTimeo
 function passeioAgenda(ms){clearTimeout(window._psT);window._psT=setTimeout(passeioTenta,ms||1800);}
 function passeioTenta(){if(passeioOff()||!S.sessao||!ui.dadosOk||S.carregando||EM_DEMO||ui.tour!=null||ui.equipe!=null||ui.sheet||ui.modoLab||document.hidden)return;
   if(document.getElementById('passeio')||document.querySelector('.vz-pop'))return;
-  var v=psLe();if(v.n>=8||Date.now()-(v.t||0)<4*60*1000)return;
+  var v=psLe(),x=null,md=null;try{md=mikaDia();}catch(e){}
+  if(md&&!v.k[md.k]&&!secOkHoje(md.k)&&ui.tab!=='secretarios'&&ui.tab!=='config')x={g:'mkt',m:md,longo:1};
+  if(!x){if(v.n>=8||Date.now()-(v.t||0)<4*60*1000)return;
   if(Math.random()>.6)return;
-  var x=passeioEscolhe(ui.tab);if(!x)return;
+  x=passeioEscolhe(ui.tab);if(!x)return;}
   var g=SECS.filter(function(s){return s.id===x.g;})[0],m=x.m,h=m.h,img=g.humores&&g.humores[h]?corpoDe(g,h):g.corpo;
   v.k[m.k]=1;v.n=(v.n||0)+1;v.t=Date.now();psGrava(v);
   var dados=function(){return (m.id?' data-id="'+esc(m.id)+'"':'')+(m.v!=null?' data-v="'+esc(m.v)+'"':'');};
   var d=document.createElement('div');d.id='passeio';d.className='passeio'+(img?'':' sem-img');d.style.setProperty('--zc',g.cor);
   d.innerHTML='<div class="ps-fala" role="status"><button class="ps-x" type="button" aria-label="Fechar">×</button>'+
     '<div class="ps-quem">'+(img?'':avSec(g,1,h))+'<span><b>'+esc(g.nome)+'</b><small>'+esc(g.cargo)+'</small></span></div>'+
-    '<strong>'+esc(m.tit)+'</strong>'+(m.sub?'<p>'+esc(m.sub)+'</p>':'')+
+    '<strong>'+esc(m.tit)+'</strong>'+(m.txt?fraseBox(m.txt):m.sub?'<p>'+esc(m.sub)+'</p>':'')+
     '<div class="ps-bt">'+(m.a&&m.bt?'<button class="btn sm pri" data-a="'+esc(m.a)+'"'+dados()+'>'+esc(m.bt)+'</button>':'')+
     '<button class="btn sm" data-a="secChat" data-v="'+g.id+'">Falar com '+esc(g.nome.replace('Sr. ',''))+'</button></div></div>'+
     (img?'<img class="ps-img" src="'+esc(img)+'" alt="">':'');
   document.body.appendChild(d);
   var hover=false;d.addEventListener('mouseenter',function(){hover=true;});d.addEventListener('mouseleave',function(){hover=false;});
-  var fim=function(){if(hover||d.contains(document.activeElement)){d._t=setTimeout(fim,3000);return;}passeioTira();};d._t=setTimeout(fim,15000);
+  var fim=function(){if(hover||d.contains(document.activeElement)){d._t=setTimeout(fim,3000);return;}passeioTira();};d._t=setTimeout(fim,x.longo?40000:15000);
   d.addEventListener('click',function(e){if(e.target.closest('.ps-x,[data-a]'))setTimeout(passeioTira,0);});}
 document.addEventListener('visibilitychange',function(){if(document.hidden)passeioTira();});
 function secVistos(){try{var v=JSON.parse(localStorage.getItem('idealicad_secv')||'{}');return v.d===today()?v:{d:today(),k:{}};}catch(e){return {d:today(),k:{}};}}
@@ -2124,7 +2146,7 @@ function linhaChat(c,on){return '<button class="zc'+(on?' on':'')+'" data-a="sec
 function bolha(m){var ok=secOkHoje(m.k);
   if(m.de){var q=SECS.filter(function(x){return x.id===m.de;})[0];
     return '<div class="zb resp">'+(q?avSec(q,1,m.h):'')+'<span><small>'+(q?q.nome:'')+'</small><b>'+esc(m.tit)+'</b></span></div>';}
-  return '<div class="zb '+m.n+(ok?' vista':'')+'"'+(m.h?' data-h="'+m.h+'"':'')+'>'+(m.n==='alta'?'<span class="pr">Urgente</span>':m.n==='media'?'<span class="pr">Atenção</span>':'')+'<b>'+esc(m.tit)+'</b>'+(m.sub?'<p>'+esc(m.sub)+'</p>':'')+
+  return '<div class="zb '+m.n+(ok?' vista':'')+'"'+(m.h?' data-h="'+m.h+'"':'')+'>'+(m.n==='alta'?'<span class="pr">Urgente</span>':m.n==='media'?'<span class="pr">Atenção</span>':'')+'<b>'+esc(m.tit)+'</b>'+(m.sub?'<p>'+esc(m.sub)+'</p>':'')+(m.txt?fraseBox(m.txt):'')+
     ((m.a&&m.bt)||m.href?'<span class="ac">'+(m.a&&m.bt?'<button class="btn sm'+(m.n==='alta'?' pri':'')+'" data-a="'+m.a+'"'+(m.id?' data-id="'+m.id+'"':'')+(m.v?' data-v="'+m.v+'"':'')+'>'+m.bt+'</button>':'')+
       (m.href?'<a class="btn sm" target="_blank" rel="noopener" href="'+m.href+'">WhatsApp do cliente</a>':'')+'</span>':'')+
     '<span class="hr">'+(m.k.slice(-3)==='_oi'?'':ok?'✓ visto':'<button class="okb" data-a="secOk" data-k="'+m.k+'">Ok, visto ✓</button>')+'</span></div>';}
