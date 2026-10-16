@@ -468,6 +468,11 @@ html[data-tema="neon"] body{background:radial-gradient(1100px 620px at 100% -10%
 .zfrase .msg-txt{background:none;border:0;padding:0;box-shadow:none;white-space:pre-wrap;font-size:.86rem;line-height:1.45;color:var(--text);max-height:150px;overflow:auto}
 .zfrase .msg-acts{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
 .ps-fala .zfrase{margin-top:8px}
+.fw-lista{display:flex;flex-direction:column;gap:6px;max-height:min(46vh,380px);overflow:auto;padding:2px}
+.fw-it{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);cursor:pointer;font:inherit}
+.fw-it:hover:not(:disabled){border-color:var(--accent)}.fw-it:disabled{opacity:.5;cursor:default}
+.fw-it b{display:block}.fw-it small{display:block;color:var(--muted);font-size:.78rem}
+.fw-st{font-size:.82rem;font-weight:700;color:var(--accent);white-space:nowrap}.fw-it.env{border-color:#1E8A5A}.fw-it.env .fw-st{color:#1E8A5A}
 .passeio{position:fixed;right:14px;bottom:0;z-index:43;display:flex;align-items:flex-end;gap:0;pointer-events:none;max-width:calc(100vw - 28px)}
 .passeio>*{pointer-events:auto}
 .ps-img{height:230px;width:auto;margin-left:-18px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.35));animation:psEntra .55s cubic-bezier(.2,.9,.3,1.2) both;transform-origin:bottom center}
@@ -1357,7 +1362,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 17h00';
+var VERSAO='16/10 · 17h20';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Secretários',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2046,7 +2051,19 @@ function mikaDia(){var t=today(),dow=new Date(t+'T12:00:00').getDay(),n=Math.flo
     if(L.length)return {k:'mkt_dia_'+t,h:'megafone',n:'media',tit:(ev.fer?'📅 Feriado: ':'💐 ')+ev.nome+' '+q+'! Mande uma mensagem para seus clientes',sub:'Já deixei uma pronta. Copie e mande no WhatsApp (ou veja outras opções).',txt:preenche(L[0],{ev:ev}),a:'msgAbrir',v:'datas',bt:'Mais opções'};}
   var F=FRASES_DIA[dow],L2=(dow===5||dow===6)&&minhas('fds').length?minhas('fds'):F.f;
   return {k:'mkt_dia_'+t,h:F.h,n:'media',tit:F.tit,sub:'Frase do dia pronta. Copie e mande para seus clientes no WhatsApp ou poste no status.',txt:preenche(L2[n%L2.length],{}),a:'msgAbrir',v:dow===5||dow===6?'fds':'divulga',bt:'Mais opções'};}
-function fraseBox(txt){return '<div class="msg-card zfrase"><div class="msg-txt">'+esc(txt)+'</div><div class="msg-acts"><span></span><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><a class="btn sm pri" href="'+esc(waLink(txt,''))+'" target="_blank" rel="noopener">WhatsApp</a></span></div></div>';}
+function fraseBox(txt){return '<div class="msg-card zfrase"><div class="msg-txt">'+esc(txt)+'</div><div class="msg-acts"><span></span><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button><button type="button" class="btn sm pri" data-a="fraseWa">WhatsApp</button></span></div></div>';}
+/* escolher o cliente e abrir o WhatsApp já no número dele, com a frase */
+function fraseNome(t,c){var n=!c?'':(c.titulo==='Dr.'||c.titulo==='Dra.')?nomeCurtoCli(c):/^(lab|laborat)/i.test(String(c.nome||''))?String(c.nome).trim():nomeContato(c);if(!n)return t;var r=t.replace(/^(Oi|Olá|Bom dia|Boa tarde|Boa noite)!/,'$1, '+n+'!');return r!==t?r:'Oi, '+n+'! '+t;}
+function fFraseWa(txt){ui.fraseEnv=ui.fraseEnv||{};var ult={};alive(S.pedidos).forEach(function(p){var d=p.recebido||'';if(!ult[p.clienteId]||d>ult[p.clienteId])ult[p.clienteId]=d;});
+  var C=alive(S.clientes).slice().sort(function(a,b){var ta=soDig(a.telefone)?1:0,tb=soDig(b.telefone)?1:0;if(ta!==tb)return tb-ta;return (ult[b.id]||'')>(ult[a.id]||'')?1:(ult[b.id]||'')<(ult[a.id]||'')?-1:String(a.nome).localeCompare(String(b.nome));});
+  return head('Mandar para quem?')+'<p class="small muted" style="margin-top:0">Toque no cliente: o WhatsApp abre direto na conversa dele, com a frase pronta e o nome dele no começo. Dá para editar a frase aqui antes.</p>'+
+    '<textarea id="fw-txt" rows="4" style="width:100%">'+esc(txt)+'</textarea>'+
+    '<label class="row small" style="gap:6px;align-items:center;margin:6px 0"><input type="checkbox" id="fw-nome" checked> Colocar o nome do cliente no começo</label>'+
+    (C.length?'<input class="search" id="fw-busca" type="search" placeholder="Buscar cliente…" autocomplete="off" style="width:100%;margin:6px 0">'+
+    '<div class="fw-lista">'+C.map(function(c){var tel=soDig(c.telefone),env=ui.fraseEnv[c.id];
+      return '<button type="button" class="fw-it'+(env?' env':'')+'" data-a="fraseEnvia" data-id="'+c.id+'" data-n="'+esc(String(c.nome||'').toLowerCase())+'"'+(tel?'':' disabled')+'><span><b>'+esc(c.nome||'Cliente')+'</b><small>'+(tel?esc(c.telefone):'sem WhatsApp cadastrado')+'</small></span><span class="fw-st">'+(env?'✓ enviado':tel?'Enviar ›':'')+'</span></button>';}).join('')+'</div>'
+    :'<div class="card empty">Você ainda não tem clientes cadastrados.</div>')+
+    '<div class="row wrap" style="gap:8px;margin-top:10px"><button class="btn" data-a="fraseEnvia" data-id="">Abrir WhatsApp sem escolher</button><button class="btn" data-a="fraseCopia">Copiar frase</button></div>';}
 function msgsMkt(){var t=today(),R=[],dow=new Date(t+'T12:00:00').getDay(),C=alive(S.clientes),P=alive(S.pedidos).filter(function(p){return p.recebido;});
   try{R=msgsCli();}catch(e){R=[];}
   R.forEach(function(m){if(m.k==='cli_oi'){m.k='mkt_oi';m.h=R.length>1?'sumiu':'animada';}else if(!m.h)m.h=m.n==='info'?'ideia':'sumiu';});
@@ -4359,6 +4376,11 @@ var A={
     var a=ta.selectionStart||0,b=ta.selectionEnd||0;ta.value=ta.value.slice(0,a)+d.v+ta.value.slice(b);ta.focus();ta.setSelectionRange(a+d.v.length,a+d.v.length);},
   mmNova:function(d){if(!guard())return;var l=document.querySelector('.mm-list[data-c="'+d.c+'"]');if(!l)return;l.insertAdjacentHTML('beforeend',linhaMinha(d.c,'',''));var t=l.lastElementChild.querySelector('textarea');window._mmTa=t;t.focus();},
   mmDel:function(d,el){var li=el.closest('.mm-li');if(li)li.remove();toast('Mensagem removida. Clique em “Salvar minhas mensagens” para confirmar.');},
+fraseWa:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;openSheet(fFraseWa,t);},
+  fraseEnvia:function(d,el){var tx=document.getElementById('fw-txt'),t=tx?tx.value:'',c=d.id?byId(S.clientes,d.id):null,nm=document.getElementById('fw-nome');
+    if(c&&nm&&nm.checked)t=fraseNome(t,c);window.open(waLink(t,c?c.telefone:''),'_blank','noopener');
+    if(c){ui.fraseEnv=ui.fraseEnv||{};ui.fraseEnv[c.id]=1;el.classList.add('env');var st=el.querySelector('.fw-st');if(st)st.textContent='✓ enviado';}},
+  fraseCopia:function(){var tx=document.getElementById('fw-txt');try{navigator.clipboard.writeText(tx.value).then(function(){toast('Frase copiada.');});}catch(e){}},
   msgCopiar:function(d,el){var t=el.closest('.msg-card').querySelector('.msg-txt').textContent;
     try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada. Cole no WhatsApp.');},function(){openSheet(fTexto,'Mensagem',t);});}catch(x){openSheet(fTexto,'Mensagem',t);}},
   secOk:function(d){try{localStorage.setItem('idealicad_sec_'+d.k+'_'+today(),'1');}catch(e){}if(document.querySelector('.sheet'))renderSheet();render();},
@@ -4790,6 +4812,7 @@ document.addEventListener('click',function(e){var zb=e.target.closest&&e.target.
   if(el.disabled)return;
   var f=A[el.dataset.a];if(f){if(el.tagName!=='A')e.preventDefault();f(el.dataset,el,e);}
 });
+document.addEventListener('input',function(e){if(e.target.id==='fw-busca'){var q=e.target.value.trim().toLowerCase();[].forEach.call(document.querySelectorAll('.fw-it'),function(b){b.style.display=!q||b.dataset.n.indexOf(q)>=0?'':'none';});}});
 document.addEventListener('keydown',function(e){
   if(e.key==='Backspace'&&e.target.classList&&e.target.classList.contains('tel-num')&&!e.target.value){var d0=document.getElementById(e.target.dataset.pre+'-ddd');if(d0){e.preventDefault();d0.focus();}}
   if(e.key==='Escape'&&ui.ddOpen){ui.ddOpen=null;render();return;}
