@@ -42,10 +42,20 @@ Deno.serve(async (req: Request) => {
     // deno-lint-ignore no-explicit-any
     const lista = (peds ?? []) as any[];
     // Print do scanbody: URL assinada (1 hora) do bucket privado "pedido-img", só da pasta do dono.
+    const acc0 = Deno.env.get("R2_ACCOUNT_ID")?.trim(), kid0 = Deno.env.get("R2_ACCESS_KEY_ID")?.trim();
+    const sec0 = Deno.env.get("R2_SECRET_ACCESS_KEY")?.trim(), bk0 = Deno.env.get("R2_BUCKET")?.trim();
+    const r20 = acc0 && kid0 && sec0 && bk0 ? new AwsClient({ accessKeyId: kid0, secretAccessKey: sec0, service: "s3", region: "auto" }) : null;
     for (const p of lista) {
       const path = String(p.scanbody_img ?? "");
       delete p.scanbody_img;
-      if (path && path.startsWith(dono + "/")) {
+      if (path.startsWith("r2:") && r20) {
+        const key = path.slice(3);
+        if (key.startsWith(dono + "/")) {
+          const u = new URL(`https://${acc0}.r2.cloudflarestorage.com/${bk0}/${key.split("/").map(encodeURIComponent).join("/")}`);
+          u.searchParams.set("X-Amz-Expires", "3600");
+          p.scanbody_url = (await r20.sign(new Request(u, { method: "GET" }), { aws: { signQuery: true } })).url;
+        }
+      } else if (path && path.startsWith(dono + "/")) {
         const { data: su } = await admin.storage.from("pedido-img").createSignedUrl(path, 3600);
         if (su?.signedUrl) p.scanbody_url = su.signedUrl;
       }

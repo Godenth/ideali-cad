@@ -80,6 +80,26 @@ Deno.serve(async (req: Request) => {
     return json(200, { key, url: await assinar("PUT", key, 3600) });
   }
 
+  // Print do scanbody (imagem pequena) no R2: sem registro em "arquivos", só a chave fica no pedido.
+  const SBKEY = new RegExp(`^${user.id}/[0-9a-f-]{36}/sb-[0-9a-f-]{36}\\.(webp|jpg|png)$`, "i");
+  if (acao === "sb_preparar") {
+    const ext = ["webp", "jpg", "png"].includes(String(body.ext)) ? String(body.ext) : "webp";
+    if (!(await pedidoDoUsuario(body.pedido_id))) return json(404, { erro: "Pedido não encontrado" });
+    const key = `${user.id}/${body.pedido_id}/sb-${crypto.randomUUID()}.${ext}`;
+    return json(200, { key, url: await assinar("PUT", key, 900) });
+  }
+  if (acao === "sb_url") {
+    const key = String(body.key ?? "");
+    if (!SBKEY.test(key)) return json(400, { erro: "Imagem inválida" });
+    return json(200, { url: await assinar("GET", key, 3600) });
+  }
+  if (acao === "sb_apagar") {
+    const key = String(body.key ?? "");
+    if (!SBKEY.test(key)) return json(400, { erro: "Imagem inválida" });
+    await r2.fetch(objUrl(key), { method: "DELETE" });
+    return json(200, { ok: true });
+  }
+
   if (acao === "confirmar") {
     const key = String(body.key ?? "");
     const pid = String(body.pedido_id ?? "");
