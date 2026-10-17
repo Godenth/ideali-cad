@@ -528,6 +528,16 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .od-t:hover .od-hit{fill:color-mix(in srgb,var(--accent) 10%,transparent)}.od-t.od-ed .od-hit{fill:color-mix(in srgb,var(--accent) 18%,transparent);stroke:var(--accent);stroke-width:1.5}
 .od-t:not(.od-sel) .od-n{stroke:color-mix(in srgb,var(--ink) 35%,transparent)}
 .od-cn{cursor:pointer}.od-cn circle{fill:var(--surface);stroke:var(--muted);stroke-width:1.5}.od-cn .od-cn-h{fill:transparent;stroke:none}.od-cn.u circle:not(.od-cn-h){fill:var(--accent);stroke:var(--accent)}
+.tsel{position:relative}.tsel-b{width:100%;display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.tsel-b span:nth-child(2){flex:1}.tsel-b i{font-style:normal;color:var(--muted)}.tsel-b:focus{outline:2px solid var(--accent);outline-offset:1px}
+.tsel-l{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:20;max-height:320px;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.35);padding:4px}
+.tsel-o{width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;border-radius:8px;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.tsel-o:hover,.tsel-o.on{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.ti{flex:0 0 32px;width:32px;height:32px;border-radius:7px;border:1px solid var(--line);background:color-mix(in srgb,var(--accent) 8%,var(--bg));display:grid;place-items:center}
+.ti svg{width:28px;height:28px}.ti-vazio{background:#fff;border-color:color-mix(in srgb,var(--ink) 25%,transparent)}
+.ti .ti-c{fill:var(--accent);stroke:var(--accent);stroke-width:.8}.ti .ti-tr{fill:color-mix(in srgb,var(--accent) 30%,transparent)}
+.ti .ti-r{fill:color-mix(in srgb,var(--ink) 18%,transparent);stroke:color-mix(in srgb,var(--ink) 45%,transparent);stroke-width:.8}
+.ti .ti-l{fill:none;stroke:var(--ink);stroke-width:1.2;stroke-linecap:round;opacity:.8}.ti .ti-p{fill:#B8C0CC;stroke:#8A93A0;stroke-width:.7}.ti .ti-g{fill:#E8A0A8;stroke:#C46C78;stroke-width:.7}
 .ia-in{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:var(--surface);position:relative;z-index:3}
 .ia-in input{flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:10px 16px;background:var(--bg);color:var(--ink);font:inherit}
 .ia-in input:focus{outline:none;border-color:var(--accent)}.ia-in .btn{border-radius:999px;min-width:46px;padding:0 14px}
@@ -1426,7 +1436,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='16/10 · 21h45';
+var VERSAO='16/10 · 22h00';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -4012,6 +4022,27 @@ function fPedido(id,preCli){
     '</div></div>'+
   '</form>';
 }
+/* Ícone de cada tipo de trabalho padrão. Tipos criados à mão pelo cadista ficam sem ícone (caixinha em branco). */
+var TIPO_ICO_NOME={'coroa sobre dente':'prep','elemento sobre dente':'prep','coroa sobre implante':'imp','elemento sobre implante':'imp','faceta':'fac','inlay / onlay':'inl','pontico':'pon',
+  'provisorio com aleta':'prov','placa de bruxismo':'pla','enceramento digital (planejamento)':'enc','protocolo (superior ou inferior)':'pro','protocolo completo (superior + inferior)':'pro2','modelo 3d':'mod','modelo adicional':'mod'};
+var CR='M5 8 Q4 13 5.5 17.5 Q12 21 18.5 17.5 Q20 13 19 8 Z';
+var TIPO_ICO={
+  prep:'<path d="M8.5 8 L9.5 3 Q12 1.5 14.5 3 L15.5 8" class="ti-r"/><path d="'+CR+'" class="ti-c"/><path d="M8.5 8 L9.3 13 Q12 15 14.7 13 L15.5 8" class="ti-l"/>',
+  imp:'<rect x="9.5" y="1.5" width="5" height="6" rx="1" class="ti-p"/><path d="M9.5 3 H14.5 M9.5 5 H14.5" class="ti-l"/><path d="'+CR+'" class="ti-c"/>',
+  fac:'<path d="'+CR+'" class="ti-r"/><path d="M6 10 Q5.5 14 6.5 17 Q12 19.5 17.5 17 Q18.5 14 18 10 Q12 12.5 6 10 Z" class="ti-c"/>',
+  inl:'<path d="'+CR+'" class="ti-r"/><path d="M8 8 L9.5 12 H14.5 L16 8 Z" class="ti-c"/>',
+  pon:'<path d="M3 9 H21" class="ti-l"/><path d="'+CR+'" class="ti-c"/>',
+  prov:'<path d="'+CR+'" class="ti-c ti-tr"/><path d="M2.5 11 H5 M19 11 H21.5" class="ti-l"/>',
+  pla:'<rect x="2" y="7" width="20" height="11" rx="4" class="ti-c ti-tr"/><path d="M6 12.5 H18" class="ti-l"/>',
+  enc:'<path d="'+CR+'" class="ti-c ti-tr"/><path d="M15 3 L20 8 L13 15 L10 15.5 L10.5 12.5 Z" class="ti-p"/>',
+  pro:'<rect x="2" y="9" width="20" height="9" rx="4" class="ti-g"/><path d="M5 9 V6 M9.7 9 V5 M14.3 9 V5 M19 9 V6" class="ti-l"/><path d="M4 9 Q12 13 20 9" class="ti-c" fill="none"/>',
+  pro2:'<rect x="2" y="3" width="20" height="7" rx="3" class="ti-g"/><rect x="2" y="14" width="20" height="7" rx="3" class="ti-g"/><path d="M6 10 V13 M12 10 V13 M18 10 V13" class="ti-l"/>',
+  mod:'<path d="M12 2.5 L20.5 7 V16.5 L12 21 L3.5 16.5 V7 Z" class="ti-c ti-tr"/><path d="M3.5 7 L12 11.5 L20.5 7 M12 11.5 V21" class="ti-l"/>'};
+function tipoIco(t){var k=t&&TIPO_ICO_NOME[semAcento(String(t.nome||'')).toLowerCase().trim()];
+  return '<span class="ti'+(k?'':' ti-vazio')+'" aria-hidden="true">'+(k?'<svg viewBox="0 0 24 24">'+TIPO_ICO[k]+'</svg>':'')+'</span>';}
+function tipoPicker(sel){var ts=alive(S.tipos).filter(function(t){return t.ativo||t.id===sel;}),cur=tipo(sel);
+  return '<div class="tsel" id="tsel"><button type="button" class="tsel-b" data-a="tselAbre">'+(cur?tipoIco(cur)+'<span>'+esc(cur.nome)+'</span>':'<span class="ti ti-vazio"></span><span class="muted">Escolha o trabalho…</span>')+'<i>▾</i></button>'+
+    '<div class="tsel-l" hidden>'+ts.map(function(t){return '<button type="button" class="tsel-o'+(t.id===sel?' on':'')+'" data-a="tselEsc" data-v="'+t.id+'">'+tipoIco(t)+'<span>'+esc(t.nome)+'</span></button>';}).join('')+'</div></div>';}
 function tiposOpts(sel){var ts=alive(S.tipos).filter(function(t){return t.ativo||t.id===sel;});
   return '<option value="">Escolha o trabalho…</option>'+ts.map(function(t){return '<option value="'+t.id+'" '+(t.id===sel?'selected':'')+'>'+esc(t.nome)+'</option>';}).join('');}
 function ehPlaca(tid){var t=tipo(tid);return !!(t&&/placa|protocolo/i.test(t.nome));}  /* trabalhos de arcada inteira: placa e protocolo */
@@ -4049,11 +4080,11 @@ function abreEditorDente(n){
   ui.pdEd=n;
   var box=document.getElementById('pd-ed');
   box.innerHTML='<div class="pd-ed"><div class="between"><b>Dente '+n+'</b>'+(novo&&its.length>1?'<span class="small muted">Copiado do dente anterior. Mude se precisar.</span>':'')+'</div>'+
-    '<label class="fld"><span>Trabalho deste dente</span><select id="ed-t">'+tiposOpts(i.t)+'</select></label>'+
+    '<div class="fld"><span>Trabalho deste dente</span><select id="ed-t" hidden>'+tiposOpts(i.t)+'</select>'+tipoPicker(i.t)+'</div>'+
     '<label class="check"><input type="checkbox" id="ed-imp" '+(i.imp?'checked':'')+'> Sobre implante (scanbody)</label>'+
     '<div id="ed-impbox" class="grid2" '+(i.imp?'':'hidden')+'><div class="fld"><span>Marca do implante'+(ui.pdRede?' <b class="req">*</b>':'')+'</span>'+selOutro('edM',MARCAS_IMP,i.m,'Digite a marca')+'</div><div class="fld"><span>Conexão / scanbody'+(ui.pdRede?' <b class="req">*</b>':'')+'</span>'+selOutro('edC',CONEX_IMP,i.c,'Digite o tipo')+'</div></div>'+
     '<div class="row wrap"><button type="button" class="btn pri sm" data-a="pdOk">Pronto</button><button type="button" class="btn sm danger" data-a="pdTira" data-n="'+n+'">Tirar este dente</button></div></div>';
-  renderItens();var s=document.getElementById('ed-t');if(s&&!i.t)s.focus();box.scrollIntoView({block:'nearest',behavior:'smooth'});
+  renderItens();var s=document.querySelector('#tsel .tsel-b');if(s&&!i.t)s.focus();box.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 function lerEditor(){
   var n=ui.pdEd;if(n==null)return true;var i=(ui.pdItens||[]).filter(function(x){return x.d===n;})[0];if(!i)return true;
@@ -4797,7 +4828,9 @@ impGrava:function(){impGrava();},
     var l=UP.indexOf(n)>=0?UP:LO,nx=its.filter(function(x){return x.d===l[l.indexOf(n)+1];})[0];
     if(nx&&(ehPontico(i.t)||ehPontico(nx.t))){toast('Pôntico fica sempre unido aos dentes vizinhos.');return;}i.u=!i.u;renderItens();},
   tooth:function(d){var n=+d.n;if(ui.pdEd!=null&&ui.pdEd!==n&&!lerEditor()){var a=ui.pdEd;toast('Escolha o trabalho do dente '+a+' primeiro.');return;}abreEditorDente(n);},
-  pdOk:function(){if(!lerEditor()){toast('Escolha o trabalho deste dente.');var s=document.getElementById('ed-t');if(s)s.focus();return;}fechaEditor();},
+tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l.hidden;if(!l.hidden){var o=l.querySelector('.on')||l.firstChild;if(o)o.scrollIntoView({block:'nearest'});}},
+  tselEsc:function(d,el){var s=document.getElementById('ed-t');if(!s)return;s.value=d.v;var w=el.closest('.tsel');w.outerHTML=tipoPicker(d.v);s.dispatchEvent(new Event('change',{bubbles:true}));},
+  pdOk:function(){if(!lerEditor()){toast('Escolha o trabalho deste dente.');var s=document.querySelector('#tsel .tsel-b');if(s)s.focus();return;}fechaEditor();},
   pdTira:function(d){var n=+d.n;ui.pdItens=(ui.pdItens||[]).filter(function(i){return i.d!==n;});if(ui.pdEd===n)fechaEditor();else renderItens();},
   pdExtra:function(){lerEditor();ui.pdExtras=ui.pdExtras||[];var m=alive(S.tipos).filter(function(t){return t.ativo&&/modelo/i.test(t.nome);})[0];ui.pdExtras.push({t:m?m.id:'',q:1});renderItens();},
   pdTiraEx:function(d){ui.pdExtras.splice(+d.k,1);renderItens();},
@@ -5041,6 +5074,7 @@ document.addEventListener('click',function(e){var zb=e.target.closest&&e.target.
   if(el.disabled)return;
   var f=A[el.dataset.a];if(f){if(el.tagName!=='A')e.preventDefault();f(el.dataset,el,e);}
 });
+document.addEventListener('click',function(e){if(!(e.target.closest&&e.target.closest('.tsel')))[].forEach.call(document.querySelectorAll('.tsel-l'),function(l){l.hidden=true;});});
 document.addEventListener('input',function(e){if(e.target.id==='pd-pac'){var v=e.target.value,av=document.getElementById('pac-lgpd');var nome=/[A-Za-zÀ-ÿ]{3,}/.test(v.replace(/\./g,' '));
   if(nome&&!av){av=document.createElement('div');av.id='pac-lgpd';av.className='pac-lgpd';av.innerHTML='Use só as <b>iniciais</b> do paciente (LGPD). <button type="button" class="btn sm" data-a="pacIni">Trocar por '+'<span id="pac-ini"></span></button>';e.target.parentNode.appendChild(av);}
   if(av){if(!nome)av.remove();else{var s=document.getElementById('pac-ini');if(s)s.textContent=pacIniciais(v);}}}});
