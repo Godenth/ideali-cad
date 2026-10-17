@@ -1,4 +1,5 @@
-// Ideali CAD · Agentes de IA (conversa livre com Ana, Bia, Mika, Klose e Sr. Otávio).
+// Ideali CAD · Agentes de IA (conversa livre com Ana, Bia, Mika, Klose e Sr. Otávio, sala de reunião,
+// mensagem pronta para cliente e análise de cliente).
 // A IA roda no Cloudflare Workers AI. A chave fica só aqui no servidor (segredo CF_AI_TOKEN).
 // Os números (atrasos, quem deve, metas) continuam sendo calculados pelo app; a IA só conversa.
 // Proteções: login obrigatório, assunto bloqueado fora do sistema, trava contra abuso por conta
@@ -46,6 +47,28 @@ Regras:
 Dados do cadista hoje:
 ${contexto}`;
 
+// Tarefas prontas (o app pede, o servidor monta a instrução; ninguém manda instrução livre por aqui).
+const EQUIPE = "ger = Sr. Otávio (gerente, rabugento mas justo, conduz e decide), ven = Ana (vendas, animada), fin = Bia (financeiro, prática), mkt = Mika (marketing, criativa), dad = Klose (dados, calmo e analítico)";
+const tarefa = (tipo: string, a: { nome: string; papel: string; jeito: string }, dados: string, extra: string) => {
+  const base = `Você trabalha no Ideali CAD, sistema para cadistas odontológicos (quem desenha próteses no computador para dentistas e laboratórios). Responda em português do Brasil. Use apenas os dados abaixo: não invente números, nomes, preços nem promoções. Pacientes só por iniciais.`;
+  if (tipo === "reuniao") return `${base}
+Escreva a reunião diária da equipe de agentes de IA, na sala de reunião. Personagens: ${EQUIPE}.
+Formato OBRIGATÓRIO: de 7 a 10 falas, uma por linha, cada linha começando com o código do personagem e dois-pontos (exemplo: "ger: Bom dia, equipe."). Cada fala com no máximo 2 frases curtas, tom de conversa de escritório, com personalidade. Eles analisam os dados de hoje, comentam o que está bom e o que preocupa, discordam um pouco quando faz sentido e propõem ações concretas (cobranças, mensagens para clientes, relatórios, metas). O Sr. Otávio abre e fecha a reunião decidindo o que fazer hoje.
+Última linha OBRIGATÓRIA: "DECISOES: " seguido de 1 a 4 códigos separados por vírgula, escolhidos SOMENTE desta lista: ${extra}
+Dados de hoje:
+${dados}`;
+  if (tipo === "msg_cliente") return `${base}
+Você é ${a.nome} (${a.jeito}) e escreve para o cadista UMA mensagem de WhatsApp que ele vai mandar ao cliente abaixo, em primeira pessoa como se fosse o próprio cadista. 2 a 4 frases, simpática e profissional, no máximo 2 emojis, sem assinatura. Objetivo: ${extra || "manter contato e trazer novos trabalhos"}.
+Responda SOMENTE com o texto da mensagem, sem aspas e sem explicação.
+Dados do cliente:
+${dados}`;
+  if (tipo === "analise_cliente") return `${base}
+Você é ${a.nome} (${a.jeito}). Analise o comportamento deste cliente para o cadista em 4 a 6 frases curtas: o que está bom, o que preocupa e 1 ou 2 ações práticas. Fale com o cadista ("você").
+Números do cliente:
+${dados}`;
+  return "";
+};
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json(405, { erro: "Método não permitido" });
@@ -67,25 +90,28 @@ Deno.serve(async (req: Request) => {
   const pergunta = String(body?.pergunta ?? "").trim().slice(0, 500);
   const contexto = String(body?.contexto ?? "").slice(0, 4000);
   const hist = Array.isArray(body?.historico) ? body.historico.slice(-6) : [];
-  if (!a || !pergunta) return json(400, { erro: "Pergunta inválida" });
+  const tipo = ["reuniao", "msg_cliente", "analise_cliente"].includes(String(body?.tarefa)) ? String(body.tarefa) : "chat";
+  const extra = String(body?.extra ?? "").replace(/[\r\n]+/g, " ").slice(0, 600);
+  if (!a || (tipo === "chat" && !pergunta)) return json(400, { erro: "Pergunta inválida" });
 
-  if (FORA.test(pergunta)) return json(200, { resposta: a.fora, fora: true });
+  if (tipo === "chat" && FORA.test(pergunta)) return json(200, { resposta: a.fora, fora: true });
 
   const { data: lim, error: el } = await admin.rpc("ia_consumir", { uid: user.id, max_conta: MAX_CONTA, max_sistema: MAX_SISTEMA });
   if (el) { console.error("limite:", el.message); return json(500, { erro: "Não consegui conferir o limite agora." }); }
   if (!lim?.ok) return json(429, { erro: lim?.motivo === "conta" ? "limite_conta" : "limite_sistema" });
 
-  const msgs = [{ role: "system", content: sistema(a, contexto) }];
-  for (const m of hist) {
+  const msgs = [{ role: "system", content: tipo === "chat" ? sistema(a, contexto) : tarefa(tipo, a, contexto, extra) }];
+  if (tipo !== "chat") msgs.push({ role: "user", content: tipo === "reuniao" ? "Comecem a reunião de hoje." : tipo === "msg_cliente" ? "Escreva a mensagem." : "Faça a análise." });
+  else for (const m of hist) {
     const t = String(m?.t ?? "").slice(0, 600);
     if (t) msgs.push({ role: m?.r === "a" ? "assistant" : "user", content: t });
   }
-  msgs.push({ role: "user", content: pergunta });
+  if (tipo === "chat") msgs.push({ role: "user", content: pergunta });
 
   const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${acc}/ai/run/${MODELO}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${tok}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ messages: msgs, max_tokens: 350, temperature: 0.5 }),
+    body: JSON.stringify({ messages: msgs, max_tokens: tipo === "reuniao" ? 750 : 350, temperature: tipo === "chat" ? 0.5 : 0.7 }),
   });
   const j = await r.json().catch(() => null);
   if (!r.ok || !j?.success) {
@@ -93,6 +119,7 @@ Deno.serve(async (req: Request) => {
     return json(502, { erro: "A IA não respondeu agora." });
   }
   const resp = String(j.result?.response ?? "").trim();
-  if (!resp || /FORA_DO_ASSUNTO/.test(resp)) return json(200, { resposta: a.fora, fora: true });
-  return json(200, { resposta: resp.slice(0, 1500) });
+  if (!resp) return json(502, { erro: "A IA não respondeu agora." });
+  if (tipo === "chat" && /FORA_DO_ASSUNTO/.test(resp)) return json(200, { resposta: a.fora, fora: true });
+  return json(200, { resposta: resp.slice(0, tipo === "reuniao" ? 3000 : 1500) });
 });
