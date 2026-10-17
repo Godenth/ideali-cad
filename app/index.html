@@ -553,6 +553,15 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .zb.ia-eu p{margin:0;color:inherit}
 .zb.ia-ag{max-width:82%}.zb.ia-ag small{display:block;font-size:.72rem;font-weight:700;color:var(--accent);margin-bottom:2px}.zb.ia-ag p{margin:0;white-space:pre-wrap}
 .zb.ia-erro small{color:var(--muted)}
+.val-chip{display:inline-flex;align-items:baseline;gap:6px;border:1px solid color-mix(in srgb,var(--ok,#1DAE8A) 40%,var(--line));background:color-mix(in srgb,var(--ok,#1DAE8A) 10%,transparent);color:var(--ink);border-radius:999px;padding:5px 12px;font:inherit;cursor:pointer;white-space:nowrap}
+.val-chip small{font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}.val-chip b{font-size:.9rem;font-weight:800}
+.val-chip i{font-style:normal;font-size:.72rem;font-weight:700}.val-chip i.up,.val-li i.up{color:var(--ok,#1DAE8A)}.val-chip i.dn,.val-li i.dn{color:#E5484D}
+.val-big{display:grid;gap:2px;text-align:center;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--ok,#1DAE8A) 10%,transparent);margin-bottom:10px}
+.val-big b{font-size:2rem;font-weight:800}.val-big small{color:var(--muted);font-weight:600}
+.val-conta{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:6px 0 12px;font-size:.8rem;color:var(--muted)}.val-conta span{display:grid;text-align:center}.val-conta b{color:var(--ink);font-size:.95rem}
+.val-f{display:grid;border:1px solid var(--line);border-radius:12px;overflow:hidden}.val-li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line)}.val-li:last-child{border-bottom:0}
+.val-li span{display:grid}.val-li small{color:var(--muted);font-size:.78rem}.val-li i{font-style:normal;font-weight:800;font-size:.85rem;white-space:nowrap}
+@media (max-width:820px){.val-chip{padding:4px 9px}.val-chip small{display:none}.val-chip b{font-size:.8rem}}
 .ia-cmds{display:flex;gap:6px;padding:8px 12px 0;overflow-x:auto;scrollbar-width:none;background:var(--surface);border-top:1px solid var(--line);position:relative;z-index:3}.ia-cmds::-webkit-scrollbar{display:none}
 .ia-cmds+.ia-in{border-top:0}
 .ia-cmd{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap}
@@ -1258,7 +1267,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -1310,7 +1319,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -1474,7 +1483,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 01h55';
+var VERSAO='17/10 · 02h10';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1517,7 +1526,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
     '<h1 class="mb">'+titulo+'</h1><span class="spacer dk"></span>'+
     '<input class="search dk" id="busca-top" type="search" placeholder="Buscar pedido, paciente, cliente…" value="'+(ui.tab==='pedidos'?'':esc(ui.busca))+'">'+
-    '<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
+    (EM_DEMO?'':valChip())+'<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
     '<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>'+
     contaMenu(nome,lix)+
     '<span class="menu-btn">'+chip.replace('Grátis no lançamento','Grátis')+'</span></div>'+
@@ -1758,6 +1767,44 @@ function corSaude(n){if(n==null)return '';n=Math.max(0,Math.min(100,n));
   if(n<25)return 'hsl(0,'+(78+n*0.4)+'%,'+(46+n*0.24)+'%)';
   var h=n>=75?105+(n-75)/25*30:n>=50?32+(n-50)/25*20:6+(n-25)/25*22;return 'hsl('+Math.round(h)+','+(n>=75?65:85)+'%,'+(n>=75?42:n>=50?47:50)+'%)';}
 function nivelSaude(n){for(var i=0;i<NIVEIS_SD.length;i++)if(n>=NIVEIS_SD[i][0])return NIVEIS_SD[i];return NIVEIS_SD[3];}
+/* ===== Valuation: quanto a empresa do cadista valeria hoje =====
+   Método usado para pequenas empresas de serviço: receita anual x múltiplo. O múltiplo começa em 1,0x
+   e sobe ou desce com crescimento, concentração de clientes, carteira ativa, qualidade, inadimplência e tempo de casa.
+   Tudo calculado no app, com os dados do próprio cadista (nada sai daqui). */
+function brlCurto(v){v=+v||0;if(v>=1e6)return 'R$ '+(v/1e6).toFixed(v>=1e7?0:1).replace('.',',')+' mi';if(v>=1e3)return 'R$ '+(v/1e3).toFixed(v>=1e5?0:1).replace('.',',').replace(',0','')+' mil';return brl(Math.round(v));}
+function valuation(){var t=today(),P=alive(S.pedidos).filter(function(p){return p.recebido&&p.recebido<=t;}),ini=addDays(t,-365),R12=P.filter(function(p){return p.recebido>ini;}),rec12=soma(R12);
+  var pri=P.map(function(p){return p.recebido;}).sort()[0],idade=pri?daysBetween(pri,t):0,F=[],m=1;
+  var anual=!rec12?0:idade>=365?rec12:rec12/Math.max(idade,90)*365;
+  var add=function(n,d,txt){d=Math.round(d*100)/100;m+=d;F.push({n:n,d:d,txt:txt});};
+  var r90=soma(P.filter(function(p){return p.recebido>addDays(t,-90);})),r180=soma(P.filter(function(p){return p.recebido>addDays(t,-180)&&p.recebido<=addDays(t,-90);}));
+  if(r180>0){var g=(r90-r180)/r180;add('Crescimento',Math.max(-0.3,Math.min(0.3,g*0.3)),'Últimos 90 dias '+(g>=0?'+':'')+Math.round(g*100)+'% contra os 90 anteriores.');}
+  else if(r90>0)add('Crescimento',0.05,'Começou a faturar nos últimos 90 dias.');
+  var por={};R12.forEach(function(p){por[p.clienteId]=(por[p.clienteId]||0)+(+p.valor||0);});var top=Object.keys(por).sort(function(a,b){return por[b]-por[a];})[0],sh=top&&rec12?por[top]/rec12:0;
+  if(rec12)add('Concentração',sh>0.5?-0.25:sh>0.3?-0.1:0.05,Math.round(sh*100)+'% do faturamento vem do maior cliente.'+(sh>0.5?' Depender de um cliente só é o maior risco.':sh<=0.3?' Carteira bem distribuída.':''));
+  var at={};P.filter(function(p){return p.recebido>addDays(t,-90);}).forEach(function(p){at[p.clienteId]=1;});var na=Object.keys(at).length;
+  if(rec12)add('Carteira ativa',na>=10?0.15:na>=5?0.08:na>=3?0:-0.1,plural(na,'cliente mandou','clientes mandaram')+' trabalho nos últimos 90 dias.');
+  var E=R12.filter(function(p){return p.entregue&&p.prazo;}),pz=E.length?E.filter(function(p){return p.entregue<=p.prazo;}).length/E.length:null,E2=R12.filter(function(p){return p.entregue;}),ap=E2.length?E2.filter(function(p){return !(p.ajustes>0);}).length/E2.length:null;
+  if(pz!=null)add('Prazo',pz>=0.95?0.05:pz>=0.8?0:-0.1,Math.round(pz*100)+'% das entregas no prazo.');
+  if(ap!=null)add('Qualidade',ap>=0.9?0.05:ap>=0.75?0:-0.1,Math.round(ap*100)+'% aprovados de primeira, sem ajuste.');
+  var dv=0;try{aReceber().forEach(function(p){var d=p.entregue||p.recebido;if(d&&daysBetween(d,t)>30)dv+=+p.valor||0;});}catch(e){}
+  if(rec12)add('Inadimplência',dv/rec12>0.1?-0.15:dv/rec12>0.03?-0.05:0.03,dv?brl(dv)+' parado há mais de 30 dias ('+Math.round(dv/rec12*100)+'% do faturamento).':'Ninguém devendo há mais de 30 dias.');
+  if(rec12)add('Tempo de casa',idade<180?-0.2:idade<365?-0.1:idade>=730?0.1:0,idade<365?'Menos de 1 ano de histórico: o valor ainda é uma projeção.':'Mais de '+plural(Math.floor(idade/365),'ano','anos')+' de histórico.');
+  m=Math.max(0.3,Math.min(2,m));var val=Math.round(anual*m/100)*100;
+  return {val:val,anual:Math.round(anual),m:m,F:F,rec12:rec12,idade:idade,projetado:idade<365};}
+function valHist(v){try{var h=(S.prefs&&S.prefs.val)||{},k=monthOf(today());if(S.sessao&&!EM_DEMO&&h[k]!==v.val){h=JSON.parse(JSON.stringify(h));h[k]=v.val;var ks=Object.keys(h).sort();while(ks.length>24)delete h[ks.shift()];S.prefs=S.prefs||{};S.prefs.val=h;clearTimeout(ui.valT);ui.valT=setTimeout(function(){save();},3000);}
+  var ant=h[prevMonth(k)];return ant!=null?ant:null;}catch(e){return null;}}
+function valChip(){var v=null;try{v=valuation();}catch(e){return '';}var ant=valHist(v),d=ant!=null&&ant>0?Math.round((v.val-ant)/ant*100):null;
+  return '<button class="val-chip" data-a="valuation" title="Valuation: quanto sua empresa de CAD vale hoje"><small>Valuation</small><b>'+brlCurto(v.val)+'</b>'+(d!=null&&d!==0?'<i class="'+(d>0?'up':'dn')+'">'+(d>0?'▲':'▼')+Math.abs(d)+'%</i>':'')+'</button>';}
+function fValuation(){var v=valuation(),ant=null;try{ant=((S.prefs&&S.prefs.val)||{})[prevMonth(monthOf(today()))];}catch(e){}
+  var dica={Crescimento:'Chame clientes sumidos e peça indicações: crescer é o que mais valoriza.',Concentração:'Busque clientes novos para não depender de um só (a Mika ajuda com mensagens).','Carteira ativa':'Mantenha contato com quem parou de mandar (plano de reconquista da Mika).',Prazo:'Prazo cumprido aumenta o valor: priorize os atrasados.',Qualidade:'Menos ajustes = clientes fiéis. Confira os motivos em Análises.',Inadimplência:'Cobre o que está parado há mais de 30 dias (a Bia gera a cobrança com Pix).','Tempo de casa':'Continue registrando seus pedidos: com histórico, o valor fica mais sólido.'};
+  var neg=v.F.filter(function(f){return f.d<0;}).sort(function(a,b){return a.d-b.d;});
+  return head('Valuation da sua empresa')+
+    '<div class="val-big"><small>Sua empresa de CAD vale hoje</small><b>'+brl(v.val)+'</b>'+(ant!=null?'<span class="muted small">Mês passado: '+brl(ant)+'</span>':'')+'</div>'+
+    (v.val?'<div class="val-conta"><span>Receita anual'+(v.projetado?' (projetada)':'')+'<b>'+brl(v.anual)+'</b></span><span>×</span><span>Múltiplo<b>'+v.m.toFixed(2).replace('.',',')+'x</b></span><span>=</span><span>Valuation<b>'+brlCurto(v.val)+'</b></span></div>':
+      '<p class="small muted">Toda conta começa valendo zero. Conforme você registra pedidos e fatura, o valor da sua empresa vai subindo.</p>')+
+    (v.F.length?'<div class="val-f">'+v.F.map(function(f){return '<div class="val-li"><span><b>'+f.n+'</b><small>'+esc(f.txt)+'</small></span><i class="'+(f.d>0?'up':f.d<0?'dn':'')+'">'+(f.d>0?'+':'')+f.d.toFixed(2).replace('.',',')+'x</i></div>';}).join('')+'</div>':'')+
+    (neg.length?'<h3 style="margin:14px 0 6px">Como aumentar</h3><ul class="small" style="margin:0;padding-left:18px">'+neg.slice(0,3).map(function(f){return '<li>'+esc(dica[f.n]||'')+'</li>';}).join('')+'</ul>':'')+
+    '<p class="small muted" style="margin-top:14px">Como é calculado: pequenas empresas de serviço costumam ser avaliadas pela receita anual vezes um múltiplo (aqui entre 0,3x e 2x). O múltiplo começa em 1x e sobe ou desce com crescimento, concentração de clientes, carteira ativa, prazo, qualidade, inadimplência e tempo de histórico. É uma estimativa para acompanhar a evolução do seu negócio, não uma avaliação oficial. Em breve: ranking dos cadistas da rede pelo valuation, sem mostrar nomes.</p>';}
 function saudeAtual(){var b=saudeEm(today());if(!b)return null;var an=analisar(),pen=0,mot=[];
   an.sig.forEach(function(x){if(x.cat==='positivo'||x.cat==='financeiro')return;var p=x.n>=3?6:x.n>=2?3:0;if(p){pen+=p;mot.push(x.tit);}});
   pen=Math.min(pen,20);var nota=Math.max(0,Math.round(b.nota-pen)),nv=nivelSaude(nota);
@@ -5033,6 +5080,7 @@ impGrava:function(){impGrava();},
   passeioTg:function(d,el){S.prefs=S.prefs||{};S.prefs.passeio=el.checked?null:'off';save();if(!el.checked)passeioTira();toast(el.checked?'A equipe vai aparecer de vez em quando.':'A equipe não vai mais passear pelas telas.');},
   novaConta:function(){ui.novaConta=true;ui.tour=null;ui.equipe=null;closeSheet();render();window.scrollTo(0,0);},
   tourIr:function(d){if(d.v==='fim'){fimTour();return;}var i=(ui.tour||0)+(d.v==='voltar'?-1:1);if(i<0)i=0;if(i>=TOUR.length){fimTour();return;}vaiTour(i);},
+  valuation:function(){openSheet(fValuation);},
   planoMika:function(d){A.iaCmd({g:'mkt',v:'plano',x:d.id});},
   iaCmd:function(d){var g=d.g||ui.secAg;if(!g||ui.iaEsperando)return;
     if(d.sala){var v=salaAtual();if(v){v.feito=v.feito||{};v.feito[d.v]=1;salaGrava(v);}}
