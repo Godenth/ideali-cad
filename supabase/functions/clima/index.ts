@@ -1,6 +1,6 @@
 // Ideali CAD · Clima do dia (fonte: MET Norway, licença CC BY 4.0 — uso comercial permitido com crédito).
 // Roda no servidor para identificar o app perante a MET Norway e guardar em cache.
-const UA = "IdealiCAD/1.0 (+https://godenth.github.io/ideali-cad/)";
+const UA = "IdealiCAD/1.0 (+https://idealisystem.com/)";
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
