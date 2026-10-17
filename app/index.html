@@ -400,6 +400,18 @@ html[data-tema="horizonte"] .btn.pri{background:linear-gradient(120deg,#F6D49A,#
 html[data-tema="horizonte"] .card,html[data-tema="horizonte"] .zap,html[data-tema="horizonte"] .sheet{backdrop-filter:blur(3px);box-shadow:0 0 0 1px rgba(232,182,106,.06),0 18px 40px -24px rgba(0,0,0,.9)}
 html[data-tema="horizonte"] .top,html[data-tema="horizonte"] .side,html[data-tema="horizonte"] .bnav{background:rgba(5,7,12,.92)}
 html[data-tema="horizonte"] #chuva{display:block;opacity:1}
+/* Sakura: estilo anime, céu pastel com pétalas de cerejeira caindo (claro de dia, céu noturno no escuro) */
+:root[data-tema="sakura"]{--accent:#F0508C;--accent-ink:#FFFFFF;--accent-soft:#FFE4EF;--bg:#FFF6FA;--surface:rgba(255,255,255,.9);--line:#F6D9E6;--soft:#FDEEF5;--ink:#2A1F33;--muted:#7B6A86;
+  --p1:#FF6F91;--p2:#FFB86B;--p3:#6FD6C2;--p4:#7FA8FF;--p5:#B48CFF;--p6:#FF8FC7;--f-display:"Plus Jakarta Sans",system-ui,sans-serif}
+@media (prefers-color-scheme: dark){:root[data-tema="sakura"]:not([data-theme="light"]){--accent:#FF7EB3;--accent-ink:#1C0F22;--accent-soft:#3A1A33;--bg:#140C22;--surface:rgba(30,18,46,.9);--line:#3A2650;--soft:#2A1A3C;--ink:#F6E9F3;--muted:#B8A2C6}}
+:root[data-tema="sakura"][data-theme="dark"]{--accent:#FF7EB3;--accent-ink:#1C0F22;--accent-soft:#3A1A33;--bg:#140C22;--surface:rgba(30,18,46,.9);--line:#3A2650;--soft:#2A1A3C;--ink:#F6E9F3;--muted:#B8A2C6}
+html[data-tema="sakura"] body{background:linear-gradient(180deg,#FFE9F2 0%,#F3EEFF 55%,#E9F4FF 100%) fixed}
+@media (prefers-color-scheme: dark){html[data-tema="sakura"]:not([data-theme="light"]) body{background:linear-gradient(180deg,#1E1035 0%,#140C22 60%,#0E0A1C 100%) fixed}}
+html[data-tema="sakura"][data-theme="dark"] body{background:linear-gradient(180deg,#1E1035 0%,#140C22 60%,#0E0A1C 100%) fixed}
+html[data-tema="sakura"] .btn.pri{background:linear-gradient(120deg,#FF7EB3,#F0508C 55%,#B26CFF);border-color:transparent;color:#fff;box-shadow:0 6px 20px -8px rgba(240,80,140,.7)}
+html[data-tema="sakura"] .card,html[data-tema="sakura"] .zap{border-radius:20px;backdrop-filter:blur(4px)}
+html[data-tema="sakura"] h1,html[data-tema="sakura"] h2{letter-spacing:-.01em}
+html[data-tema="sakura"] #chuva{display:block;opacity:1}
 #chuva{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.22;display:none}
 html[data-tema="codigo"] #chuva{display:block}
 @media (prefers-reduced-motion:reduce){#chuva{opacity:.1}}
@@ -1506,7 +1518,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 03h05';
+var VERSAO='17/10 · 03h15';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2055,10 +2067,10 @@ function secPrevisao(){var tot=alive(S.pedidos).length,par=ui.prevPar||(ui.prevP
 /* ---------- Dashboard ---------- */
 /* ---------- Temas (cor do sistema por personalidade) + modo claro/escuro ----------
    Guardado em perfis.preferencias (tema, modo) e copiado no navegador para abrir já com o tema certo. */
-var TEMAS=[['ideali','Ideali','#5B45E0','#F6F5F8','#E2DFEA','Criativo'],['oceano','Oceano','#1F6FD1','#F4F7FB','#DCE5F0','Calmo'],['esmeralda','Esmeralda','#138A63','#F4F8F6','#DCE8E2','Equilibrado'],['brasa','Brasa','#D9531E','#FBF6F3','#F0E1D9','Energético'],['rose','Rosé','#C2367A','#FBF5F8','#F0DEE7','Acolhedor'],['dourado','Dourado','#9A7419','#F8F6F1','#E9E3D3','Elegante'],['grafite','Grafite','#2B2F36','#F5F5F6','#E2E3E6','Focado'],['neon','Neon','linear-gradient(135deg,#4FC8FF,#3D4BF2 45%,#B44DFF 75%,#E45CFF)','#0A0A24','#29285E','Vibrante'],['codigo','Código','#00FF66','#000400','#0F3D1F','Hacker'],['horizonte','Horizonte','#E8B66A','#04060B','#1E2434','Espacial']];
+var TEMAS=[['ideali','Ideali','#5B45E0','#F6F5F8','#E2DFEA','Criativo'],['oceano','Oceano','#1F6FD1','#F4F7FB','#DCE5F0','Calmo'],['esmeralda','Esmeralda','#138A63','#F4F8F6','#DCE8E2','Equilibrado'],['brasa','Brasa','#D9531E','#FBF6F3','#F0E1D9','Energético'],['rose','Rosé','#C2367A','#FBF5F8','#F0DEE7','Acolhedor'],['dourado','Dourado','#9A7419','#F8F6F1','#E9E3D3','Elegante'],['grafite','Grafite','#2B2F36','#F5F5F6','#E2E3E6','Focado'],['neon','Neon','linear-gradient(135deg,#4FC8FF,#3D4BF2 45%,#B44DFF 75%,#E45CFF)','#0A0A24','#29285E','Vibrante'],['codigo','Código','#00FF66','#000400','#0F3D1F','Hacker'],['horizonte','Horizonte','#E8B66A','#04060B','#1E2434','Espacial'],['sakura','Sakura','#F0508C','#FFF6FA','#F6D9E6','Anime']];
 /* Chuva de caracteres do tema Código (canvas leve, ~18 quadros por segundo, para quando a aba some) */
 var CHUVA={on:false};
-function chuvaLiga(){if(!document.body){document.addEventListener('DOMContentLoaded',chuvaLiga);return;}var r=document.documentElement;if(r.getAttribute('data-tema')==='horizonte'){espacoLiga();return;}if(r.getAttribute('data-tema')!=='codigo'){CHUVA.on=false;return;}
+function chuvaLiga(){if(!document.body){document.addEventListener('DOMContentLoaded',chuvaLiga);return;}var r=document.documentElement;if(r.getAttribute('data-tema')==='horizonte'){espacoLiga();return;}if(r.getAttribute('data-tema')==='sakura'){sakuraLiga();return;}if(r.getAttribute('data-tema')!=='codigo'){CHUVA.on=false;return;}
   var c=document.getElementById('chuva');if(!c){c=document.createElement('canvas');c.id='chuva';c.setAttribute('aria-hidden','true');document.body.insertBefore(c,document.body.firstChild);}
   if(CHUVA.on&&CHUVA.modo==='codigo')return;CHUVA.on=true;CHUVA.modo='codigo';var x=c.getContext('2d'),fs=16,cols=0,gotas=[],ch='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン0123456789ABCDEF$#@%&*+=<>'.split(''),ult=0,red=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   var tam=function(){c.width=innerWidth;c.height=innerHeight;cols=Math.ceil(c.width/fs);gotas=[];for(var i=0;i<cols;i++)gotas.push(Math.random()*-c.height/fs);x.fillStyle='#000400';x.fillRect(0,0,c.width,c.height);};tam();window.addEventListener('resize',tam);
@@ -2086,6 +2098,19 @@ function espacoLiga(){var c=document.getElementById('chuva');if(!c){c=document.c
     var neb=x.createRadialGradient(c.width*.15,c.height*.85,0,c.width*.15,c.height*.85,c.width*.5);neb.addColorStop(0,'rgba(80,100,160,.10)');neb.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=neb;x.fillRect(0,0,c.width,c.height);
     for(var i=0;i<E.length;i++){var s=E[i];s.f+=s.v;var a=.35+.65*Math.abs(Math.sin(s.f));x.fillStyle=s.q?'rgba(255,220,170,'+a+')':'rgba(220,228,255,'+a+')';x.beginPath();x.arc(s.x,s.y,s.r,0,6.29);x.fill();if(!red){s.x-=.03;if(s.x<0)s.x=c.width;}}
     buraco();};
+  requestAnimationFrame(passo);}
+/* Fundo do tema Sakura: pétalas de cerejeira caindo e girando, com alguns brilhos */
+function sakuraLiga(){var c=document.getElementById('chuva');if(!c){c=document.createElement('canvas');c.id='chuva';c.setAttribute('aria-hidden','true');document.body.insertBefore(c,document.body.firstChild);}
+  if(CHUVA.on&&CHUVA.modo==='sakura')return;CHUVA.on=true;CHUVA.modo='sakura';var x=c.getContext('2d'),P=[],B=[],ult=0,red=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nova=function(topo){return {x:Math.random()*c.width,y:topo?-20-Math.random()*c.height*.3:Math.random()*c.height,s:Math.random()*7+6,vy:Math.random()*.8+.5,vx:Math.random()*.6-.1,a:Math.random()*6.28,va:(Math.random()-.5)*.06,o:Math.random()*.35+.55,w:Math.random()*6.28,cor:Math.random()<.5?'255,183,206':Math.random()<.5?'255,150,190':'255,214,228'};};
+  var tam=function(){c.width=innerWidth;c.height=innerHeight;var n=Math.min(80,Math.round(c.width*c.height/17000));P=[];for(var i=0;i<n;i++)P.push(nova(false));B=[];for(var j=0;j<18;j++)B.push({x:Math.random()*c.width,y:Math.random()*c.height,f:Math.random()*6.28});};tam();window.addEventListener('resize',tam);
+  var petala=function(p){x.save();x.translate(p.x,p.y);x.rotate(p.a);x.scale(1,Math.abs(Math.cos(p.w))*.6+.4);x.fillStyle='rgba('+p.cor+','+p.o+')';x.beginPath();
+    x.moveTo(0,-p.s);x.bezierCurveTo(p.s*.9,-p.s*.6,p.s*.7,p.s*.7,0,p.s);x.bezierCurveTo(-p.s*.7,p.s*.7,-p.s*.9,-p.s*.6,0,-p.s);x.fill();
+    x.fillStyle='rgba(255,255,255,'+(p.o*.5)+')';x.beginPath();x.moveTo(0,-p.s*.75);x.lineTo(p.s*.12,-p.s*.95);x.lineTo(-p.s*.12,-p.s*.95);x.fill();x.restore();};
+  var passo=function(ts){if(!CHUVA.on||CHUVA.modo!=='sakura'||document.documentElement.getAttribute('data-tema')!=='sakura'){if(CHUVA.modo==='sakura'){CHUVA.on=false;x.clearRect(0,0,c.width,c.height);}return;}
+    requestAnimationFrame(passo);if(document.hidden||ts-ult<(red?500:40))return;ult=ts;x.clearRect(0,0,c.width,c.height);
+    for(var j=0;j<B.length;j++){var b=B[j];b.f+=.03;var a=Math.max(0,Math.sin(b.f))*.6;if(a>.05){x.fillStyle='rgba(255,255,255,'+a+')';x.beginPath();x.moveTo(b.x,b.y-4);x.lineTo(b.x+1,b.y-1);x.lineTo(b.x+4,b.y);x.lineTo(b.x+1,b.y+1);x.lineTo(b.x,b.y+4);x.lineTo(b.x-1,b.y+1);x.lineTo(b.x-4,b.y);x.lineTo(b.x-1,b.y-1);x.fill();}else if(Math.random()<.01){b.x=Math.random()*c.width;b.y=Math.random()*c.height;}}
+    for(var i=0;i<P.length;i++){var p=P[i];if(!red){p.y+=p.vy;p.x+=p.vx+Math.sin(p.w)*.4;p.a+=p.va;p.w+=.03;}petala(p);if(p.y>c.height+20||p.x>c.width+20)P[i]=nova(true);}};
   requestAnimationFrame(passo);}
 function temaAtual(){return (S.prefs&&S.prefs.tema)||'ideali';}
 function modoAtual(){return (S.prefs&&S.prefs.modo)||'auto';}
