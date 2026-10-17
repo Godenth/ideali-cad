@@ -1560,7 +1560,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 17h55';
+var VERSAO='17/10 · 18h25';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -5129,13 +5129,24 @@ function slotsPedido(p,w){var arqs=alive(S.arquivos).filter(function(a){return a
       L.map(function(a){var lk=a.origem==='link';return '<div class="slot-f">'+(lk?'<a class="nm" style="flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" href="'+esc(a.url)+'" target="_blank" rel="noopener">🔗 '+esc(a.nome)+'</a>':'<button class="nm" data-a="'+(sl[0]==='html'?'verHtml':'ver3d')+'" data-id="'+a.id+'" title="Abrir em tela grande">'+esc(a.nome)+'</button><button class="icon-btn" data-a="baixarArq" data-id="'+a.id+'" aria-label="Baixar" title="Baixar">⤓</button>')+
         '<button class="icon-btn" data-a="delArq" data-id="'+a.id+'" aria-label="Excluir" title="Excluir" '+(w?'':'disabled')+'>🗑</button></div>';}).join('')+
       ((sl[0]==='html'||sl[0]==='fres')&&p.clienteId&&L.length?(function(){var c=cliente(p.clienteId);waPreaquece(c,p.id);
-        return '<button class="btn wa-bt2" data-a="waDireto" data-id="'+p.id+'" data-tipo="'+sl[0]+'">📲 Enviar '+(sl[0]==='html'?'para aprovação':'o STL')+' · '+esc(c?nomeCurtoCli(c):'cliente')+'</button><button class="linkbtn small" data-a="waArq" data-id="'+p.id+'" data-tipo="'+sl[0]+'">editar a mensagem antes</button>';})():'')+(canFile()?'<label class="btn sm up">+ Enviar<input type="file" multiple accept="'+sl[3]+'" class="slot-up" data-slot="'+sl[0]+'" data-id="'+p.id+'" '+(w?'':'disabled')+'></label>':'')+'</div>';}).join('')+'</div>';}
+        var com=podeCompartilharArq()&&L.some(function(a){return a.origem!=='link';});
+        return '<button class="btn wa-bt2" data-a="waDireto" data-id="'+p.id+'" data-tipo="'+sl[0]+'">📲 Enviar '+(com?(sl[0]==='html'?'o HTML':'o STL')+' no WhatsApp':(sl[0]==='html'?'para aprovação':'o STL'))+' · '+esc(c?nomeCurtoCli(c):'cliente')+'</button><button class="linkbtn small" data-a="waArq" data-id="'+p.id+'" data-tipo="'+sl[0]+'">editar a mensagem antes</button>';})():'')+(canFile()?'<label class="btn sm up">+ Enviar<input type="file" multiple accept="'+sl[3]+'" class="slot-up" data-slot="'+sl[0]+'" data-id="'+p.id+'" '+(w?'':'disabled')+'></label>':'')+'</div>';}).join('')+'</div>';}
 /* Mandar o HTML (aprovação) ou o STL de fresagem (finalizado) para o cliente pelo WhatsApp:
    abre a conversa no número dele com a frase pronta e o link de acompanhamento já no caso */
 function nomeSaud(c){if(!c)return '';return (c.titulo==='Dr.'||c.titulo==='Dra.')?nomeCurtoCli(c):/^(lab|laborat)/i.test(String(c.nome||''))?String(c.nome).trim():nomeContato(c);}
 /* Envio direto: o link do cliente fica pronto antes do clique, para o WhatsApp abrir na hora (sem bloqueio de janela) */
-function waPreaquece(c,pid){if(!c||!sb)return;ui.links=ui.links||{};ui.linkBusy=ui.linkBusy||{};if((ui.links[c.id]&&ui.links[c.id].token)||ui.linkBusy[c.id])return;ui.linkBusy[c.id]=1;
+function waPreaquece(c,pid){if(!c||!sb)return;ui.links=ui.links||{};ui.linkBusy=ui.linkBusy||{};
+  ['html','fres'].forEach(function(tp){waArqsPrepara(pid,tp);});
+  if((ui.links[c.id]&&ui.links[c.id].token)||ui.linkBusy[c.id])return;ui.linkBusy[c.id]=1;
   setTimeout(function(){waLinkCaso(c,pid).then(function(){ui.linkBusy[c.id]=0;},function(){ui.linkBusy[c.id]=0;});},0);}
+/* Baixa antes os arquivos (HTML/STL) do pedido para o botão mandar o ARQUIVO no WhatsApp na hora do toque */
+function podeCompartilharArq(){try{return !!(navigator.canShare&&window.File&&navigator.canShare({files:[new File(['x'],'t.txt',{type:'text/plain'})]}));}catch(e){return false;}}
+function waArqsPrepara(pid,tipo){if(!podeCompartilharArq())return;ui.waArqs=ui.waArqs||{};var k=pid+'|'+tipo;if(ui.waArqs[k])return;
+  var L=alive(S.arquivos).filter(function(x){return x.pedidoId===pid&&x.origem!=='link'&&catArq(x)===tipo;});if(!L.length)return;ui.waArqs[k]={st:'baixando'};
+  Promise.all(L.map(function(a){return waArqFileDe(a);})).then(function(fs){var tudo=[].concat.apply([],fs);ui.waArqs[k]={st:'ok',files:tudo};},function(){ui.waArqs[k]={st:'erro'};});}
+function waArqFileDe(a){return vzBlob(a.id).then(function(bl){return bl.slice(0,2).text().then(function(h){if(h!=='PK'||!window.JSZip)return [new File([bl],a.nome)];
+  return JSZip.loadAsync(bl).then(function(z){var ns=Object.keys(z.files).filter(function(n){return !z.files[n].dir;});if(!ns.length||ns.length>10)return [new File([bl],a.nome,{type:'application/zip'})];
+    return Promise.all(ns.map(function(n){return z.files[n].async('blob').then(function(b){return new File([b],n.split('/').pop(),{type:/\.html?$/i.test(n)?'text/html':'application/octet-stream'});});}));});});});}
 function waMoverPara(p,tipo){return tipo==='html'?(p.status==='entrada'||p.status==='pendente'?'aprovacao':''):(p.status!=='finalizado'&&p.status!=='arquivado'?'finalizado':'');}
 function waArqTexto(p,tipo,link){var c=cliente(p.clienteId),n=nomeSaud(c),tp=tipoPed(p),eu=(S.perfil.nome||'').trim()||'seu cadista',caso=(p.paciente?p.paciente+' ':'')+'#'+p.num+(tp?' ('+tp.nome+')':'');
   var oi=saudTxt()+(n?', '+n:'')+'!';
@@ -5338,7 +5349,12 @@ waArq:async function(d,el){var p=byId(S.pedidos,d.id),c=p&&cliente(p.clienteId);
     catch(x){toast('Não consegui preparar o link: '+((x&&x.message)||x)+'.');}
     if(el)el.disabled=false;},
   waDireto:function(d,el){var p=byId(S.pedidos,d.id),c=p&&cliente(p.clienteId);if(!p||!c){toast('Este pedido não tem cliente.');return;}
-    var k=ui.links&&ui.links[c.id];if(!(k&&k.token)){A.waArq(d,el);return;}
+    var k=ui.links&&ui.links[c.id],ar=ui.waArqs&&ui.waArqs[p.id+'|'+d.tipo],mv0=waMoverPara(p,d.tipo);
+    if(ar&&ar.st==='ok'&&ar.files.length&&navigator.canShare&&navigator.canShare({files:ar.files})){
+      var tx=waArqTexto(p,d.tipo,k&&k.token?urlLink(k.token)+'&p='+p.id:'').replace(/\n[^\n]*:\s*$/m,'');
+      navigator.share({files:ar.files,text:tx}).then(function(){if(mv0)setStatus(p.id,mv0);toast('Arquivo enviado'+(mv0?'. Pedido movido para '+stLabel(mv0)+'.':'.'));},function(){});return;}
+    if(ar&&ar.st==='baixando'){toast('Preparando o arquivo para anexar… toque de novo em alguns segundos.');return;}
+    if(!(k&&k.token)){A.waArq(d,el);return;}
     var link=urlLink(k.token)+'&p='+p.id,txt=waArqTexto(p,d.tipo,link),mv=waMoverPara(p,d.tipo);
     window.open(waLink(txt,c.telefone),'_blank','noopener');
     if(mv)setStatus(p.id,mv);toast((soDig(c.telefone)?'Abrindo o WhatsApp de '+(nomeSaud(c)||c.nome):'Escolha a conversa no WhatsApp')+(mv?'. Pedido movido para '+stLabel(mv)+'.':'.'));},
