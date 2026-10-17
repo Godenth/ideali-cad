@@ -23,8 +23,8 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json(405, { erro: "Método não permitido" });
 
-  const acc = Deno.env.get("R2_ACCOUNT_ID"), kid = Deno.env.get("R2_ACCESS_KEY_ID");
-  const sec = Deno.env.get("R2_SECRET_ACCESS_KEY"), bucket = Deno.env.get("R2_BUCKET");
+  const acc = Deno.env.get("R2_ACCOUNT_ID")?.trim(), kid = Deno.env.get("R2_ACCESS_KEY_ID")?.trim();
+  const sec = Deno.env.get("R2_SECRET_ACCESS_KEY")?.trim(), bucket = Deno.env.get("R2_BUCKET")?.trim();
   if (!acc || !kid || !sec || !bucket) return json(503, { erro: "O armazenamento de arquivos ainda não foi configurado." });
 
   const url = Deno.env.get("SUPABASE_URL")!;
@@ -71,6 +71,12 @@ Deno.serve(async (req: Request) => {
     const e = await espaco();
     if (e.usado + tamanho > e.limite) return json(413, { erro: "Sem espaço livre para este arquivo." });
     const key = `${user.id}/${body.pedido_id}/${crypto.randomUUID()}.zip`;
+    // Diagnóstico: confere se as chaves do R2 e o nome do bucket batem (só registra no log do servidor).
+    try {
+      const t = await r2.fetch(`${base}?list-type=2&max-keys=1`, { method: "GET" });
+      if (!t.ok) console.error("r2 recusou:", t.status, (await t.text()).slice(0, 300), "bucket:", bucket, "conta:", acc.slice(0, 6));
+      else console.log("r2 ok: chaves e bucket conferem");
+    } catch (er) { console.error("r2 sem conexao:", String(er)); }
     return json(200, { key, url: await assinar("PUT", key, 3600) });
   }
 
