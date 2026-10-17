@@ -639,6 +639,8 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .val-li span{display:grid}.val-li small{color:var(--muted);font-size:.78rem}.val-li i{font-style:normal;font-weight:800;font-size:.85rem;white-space:nowrap}
 @media (max-width:820px){.val-chip{padding:4px 9px}.val-chip small{display:none}.val-chip b{font-size:.8rem}}
 .zb .ia-hr{display:block;text-align:right;font-size:.68rem!important;font-weight:500!important;color:var(--muted)!important;margin-top:3px;opacity:.85}.zb.ia-eu .ia-hr{color:inherit!important;opacity:.75}
+.suporte{display:grid;gap:2px;font-size:.82rem;color:var(--muted);padding:10px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)}.suporte b{color:var(--ink);font-size:.86rem}.suporte a{color:var(--accent);font-weight:600}
+.dd-sup{display:block;padding:9px 12px;color:var(--ink);text-decoration:none;border-radius:8px}.dd-sup:hover{background:var(--accent-soft)}
 .ia-cmds{display:flex;gap:6px;padding:8px 12px 0;overflow-x:auto;scrollbar-width:none;background:var(--surface);border-top:1px solid var(--line);position:relative;z-index:3}.ia-cmds::-webkit-scrollbar{display:none}
 .ia-cmds+.ia-in{border-top:0}
 .ia-cmd{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap}
@@ -1560,7 +1562,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 18h40';
+var VERSAO='17/10 · 21h00';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1572,11 +1574,12 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
   if(S.carregando){app.innerHTML=rCarregando();return;}
   if(ui.modoLab&&S.admin){app.innerHTML=rLabModo();return;}
   if(ui.equipe!=null&&EQ_INTRO[ui.equipe]){app.innerHTML=rEquipeIntro();return;}
+  if(precisaWhats()){app.innerHTML=rPedeWhats();return;}
   if(ui.tour==null&&precisaBoas()){app.innerHTML=rBoasVindas();return;}
   if(ui.tour==null&&!EM_DEMO&&S.sessao&&ui.dadosOk&&!S.carregando&&!(S.prefs&&S.prefs.equipe==='ok')&&!ui.eqVisto&&!ui.sheet){ui.eqVisto=true;ui.equipe=0;app.innerHTML=rEquipeIntro();return;}
   var a=S.assinatura,w=canWrite(),chip;
   if(!w) chip='<span class="tag u">Conta bloqueada</span>';
-  else chip='<span class="tag ok">Grátis no lançamento</span>';
+  else chip='';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
     ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,lab:rLab,analises:rAnalisesTab,metas:rMetasTab,secretarios:rSecretarios,visu:rVisu,config:rConfig,admin:rAdmin};
   var body=ui.tour!=null&&ui.tab!=='config'?comDemo(R[ui.tab]||rDashboard):(R[ui.tab]||rDashboard)();
@@ -1620,12 +1623,21 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
     (w?'':'<div class="banner bad"><span><b>Conta bloqueada.</b> Seus dados estão guardados. Você pode ver e exportar, mas não pode criar nem alterar.</span><button class="btn sm" data-a="tab" data-v="config">Ver assinatura</button></div>')+
     (emCfg()?'<div class="cfg">'+cfgTabs(lix)+body+'</div>':body)+'</main></div>'+bnav+'</div>'+(ui.tour!=null?tourCard():'');
 }
+/* Suporte e dúvidas (aparece no cadastro, no menu da conta e em Perfil e conta) */
+var SUPORTE={email:'contato.idealisystem@gmail.com',wa:'5511960680814',waTxt:'(11) 96068-0814'};
+function suporteHtml(c){var w='https://wa.me/'+SUPORTE.wa+'?text='+encodeURIComponent('Olá! Preciso de ajuda com o Ideali CAD.');
+  return '<div class="suporte'+(c?' '+c:'')+'"><b>Suporte e dúvidas</b><span>Fale com a gente: <a href="'+w+'" target="_blank" rel="noopener">WhatsApp '+SUPORTE.waTxt+'</a> · <a href="mailto:'+SUPORTE.email+'">'+SUPORTE.email+'</a></span></div>';}
+function precisaWhats(){return !!(S.sessao&&ui.dadosOk&&!EM_DEMO&&!S.carregando&&S.perfil&&soDig(S.perfil.telefone||'').length<10);}
+function rPedeWhats(){return '<div class="login"><div class="lg-main"><form class="box card" data-form="whatsObrig" style="padding:24px;display:grid;gap:12px">'+logo(40)+
+  '<h2 style="margin:0">Falta só o seu WhatsApp</h2><p class="muted" style="margin:0">Ele é obrigatório para usar o Ideali CAD. Usamos para avisos importantes da sua conta e suporte. Não aparece para outros cadistas.</p>'+
+  '<label class="fld"><span>WhatsApp (com DDD)</span><input name="tel" type="tel" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" pattern="[0-9()+ \\-]{10,20}"></label>'+
+  '<button class="btn pri block" type="submit">Salvar e continuar</button>'+suporteHtml()+'</form></div></div>';}
 function contaMenu(nome,lix){
   var it=[['config','Perfil e conta'],['tabela','Tabela de preços'],['arquivos','Arquivos STL'],['lixeira','Lixeira']];if(S.admin)it.push(['admin','Administração']);
   return '<div class="dd conta dk"><button class="av'+(emCfg()?' on':'')+'" data-a="ddOpen" data-k="conta" title="Minha conta" aria-label="Minha conta" aria-expanded="'+(ui.ddOpen==='conta')+'">'+esc((nome[0]||'?').toUpperCase())+'</button>'+
     (ui.ddOpen==='conta'?'<div class="dd-menu" role="menu"><div class="conta-h"><b>'+esc(S.perfil.nome||'Minha conta')+'</b><span>'+esc(S.sessao.email||'')+'</span></div>'+
       it.map(function(x){return '<button role="menuitem" class="'+(ui.tab===x[0]?'on':'')+'" data-a="contaIr" data-v="'+x[0]+'"><span class="ci">'+ICON[x[0]]+x[1]+'</span>'+(x[0]==='lixeira'&&lix?'<span class="muted mono small">'+lix+'</span>':'')+'</button>';}).join('')+
-      '<hr><button role="menuitem" data-a="sair"><span class="ci">'+ICON.sair+'Sair</span></button></div>':'')+'</div>';
+      '<hr><a role="menuitem" class="dd-sup" href="https://wa.me/'+SUPORTE.wa+'?text='+encodeURIComponent('Olá! Preciso de ajuda com o Ideali CAD.')+'" target="_blank" rel="noopener"><span class="ci">💬 Suporte e dúvidas</span></a><button role="menuitem" data-a="sair"><span class="ci">'+ICON.sair+'Sair</span></button></div>':'')+'</div>';
 }
 function cfgTabs(lix){
   var t=[['config','Perfil e conta','Perfil'],['tabela','Tabela de preços','Preços'],['arquivos','Arquivos STL','STL'],['lixeira','Lixeira','Lixeira']];if(S.admin)t.push(['admin','Administração','Admin']);
@@ -1666,16 +1678,17 @@ function rLogin(){
   var criar=ui.loginCriar;
   return '<div class="login"><div class="lg-main"><form class="box card" data-form="login" style="padding:24px">'+
     '<div class="row">'+logo(36)+'<h1>Ideali CAD</h1></div>'+
-    '<p class="muted">'+(criar?'Crie sua conta. Grátis no lançamento, com tudo liberado e sem cartão.':'Entre para ver seus pedidos.')+'</p>'+
+    '<p class="muted">'+(criar?'Crie sua conta. Sem cartão de crédito.':'Entre para ver seus pedidos.')+'</p>'+
     (ui.loginMsg?'<div class="banner">'+ui.loginMsg+'</div>':'')+
     (criar?'<div class="lg-2"><label class="fld"><span>Nome</span><input id="lg-nome" name="nome" required maxlength="40" autocomplete="given-name"></label><label class="fld"><span>Sobrenome</span><input id="lg-sobrenome" name="sobrenome" required maxlength="40" autocomplete="family-name"></label></div>':'')+
     '<label class="fld"><span>E-mail</span><input id="lg-email" name="email" type="email" required autocomplete="email" value="'+esc(ui.loginEmail||'')+'"></label>'+
+    (criar?'<label class="fld"><span>WhatsApp (com DDD)</span><input id="lg-tel" name="tel" type="tel" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" pattern="[0-9()+ \\-]{10,20}"><small>Obrigatório. Para avisos da sua conta e suporte.</small></label>':'')+
     '<label class="fld"><span>Senha</span><input id="lg-senha" name="senha" type="password" required minlength="'+(criar?8:6)+'" autocomplete="'+(criar?'new-password':'current-password')+'"><small>'+(criar?'Mínimo de 8 caracteres.':'')+'</small></label>'+
     (criar?'<label class="check small"><input type="checkbox" required id="lg-termos"> Li e aceito os <a href="../termos.html" target="_blank" rel="noopener">termos de uso</a> e a <a href="../privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</label>':'')+
     '<button class="btn pri block" type="submit" '+(ui.loginBusy?'disabled':'')+'>'+(ui.loginBusy?'Aguarde…':criar?'Criar conta grátis':'Entrar')+'</button>'+
     '<div class="between small"><button type="button" class="btn sm" data-a="loginModo">'+(criar?'Já tenho conta':'Criar conta')+'</button>'+
     (criar?'':'<button type="button" class="btn sm" data-a="esqueci">Esqueci a senha</button>')+'</div>'+
-    '<p class="proto"><a href="../" style="color:inherit">Conhecer o Ideali CAD</a></p>'+
+    suporteHtml('lg')+'<p class="proto"><a href="../" style="color:inherit">Conhecer o Ideali CAD</a></p>'+
     '</form></div>'+painelMapa()+'</div>';
 }
 function rCarregando(){return '<div class="login"><div class="box" style="text-align:center;display:grid;gap:14px;justify-items:center">'+logo(44)+'<p class="muted">Carregando seus dados…</p></div></div>';}
@@ -4593,7 +4606,7 @@ function rLixeira(){
 function rConfig(){
   var p=S.perfil,a=S.assinatura,dis=canWrite()?'':'disabled';
   return '<div class="cfg-grid">'+
-    '<form class="card stack cfg-perfil" data-form="perfil"><h2>Seu perfil</h2><div class="g2">'+
+    '<form class="card stack cfg-perfil" data-form="perfil">'+suporteHtml()+'<h2>Seu perfil</h2><div class="g2">'+
       '<label class="fld"><span>Nome</span><input id="cf-nome" class="nome-p" name="nome" value="'+esc(p.nome)+'" '+dis+'></label>'+
       campoTel('cf',p.telefone,dis)+'</div>'+
       '<h2 style="margin-top:6px">Chave Pix</h2><p class="small muted">Usada para gerar o QR Code de cobrança. O dinheiro cai direto na sua conta.</p><div class="g2">'+
@@ -4610,7 +4623,7 @@ function rConfig(){
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Plano</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
-      '<div class="between"><span>Plano</span>'+(!canWrite()?'<span class="tag u">Bloqueada</span>':'<span class="tag ok">Grátis no lançamento</span>')+'</div>'+
+      '<div class="between"><span>Plano</span>'+(!canWrite()?'<span class="tag u">Bloqueada</span>':'<span class="tag ok">Ativa</span>')+'</div>'+
       '<p class="small muted">No lançamento o Ideali CAD é gratuito, com todos os recursos liberados. Se um dia houver planos pagos, você recebe um aviso antes e nada do que cadastrou é apagado.</p></section>'+
     '<section class="card stack"><h2>Seus dados</h2><p class="small muted">Você pode levar seus dados ou apagar tudo quando quiser.</p>'+
       '<div class="row wrap"><button class="btn" data-a="exportar">Exportar meus dados</button><button class="btn danger" data-a="excluirConta">Excluir minha conta</button></div>'+'<p class="small muted"><a href="../termos.html" target="_blank" rel="noopener">Termos de uso</a> · <a href="../privacidade.html" target="_blank" rel="noopener">Política de privacidade</a></p></section>'+
@@ -5658,6 +5671,7 @@ tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l
   bg:function(d,el,e){if(e.target===el)closeSheet();}
 };
 var F={
+  whatsObrig:function(fd){var v=String(fd.get('tel')||'').trim();if(soDig(v).length<10||soDig(v).length>13){toast('Digite o WhatsApp com DDD.');return;}S.perfil.telefone=v;save();render();toast('WhatsApp salvo. Obrigado!');},
   iaPerg:function(fd,f){var q=String(fd.get('q')||'').trim(),g=f.dataset.g;if(!q||ui.iaEsperando)return;var it=null;try{it=iaIntent(g,q);}catch(e){}
     var memo=null;try{memo=memDetecta(g,q);}catch(e){}if(memo){var mm=memDe();memo.cid=Object.keys(mm.c).filter(function(k){return (mm.c[k]||[]).indexOf(memo)>=0;})[0]||'';iaPergunta(g,q,null,memo);return;}
     if(it){if(it.c==='reuniao'){ui.secAg='reu';render();return;}iaEu(g,q);iaCmd(g,it.c,it.x);return;}iaPergunta(g,q);},
@@ -5666,7 +5680,8 @@ var F={
     var fim=function(msg){ui.loginBusy=false;if(msg)ui.loginMsg=msg;render();};
     if(ui.loginCriar){
       var pn=nomeProprio(String(fd.get('nome')||'').trim()),sn=nomeProprio(String(fd.get('sobrenome')||'').trim());
-      sb.auth.signUp({email:email,password:senha,options:{data:{nome:(pn+' '+sn).trim()},emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){
+      var tel=String(fd.get('tel')||'').trim();if(soDig(tel).length<10){ui.loginBusy=false;ui.loginMsg='Digite o seu WhatsApp com DDD.';render();return;}
+      sb.auth.signUp({email:email,password:senha,options:{data:{nome:(pn+' '+sn).trim(),telefone:tel},emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){
         if(r.error)return fim(msgAuth(r.error));
         try{window.idealiEvento&&window.idealiEvento('CompleteRegistration');}catch(x){}
         if(!r.data.session){ui.loginCriar=false;ui.checaEmail={email:email,nome:pn};return fim();}
