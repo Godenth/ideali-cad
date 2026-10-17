@@ -1483,7 +1483,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 02h10';
+var VERSAO='17/10 · 02h25';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2397,14 +2397,23 @@ function iaContexto(id){var t=today(),L=[],P=alive(S.pedidos),ab=P.filter(aberto
   return L.join('\n').slice(0,3900);}
 var IA_ERRO={limite_conta:'Hoje já conversamos bastante! 😅 Amanhã eu volto a responder perguntas livres. Meus recados acima continuam valendo.',limite_sistema:'Estou com muita gente me chamando hoje. Tenta de novo amanhã! Meus recados acima continuam valendo.',
   config:'A conversa livre ainda está sendo ligada. Por enquanto, veja meus recados acima. 😉',rede:'Fiquei sem sinal agora. Tenta de novo daqui a pouco.'};
+/* A conversa com os agentes fica guardada neste aparelho (últimas 60 mensagens de cada um) */
+function iaChave(){return 'idealicad_iaconv_'+((S.sessao&&S.sessao.id)||'x');}
+function iaSalva(){clearTimeout(ui.iaSalvaT);ui.iaSalvaT=setTimeout(function(){if(!ui.iaConv||EM_DEMO)return;var o={},d=today();
+  Object.keys(ui.iaConv).forEach(function(k){o[k]=ui.iaConv[k].filter(function(m){if(!m.d)m.d=d;return !m.erro;}).slice(-60);});
+  try{localStorage.setItem(iaChave(),JSON.stringify(o));}catch(e){}},400);}
+function iaGaranta(){if(S.sessao&&ui.iaConvKey!==iaChave()){ui.iaConvKey=iaChave();ui.iaConv={};iaCarrega();}}
+function iaCarrega(){try{var o=JSON.parse(localStorage.getItem(iaChave())||'null');if(o&&typeof o==='object'){ui.iaConv=o;}}catch(e){}}
 function iaBolhas(id){var L=(ui.iaConv&&ui.iaConv[id])||[],g=SECS.filter(function(x){return x.id===id;})[0];
-  return L.map(function(m){return m.r==='u'?'<div class="zb ia-eu"><p>'+esc(m.t)+'</p></div>':iaBolhaA(m,g);}).join('')+
+  var hoje=today(),ult=null;
+  return L.map(function(m){var sep='';if(m.d&&m.d!==ult){ult=m.d;sep='<span class="zdia">'+(m.d===hoje?'Conversa de hoje':'Conversa de '+dmy(m.d).slice(0,5))+'</span>';}
+    return sep+(m.r==='u'?'<div class="zb ia-eu"><p>'+esc(m.t)+'</p></div>':iaBolhaA(m,g));}).join('')+
     (ui.iaEsperando===id?'<div class="zb ia-ag ia-dig"><small>'+esc(g.nome)+'</small><p><i></i><i></i><i></i></p></div>':'');}
 function iaForm(g){var ph={ger:'Pergunte ao Sr. Otávio sobre as metas…',ven:'Pergunte à Ana sobre pedidos e prazos…',fin:'Pergunte à Bia sobre cobranças…',mkt:'Peça uma mensagem para a Mika…',dad:'Pergunte ao Klose sobre os números…'}[g.id]||'Escreva sua pergunta…';
   return '<form class="ia-in" data-form="iaPerg" data-g="'+g.id+'"><input name="q" id="ia-q" maxlength="500" autocomplete="off" placeholder="'+esc(ph)+'"'+(ui.iaEsperando?' disabled':'')+'><button class="btn pri" type="submit" aria-label="Enviar"'+(ui.iaEsperando?' disabled':'')+'>➤</button></form>';}
 function iaRolar(){setTimeout(function(){var b=document.getElementById('zap-b');if(b)b.scrollTop=b.scrollHeight;var q=document.getElementById('ia-q');if(q&&!ui.iaEsperando&&window.innerWidth>820)q.focus();},0);}
 async function iaPergunta(id,q,label){var C=iaConvDe(id);C.push({r:'u',t:label||q,q:q});ui.iaEsperando=id;render();iaRolar();
-  var hist=C.slice(-7,-1).filter(function(m){return !m.erro&&(m.q||m.t);}).map(function(m){return {r:m.r,t:m.q||m.t};});
+  var hist=C.slice(-9,-1).filter(function(m){return !m.erro&&(m.q||m.t);}).map(function(m){return {r:m.r,t:((m.q||m.t)+(m.lst?' '+m.lst.map(function(x){return x.t+(x.s?': '+x.s:'');}).join('; '):'')+(m.msgs?' '+m.msgs.map(function(x){return x.tit+': '+x.txt;}).join(' | '):'')+(m.msg?' '+m.msg:'')).slice(0,600)};});
   var r=await iaChama({agente:id,pergunta:q,contexto:iaContexto(id),historico:hist});
   C.push(r.t?{r:'a',t:r.t,chips:iaSugs(id)}:{r:'a',t:IA_ERRO[r.err]||IA_ERRO.rede,erro:1,chips:iaSugs(id)});ui.iaEsperando=null;if(ui.tab==='secretarios')render();iaRolar();}
 /* ===== Agentes que fazem coisas: atalhos, perguntas guiadas ("de quem?"), relatórios, sugestões e sala de reunião =====
@@ -2434,7 +2443,7 @@ function iaBolhaA(m,g){
     (m.depois?'<p>'+esc(m.depois)+'</p>':'')+
     (m.bts&&m.bts.length?'<span class="ac">'+m.bts.map(btnIa).join('')+'</span>':'')+
     (m.chips&&m.chips.length?'<div class="ia-chips">'+m.chips.map(btnIa).join('')+'</div>':'')+'</div>';}
-function iaConvDe(id){ui.iaConv=ui.iaConv||{};return ui.iaConv[id]=ui.iaConv[id]||[];}
+function iaConvDe(id){iaGaranta();ui.iaConv=ui.iaConv||{};var L=ui.iaConv[id]=ui.iaConv[id]||[];if(!L._p){L._p=1;var ps=L.push;L.push=function(){for(var i=0;i<arguments.length;i++)if(arguments[i]&&!arguments[i].d)arguments[i].d=today();var r=ps.apply(L,arguments);iaSalva();return r;};}return L;}
 function iaDiz(id,m){m.r='a';if(!m.ia)m.loc=1;iaConvDe(id).push(m);}
 function iaEu(id,t){iaConvDe(id).push({r:'u',t:t});}
 function iaMostra(){if(ui.tab==='secretarios')render();iaRolar();}
@@ -2694,7 +2703,7 @@ function rSala(){var v=salaAtual(),anim=ui.salaAnim;ui.salaAnim=0;var G=function
   return '<div class="zap-c sala"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+salaRostos()+'<span class="tx"><b>Sala de reunião</b><span>Ana, Bia, Mika, Klose e o Sr. Otávio decidem juntos o que fazer hoje</span></span></div>'+
     '<div class="zap-b" id="zap-b"><span class="zdia">Hoje</span>'+corpo+'</div></div>';}
 
-function rSecretarios(){var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth>820){var pr=C.filter(function(x){return x.urg;})[0]||C.filter(function(x){return x.nl;})[0]||C[0];sel=pr.g.id;}var c=C.filter(function(x){return x.g.id===sel;})[0];
+function rSecretarios(){iaGaranta();var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth>820){var pr=C.filter(function(x){return x.urg;})[0]||C.filter(function(x){return x.nl;})[0]||C[0];sel=pr.g.id;}var c=C.filter(function(x){return x.g.id===sel;})[0];
   if(sel==='reu')return '<div class="zap aberto"><div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+linhaSala(true)+C.map(function(x){return linhaChat(x,false);}).join('')+'</div>'+rSala()+'</div>';
   if(c)setTimeout(function(){secMarca(c.ms.map(function(m){return m.k;}));ui.secCharVisto=c.g.id;},0);
   var lista='<div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+linhaSala(false)+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+'</div>';
