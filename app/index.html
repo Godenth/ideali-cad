@@ -1267,7 +1267,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,mem:(S.prefs||{}).mem||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -1319,7 +1319,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null,mem:pref.mem||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -1483,7 +1483,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 02h25';
+var VERSAO='17/10 · 02h40';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2383,7 +2383,7 @@ function bolha(m){var ok=secOkHoje(m.k);
       (m.href?'<a class="btn sm" target="_blank" rel="noopener" href="'+m.href+'">WhatsApp do cliente</a>':'')+'</span>':'')+
     '<span class="hr">'+(m.k.slice(-3)==='_oi'?'':ok?'✓ visto':'<button class="okb" data-a="secOk" data-k="'+m.k+'">Ok, visto ✓</button>')+'</span></div>';}
 /* IA dos agentes: conversa livre. As contas continuam no app; a IA (servidor "agente") só conversa sobre estes dados. */
-function iaContexto(id){var t=today(),L=[],P=alive(S.pedidos),ab=P.filter(aberto),F={ger:msgsGer,ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},ms=[];
+function iaContexto(id,q){var t=today(),L=[],P=alive(S.pedidos),ab=P.filter(aberto),F={ger:msgsGer,ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},ms=[];
   try{ms=F[id]();}catch(e){}
   L.push('Hoje: '+DIAS[new Date(t+'T12:00:00').getDay()]+', '+dmy(t)+'. Cadista: '+((S.perfil.nome||'').trim()||'sem nome')+'.');
   var mes=monthOf(t),fat=P.filter(function(p){return p.recebido&&monthOf(p.recebido)===mes;}).reduce(function(s,p){return s+(+p.valor||0);},0),meta=null;try{meta=metaDe(mes);}catch(e){}
@@ -2394,6 +2394,7 @@ function iaContexto(id){var t=today(),L=[],P=alive(S.pedidos),ab=P.filter(aberto
   if(id==='ven'||id==='ger'||id==='dad')L.push('Pedidos em produção:\n'+ab.slice(0,15).map(function(p){return '- #'+p.num+' '+pedTxt(p)+(p.prazo?' prazo '+dmy(p.prazo).slice(0,5):'')+' ('+stLabel(p.status)+')';}).join('\n'));
   if(id==='mkt'){var ult={};P.forEach(function(p){if(p.recebido&&(!ult[p.clienteId]||p.recebido>ult[p.clienteId]))ult[p.clienteId]=p.recebido;});
     L.push('Clientes (último pedido):\n'+alive(S.clientes).slice(0,25).map(function(c){var u=ult[c.id];return '- '+c.nome+': '+(u?'há '+daysBetween(u,t)+' dias':'nunca pediu');}).join('\n'));}
+  try{var mg=memTxtGeral(),qc=q?cliPorTexto(q):null,qcid=qc?qc.id:ui.iaUltCli,mc=qcid?memTxtCli(qcid):'';if(mc)L.unshift((qc?'':'Cliente da conversa: '+nomeCurtoCli(cliente(qcid))+'\n')+mc);if(mg)L.unshift(mg);}catch(e){}
   return L.join('\n').slice(0,3900);}
 var IA_ERRO={limite_conta:'Hoje já conversamos bastante! 😅 Amanhã eu volto a responder perguntas livres. Meus recados acima continuam valendo.',limite_sistema:'Estou com muita gente me chamando hoje. Tenta de novo amanhã! Meus recados acima continuam valendo.',
   config:'A conversa livre ainda está sendo ligada. Por enquanto, veja meus recados acima. 😉',rede:'Fiquei sem sinal agora. Tenta de novo daqui a pouco.'};
@@ -2404,6 +2405,20 @@ function iaSalva(){clearTimeout(ui.iaSalvaT);ui.iaSalvaT=setTimeout(function(){i
   try{localStorage.setItem(iaChave(),JSON.stringify(o));}catch(e){}},400);}
 function iaGaranta(){if(S.sessao&&ui.iaConvKey!==iaChave()){ui.iaConvKey=iaChave();ui.iaConv={};iaCarrega();}}
 function iaCarrega(){try{var o=JSON.parse(localStorage.getItem(iaChave())||'null');if(o&&typeof o==='object'){ui.iaConv=o;}}catch(e){}}
+/* ===== Memória da equipe: o que o cadista conta (sobre clientes e o que funcionou) fica guardado na conta
+   e entra em toda análise, plano, mensagem e reunião dos agentes. Sem custo extra: só vai junto com os dados. */
+function memDe(){S.prefs=S.prefs||{};var m=S.prefs.mem;if(!m||typeof m!=='object')m=S.prefs.mem={c:{},g:[]};m.c=m.c||{};m.g=m.g||[];return m;}
+function memAdd(cid,txt,de,tipo){var m=memDe(),n={id:uid().slice(0,8),d:today(),t:String(txt).slice(0,300),de:de,k:tipo||'nota'};
+  if(cid&&cliente(cid)){(m.c[cid]=m.c[cid]||[]).push(n);m.c[cid]=m.c[cid].slice(-15);}else{m.g.push(n);m.g=m.g.slice(-30);}save();return n;}
+function memTxtCli(cid){var L=memDe().c[cid]||[];return L.length?'MEMÓRIA DA EQUIPE sobre este cliente (o que o cadista contou):\n'+L.map(function(n){return '- '+dmy(n.d).slice(0,5)+(n.k==='funcionou'?' (funcionou)':'')+': '+n.t;}).join('\n'):'';}
+function memTxtGeral(){var m=memDe(),L=m.g.slice(-10),W=[];Object.keys(m.c).forEach(function(k){var c=cliente(k);(m.c[k]||[]).forEach(function(n){if(n.k==='funcionou'&&c)W.push(nomeCurtoCli(c)+': '+n.t);});});
+  return (L.length?'MEMÓRIA DA EQUIPE (anotações do cadista):\n'+L.map(function(n){return '- '+n.t;}).join('\n'):'')+(W.length?(L.length?'\n':'')+'O QUE JÁ FUNCIONOU com clientes:\n'+W.slice(-8).map(function(x){return '- '+x;}).join('\n'):'');}
+var MEM_FUNC=/funcionou|deu certo|consegui|conquistei|reconquistei|voltou a mandar|voltou a enviar|fechou comigo|mandou (um )?pedido/i;
+var MEM_RE=/\b(anot[ae]|anotar|lembr[ae]|lembrar|guard[ae]|registr[ae])\b|\b(ele|ela|cliente|dr|dra|lab\w*|doutor\w*)\b.{0,60}\b(disse|falou|respondeu|reclamou|comentou|elogiou|achou|pediu|prefere|gosta|quer|contou|explicou)\b/i;
+function memDetecta(g,q){if(!(MEM_RE.test(q)||MEM_FUNC.test(q)))return null;var c=cliPorTexto(q)||(ui.iaUltCli?cliente(ui.iaUltCli):null);
+  return memAdd(c?c.id:null,q,g,MEM_FUNC.test(q)?'funcionou':'nota');}
+function memLista(){var m=memDe(),L=[];Object.keys(m.c).forEach(function(k){var c=cliente(k);(m.c[k]||[]).forEach(function(n){L.push({c:c,cid:k,n:n});});});m.g.forEach(function(n){L.push({c:null,cid:'',n:n});});
+  return L.sort(function(a,b){return a.n.d<b.n.d?1:-1;});}
 function iaBolhas(id){var L=(ui.iaConv&&ui.iaConv[id])||[],g=SECS.filter(function(x){return x.id===id;})[0];
   var hoje=today(),ult=null;
   return L.map(function(m){var sep='';if(m.d&&m.d!==ult){ult=m.d;sep='<span class="zdia">'+(m.d===hoje?'Conversa de hoje':'Conversa de '+dmy(m.d).slice(0,5))+'</span>';}
@@ -2412,18 +2427,18 @@ function iaBolhas(id){var L=(ui.iaConv&&ui.iaConv[id])||[],g=SECS.filter(functio
 function iaForm(g){var ph={ger:'Pergunte ao Sr. Otávio sobre as metas…',ven:'Pergunte à Ana sobre pedidos e prazos…',fin:'Pergunte à Bia sobre cobranças…',mkt:'Peça uma mensagem para a Mika…',dad:'Pergunte ao Klose sobre os números…'}[g.id]||'Escreva sua pergunta…';
   return '<form class="ia-in" data-form="iaPerg" data-g="'+g.id+'"><input name="q" id="ia-q" maxlength="500" autocomplete="off" placeholder="'+esc(ph)+'"'+(ui.iaEsperando?' disabled':'')+'><button class="btn pri" type="submit" aria-label="Enviar"'+(ui.iaEsperando?' disabled':'')+'>➤</button></form>';}
 function iaRolar(){setTimeout(function(){var b=document.getElementById('zap-b');if(b)b.scrollTop=b.scrollHeight;var q=document.getElementById('ia-q');if(q&&!ui.iaEsperando&&window.innerWidth>820)q.focus();},0);}
-async function iaPergunta(id,q,label){var C=iaConvDe(id);C.push({r:'u',t:label||q,q:q});ui.iaEsperando=id;render();iaRolar();
+async function iaPergunta(id,q,label,memo){var C=iaConvDe(id);C.push({r:'u',t:label||q,q:q});if(memo){var mc=memo.cid?cliente(memo.cid):null;C.push({r:'a',loc:1,t:'📝 Guardei na memória da equipe'+(mc?' (sobre '+nomeCurtoCli(mc)+')':'')+'. Todos os agentes vão levar isso em conta nas próximas análises, planos e mensagens.',chips:[{a:'iaCmd',g:id,v:'memoria',l:'🧠 Ver memória',chip:1}]});}ui.iaEsperando=id;render();iaRolar();
   var hist=C.slice(-9,-1).filter(function(m){return !m.erro&&(m.q||m.t);}).map(function(m){return {r:m.r,t:((m.q||m.t)+(m.lst?' '+m.lst.map(function(x){return x.t+(x.s?': '+x.s:'');}).join('; '):'')+(m.msgs?' '+m.msgs.map(function(x){return x.tit+': '+x.txt;}).join(' | '):'')+(m.msg?' '+m.msg:'')).slice(0,600)};});
-  var r=await iaChama({agente:id,pergunta:q,contexto:iaContexto(id),historico:hist});
+  var r=await iaChama({agente:id,pergunta:q,contexto:iaContexto(id,q),historico:hist});
   C.push(r.t?{r:'a',t:r.t,chips:iaSugs(id)}:{r:'a',t:IA_ERRO[r.err]||IA_ERRO.rede,erro:1,chips:iaSugs(id)});ui.iaEsperando=null;if(ui.tab==='secretarios')render();iaRolar();}
 /* ===== Agentes que fazem coisas: atalhos, perguntas guiadas ("de quem?"), relatórios, sugestões e sala de reunião =====
    As contas e as ações são do app (grátis e sem erro). A IA só escreve: conversa, reunião, mensagem e análise. */
 var CMDS={
-  ger:[['reuniao','👥 Sala de reunião'],['resumo','📋 Resumo do dia'],['meta','🎯 Meta do mês'],['sugira','💡 O que faço hoje?']],
+  ger:[['reuniao','👥 Sala de reunião'],['resumo','📋 Resumo do dia'],['meta','🎯 Meta do mês'],['sugira','💡 O que faço hoje?'],['memoria','🧠 Memória da equipe']],
   ven:[['relVendas','📄 Relatório de vendas'],['atrasados','⏰ Atrasados'],['semana','📅 Prazos da semana'],['relProd','🧾 Relatório p/ cliente']],
   fin:[['cobrar','💸 Gerar cobrança'],['devendo','📋 Quem está devendo'],['relFin','📄 Relatório financeiro'],['pagou','✅ Registrar pagamento']],
-  mkt:[['plano','🎯 Reconquistar cliente'],['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post']],
-  dad:[['relAn','📄 Relatório de análise'],['top','🏆 Melhores clientes'],['comport','🔎 Analisar um cliente'],['sugira','💡 O que melhorar?']]};
+  mkt:[['plano','🎯 Reconquistar cliente'],['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post'],['memoria','🧠 Memória']],
+  dad:[['relAn','📄 Relatório de análise'],['top','🏆 Melhores clientes'],['comport','🔎 Analisar um cliente'],['sugira','💡 O que melhorar?'],['memoria','🧠 Memória']]};
 var IA_INT={
   fin:[[/registr\w*\s+(o\s+|um\s+)?pag|recebi|pagou/i,'pagou'],[/cobr|gera\w*\s+(o\s+|um\s+)?pag|pix/i,'cobrar'],[/relat/i,'relFin'],[/devend|quem\s+(me\s+)?deve/i,'devendo']],
   ven:[[/relat\w*\s+(de\s+)?(produ|p\/|para|pro)/i,'relProd'],[/relat/i,'relVendas'],[/atras/i,'atrasados'],[/prazos?\s+da\s+semana|vence\w*\s+(essa|esta)\s+semana/i,'semana']],
@@ -2499,7 +2514,7 @@ function cliStatsLst(s){var L=[];
   if(s.dev)L.push({t:'Deve '+brl(s.dev),s:'Trabalhos entregues e ainda não pagos'});
   return L;}
 function cliStatsTxt(s){var c=s.c;return ['Cliente: '+nomeCurtoCli(c)+' ('+(c.tipo==='laboratorio'?'laboratório':'dentista')+')','Cadista: '+((S.perfil.nome||'').trim()||'sem nome'),'PADRÃO: '+cliPadraoTxt(s)+(s.pico?' Maior volume num mês: '+s.pico+' pedidos.':'')]
-  .concat(cliStatsLst(s).slice(1).map(function(x){return x.t+(x.s?' — '+x.s:'');})).concat(s.ultimos.length?['Últimos trabalhos: '+s.ultimos.join('; ')]:[]).join('\n');}
+  .concat(cliStatsLst(s).slice(1).map(function(x){return x.t+(x.s?' — '+x.s:'');})).concat(s.ultimos.length?['Últimos trabalhos: '+s.ultimos.join('; ')]:[]).concat([memTxtCli(c.id),(function(){var w=memTxtGeral();return w.indexOf('O QUE JÁ FUNCIONOU')>=0?w.slice(w.indexOf('O QUE JÁ FUNCIONOU')):'';})()].filter(Boolean)).join('\n');}
 function iaQuem(g,c,pergunta,L,vazio){if(!L.length){iaDiz(g,{t:vazio});return;}
   iaDiz(g,{t:pergunta,chips:L.slice(0,14).map(function(o){return {a:'iaCmd',g:g,v:c,x:o.c.id,l:nomeCurtoCli(o.c)+(o.s?' · '+o.s:''),chip:1};})});}
 function iaListaPed(L){return L.map(function(p){return {t:'#'+p.num+' · '+pedTxt(p),s:(p.prazo?'Prazo '+dmy(p.prazo).slice(0,5):'Sem prazo')+' · '+stLabel(p.status),bt:{a:'verPedido',id:p.id,l:'Abrir'}};});}
@@ -2551,6 +2566,9 @@ async function geraRelGeral(tipo){var R=relDados(tipo);await carregaJsPDF();var 
 /* cada atalho: o agente faz e responde no chat */
 function iaPerguntaCmd(g,q,label){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();iaPergunta(g,q,label);}
 var IA_CMD={
+  '*.memoria':function(g){var L=memLista();
+    iaDiz(g,L.length?{t:'🧠 Memória da equipe ('+L.length+'). É o que você contou para a gente: todos os agentes usam isso nas análises, planos, mensagens e na reunião.',lst:L.slice(0,20).map(function(o){return {t:(o.c?nomeCurtoCli(o.c):'Geral')+(o.n.k==='funcionou'?' · ✅ funcionou':'')+' · '+dmy(o.n.d).slice(0,5),s:o.n.t,bt:{a:'memDel',id:o.n.id,v:o.cid,l:'Apagar'}};})}:
+      {t:'🧠 A memória da equipe ainda está vazia. Conte pra gente o que os clientes falam e o que funcionou, por exemplo: "o Dr. Paulo disse que prefere contato mais justo" ou "consegui reconquistar o Lab X oferecendo prioridade". Eu guardo e todo mundo passa a usar.'});},
   'ger.resumo':function(g){iaPerguntaCmd(g,'Me dá um resumo do dia: o que está bom, o que preocupa e o que eu faço primeiro.','Resumo do dia');},
   'ger.meta':function(g){var s=gerSit();iaDiz(g,{t:s.tipo==='semmeta'?'Ainda não tem meta! Cadastre a meta de faturamento do mês e eu cobro a equipe todo dia.':s.resumo+' Meta diária: '+brl(Math.round(s.metaDia))+'.',bts:[{a:'tab',v:'metas',l:s.tipo==='semmeta'?'Criar meta':'Abrir metas',pri:1}]});},
   'ger.sugira':function(g){iaPerguntaCmd(g,'Olhando os dados de hoje, me dê 3 decisões práticas para hoje, em tópicos curtos.','O que faço hoje?');},
@@ -2565,7 +2583,7 @@ var IA_CMD={
   'ven.relProd':function(g,x){if(x){var c=cliente(x);iaDiz(g,{t:'Abri o relatório de produção de '+nomeCurtoCli(c)+'. É só gerar o PDF e mandar. 🧾'});openSheet(fRelProd,x);return;}
     var m={};alive(S.pedidos).forEach(function(p){if(p.status!=='arquivado'&&aberto(p))m[p.clienteId]=(m[p.clienteId]||0)+1;});
     iaQuem(g,'relProd','Relatório de produção para qual cliente?',Object.keys(m).filter(function(k){return cliente(k);}).sort(function(a,b){return m[b]-m[a];}).map(function(k){return {c:cliente(k),s:plural(m[k],'pedido','pedidos')};}),'Nenhum cliente com trabalho em produção agora.');},
-  'fin.cobrar':function(g,x){if(x){var c=cliente(x),ps=aReceber(x);ui.cobSel={};
+  'fin.cobrar':function(g,x){if(x){ui.iaUltCli=x;var c=cliente(x),ps=aReceber(x);ui.cobSel={};
       if(!ps.length){iaDiz(g,{t:nomeCurtoCli(c)+' não está devendo nada. 👏'});return;}
       iaDiz(g,{t:'Separei '+plural(ps.length,'pedido','pedidos')+' de '+nomeCurtoCli(c)+': total '+brl(soma(ps))+'. A cobrança está pronta, é só mandar! 💸',bts:[{a:'cobrancaPdf',id:x,l:'Gerar PDF com Pix',pri:1},{a:'cobrancaMsg',id:x,l:'Copiar mensagem'},{a:'cobranca',id:x,l:'Escolher pedidos'}]});return;}
     iaQuem(g,'cobrar','De quem? 🤔',devedores().slice().sort(function(a,b){return b.v-a.v;}).map(function(d){return {c:d.c,s:brl(d.v)};}),'Ninguém está devendo agora. 👏');},
@@ -2574,7 +2592,7 @@ var IA_CMD={
   'fin.pagou':function(g,x){if(x){iaDiz(g,{t:'Abri o registro de pagamento de '+nomeCurtoCli(cliente(x))+'. Confere o valor e salva. ✅'});openSheet(fPagamento,x);return;}
     var dv=devedores().slice().sort(function(a,b){return b.v-a.v;}),ja={},L=dv.map(function(d){ja[d.c.id]=1;return {c:d.c,s:'deve '+brl(d.v)};});
     alive(S.clientes).forEach(function(c){if(!ja[c.id])L.push({c:c});});iaQuem(g,'pagou','Quem pagou?',L,'Você ainda não tem clientes cadastrados.');},
-  'mkt.msgCli':function(g,x){if(x){var s=cliStats(x),c=s.c,obj=s.diasSem!=null&&s.diasSem>45?'reaproximar um cliente que não manda trabalho há '+s.diasSem+' dias: pergunte como ele está e diga que a agenda está aberta':s.n?'agradecer a parceria e lembrar que a agenda está aberta para novos casos':'se apresentar e oferecer os serviços de CAD para um cliente que ainda não mandou trabalho';
+  'mkt.msgCli':function(g,x){if(x){ui.iaUltCli=x;var s=cliStats(x),c=s.c,obj=s.diasSem!=null&&s.diasSem>45?'reaproximar um cliente que não manda trabalho há '+s.diasSem+' dias: pergunte como ele está e diga que a agenda está aberta':s.n?'agradecer a parceria e lembrar que a agenda está aberta para novos casos':'se apresentar e oferecer os serviços de CAD para um cliente que ainda não mandou trabalho';
       iaTarefa(g,'msg_cliente',cliStatsTxt(s),obj).then(function(r){var tx=r.t?r.t.replace(/^["“]|["”]$/g,'').trim():'';if(tx)iaDiz(g,{t:'Escrevi esta para '+nomeCurtoCli(c)+':',msg:tx,wa:soDig(c.telefone)?waLink(tx,c.telefone):null,depois:soDig(c.telefone)?'':'Esse cliente não tem WhatsApp cadastrado: copie e mande por onde preferir.',chips:[{a:'iaCmd',g:g,v:'msgCli',x:x,l:'🔄 Outra versão',chip:1}],ia:1});else iaDiz(g,{t:IA_ERRO[r.err]||IA_ERRO.rede,erro:1});iaMostra();});return;}
     var sm=clisSumidos(),ja={},L=sm.map(function(o){ja[o.c.id]=1;return {c:o.c,s:o.s.padrao==='caindo'?'esfriou':'sumido '+quandoTxt(o.d).replace('há ','')};});
     alive(S.clientes).forEach(function(c){if(!ja[c.id])L.push({c:c});});iaQuem(g,'msgCli','Para quem eu escrevo? ✍️',L,'Cadastre seus clientes que eu escrevo as mensagens.');},
@@ -2625,7 +2643,7 @@ function planoParse(txt){var o={msgs:[]},R={CONTATO:'Mensagem 1 · retomar conta
     if(cur&&x)buf[cur]=(buf[cur]?buf[cur]+'\n':'')+x;});
   ['CONTATO','PESQUISA','CONVITE','AUDIO'].forEach(function(k){var v=(buf[k]||'').replace(/^["“]|["”]$/g,'').trim();if(v)o.msgs.push({tit:R[k],txt:v});});return o;}
 function planoTxtIa(s,P){return cliStatsTxt(s)+'\nMOTIVO MAIS PROVÁVEL: '+P.principal.t+'\nOutros motivos possíveis: '+P.H.slice(1).map(function(h){return h.t;}).join(' ')+'\nTrabalho que ele mais pede: '+P.tp;}
-function mikaPlano(cid,s,deKlose){var c=s.c,P=planoLocal(s),tel=soDig(c.telefone)?c.telefone:null;
+function mikaPlano(cid,s,deKlose){ui.iaUltCli=cid;var c=s.c,P=planoLocal(s),tel=soDig(c.telefone)?c.telefone:null;
   if(deKlose)iaConvDe('mkt').push({r:'u',t:'🔎 Klose: '+P.n+' esfriou. Monta um plano para trazer de volta?'});
   iaDiz('mkt',{t:'🎯 Plano de reconquista · '+P.n,lst:[{t:'Diagnóstico',s:P.diag.join(' ')}].concat(P.H.map(function(h,i){return {t:(i===0?'Motivo mais provável: ':'Outro motivo possível: ')+h.t,s:''};}))});
   iaDiz('mkt',{t:'📅 Cronograma',lst:P.E.map(function(e){return {t:e.q,s:e.a+' '+e.o};})});
@@ -2636,7 +2654,7 @@ function mikaPlano(cid,s,deKlose){var c=s.c,P=planoLocal(s),tel=soDig(c.telefone
     else if(r.t)iaDiz('mkt',{ia:1,t:r.t});else iaDiz('mkt',{t:IA_ERRO[r.err]||IA_ERRO.rede,erro:1});
     iaDiz('mkt',{t:'💬 Se ele responder…',lst:P.R.map(function(x){return {t:x.se,s:x.f};}),depois:'Me conta o que ele respondeu que eu te ajudo a responder. 😉',chips:[{a:'iaCmd',g:'mkt',v:'plano',x:cid,l:'🔄 Refazer mensagens',chip:1},{a:'verCliente',id:cid,l:'Ver cliente',chip:1}]});
     if(ui.tab==='secretarios')render();iaRolar();});}
-function iaCmd(g,c,x){if(c==='reuniao'){ui.secAg='reu';render();return;}var H=IA_CMD[g+'.'+c];if(!H)return;H(g,x||null);iaMostra();}
+function iaCmd(g,c,x){if(c==='reuniao'){ui.secAg='reu';render();return;}var H=IA_CMD[g+'.'+c]||IA_CMD['*.'+c];if(!H)return;H(g,x||null);iaMostra();}
 function iaIntent(g,q){var L=IA_INT[g]||[];for(var i=0;i<L.length;i++)if(L[i][0].test(q)){var c=L[i][1];return {c:c,x:IA_COM_CLI[c]?(function(){var k=cliPorTexto(q);return k?k.id:null;})():null};}return null;}
 /* sugestão do agente (calculada no app): aparece no fim dos recados */
 function iaSugestao(g){var t=today();
@@ -2673,6 +2691,7 @@ function salaOpcoes(){var t=today(),O=[],dv=[],g=null;try{dv=devedores();}catch(
   return O;}
 function salaDados(){var F={ger:msgsGer,ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},L=[iaContexto('ger').split('\n').slice(0,3).join('\n')];
   Object.keys(F).forEach(function(k){var ms=[];try{ms=F[k]();}catch(e){}L.push('Recados de '+k+':\n'+ms.slice(0,5).map(function(m){return '- '+m.tit+(m.sub?': '+m.sub:'');}).join('\n'));});
+  try{var mg=memTxtGeral();if(mg)L.splice(1,0,mg);}catch(e){}
   return L.join('\n').slice(0,3900);}
 function salaParse(txt,O){var ok={},ls=[],dec=[],NM={'sr otavio':'ger','otavio':'ger','ana':'ven','bia':'fin','mika':'mkt','klose':'dad'};O.forEach(function(o){ok[o[0].toLowerCase()]=o;});
   String(txt).split(/\n+/).forEach(function(l){l=l.replace(/\*+/g,'').replace(/^[\s\-•>]+/,'').trim();if(!l)return;
@@ -5090,6 +5109,8 @@ impGrava:function(){impGrava();},
   novaConta:function(){ui.novaConta=true;ui.tour=null;ui.equipe=null;closeSheet();render();window.scrollTo(0,0);},
   tourIr:function(d){if(d.v==='fim'){fimTour();return;}var i=(ui.tour||0)+(d.v==='voltar'?-1:1);if(i<0)i=0;if(i>=TOUR.length){fimTour();return;}vaiTour(i);},
   valuation:function(){openSheet(fValuation);},
+  memDel:function(d){var m=memDe();if(d.v&&m.c[d.v])m.c[d.v]=m.c[d.v].filter(function(n){return n.id!==d.id;});else m.g=m.g.filter(function(n){return n.id!==d.id;});save();
+    Object.keys(ui.iaConv||{}).forEach(function(k){(ui.iaConv[k]||[]).forEach(function(b){if(b.lst)b.lst=b.lst.filter(function(x){return !(x.bt&&x.bt.a==='memDel'&&x.bt.id===d.id);});});});toast('Apagado da memória.');render();},
   planoMika:function(d){A.iaCmd({g:'mkt',v:'plano',x:d.id});},
   iaCmd:function(d){var g=d.g||ui.secAg;if(!g||ui.iaEsperando)return;
     if(d.sala){var v=salaAtual();if(v){v.feito=v.feito||{};v.feito[d.v]=1;salaGrava(v);}}
@@ -5364,6 +5385,7 @@ tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l
 };
 var F={
   iaPerg:function(fd,f){var q=String(fd.get('q')||'').trim(),g=f.dataset.g;if(!q||ui.iaEsperando)return;var it=null;try{it=iaIntent(g,q);}catch(e){}
+    var memo=null;try{memo=memDetecta(g,q);}catch(e){}if(memo){var mm=memDe();memo.cid=Object.keys(mm.c).filter(function(k){return (mm.c[k]||[]).indexOf(memo)>=0;})[0]||'';iaPergunta(g,q,null,memo);return;}
     if(it){if(it.c==='reuniao'){ui.secAg='reu';render();return;}iaEu(g,q);iaCmd(g,it.c,it.x);return;}iaPergunta(g,q);},
   login:function(fd){
     var email=String(fd.get('email')||'').trim(),senha=String(fd.get('senha')||'');ui.loginEmail=email;ui.loginMsg='';ui.loginBusy=true;render();
