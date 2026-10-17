@@ -1,5 +1,5 @@
 // Ideali CAD · Agentes de IA (conversa livre com Ana, Bia, Mika, Klose e Sr. Otávio, sala de reunião,
-// mensagem pronta para cliente e análise de cliente).
+// mensagem pronta para cliente, análise de cliente e plano de reconquista).
 // A IA roda no Cloudflare Workers AI. A chave fica só aqui no servidor (segredo CF_AI_TOKEN).
 // Os números (atrasos, quem deve, metas) continuam sendo calculados pelo app; a IA só conversa.
 // Proteções: login obrigatório, assunto bloqueado fora do sistema, trava contra abuso por conta
@@ -27,7 +27,7 @@ const AGENTES: Record<string, { nome: string; papel: string; jeito: string; fora
     jeito: "esperta, prática e de olho no dinheiro", fora: "Ih, isso foge do meu setor! 😅 Eu cuido do seu financeiro. Quer saber quem está te devendo?" },
   mkt: { nome: "Mika", papel: "marketing: mensagens para clientes no WhatsApp, clientes sumidos, novos e perdidos, divulgação e datas especiais",
     jeito: "criativa, descolada e cheia de ideias", fora: "Haha, aí não é comigo! 😎 Eu cuido do seu marketing. Quer uma mensagem pronta para algum cliente?" },
-  dad: { nome: "Klose", papel: "análise de dados: entregas no prazo, tempo de entrega, ajustes, qualidade e concentração de clientes",
+  dad: { nome: "Klose", papel: "análise de dados: entregas no prazo, tempo de entrega, ajustes, qualidade, concentração de clientes e clientes que esfriaram (quando um cliente esfria, ele avisa a Mika para montar um plano de reconquista)",
     jeito: "calmo, analítico e didático", fora: "Isso está fora da minha análise. 📊 Eu cuido dos números do seu negócio. Quer que eu explique algum deles?" },
 };
 
@@ -53,7 +53,7 @@ const tarefa = (tipo: string, a: { nome: string; papel: string; jeito: string },
   const base = `Você trabalha no Ideali CAD, sistema para cadistas odontológicos (quem desenha próteses no computador para dentistas e laboratórios). Responda em português do Brasil. Use apenas os dados abaixo: não invente números, nomes, preços nem promoções. Pacientes só por iniciais.`;
   if (tipo === "reuniao") return `${base}
 Escreva a reunião diária da equipe de agentes de IA, na sala de reunião. Personagens: ${EQUIPE}.
-Formato OBRIGATÓRIO: de 7 a 10 falas, uma por linha, cada linha começando com o código do personagem e dois-pontos (exemplo: "ger: Bom dia, equipe."). Cada fala com no máximo 2 frases curtas, tom de conversa de escritório, com personalidade. Eles analisam os dados de hoje, comentam o que está bom e o que preocupa, discordam um pouco quando faz sentido e propõem ações concretas (cobranças, mensagens para clientes, relatórios, metas). O Sr. Otávio abre e fecha a reunião decidindo o que fazer hoje.
+Formato OBRIGATÓRIO: de 7 a 10 falas, uma por linha, cada linha começando com o código do personagem e dois-pontos (exemplo: "ger: Bom dia, equipe."). Cada fala com no máximo 2 frases curtas, tom de conversa de escritório, com personalidade. Eles analisam os dados de hoje, comentam o que está bom e o que preocupa, discordam um pouco quando faz sentido e propõem ações concretas (cobranças, mensagens para clientes, relatórios, metas). Se algum cliente esfriou, o Klose avisa e a Mika propõe um plano para trazer de volta. O Sr. Otávio abre e fecha a reunião decidindo o que fazer hoje.
 Última linha OBRIGATÓRIA: "DECISOES: " seguido de 1 a 4 códigos separados por vírgula, escolhidos SOMENTE desta lista: ${extra}
 Dados de hoje:
 ${dados}`;
@@ -63,8 +63,18 @@ Responda SOMENTE com o texto da mensagem, sem aspas e sem explicação.
 Dados do cliente:
 ${dados}`;
   if (tipo === "analise_cliente") return `${base}
-Você é ${a.nome} (${a.jeito}). Analise o comportamento deste cliente para o cadista em 4 a 6 frases curtas: o que está bom, o que preocupa e 1 ou 2 ações práticas. Fale com o cadista ("você").
+Você é ${a.nome} (${a.jeito}), o analista. Analise o comportamento deste cliente para o cadista em 4 a 6 frases curtas: o que está bom, o que preocupa e 1 ou 2 ações práticas. Fale com o cadista ("você"), sem saudação.
+Olhe principalmente o PADRÃO: se o cliente mandava bastante e diminuiu ou parou, diga isso com clareza logo na primeira frase, levante possíveis motivos (insatisfação com algum trabalho, prazo, preço, concorrente, fase da clínica) e diga que vai pedir para a Mika (marketing) montar um plano para reconquistar esse cliente.
 Números do cliente:
+${dados}`;
+  if (tipo === "plano_reconquista") return `${base}
+Você é ${a.nome} (${a.jeito}), do marketing. O analista avisou que este cliente diminuiu ou parou de mandar trabalhos. Monte um plano curto para o cadista reconquistar o cliente, com mensagens prontas para o WhatsApp escritas em primeira pessoa como se fosse o próprio cadista (simpáticas, profissionais, sem assinatura, no máximo 2 emojis cada, sem inventar preço nem promoção).
+Formato OBRIGATÓRIO, exatamente com estes rótulos, um por linha:
+PLANO: 3 passos curtos separados por " | " (quando mandar cada mensagem e o que observar)
+CONTATO: mensagem para retomar contato, perguntando como ele está, sem cobrar nada
+PESQUISA: mensagem pedindo a opinião dele sobre os últimos trabalhos (cite o tipo de trabalho), com 2 ou 3 perguntas curtas sobre qualidade, adaptação e prazo
+CONVITE: mensagem convidando a mandar o próximo caso, reforçando prazo e atendimento
+Dados do cliente:
 ${dados}`;
   return "";
 };
@@ -90,7 +100,7 @@ Deno.serve(async (req: Request) => {
   const pergunta = String(body?.pergunta ?? "").trim().slice(0, 500);
   const contexto = String(body?.contexto ?? "").slice(0, 4000);
   const hist = Array.isArray(body?.historico) ? body.historico.slice(-6) : [];
-  const tipo = ["reuniao", "msg_cliente", "analise_cliente"].includes(String(body?.tarefa)) ? String(body.tarefa) : "chat";
+  const tipo = ["reuniao", "msg_cliente", "analise_cliente", "plano_reconquista"].includes(String(body?.tarefa)) ? String(body.tarefa) : "chat";
   const extra = String(body?.extra ?? "").replace(/[\r\n]+/g, " ").slice(0, 600);
   if (!a || (tipo === "chat" && !pergunta)) return json(400, { erro: "Pergunta inválida" });
 
@@ -101,7 +111,7 @@ Deno.serve(async (req: Request) => {
   if (!lim?.ok) return json(429, { erro: lim?.motivo === "conta" ? "limite_conta" : "limite_sistema" });
 
   const msgs = [{ role: "system", content: tipo === "chat" ? sistema(a, contexto) : tarefa(tipo, a, contexto, extra) }];
-  if (tipo !== "chat") msgs.push({ role: "user", content: tipo === "reuniao" ? "Comecem a reunião de hoje." : tipo === "msg_cliente" ? "Escreva a mensagem." : "Faça a análise." });
+  if (tipo !== "chat") msgs.push({ role: "user", content: tipo === "reuniao" ? "Comecem a reunião de hoje." : tipo === "msg_cliente" ? "Escreva a mensagem." : tipo === "plano_reconquista" ? "Monte o plano." : "Faça a análise." });
   else for (const m of hist) {
     const t = String(m?.t ?? "").slice(0, 600);
     if (t) msgs.push({ role: m?.r === "a" ? "assistant" : "user", content: t });
@@ -111,7 +121,7 @@ Deno.serve(async (req: Request) => {
   const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${acc}/ai/run/${MODELO}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${tok}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ messages: msgs, max_tokens: tipo === "reuniao" ? 750 : 350, temperature: tipo === "chat" ? 0.5 : 0.7 }),
+    body: JSON.stringify({ messages: msgs, max_tokens: tipo === "reuniao" || tipo === "plano_reconquista" ? 750 : 350, temperature: tipo === "chat" ? 0.5 : 0.7 }),
   });
   const j = await r.json().catch(() => null);
   if (!r.ok || !j?.success) {
@@ -121,5 +131,5 @@ Deno.serve(async (req: Request) => {
   const resp = String(j.result?.response ?? "").trim();
   if (!resp) return json(502, { erro: "A IA não respondeu agora." });
   if (tipo === "chat" && /FORA_DO_ASSUNTO/.test(resp)) return json(200, { resposta: a.fora, fora: true });
-  return json(200, { resposta: resp.slice(0, tipo === "reuniao" ? 3000 : 1500) });
+  return json(200, { resposta: resp.slice(0, tipo === "reuniao" || tipo === "plano_reconquista" ? 3000 : 1500) });
 });

@@ -557,6 +557,7 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .ia-cmds+.ia-in{border-top:0}
 .ia-cmd{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap}
 .ia-cmd:hover{border-color:var(--accent);color:var(--accent)}
+.ia-msgt{font-size:.78rem;font-weight:800;margin-top:8px;color:var(--muted)}
 .ia-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .ia-chip{border-radius:999px!important}
 .zb.ia-sug{border-style:dashed;border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
@@ -1473,7 +1474,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 01h30';
+var VERSAO='17/10 · 01h20';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2182,6 +2183,8 @@ function msgsMkt(){var t=today(),R=[],dow=new Date(t+'T12:00:00').getDay(),C=ali
   try{R=msgsCli();}catch(e){R=[];}
   R.forEach(function(m){if(m.k==='cli_oi'){m.k='mkt_oi';m.h=R.length>1?'sumiu':'animada';}else if(!m.h)m.h=m.n==='info'?'ideia':'sumiu';});
   try{R.splice(1,0,mikaDia());}catch(e){}
+  try{clisSumidos().filter(function(o){return o.s.n>=2;}).slice(0,3).forEach(function(o){
+    R.splice(2,0,{k:'mkt_klose_'+o.c.id+'_'+o.s.padrao,h:'ideia',n:'media',tit:'O Klose me avisou: '+nomeCurtoCli(o.c)+(o.s.padrao==='caindo'?' esfriou':' parou de mandar'),sub:cliPadraoTxt(o.s)+' Bora montar um plano para trazer de volta? Eu escrevo as mensagens, incluindo uma pesquisa sobre os últimos trabalhos.',a:'planoMika',id:o.c.id,bt:'Montar plano'});});}catch(e){}
   var mes=monthOf(t),pm=prevMonth(mes),nov=C.filter(function(c){return c.criado&&monthOf(c.criado)===mes;}).length,novA=C.filter(function(c){return c.criado&&monthOf(c.criado)===pm;}).length;
   R.push({k:'mkt_nov_'+nov,h:nov>novA?'novo':nov<novA?'ideia':'animada',n:nov<novA?'media':'info',tit:nov?(nov===1?'1 cliente novo':nov+' clientes novos')+' em '+MESES[+mes.slice(5,7)-1]:'Nenhum cliente novo em '+MESES[+mes.slice(5,7)-1]+' ainda',
     sub:'No mês passado foram '+novA+'.'+(nov>novA?' Está melhor que o mês passado. 👏':nov<novA?' Vale divulgar seu trabalho: poste um antes e depois ou peça indicação a quem já é cliente.':''),a:'tab',v:'clientes',bt:'Ver clientes'});
@@ -2203,6 +2206,8 @@ function msgsDad(){var t=today(),R=[],P=alive(S.pedidos);
   if(qa!=null){var q=Math.round(qa);R.push({k:'dad_aj',h:q<85?'desconfiado':'orgulhoso',n:q<70?'alta':q<85?'media':'info',tit:'Aprovados de primeira: '+q+'%',sub:'Pedidos que não voltaram para ajuste.'+(qb!=null?' Antes eram '+Math.round(qb)+'%.':'')+(q<85?' Muito ajuste costuma indicar cliente insatisfeito ou pedido mal explicado: confira os motivos em Análises.':' Sinal de clientes satisfeitos.')});}
   var sig=[];try{sig=analisar().sig;}catch(e){}
   sig.filter(function(x){return x.cat==='qualidade';}).slice(0,2).forEach(function(x,i){R.push({k:'dad_q'+i,h:'desconfiado',n:x.n>=3?'alta':'media',tit:x.tit,sub:x.txt,a:'tab',v:'analises',bt:'Ver Análises'});});
+  try{clisSumidos().filter(function(o){return o.s.n>=2;}).slice(0,3).forEach(function(o){
+    R.push({k:'dad_esf_'+o.c.id+'_'+o.s.padrao,h:'preocupado',n:'media',tit:nomeCurtoCli(o.c)+(o.s.padrao==='caindo'?' está esfriando':' parou de mandar trabalho'),sub:cliPadraoTxt(o.s)+' Já avisei a Mika para montar um plano de reconquista.',a:'planoMika',id:o.c.id,bt:'Ver plano com a Mika'});});}catch(e){}
   var por={},tot=0;P.filter(function(p){return p.recebido&&p.recebido>=addDays(t,-90);}).forEach(function(p){por[p.clienteId]=(por[p.clienteId]||0)+(+p.valor||0);tot+=+p.valor||0;});
   var top=Object.keys(por).sort(function(a,b){return por[b]-por[a];})[0];
   if(top&&tot&&por[top]/tot>=0.5&&Object.keys(por).length>=2)R.push({k:'dad_conc',h:'preocupado',n:'media',tit:'Metade do faturamento vem de um cliente só',sub:nomeCurtoCli(cliente(top))+' respondeu por '+Math.round(por[top]/tot*100)+'% nos últimos 90 dias. Se ele parar, o mês sente. Vale buscar outros clientes.',a:'verCliente',id:top,bt:'Ver cliente'});
@@ -2342,15 +2347,15 @@ var CMDS={
   ger:[['reuniao','👥 Sala de reunião'],['resumo','📋 Resumo do dia'],['meta','🎯 Meta do mês'],['sugira','💡 O que faço hoje?']],
   ven:[['relVendas','📄 Relatório de vendas'],['atrasados','⏰ Atrasados'],['semana','📅 Prazos da semana'],['relProd','🧾 Relatório p/ cliente']],
   fin:[['cobrar','💸 Gerar cobrança'],['devendo','📋 Quem está devendo'],['relFin','📄 Relatório financeiro'],['pagou','✅ Registrar pagamento']],
-  mkt:[['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post']],
+  mkt:[['plano','🎯 Reconquistar cliente'],['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post']],
   dad:[['relAn','📄 Relatório de análise'],['top','🏆 Melhores clientes'],['comport','🔎 Analisar um cliente'],['sugira','💡 O que melhorar?']]};
 var IA_INT={
   fin:[[/registr\w*\s+(o\s+|um\s+)?pag|recebi|pagou/i,'pagou'],[/cobr|gera\w*\s+(o\s+|um\s+)?pag|pix/i,'cobrar'],[/relat/i,'relFin'],[/devend|quem\s+(me\s+)?deve/i,'devendo']],
   ven:[[/relat\w*\s+(de\s+)?(produ|p\/|para|pro)/i,'relProd'],[/relat/i,'relVendas'],[/atras/i,'atrasados'],[/prazos?\s+da\s+semana|vence\w*\s+(essa|esta)\s+semana/i,'semana']],
-  mkt:[[/sumid|inativ|parou|perdid/i,'sumidos'],[/(mensag|msg)\w*\s+(p\/|para|pro|pra|ao|a)\b|escrev\w*\s+(uma\s+)?(mensag|msg)/i,'msgCli'],[/frase/i,'frase'],[/\bpost|status|instagram/i,'post']],
-  dad:[[/relat/i,'relAn'],[/comport|analis\w*\s+(o\s+|a\s+)?(cliente|dr|dra|lab)/i,'comport'],[/melhor\w*\s+cliente|maior\w*\s+cliente/i,'top']],
+  mkt:[[/plano|reconquist|trazer\s+de\s+volta|recuperar/i,'plano'],[/sumid|inativ|parou|perdid/i,'sumidos'],[/(mensag|msg)\w*\s+(p\/|para|pro|pra|ao|a)\b|escrev\w*\s+(uma\s+)?(mensag|msg)/i,'msgCli'],[/frase/i,'frase'],[/\bpost|status|instagram/i,'post']],
+  dad:[[/mika|recaptur|reconquist|trazer\s+de\s+volta|recuperar/i,'passaMika'],[/relat/i,'relAn'],[/comport|analis\w*\s+(o\s+|a\s+)?(cliente|dr|dra|lab)/i,'comport'],[/melhor\w*\s+cliente|maior\w*\s+cliente/i,'top']],
   ger:[[/reuni/i,'reuniao'],[/resumo/i,'resumo']]};
-var IA_COM_CLI={relProd:1,cobrar:1,pagou:1,msgCli:1,comport:1};
+var IA_COM_CLI={relProd:1,cobrar:1,pagou:1,msgCli:1,comport:1,plano:1,passaMika:1};
 function cmdNome(g,c){var L=CMDS[g]||[];for(var i=0;i<L.length;i++)if(L[i][0]===c)return L[i][1].replace(/^\S+\s/,'');return c;}
 function iaCmdsHtml(g){return '<div class="ia-cmds" role="group" aria-label="O que eu posso fazer">'+(CMDS[g]||[]).map(function(c){return '<button type="button" class="ia-cmd" data-a="iaCmd" data-g="'+g+'" data-v="'+c[0]+'">'+esc(c[1])+'</button>';}).join('')+'</div>';}
 function btnIa(b){return '<button type="button" class="btn sm'+(b.pri?' pri':'')+(b.chip?' ia-chip':'')+'" data-a="'+b.a+'"'+(b.g?' data-g="'+b.g+'"':'')+(b.id!=null?' data-id="'+esc(b.id)+'"':'')+(b.v!=null?' data-v="'+esc(b.v)+'"':'')+(b.x!=null?' data-x="'+esc(b.x)+'"':'')+'>'+esc(b.l)+'</button>';}
@@ -2359,6 +2364,7 @@ function iaBolhaA(m,g){
     (m.lst&&m.lst.length?'<div class="ia-lst">'+m.lst.map(function(x){return '<div class="ia-li"><span><b>'+esc(x.t)+'</b>'+(x.s?'<small>'+esc(x.s)+'</small>':'')+'</span>'+(x.bt?btnIa(x.bt):'')+'</div>';}).join('')+'</div>':'')+
     (m.msg?'<div class="msg-card zfrase"><div class="msg-txt">'+esc(m.msg)+'</div><div class="msg-acts"><span></span><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button>'+
       (m.wa?'<a class="btn sm pri" target="_blank" rel="noopener" href="'+esc(m.wa)+'">Abrir WhatsApp</a>':'<button type="button" class="btn sm pri" data-a="fraseWa">WhatsApp</button>')+'</span></div></div>':'')+
+    (m.msgs&&m.msgs.length?m.msgs.map(function(x){return '<div class="ia-msgt">'+esc(x.tit)+'</div><div class="msg-card zfrase"><div class="msg-txt">'+esc(x.txt)+'</div><div class="msg-acts"><span></span><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button>'+(x.wa?'<a class="btn sm pri" target="_blank" rel="noopener" href="'+esc(x.wa)+'">WhatsApp</a>':'<button type="button" class="btn sm pri" data-a="fraseWa">WhatsApp</button>')+'</span></div></div>';}).join(''):'')+
     (m.depois?'<p>'+esc(m.depois)+'</p>':'')+
     (m.bts&&m.bts.length?'<span class="ac">'+m.bts.map(btnIa).join('')+'</span>':'')+
     (m.chips&&m.chips.length?'<div class="ia-chips">'+m.chips.map(btnIa).join('')+'</div>':'')+'</div>';}
@@ -2383,27 +2389,41 @@ function cliPorTexto(q){var n=norm(q,200).toLowerCase(),best=null;
     if(sc>=4&&(!best||sc>best.sc))best={c:c,sc:sc};});
   return best?best.c:null;}
 function ultPedidos(){var u={};alive(S.pedidos).forEach(function(p){if(p.recebido&&(!u[p.clienteId]||p.recebido>u[p.clienteId]))u[p.clienteId]=p.recebido;});return u;}
-function clisSumidos(){var t=today(),u=ultPedidos();return alive(S.clientes).filter(function(c){return u[c.id]&&u[c.id]<addDays(t,-45);}).map(function(c){return {c:c,d:daysBetween(u[c.id],t)};}).sort(function(a,b){return a.d-b.d;});}
+function clisSumidos(){var R=[];alive(S.clientes).forEach(function(c){var s=cliStats(c.id);if(s.n&&cliRisco(s))R.push({c:c,d:s.diasSem,s:s});});return R.sort(function(a,b){return (b.s.ritmoAntes||0)-(a.s.ritmoAntes||0)||a.d-b.d;});}
 function cliRanking(dias){var t=today(),por={},n={},tot=0;alive(S.pedidos).filter(function(p){return p.recebido&&p.recebido>=addDays(t,-dias);}).forEach(function(p){por[p.clienteId]=(por[p.clienteId]||0)+(+p.valor||0);n[p.clienteId]=(n[p.clienteId]||0)+1;tot+=+p.valor||0;});
   return Object.keys(por).filter(function(k){return cliente(k);}).sort(function(a,b){return por[b]-por[a];}).map(function(k){return {c:cliente(k),v:por[k],n:n[k],pct:tot?Math.round(por[k]/tot*100):0};});}
-function cliStats(cid){var t=today(),c=cliente(cid),P=alive(S.pedidos).filter(function(p){return p.clienteId===cid&&p.recebido;}).sort(function(a,b){return a.recebido<b.recebido?-1:1;}),n=P.length,gaps=[];
-  for(var i=1;i<n;i++)gaps.push(daysBetween(P[i-1].recebido,P[i].recebido));
+function cliStats(cid){var t=today(),c=cliente(cid),P=alive(S.pedidos).filter(function(p){return p.clienteId===cid&&p.recebido;}).sort(function(a,b){return a.recebido<b.recebido?-1:1;}),n=P.length;
+  var ds=[];P.forEach(function(p){if(ds[ds.length-1]!==p.recebido)ds.push(p.recebido);});var gaps=[];for(var i=1;i<ds.length;i++)gaps.push(daysBetween(ds[i-1],ds[i]));
+  var med=null;if(gaps.length){var g2=gaps.slice().sort(function(a,b){return a-b;});med=Math.max(1,Math.round(g2[Math.floor(g2.length/2)]));}
   var p90=P.filter(function(p){return p.recebido>=addDays(t,-90);}),p180=P.filter(function(p){return p.recebido>=addDays(t,-180)&&p.recebido<addDays(t,-90);});
+  var r30=P.filter(function(p){return p.recebido>=addDays(t,-30);}).length,antes=P.filter(function(p){return p.recebido<addDays(t,-30);}),span=antes.length?daysBetween(antes[0].recebido,addDays(t,-30)):0,ritmoAntes=antes.length&&span>=14?antes.length/(span/30):antes.length;
   var ent=P.filter(function(p){return p.entregue;}),noPr=ent.filter(function(p){return p.prazo;}),tipos={};P.forEach(function(p){var k=nomeTrab(p)||'Trabalho';tipos[k]=(tipos[k]||0)+1;});
-  return {c:c,n:n,ult:n?P[n-1].recebido:null,pri:n?P[0].recebido:null,freq:gaps.length?Math.round(gaps.reduce(function(s,x){return s+x;},0)/gaps.length):null,
+  var diasSem=n?daysBetween(P[n-1].recebido,t):null,pico=0,pm={};P.forEach(function(p){var m=monthOf(p.recebido);pm[m]=(pm[m]||0)+1;if(pm[m]>pico)pico=pm[m];});
+  var padrao=!n?'nunca':diasSem>Math.max(14,(med||7)*3)&&n>=3?'parou':ritmoAntes>=3&&r30<=ritmoAntes*0.4?'caindo':n<3&&diasSem<=60?'novo':ritmoAntes>=2&&r30>=ritmoAntes*1.3?'subindo':'estavel';
+  return {c:c,n:n,ult:n?P[n-1].recebido:null,pri:n?P[0].recebido:null,freq:med,r30:r30,ritmoAntes:Math.round(ritmoAntes*10)/10,pico:pico,padrao:padrao,
     v90:soma(p90),n90:p90.length,v180:soma(p180),n180:p180.length,el:elems(P),aj:ent.length?Math.round(ent.filter(function(p){return !(p.ajustes>0);}).length/ent.length*100):null,
     prazo:noPr.length?Math.round(noPr.filter(function(p){return p.entregue<=p.prazo;}).length/noPr.length*100):null,
     tipos:Object.keys(tipos).sort(function(a,b){return tipos[b]-tipos[a];}).slice(0,3).map(function(k){return k+' ('+tipos[k]+')';}),
-    dev:soma(aReceber(cid)),total:soma(P),ticket:n?soma(P)/n:0,diasSem:n?daysBetween(P[n-1].recebido,t):null};}
+    ultimos:P.slice(-3).reverse().map(function(p){return (nomeTrab(p)||'Trabalho')+(p.paciente?' do paciente '+p.paciente:'')+' em '+dmy(p.recebido).slice(0,5)+(p.ajustes>0?' (teve '+p.ajustes+' ajuste)':'');}),
+    dev:soma(aReceber(cid)),total:soma(P),ticket:n?soma(P)/n:0,diasSem:diasSem};}
+function cliRisco(s){return s.padrao==='parou'||s.padrao==='caindo'||(s.diasSem!=null&&s.diasSem>45);}
+function cliPadraoTxt(s){var r=String(s.ritmoAntes).replace('.',',');
+  return s.padrao==='parou'?'Parou de mandar: costumava mandar a cada '+plural(s.freq||7,'dia','dias')+' e está há '+plural(s.diasSem,'dia','dias')+' sem mandar.':
+    s.padrao==='caindo'?'Esfriou: mandava uns '+r+' pedidos por mês e nos últimos 30 dias mandou só '+s.r30+'.':
+    s.padrao==='subindo'?'Está mandando mais: '+s.r30+' pedidos nos últimos 30 dias (antes uns '+r+' por mês).':
+    s.padrao==='novo'?'Cliente novo, ainda com poucos pedidos.':s.padrao==='nunca'?'Ainda não mandou pedido.':
+    s.diasSem>45?'Sumido: '+plural(s.diasSem,'dia','dias')+' sem mandar trabalho.':'Ritmo estável.';}
 function cliStatsLst(s){var L=[];
+  L.push({t:(cliRisco(s)?'⚠️ ':s.padrao==='subindo'?'📈 ':'')+cliPadraoTxt(s),s:''});
   L.push({t:plural(s.n,'pedido','pedidos')+' no total · '+brl(s.total),s:'Ticket médio '+brl(Math.round(s.ticket))+(s.pri?' · cliente desde '+dmy(s.pri):'')});
-  if(s.ult)L.push({t:'Último pedido '+quandoTxt(s.diasSem),s:s.freq?'Costuma mandar a cada '+plural(s.freq,'dia','dias')+(s.diasSem>s.freq*2?' · está demorando mais que o normal':''):'Ainda não dá para medir a frequência'});
+  if(s.ult)L.push({t:'Último pedido '+quandoTxt(s.diasSem),s:s.freq?'Costuma mandar a cada '+plural(s.freq,'dia','dias'):'Ainda não dá para medir a frequência'});
   L.push({t:'Últimos 90 dias: '+brl(s.v90)+' ('+s.n90+')',s:'90 dias antes: '+brl(s.v180)+' ('+s.n180+')'+(s.v180?(s.v90>=s.v180?' · subiu':' · caiu '+Math.round((1-s.v90/s.v180)*100)+'%'):'')});
   if(s.aj!=null||s.prazo!=null)L.push({t:(s.aj!=null?'Aprovados de primeira: '+s.aj+'%':'')+(s.aj!=null&&s.prazo!=null?' · ':'')+(s.prazo!=null?'No prazo: '+s.prazo+'%':''),s:''});
   if(s.tipos.length)L.push({t:'Mais pede: '+s.tipos.join(', '),s:''});
   if(s.dev)L.push({t:'Deve '+brl(s.dev),s:'Trabalhos entregues e ainda não pagos'});
   return L;}
-function cliStatsTxt(s){var c=s.c;return ['Cliente: '+nomeCurtoCli(c)+' ('+(c.tipo==='laboratorio'?'laboratório':'dentista')+')','Cadista: '+((S.perfil.nome||'').trim()||'sem nome')].concat(cliStatsLst(s).map(function(x){return x.t+(x.s?' — '+x.s:'');})).join('\n');}
+function cliStatsTxt(s){var c=s.c;return ['Cliente: '+nomeCurtoCli(c)+' ('+(c.tipo==='laboratorio'?'laboratório':'dentista')+')','Cadista: '+((S.perfil.nome||'').trim()||'sem nome'),'PADRÃO: '+cliPadraoTxt(s)+(s.pico?' Maior volume num mês: '+s.pico+' pedidos.':'')]
+  .concat(cliStatsLst(s).slice(1).map(function(x){return x.t+(x.s?' — '+x.s:'');})).concat(s.ultimos.length?['Últimos trabalhos: '+s.ultimos.join('; ')]:[]).join('\n');}
 function iaQuem(g,c,pergunta,L,vazio){if(!L.length){iaDiz(g,{t:vazio});return;}
   iaDiz(g,{t:pergunta,chips:L.slice(0,14).map(function(o){return {a:'iaCmd',g:g,v:c,x:o.c.id,l:nomeCurtoCli(o.c)+(o.s?' · '+o.s:''),chip:1};})});}
 function iaListaPed(L){return L.map(function(p){return {t:'#'+p.num+' · '+pedTxt(p),s:(p.prazo?'Prazo '+dmy(p.prazo).slice(0,5):'Sem prazo')+' · '+stLabel(p.status),bt:{a:'verPedido',id:p.id,l:'Abrir'}};});}
@@ -2480,18 +2500,39 @@ var IA_CMD={
     alive(S.clientes).forEach(function(c){if(!ja[c.id])L.push({c:c});});iaQuem(g,'pagou','Quem pagou?',L,'Você ainda não tem clientes cadastrados.');},
   'mkt.msgCli':function(g,x){if(x){var s=cliStats(x),c=s.c,obj=s.diasSem!=null&&s.diasSem>45?'reaproximar um cliente que não manda trabalho há '+s.diasSem+' dias: pergunte como ele está e diga que a agenda está aberta':s.n?'agradecer a parceria e lembrar que a agenda está aberta para novos casos':'se apresentar e oferecer os serviços de CAD para um cliente que ainda não mandou trabalho';
       iaTarefa(g,'msg_cliente',cliStatsTxt(s),obj).then(function(r){var tx=r.t?r.t.replace(/^["“]|["”]$/g,'').trim():'';if(tx)iaDiz(g,{t:'Escrevi esta para '+nomeCurtoCli(c)+':',msg:tx,wa:soDig(c.telefone)?waLink(tx,c.telefone):null,depois:soDig(c.telefone)?'':'Esse cliente não tem WhatsApp cadastrado: copie e mande por onde preferir.',chips:[{a:'iaCmd',g:g,v:'msgCli',x:x,l:'🔄 Outra versão',chip:1}],ia:1});else iaDiz(g,{t:IA_ERRO[r.err]||IA_ERRO.rede,erro:1});iaMostra();});return;}
-    var sm=clisSumidos(),ja={},L=sm.map(function(o){ja[o.c.id]=1;return {c:o.c,s:'sumido '+quandoTxt(o.d).replace('há ','')};});
+    var sm=clisSumidos(),ja={},L=sm.map(function(o){ja[o.c.id]=1;return {c:o.c,s:o.s.padrao==='caindo'?'esfriou':'sumido '+quandoTxt(o.d).replace('há ','')};});
     alive(S.clientes).forEach(function(c){if(!ja[c.id])L.push({c:c});});iaQuem(g,'msgCli','Para quem eu escrevo? ✍️',L,'Cadastre seus clientes que eu escrevo as mensagens.');},
+  'mkt.plano':function(g,x){if(x){var s=cliStats(x);mikaPlano(x,s);return;}
+    var sm=clisSumidos(),ja={},L=sm.map(function(o){ja[o.c.id]=1;return {c:o.c,s:o.s.padrao==='caindo'?'esfriou':'sumido '+quandoTxt(o.d).replace('há ','')};});
+    cliRanking(365).forEach(function(o){if(!ja[o.c.id])L.push({c:o.c});});iaQuem(g,'plano','Qual cliente a gente vai reconquistar? 🎯',L,'Ainda não há clientes com pedidos.');},
   'mkt.sumidos':function(g){var L=clisSumidos();
-    iaDiz(g,L.length?{t:plural(L.length,'cliente está sumido','clientes estão sumidos')+' (mais de 45 dias sem mandar trabalho). Quer que eu escreva para algum?',lst:L.slice(0,12).map(function(o){return {t:nomeCurtoCli(o.c),s:'Último pedido '+quandoTxt(o.d),bt:{a:'iaCmd',g:'mkt',v:'msgCli',x:o.c.id,l:'Escrever'}};})}:{t:'Ninguém sumido! Todo mundo mandou trabalho nos últimos 45 dias. 😎'});},
+    iaDiz(g,L.length?{t:plural(L.length,'cliente esfriou ou sumiu','clientes esfriaram ou sumiram')+'. Monto um plano para trazer de volta?',lst:L.slice(0,12).map(function(o){return {t:nomeCurtoCli(o.c),s:cliPadraoTxt(o.s),bt:{a:'iaCmd',g:'mkt',v:'plano',x:o.c.id,l:'Montar plano'}};})}:{t:'Ninguém sumido nem esfriando! Todo mundo está no ritmo de sempre. 😎'});},
   'mkt.frase':function(g){var md=mikaDia();iaDiz(g,{t:md.tit,msg:md.txt});},
   'mkt.post':function(g){iaPerguntaCmd(g,'Me dê uma ideia de post para o status do WhatsApp ou Instagram de hoje, com o texto pronto para copiar.','Ideia de post');},
   'dad.top':function(g){var L=cliRanking(90);iaDiz(g,L.length?{t:'Seus melhores clientes nos últimos 90 dias:',lst:L.slice(0,5).map(function(x,i){return {t:(i+1)+'º '+nomeCurtoCli(x.c)+' · '+brl(x.v),s:plural(x.n,'pedido','pedidos')+' · '+x.pct+'% do total',bt:{a:'iaCmd',g:'dad',v:'comport',x:x.c.id,l:'Analisar'}};})}:{t:'Ainda não há pedidos nos últimos 90 dias.'});},
-  'dad.comport':function(g,x){if(x){var s=cliStats(x);if(!s.n){iaDiz(g,{t:nomeCurtoCli(s.c)+' ainda não mandou nenhum pedido, então não tenho o que analisar.'});return;}
+  'dad.passaMika':function(g,x){x=x||ui.iaUltCli;if(x&&cliente(x)){var s=cliStats(x);iaDiz(g,{t:'✅ Passei para a Mika: '+nomeCurtoCli(s.c)+' — '+cliPadraoTxt(s)+' Ela já está montando o plano de reconquista.',bts:[{a:'secChat',v:'mkt',l:'Ver plano da Mika',pri:1}]});iaMostra();mikaPlano(x,s,1);return;}
+    var L=clisSumidos().map(function(o){return {c:o.c,s:o.s.padrao==='caindo'?'esfriou':'sumido'};});cliRanking(365).forEach(function(o){if(!L.some(function(y){return y.c.id===o.c.id;}))L.push({c:o.c});});
+    iaQuem(g,'passaMika','Qual cliente eu passo para a Mika?',L,'Ainda não há clientes com pedidos.');},
+  'dad.comport':function(g,x){if(x){ui.iaUltCli=x;var s=cliStats(x);if(!s.n){iaDiz(g,{t:nomeCurtoCli(s.c)+' ainda não mandou nenhum pedido, então não tenho o que analisar.'});return;}
       iaDiz(g,{t:'Os números de '+nomeCurtoCli(s.c)+':',lst:cliStatsLst(s)});
-      iaTarefa(g,'analise_cliente',cliStatsTxt(s),'').then(function(r){if(r.t){var m={t:r.t,bts:[{a:'verCliente',id:x,l:'Ver cliente'}].concat(s.diasSem>45?[{a:'iaCmd',g:'mkt',v:'msgCli',x:x,l:'Pedir mensagem à Mika'}]:[]).concat(s.dev?[{a:'iaCmd',g:'fin',v:'cobrar',x:x,l:'Cobrar com a Bia'}]:[])};iaConvDe(g).push({r:'a',t:m.t,bts:m.bts});}else iaDiz(g,{t:IA_ERRO[r.err]||IA_ERRO.rede,erro:1});iaMostra();});return;}
+      iaTarefa(g,'analise_cliente',cliStatsTxt(s),'').then(function(r){if(r.t){iaConvDe(g).push({r:'a',t:r.t,bts:[{a:'verCliente',id:x,l:'Ver cliente'}].concat(s.dev?[{a:'iaCmd',g:'fin',v:'cobrar',x:x,l:'Cobrar com a Bia'}]:[])});
+          if(cliRisco(s)){iaDiz(g,{t:'📣 Esse cliente esfriou. Já chamei a Mika para montar um plano de reconquista: mensagem para retomar contato, pesquisa sobre os últimos trabalhos e convite para o próximo caso.',bts:[{a:'secChat',v:'mkt',l:'Ver plano da Mika',pri:1}]});iaMostra();mikaPlano(x,s,1);return;}}
+        else iaDiz(g,{t:IA_ERRO[r.err]||IA_ERRO.rede,erro:1});iaMostra();});return;}
     var tc=cliRanking(365),ja={},L=tc.map(function(o){ja[o.c.id]=1;return {c:o.c,s:plural(o.n,'pedido','pedidos')};});
     iaQuem(g,'comport','Qual cliente eu analiso? 🔎',L,'Ainda não há pedidos para analisar.');}};
+function planoParse(txt){var o={passos:[],msgs:[]},R={CONTATO:'1. Retomar contato',PESQUISA:'2. Pesquisa sobre os trabalhos',CONVITE:'3. Convite para o próximo caso'};
+  String(txt).split(/\n+/).forEach(function(l){l=l.replace(/\*+/g,'').replace(/^[\s\-•>#]+/,'').trim();var m=l.match(/^(PLANO|CONTATO|PESQUISA|CONVITE)\s*:\s*(.+)$/i);if(!m)return;var k=m[1].toUpperCase(),v=m[2].replace(/^["“]|["”]$/g,'').trim();
+    if(k==='PLANO')o.passos=v.split(/\s*\|\s*|\s*;\s*/).filter(Boolean).slice(0,4);else o.msgs.push({tit:R[k],txt:v});});return o;}
+function mikaPlano(cid,s,deKlose){var c=s.c;if(!deKlose)iaDiz('mkt',{t:'Deixa comigo! Analisando '+nomeCurtoCli(c)+'… '+cliPadraoTxt(s)});else iaConvDe('mkt').push({r:'u',t:'🔎 Klose: '+nomeCurtoCli(c)+' esfriou. Monta um plano para trazer de volta?'});
+  var esp=ui.iaEsperando;ui.iaEsperando='mkt';if(!deKlose)iaMostra();
+  iaChama({agente:'mkt',tarefa:'plano_reconquista',contexto:cliStatsTxt(s),extra:''}).then(function(r){if(ui.iaEsperando==='mkt')ui.iaEsperando=esp===('mkt')?null:esp;
+    var tel=soDig(c.telefone)?c.telefone:null;
+    if(r.t){var p=planoParse(r.t);
+      if(p.msgs.length)iaDiz('mkt',{ia:1,t:'🎯 Plano para reconquistar '+nomeCurtoCli(c)+':',lst:p.passos.map(function(x,i){return {t:(i+1)+'. '+x,s:''};}),msgs:p.msgs.map(function(m){return {tit:m.tit,txt:m.txt,wa:tel?waLink(m.txt,tel):null};}),
+        depois:tel?'Mande uma de cada vez, com uns dias de intervalo. Se ele responder a pesquisa, me conta o que ele disse que eu te ajudo a responder.':'Esse cliente não tem WhatsApp cadastrado: copie as mensagens e mande por onde preferir.',chips:[{a:'iaCmd',g:'mkt',v:'plano',x:cid,l:'🔄 Outro plano',chip:1}]});
+      else iaDiz('mkt',{ia:1,t:r.t});}
+    else iaDiz('mkt',{t:IA_ERRO[r.err]||IA_ERRO.rede,erro:1});
+    if(ui.tab==='secretarios')render();iaRolar();});}
 function iaCmd(g,c,x){if(c==='reuniao'){ui.secAg='reu';render();return;}var H=IA_CMD[g+'.'+c];if(!H)return;H(g,x||null);iaMostra();}
 function iaIntent(g,q){var L=IA_INT[g]||[];for(var i=0;i<L.length;i++)if(L[i][0].test(q)){var c=L[i][1];return {c:c,x:IA_COM_CLI[c]?(function(){var k=cliPorTexto(q);return k?k.id:null;})():null};}return null;}
 /* sugestão do agente (calculada no app): aparece no fim dos recados */
@@ -2503,7 +2544,7 @@ function iaSugestao(g){var t=today();
     return at?{t:'Tem '+plural(at,'pedido atrasado','pedidos atrasados')+'. Quer a lista para resolver um por um?',chips:[{a:'iaCmd',g:g,v:'atrasados',l:'⏰ Ver atrasados',chip:1},{a:'iaCmd',g:g,v:'relProd',l:'🧾 Avisar o cliente',chip:1}]}:
       {t:'Quer que eu gere o relatório de vendas do mês?',chips:[{a:'iaCmd',g:g,v:'relVendas',l:'📄 Gerar relatório',chip:1},{a:'iaCmd',g:g,v:'semana',l:'📅 Prazos da semana',chip:1}]};}
   if(g==='mkt'){var sm=clisSumidos()[0];
-    return sm?{t:nomeCurtoCli(sm.c)+' não manda trabalho '+quandoTxt(sm.d)+'. Quer que eu escreva uma mensagem pra ele?',chips:[{a:'iaCmd',g:g,v:'msgCli',x:sm.c.id,l:'✍️ Escrever agora',chip:1},{a:'iaCmd',g:g,v:'sumidos',l:'👋 Ver todos os sumidos',chip:1}]}:
+    return sm?{t:nomeCurtoCli(sm.c)+': '+cliPadraoTxt(sm.s)+' Quer que eu monte um plano para trazer de volta?',chips:[{a:'iaCmd',g:g,v:'plano',x:sm.c.id,l:'🎯 Montar plano',chip:1},{a:'iaCmd',g:g,v:'sumidos',l:'👋 Ver todos',chip:1}]}:
       {t:'Quer uma ideia de post para hoje?',chips:[{a:'iaCmd',g:g,v:'post',l:'✨ Ideia de post',chip:1},{a:'iaCmd',g:g,v:'msgCli',l:'💬 Mensagem para cliente',chip:1}]};}
   if(g==='dad'){var tp=cliRanking(90)[0];
     return tp?{t:'Quer que eu analise o comportamento de '+nomeCurtoCli(tp.c)+', seu maior cliente nos últimos 90 dias?',chips:[{a:'iaCmd',g:g,v:'comport',x:tp.c.id,l:'🔎 Analisar',chip:1},{a:'iaCmd',g:g,v:'relAn',l:'📄 Relatório de análise',chip:1}]}:null;}
@@ -2523,6 +2564,7 @@ function salaOpcoes(){var t=today(),O=[],dv=[],g=null;try{dv=devedores();}catch(
   O.push(['frase','mkt','Mandar a frase do dia aos clientes']);
   O.push(['relVendas','ven','Gerar o relatório de vendas']);
   if(dv.length||alive(S.pagamentos).length)O.push(['relFin','fin','Gerar o relatório financeiro']);
+  var rc=sm.filter(function(o){return o.s.padrao==='parou'||o.s.padrao==='caindo';})[0];if(rc)O.push(['plano','mkt','Plano para reconquistar '+nomeCurtoCli(rc.c),rc.c.id]);
   if(tp)O.push(['comport','dad','Analisar '+nomeCurtoCli(tp.c),tp.c.id]);
   O.push(['relAn','dad','Gerar o relatório de análise']);
   return O;}
@@ -4944,6 +4986,7 @@ impGrava:function(){impGrava();},
   passeioTg:function(d,el){S.prefs=S.prefs||{};S.prefs.passeio=el.checked?null:'off';save();if(!el.checked)passeioTira();toast(el.checked?'A equipe vai aparecer de vez em quando.':'A equipe não vai mais passear pelas telas.');},
   novaConta:function(){ui.novaConta=true;ui.tour=null;ui.equipe=null;closeSheet();render();window.scrollTo(0,0);},
   tourIr:function(d){if(d.v==='fim'){fimTour();return;}var i=(ui.tour||0)+(d.v==='voltar'?-1:1);if(i<0)i=0;if(i>=TOUR.length){fimTour();return;}vaiTour(i);},
+  planoMika:function(d){A.iaCmd({g:'mkt',v:'plano',x:d.id});},
   iaCmd:function(d){var g=d.g||ui.secAg;if(!g||ui.iaEsperando)return;
     if(d.sala){var v=salaAtual();if(v){v.feito=v.feito||{};v.feito[d.v]=1;salaGrava(v);}}
     if(d.v==='reuniao'){A.secChat({v:'reu'});return;}
