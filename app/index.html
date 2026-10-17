@@ -4613,7 +4613,7 @@ async function enviaArquivo(pid,files,cat){
     else{if(!window.JSZip)throw new Error('o compactador não carregou');upProg(pid,'Compactando '+files.length+' arquivo(s) de '+bytes(tot)+'…',0);
       var z=new JSZip();files.forEach(function(f){z.file(f.name,f);});
       blob=await z.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}},function(m){upProg(pid,'Compactando… '+m.percent.toFixed(0)+'%',m.percent);});}
-    var livre=S.assinatura.limite-usado();if(blob.size>livre)throw new Error('sem espaço: faltam '+bytes(blob.size-livre)+'. Apague arquivos, use um link ou amplie para 10 GB');
+    var livre=S.assinatura.limite-usado();if(blob.size>livre)throw new Error('sem espaço: faltam '+bytes(blob.size-livre)+'. Apague arquivos ou use um link');
     upProg(pid,'Preparando o envio…',0);
     clearTimeout(syncTimer);syncFila=syncFila.then(sincroniza);await syncFila; // o pedido precisa estar salvo antes
     var pr=await fnArq('preparar',{pedido_id:pid,tamanho:blob.size});
