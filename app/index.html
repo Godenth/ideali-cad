@@ -641,6 +641,20 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .zb .ia-hr{display:block;text-align:right;font-size:.68rem!important;font-weight:500!important;color:var(--muted)!important;margin-top:3px;opacity:.85}.zb.ia-eu .ia-hr{color:inherit!important;opacity:.75}
 .suporte{display:grid;gap:2px;font-size:.82rem;color:var(--muted);padding:10px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)}.suporte b{color:var(--ink);font-size:.86rem}.suporte a{color:var(--accent);font-weight:600}
 .dd-sup{display:block;padding:9px 12px;color:var(--ink);text-decoration:none;border-radius:8px}.dd-sup:hover{background:var(--accent-soft)}
+.ld-head{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.ld-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}.ld-bar .up{position:relative}
+.ld-imp{border:1px solid var(--line);background:var(--soft);border-radius:14px;padding:12px;margin-bottom:10px;display:grid;gap:8px}
+.ld-rev{display:grid;grid-template-columns:auto 1.3fr 1fr auto;gap:6px;align-items:center}.ld-rev input:not([type=checkbox]),.ld-rev select{min-width:0;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:.88rem}
+.ld-rev small{grid-column:2/-1}
+.ld-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.ld-chips .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font:inherit;font-size:.82rem;cursor:pointer;color:var(--ink)}.ld-chips .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.ld-lista{display:grid;gap:8px}
+.ld-card{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--surface);display:grid;gap:6px}.ld-card.hoje{border-color:#1FAF5B;box-shadow:0 0 0 2px rgba(31,175,91,.15)}
+.ld-top{display:flex;gap:10px;align-items:center}.ld-ic{font-size:1.3rem}.ld-nm{display:grid;min-width:0}.ld-nm small{color:var(--muted);font-size:.78rem}
+.ld-st{font-size:.82rem;color:var(--muted)}.ld-hoje{color:#1FAF5B}
+.ld-acs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ld-acs .icon-btn{margin-left:auto}
+.btn.ld-wa{background:#1FAF5B;border-color:#1FAF5B;color:#fff;font-weight:700}
+@media (max-width:600px){.ld-rev{grid-template-columns:auto 1fr}.ld-rev select{grid-column:2}}
 .ia-cmds{display:flex;gap:6px;padding:8px 12px 0;overflow-x:auto;scrollbar-width:none;background:var(--surface);border-top:1px solid var(--line);position:relative;z-index:3}.ia-cmds::-webkit-scrollbar{display:none}
 .ia-cmds+.ia-in{border-top:0}
 .ia-cmd{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap}
@@ -1346,7 +1360,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,mem:(S.prefs||{}).mem||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,mem:(S.prefs||{}).mem||null,leads:(S.prefs||{}).leads||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -1398,7 +1412,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null,mem:pref.mem||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null,mem:pref.mem||null,leads:pref.leads||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -1562,7 +1576,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 21h00';
+var VERSAO='17/10 · 21h20';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2483,6 +2497,7 @@ function msgsMkt(){var t=today(),R=[],dow=new Date(t+'T12:00:00').getDay(),C=ali
   try{R=msgsCli();}catch(e){R=[];}
   R.forEach(function(m){if(m.k==='cli_oi'){m.k='mkt_oi';m.h=R.length>1?'sumiu':'animada';}else if(!m.h)m.h=m.n==='info'?'ideia':'sumiu';});
   try{R.splice(1,0,mikaDia());}catch(e){}
+  try{var lh=leadsHoje().length;if(lh)R.splice(1,0,{k:'mkt_leads_'+lh,h:'gravando',n:'media',tit:'Hoje tem '+plural(lh,'lead para chamar','leads para chamar')+' 📲',sub:'Contatos dos anúncios na sequência de mensagens. Cada um já tem a mensagem certa pronta: é só tocar no WhatsApp.',a:'leadAbre',bt:'Abrir os leads'});}catch(e){}
   try{clisSumidos().slice(0,3).forEach(function(o){
     R.splice(2,0,{k:'mkt_klose_'+o.c.id+'_'+o.s.padrao,h:'ideia',n:'media',tit:'O Klose me avisou: '+nomeCurtoCli(o.c)+(o.s.padrao==='caindo'?' esfriou':o.s.padrao==='umavez'?' mandou 1 vez e não voltou':' parou de mandar'),sub:cliPadraoTxt(o.s)+' Bora montar um plano para trazer de volta? Eu escrevo as mensagens, incluindo uma pesquisa sobre os últimos trabalhos.',a:'planoMika',id:o.c.id,bt:'Montar plano'});});}catch(e){}
   var mes=monthOf(t),pm=prevMonth(mes),nov=C.filter(function(c){return c.criado&&monthOf(c.criado)===mes;}).length,novA=C.filter(function(c){return c.criado&&monthOf(c.criado)===pm;}).length;
@@ -2672,6 +2687,58 @@ function memDetecta(g,q){if(!(MEM_RE.test(q)||MEM_FUNC.test(q)))return null;var 
   return memAdd(c?c.id:null,q,g,MEM_FUNC.test(q)?'funcionou':'nota');}
 function memLista(){var m=memDe(),L=[];Object.keys(m.c).forEach(function(k){var c=cliente(k);(m.c[k]||[]).forEach(function(n){L.push({c:c,cid:k,n:n});});});m.g.forEach(function(n){L.push({c:null,cid:'',n:n});});
   return L.sort(function(a,b){return a.n.d<b.n.d?1:-1;});}
+/* ===== Leads da Mika: o cadista cola o print dos contatos que chegaram pelos anúncios (Face/Insta),
+   o sistema lê nome e telefone, e a Mika conduz uma sequência curta de mensagens no WhatsApp (para no dia 10). ===== */
+var LEAD_SEQ=[
+  {n:'Apresentação',dias:2,t:'{oi}, {nome}! Aqui é {eu}, cadista. Vi que você se interessou pelo meu trabalho de planejamento digital (coroas, facetas, protocolos e mais). 🦷 Como posso te ajudar? Se quiser, me conta que tipo de caso você mais faz.'},
+  {n:'Lembrete',dias:3,t:'{oi}, {nome}! Passando para saber se ficou alguma dúvida. Trabalho com prazo combinado e ajuste incluso. Tem algum caso para esta semana?'},
+  {n:'Prova do trabalho',dias:5,t:'{oi}, {nome}! Posso te mandar alguns antes e depois de casos que desenhei? Assim você vê o padrão de acabamento antes de mandar o primeiro caso. 😉'},
+  {n:'Última tentativa',dias:0,t:'{oi}, {nome}! Não quero te incomodar, então esta é minha última mensagem. Quando precisar de um cadista, é só me chamar aqui. Sucesso nos atendimentos! 🙌'}];
+function leadsDe(){S.prefs=S.prefs||{};if(!Array.isArray(S.prefs.leads))S.prefs.leads=[];return S.prefs.leads;}
+function leadsAtivos(){return leadsDe().filter(function(l){return l.st==='seq';});}
+function leadsHoje(){var t=today();return leadsAtivos().filter(function(l){return !l.prox||l.prox<=t;});}
+function leadMsg(l){var e=LEAD_SEQ[Math.min(l.etapa||0,LEAD_SEQ.length-1)],eu=((S.perfil.nome||'').trim().split(' ')[0])||'seu cadista',nome=String(l.nome||'').trim().split(' ')[0]||'tudo bem';
+  return e.t.replace('{oi}',saudTxt()).replace('{nome}',nome).replace('{eu}',eu);}
+function telNorm(v){var d=soDig(v);if(d.length>=12&&d.slice(0,2)==='55')d=d.slice(2);return d.length>=10&&d.length<=11?d:'';}
+function telFmt(d){return d.length===11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d;}
+/* Lê o texto do print: cada telefone vira um lead; o nome é o texto da mesma linha ou da linha de cima */
+function leadsDoTexto(txt){var L=String(txt).split(/\n+/).map(function(s){return s.trim();}).filter(Boolean),R=[],vistos={},orig=/insta/i.test(txt)?'insta':/face|messenger|meta/i.test(txt)?'face':'';
+  var re=/(\+?55[\s.-]?)?\(?\b(\d{2})\)?[\s.-]?(9?\s?\d{4})[\s.-]?(\d{4})\b/g;
+  L.forEach(function(lin,i){var m;re.lastIndex=0;while((m=re.exec(lin))){var d=telNorm(m[0]);if(!d||vistos[d])continue;vistos[d]=1;
+    var nome=lin.slice(0,m.index).replace(/[|:•·\-–—,;]+$/,'').replace(/[^A-Za-zÀ-ÿ' ]/g,' ').replace(/\s+/g,' ').trim();
+    if(nome.length<2){for(var k=i-1;k>=0&&k>=i-2;k--){var c=L[k].replace(/[^A-Za-zÀ-ÿ' ]/g,' ').replace(/\s+/g,' ').trim();if(c.length>=2&&!/^(hoje|ontem|lead|leads|nome|telefone|whatsapp|formul|instagram|facebook)/i.test(c)){nome=c;break;}}}
+    R.push({nome:nome.split(' ').slice(0,3).join(' '),tel:d,orig:orig,ok:true});}});
+  return R;}
+function carregaOCR(){if(window.Tesseract)return Promise.resolve();return new Promise(function(ok,ruim){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=ok;s.onerror=function(){ruim(new Error('não consegui carregar o leitor de imagem'));};document.head.appendChild(s);});}
+async function leadsLePrint(file){ui.leadImp={st:'lendo',p:0,lista:[]};renderSheet();
+  try{await carregaOCR();var r=await window.Tesseract.recognize(file,'por',{logger:function(m){if(m.status==='recognizing text'&&ui.leadImp){ui.leadImp.p=Math.round(m.progress*100);var e=document.getElementById('ld-prog');if(e)e.textContent='Lendo o print… '+ui.leadImp.p+'%';}}});
+    var lista=leadsDoTexto(r.data.text||''),ja={};leadsDe().forEach(function(l){ja[l.tel]=1;});lista.forEach(function(x){if(ja[x.tel]){x.ok=false;x.dup=true;}});
+    ui.leadImp={st:'revisar',lista:lista};}
+  catch(e){ui.leadImp={st:'erro',msg:(e&&e.message)||String(e)};}
+  if(ui.sheet)renderSheet();}
+function leadCard(l){var t=today(),hoje=l.st==='seq'&&(!l.prox||l.prox<=t),e=LEAD_SEQ[Math.min(l.etapa||0,LEAD_SEQ.length-1)],ic=l.orig==='insta'?'📸':l.orig==='face'?'📘':'👤';
+  var stTxt=l.st==='seq'?(hoje?'<b class="ld-hoje">Chamar hoje</b> · '+e.n:'Próxima: '+dmy(l.prox).slice(0,5)+' · '+e.n):l.st==='resp'?'💬 Respondeu':l.st==='cli'?'✅ Virou cliente':l.st==='fim'?'Encerrado (sem resposta)':'Sem interesse';
+  return '<div class="ld-card'+(hoje?' hoje':'')+'"><div class="ld-top"><span class="ld-ic">'+ic+'</span><span class="ld-nm"><b>'+esc(l.nome||'Sem nome')+'</b><small>'+esc(telFmt(l.tel))+' · chegou '+(l.criado===t?'hoje':dmy(l.criado).slice(0,5))+(l.etapa?' · '+plural(l.etapa,'mensagem','mensagens'):'')+'</small></span></div>'+
+    '<div class="ld-st">'+stTxt+'</div>'+
+    '<div class="ld-acs">'+(l.st==='seq'?'<button class="btn sm ld-wa" data-a="leadWa" data-id="'+l.id+'">WhatsApp · '+esc(e.n)+'</button>':l.st==='resp'?'<a class="btn sm ld-wa" target="_blank" rel="noopener" href="'+waLink('',l.tel)+'">Abrir conversa</a>':'')+
+      (l.st==='seq'||l.st==='resp'?'<button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="resp"'+(l.st==='resp'?' hidden':'')+'>Respondeu</button><button class="btn sm" data-a="leadCli" data-id="'+l.id+'">Virou cliente</button><button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="nao">Sem interesse</button>':'')+
+      '<button class="icon-btn" data-a="leadDel" data-id="'+l.id+'" aria-label="Apagar lead" title="Apagar">🗑</button></div></div>';}
+function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
+  var cont={hoje:leadsHoje().length,seq:leadsAtivos().length,resp:L.filter(function(l){return l.st==='resp';}).length,cli:L.filter(function(l){return l.st==='cli';}).length,fim:L.filter(function(l){return l.st==='fim'||l.st==='nao';}).length};
+  var lista=L.filter(function(l){return f==='hoje'?l.st==='seq'&&(!l.prox||l.prox<=t):f==='seq'?l.st==='seq':f==='fim'?(l.st==='fim'||l.st==='nao'):l.st===f;}).sort(function(a,b){return (a.prox||'')<(b.prox||'')?-1:1;});
+  var g=SECS.filter(function(x){return x.id==='mkt';})[0];
+  var topo='<div class="ld-head">'+(g?avSec(g,0,'gravando'):'')+'<div><h2 style="margin:0">Leads da Mika</h2><p class="small muted" style="margin:2px 0 0">Contatos dos anúncios. Eu cuido da sequência: 4 mensagens em 10 dias e paro, para não virar spam.</p></div><button class="icon-btn" data-a="fechar" aria-label="Fechar" style="margin-left:auto">✕</button></div>';
+  var importa='';
+  if(imp&&imp.st==='lendo')importa='<div class="ld-imp"><p id="ld-prog">Lendo o print… '+(imp.p||0)+'%</p><p class="small muted">Na primeira vez demora um pouco mais (baixa o leitor de texto).</p></div>';
+  else if(imp&&imp.st==='erro')importa='<div class="ld-imp"><p>Não consegui ler o print: '+esc(imp.msg)+'</p><button class="btn sm" data-a="leadImpX">Ok</button></div>';
+  else if(imp&&imp.st==='revisar')importa='<div class="ld-imp"><b>'+(imp.lista.length?'Achei '+plural(imp.lista.length,'contato','contatos')+'. Confira antes de salvar:':'Não achei telefone no print. Tente um print mais nítido ou adicione à mão.')+'</b>'+
+    imp.lista.map(function(x,i){return '<div class="ld-rev"><input type="checkbox" class="ld-ok" data-i="'+i+'" '+(x.ok?'checked':'')+'><input class="ld-in" data-i="'+i+'" data-k="nome" value="'+esc(x.nome)+'" placeholder="Nome"><input class="ld-in" data-i="'+i+'" data-k="tel" value="'+esc(telFmt(x.tel))+'" inputmode="tel"><select class="ld-in" data-i="'+i+'" data-k="orig"><option value="">Origem</option><option value="face"'+(x.orig==='face'?' selected':'')+'>Facebook</option><option value="insta"'+(x.orig==='insta'?' selected':'')+'>Instagram</option></select>'+(x.dup?'<small class="muted">já está na lista</small>':'')+'</div>';}).join('')+
+    '<div class="row wrap" style="gap:8px;margin-top:8px">'+(imp.lista.length?'<button class="btn pri" data-a="leadSalva">Salvar leads</button>':'')+'<button class="btn" data-a="leadImpX">Cancelar</button></div></div>';
+  return topo+
+    '<div class="ld-bar"><label class="btn pri up">📷 Print dos leads<input type="file" accept="image/*" id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar à mão</button><span class="small muted">ou cole o print aqui (Ctrl+V)</span></div>'+importa+
+    '<div class="chips ld-chips">'+[['hoje','Chamar hoje'],['seq','Em andamento'],['resp','Responderam'],['cli','Viraram clientes'],['fim','Encerrados']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-a="leadFil" data-v="'+c[0]+'">'+c[1]+' <b>'+cont[c[0]]+'</b></button>';}).join('')+'</div>'+
+    '<div class="ld-lista">'+(lista.length?lista.map(leadCard).join(''):'<p class="empty">'+(f==='hoje'?(L.length?'Ninguém para chamar hoje. 🎉':'Mande o print dos contatos que chegaram pelos anúncios e eu monto a lista.'):'Nada aqui.')+'</p>')+'</div>';}
+function leadNovoObj(nome,tel,orig){return {id:uid(),nome:String(nome||'').trim().slice(0,60),tel:tel,orig:orig||'',criado:today(),etapa:0,st:'seq',prox:today(),ult:null};}
 function iaBolhas(id){var L=(ui.iaConv&&ui.iaConv[id])||[],g=SECS.filter(function(x){return x.id===id;})[0];
   var hoje=today(),ult=null;
   return L.map(function(m){var sep='';if(m.d&&m.d!==ult){ult=m.d;sep='<span class="zdia">'+(m.d===hoje?'Conversa de hoje':'Conversa de '+dmy(m.d).slice(0,5))+'</span>';}
@@ -2690,7 +2757,7 @@ var CMDS={
   ger:[['reuniao','👥 Sala de reunião'],['resumo','📋 Resumo do dia'],['meta','🎯 Meta do mês'],['sugira','💡 O que faço hoje?'],['memoria','🧠 Memória da equipe']],
   ven:[['relVendas','📄 Relatório de vendas'],['atrasados','⏰ Atrasados'],['semana','📅 Prazos da semana'],['relProd','🧾 Relatório p/ cliente']],
   fin:[['cobrar','💸 Gerar cobrança'],['devendo','📋 Quem está devendo'],['relFin','📄 Relatório financeiro'],['pagou','✅ Registrar pagamento']],
-  mkt:[['plano','🎯 Reconquistar cliente'],['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post'],['memoria','🧠 Memória']],
+  mkt:[['leads','📱 Leads'],['plano','🎯 Reconquistar cliente'],['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post'],['memoria','🧠 Memória']],
   dad:[['relAn','📄 Relatório de análise'],['top','🏆 Melhores clientes'],['comport','🔎 Analisar um cliente'],['sugira','💡 O que melhorar?'],['memoria','🧠 Memória']]};
 var IA_INT={
   fin:[[/registr\w*\s+(o\s+|um\s+)?pag|recebi|pagou/i,'pagou'],[/cobr|gera\w*\s+(o\s+|um\s+)?pag|pix/i,'cobrar'],[/relat/i,'relFin'],[/devend|quem\s+(me\s+)?deve/i,'devendo']],
@@ -2855,6 +2922,7 @@ var IA_CMD={
   'mkt.plano':function(g,x){if(x){var s=cliStats(x);mikaPlano(x,s);return;}
     var sm=clisSumidos(),ja={},L=sm.map(function(o){ja[o.c.id]=1;return {c:o.c,s:o.s.padrao==='caindo'?'esfriou':'sumido '+quandoTxt(o.d).replace('há ','')};});
     cliRanking(365).forEach(function(o){if(!ja[o.c.id])L.push({c:o.c});});iaQuem(g,'plano','Qual cliente a gente vai reconquistar? 🎯',L,'Ainda não há clientes com pedidos.');},
+  'mkt.leads':function(g){var n=leadsHoje().length;iaDiz(g,{t:n?'Abri meu tablet: '+plural(n,'lead para chamar','leads para chamar')+' hoje! 📲':'Abri meu tablet com os leads. Mande o print dos contatos que chegaram pelos anúncios que eu monto a lista.',bts:[{a:'leadAbre',l:'📱 Abrir os leads',pri:1}]});A.leadAbre();},
   'mkt.sumidos':function(g){var L=clisSumidos();
     iaDiz(g,L.length?{t:plural(L.length,'cliente esfriou ou sumiu','clientes esfriaram ou sumiram')+' (comparando com o ritmo de cada um). Monto um plano para trazer de volta?',lst:L.slice(0,12).map(function(o){return {t:nomeCurtoCli(o.c),s:cliPadraoTxt(o.s),bt:{a:'iaCmd',g:'mkt',v:'plano',x:o.c.id,l:'Montar plano'}};})}:{t:'Ninguém sumido nem esfriando! Todo mundo está no ritmo de sempre. 😎'});},
   'mkt.frase':function(g){var md=mikaDia();iaDiz(g,{t:md.tit,msg:md.txt});},
@@ -4894,8 +4962,8 @@ function cpfOk(d){if(!/^\d{11}$/.test(d)||/^(\d)\1{10}$/.test(d))return false;fo
 function cnpjOk(d){if(!/^\d{14}$/.test(d)||/^(\d)\1{13}$/.test(d))return false;var w=[6,5,4,3,2,9,8,7,6,5,4,3,2];for(var t=12;t<14;t++){var s=0;for(var i=0;i<t;i++)s+=+d[i]*w[i+13-t];var r=s%11;if((r<2?0:11-r)!==+d[t])return false;}return true;}
 function fmtDoc(d){d=soDig(d);if(d.length===11)return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');if(d.length===14)return d.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,'$1.$2.$3/$4-$5');return d;}
 function fCliente(id){
-  var c=id?cliente(id):null;
-  return head(c?'Editar cliente':'Novo cliente')+'<form data-form="cliente" data-id="'+(id||'')+'" class="stack frm2">'+
+  var c=id?cliente(id):(ui.preCli||null);
+  return head(id?'Editar cliente':'Novo cliente')+'<form data-form="cliente" data-id="'+(id||'')+'" class="stack frm2">'+
     '<div class="fld"><span>Tipo de cliente</span><div class="seg" role="radiogroup">'+[['laboratorio','Laboratório'],['dentista','Clínica / consultório']].map(function(o){return '<label class="check"><input type="radio" name="tipo" value="'+o[0]+'" '+((c?c.tipo:'laboratorio')===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('<span style="width:14px"></span>')+'</div></div>'+
     (function(){var v=c?c.titulo||'':'',outro=!!v&&TRATAMENTOS.indexOf(v)<0;
       return '<div class="fld"><span>Tratamento</span><div class="tit-op" role="radiogroup" aria-label="Tratamento">'+[['','Nenhum']].concat(TRATAMENTOS.map(function(t){return [t,t];})).concat([['__outro','Outros']]).map(function(o){var on=o[0]==='__outro'?outro:(!outro&&v===o[0]);
@@ -5398,6 +5466,20 @@ impGrava:function(){impGrava();},
   valuation:function(){openSheet(fValuation);},
   memDel:function(d){var m=memDe();if(d.v&&m.c[d.v])m.c[d.v]=m.c[d.v].filter(function(n){return n.id!==d.id;});else m.g=m.g.filter(function(n){return n.id!==d.id;});save();
     Object.keys(ui.iaConv||{}).forEach(function(k){(ui.iaConv[k]||[]).forEach(function(b){if(b.lst)b.lst=b.lst.filter(function(x){return !(x.bt&&x.bt.a==='memDel'&&x.bt.id===d.id);});});});toast('Apagado da memória.');render();},
+  leadAbre:function(){ui.leadImp=null;ui.leadFil=leadsHoje().length?'hoje':'seq';openSheet(fLeads);},
+  leadFil:function(d){ui.leadFil=d.v;renderSheet();},
+  leadImpX:function(){ui.leadImp=null;renderSheet();},
+  leadNovo:function(){ui.leadImp={st:'revisar',lista:[{nome:'',tel:'',orig:'',ok:true}]};renderSheet();setTimeout(function(){var e=document.querySelector('.ld-in[data-k=nome]');if(e)e.focus();},50);},
+  leadSalva:function(){var imp=ui.leadImp;if(!imp)return;var L=leadsDe(),ja={},n=0,ruim=0;L.forEach(function(l){ja[l.tel]=1;});
+    imp.lista.forEach(function(x){if(!x.ok)return;var d=telNorm(x.tel);if(!d){ruim++;return;}if(ja[d])return;ja[d]=1;L.push(leadNovoObj(x.nome,d,x.orig));n++;});
+    if(L.length>500)L.splice(0,L.length-500);ui.leadImp=null;ui.leadFil='hoje';save();renderSheet();toast(n?plural(n,'lead salvo','leads salvos')+'. Bora chamar! 📲':'Nenhum lead novo.'+(ruim?' Confira os telefones (com DDD).':''));},
+  leadWa:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;window.open(waLink(leadMsg(l),l.tel),'_blank','noopener');
+    var e=l.etapa||0;l.etapa=e+1;l.ult=today();if(l.etapa>=LEAD_SEQ.length){l.st='fim';l.prox=null;}else l.prox=addDays(today(),LEAD_SEQ[e].dias);save();renderSheet();
+    toast(l.st==='fim'?'Última mensagem enviada. Encerrei a sequência deste lead.':'Próxima mensagem para '+(l.nome||'este lead')+' em '+dmy(l.prox).slice(0,5)+'.');},
+  leadSt:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;l.st=d.v;l.prox=null;save();renderSheet();toast(d.v==='resp'?'Boa! Parei a sequência: agora é com você na conversa. 💬':'Ok, encerrei este lead.');},
+  leadCli:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;var ps=String(l.nome||'').trim().split(/\s+/);l.st='cli';l.prox=null;save();
+    ui.preCli={tipo:'dentista',pnome:ps[0]||'',sobrenome:ps.slice(1).join(' '),telefone:l.tel};openSheet(fCliente);ui.preCli=null;toast('Complete o cadastro do novo cliente. 🎉');},
+  leadDel:function(d){var L=leadsDe(),i=L.map(function(x){return x.id;}).indexOf(d.id);if(i<0)return;L.splice(i,1);save();renderSheet();},
   planoMika:function(d){A.iaCmd({g:'mkt',v:'plano',x:d.id});},
   iaCmd:function(d){var g=d.g||ui.secAg;if(!g||ui.iaEsperando)return;
     if(d.sala){var v=salaAtual();if(v){v.feito=v.feito||{};v.feito[d.v]=1;salaGrava(v);}}
@@ -5837,7 +5919,7 @@ document.addEventListener('click',function(e){if(!(e.target.closest&&e.target.cl
 document.addEventListener('input',function(e){if(e.target.id==='pd-pac'){var v=e.target.value,av=document.getElementById('pac-lgpd');var nome=/[A-Za-zÀ-ÿ]{3,}/.test(v.replace(/\./g,' '));
   if(nome&&!av){av=document.createElement('div');av.id='pac-lgpd';av.className='pac-lgpd';av.innerHTML='Use só as <b>iniciais</b> do paciente (LGPD). <button type="button" class="btn sm" data-a="pacIni">Trocar por '+'<span id="pac-ini"></span></button>';e.target.parentNode.appendChild(av);}
   if(av){if(!nome)av.remove();else{var s=document.getElementById('pac-ini');if(s)s.textContent=pacIniciais(v);}}}});
-document.addEventListener('input',function(e){if(e.target.id==='fw-busca'){var q=e.target.value.trim().toLowerCase();[].forEach.call(document.querySelectorAll('.fw-it'),function(b){b.style.display=!q||b.dataset.n.indexOf(q)>=0?'':'none';});}});
+document.addEventListener('input',function(e){if(e.target.classList&&e.target.classList.contains('ld-in')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i][e.target.dataset.k]=e.target.value;return;}if(e.target.id==='fw-busca'){var q=e.target.value.trim().toLowerCase();[].forEach.call(document.querySelectorAll('.fw-it'),function(b){b.style.display=!q||b.dataset.n.indexOf(q)>=0?'':'none';});}});
 document.addEventListener('keydown',function(e){
   if(e.key==='Backspace'&&e.target.classList&&e.target.classList.contains('tel-num')&&!e.target.value){var d0=document.getElementById(e.target.dataset.pre+'-ddd');if(d0){e.preventDefault();d0.focus();}}
   if(e.key==='Escape'&&ui.ddOpen){ui.ddOpen=null;render();return;}
@@ -5884,11 +5966,14 @@ document.addEventListener('input',function(e){
   if(t.id==='px-valor')desenhaPix();
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
-document.addEventListener('paste',function(e){if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it)return;
+document.addEventListener('paste',function(e){if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it)return;if(ui.sheet&&ui.sheet.fn===fLeads){e.preventDefault();leadsLePrint(it.getAsFile());return;}
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.type!=='file')return;
   var f=it.getAsFile();if(!f)return;e.preventDefault();
   if(ui.sheet.fn===fPedidoDet){var pa=ui.sheet.args[0];sbEditor(f,function(g){sbProcessa(pa,g);});}else if(ui.sheet.fn===fTrabRede){var ra=ui.sheet.args[0];sbEditor(f,function(g){rdSbCola(ra,g);});}});
 document.addEventListener('change',function(e){
+  if(e.target&&e.target.id==='ld-file'&&e.target.files&&e.target.files[0]){var f0=e.target.files[0];e.target.value='';leadsLePrint(f0);return;}
+  if(e.target&&e.target.classList&&e.target.classList.contains('ld-ok')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i].ok=e.target.checked;return;}
+  if(e.target&&e.target.classList&&e.target.classList.contains('ld-in')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i][e.target.dataset.k]=e.target.value;}
   if(e.target&&e.target.classList&&e.target.classList.contains('slot-up')&&e.target.files.length){var fs=[].slice.call(e.target.files);e.target.value='';enviaArquivo(e.target.dataset.id,fs,e.target.dataset.slot);}
   if(e.target&&e.target.classList&&e.target.classList.contains('sb-up')&&e.target.files.length){var f0=e.target.files[0],pid0=e.target.dataset.id;e.target.value='';sbEditor(f0,function(f){sbProcessa(pid0,f);});}
   if(e.target&&e.target.classList&&e.target.classList.contains('rd-sb-up')&&e.target.files.length){var f1=e.target.files[0],id1=e.target.dataset.id;e.target.value='';sbEditor(f1,function(f){rdSbCola(id1,f);});}
