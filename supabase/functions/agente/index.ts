@@ -68,12 +68,12 @@ Olhe principalmente o PADRÃO: se o cliente mandava bastante e diminuiu ou parou
 Números do cliente:
 ${dados}`;
   if (tipo === "plano_reconquista") return `${base}
-Você é ${a.nome} (${a.jeito}), do marketing. O analista avisou que este cliente diminuiu ou parou de mandar trabalhos. Monte um plano curto para o cadista reconquistar o cliente, com mensagens prontas para o WhatsApp escritas em primeira pessoa como se fosse o próprio cadista (simpáticas, profissionais, sem assinatura, no máximo 2 emojis cada, sem inventar preço nem promoção).
-Formato OBRIGATÓRIO, exatamente com estes rótulos, um por linha:
-PLANO: 3 passos curtos separados por " | " (quando mandar cada mensagem e o que observar)
-CONTATO: mensagem para retomar contato, perguntando como ele está, sem cobrar nada
-PESQUISA: mensagem pedindo a opinião dele sobre os últimos trabalhos (cite o tipo de trabalho), com 2 ou 3 perguntas curtas sobre qualidade, adaptação e prazo
-CONVITE: mensagem convidando a mandar o próximo caso, reforçando prazo e atendimento
+Você é ${a.nome} (${a.jeito}), do marketing. Este cliente esfriou ou parou de mandar trabalhos. O diagnóstico e o cronograma já foram feitos; sua parte é escrever as MENSAGENS, que o cadista vai mandar no WhatsApp em primeira pessoa (como se fosse ele). Leve em conta o MOTIVO MAIS PROVÁVEL sem acusar o cliente nem citar dívida. Cite o tipo de trabalho que ele mais pede. Tom próximo e profissional, como um parceiro de laboratório; nada genérico. Sem assinatura, no máximo 1 emoji por mensagem, sem inventar preço, desconto nem promoção.
+Responda SOMENTE neste formato, com cada rótulo no começo da linha e a mensagem logo depois na mesma linha:
+CONTATO: (2 a 3 frases) retomar contato de forma pessoal, perguntando como está a rotina da clínica/laboratório, sem falar de trabalho
+PESQUISA: (3 a 4 frases) pedir a opinião sincera sobre os últimos trabalhos, com 3 perguntas curtas e concretas: adaptação/encaixe, acabamento/anatomia e prazo; deixar claro que quer melhorar
+CONVITE: (2 a 3 frases) convidar para mandar o próximo caso, oferecendo prioridade na fila e um prazo combinado
+AUDIO: (3 a 4 frases) roteiro de um áudio curto e simpático para mandar se ele não responder
 Dados do cliente:
 ${dados}`;
   return "";
