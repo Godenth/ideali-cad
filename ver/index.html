@@ -86,6 +86,7 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .small{font-size:.85rem;color:var(--muted)}
 .erro{max-width:520px;margin:80px auto;text-align:center;display:grid;gap:12px;padding:0 16px}
 footer{color:var(--muted);font-size:.8rem;text-align:center;padding:20px 0 40px}
+.wa-acs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}.btn.wa{background:#1FAF5B;border-color:#1FAF5B;color:#fff}
 </style>
 </head>
 <body>
@@ -148,7 +149,9 @@ function ficha(pid){
     (p.scanbody_url?'<h3>Scanbody</h3><a href="'+esc(p.scanbody_url)+'" target="_blank" rel="noopener noreferrer"><img src="'+esc(p.scanbody_url)+'" alt="Print do scanbody" style="display:block;width:100%;max-height:340px;object-fit:contain;border-radius:12px;background:#0b0b10"></a>':'')+
     '<h3>Arquivos</h3><div class="arqs">'+(as.length?as.map(function(a){
       if(a.origem==='link')return '<div class="arq"><span class="ft">LINK</span><span class="n"><b>'+esc(a.nome)+'</b><span>link externo</span></span><a class="btn" href="'+esc(a.url_externa)+'" target="_blank" rel="noopener noreferrer">Abrir</a></div>';
-      return '<div class="arq"><span class="ft">ZIP</span><span class="n"><b>'+esc(a.nome)+'</b><span>'+(a.tamanho_zip?(a.tamanho_zip/1048576).toFixed(1).replace('.',',')+' MB · ':'')+'STL, HTML e imagens</span></span><button class="btn pri" data-ver="'+a.id+'">Visualizar</button><button class="btn" data-baixar="'+a.id+'">Baixar</button></div>';}).join(''):'<p class="small">Nenhum arquivo neste caso ainda.</p>')+'</div>'+
+      var cat=a.categoria==='html'?['HTML','Projeto para aprovação']:a.categoria==='fres'?['STL','Arquivo para fresagem']:a.categoria==='scan'?['3D','Escaneamento']:['3D','Arquivo do caso'];
+      return '<div class="arq"><span class="ft">'+cat[0]+'</span><span class="n"><b>'+esc(String(a.nome||'').replace(/\.zip$/i,''))+'</b><span>'+cat[1]+(a.tamanho_zip?' · '+(a.tamanho_zip/1048576).toFixed(1).replace('.',',')+' MB':'')+'</span></span><button class="btn pri" data-ver="'+a.id+'">Visualizar</button><button class="btn" data-baixar="'+a.id+'">Baixar</button></div>';}).join(''):'<p class="small">Nenhum arquivo neste caso ainda.</p>')+'</div>'+
+    waCaso(p)+
     '<div id="vw" class="vw"></div></div></div>';
 }
 function fechaFicha(){if(viewer){viewer.stop();viewer=null;}urls.forEach(function(u){URL.revokeObjectURL(u);});urls=[];document.getElementById('ficha').innerHTML='';}
@@ -175,7 +178,21 @@ function mostra(i){
       f.setAttribute('sandbox','allow-scripts');f.srcdoc=h;box.innerHTML='';box.appendChild(f);});}
   else{z.files[n].async('blob').then(function(b){var u=URL.createObjectURL(b);urls.push(u);box.innerHTML='<img class="vimg" alt="'+esc(n)+'" src="'+u+'">';});}
 }
-function baixar(id){api({acao:'baixar',arquivo_id:id}).then(function(r){var a=document.createElement('a');a.href=r.url;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}).catch(function(e){alert(e.message);});}
+/* Baixar: tira o arquivo de dentro do zip e baixa o STL/HTML normal (o celular não abre .zip) */
+function salvaBlob(b,nome){var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},60000);}
+function baixar(id){var vw=document.getElementById('vw');if(vw)vw.innerHTML='<p class="small">Preparando o arquivo…</p>';
+  var pega=blobs[id]?Promise.resolve(blobs[id]):api({acao:'baixar',arquivo_id:id}).then(function(r){return fetch(r.url);}).then(function(res){if(!res.ok)throw new Error('download recusado');return res.blob();}).then(function(b){blobs[id]=b;return b;});
+  pega.then(function(b){return b.slice(0,2).text().then(function(h){if(h!=='PK'||!window.JSZip){salvaBlob(b,'arquivo');if(vw)vw.innerHTML='';return;}
+    return window.JSZip.loadAsync(b).then(function(z){var ns=Object.keys(z.files).filter(function(n){return !z.files[n].dir&&!/(^|\/)\._/.test(n)&&!/__MACOSX/.test(n);});
+      if(ns.length===1){return z.files[ns[0]].async('blob').then(function(x){salvaBlob(x,ns[0].split('/').pop());if(vw)vw.innerHTML='<p class="small">Baixado: '+esc(ns[0].split('/').pop())+'</p>';});}
+      vw._zb=z;vw.innerHTML='<p class="small">Este caso tem '+ns.length+' arquivos. Toque para baixar cada um:</p><div class="arqs">'+ns.map(function(n){return '<button class="btn" data-sub="'+esc(n)+'">⤓ '+esc(n.split('/').pop())+'</button>';}).join('')+'</div>';});});})
+  .catch(function(e){if(vw)vw.innerHTML='<p class="small">Não consegui baixar: '+esc(e.message)+'</p>';});}
+/* Responder ao cadista pelo WhatsApp já falando deste caso */
+function waCaso(p){var tel=(D.telefone||'').replace(/\D/g,'');if(tel&&tel.length<=11)tel='55'+tel;if(!tel)return '';var cad=(D.cadista||'').split(' ')[0],caso='o caso #'+p.numero+' · paciente '+p.paciente+' ('+nomeTrab(p)+')';
+  var l=function(t){return 'https://wa.me/'+tel+'?text='+encodeURIComponent(t);},oi='Olá'+(cad?', '+cad:'')+'! ';
+  return '<h3>Responder pelo WhatsApp</h3><div class="wa-acs">'+(p.status==='aprovacao'?
+    '<a class="btn wa" target="_blank" rel="noopener" href="'+l(oi+'Aprovo '+caso+'. Pode finalizar! 👍')+'">✅ Aprovar pelo WhatsApp</a><a class="btn" target="_blank" rel="noopener" href="'+l(oi+'Sobre '+caso+': preciso de um ajuste: ')+'">✏️ Pedir ajuste</a>':
+    '<a class="btn wa" target="_blank" rel="noopener" href="'+l(oi+'Sobre '+caso+': ')+'">💬 Falar sobre este caso</a>')+'</div>';}
 
 function parseSTL(buf){var dv=new DataView(buf);
   if(buf.byteLength>84){var n=dv.getUint32(80,true);if(84+n*50===buf.byteLength){var pos=new Float32Array(n*9);for(var i=0;i<n;i++){var o=84+i*50+12;for(var k=0;k<9;k++)pos[i*9+k]=dv.getFloat32(o+k*4,true);}return pos;}}
@@ -202,7 +219,8 @@ function montaViewer(pos){
   return {stop:function(){run=false;if(ro)ro.disconnect();g.dispose();r.dispose();}};
 }
 
-document.addEventListener('click',function(e){var t=e.target.closest('[data-f],[data-p],[data-x],[data-ver],[data-baixar],[data-ent]');if(!t)return;
+document.addEventListener('click',function(e){var t=e.target.closest('[data-f],[data-p],[data-x],[data-ver],[data-baixar],[data-ent],[data-sub]');if(!t)return;
+  if(t.dataset.sub){var z=document.getElementById('vw')._zb,n=t.dataset.sub;if(z&&z.files[n])z.files[n].async('blob').then(function(b){salvaBlob(b,n.split('/').pop());});return;}
   if(t.dataset.f){filtro=t.dataset.f;render();}
   else if(t.dataset.p)ficha(t.dataset.p);
   else if(t.dataset.x){if(t===e.target||t.classList.contains('x'))fechaFicha();}
