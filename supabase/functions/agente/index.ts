@@ -51,7 +51,10 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json(405, { erro: "Método não permitido" });
 
   const acc = Deno.env.get("CF_ACCOUNT_ID") || Deno.env.get("R2_ACCOUNT_ID"), tok = Deno.env.get("CF_AI_TOKEN");
-  if (!acc || !tok) return json(503, { erro: "A IA dos agentes ainda não foi configurada." });
+  if (!acc || !tok) {
+    console.error("configuracao faltando:", !acc ? "CF_ACCOUNT_ID/R2_ACCOUNT_ID" : "", !tok ? "CF_AI_TOKEN" : "");
+    return json(503, { erro: "A IA dos agentes ainda não foi configurada.", falta: [!acc ? "conta" : "", !tok ? "token" : ""].filter(Boolean) });
+  }
 
   const url = Deno.env.get("SUPABASE_URL")!;
   const userClient = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } } });
@@ -69,7 +72,7 @@ Deno.serve(async (req: Request) => {
   if (FORA.test(pergunta)) return json(200, { resposta: a.fora, fora: true });
 
   const { data: lim, error: el } = await admin.rpc("ia_consumir", { uid: user.id, max_conta: MAX_CONTA, max_sistema: MAX_SISTEMA });
-  if (el) return json(500, { erro: "Não consegui conferir o limite agora." });
+  if (el) { console.error("limite:", el.message); return json(500, { erro: "Não consegui conferir o limite agora." }); }
   if (!lim?.ok) return json(429, { erro: lim?.motivo === "conta" ? "limite_conta" : "limite_sistema" });
 
   const msgs = [{ role: "system", content: sistema(a, contexto) }];
@@ -85,8 +88,11 @@ Deno.serve(async (req: Request) => {
     body: JSON.stringify({ messages: msgs, max_tokens: 350, temperature: 0.5 }),
   });
   const j = await r.json().catch(() => null);
-  if (!r.ok || !j?.success) return json(502, { erro: "A IA não respondeu agora." });
-  let resp = String(j.result?.response ?? "").trim();
+  if (!r.ok || !j?.success) {
+    console.error("cloudflare falhou:", r.status, JSON.stringify(j?.errors ?? j).slice(0, 500));
+    return json(502, { erro: "A IA não respondeu agora." });
+  }
+  const resp = String(j.result?.response ?? "").trim();
   if (!resp || /FORA_DO_ASSUNTO/.test(resp)) return json(200, { resposta: a.fora, fora: true });
   return json(200, { resposta: resp.slice(0, 1500) });
 });
