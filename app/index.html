@@ -674,6 +674,10 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .mo-l{display:grid;gap:8px;padding:6px 0}.mo-bar{position:relative;height:12px;border-radius:99px;background:var(--line);margin:14px 0 4px}.mo-bar i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:linear-gradient(90deg,#FFB13D,#E0559B)}
 .mo-bar s{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--muted);text-decoration:none}.mo-bar s.ok{background:#1DAE8A}.mo-bar s em{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-style:normal;font-size:.95rem}
 .mo-fx{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem;color:var(--muted)}.mo-fx .ok{color:var(--ok,#1DAE8A);font-weight:700}
+.mh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}.mh-c{display:flex;gap:12px;align-items:center;text-align:left;cursor:pointer;font:inherit;color:var(--ink);border:1px solid var(--line)}
+.mh-c:hover{border-color:var(--accent)}.mh-n{display:inline-block;vertical-align:middle;margin-left:6px;background:var(--ok,#1DAE8A);color:#fff;font-size:.7rem;font-weight:800;border-radius:99px;padding:2px 8px}.mh-c b{display:block}.mh-c small{color:var(--muted);font-size:.8rem}.mh-ic{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);flex:none}.mh-ic svg{width:22px;height:22px}
+.mh-fora{display:grid;gap:6px;font-size:.88rem;color:var(--muted)}.mh-fora span{display:flex;align-items:center;gap:6px}.mh-fora svg{width:16px;height:16px;opacity:.6}
+.dash-tit{font-size:1.05rem;margin:4px 0 10px}
 .pr-col{display:grid;gap:6px}.pr-itens{display:flex;flex-wrap:wrap;gap:10px}.pr-it{display:flex;align-items:baseline;gap:5px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:6px 12px}.pr-it i{font-style:normal;font-size:1.3rem}.pr-it b{font-size:1.2rem}.pr-it small{color:var(--muted)}
 .festa-gr small{display:block;font-weight:700;color:var(--muted);margin-bottom:4px}.festa-op{display:flex;flex-wrap:wrap;gap:6px}
 .festa-b{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 12px;font:inherit;font-size:.86rem;cursor:pointer}
@@ -1387,7 +1391,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,mem:(S.prefs||{}).mem||null,leads:(S.prefs||{}).leads||null,orig:(S.prefs||{}).orig||null,premios:(S.prefs||{}).premios||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,mem:(S.prefs||{}).mem||null,leads:(S.prefs||{}).leads||null,orig:(S.prefs||{}).orig||null,premios:(S.prefs||{}).premios||null,lib:(S.prefs||{}).lib||null,dashFull:(S.prefs||{}).dashFull||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -1439,14 +1443,14 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null,mem:pref.mem||null,leads:pref.leads||null,orig:pref.orig||null,premios:pref.premios||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null,mem:pref.mem||null,leads:pref.leads||null,orig:pref.orig||null,premios:pref.premios||null,lib:pref.lib||null,dashFull:pref.dashFull||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
     novo.faixas=novo.faixas.filter(function(x){return !x.deleted;});
     novo.pagamentos.forEach(function(g){g.pedidos=novo.pedidos.filter(function(x){return x.pagamentoId===g.id;}).map(function(x){return x.id;});});
     novo.seq=novo.pedidos.reduce(function(m,x){return Math.max(m,x.num||0);},0);
-    S=novo;tiraFoto();ui.dadosOk=true;passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);
+    S=novo;tiraFoto();ui.dadosOk=true;passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);setTimeout(libCheca,2500);
     try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
   S.carregando=false;ui.autoArqMes=null;aplicaTema(temaAtual(),modoAtual());autoArquivar();render();iniciaUso();secAbreDia();
@@ -1599,14 +1603,33 @@ var ICON={
   rede:ic('<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M10.8 7.2 6.3 15.8M13.2 7.2l4.5 8.6M7.5 18h9"/>')
 };
 var MENU=[
-  ['Principal',[['dashboard','Dashboard'],['secretarios','Agentes IA'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
-  ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
+  ['Principal',[['dashboard','Início'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
+  ['Mais',[['secretarios','Equipe de IA'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['rede','Rede'],['visu','Visualizador 3D']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='18/10 · 00h25';
-var CFG=['config','tabela','arquivos','lixeira'];
+var MAIS_IDS=['secretarios','metas','analises','ranking','rede','visu','mais'];
+var MAIS_DESC={secretarios:'Converse com a Ana, o Sr. Otávio, a Bia, a Mika e o Klose',metas:'Meta oficial com medalhas 🥉🥈🥇 e presentes',analises:'Saúde do negócio, clientes sumidos e sinais',ranking:'Quem são seus melhores clientes',rede:'Seu perfil público e cadistas da Rede',visu:'Abra STL, PLY e OBJ no navegador'};
+/* ===== Liberação aos poucos: conta nova começa só com o núcleo; cada função chega na hora certa, apresentada por um agente =====
+   S.prefs.lib = {ini:'AAAA-MM-DD', all:1 (tudo liberado), metas:'data', ...}. Contas que já tinham pedidos ganham tudo liberado. */
+var LIBS=[
+  {k:'envio',g:'ven',h:'feliz',so:1,c:function(){return alive(S.pedidos).some(function(p){return p.status==='finalizado'||p.status==='arquivado';});},tit:'Primeiro pedido finalizado! 🎉',txt:'Dica: dentro do pedido, o botão verde manda o STL e o HTML direto no WhatsApp do cliente. E ele ganha uma página para aprovar o caso.',bts:[]},
+  {k:'leads',g:'mkt',h:'animada',so:1,c:function(){return alive(S.clientes).length>=2;},tit:'Clientes chegando! 📣',txt:'Se você anuncia no Instagram ou no Facebook, me manda o print dos contatos que chegaram. Eu monto a lista e cuido das mensagens no WhatsApp.',bts:[{a:'leadAbre',l:'Ver Leads',pri:1}]},
+  {k:'metas',g:'ger',h:'satisfeito',c:function(){return alive(S.pedidos).length>=10;},tit:'10 pedidos! Liberei as Metas 🎯',txt:'Agora eu calculo sua meta oficial todo mês. Bateu, ganha medalha 🥉🥈🥇 e presente. Só conta pedido finalizado com STL e HTML guardados aqui.',bts:[{a:'tab',v:'metas',l:'Ver metas',pri:1}]},
+  {k:'analises',g:'dad',h:'analisando',c:function(){var cm=monthOf(today());return alive(S.pedidos).some(function(p){return p.recebido&&monthOf(p.recebido)<cm;});},tit:'Seu primeiro mês fechou 📊',txt:'Liberei as Análises e o Ranking de clientes: quem manda mais, quem sumiu e como está a saúde do seu negócio.',bts:[{a:'tab',v:'analises',l:'Ver análises',pri:1}],tambem:['ranking']},
+  {k:'sala',g:'ger',h:'serio',c:function(){return libIdade()>=14;},tit:'Agora tem reunião de equipe ☕',txt:'Todo dia, no primeiro acesso, a equipe se reúne e te conta o que viu: pedidos, dinheiro, clientes e marketing.',bts:[{a:'tab',v:'secretarios',l:'Ver a equipe',pri:1}]},
+  {k:'passeio',g:'ven',h:'feliz',so:1,c:function(){return libIdade()>=7;},tit:'Uma semana juntos! 💛',txt:'A partir de agora, de vez em quando um de nós aparece aqui no canto com um aviso ou uma dica. Dá para desligar em Configurações.',bts:[]},
+  {k:'rede',g:'mkt',h:'animada',c:function(){try{return alive(S.pedidos).filter(function(p){return pedComprovado(p);}).length>=10;}catch(e){return false;}},tit:'10 trabalhos comprovados! 🌐',txt:'Você já pode publicar seu perfil na Rede. Laboratórios veem seus trabalhos comprovados e podem te chamar.',bts:[{a:'tab',v:'rede',l:'Ver a Rede',pri:1}]}];
+function libEstado(){S.prefs=S.prefs||{};var L=S.prefs.lib;if(!L||typeof L!=='object'){L=S.prefs.lib={ini:today()};if(alive(S.pedidos).length||alive(S.clientes).length)L.all=1;}return L;}
+function libIdade(){var L=libEstado();return L.ini?Math.round((new Date(today()+'T12:00:00')-new Date(L.ini+'T12:00:00'))/864e5):99;}
+function libOk(k){if(EM_DEMO||!S.sessao)return true;if(['metas','analises','ranking','rede','sala','passeio'].indexOf(k)<0)return true;var L=libEstado();return !!(L.all||L[k]);}
+function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),mud=false;
+  LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
+    if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
+  if(mud){save();render();}}
+var VERSAO='18/10 · 01h00';
+var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
-var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
+var TITULOS={mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAplica)decoAplica();},0);
@@ -1622,7 +1645,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
   if(!w) chip='<span class="tag u">Conta bloqueada</span>';
   else chip='';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
-    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,lab:rLab,analises:rAnalisesTab,metas:rMetasTab,secretarios:rSecretarios,visu:rVisu,config:rConfig,admin:rAdmin};
+    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,lab:rLab,mais:rMaisHub,analises:rAnalisesTab,metas:rMetasTab,secretarios:rSecretarios,visu:rVisu,config:rConfig,admin:rAdmin};
   var body=ui.tour!=null&&ui.tab!=='config'?comDemo(R[ui.tab]||rDashboard):(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
@@ -1632,7 +1655,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
   var NL=secNaoLidas();
   var itSd=function(id,lbl){return id==='analises'&&SD?{c:' sd sd-'+SD.nivel,st:' style="--sd:'+SD.cor+'" title="Saúde do negócio: '+SD.nota+'/100"',l:SD.nome}:{c:'',st:'',l:lbl};};
   var side='<aside class="side" aria-label="Menu"><div class="brand">'+logo(30)+'<span>Ideali CAD</span></div>'+
-    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return (it[0]!=='admin'&&it[0]!=='lab')||S.admin;}).map(function(it){
+    MENU.map(function(g){return '<div class="grp">'+g[0]+'</div>'+g[1].filter(function(it){return ((it[0]!=='admin'&&it[0]!=='lab')||S.admin)&&libOk(it[0]);}).map(function(it){
       var badge=it[0]==='secretarios'&&NL?'<span class="badge" style="background:var(--ok)">'+NL+'</span>':it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':it[0]==='config'&&lix?'<span class="badge" style="background:var(--muted)">'+lix+'</span>':'';
       var z=itSd(it[0],it[1]);return '<button class="it'+z.c+' '+(ui.tab===it[0]||(it[0]==='config'&&emCfg())?'on':'')+'"'+z.st+' data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+z.l+'</span>'+badge+'</button>';}).join('');}).join('')+
     '<div class="plan"><div class="between"><b>Plano</b>'+chip+'</div>'+
@@ -1641,7 +1664,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
       '</div>'+
     '<div class="me"><span class="av">'+esc((nome[0]||'?').toUpperCase())+'</span><span class="nm">'+esc(nome)+'</span><button class="icon-btn" data-a="sair" aria-label="Sair" title="Sair" style="width:32px;height:32px">'+ICON.sair+'</button></div></aside>';
   var titulo=ui.tab==='analises'&&SD?'<span style="color:'+SD.cor+'">'+SD.nome+'</span>':(TITULOS[ui.tab]||'');
-  var flat=[];MENU.forEach(function(g){g[1].forEach(function(it){if(it[0]!=='config'&&((it[0]!=='admin'&&it[0]!=='lab')||S.admin))flat.push(it);});});
+  var flat=MENU[0][1].slice();if(S.admin)flat.push(['admin','Admin']);
   var top='<header class="top"><div class="top-in">'+
     '<button class="icon-btn menu-btn" data-a="drawer" aria-label="Abrir menu">'+ICON.menu+'</button>'+
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
@@ -1653,12 +1676,14 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
     '<span class="menu-btn">'+chip.replace('Grátis no lançamento','Grátis')+'</span></div>'+
     '<nav class="tnav" aria-label="Menu principal"><div class="tnav-in">'+flat.map(function(it){
       var badge=it[0]==='secretarios'&&NL?'<span class="badge" style="background:var(--ok)">'+NL+'</span>':it[0]==='pedidos'&&urg?'<span class="badge">'+urg+'</span>':'';
-      var z=itSd(it[0],it[1]);return '<button class="'+(ui.tab===it[0]?'on':'')+z.c+'"'+z.st+' data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+z.l+'</span>'+badge+'</button>';}).join('')+'</div></nav></header>';
+      var z=itSd(it[0],it[1]);return '<button class="'+(ui.tab===it[0]?'on':'')+z.c+'"'+z.st+' data-a="tab" data-v="'+it[0]+'">'+ICON[it[0]]+'<span>'+z.l+'</span>'+badge+'</button>';}).join('')+
+      '<button class="'+(MAIS_IDS.indexOf(ui.tab)>=0?'on':'')+'" data-a="tab" data-v="mais">'+ICON.menu+'<span>Mais'+(MAIS_IDS.indexOf(ui.tab)>=0&&ui.tab!=='mais'?' · '+esc(TITULOS[ui.tab]||''):'')+'</span>'+(NL?'<span class="badge" style="background:var(--ok)">'+NL+'</span>':'')+'</button>'+
+      '<button class="'+(emCfg()?'on':'')+'" data-a="tab" data-v="config">'+ICON.config+'<span>Configurações</span></button></div></nav></header>';
   var bnav='<nav class="bnav" aria-label="Navegação">'+
     bn('dashboard','Início')+bn('pedidos','Produção')+
     '<button data-a="novoPedido" aria-label="Novo pedido" '+(w?'':'disabled')+'><span class="plus">+</span></button>'+
     bn('financeiro','Financeiro')+
-    '<button data-a="drawer" class="'+(['dashboard','pedidos','financeiro'].indexOf(ui.tab)<0?'on':'')+'">'+ICON.menu+'<span>Menu</span>'+(NL?'<span class="badge" style="background:var(--ok)">'+NL+'</span>':'')+'</button></nav>';
+    '<button data-a="tab" data-v="mais" class="'+(['dashboard','pedidos','financeiro'].indexOf(ui.tab)<0?'on':'')+'">'+ICON.menu+'<span>Mais</span>'+(NL?'<span class="badge" style="background:var(--ok)">'+NL+'</span>':'')+'</button></nav>';
   app.innerHTML='<div class="shell '+(ui.drawer?'open':'')+'">'+side+'<div class="scrim" data-a="drawer"></div>'+
     '<div class="content">'+top+'<main class="main">'+
     (w?'':'<div class="banner bad"><span><b>Conta bloqueada.</b> Seus dados estão guardados. Você pode ver e exportar, mas não pode criar nem alterar.</span><button class="btn sm" data-a="tab" data-v="config">Ver assinatura</button></div>')+
@@ -1681,11 +1706,16 @@ function contaMenu(nome,lix){
       '<hr><a role="menuitem" class="dd-sup" href="https://wa.me/'+SUPORTE.wa+'?text='+encodeURIComponent('Olá! Preciso de ajuda com o Ideali CAD.')+'" target="_blank" rel="noopener"><span class="ci">💬 Suporte e dúvidas</span></a><button role="menuitem" data-a="sair"><span class="ci">'+ICON.sair+'Sair</span></button></div>':'')+'</div>';
 }
 function cfgTabs(lix){
-  var t=[['config','Perfil e conta','Perfil'],['tabela','Tabela de preços','Preços'],['arquivos','Arquivos STL','STL'],['lixeira','Lixeira','Lixeira']];if(S.admin)t.push(['admin','Administração','Admin']);
+  var t=[['config','Perfil e conta','Perfil'],['tabela','Tabela de preços','Preços'],['tipos','Tipos de trabalho','Tipos'],['arquivos','Arquivos STL','STL'],['lixeira','Lixeira','Lixeira']];if(S.admin)t.push(['admin','Administração','Admin']);
   return '<nav class="cfg-tabs" aria-label="Configurações">'+t.map(function(x){
     return '<button class="'+(ui.tab===x[0]?'on':'')+'" data-a="tab" data-v="'+x[0]+'">'+ICON[x[0]]+'<span class="lg">'+x[1]+'</span><span class="sm">'+x[2]+'</span>'+(x[0]==='lixeira'&&lix?'<span class="n">'+lix+'</span>':'')+'</button>';}).join('')+'</nav>';
 }
 function logo(s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 28 28" aria-hidden="true"><defs><linearGradient id="lgP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--p6)"/><stop offset=".5" stop-color="var(--p5)"/><stop offset="1" stop-color="var(--p4)"/></linearGradient></defs><rect width="28" height="28" rx="8" fill="url(#lgP)"/><path d="M8 9c0-1.5 1.4-2.3 3-2 1.3.2 2 .9 3 .9s1.7-.7 3-.9c1.6-.3 3 .5 3 2 0 3-1 5-1.6 8.5-.4 2.3-1 3.5-1.9 3.5-1.2 0-1.2-4-2.5-4s-1.3 4-2.5 4c-.9 0-1.5-1.2-1.9-3.5C9 14 8 12 8 9z" fill="#fff"/></svg>';}
+function rMaisHub(){var it=MENU[1][1],ok=it.filter(function(x){return libOk(x[0]);}),fora=it.filter(function(x){return !libOk(x[0]);}),NL=secNaoLidas();
+  var dica={metas:'com 10 pedidos',analises:'quando seu primeiro mês fechar',ranking:'quando seu primeiro mês fechar',rede:'com 10 trabalhos comprovados'};
+  return '<div class="stack" style="gap:16px"><div class="mh-grid">'+ok.map(function(x){return '<button class="card mh-c" data-a="tab" data-v="'+x[0]+'"><span class="mh-ic">'+ICON[x[0]]+'</span><span><b>'+esc(x[1])+(x[0]==='secretarios'&&NL?' <span class="mh-n">'+NL+' novo'+(NL>1?'s':'')+'</span>':'')+'</b><small>'+esc(MAIS_DESC[x[0]]||'')+'</small></span></button>';}).join('')+
+    '<button class="card mh-c" data-a="tab" data-v="config"><span class="mh-ic">'+ICON.config+'</span><span><b>Configurações</b><small>Perfil, tabela de preços, tipos de trabalho, aparência</small></span></button></div>'+
+    (fora.length?'<section class="card stack"><h2 style="margin:0">Chegando para você 🔒</h2><p class="small muted" style="margin:0">Essas funções aparecem sozinhas na hora certa, e alguém da equipe te apresenta.</p><div class="mh-fora">'+fora.map(function(x){return '<span>'+ICON[x[0]]+' <b>'+esc(x[1])+'</b> · '+esc(dica[x[0]]||'em breve')+'</span>';}).join('')+'</div><button class="btn sm" data-a="libTudo" style="justify-self:start">Mostrar tudo agora</button></section>':'')+'</div>';}
 function bn(v,l){return '<button data-a="tab" data-v="'+v+'" class="'+(ui.tab===v?'on':'')+'">'+ICON[v]+'<span>'+l+'</span></button>';}
 
 /* ---------- Login ---------- */
@@ -2572,7 +2602,7 @@ var DECOS=[
   {id:'halloween',nome:'Halloween',emoji:'🎃',m:10,d:31,cores:['#F58A2A','#2A1840','#8E44D9','#F58A2A'],bandeira:'',canto:['abobora','fantasma','abobora'],voa:['morcego','morcego','morcego','fantasma'],teia:true}];
 function decoAtual(t){t=t||today();var y=+t.slice(0,4),best=null;
   DECOS.forEach(function(x){[y,y+1].forEach(function(yy){var d=yy+'-'+pad(x.m)+'-'+pad(x.d),n=daysBetween(t,d);if(n>=0&&n<=10&&(!best||n<best.n))best={x:x,n:n,d:d};});});return best;}
-function decoOff(){return !!(S.prefs&&S.prefs.deco==='off');}
+function decoOff(){return !!(S.prefs&&S.prefs.deco==='off')||(!!S.sessao&&ui.dadosOk&&!libOk('passeio'));}
 function decoHtml(b){var x=b.x,h='',k;
   if(x.teia)h+='<i class="dc-teia">'+DECO_SVG.teia+'</i><i class="dc-aranha">'+DECO_SVG.aranha+'</i>';
   var tag='<span class="dc-tag">'+x.emoji+' '+esc(x.nome)+(b.n===0?' é hoje!':b.n===1?' é amanhã':' em '+b.n+' dias')+'</span>';
@@ -2610,7 +2640,7 @@ var DICAS={
        {h:'desconfiado',tit:'Ajuste demais?',sub:'Cliente que sempre pede ajuste? Combine as informações do caso antes de começar.'}]};
 function psLe(){try{var v=JSON.parse(localStorage.getItem('idealicad_passeio')||'{}');return v.d===today()?v:{d:today(),k:{},n:0,t:0};}catch(e){return {d:today(),k:{},n:0,t:0};}}
 function psGrava(v){try{localStorage.setItem('idealicad_passeio',JSON.stringify(v));}catch(e){}}
-function passeioOff(){return !!(S.prefs&&S.prefs.passeio==='off');}
+function passeioOff(){return !!(S.prefs&&S.prefs.passeio==='off')||(!!S.sessao&&ui.dadosOk&&!libOk('passeio'));}
 function passeioEscolhe(tab){var ids=(PASSEIO_TAB[tab]||[]).slice(),F={ger:msgsGer,ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},v=psLe();
   ids.sort(function(){return Math.random()-.5;});
   for(var i=0;i<ids.length;i++){var ms=[];try{ms=F[ids[i]]();}catch(e){}
@@ -2664,7 +2694,7 @@ function eqConversas(){var t=today(),O={ven:[],fin:[],mkt:[],dad:[],ger:[]},add=
     if(sub)add('ven','dad','sub_'+sub.c.id,'comemorando','Ana, '+nomeCurtoCli(sub.c)+' está mandando mais: '+sub.r30+' pedidos em 30 dias. Bom momento para agradecer!');}catch(e){}
   try{var v=salaAtual();if(v&&v.dec.length)v.dec.forEach(function(o){if(o[1]!=='ger'&&!(v.feito&&v.feito[o[0]]))add(o[1],'ger','dec_'+o[0],'serio','Ficou decidido na reunião: '+o[2]+'. Quero isso feito hoje.');});}catch(e){}
   return O;}
-function salaAuto(){try{if(!S.sessao||EM_DEMO||salaAtual()||ui.salaRod||!alive(S.pedidos).length)return;salaRoda();}catch(e){}}
+function salaAuto(){try{if(!S.sessao||EM_DEMO||!libOk('sala')||salaAtual()||ui.salaRod||!alive(S.pedidos).length)return;salaRoda();}catch(e){}}
 function secChats(){var F={ger:msgsGer,ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},v=secVistos().k,EQ={};try{EQ=eqConversas();}catch(e){}
   return SECS.map(function(g){var ms=[];try{ms=F[g.id]().concat(EQ[g.id]||[]);}catch(e){ms=[];}
     var nl=ms.filter(function(m){return !v[m.k]&&!secOkHoje(m.k)&&m.k.slice(-3)!=='_oi';}).length,urg=ms.some(function(m){return m.n==='alta'&&!secOkHoje(m.k);});
@@ -2868,7 +2898,7 @@ async function verificaAntigos(){if(ui.verifOk||ui.verifRod||EM_DEMO||!S.sessao)
     ui.verifOk=true;}catch(e){ui.verifOk=true;}
   try{if(S.redeStats&&S.sessao)delete S.redeStats[S.sessao.id];}catch(e){}
   ui.verifRod=false;if(ui.tab==='metas')render();premioCheca();}
-function premioCheca(){try{if(!S||!S.sessao||EM_DEMO||ui.premioAdiado||document.getElementById('festa'))return;if(!ui.verifOk){verificaAntigos();return;}
+function premioCheca(){try{if(!S||!S.sessao||EM_DEMO||!libOk('metas')||ui.premioAdiado||document.getElementById('festa'))return;if(!ui.verifOk){verificaAntigos();return;}
   var m=monthOf(today()),of=metaOficial(m);if(!of||of.calib)return;var r=realOficial(m),H=premiosDe().h,ach=null;
   ['fat','el'].some(function(k){if(!of[k])return false;return FAIXAS.some(function(f){var alvo=k==='fat'?Math.round(of.fat*f[3]*100)/100:Math.ceil(of.el*f[3]);if(r[k]>=alvo&&!H[m+':'+k+':'+f[0]]){ach={k:k,f:f,alvo:alvo};return true;}return false;});});
   if(!ach)return;ui.premio={k:ach.k,m:m,real:r[ach.k],meta:ach.alvo,f:ach.f};var d=document.createElement('div');d.id='festa';d.className='festa-bg pr-bg';document.body.appendChild(d);premioRender();fogos(5000);setTimeout(function(){fogos(2500);},5200);}catch(e){}}
@@ -3338,7 +3368,7 @@ function rDashboard(){
   var fv=meses.map(fatMes),pv=meses.map(pagoMes);
   return '<section class="hero-clima '+cenaClima().tipo+'"><canvas id="ceu" aria-hidden="true"></canvas><div class="stack hero-in" style="gap:12px"><div class="between wrap"><div class="row wrap" style="gap:14px">'+saud.ic+'<div><h2 style="font-size:1.5rem">'+saud.t+(nome?', '+esc(nome):'')+'</h2><p class="muted small">Resumo de '+perNome()+'</p></div>'+infoDia()+'</div>'+
       '<div class="row wrap">'+(urg.length?'<span class="tag u">'+urg.length+' urgente(s)</span>':'')+(atr.length?'<span class="tag u">'+atr.length+' atrasado(s)</span>':'')+'</div></div>'+perPicker()+'</div></section>'+
-    primeirosPassos()+lembretes()+'<div class="dash" style="margin-bottom:16px">'+secMini()+secFraseCard()+secEntregasCard()+'</div>'+
+    primeirosPassos()+lembretes()+(!(S.prefs&&S.prefs.dashFull)&&!EM_DEMO?dashSimples(fat,rec,arec,nDev,G,prevPs,sparkM,el):'<div class="dash" style="margin-bottom:16px">'+secMini()+secFraseCard()+secEntregasCard()+'</div>'+
     (!S.perfil.chave&&!primeirosPassos()?'<div class="banner"><span>Cadastre sua chave Pix para cobrar seus clientes pelo QR Code.</span><button class="btn sm" data-a="tab" data-v="config">Cadastrar chave</button></div>':'')+
     '<div class="dash">'+
       kpi(G?'Faturamento total':'Faturamento do mês',brl(fat),G?'<span>'+ps.length+' pedidos</span>':delta(fat,soma(prevPs)),spark(sparkM.map(fatMes)),'financeiro')+
@@ -3363,8 +3393,20 @@ function rDashboard(){
       '<section class="card stack half" style="grid-column:span 12"><div class="between"><h2>Armazenamento</h2><button class="btn sm" data-a="tab" data-v="arquivos">Controle de espaço</button></div>'+
         '<div class="between"><b class="mono" style="font-size:1.3rem">'+bytes(u)+'</b><span class="muted small">de '+bytes(lim)+' · '+pct.toFixed(1).replace('.',',')+'%</span></div>'+
         '<div class="bar '+(pct>90?'full':pct>75?'warn':'')+'"><i style="width:'+pct.toFixed(1)+'%"></i></div></section>'+
-    '</div>';
+    '</div>')+(EM_DEMO?'':'<div class="row" style="justify-content:center;margin-top:16px"><button class="btn sm" data-a="dashFull">'+(S.prefs&&S.prefs.dashFull?'Ver menos ▴':'Ver painel completo ▾ <span class="muted small">(gráficos, produção, clientes, trabalhos)</span>')+'</button></div>');
 }
+/* Início simples: Hoje (equipe + entregas + quem deve) e Seu mês (faturado, recebido, a receber, medalha) */
+function dashSimples(fat,rec,arec,nDev,G,prevPs,sparkM,el){var cm=monthOf(today()),med='';
+  if(libOk('metas')){try{var of=metaOficial(cm),r=realOficial(cm);if(of&&!of.calib&&of.fat){var al=FAIXAS.map(function(f){return Math.round(of.fat*f[3]*100)/100;}),i=-1;al.forEach(function(a,j){if(r.fat>=a)i=j;});
+    var prox=i<2?FAIXAS[i+1]:null;med=kpi('Medalha do mês',i>=0?FAIXAS[i][1]+' '+FAIXAS[i][2]:'—',prox?'<span>faltam '+brl(al[i+1]-r.fat)+' para '+prox[1]+' '+prox[2]+'</span>':'<span>Ouro! Faixa máxima 🎉</span>','','metas');}}catch(e){}}
+  if(!med)med=kpi('Elementos',el,G?'':delta(el,elems(prevPs)),spark(sparkM.map(function(m){return elems(alive(S.pedidos).filter(function(p){return monthOf(p.recebido)===m;}));})),null);
+  return '<div class="dash" style="margin-bottom:16px">'+secMini()+secEntregasCard()+
+      '<section class="card stack tres2"><div class="between"><div><h2 style="margin:0">Quem está devendo</h2><p class="small muted" style="margin:2px 0 0">'+(nDev?plural(nDev,'cliente','clientes')+' · '+brl(soma(arec)):'Tudo em dia')+'</p></div><button class="btn sm" data-a="tab" data-v="financeiro">Financeiro</button></div>'+
+        (nDev?'<div class="list">'+devedores().slice(0,4).map(liDevedor).join('')+'</div>':'<p class="empty">Ninguém devendo. 🎉</p>')+'</section></div>'+
+    '<h2 class="dash-tit">Seu mês</h2><div class="dash">'+
+      kpi(G?'Faturamento total':'Faturamento do mês',brl(fat),G?'':delta(fat,soma(prevPs)),spark(sparkM.map(fatMes)),'financeiro')+
+      kpi('Recebido',brl(rec),'<span>'+(fat?Math.round(rec/fat*100):0)+'% do faturado</span>','','financeiro')+
+      kpi('A receber',brl(soma(arec)),'<span>'+nDev+' cliente(s) · '+arec.length+' pedido(s)</span>','','financeiro')+med+'</div>';}
 function primeiroNome(){
   var n=(S.perfil.nome||'').trim().split(/\s+/)[0];
   if(!n&&S.sessao&&S.sessao.email){n=S.sessao.email.split('@')[0].split(/[._\-0-9]/)[0];}
@@ -4867,7 +4909,7 @@ function rConfig(){
     '<section class="card stack"><h2>Use como aplicativo</h2>'+(window._instalar?'<p class="small muted">Coloque o Ideali CAD na tela inicial e abra como um app, sem a barra do navegador.</p><button class="btn pri" data-a="instalarApp">Instalar no celular / computador</button>':
       (window.matchMedia&&matchMedia('(display-mode: standalone)').matches?'<p class="small muted">Você já está usando como aplicativo. ✓</p>':'<p class="small muted"><b>Android (Chrome):</b> menu ⋮ → <b>Adicionar à tela inicial</b>.<br><b>iPhone (Safari):</b> botão Compartilhar → <b>Adicionar à Tela de Início</b>.</p>'))+'</section>'+
     '<section class="card stack"><h2>Perfil na Rede</h2><p class="small muted">Foto, especialidades, softwares, portfólio e vídeo. Você escolhe se publica para outros usuários verem.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="prEditar">Editar perfil na Rede</button><button class="btn" data-a="rdPerfil" data-id="eu">Ver como fica</button></div></section>'+
-    secTema()+'<section class="card stack"><h2>Apresentação</h2><p class="small muted">Veja de novo as boas-vindas, o tour e a sua equipe, do jeito que aparece para quem acabou de criar a conta. Seus dados não mudam.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="novaConta">Ver como conta nova</button><button class="btn" data-a="eqIr" data-v="rever">Só a equipe</button></div><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="passeioTg"'+(passeioOff()?'':' checked')+'><span>Equipe passeando pelo sistema <span class="muted small">(de vez em quando alguém aparece no canto da tela com um aviso ou dica)</span></span></label><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="decoTg"'+(decoOff()?'':' checked')+'><span>Decorações de datas especiais <span class="muted small">(Halloween, Natal, Dia do Dentista… aparecem 10 dias antes)</span></span></label></section><section class="card stack"><h2>Importar dados</h2><p class="small muted">Traga clientes, pedidos e pagamentos de outro sistema (arquivo .json de importação). Antes de gravar, você confere tudo numa prévia.</p><div><label class="btn up">Escolher arquivo .json<input type="file" accept=".json,application/json" id="imp-file" hidden></label></div></section>'+
+    secTema()+'<section class="card stack"><h2>Apresentação</h2><p class="small muted">Veja de novo as boas-vindas, o tour e a sua equipe, do jeito que aparece para quem acabou de criar a conta. Seus dados não mudam.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="novaConta">Ver como conta nova</button><button class="btn" data-a="eqIr" data-v="rever">Só a equipe</button></div><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="libTg"'+(libEstado().all?' checked':'')+'><span>Mostrar todas as funções <span class="muted small">(desligado, as funções aparecem aos poucos, conforme você usa)</span></span></label><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="passeioTg"'+(passeioOff()?'':' checked')+'><span>Equipe passeando pelo sistema <span class="muted small">(de vez em quando alguém aparece no canto da tela com um aviso ou dica)</span></span></label><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="decoTg"'+(decoOff()?'':' checked')+'><span>Decorações de datas especiais <span class="muted small">(Halloween, Natal, Dia do Dentista… aparecem 10 dias antes)</span></span></label></section><section class="card stack"><h2>Importar dados</h2><p class="small muted">Traga clientes, pedidos e pagamentos de outro sistema (arquivo .json de importação). Antes de gravar, você confere tudo numa prévia.</p><div><label class="btn up">Escolher arquivo .json<input type="file" accept=".json,application/json" id="imp-file" hidden></label></div></section>'+
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Plano</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
@@ -5640,8 +5682,8 @@ impGrava:function(){impGrava();},
     if(n){var a=nomeProprio((n.value||'').trim()),b=nomeProprio(((sn&&sn.value)||'').trim());if(!a){toast('Digite seu nome.');n.focus();return;}S.perfil.nome=(a+' '+b).trim();save();}
     if(d.v==='tour')vaiTour(0);else fimTour();},
   eqIr:function(d){if(d.v==='rever'){ui.equipe=0;closeSheet();render();window.scrollTo(0,0);return;}if(d.v==='fim'){fimEquipe();return;}var i=(ui.equipe||0)+(d.v==='voltar'?-1:1);if(i<0)i=0;if(i>=EQ_INTRO.length){fimEquipe();return;}ui.equipe=i;render();window.scrollTo(0,0);},
-  decoTg:function(d,el){S.prefs=S.prefs||{};S.prefs.deco=el.checked?null:'off';save();decoAplica();},
-  passeioTg:function(d,el){S.prefs=S.prefs||{};S.prefs.passeio=el.checked?null:'off';save();if(!el.checked)passeioTira();toast(el.checked?'A equipe vai aparecer de vez em quando.':'A equipe não vai mais passear pelas telas.');},
+  decoTg:function(d,el){S.prefs=S.prefs||{};S.prefs.deco=el.checked?null:'off';if(el.checked){var L=libEstado();L.passeio=L.passeio||today();}save();decoAplica();},
+  passeioTg:function(d,el){S.prefs=S.prefs||{};S.prefs.passeio=el.checked?null:'off';if(el.checked){var L=libEstado();L.passeio=L.passeio||today();}save();if(!el.checked)passeioTira();toast(el.checked?'A equipe vai aparecer de vez em quando.':'A equipe não vai mais passear pelas telas.');},
   novaConta:function(){ui.novaConta=true;ui.tour=null;ui.equipe=null;closeSheet();render();window.scrollTo(0,0);},
   tourIr:function(d){if(d.v==='fim'){fimTour();return;}var i=(ui.tour||0)+(d.v==='voltar'?-1:1);if(i<0)i=0;if(i>=TOUR.length){fimTour();return;}vaiTour(i);},
   valuation:function(){openSheet(fValuation);},
@@ -5801,6 +5843,10 @@ impGrava:function(){impGrava();},
   addRef:function(){if(!guard())return;var f=refFaltando();f.forEach(function(r){S.tipos.push({id:uid(),nome:r[0],forma:r[1],valor:0,ativo:true});});save();render();toast(f.length+' trabalho(s) adicionado(s) com R$ 0,00.');},
   contaIr:function(d){ui.ddOpen=null;A.tab(d);},
   tab:function(d){ui.tab=d.v;ui.msgs=false;ui.sub=d.sub||null;ui.drawer=false;if('f' in d)ui.filtro=d.f==='urg'?'urg':'todos';closeSheet();render();window.scrollTo(0,0);passeioTira();passeioAgenda();},
+  libTg:function(d,el){var L=libEstado();if(el.checked)L.all=1;else delete L.all;save();render();toast(el.checked?'Todas as funções liberadas.':'As funções vão aparecer aos poucos.');},
+  libTudo:function(){var L=libEstado();L.all=1;save();render();toast('Pronto! Tudo liberado.');},
+  libReset:function(){S.prefs.lib={ini:today()};save();render();toast('Voltou ao modo de conta nova: as funções aparecem aos poucos.');},
+  dashFull:function(){S.prefs=S.prefs||{};S.prefs.dashFull=S.prefs.dashFull?null:1;save();render();},
   sub:function(d){ui.sub=d.v||null;render();window.scrollTo(0,0);},
   filtro:function(d){ui.filtro=d.v;render();},
   mes:function(d){ui.mes=d.d==='1'?nextMonth(ui.mes):prevMonth(ui.mes);render();},
@@ -6000,7 +6046,7 @@ var F={
     save();render();openSheet(fPedidoDet,p.id);toast(id?'Pedido salvo.':'Pedido #'+p.num+' criado.');
     if(virou&&!EM_DEMO)setTimeout(function(){festaCliente(virou.cid,virou.pre);},500);
     if(!id&&!EM_DEMO)setTimeout(function(){try{celebraPedido(p,antesCli);}catch(e){}},virou?1500:700);
-    if(!EM_DEMO)setTimeout(premioCheca,virou?2500:1800);
+    if(!EM_DEMO){setTimeout(premioCheca,virou?2500:1800);setTimeout(libCheca,virou?9000:6000);}
     if(anexos.length)enviaArquivo(p.id,anexos);
   },
   cliente:function(fd,f){
