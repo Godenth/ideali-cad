@@ -1660,7 +1660,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 04h40';
+var VERSAO='18/10 · 04h50';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2798,16 +2798,16 @@ function memLista(){var m=memDe(),L=[];Object.keys(m.c).forEach(function(k){var 
 /* ===== Leads da Mika: o cadista cola o print dos contatos que chegaram pelos anúncios (Face/Insta),
    o sistema lê nome e telefone, e a Mika conduz uma sequência curta de mensagens no WhatsApp (para no dia 10). ===== */
 var LEAD_SEQ=[
-  {n:'Apresentação',dias:2,t:'{oi}, {nome}! Aqui é {eu}, cadista. Vi que você se interessou pelo meu trabalho de planejamento digital (coroas, facetas, protocolos e mais). 🦷 Como posso te ajudar? Se quiser, me conta que tipo de caso você mais faz.'},
-  {n:'Lembrete',dias:3,t:'{oi}, {nome}! Passando para saber se ficou alguma dúvida. Trabalho com prazo combinado e ajuste incluso. Tem algum caso para esta semana?'},
-  {n:'Prova do trabalho',dias:5,t:'{oi}, {nome}! Posso te mandar alguns antes e depois de casos que desenhei? Assim você vê o padrão de acabamento antes de mandar o primeiro caso. 😉'},
-  {n:'Última tentativa',dias:0,t:'{oi}, {nome}! Não quero te incomodar, então esta é minha última mensagem. Quando precisar de um cadista, é só me chamar aqui. Sucesso nos atendimentos! 🙌'}];
+  {n:'Retomar contato',dias:3,t:'{oi}, {nome}! Tudo bem? Aqui é {eu}, cadista. Passando para saber se você tem algum caso para esta semana. Consigo te entregar com prazo combinado e ajuste incluso.'},
+  {n:'Tabela',dias:4,t:'{oi}, {nome}! Quer que eu te mande minha tabela atualizada de valores e prazos? Assim fica fácil na hora que aparecer um caso.'},
+  {n:'Mostrar trabalho',dias:5,t:'{oi}, {nome}! Posso te mandar alguns casos que desenhei recentemente? Assim você vê o padrão de acabamento antes de mandar o primeiro.'},
+  {n:'Última mensagem',dias:0,t:'{oi}, {nome}! Vou parar de te chamar para não incomodar. Quando precisar de um cadista, é só me mandar mensagem aqui. Sucesso nos atendimentos!'}];
 /* Modo "Prospecção Ideali" (só admin): mesma ferramenta, outra lista e outras mensagens, para divulgar o próprio Ideali CAD. Sem IA: custo zero. */
 var LEAD_SEQ_IDEALI=[
-  {n:'Apresentação',dias:2,t:'{oi}, {nome}! Aqui é o {eu}, cadista e criador do Ideali CAD 🦷 Fiz um sistema pensado para o dia a dia de quem é cadista: pedidos e prazos, arquivos STL/HTML, envio pro dentista direto no WhatsApp, financeiro com Pix e uma equipe de IA que te avisa de atrasos e clientes sumidos.\n\n▶️ Veja como funciona: https://idealisystems.com/tour.html\n🌐 Site: https://idealisystems.com'},
+  {n:'Apresentação',dias:2,t:'{oi}, {nome}! Aqui é o {eu}, cadista e criador do Ideali CAD. Fiz um sistema pensado para o dia a dia de quem é cadista: pedidos e prazos, arquivos STL/HTML, envio pro dentista direto no WhatsApp, financeiro com Pix e uma equipe de IA que te avisa de atrasos e clientes sumidos.\n\nVeja como funciona: https://idealisystems.com/tour.html\nSite: https://idealisystems.com'},
   {n:'Convite',dias:3,t:'{oi}, {nome}! Conseguiu ver o Ideali CAD? O cadastro leva 1 minuto e você já começa a organizar seus pedidos: https://idealisystems.com/app/#criar . Qualquer dúvida, me chama aqui.'},
   {n:'Demonstração',dias:5,t:'{oi}, {nome}! O que o pessoal mais gosta: mandar o STL e o HTML pro dentista pelo WhatsApp, com uma página pra ele aprovar o caso. Dá para ver aqui: https://idealisystems.com/tour.html . Quer que eu te mostre em 5 minutos por vídeo?'},
-  {n:'Última tentativa',dias:0,t:'{oi}, {nome}! Última mensagem para não incomodar 🙂 Quando quiser organizar seus pedidos, o Ideali CAD está aqui: https://idealisystems.com . Sucesso!'}];
+  {n:'Última tentativa',dias:0,t:'{oi}, {nome}! Última mensagem para não incomodar. Quando quiser organizar seus pedidos, o Ideali CAD está aqui: https://idealisystems.com . Sucesso!'}];
 function ldAberto(){return (!ui.sheet&&ui.tab==='leads')||(!!ui.sheet&&ui.sheet.fn===fLeads);}
 function ldR(){if(ui.sheet&&ui.sheet.fn===fLeads)renderSheet();else if(ui.tab==='leads')render();}
 function leadIdeali(){return !!S.admin&&ldAberto()&&(ui.tab==='leads'?ui.sub==='ideali':ui.leadModo==='ideali');}
@@ -2897,8 +2897,8 @@ function leadCard(l){if(ui.leadEd===l.id)return leadEdForm(l);var SQ=leadSeq(),I
 /* ===== Tela de Leads (agenda de contatos + controle) =====
    Lista à esquerda em ordem alfabética; ao clicar, os detalhes à direita. WhatsApp abre as opções de mensagem;
    depois de enviar, o lead vai para "Aguardando retorno" pelo prazo escolhido e volta para "Chamar hoje" quando vencer. */
-var LD_ALT={cli:[['Curta','{oi}, {nome}! Aqui é {eu}, cadista 🦷 Posso te ajudar com algum caso esta semana?'],['Pergunta','{oi}, {nome}! Tudo bem? Você costuma terceirizar o planejamento digital (coroas, facetas, protocolos)? Se quiser, te mando minha tabela.'],['Tabela','{oi}, {nome}! Posso te mandar minha tabela de valores e prazos? Trabalho com prazo combinado e ajuste incluso. 😉']],
-  ideali:[['Curta','{oi}, {nome}! Aqui é o {eu}, do Ideali CAD 🦷 Posso te mostrar em 2 minutos como organizar pedidos, arquivos e cobranças? https://idealisystems.com/tour.html'],['Pergunta','{oi}, {nome}! Você é cadista? Hoje como você controla pedidos, prazos e cobranças? Fiz um sistema pra isso: https://idealisystems.com']]};
+var LD_ALT={cli:[['Curta','{oi}, {nome}! Tem algum caso para esta semana? Estou com agenda para entregar rápido.'],['Dúvida','{oi}, {nome}! Conseguiu ver os valores que te passei? Ficou alguma dúvida?'],['Primeiro contato','{oi}, {nome}! Aqui é {eu}, cadista. Vi que você se interessou pelo meu trabalho de planejamento digital (coroas, facetas, protocolos e mais). Você é dentista ou protético? Assim já te mando a tabela.']],
+  ideali:[['Curta','{oi}, {nome}! Aqui é o {eu}, do Ideali CAD. Posso te mostrar em 2 minutos como organizar pedidos, arquivos e cobranças? https://idealisystems.com/tour.html'],['Pergunta','{oi}, {nome}! Você é cadista? Hoje como você controla pedidos, prazos e cobranças? Fiz um sistema pra isso: https://idealisystems.com']]};
 var LD_F=[['hoje','Chamar hoje','📲'],['espera','Aguardando retorno','⏳'],['resp','Em conversa','💬'],['cli','Clientes','✅'],['fim','Encerrados','🗂'],['todos','Todos','👥']];
 function ldCat(l,t){return l.st==='seq'?((!l.prox||l.prox<=t)?'hoje':'espera'):l.st==='resp'?'resp':l.st==='cli'?'cli':'fim';}
 function ldOrig(l){return l.orig==='insta'?'📸 Instagram':l.orig==='face'?'📘 Facebook':l.pag?'🌐 Página de anúncio':'👤 Contato';}
