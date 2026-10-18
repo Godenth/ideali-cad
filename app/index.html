@@ -677,6 +677,7 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .mh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}.mh-c{display:flex;gap:12px;align-items:center;text-align:left;cursor:pointer;font:inherit;color:var(--ink);border:1px solid var(--line)}
 .mh-c:hover{border-color:var(--accent)}.mh-n{display:inline-block;vertical-align:middle;margin-left:6px;background:var(--ok,#1DAE8A);color:#fff;font-size:.7rem;font-weight:800;border-radius:99px;padding:2px 8px}.mh-c b{display:block}.mh-c small{color:var(--muted);font-size:.8rem}.mh-ic{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);flex:none}.mh-ic svg{width:22px;height:22px}
 .mh-fora{display:grid;gap:6px;font-size:.88rem;color:var(--muted)}.mh-fora span{display:flex;align-items:center;gap:6px}.mh-fora svg{width:16px;height:16px;opacity:.6}
+.rs-linha{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px}.rs-linha>*{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-size:.9rem;font-weight:600;cursor:pointer}.rs-linha>span{cursor:default}.rs-linha .rs-u{border-color:#E5484D;color:#E5484D}
 .dash-tit{font-size:1.05rem;margin:4px 0 10px}
 .pr-col{display:grid;gap:6px}.pr-itens{display:flex;flex-wrap:wrap;gap:10px}.pr-it{display:flex;align-items:baseline;gap:5px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:6px 12px}.pr-it i{font-style:normal;font-size:1.3rem}.pr-it b{font-size:1.2rem}.pr-it small{color:var(--muted)}
 .festa-gr small{display:block;font-weight:700;color:var(--muted);margin-bottom:4px}.festa-op{display:flex;flex-wrap:wrap;gap:6px}
@@ -1614,6 +1615,7 @@ var MAIS_DESC={secretarios:'Converse com a Ana, o Sr. Otávio, a Bia, a Mika e o
 var LIBS=[
   {k:'envio',g:'ven',h:'feliz',so:1,c:function(){return alive(S.pedidos).some(function(p){return p.status==='finalizado'||p.status==='arquivado';});},tit:'Primeiro pedido finalizado! 🎉',txt:'Dica: dentro do pedido, o botão verde manda o STL e o HTML direto no WhatsApp do cliente. E ele ganha uma página para aprovar o caso.',bts:[]},
   {k:'leads',g:'mkt',h:'animada',so:1,c:function(){return alive(S.clientes).length>=2;},tit:'Clientes chegando! 📣',txt:'Se você anuncia no Instagram ou no Facebook, me manda o print dos contatos que chegaram. Eu monto a lista e cuido das mensagens no WhatsApp.',bts:[{a:'leadAbre',l:'Ver Leads',pri:1}]},
+  {k:'painel',g:'ven',h:'feliz',c:function(){return alive(S.pedidos).length>=5;},tit:'Montei seu painel! 📋',txt:'Com 5 pedidos já dá para acompanhar: agora o Início mostra suas entregas, quem está devendo e os números do mês.',bts:[{a:'tab',v:'dashboard',l:'Ver o Início',pri:1}]},
   {k:'metas',g:'ger',h:'satisfeito',c:function(){return alive(S.pedidos).length>=10;},tit:'10 pedidos! Liberei as Metas 🎯',txt:'Agora eu calculo sua meta oficial todo mês. Bateu, ganha medalha 🥉🥈🥇 e presente. Só conta pedido finalizado com STL e HTML guardados aqui.',bts:[{a:'tab',v:'metas',l:'Ver metas',pri:1}]},
   {k:'analises',g:'dad',h:'analisando',c:function(){var cm=monthOf(today());return alive(S.pedidos).some(function(p){return p.recebido&&monthOf(p.recebido)<cm;});},tit:'Seu primeiro mês fechou 📊',txt:'Liberei as Análises e o Ranking de clientes: quem manda mais, quem sumiu e como está a saúde do seu negócio.',bts:[{a:'tab',v:'analises',l:'Ver análises',pri:1}],tambem:['ranking']},
   {k:'sala',g:'ger',h:'serio',c:function(){return libIdade()>=14;},tit:'Agora tem reunião de equipe ☕',txt:'Todo dia, no primeiro acesso, a equipe se reúne e te conta o que viu: pedidos, dinheiro, clientes e marketing.',bts:[{a:'tab',v:'secretarios',l:'Ver a equipe',pri:1}]},
@@ -1621,12 +1623,12 @@ var LIBS=[
   {k:'rede',g:'mkt',h:'animada',c:function(){try{return alive(S.pedidos).filter(function(p){return pedComprovado(p);}).length>=10;}catch(e){return false;}},tit:'10 trabalhos comprovados! 🌐',txt:'Você já pode publicar seu perfil na Rede. Laboratórios veem seus trabalhos comprovados e podem te chamar.',bts:[{a:'tab',v:'rede',l:'Ver a Rede',pri:1}]}];
 function libEstado(){S.prefs=S.prefs||{};var L=S.prefs.lib;if(!L||typeof L!=='object'){L=S.prefs.lib={ini:today()};if(alive(S.pedidos).length||alive(S.clientes).length)L.all=1;}return L;}
 function libIdade(){var L=libEstado();return L.ini?Math.round((new Date(today()+'T12:00:00')-new Date(L.ini+'T12:00:00'))/864e5):99;}
-function libOk(k){if(EM_DEMO||!S.sessao)return true;if(['metas','analises','ranking','rede','sala','passeio'].indexOf(k)<0)return true;var L=libEstado();return !!(L.all||L[k]);}
+function libOk(k){if(EM_DEMO||!S.sessao)return true;if(['metas','analises','ranking','rede','sala','passeio','painel'].indexOf(k)<0)return true;var L=libEstado();return !!(L.all||L[k]);}
 function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),mud=false;
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 01h00';
+var VERSAO='18/10 · 01h10';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3367,7 +3369,7 @@ function rDashboard(){
   var nome=primeiroNome(),saud=saudacao();
   var fv=meses.map(fatMes),pv=meses.map(pagoMes);
   return '<section class="hero-clima '+cenaClima().tipo+'"><canvas id="ceu" aria-hidden="true"></canvas><div class="stack hero-in" style="gap:12px"><div class="between wrap"><div class="row wrap" style="gap:14px">'+saud.ic+'<div><h2 style="font-size:1.5rem">'+saud.t+(nome?', '+esc(nome):'')+'</h2><p class="muted small">Resumo de '+perNome()+'</p></div>'+infoDia()+'</div>'+
-      '<div class="row wrap">'+(urg.length?'<span class="tag u">'+urg.length+' urgente(s)</span>':'')+(atr.length?'<span class="tag u">'+atr.length+' atrasado(s)</span>':'')+'</div></div>'+perPicker()+'</div></section>'+
+      '<div class="row wrap">'+(urg.length?'<span class="tag u">'+urg.length+' urgente(s)</span>':'')+(atr.length?'<span class="tag u">'+atr.length+' atrasado(s)</span>':'')+'</div></div>'+(EM_DEMO||libOk('painel')?perPicker():'')+'</div></section>'+
     primeirosPassos()+lembretes()+(!(S.prefs&&S.prefs.dashFull)&&!EM_DEMO?dashSimples(fat,rec,arec,nDev,G,prevPs,sparkM,el):'<div class="dash" style="margin-bottom:16px">'+secMini()+secFraseCard()+secEntregasCard()+'</div>'+
     (!S.perfil.chave&&!primeirosPassos()?'<div class="banner"><span>Cadastre sua chave Pix para cobrar seus clientes pelo QR Code.</span><button class="btn sm" data-a="tab" data-v="config">Cadastrar chave</button></div>':'')+
     '<div class="dash">'+
@@ -3393,10 +3395,18 @@ function rDashboard(){
       '<section class="card stack half" style="grid-column:span 12"><div class="between"><h2>Armazenamento</h2><button class="btn sm" data-a="tab" data-v="arquivos">Controle de espaço</button></div>'+
         '<div class="between"><b class="mono" style="font-size:1.3rem">'+bytes(u)+'</b><span class="muted small">de '+bytes(lim)+' · '+pct.toFixed(1).replace('.',',')+'%</span></div>'+
         '<div class="bar '+(pct>90?'full':pct>75?'warn':'')+'"><i style="width:'+pct.toFixed(1)+'%"></i></div></section>'+
-    '</div>')+(EM_DEMO?'':'<div class="row" style="justify-content:center;margin-top:16px"><button class="btn sm" data-a="dashFull">'+(S.prefs&&S.prefs.dashFull?'Ver menos ▴':'Ver painel completo ▾ <span class="muted small">(gráficos, produção, clientes, trabalhos)</span>')+'</button></div>');
+    '</div>')+(EM_DEMO||!libOk('painel')?'':'<div class="row" style="justify-content:center;margin-top:16px"><button class="btn sm" data-a="dashFull">'+(S.prefs&&S.prefs.dashFull?'Ver menos ▴':'Ver painel completo ▾ <span class="muted small">(gráficos, produção, clientes, trabalhos)</span>')+'</button></div>');
 }
 /* Início simples: Hoje (equipe + entregas + quem deve) e Seu mês (faturado, recebido, a receber, medalha) */
+function dashResumo(arec){var t=today(),ab=alive(S.pedidos).filter(aberto),hj=ab.filter(function(p){return p.prazo===t&&!esperaCli(p);}).length,at=ab.filter(function(p){return atrasado(p,t);}).length,ar=soma(arec),nl=secNaoLidas(),it=[];
+  if(at)it.push('<button data-a="tab" data-v="pedidos" class="rs-u">⚠️ '+plural(at,'atrasado','atrasados')+'</button>');
+  if(hj)it.push('<button data-a="tab" data-v="pedidos">📦 '+plural(hj,'entrega','entregas')+' hoje</button>');
+  if(ab.length)it.push('<button data-a="tab" data-v="pedidos">🛠️ '+plural(ab.length,'em produção','em produção')+'</button>');
+  if(ar)it.push('<button data-a="tab" data-v="financeiro">💰 '+brl(ar)+' a receber</button>');
+  if(nl)it.push('<button data-a="tab" data-v="secretarios">💬 '+plural(nl,'recado','recados')+'</button>');
+  return '<div class="rs-linha">'+(it.length?it.join(''):'<span>Tudo em dia ✨</span>')+'</div>';}
 function dashSimples(fat,rec,arec,nDev,G,prevPs,sparkM,el){var cm=monthOf(today()),med='';
+  if(!libOk('painel'))return dashResumo(arec)+(alive(S.pedidos).length?'<p class="small muted" style="text-align:center;margin:14px 0 0">Seu painel aparece aqui quando você tiver 5 pedidos. 📋</p>':'');
   if(libOk('metas')){try{var of=metaOficial(cm),r=realOficial(cm);if(of&&!of.calib&&of.fat){var al=FAIXAS.map(function(f){return Math.round(of.fat*f[3]*100)/100;}),i=-1;al.forEach(function(a,j){if(r.fat>=a)i=j;});
     var prox=i<2?FAIXAS[i+1]:null;med=kpi('Medalha do mês',i>=0?FAIXAS[i][1]+' '+FAIXAS[i][2]:'—',prox?'<span>faltam '+brl(al[i+1]-r.fat)+' para '+prox[1]+' '+prox[2]+'</span>':'<span>Ouro! Faixa máxima 🎉</span>','','metas');}}catch(e){}}
   if(!med)med=kpi('Elementos',el,G?'':delta(el,elems(prevPs)),spark(sparkM.map(function(m){return elems(alive(S.pedidos).filter(function(p){return monthOf(p.recebido)===m;}));})),null);
