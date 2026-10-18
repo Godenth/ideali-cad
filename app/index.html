@@ -1576,7 +1576,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 21h20';
+var VERSAO='17/10 · 21h30';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2710,9 +2710,9 @@ function leadsDoTexto(txt){var L=String(txt).split(/\n+/).map(function(s){return
     R.push({nome:nome.split(' ').slice(0,3).join(' '),tel:d,orig:orig,ok:true});}});
   return R;}
 function carregaOCR(){if(window.Tesseract)return Promise.resolve();return new Promise(function(ok,ruim){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=ok;s.onerror=function(){ruim(new Error('não consegui carregar o leitor de imagem'));};document.head.appendChild(s);});}
-async function leadsLePrint(file){ui.leadImp={st:'lendo',p:0,lista:[]};renderSheet();
-  try{await carregaOCR();var r=await window.Tesseract.recognize(file,'por',{logger:function(m){if(m.status==='recognizing text'&&ui.leadImp){ui.leadImp.p=Math.round(m.progress*100);var e=document.getElementById('ld-prog');if(e)e.textContent='Lendo o print… '+ui.leadImp.p+'%';}}});
-    var lista=leadsDoTexto(r.data.text||''),ja={};leadsDe().forEach(function(l){ja[l.tel]=1;});lista.forEach(function(x){if(ja[x.tel]){x.ok=false;x.dup=true;}});
+async function leadsLePrint(file){var fs=[].concat(file).filter(Boolean);if(!fs.length)return;if(!ui.sheet||ui.sheet.fn!==fLeads){ui.leadFil='hoje';openSheet(fLeads);}ui.leadImp={st:'lendo',p:0,lista:[]};renderSheet();
+  try{await carregaOCR();var txt='';for(var i=0;i<fs.length;i++){var r=await window.Tesseract.recognize(fs[i],'por',{logger:function(m){if(m.status==='recognizing text'&&ui.leadImp){ui.leadImp.p=Math.round(m.progress*100);var e=document.getElementById('ld-prog');if(e)e.textContent='Lendo o print '+(i+1)+' de '+fs.length+'… '+ui.leadImp.p+'%';}}});txt+='\n'+(r.data.text||'');}
+    var lista=leadsDoTexto(txt),ja={};leadsDe().forEach(function(l){ja[l.tel]=1;});lista.forEach(function(x){if(ja[x.tel]){x.ok=false;x.dup=true;}});
     ui.leadImp={st:'revisar',lista:lista};}
   catch(e){ui.leadImp={st:'erro',msg:(e&&e.message)||String(e)};}
   if(ui.sheet)renderSheet();}
@@ -2735,7 +2735,7 @@ function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
     imp.lista.map(function(x,i){return '<div class="ld-rev"><input type="checkbox" class="ld-ok" data-i="'+i+'" '+(x.ok?'checked':'')+'><input class="ld-in" data-i="'+i+'" data-k="nome" value="'+esc(x.nome)+'" placeholder="Nome"><input class="ld-in" data-i="'+i+'" data-k="tel" value="'+esc(telFmt(x.tel))+'" inputmode="tel"><select class="ld-in" data-i="'+i+'" data-k="orig"><option value="">Origem</option><option value="face"'+(x.orig==='face'?' selected':'')+'>Facebook</option><option value="insta"'+(x.orig==='insta'?' selected':'')+'>Instagram</option></select>'+(x.dup?'<small class="muted">já está na lista</small>':'')+'</div>';}).join('')+
     '<div class="row wrap" style="gap:8px;margin-top:8px">'+(imp.lista.length?'<button class="btn pri" data-a="leadSalva">Salvar leads</button>':'')+'<button class="btn" data-a="leadImpX">Cancelar</button></div></div>';
   return topo+
-    '<div class="ld-bar"><label class="btn pri up">📷 Print dos leads<input type="file" accept="image/*" id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar à mão</button><span class="small muted">ou cole o print aqui (Ctrl+V)</span></div>'+importa+
+    '<div class="ld-bar"><button class="btn pri" data-a="leadCola">📋 Colar print</button><label class="btn up">📷 Escolher prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar à mão</button><span class="small muted">Dá para mandar vários prints de uma vez (rolando a lista da etiqueta).</span></div>'+importa+
     '<div class="chips ld-chips">'+[['hoje','Chamar hoje'],['seq','Em andamento'],['resp','Responderam'],['cli','Viraram clientes'],['fim','Encerrados']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-a="leadFil" data-v="'+c[0]+'">'+c[1]+' <b>'+cont[c[0]]+'</b></button>';}).join('')+'</div>'+
     '<div class="ld-lista">'+(lista.length?lista.map(leadCard).join(''):'<p class="empty">'+(f==='hoje'?(L.length?'Ninguém para chamar hoje. 🎉':'Mande o print dos contatos que chegaram pelos anúncios e eu monto a lista.'):'Nada aqui.')+'</p>')+'</div>';}
 function leadNovoObj(nome,tel,orig){return {id:uid(),nome:String(nome||'').trim().slice(0,60),tel:tel,orig:orig||'',criado:today(),etapa:0,st:'seq',prox:today(),ult:null};}
@@ -2757,7 +2757,7 @@ var CMDS={
   ger:[['reuniao','👥 Sala de reunião'],['resumo','📋 Resumo do dia'],['meta','🎯 Meta do mês'],['sugira','💡 O que faço hoje?'],['memoria','🧠 Memória da equipe']],
   ven:[['relVendas','📄 Relatório de vendas'],['atrasados','⏰ Atrasados'],['semana','📅 Prazos da semana'],['relProd','🧾 Relatório p/ cliente']],
   fin:[['cobrar','💸 Gerar cobrança'],['devendo','📋 Quem está devendo'],['relFin','📄 Relatório financeiro'],['pagou','✅ Registrar pagamento']],
-  mkt:[['leads','📱 Leads'],['plano','🎯 Reconquistar cliente'],['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post'],['memoria','🧠 Memória']],
+  mkt:[['colaLead','📋 Colar print de leads'],['leads','📱 Leads'],['plano','🎯 Reconquistar cliente'],['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post'],['memoria','🧠 Memória']],
   dad:[['relAn','📄 Relatório de análise'],['top','🏆 Melhores clientes'],['comport','🔎 Analisar um cliente'],['sugira','💡 O que melhorar?'],['memoria','🧠 Memória']]};
 var IA_INT={
   fin:[[/registr\w*\s+(o\s+|um\s+)?pag|recebi|pagou/i,'pagou'],[/cobr|gera\w*\s+(o\s+|um\s+)?pag|pix/i,'cobrar'],[/relat/i,'relFin'],[/devend|quem\s+(me\s+)?deve/i,'devendo']],
@@ -2922,6 +2922,7 @@ var IA_CMD={
   'mkt.plano':function(g,x){if(x){var s=cliStats(x);mikaPlano(x,s);return;}
     var sm=clisSumidos(),ja={},L=sm.map(function(o){ja[o.c.id]=1;return {c:o.c,s:o.s.padrao==='caindo'?'esfriou':'sumido '+quandoTxt(o.d).replace('há ','')};});
     cliRanking(365).forEach(function(o){if(!ja[o.c.id])L.push({c:o.c});});iaQuem(g,'plano','Qual cliente a gente vai reconquistar? 🎯',L,'Ainda não há clientes com pedidos.');},
+  'mkt.colaLead':function(g){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();A.leadCola();},
   'mkt.leads':function(g){var n=leadsHoje().length;iaDiz(g,{t:n?'Abri meu tablet: '+plural(n,'lead para chamar','leads para chamar')+' hoje! 📲':'Abri meu tablet com os leads. Mande o print dos contatos que chegaram pelos anúncios que eu monto a lista.',bts:[{a:'leadAbre',l:'📱 Abrir os leads',pri:1}]});A.leadAbre();},
   'mkt.sumidos':function(g){var L=clisSumidos();
     iaDiz(g,L.length?{t:plural(L.length,'cliente esfriou ou sumiu','clientes esfriaram ou sumiram')+' (comparando com o ritmo de cada um). Monto um plano para trazer de volta?',lst:L.slice(0,12).map(function(o){return {t:nomeCurtoCli(o.c),s:cliPadraoTxt(o.s),bt:{a:'iaCmd',g:'mkt',v:'plano',x:o.c.id,l:'Montar plano'}};})}:{t:'Ninguém sumido nem esfriando! Todo mundo está no ritmo de sempre. 😎'});},
@@ -5467,6 +5468,10 @@ impGrava:function(){impGrava();},
   memDel:function(d){var m=memDe();if(d.v&&m.c[d.v])m.c[d.v]=m.c[d.v].filter(function(n){return n.id!==d.id;});else m.g=m.g.filter(function(n){return n.id!==d.id;});save();
     Object.keys(ui.iaConv||{}).forEach(function(k){(ui.iaConv[k]||[]).forEach(function(b){if(b.lst)b.lst=b.lst.filter(function(x){return !(x.bt&&x.bt.a==='memDel'&&x.bt.id===d.id);});});});toast('Apagado da memória.');render();},
   leadAbre:function(){ui.leadImp=null;ui.leadFil=leadsHoje().length?'hoje':'seq';openSheet(fLeads);},
+  leadCola:async function(){try{if(!navigator.clipboard||!navigator.clipboard.read)throw new Error('x');var its=await navigator.clipboard.read(),fs=[];
+      for(var i=0;i<its.length;i++){var ty=its[i].types.filter(function(x){return /^image\//.test(x);})[0];if(ty){var b=await its[i].getType(ty);fs.push(new File([b],'print.png',{type:ty}));}}
+      if(!fs.length){toast('Não achei imagem copiada. Copie o print (ou use “Escolher prints”).');return;}leadsLePrint(fs);}
+    catch(e){toast('Neste aparelho use “Escolher prints” ou Ctrl+V.');}},
   leadFil:function(d){ui.leadFil=d.v;renderSheet();},
   leadImpX:function(){ui.leadImp=null;renderSheet();},
   leadNovo:function(){ui.leadImp={st:'revisar',lista:[{nome:'',tel:'',orig:'',ok:true}]};renderSheet();setTimeout(function(){var e=document.querySelector('.ld-in[data-k=nome]');if(e)e.focus();},50);},
@@ -5966,12 +5971,12 @@ document.addEventListener('input',function(e){
   if(t.id==='px-valor')desenhaPix();
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
-document.addEventListener('paste',function(e){if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it)return;if(ui.sheet&&ui.sheet.fn===fLeads){e.preventDefault();leadsLePrint(it.getAsFile());return;}
+document.addEventListener('paste',function(e){if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet&&ui.tab==='secretarios'&&ui.secAg==='mkt'){var im0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(im0){e.preventDefault();leadsLePrint(im0.getAsFile());return;}}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it)return;if(ui.sheet&&ui.sheet.fn===fLeads){e.preventDefault();leadsLePrint(it.getAsFile());return;}
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.type!=='file')return;
   var f=it.getAsFile();if(!f)return;e.preventDefault();
   if(ui.sheet.fn===fPedidoDet){var pa=ui.sheet.args[0];sbEditor(f,function(g){sbProcessa(pa,g);});}else if(ui.sheet.fn===fTrabRede){var ra=ui.sheet.args[0];sbEditor(f,function(g){rdSbCola(ra,g);});}});
 document.addEventListener('change',function(e){
-  if(e.target&&e.target.id==='ld-file'&&e.target.files&&e.target.files[0]){var f0=e.target.files[0];e.target.value='';leadsLePrint(f0);return;}
+  if(e.target&&e.target.id==='ld-file'&&e.target.files&&e.target.files[0]){var f0=[].slice.call(e.target.files);e.target.value='';leadsLePrint(f0);return;}
   if(e.target&&e.target.classList&&e.target.classList.contains('ld-ok')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i].ok=e.target.checked;return;}
   if(e.target&&e.target.classList&&e.target.classList.contains('ld-in')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i][e.target.dataset.k]=e.target.value;}
   if(e.target&&e.target.classList&&e.target.classList.contains('slot-up')&&e.target.files.length){var fs=[].slice.call(e.target.files);e.target.value='';enviaArquivo(e.target.dataset.id,fs,e.target.dataset.slot);}
