@@ -1603,7 +1603,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='18/10 · 00h10';
+var VERSAO='18/10 · 00h25';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2866,6 +2866,7 @@ async function verificaAntigos(){if(ui.verifOk||ui.verifRod||EM_DEMO||!S.sessao)
     for(var i=0;i<fila.length&&i<200;i+=20){var lote=fila.slice(i,i+20),r=await fnArq('verificar',{ids:lote.map(function(a){return a.id;})});
       lote.forEach(function(a){var c=r&&r.conteudo&&r.conteudo[a.id];if(c){a.cont=c;SNAP.arquivos=SNAP.arquivos||{};SNAP.arquivos[a.id]=JSON.stringify(MAP.arquivos.to(a));}});}
     ui.verifOk=true;}catch(e){ui.verifOk=true;}
+  try{if(S.redeStats&&S.sessao)delete S.redeStats[S.sessao.id];}catch(e){}
   ui.verifRod=false;if(ui.tab==='metas')render();premioCheca();}
 function premioCheca(){try{if(!S||!S.sessao||EM_DEMO||ui.premioAdiado||document.getElementById('festa'))return;if(!ui.verifOk){verificaAntigos();return;}
   var m=monthOf(today()),of=metaOficial(m);if(!of||of.calib)return;var r=realOficial(m),H=premiosDe().h,ach=null;
@@ -4573,7 +4574,7 @@ function secCadistasReais(){carregaListaRede();var L=S.redeLista||{rows:[]},eu=S
     (L.busy&&!rows.length?'<p class="empty">Carregando…</p>':rows.length?'<div class="cr-grid">'+rows.map(function(x){var es=x.especialidades||[];
       return '<button class="cr-card" data-a="pubPerfil" data-id="'+x.user_id+'"><span class="cr-top">'+avPub(x,48)+'<span><b>'+esc(x.nome||'Cadista')+(x.user_id===eu?' <span class="tag a">você</span>':'')+'</b><small>'+esc((x.cidade||'')+(x.uf?', '+x.uf:''))+(x.prazo?' · '+esc(x.prazo):'')+'</small></span></span>'+
         (es.length||(x.softwares||[]).length?'<span class="rd-chips">'+(x.softwares||[]).slice(0,2).map(function(q){return '<span class="sw">'+esc(q)+'</span>';}).join('')+es.slice(0,3).map(function(q){return '<span>'+esc(q)+'</span>';}).join('')+(es.length>3?'<span>+'+(es.length-3)+'</span>':'')+'</span>':'')+
-        '<span class="small muted">'+(function(){var st=statsRede(x.user_id);return st?st.trabalhos+' trabalho'+(st.trabalhos===1?'':'s')+' feito'+(st.trabalhos===1?'':'s')+(st.no_prazo!=null?' · '+st.no_prazo+'% no prazo':'')+' · ':'';})()+((x.fotos||[]).length?(x.fotos.length+' foto'+(x.fotos.length>1?'s':'')):'sem fotos')+(x.video_url?' · vídeo':'')+'</span></button>';}).join('')+'</div>'
+        '<span class="small muted">'+(function(){var st=statsRede(x.user_id);return st?'✓ '+st.trabalhos+' trabalho'+(st.trabalhos===1?'':'s')+' comprovado'+(st.trabalhos===1?'':'s')+(st.no_prazo!=null?' · '+st.no_prazo+'% no prazo':'')+' · ':'';})()+((x.fotos||[]).length?(x.fotos.length+' foto'+(x.fotos.length>1?'s':'')):'sem fotos')+(x.video_url?' · vídeo':'')+'</span></button>';}).join('')+'</div>'
       :'<p class="empty">Nenhum cadista publicou o perfil ainda. Seja o primeiro: em Editar perfil, marque "Publicar meu perfil".</p>')+'</section>';}
 /* Números reais do perfil (rpc rede_stats, calculado no servidor, só de perfis publicados ou do próprio usuário). */
 function statsRede(uid){S.redeStats=S.redeStats||{};var c=S.redeStats[uid];if(c&&(c.busy||Date.now()-c.t<120000))return c.d;
@@ -4583,9 +4584,10 @@ function statsRede(uid){S.redeStats=S.redeStats||{};var c=S.redeStats[uid];if(c&
 function diasTxt(d){if(d==null)return '—';if(d<0.75)return 'mesmo dia';var n=Math.round(d);return n<=1?'1 dia':n+' dias';}
 function blocoStats(uid){var st=statsRede(uid);if(st===undefined)return '<p class="small muted">Carregando números…</p>';if(!st)return '';
   var mes=st.desde?MESES[+st.desde.slice(5,7)-1].slice(0,3)+'/'+st.desde.slice(0,4):'—',tp=st.tipos||[];
-  return '<div class="rd-kpis"><div><b>'+st.trabalhos+'</b><span>trabalhos feitos</span></div><div><b>'+st.elementos+'</b><span>elementos</span></div><div><b>'+(st.no_prazo==null?'—':st.no_prazo+'%')+'</b><span>entregues no prazo</span></div><div><b>'+diasTxt(st.dias_medio)+'</b><span>entrega média</span></div></div>'+
+  return '<div class="rd-kpis"><div><b>'+st.trabalhos+'</b><span>trabalhos comprovados</span></div><div><b>'+st.elementos+'</b><span>elementos</span></div><div><b>'+(st.no_prazo==null?'—':st.no_prazo+'%')+'</b><span>entregues no prazo</span></div><div><b>'+diasTxt(st.dias_medio)+'</b><span>entrega média</span></div></div>'+
     '<div class="stack" style="gap:6px"><div class="between"><h3 style="margin:6px 0 0">Tipos de trabalho que mais faz</h3><span class="small muted">no Ideali desde '+mes+'</span></div>'+
-    hbars(tp.map(function(x){return {l:esc(x.nome),r:x.n+'',v:x.n};}),'Ainda sem trabalhos entregues.')+'<p class="small muted" style="margin:0">Números calculados pelo sistema a partir dos pedidos entregues. Nunca mostram clientes, pacientes ou valores.</p></div>';}
+    hbars(tp.map(function(x){return {l:esc(x.nome),r:x.n+'',v:x.n};}),'Ainda sem trabalhos entregues.')+'<p class="small muted" style="margin:0">✓ <b>Trabalhos comprovados:</b> só contam pedidos finalizados com o STL e o HTML guardados no Ideali (o servidor confere os arquivos). Nunca mostram clientes, pacientes ou valores.</p>'+
+    (st.sem_comprovar>0?'<div class="banner"><span>📈 Você tem <b>'+plural(st.sem_comprovar,'pedido finalizado','pedidos finalizados')+'</b> que ainda não aparece'+(st.sem_comprovar>1?'m':'')+' aqui. Guarde o STL e o HTML deles no sistema para entrarem no seu perfil e na meta oficial.</span></div>':'')+'</div>';}
 function fPerfilPub(id){var L=S.redeLista||{rows:[]},x=(L.rows||[]).filter(function(q){return q.user_id===id;})[0];if(!x)return head('Cadista')+'<p class="empty">Perfil não encontrado ou não está mais publicado.</p>';
   var fs=x.fotos||[],falta=fs.map(function(f){return f.p;}).filter(function(p){return p&&!L.urls[p];});
   if(falta.length&&!x._ass){x._ass=1;sb.storage.from('portfolio').createSignedUrls(falta,3600).then(function(r){(r.data||[]).forEach(function(d){if(d.signedUrl)L.urls[d.path]=d.signedUrl;});if(ui.sheet)renderSheet();});}
