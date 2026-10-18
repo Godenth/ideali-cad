@@ -655,6 +655,7 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .ld-card{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--surface);display:grid;gap:6px}.ld-card.hoje{border-color:#1FAF5B;box-shadow:0 0 0 2px rgba(31,175,91,.15)}
 .ld-top{display:flex;gap:10px;align-items:center}.ld-ic{font-size:1.3rem}.ld-nm{display:grid;min-width:0}.ld-nm small{color:var(--muted);font-size:.78rem}
 .ld-st{font-size:.82rem;color:var(--muted)}.ld-hoje{color:#1FAF5B}
+.lg-lembra{font-size:.88rem;color:var(--muted);margin-top:-4px}
 .ld-logo{display:grid;place-items:center;flex:none}
 .ld-edb{margin-left:auto;font-size:.9rem}.ld-edit{gap:8px}.ld-edg{display:grid;grid-template-columns:1.4fr 1fr;gap:6px 10px}.ld-edg .fld{margin:0}.ld-edg .ld-obs{grid-column:1/-1}
 @media (max-width:600px){.ld-edg{grid-template-columns:1fr}}
@@ -1633,7 +1634,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 02h45';
+var VERSAO='18/10 · 02h55';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1744,7 +1745,11 @@ var lgTimer=null;
 function animaMapa(){clearInterval(lgTimer);var k=0;lgTimer=setInterval(function(){var el=document.getElementById('lg-toast');if(!el){clearInterval(lgTimer);return;}
   var caps=document.querySelectorAll('.lg-cap');if(!caps.length)return;[].forEach.call(caps,function(g){g.classList.remove('on');});
   var i=(k*7)%caps.length;k++;var g=caps[i];g.classList.add('on');var c=MAPA_BR.c[i];el.textContent=c[0]+' · '+c[1];el.classList.remove('vis');void el.offsetWidth;el.classList.add('vis');},2400);}
-function rLogin(){
+/* Login: lembra o e-mail neste aparelho e oferece salvar a senha no gerenciador do navegador (a senha nunca é guardada pelo sistema) */
+function lgLembrar(){try{return localStorage.getItem('idealicad_lembrar')!=='0';}catch(e){return true;}}
+function lgLembrado(){try{return lgLembrar()?(localStorage.getItem('idealicad_email')||''):'';}catch(e){return '';}}
+function lgFoco(){setTimeout(function(){var e=document.getElementById('lg-email'),s=document.getElementById('lg-senha');if(e&&s&&e.value&&document.activeElement!==e&&!s.value)s.focus();},60);}
+function rLogin(){lgFoco();
   setTimeout(animaMapa,50);
   if(ui.recuperar)return '<div class="login"><div class="lg-main"><form class="box card" data-form="novaSenha" style="padding:24px">'+
     '<div class="row">'+logo(36)+'<h1>Nova senha</h1></div><p class="muted">Digite a nova senha da sua conta.</p>'+
@@ -1765,9 +1770,10 @@ function rLogin(){
     '<p class="muted">'+(criar?'Crie sua conta. Sem cartão de crédito.':'Entre para ver seus pedidos.')+'</p>'+
     (ui.loginMsg?'<div class="banner">'+ui.loginMsg+'</div>':'')+
     (criar?'<div class="lg-2"><label class="fld"><span>Nome</span><input id="lg-nome" name="nome" required maxlength="40" autocomplete="given-name"></label><label class="fld"><span>Sobrenome</span><input id="lg-sobrenome" name="sobrenome" required maxlength="40" autocomplete="family-name"></label></div>':'')+
-    '<label class="fld"><span>E-mail</span><input id="lg-email" name="email" type="email" required autocomplete="email" value="'+esc(ui.loginEmail||'')+'"></label>'+
+    '<label class="fld"><span>E-mail</span><input id="lg-email" name="email" type="email" required autocomplete="'+(criar?'email':'username')+'" value="'+esc(ui.loginEmail||(criar?'':lgLembrado()))+'"></label>'+
     (criar?'<label class="fld"><span>WhatsApp (com DDD)</span><input id="lg-tel" name="tel" type="tel" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" pattern="[0-9()+ \\-]{10,20}"><small>Obrigatório. Para avisos da sua conta e suporte.</small></label>':'')+
     '<label class="fld"><span>Senha</span><input id="lg-senha" name="senha" type="password" required minlength="'+(criar?8:6)+'" autocomplete="'+(criar?'new-password':'current-password')+'"><small>'+(criar?'Mínimo de 8 caracteres.':'')+'</small></label>'+
+    (criar?'':'<label class="check lg-lembra"><input type="checkbox" name="lembrar" '+(lgLembrar()?'checked':'')+'> Lembrar meu e-mail e senha neste aparelho</label>')+
     (criar?'<label class="check small"><input type="checkbox" required id="lg-termos"> Li e aceito os <a href="../termos.html" target="_blank" rel="noopener">termos de uso</a> e a <a href="../privacidade.html" target="_blank" rel="noopener">política de privacidade</a>.</label>':'')+
     '<button class="btn pri block" type="submit" '+(ui.loginBusy?'disabled':'')+'>'+(ui.loginBusy?'Aguarde…':criar?'Criar conta grátis':'Entrar')+'</button>'+
     '<div class="between small"><button type="button" class="btn sm" data-a="loginModo">'+(criar?'Já tenho conta':'Criar conta')+'</button>'+
@@ -6058,7 +6064,9 @@ var F={
         if(!r.data.session){ui.loginCriar=false;ui.checaEmail={email:email,nome:pn};return fim();}
         ui.loginBusy=false;});
     }else{
-      sb.auth.signInWithPassword({email:email,password:senha}).then(function(r){if(r.error)return fim(msgAuth(r.error));ui.loginBusy=false;});
+      var lembra=!!fd.get('lembrar');try{localStorage.setItem('idealicad_lembrar',lembra?'1':'0');if(lembra)localStorage.setItem('idealicad_email',email);else localStorage.removeItem('idealicad_email');}catch(x){}
+      sb.auth.signInWithPassword({email:email,password:senha}).then(function(r){if(r.error)return fim(msgAuth(r.error));ui.loginBusy=false;
+        if(lembra&&window.PasswordCredential&&navigator.credentials){try{navigator.credentials.store(new PasswordCredential({id:email,password:senha,name:email})).catch(function(){});}catch(x){}}});
     }
   },
   novaSenha:function(fd){sb.auth.updateUser({password:String(fd.get('senha')||'')}).then(function(r){if(r.error){toast(msgAuth(r.error));return;}ui.recuperar=false;toast('Senha alterada.');render();});},
