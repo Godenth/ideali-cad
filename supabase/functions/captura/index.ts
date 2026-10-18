@@ -32,10 +32,10 @@ Deno.serve(async (req: Request) => {
   const slug = String(body?.u ?? "").toLowerCase();
   if (!SLUG.test(slug)) return json(404, { erro: "Página não encontrada." });
   const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  const { data: pg } = await admin.from("captura_paginas").select("user_id,ativo,titulo,msg").eq("slug", slug).maybeSingle();
+  const { data: pg } = await admin.from("captura_paginas").select("user_id,ativo,titulo,msg,wa").eq("slug", slug).maybeSingle();
   if (!pg || !pg.ativo) return json(404, { erro: "Esta página não está disponível." });
   const { data: perfil } = await admin.from("perfis").select("nome,telefone,cidade,uf").eq("user_id", pg.user_id).maybeSingle();
-  const tel = telNorm(perfil?.telefone);
+  const tel = telNorm(pg.wa) || telNorm(perfil?.telefone); // número próprio da página, se houver
   const nome = limpa(perfil?.nome, 60);
   const primeiro = nome.split(" ")[0] || "";
 
