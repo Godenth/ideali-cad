@@ -1634,7 +1634,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 02h55';
+var VERSAO='18/10 · 03h15';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2797,7 +2797,7 @@ function leadsDoTexto(txt){var L=String(txt).split(/\n+/).map(function(s){return
   var re2=/\+?\d{10,13}(?!\d)/g;
   L.forEach(function(lin,i){var m;[re2,re].forEach(function(rx){rx.lastIndex=0;while((m=rx.exec(lin))){var d=rx===re2&&m[0][0]==='+'&&!/^\+55\d{10,11}$/.test(m[0])?'':telNorm(m[0]);if(!d||vistos[d])continue;vistos[d]=1;
     var nome=lin.slice(0,m.index).replace(/[|:•·\-–—,;]+$/,'').replace(/[^A-Za-zÀ-ÿ' ]/g,' ').replace(/\s+/g,' ').trim();
-    if(nome.length<2){for(var k=i-1;k>=0&&k>=i-2;k--){var c=L[k].replace(/[^A-Za-zÀ-ÿ' ]/g,' ').replace(/\s+/g,' ').trim();if(c.length>=2&&!/^(hoje|ontem|lead|leads|nome|telefone|whatsapp|formul|instagram|facebook)/i.test(c)){nome=c;break;}}}
+    if(nome.length<2){for(var k=i-1;k>=0&&k>=i-2;k--){if(/\d{4}[\s.-]?\d{4}/.test(L[k]))break;var c=L[k].replace(/[^A-Za-zÀ-ÿ' ]/g,' ').replace(/\s+/g,' ').trim();if(c.length>=2&&!/^(hoje|ontem|lead|leads|nome|telefone|whatsapp|formul|instagram|facebook)/i.test(c)){nome=c;break;}}}
     R.push({nome:nome.split(' ').slice(0,3).join(' '),tel:d,orig:orig,ok:true});}});});
   return R;}
 function carregaOCR(){if(window.Tesseract)return Promise.resolve();return new Promise(function(ok,ruim){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=ok;s.onerror=function(){ruim(new Error('não consegui carregar o leitor de imagem'));};document.head.appendChild(s);});}
@@ -2827,6 +2827,10 @@ function leadEdForm(l){var o=function(v,t){return '<option value="'+v+'"'+((l.or
     '<div class="row wrap" style="gap:8px"><button class="btn sm pri" data-a="leadEdSalva" data-id="'+l.id+'">Salvar</button><button class="btn sm" data-a="leadEdX">Cancelar</button></div></div>';}
 /* Lista de números colada como texto (ex.: copiada de um PDF ou de uma planilha): vai direto para a revisão, sem ler imagem */
 function leadsTextoImp(tx){var lista=leadsDoTexto(tx),ja={},cn={};lista.forEach(function(x){if(x.nome)cn[x.nome]=(cn[x.nome]||0)+1;});lista.forEach(function(x){if(cn[x.nome]>1)x.nome='';});leadsDe().forEach(function(l){ja[l.tel]=1;});lista.forEach(function(x){if(ja[x.tel]){x.ok=false;x.dup=true;}});ui.leadImp={st:'revisar',lista:lista};renderSheet();}
+/* Lista de números colada na conversa da Mika: abre o tablet de leads já com a lista para conferir */
+function mikaListaLeads(tx){var g=SECS.filter(function(x){return x.id==='mkt';})[0],n=leadsDoTexto(tx).length;iaEu('mkt','📋 Lista com '+plural(n,'número','números'));
+  iaDiz('mkt',{t:'Achei '+plural(n,'número','números')+' na sua lista! 📲 Abri meu tablet: confira, ajuste os nomes se quiser e clique em "Salvar leads". Os repetidos eu já desmarquei.'});
+  try{iaMostra();}catch(e){}ui.leadModo='cli';ui.leadFil='hoje';openSheet(fLeads);leadsTextoImp(tx);}
 function leadCard(l){if(ui.leadEd===l.id)return leadEdForm(l);var SQ=leadSeq(),ID=leadIdeali(),t=today(),hoje=l.st==='seq'&&(!l.prox||l.prox<=t),e=SQ[Math.min(l.etapa||0,SQ.length-1)],ic=l.orig==='insta'?'📸':l.orig==='face'?'📘':'👤';
   var stTxt=l.st==='seq'?(hoje?'<b class="ld-hoje">Chamar hoje</b> · '+e.n:'Próxima: '+dmy(l.prox).slice(0,5)+' · '+e.n):l.st==='resp'?'💬 Respondeu':l.st==='cli'?(ID?'✅ Criou conta no Ideali':'✅ Virou cliente')+(l.cli&&cliente(l.cli)?' · '+esc(cliente(l.cli).nome):''):l.st==='fim'?'Encerrado (sem resposta)':'Sem interesse';
   return '<div class="ld-card'+(hoje?' hoje':'')+'"><div class="ld-top"><span class="ld-ic">'+ic+'</span><span class="ld-nm"><b>'+esc(l.nome||'Sem nome')+'</b><small>'+esc(telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade)+(l.uf?'/'+l.uf:''):'')+' · chegou '+(l.criado===t?'hoje':dmy(l.criado).slice(0,5))+(l.etapa?' · '+plural(l.etapa,'mensagem','mensagens'):'')+'</small></span><button class="icon-btn ld-edb" data-a="leadEd" data-id="'+l.id+'" aria-label="Editar lead" title="Editar">✏️</button></div>'+
@@ -3000,7 +3004,7 @@ var CMDS={
 var IA_INT={
   fin:[[/registr\w*\s+(o\s+|um\s+)?pag|recebi|pagou/i,'pagou'],[/cobr|gera\w*\s+(o\s+|um\s+)?pag|pix/i,'cobrar'],[/relat/i,'relFin'],[/devend|quem\s+(me\s+)?deve/i,'devendo']],
   ven:[[/relat\w*\s+(de\s+)?(produ|p\/|para|pro)/i,'relProd'],[/relat/i,'relVendas'],[/atras/i,'atrasados'],[/prazos?\s+da\s+semana|vence\w*\s+(essa|esta)\s+semana/i,'semana']],
-  mkt:[[/plano|reconquist|trazer\s+de\s+volta|recuperar/i,'plano'],[/sumid|inativ|parou|perdid/i,'sumidos'],[/(mensag|msg)\w*\s+(p\/|para|pro|pra|ao|a)\b|escrev\w*\s+(uma\s+)?(mensag|msg)/i,'msgCli'],[/frase/i,'frase'],[/\bpost|status|instagram/i,'post']],
+  mkt:[[/\ble+a?ds?\b|\blead|lista\s+(de\s+)?(contat|n[uú]mer|telef)|(salv|cadastr|guard|import)\w*.{0,30}(contat|n[uú]mer|telefon)|(contat|n[uú]mer|telefon)\w*.{0,30}(salv|cadastr|guard|import)/i,'leads'],[/plano|reconquist|trazer\s+de\s+volta|recuperar/i,'plano'],[/sumid|inativ|parou|perdid/i,'sumidos'],[/(mensag|msg)\w*\s+(p\/|para|pro|pra|ao|a)\b|escrev\w*\s+(uma\s+)?(mensag|msg)/i,'msgCli'],[/frase/i,'frase'],[/\bpost|status|instagram/i,'post']],
   dad:[[/mika|recaptur|reconquist|trazer\s+de\s+volta|recuperar/i,'passaMika'],[/relat/i,'relAn'],[/comport|analis\w*\s+(o\s+|a\s+)?(cliente|dr|dra|lab)/i,'comport'],[/melhor\w*\s+cliente|maior\w*\s+cliente/i,'top']],
   ger:[[/reuni/i,'reuniao'],[/resumo/i,'resumo']]};
 var IA_COM_CLI={relProd:1,cobrar:1,pagou:1,msgCli:1,comport:1,plano:1,passaMika:1};
@@ -3161,7 +3165,7 @@ var IA_CMD={
     var sm=clisSumidos(),ja={},L=sm.map(function(o){ja[o.c.id]=1;return {c:o.c,s:o.s.padrao==='caindo'?'esfriou':'sumido '+quandoTxt(o.d).replace('há ','')};});
     cliRanking(365).forEach(function(o){if(!ja[o.c.id])L.push({c:o.c});});iaQuem(g,'plano','Qual cliente a gente vai reconquistar? 🎯',L,'Ainda não há clientes com pedidos.');},
   'mkt.colaLead':function(g){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();A.leadCola();},
-  'mkt.leads':function(g){var n=leadsHoje().length;iaDiz(g,{t:n?'Abri meu tablet: '+plural(n,'lead para chamar','leads para chamar')+' hoje! 📲':'Abri meu tablet com os leads. Mande o print dos contatos que chegaram pelos anúncios que eu monto a lista.',bts:[{a:'leadAbre',l:'📱 Abrir os leads',pri:1}]});A.leadAbre();},
+  'mkt.leads':function(g){var n=leadsHoje().length;iaDiz(g,{t:(n?'Tenho '+plural(n,'lead para chamar','leads para chamar')+' hoje! 📲 ':'')+'É comigo sim! 💜 Cola aqui na conversa (Ctrl+V) a sua lista de números, do bloco de notas, de uma planilha ou de um PDF, ou o print dos contatos. Eu separo os números, você confere e eu salvo nos leads para a gente mandar as mensagens.',bts:[{a:'leadAbre',l:'📱 Abrir os leads',pri:1}]});A.leadAbre();},
   'mkt.sumidos':function(g){var L=clisSumidos();
     iaDiz(g,L.length?{t:plural(L.length,'cliente esfriou ou sumiu','clientes esfriaram ou sumiram')+' (comparando com o ritmo de cada um). Monto um plano para trazer de volta?',lst:L.slice(0,12).map(function(o){return {t:nomeCurtoCli(o.c),s:cliPadraoTxt(o.s),bt:{a:'iaCmd',g:'mkt',v:'plano',x:o.c.id,l:'Montar plano'}};})}:{t:'Ninguém sumido nem esfriando! Todo mundo está no ritmo de sempre. 😎'});},
   'mkt.frase':function(g){var md=mikaDia();iaDiz(g,{t:md.tit,msg:md.txt});},
@@ -6048,7 +6052,9 @@ tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l
 };
 var F={
   whatsObrig:function(fd){var v=String(fd.get('tel')||'').trim();if(soDig(v).length<10||soDig(v).length>13){toast('Digite o WhatsApp com DDD.');return;}S.perfil.telefone=v;save();render();toast('WhatsApp salvo. Obrigado!');},
-  iaPerg:function(fd,f){var q=String(fd.get('q')||'').trim(),g=f.dataset.g;if(!q||ui.iaEsperando)return;var it=null;try{it=iaIntent(g,q);}catch(e){}
+  iaPerg:function(fd,f){var q=String(fd.get('q')||'').trim(),g=f.dataset.g;if(!q||ui.iaEsperando)return;
+    if(g==='mkt'){var nl0=[];try{nl0=leadsDoTexto(q);}catch(e){}if(nl0.length){f.reset();mikaListaLeads(q);return;}}
+    var it=null;try{it=iaIntent(g,q);}catch(e){}
     var memo=null;try{memo=memDetecta(g,q);}catch(e){}if(memo){var mm=memDe();memo.cid=Object.keys(mm.c).filter(function(k){return (mm.c[k]||[]).indexOf(memo)>=0;})[0]||'';iaPergunta(g,q,null,memo);return;}
     var rf=null;try{rf=respFaturamento(q);}catch(e){}if(rf){iaEu(g,q);iaDiz(g,{t:rf,chips:iaSugs(g)});iaMostra();return;}
     if(it){if(it.c==='reuniao'){ui.secAg='reu';render();return;}iaEu(g,q);iaCmd(g,it.c,it.x);return;}iaPergunta(g,q);},
@@ -6270,7 +6276,7 @@ document.addEventListener('input',function(e){
   if(t.id==='px-valor')desenhaPix();
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
-document.addEventListener('paste',function(e){if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet&&ui.tab==='secretarios'&&ui.secAg==='mkt'){var im0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(im0){e.preventDefault();leadsLePrint(im0.getAsFile());return;}}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it&&ui.sheet&&ui.sheet.fn===fLeads){var ae1=document.activeElement;if(ae1&&/^(INPUT|TEXTAREA)$/.test(ae1.tagName))return;var tx1=e.clipboardData&&e.clipboardData.getData('text');if(tx1&&leadsDoTexto(tx1).length){e.preventDefault();leadsTextoImp(tx1);}return;}if(!it)return;if(ui.sheet&&ui.sheet.fn===fLeads){e.preventDefault();leadsLePrint(it.getAsFile());return;}
+document.addEventListener('paste',function(e){if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet&&ui.tab==='secretarios'&&ui.secAg==='mkt'){var tx0=e.clipboardData&&e.clipboardData.getData('text'),hasImg=[].some.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);});if(!hasImg&&tx0&&/\n/.test(tx0.trim())&&leadsDoTexto(tx0).length){e.preventDefault();mikaListaLeads(tx0);return;}var im0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(im0){e.preventDefault();leadsLePrint(im0.getAsFile());return;}}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it&&ui.sheet&&ui.sheet.fn===fLeads){var ae1=document.activeElement;if(ae1&&/^(INPUT|TEXTAREA)$/.test(ae1.tagName))return;var tx1=e.clipboardData&&e.clipboardData.getData('text');if(tx1&&leadsDoTexto(tx1).length){e.preventDefault();leadsTextoImp(tx1);}return;}if(!it)return;if(ui.sheet&&ui.sheet.fn===fLeads){e.preventDefault();leadsLePrint(it.getAsFile());return;}
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.type!=='file')return;
   var f=it.getAsFile();if(!f)return;e.preventDefault();
   if(ui.sheet.fn===fPedidoDet){var pa=ui.sheet.args[0];sbEditor(f,function(g){sbProcessa(pa,g);});}else if(ui.sheet.fn===fTrabRede){var ra=ui.sheet.args[0];sbEditor(f,function(g){rdSbCola(ra,g);});}});
