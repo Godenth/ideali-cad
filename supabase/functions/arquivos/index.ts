@@ -2,7 +2,7 @@
 // O navegador nunca vê as chaves do R2: este servidor confere o login, o dono do pedido,
 // a assinatura e o espaço livre, e devolve um link assinado que vale por pouco tempo.
 // Ações: "preparar" (link para enviar), "confirmar" (registra o arquivo já enviado),
-// "baixar" (link para baixar ou abrir no visualizador).
+// "baixar" (link para baixar ou abrir no visualizador), "verificar" (confere STL/HTML dentro do zip).
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { AwsClient } from "npm:aws4fetch@1.0.20";
 
@@ -18,6 +18,64 @@ const MAX_ARQUIVO = 2 * 1024 ** 3; // 2 GB por arquivo
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const limpaNome = (n: unknown) =>
   String(n ?? "arquivo.zip").replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_").trim().slice(0, 150) || "arquivo.zip";
+
+
+// ---- Conferência do conteúdo do .zip (sem baixar o arquivo inteiro) ----
+// Lê o índice do zip no fim do arquivo e o começo de cada STL/HTML, e confere se é mesmo uma malha STL
+// (binária: 84 + 50 × triângulos bytes; texto: "solid … facet normal") e um HTML de verdade.
+type Entrada = { nome: string; metodo: number; comp: number; tam: number; off: number };
+async function confereZip(r2: AwsClient, url: string, total: number) {
+  const faixa = async (ini: number, fim: number) => {
+    const r = await r2.fetch(url, { headers: { Range: `bytes=${ini}-${fim}` } });
+    if (!r.ok) throw new Error("range " + r.status);
+    return new Uint8Array(await r.arrayBuffer());
+  };
+  const n = Math.min(total, 66000), cauda = await faixa(total - n, total - 1), dv = new DataView(cauda.buffer);
+  let eocd = -1;
+  for (let i = cauda.length - 22; i >= 0; i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) return { ok: false, motivo: "não é zip" };
+  const qtd = dv.getUint16(eocd + 10, true), cdTam = dv.getUint32(eocd + 12, true), cdOff = dv.getUint32(eocd + 16, true);
+  const cd = cdOff >= total - n ? cauda.subarray(cdOff - (total - n), cdOff - (total - n) + cdTam) : await faixa(cdOff, cdOff + cdTam - 1);
+  const cv = new DataView(cd.buffer, cd.byteOffset, cd.byteLength), dec = new TextDecoder();
+  const ents: Entrada[] = [];
+  for (let p = 0, k = 0; k < qtd && p + 46 <= cd.length; k++) {
+    if (cv.getUint32(p, true) !== 0x02014b50) break;
+    const ln = cv.getUint16(p + 28, true), lx = cv.getUint16(p + 30, true), lc = cv.getUint16(p + 32, true);
+    ents.push({ nome: dec.decode(cd.subarray(p + 46, p + 46 + ln)), metodo: cv.getUint16(p + 10, true), comp: cv.getUint32(p + 20, true), tam: cv.getUint32(p + 24, true), off: cv.getUint32(p + 42, true) });
+    p += 46 + ln + lx + lc;
+  }
+  const inicio = async (e: Entrada, quer: number) => {
+    const lh = await faixa(e.off, e.off + 29), lv = new DataView(lh.buffer);
+    const dados = e.off + 30 + lv.getUint16(26, true) + lv.getUint16(28, true);
+    const bruto = await faixa(dados, dados + Math.min(e.comp, 65536) - 1);
+    if (e.metodo === 0) return bruto.subarray(0, quer);
+    if (e.metodo !== 8) return new Uint8Array();
+    const ds = new DecompressionStream("deflate-raw"), w = ds.writable.getWriter(), rd = ds.readable.getReader();
+    w.write(bruto).catch(() => {}); if (e.comp <= 65536) w.close().catch(() => {});
+    const out: number[] = [];
+    const lim = setTimeout(() => rd.cancel().catch(() => {}), 3000);
+    try { while (out.length < quer) { const { value, done } = await rd.read(); if (done) break; for (const b of value) { out.push(b); if (out.length >= quer) break; } } } catch { /* zip truncado no meio: usa o que já saiu */ }
+    clearTimeout(lim); rd.cancel().catch(() => {});
+    return new Uint8Array(out);
+  };
+  let stl = 0, html = 0;
+  const vistos: string[] = [];
+  for (const e of ents.slice(0, 60)) {
+    const nm = e.nome.toLowerCase();
+    if (nm.endsWith(".stl") && e.tam >= 684) {
+      const b = await inicio(e, 4096);
+      if (b.length >= 84) {
+        const tri = new DataView(b.buffer, b.byteOffset).getUint32(80, true), txt = dec.decode(b.subarray(0, 4096)).toLowerCase();
+        const bin = tri >= 10 && 84 + 50 * tri === e.tam, asc = txt.trimStart().startsWith("solid") && txt.includes("facet") && txt.includes("vertex");
+        if (bin || asc) { stl++; vistos.push(e.nome); }
+      }
+    } else if (/\.html?$/.test(nm) && e.tam >= 1024) {
+      const t = dec.decode(await inicio(e, 8192)).toLowerCase();
+      if (/<!doctype html|<html|<head|<script|<body/.test(t)) { html++; vistos.push(e.nome); }
+    }
+  }
+  return { ok: true, stl, html, arquivos: vistos.slice(0, 10), v: 1, em: new Date().toISOString() };
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -121,7 +179,25 @@ Deno.serve(async (req: Request) => {
       categoria: ["scan", "html", "fres"].includes(String(body.categoria)) ? String(body.categoria) : null,
     }).select("id,pedido_id,origem,nome,tamanho_original,tamanho_zip,criado_em,categoria").single();
     if (error) { await apaga(); return json(500, { erro: "Não foi possível registrar o arquivo." }); }
-    return json(200, data);
+    let conteudo: unknown = null;
+    try { conteudo = await confereZip(r2, objUrl(key), tamanho); } catch (er) { conteudo = { ok: false, motivo: String(er).slice(0, 80) }; }
+    await admin.from("arquivos").update({ conteudo }).eq("id", data.id);
+    return json(200, { ...data, conteudo });
+  }
+
+  // Confere arquivos antigos (enviados antes da conferência existir). Só do próprio usuário.
+  if (acao === "verificar") {
+    const ids = (Array.isArray(body.ids) ? body.ids : []).map(String).filter((x: string) => UUID.test(x)).slice(0, 20);
+    const { data: lista } = ids.length ? await userClient.from("arquivos").select("id,storage_key,tamanho_zip,conteudo,origem").in("id", ids) : { data: [] };
+    const res: Record<string, unknown> = {};
+    for (const a of lista ?? []) {
+      if (a.conteudo || a.origem !== "upload" || !a.storage_key || !String(a.storage_key).startsWith(user.id + "/")) { res[a.id] = a.conteudo; continue; }
+      let c: unknown;
+      try { c = await confereZip(r2, objUrl(a.storage_key), Number(a.tamanho_zip)); } catch (er) { c = { ok: false, motivo: String(er).slice(0, 80) }; }
+      await admin.from("arquivos").update({ conteudo: c }).eq("id", a.id);
+      res[a.id] = c;
+    }
+    return json(200, { conteudo: res });
   }
 
   if (acao === "baixar") {
