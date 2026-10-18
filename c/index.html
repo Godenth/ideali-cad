@@ -105,7 +105,6 @@ footer{position:relative;z-index:2;text-align:center;font-size:.76rem;color:#7F7
             </div>
           </fieldset>
           <label>Seu WhatsApp (com DDD)<input type="tel" name="tel" autocomplete="tel" inputmode="tel" maxlength="20" required placeholder="(11) 99999-9999"></label>
-          <label>Cidade <span style="font-weight:400;color:var(--muted)">(opcional)</span><input type="text" name="cidade" autocomplete="address-level2" maxlength="60"></label>
           <div class="hp" aria-hidden="true"><label>Site<input type="text" name="site" tabindex="-1" autocomplete="off"></label></div>
           <label class="ok"><input type="checkbox" name="aceite" required><span>Autorizo o contato pelo WhatsApp sobre os serviços. Meus dados ficam só com esta equipe e não são compartilhados.</span></label>
           <p class="erro" id="err" role="alert" hidden></p>
@@ -151,7 +150,7 @@ else api({acao:'info'}).then(function(j){INFO=j;$('carregando').hidden=true;$('p
 document.querySelector('[name=tel]').addEventListener('input',function(e){var d=e.target.value.replace(/\D/g,'').slice(0,11);e.target.value=d.length>10?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length>6?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d.length>2?'('+d.slice(0,2)+') '+d.slice(2):d;});
 $('final-a').addEventListener('click',function(e){e.preventDefault();$('cartao').scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){var i=document.querySelector('[name=nome]');if(i)i.focus({preventScroll:true});},450);});
 $('f').addEventListener('submit',function(e){e.preventDefault();var f=e.target,err=$('err');err.hidden=true;
-  var d={acao:'enviar',nome:f.nome.value.trim(),tipo:(f.querySelector('[name=tipo]:checked')||{}).value||'outro',tel:f.tel.value,cidade:f.cidade.value.trim(),site:f.site.value,aceite:f.aceite.checked,origem:ORIG};
+  var d={acao:'enviar',nome:f.nome.value.trim(),tipo:(f.querySelector('[name=tipo]:checked')||{}).value||'outro',tel:f.tel.value,cidade:'',site:f.site.value,aceite:f.aceite.checked,origem:ORIG};
   var dg=d.tel.replace(/\D/g,'');
   if(d.nome.length<2){err.textContent='Digite o seu nome.';err.hidden=false;f.nome.focus();return;}
   if(dg.length<10||dg.length>11){err.textContent='Digite o seu WhatsApp com DDD.';err.hidden=false;f.tel.focus();return;}
