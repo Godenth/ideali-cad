@@ -1660,7 +1660,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 04h10';
+var VERSAO='18/10 · 04h30';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2874,7 +2874,7 @@ function secCaptura(){if(!ui.cap)capCarrega();var C=ui.cap||{},r=C.row;
   var u=capUrl(r.slug);
   return top+'<div class="cap-link"><code>'+esc(u)+'</code><div class="row wrap" style="gap:6px"><button class="btn sm pri" data-a="capCopia" data-v="'+esc(u)+'">Copiar link</button><a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener">Ver página</a></div></div>'+
     '<details class="small"><summary class="muted" style="cursor:pointer">Links separados por anúncio (para saber de onde veio cada contato)</summary><div class="stack" style="gap:6px;margin-top:8px">'+[['instagram','📸 Instagram'],['facebook','📘 Facebook'],['google','🔎 Google']].map(function(x){var l=capUrl(r.slug,x[0]);return '<div class="cap-link sm"><span>'+x[1]+'</span><code>'+esc(l)+'</code><button class="btn sm" data-a="capCopia" data-v="'+esc(l)+'">Copiar</button></div>';}).join('')+'</div></details>'+
-    '<form data-form="capSalva" class="stack" style="gap:10px"><label class="fld" style="margin:0"><span>Título da página <i class="muted" style="font-style:normal;font-weight:400">(opcional)</i></span><input name="titulo" maxlength="80" value="'+esc(r.titulo||'')+'" placeholder="Fale com '+esc(primeiroNome()||'o cadista')+', cadista"></label>'+
+    '<form data-form="capSalva" class="stack" style="gap:10px"><label class="fld" style="margin:0"><span>Título da página <i class="muted" style="font-style:normal;font-weight:400">(opcional)</i></span><input name="titulo" maxlength="80" value="'+esc(r.titulo||'')+'" placeholder="Seus casos desenhados com precisão. Entregues no prazo."></label>'+
     '<label class="fld" style="margin:0"><span>Mensagem que a pessoa manda no WhatsApp <i class="muted" style="font-style:normal;font-weight:400">(opcional)</i></span><textarea name="msg" maxlength="300" rows="2" placeholder="Em branco: Olá! Sou {nome}, dentista, de Campinas. Vim pelo anúncio…">'+esc(r.msg||'')+'</textarea><small>Use {nome} para o nome da pessoa.</small></label>'+
     '<label class="check"><input type="checkbox" name="ativo" '+(r.ativo?'checked':'')+'> Página no ar</label><div class="row wrap" style="gap:8px"><button class="btn sm pri" type="submit">Salvar</button></div></form></section>';}
 function capSync(manual){if(EM_DEMO||!S.sessao||ui.capSync)return Promise.resolve(0);ui.capSync=1;
