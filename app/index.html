@@ -655,6 +655,7 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .ld-card{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--surface);display:grid;gap:6px}.ld-card.hoje{border-color:#1FAF5B;box-shadow:0 0 0 2px rgba(31,175,91,.15)}
 .ld-top{display:flex;gap:10px;align-items:center}.ld-ic{font-size:1.3rem}.ld-nm{display:grid;min-width:0}.ld-nm small{color:var(--muted);font-size:.78rem}
 .ld-st{font-size:.82rem;color:var(--muted)}.ld-hoje{color:#1FAF5B}
+.ld-logo{display:grid;place-items:center;flex:none}
 .ld-edb{margin-left:auto;font-size:.9rem}.ld-edit{gap:8px}.ld-edg{display:grid;grid-template-columns:1.4fr 1fr;gap:6px 10px}.ld-edg .fld{margin:0}.ld-edg .ld-obs{grid-column:1/-1}
 @media (max-width:600px){.ld-edg{grid-template-columns:1fr}}
 .ld-acs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ld-acs .icon-btn{margin-left:auto}
@@ -1394,7 +1395,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,mem:(S.prefs||{}).mem||null,leads:(S.prefs||{}).leads||null,orig:(S.prefs||{}).orig||null,premios:(S.prefs||{}).premios||null,lib:(S.prefs||{}).lib||null,dashFull:(S.prefs||{}).dashFull||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,mem:(S.prefs||{}).mem||null,leads:(S.prefs||{}).leads||null,orig:(S.prefs||{}).orig||null,premios:(S.prefs||{}).premios||null,lib:(S.prefs||{}).lib||null,leadsIdeali:(S.prefs||{}).leadsIdeali||null,dashFull:(S.prefs||{}).dashFull||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -1446,7 +1447,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null,mem:pref.mem||null,leads:pref.leads||null,orig:pref.orig||null,premios:pref.premios||null,lib:pref.lib||null,dashFull:pref.dashFull||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null,mem:pref.mem||null,leads:pref.leads||null,orig:pref.orig||null,premios:pref.premios||null,lib:pref.lib||null,leadsIdeali:pref.leadsIdeali||null,dashFull:pref.dashFull||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -1632,7 +1633,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 02h05';
+var VERSAO='18/10 · 02h20';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2769,10 +2770,18 @@ var LEAD_SEQ=[
   {n:'Lembrete',dias:3,t:'{oi}, {nome}! Passando para saber se ficou alguma dúvida. Trabalho com prazo combinado e ajuste incluso. Tem algum caso para esta semana?'},
   {n:'Prova do trabalho',dias:5,t:'{oi}, {nome}! Posso te mandar alguns antes e depois de casos que desenhei? Assim você vê o padrão de acabamento antes de mandar o primeiro caso. 😉'},
   {n:'Última tentativa',dias:0,t:'{oi}, {nome}! Não quero te incomodar, então esta é minha última mensagem. Quando precisar de um cadista, é só me chamar aqui. Sucesso nos atendimentos! 🙌'}];
-function leadsDe(){S.prefs=S.prefs||{};if(!Array.isArray(S.prefs.leads))S.prefs.leads=[];return S.prefs.leads;}
+/* Modo "Prospecção Ideali" (só admin): mesma ferramenta, outra lista e outras mensagens, para divulgar o próprio Ideali CAD. Sem IA: custo zero. */
+var LEAD_SEQ_IDEALI=[
+  {n:'Apresentação',dias:2,t:'{oi}, {nome}! Aqui é o {eu}, do Ideali CAD 🦷 Vi que você se interessou pelo sistema. Ele foi feito para cadista: pedidos e prazos, arquivos STL/HTML, envio pro dentista direto no WhatsApp, financeiro com Pix e uma equipe de IA que te avisa de atrasos e clientes sumidos. Dá uma olhada: https://idealisystems.com'},
+  {n:'Convite',dias:3,t:'{oi}, {nome}! Conseguiu ver o Ideali CAD? O cadastro leva 1 minuto e você já começa a organizar seus pedidos: https://idealisystems.com/app/#criar . Qualquer dúvida, me chama aqui.'},
+  {n:'Demonstração',dias:5,t:'{oi}, {nome}! O que o pessoal mais gosta: mandar o STL e o HTML pro dentista pelo WhatsApp, com uma página pra ele aprovar o caso. Quer que eu te mostre em 5 minutos por vídeo?'},
+  {n:'Última tentativa',dias:0,t:'{oi}, {nome}! Última mensagem para não incomodar 🙂 Quando quiser organizar seus pedidos, o Ideali CAD está aqui: https://idealisystems.com . Sucesso!'}];
+function leadIdeali(){return ui.leadModo==='ideali'&&!!S.admin&&!!ui.sheet&&ui.sheet.fn===fLeads;}
+function leadSeq(){return leadIdeali()?LEAD_SEQ_IDEALI:LEAD_SEQ;}
+function leadsDe(){S.prefs=S.prefs||{};var k=leadIdeali()?'leadsIdeali':'leads';if(!Array.isArray(S.prefs[k]))S.prefs[k]=[];return S.prefs[k];}
 function leadsAtivos(){return leadsDe().filter(function(l){return l.st==='seq';});}
 function leadsHoje(){var t=today();return leadsAtivos().filter(function(l){return !l.prox||l.prox<=t;});}
-function leadMsg(l){var e=LEAD_SEQ[Math.min(l.etapa||0,LEAD_SEQ.length-1)],eu=((S.perfil.nome||'').trim().split(' ')[0])||'seu cadista',nome=String(l.nome||'').trim().split(' ')[0]||'tudo bem';
+function leadMsg(l){var SQ=leadSeq(),e=SQ[Math.min(l.etapa||0,SQ.length-1)],eu=((S.perfil.nome||'').trim().split(' ')[0])||'seu cadista',nome=String(l.nome||'').trim().split(' ')[0]||'tudo bem';
   return e.t.replace('{oi}',saudTxt()).replace('{nome}',nome).replace('{eu}',eu);}
 function telNorm(v){var d=soDig(v);if(d.length>=12&&d.slice(0,2)==='55')d=d.slice(2);return d.length>=10&&d.length<=11?d:'';}
 function telFmt(d){return d.length===11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d;}
@@ -2809,19 +2818,19 @@ function leadEdForm(l){var o=function(v,t){return '<option value="'+v+'"'+((l.or
     '<label class="fld"><span>Veio de</span><select class="ld-e" data-k="orig">'+o('','Outro')+o('face','Facebook')+o('insta','Instagram')+'</select></label>'+
     '<label class="fld ld-obs"><span>Anotação</span><input class="ld-e" data-k="obs" maxlength="200" value="'+esc(l.obs||'')+'" placeholder="Ex.: faz muito protocolo, pediu tabela"></label></div>'+
     '<div class="row wrap" style="gap:8px"><button class="btn sm pri" data-a="leadEdSalva" data-id="'+l.id+'">Salvar</button><button class="btn sm" data-a="leadEdX">Cancelar</button></div></div>';}
-function leadCard(l){if(ui.leadEd===l.id)return leadEdForm(l);var t=today(),hoje=l.st==='seq'&&(!l.prox||l.prox<=t),e=LEAD_SEQ[Math.min(l.etapa||0,LEAD_SEQ.length-1)],ic=l.orig==='insta'?'📸':l.orig==='face'?'📘':'👤';
-  var stTxt=l.st==='seq'?(hoje?'<b class="ld-hoje">Chamar hoje</b> · '+e.n:'Próxima: '+dmy(l.prox).slice(0,5)+' · '+e.n):l.st==='resp'?'💬 Respondeu':l.st==='cli'?'✅ Virou cliente'+(l.cli&&cliente(l.cli)?' · '+esc(cliente(l.cli).nome):''):l.st==='fim'?'Encerrado (sem resposta)':'Sem interesse';
+function leadCard(l){if(ui.leadEd===l.id)return leadEdForm(l);var SQ=leadSeq(),ID=leadIdeali(),t=today(),hoje=l.st==='seq'&&(!l.prox||l.prox<=t),e=SQ[Math.min(l.etapa||0,SQ.length-1)],ic=l.orig==='insta'?'📸':l.orig==='face'?'📘':'👤';
+  var stTxt=l.st==='seq'?(hoje?'<b class="ld-hoje">Chamar hoje</b> · '+e.n:'Próxima: '+dmy(l.prox).slice(0,5)+' · '+e.n):l.st==='resp'?'💬 Respondeu':l.st==='cli'?(ID?'✅ Criou conta no Ideali':'✅ Virou cliente')+(l.cli&&cliente(l.cli)?' · '+esc(cliente(l.cli).nome):''):l.st==='fim'?'Encerrado (sem resposta)':'Sem interesse';
   return '<div class="ld-card'+(hoje?' hoje':'')+'"><div class="ld-top"><span class="ld-ic">'+ic+'</span><span class="ld-nm"><b>'+esc(l.nome||'Sem nome')+'</b><small>'+esc(telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade)+(l.uf?'/'+l.uf:''):'')+' · chegou '+(l.criado===t?'hoje':dmy(l.criado).slice(0,5))+(l.etapa?' · '+plural(l.etapa,'mensagem','mensagens'):'')+'</small></span><button class="icon-btn ld-edb" data-a="leadEd" data-id="'+l.id+'" aria-label="Editar lead" title="Editar">✏️</button></div>'+
     (l.obs?'<div class="small muted">📝 '+esc(l.obs)+'</div>':'')+
     '<div class="ld-st">'+stTxt+'</div>'+
-    '<div class="ld-acs">'+(l.st==='seq'?'<button class="btn sm ld-wa" data-a="leadWa" data-id="'+l.id+'">WhatsApp · '+esc(e.n)+'</button>':l.st==='resp'?'<a class="btn sm ld-wa" target="_blank" rel="noopener" href="'+waLink('',l.tel)+'">Abrir conversa</a>':'')+
-      (l.st==='seq'||l.st==='resp'?'<button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="resp"'+(l.st==='resp'?' hidden':'')+'>Respondeu</button><button class="btn sm" data-a="leadPed" data-id="'+l.id+'">📦 Mandou pedido</button><button class="btn sm" data-a="leadCli" data-id="'+l.id+'">Virou cliente</button><button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="nao">Sem interesse</button>':'')+
+    '<div class="ld-acs">'+(l.st==='seq'?'<button class="btn sm ld-wa" data-a="leadWa" data-id="'+l.id+'">WhatsApp · '+esc(e.n)+'</button>'+(ID?'<button class="btn sm" data-a="leadWaImg" data-id="'+l.id+'" title="Manda a mensagem com a imagem do Ideali (no celular)">📷 Com imagem</button>':''):l.st==='resp'?'<a class="btn sm ld-wa" target="_blank" rel="noopener" href="'+waLink('',l.tel)+'">Abrir conversa</a>':'')+
+      (l.st==='seq'||l.st==='resp'?'<button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="resp"'+(l.st==='resp'?' hidden':'')+'>Respondeu</button>'+(ID?'<button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="cli">✅ Criou conta</button>':'<button class="btn sm" data-a="leadPed" data-id="'+l.id+'">📦 Mandou pedido</button><button class="btn sm" data-a="leadCli" data-id="'+l.id+'">Virou cliente</button>')+'<button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="nao">Sem interesse</button>':'')+
       '<button class="icon-btn" data-a="leadDel" data-id="'+l.id+'" aria-label="Apagar lead" title="Apagar">🗑</button></div></div>';}
 function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
   var cont={hoje:leadsHoje().length,seq:leadsAtivos().length,resp:L.filter(function(l){return l.st==='resp';}).length,cli:L.filter(function(l){return l.st==='cli';}).length,fim:L.filter(function(l){return l.st==='fim'||l.st==='nao';}).length};
   var lista=L.filter(function(l){return f==='hoje'?l.st==='seq'&&(!l.prox||l.prox<=t):f==='seq'?l.st==='seq':f==='fim'?(l.st==='fim'||l.st==='nao'):l.st===f;}).sort(function(a,b){return (a.prox||'')<(b.prox||'')?-1:1;});
   var g=SECS.filter(function(x){return x.id==='mkt';})[0];
-  var topo='<div class="ld-head">'+(g?avSec(g,0,'gravando'):'')+'<div><h2 style="margin:0">Leads da Mika</h2><p class="small muted" style="margin:2px 0 0">Contatos dos anúncios. Eu cuido da sequência: 4 mensagens em 10 dias e paro, para não virar spam.</p></div><button class="icon-btn" data-a="fechar" aria-label="Fechar" style="margin-left:auto">✕</button></div>';
+  var topo='<div class="ld-head">'+(leadIdeali()?'<span class="ld-logo">'+logo(44)+'</span><div><h2 style="margin:0">📣 Prospecção Ideali <span class="tag a">só admin</span></h2><p class="small muted" style="margin:2px 0 0">Contatos dos anúncios do Ideali CAD. 4 mensagens em 10 dias com o link do site (a prévia mostra a imagem do sistema). Sem IA, custo zero.</p></div>':(g?avSec(g,0,'gravando'):'')+'<div><h2 style="margin:0">Leads da Mika</h2><p class="small muted" style="margin:2px 0 0">Contatos dos anúncios. Eu cuido da sequência: 4 mensagens em 10 dias e paro, para não virar spam.</p></div>')+'<button class="icon-btn" data-a="fechar" aria-label="Fechar" style="margin-left:auto">✕</button></div>';
   var importa='';
   var prevs=imp&&imp.prev&&imp.prev.length?'<div class="ld-prevs">'+imp.prev.map(function(u){return '<img src="'+u+'" alt="Print colado">';}).join('')+'</div>':'';
   if(imp&&imp.st==='lendo')importa='<div class="ld-imp">'+prevs+'<p id="ld-prog">'+esc(imp.msg||'Lendo o print…')+(imp.p!=null?' '+imp.p+'%':'')+'</p><p class="small muted">Na primeira vez demora um pouco mais: o celular baixa o leitor de texto (uns 5 MB).</p></div>';
@@ -2832,7 +2841,7 @@ function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
     '<div class="row wrap" style="gap:8px;margin-top:8px">'+(imp.lista.length?'<button class="btn pri" data-a="leadSalva">Salvar leads</button>':'')+'<button class="btn" data-a="leadImpX">Cancelar</button></div></div>';
   return topo+
     '<div class="ld-bar"><button class="btn pri" data-a="leadCola">📋 Colar print</button><label class="btn up">📷 Escolher prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar à mão</button><span class="small muted">Dá para mandar vários prints de uma vez (rolando a lista da etiqueta).</span></div>'+importa+
-    '<div class="chips ld-chips">'+[['hoje','Chamar hoje'],['seq','Em andamento'],['resp','Responderam'],['cli','Viraram clientes'],['fim','Encerrados']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-a="leadFil" data-v="'+c[0]+'">'+c[1]+' <b>'+cont[c[0]]+'</b></button>';}).join('')+'</div>'+
+    '<div class="chips ld-chips">'+[['hoje','Chamar hoje'],['seq','Em andamento'],['resp','Responderam'],['cli',leadIdeali()?'Criaram conta':'Viraram clientes'],['fim','Encerrados']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-a="leadFil" data-v="'+c[0]+'">'+c[1]+' <b>'+cont[c[0]]+'</b></button>';}).join('')+'</div>'+
     '<div class="ld-lista">'+(lista.length?lista.map(leadCard).join(''):'<p class="empty">'+(f==='hoje'?(L.length?'Ninguém para chamar hoje. 🎉':'Mande o print dos contatos que chegaram pelos anúncios e eu monto a lista.'):'Nada aqui.')+'</p>')+'</div>';}
 function leadOrigPre(l){return {c:'pago',s:l.orig==='insta'?'Instagram Ads':l.orig==='face'?'Facebook Ads':''};}
 function leadDoTel(tel){var d=telNorm(tel);if(!d)return null;return leadsDe().filter(function(l){return l.tel===d&&l.st!=='cli';})[0]||null;}
@@ -4820,7 +4829,9 @@ function admTestes(){var at=ui.decoTeste,b=decoAtual(at),y=+today().slice(0,4);
       return '<button class="btn sm'+(on?' pri':'')+'" data-a="admDeco" data-v="'+addDays(d,-3)+'">'+x.emoji+' '+esc(x.nome)+'</button>';}).join('')+
     '<button class="btn sm danger" data-a="admDeco" data-v=""'+(at?'':' disabled')+'>Desativar teste</button></div>'+
     '<div class="row wrap" style="gap:8px;align-items:center"><button class="btn sm" data-a="admPasseio">🚶 Fazer alguém da equipe aparecer agora</button>'+(decoOff()?'<span class="small muted">As decorações estão desligadas em Configurações; o teste liga mesmo assim.</span>':'')+'</div></section>'+'<section class="card stack" style="margin-bottom:14px"><h2 style="margin:0">📥 Importar dados</h2><p class="small muted" style="margin:0">Traga clientes, pedidos e pagamentos de outro sistema (arquivo .json de importação). Antes de gravar, você confere tudo numa prévia.</p><div><label class="btn pri up">Escolher arquivo .json<input type="file" accept=".json,application/json" id="imp-file" hidden></label></div></section>';}
-function rAdmin(){var h=rAdmin0();return (S.admin&&ui.mfa&&ui.admLista&&!(ui.mfa.fat&&ui.mfa.aal!=='aal2')?admTestes():'')+h;}
+function admProspec(){var L=(S.prefs&&S.prefs.leadsIdeali)||[],t=today(),hj=L.filter(function(l){return l.st==='seq'&&(!l.prox||l.prox<=t);}).length,cli=L.filter(function(l){return l.st==='cli';}).length;
+  return '<section class="card between wrap" style="gap:12px;margin-bottom:16px"><div><h2 style="margin:0">📣 Prospecção Ideali</h2><p class="small muted" style="margin:4px 0 0">Cole o print dos contatos dos anúncios do Ideali CAD e mande a sequência no WhatsApp com a imagem do sistema. Sem IA, custo zero.'+(L.length?' · <b>'+L.length+'</b> contatos'+(hj?' · <b>'+hj+'</b> para chamar hoje':'')+(cli?' · <b>'+cli+'</b> criaram conta':''):'')+'</p></div><button class="btn pri" data-a="leadAbre" data-v="ideali">Abrir prospecção</button></section>';}
+function rAdmin(){var h=rAdmin0(),ok=S.admin&&ui.mfa&&ui.admLista&&!(ui.mfa.fat&&ui.mfa.aal!=='aal2');return (ok?admProspec()+admTestes():'')+h;}
 function rAdmin0(){
   if(!S.admin)return '<div class="card empty">Esta área é só para o administrador do sistema.</div>';
   if(!ui.mfa){if(!ui.mfaBusy)setTimeout(checaMfa,0);return '<div class="card empty">Verificando segurança…</div>';}
@@ -5710,7 +5721,7 @@ impGrava:function(){impGrava();},
   valuation:function(){openSheet(fValuation);},
   memDel:function(d){var m=memDe();if(d.v&&m.c[d.v])m.c[d.v]=m.c[d.v].filter(function(n){return n.id!==d.id;});else m.g=m.g.filter(function(n){return n.id!==d.id;});save();
     Object.keys(ui.iaConv||{}).forEach(function(k){(ui.iaConv[k]||[]).forEach(function(b){if(b.lst)b.lst=b.lst.filter(function(x){return !(x.bt&&x.bt.a==='memDel'&&x.bt.id===d.id);});});});toast('Apagado da memória.');render();},
-  leadAbre:function(){ui.leadImp=null;ui.leadFil=leadsHoje().length?'hoje':'seq';openSheet(fLeads);},
+  leadAbre:function(d){ui.leadModo=d&&d.v==='ideali'&&S.admin?'ideali':'cli';ui.leadImp=null;ui.leadFil=leadsHoje().length?'hoje':'seq';openSheet(fLeads);},
   leadCola:async function(){try{if(!navigator.clipboard||!navigator.clipboard.read)throw new Error('x');var its=await navigator.clipboard.read(),fs=[];
       for(var i=0;i<its.length;i++){var ty=its[i].types.filter(function(x){return /^image\//.test(x);})[0];if(ty){var b=await its[i].getType(ty);fs.push(new File([b],'print.png',{type:ty}));}}
       if(!fs.length){toast('Não achei imagem copiada. Copie o print (ou use “Escolher prints”).');return;}leadsLePrint(fs);}
@@ -5721,8 +5732,12 @@ impGrava:function(){impGrava();},
   leadSalva:function(){var imp=ui.leadImp;if(!imp)return;var L=leadsDe(),ja={},n=0,ruim=0;L.forEach(function(l){ja[l.tel]=1;});
     imp.lista.forEach(function(x){if(!x.ok)return;var d=telNorm(x.tel);if(!d){ruim++;return;}if(ja[d])return;ja[d]=1;L.push(leadNovoObj(x.nome,d,x.orig));n++;});
     if(L.length>500)L.splice(0,L.length-500);ui.leadImp=null;ui.leadFil='hoje';save();renderSheet();toast(n?plural(n,'lead salvo','leads salvos')+'. Bora chamar! 📲':'Nenhum lead novo.'+(ruim?' Confira os telefones (com DDD).':''));},
-  leadWa:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;window.open(waLink(leadMsg(l),l.tel),'_blank','noopener');
-    var e=l.etapa||0;l.etapa=e+1;l.ult=today();if(l.etapa>=LEAD_SEQ.length){l.st='fim';l.prox=null;}else l.prox=addDays(today(),LEAD_SEQ[e].dias);save();renderSheet();
+  leadWaImg:async function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;var txt=leadMsg(l);
+    try{var b=await (await fetch('/og.jpg')).blob(),f=new File([b],'ideali-cad.jpg',{type:'image/jpeg'});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.clipboard.writeText(txt);}catch(e){}await navigator.share({files:[f],text:txt});A.leadWa(d,true);return;}}catch(e){if(e&&e.name==='AbortError')return;}
+    toast('Neste aparelho não dá para anexar imagem. Mandei só o texto: o link já mostra a imagem do Ideali na prévia.');A.leadWa(d);},
+  leadWa:function(d,soMarca){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;if(soMarca!==true)window.open(waLink(leadMsg(l),l.tel),'_blank','noopener');
+    var e=l.etapa||0;l.etapa=e+1;l.ult=today();if(l.etapa>=leadSeq().length){l.st='fim';l.prox=null;}else l.prox=addDays(today(),leadSeq()[e].dias);save();renderSheet();
     toast(l.st==='fim'?'Última mensagem enviada. Encerrei a sequência deste lead.':'Próxima mensagem para '+(l.nome||'este lead')+' em '+dmy(l.prox).slice(0,5)+'.');},
   leadSt:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;l.st=d.v;l.prox=null;save();renderSheet();toast(d.v==='resp'?'Boa! Parei a sequência: agora é com você na conversa. 💬':'Ok, encerrei este lead.');},
   leadCli:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;var ps=String(l.nome||'').trim().split(/\s+/);l.st='cli';l.prox=null;save();
