@@ -657,7 +657,8 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .ld-st{font-size:.82rem;color:var(--muted)}.ld-hoje{color:#1FAF5B}
 .lg-lembra{font-size:.88rem;color:var(--muted);margin-top:-4px}
 .cap-link{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:space-between;background:var(--soft);border-radius:12px;padding:10px 12px}.cap-link code{font-size:.85rem;word-break:break-all}.cap-link.sm{background:transparent;border:1px solid var(--line);padding:6px 10px}.cap-link.sm span{font-weight:600;min-width:100px}
-.ldx{display:grid;gap:14px}.ldx-tp{font-style:normal;font-size:.66rem;font-weight:800;background:linear-gradient(90deg,#F0A53A,#DD5A9E);color:#fff;border-radius:99px;padding:1px 7px;margin-right:2px;white-space:nowrap}
+.ldx{display:grid;gap:14px}.ldx-oc{display:flex;align-items:center;gap:12px;border:1px solid #F0A53A;background:color-mix(in srgb,#F0A53A 12%,transparent);border-radius:16px;padding:12px 14px}.ldx-oc>span{font-size:1.6rem}.ldx-oc div{display:grid;flex:1;min-width:0}.ldx-oc small{color:var(--muted)}
+.ldx-tp{font-style:normal;font-size:.66rem;font-weight:800;background:linear-gradient(90deg,#F0A53A,#DD5A9E);color:#fff;border-radius:99px;padding:1px 7px;margin-right:2px;white-space:nowrap}
 .ldx-chips .ldx-tpc{background:linear-gradient(90deg,#F0A53A,#DD5A9E);color:#fff;border-color:transparent;font-weight:700}
 .lf-bg{background:radial-gradient(circle at 50% 40%,rgba(240,165,58,.4),rgba(10,6,30,.86) 70%)}.lf-tag{background:linear-gradient(90deg,#EF5F5A,#F0A53A);animation:lfPisca 1s ease-in-out 4}
 @keyframes lfPisca{50%{transform:scale(1.06)}}
@@ -1486,7 +1487,7 @@ async function carregar2(){
     novo.faixas=novo.faixas.filter(function(x){return !x.deleted;});
     novo.pagamentos.forEach(function(g){g.pedidos=novo.pedidos.filter(function(x){return x.pagamentoId===g.id;}).map(function(x){return x.id;});});
     novo.seq=novo.pedidos.reduce(function(m,x){return Math.max(m,x.num||0);},0);
-    S=novo;tiraFoto();ui.dadosOk=true;passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);setTimeout(capSync,4500);clearInterval(window._capT);window._capT=setInterval(function(){if(!document.hidden)capSync();},90000);setTimeout(libCheca,2500);
+    S=novo;tiraFoto();ui.dadosOk=true;passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);setTimeout(capSync,4500);setTimeout(ldOcAviso,9000);clearInterval(window._capT);window._capT=setInterval(function(){if(!document.hidden)capSync();},90000);setTimeout(libCheca,2500);
     try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
   S.carregando=false;ui.autoArqMes=null;aplicaTema(temaAtual(),modoAtual());autoArquivar();render();iniciaUso();secAbreDia();
@@ -1665,7 +1666,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 11h35';
+var VERSAO='18/10 · 11h55';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2824,7 +2825,7 @@ function leadSeq(){return leadIdeali()?LEAD_SEQ_IDEALI:LEAD_SEQ;}
 function leadsDe(){S.prefs=S.prefs||{};var k=leadIdeali()?'leadsIdeali':'leads';if(!Array.isArray(S.prefs[k]))S.prefs[k]=[];return S.prefs[k];}
 function leadsAtivos(){return leadsDe().filter(function(l){return l.st==='seq';});}
 function leadsHoje(){var t=today();return leadsAtivos().filter(function(l){return !l.prox||l.prox<=t;});}
-function ldFill(t,l){var eu=((S.perfil.nome||'').trim().split(' ')[0])||'seu cadista',nome=String(l.nome||'').trim().split(' ')[0]||'tudo bem';return t.replace(/\{oi\}/g,saudTxt()).replace(/\{nome\}/g,nome).replace(/\{eu\}/g,eu);}
+function ldFill(t,l){var eu=((S.perfil.nome||'').trim().split(' ')[0])||'seu cadista',nome=String(l.nome||'').trim().split(/\s+/).filter(function(w){return w&&!/^(dra?|lab|cl[ií]nica)\.?$/i.test(w);})[0]||'tudo bem';return t.replace(/\{oi\}/g,saudTxt()).replace(/\{nome\}/g,nome).replace(/\{eu\}/g,eu);}
 function leadMsg(l){var SQ=leadSeq(),e=SQ[Math.min(l.etapa||0,SQ.length-1)];return ldFill(e.t,l);}
 function telNorm(v){var d=soDig(v);if(d.length>=12&&d.slice(0,2)==='55')d=d.slice(2);return d.length>=10&&d.length<=11?d:'';}
 function telFmt(d){return d.length===11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d;}
@@ -2920,6 +2921,17 @@ function leadCard(l){if(ui.leadEd===l.id)return leadEdForm(l);var SQ=leadSeq(),I
    depois de enviar, o lead vai para "Aguardando retorno" pelo prazo escolhido e volta para "Chamar hoje" quando vencer. */
 var LD_ALT={cli:[['Curta','{oi}, {nome}! Tem algum caso para esta semana? Estou com agenda para entregar rápido.'],['Dúvida','{oi}, {nome}! Conseguiu ver os valores que te passei? Ficou alguma dúvida?'],['Primeiro contato','{oi}, {nome}! Aqui é {eu}, cadista. Vi que você se interessou pelo meu trabalho de planejamento digital (coroas, facetas, protocolos e mais). Você é dentista ou protético? Assim já te mando a tabela.']],
   ideali:[['Curta','{oi}, {nome}! Aqui é o {eu}, do Ideali CAD. Posso te mostrar em 2 minutos como organizar pedidos, arquivos e cobranças? https://idealisystems.com/tour.html'],['Pergunta','{oi}, {nome}! Você é cadista? Hoje como você controla pedidos, prazos e cobranças? Fiz um sistema pra isso: https://idealisystems.com']]};
+/* Ocasiões especiais: no dia, contatos que estão na fila de espera podem receber uma mensagem comemorativa
+   sem quebrar a sequência (o retorno continua na mesma data). Sem emojis, porque o WhatsApp do computador quebra alguns. */
+var LD_OC={dentista:{p:function(l){return l.tipo!=='protetico'&&l.tipo!=='outro';},t:'{oi}, {nome}! Passando para te desejar um feliz Dia do Dentista! Obrigado por cuidar de tantos sorrisos. Quando precisar de um cadista, conte comigo. Abraço, {eu}'},
+  protetico:{p:function(l){return l.tipo==='protetico';},t:'{oi}, {nome}! Feliz Dia do Protético! Que o seu trabalho continue transformando sorrisos. Quando precisar de apoio no planejamento digital, conte comigo. Abraço, {eu}'},
+  natal:{t:'{oi}, {nome}! Passando para te desejar um feliz Natal, com muita paz e alegria. Boas festas! Abraço, {eu}'},
+  anonovo:{t:'{oi}, {nome}! Feliz Ano Novo! Que este ano seja de muitos sorrisos e ótimos trabalhos. Abraço, {eu}'},
+  pascoa:{t:'{oi}, {nome}! Feliz Páscoa! Que seja um tempo de renovação e paz para você e sua família. Abraço, {eu}'}};
+function ldOcasiao(){var t=today(),ev=eventosAno(+t.slice(0,4)).filter(function(e){return e.d===t&&LD_OC[e.id];})[0];return ev?{ev:ev,o:LD_OC[ev.id],k:ev.id+t.slice(0,4)}:null;}
+function ldOcElegivel(l,oc){return !!oc&&l.st==='seq'&&!!l.prox&&l.prox>today()&&(l.oc||'')!==oc.k&&(!oc.o.p||oc.o.p(l));}
+function ldOcAviso(){try{var oc=ldOcasiao();if(!oc||EM_DEMO||!S.sessao)return;var k='idealicad_ocav_'+oc.k;if(localStorage.getItem(k))return;var mo=ui.leadModo;ui.leadModo='cli';var n=leadsDe().filter(function(l){return ldOcElegivel(l,oc);}).length;ui.leadModo=mo;if(!n)return;
+  localStorage.setItem(k,'1');var g=agOk('mkt')?'mkt':'ven';agenteCanto(g,g==='mkt'?'ideia':'feliz','Hoje é '+oc.ev.nome+'! 🎉',plural(n,'contato da fila de espera pode','contatos da fila de espera podem')+' receber uma mensagem especial hoje, sem atrapalhar a sequência. É um bom motivo para lembrar de você!',[{a:'ldOcVer',l:'Ver contatos',pri:1}],14000,true);}catch(e){}}
 var LD_F=[['hoje','Chamar hoje','📲'],['espera','Aguardando retorno','⏳'],['resp','Em conversa','💬'],['cli','Clientes','✅'],['fim','Encerrados','🗂'],['todos','Todos','👥']];
 function ldCat(l,t){return l.st==='seq'?((!l.prox||l.prox<=t)?'hoje':'espera'):l.st==='resp'?'resp':l.st==='cli'?'cli':'fim';}
 function ldOrig(l){return l.orig==='insta'?'📸 Instagram':l.orig==='face'?'📘 Facebook':l.pag?'🌐 Página de anúncio':'👤 Contato';}
@@ -2933,11 +2945,12 @@ function ldStatus(l,t){var SQ=leadSeq(),e=SQ[Math.min(l.etapa||0,SQ.length-1)],c
   return {c:'fim',tx:l.st==='nao'?'Sem interesse':'Encerrado (sem resposta)',sub:''};}
 function ldItem(l,t,on){var st=ldStatus(l,t);return '<button class="ldx-it'+(on?' on':'')+'" data-a="ldSel" data-id="'+l.id+'"><span class="ldx-av" style="background:'+ldCor(l.id)+'">'+esc(ldIni(l.nome))+'</span><span class="ldx-tx"><b>'+esc(l.nome||'Sem nome')+'</b><small>'+(l.pago?'<i class="ldx-tp" title="Veio do tráfego pago">🚀 Tráfego pago</i> ':'')+esc(telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade):'')+'</small></span><span class="ldx-pill p-'+st.c+'">'+(st.c==='espera'?dmy(l.prox).slice(0,5):st.c==='hoje'?(l.etapa?'retornar':'novo'):st.c==='resp'?'conversa':st.c==='cli'?'cliente':'fim')+'</span></button>';}
 function ldComposer(l){var C=ui.ldComp,SQ=leadSeq(),e=SQ[Math.min(l.etapa||0,SQ.length-1)],ID=leadIdeali();
-  var ops=[[e.n+' (recomendada)',leadMsg(l)]].concat((LD_ALT[ID?'ideali':'cli']||[]).map(function(x){return [x[0],ldFill(x[1],l)];}));
-  C.ops=ops.map(function(o){return o[1];});C.opsN=ops.map(function(o){return o[0].replace(' (recomendada)','');});if(C.txt==null)C.txt=ops[0][1];
+  var OC=ldOcasiao(),okOc=ldOcElegivel(l,OC);C.oc=okOc?OC.k:null;
+  var ops=(okOc?[['🎉 '+OC.ev.nome+' (especial)',ldFill(OC.o.t,l)]]:[]).concat([[e.n+(okOc?'':' (recomendada)'),leadMsg(l)]]).concat((LD_ALT[ID?'ideali':'cli']||[]).map(function(x){return [x[0],ldFill(x[1],l)];}));
+  C.ops=ops.map(function(o){return o[1];});C.opsN=ops.map(function(o){return o[0].replace(' (recomendada)','').replace(' (especial)','').replace(/^🎉 /,'');});if(C.txt==null)C.txt=ops[0][1];
   return '<div class="ldx-comp"><b>Escolha a mensagem</b><div class="ldx-ops">'+ops.map(function(o,i){return '<button class="ldx-op'+(C.op===i?' on':'')+'" data-a="ldOp" data-v="'+i+'"><span>'+esc(o[0])+'</span><small>'+esc(o[1].slice(0,120))+(o[1].length>120?'…':'')+'</small></button>';}).join('')+'</div>'+
     '<label class="fld" style="margin:0"><span>Mensagem (dá para editar)</span><textarea id="ldx-txt" rows="5" maxlength="1200">'+esc(C.txt)+'</textarea></label>'+
-    '<div class="ldx-dias"><span>Depois de enviar, retornar em</span>'+[3,7,15,30].map(function(d){return '<button class="chip'+(C.dias===d?' on':'')+'" data-a="ldDias" data-v="'+d+'">'+plural(d,'dia','dias')+'</button>';}).join('')+'</div>'+
+    (C.oc&&C.op===0?'<p class="small muted" style="margin:0">Mensagem especial: o contato continua na fila de espera, com retorno em '+dmy(l.prox).slice(0,5)+'.</p>':'<div class="ldx-dias"><span>Depois de enviar, retornar em</span>'+[3,7,15,30].map(function(d){return '<button class="chip'+(C.dias===d?' on':'')+'" data-a="ldDias" data-v="'+d+'">'+plural(d,'dia','dias')+'</button>';}).join('')+'</div>')+
     '<div class="row wrap" style="gap:8px"><button class="btn pri ld-wa" data-a="ldEnvia">Enviar no WhatsApp</button>'+(ID?'<button class="btn" data-a="ldEnvia" data-v="img">📷 Enviar com imagem</button>':'')+'<button class="btn" data-a="ldCompX">Cancelar</button></div>'+'</div>';}
 function ldDetalhe(l,t){if(ui.leadEd===l.id)return '<div class="ldx-det">'+leadEdForm(l)+'</div>';var st=ldStatus(l,t),ID=leadIdeali(),H=(l.hist||[]).slice().reverse();
   var tipo=l.tipo?(CAP_TIPO[l.tipo]||l.tipo):'';
@@ -2957,7 +2970,8 @@ function ldDetalhe(l,t){if(ui.leadEd===l.id)return '<div class="ldx-det">'+leadE
       '<div class="ldx-h"><span>'+dmy(l.criado).slice(0,5)+'</span><div><b>Entrou na lista</b><small>'+esc(ldOrig(l).replace(/^\S+\s/,''))+'</small></div></div></div></div>';}
 function rLeads(){if(ui.sub==='ideali'&&!S.admin)ui.sub=null;ui.leadModo=ui.sub==='ideali'?'ideali':'cli';var ID=leadIdeali(),L=leadsDe(),t=today(),f=ui.leadFil||'hoje',q=(ui.ldBusca||'').trim().toLowerCase(),imp=ui.leadImp;
   var cont={};LD_F.forEach(function(x){cont[x[0]]=0;});L.forEach(function(l){cont[ldCat(l,t)]++;});cont.todos=L.length;
-  var lista=L.filter(function(l){return (f==='todos'||ldCat(l,t)===f)&&(!q||(String(l.nome||'').toLowerCase().indexOf(q)>=0||String(l.tel).indexOf(q.replace(/\D/g,'')||'§')>=0||String(l.cidade||'').toLowerCase().indexOf(q)>=0));})
+  var OC=ldOcasiao(),nOc=OC?L.filter(function(l){return ldOcElegivel(l,OC);}).length:0;if(f==='oc'&&!nOc)f=ui.leadFil='espera';
+  var lista=L.filter(function(l){return (f==='todos'||(f==='oc'?ldOcElegivel(l,OC):ldCat(l,t)===f))&&(!q||(String(l.nome||'').toLowerCase().indexOf(q)>=0||String(l.tel).indexOf(q.replace(/\D/g,'')||'§')>=0||String(l.cidade||'').toLowerCase().indexOf(q)>=0));})
     .sort(function(a,b){return String(a.nome||'~').localeCompare(String(b.nome||'~'),'pt');});
   var sel=L.filter(function(l){return l.id===ui.ldSel;})[0]||null,g=SECS.filter(function(x){return x.id==='mkt';})[0];
   var letra='',itens=lista.map(function(l){var c=(String(l.nome||'#').trim()[0]||'#').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(!/[A-Z]/.test(c))c='#';var h=c!==letra?'<div class="ldx-letra">'+c+'</div>':'';letra=c;return h+ldItem(l,t,sel&&sel.id===l.id);}).join('');
@@ -2972,7 +2986,8 @@ function rLeads(){if(ui.sub==='ideali'&&!S.admin)ui.sub=null;ui.leadModo=ui.sub=
   var head='<div class="ldx-head"><div class="ldx-ht">'+(ID?'<span class="ld-logo">'+logo(40)+'</span>':(g&&agOk('mkt')?avSec(g,0,'gravando'):''))+'<div><h1>'+(ID?'Prospecção Ideali <span class="tag a">só admin</span>':'Leads')+'</h1><p class="small muted">'+(ID?'Cadistas para apresentar o Ideali CAD. Mensagens com o link do tour e do site.':'Contatos dos anúncios e da sua página. Depois de cada mensagem o contato espera o prazo que você escolher e volta para "Chamar hoje".')+'</p></div></div>'+
     '<div class="ldx-hb"><button class="btn pri" data-a="leadCola">📋 Colar print ou lista</button><label class="btn up">📷 Prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar</button>'+(ID?'':'<button class="btn" data-a="capVai" title="Página para anúncios">🌐 Minha página</button>')+'</div></div>'+
     '<div class="ldx-kpis">'+LD_F.map(function(x){return '<button class="ldx-k'+(f===x[0]?' on':'')+(x[0]==='hoje'&&cont.hoje?' alerta':'')+'" data-a="leadFil" data-v="'+x[0]+'"><span>'+x[2]+' '+(ID&&x[0]==='cli'?'Criaram conta':x[1])+'</span><b>'+cont[x[0]]+'</b></button>';}).join('')+'</div>';
-  return '<div class="ldx'+(sel?' com-sel':'')+'">'+head+importa+
+  var ocB=nOc?'<div class="ldx-oc"><span>🎉</span><div><b>Hoje é '+esc(OC.ev.nome)+'!</b><small>'+plural(nOc,'contato da fila de espera pode','contatos da fila de espera podem')+' receber uma mensagem especial hoje. O retorno de cada um continua na mesma data.</small></div><button class="btn sm pri" data-a="leadFil" data-v="oc">'+(f==='oc'?'Mostrando':'Ver contatos')+'</button></div>':'';
+  return '<div class="ldx'+(sel?' com-sel':'')+'">'+head+ocB+importa+
     '<div class="ldx-grid"><div class="ldx-lista card"><input class="ldx-busca" id="ldx-busca" type="search" placeholder="Buscar nome, telefone ou cidade" value="'+esc(ui.ldBusca||'')+'">'+
       '<div class="ldx-itens">'+(itens||'<p class="empty">'+(L.length?(f==='hoje'?'Ninguém para chamar hoje. 🎉':'Nenhum contato aqui.'):'Cole a sua lista de números ou o print dos contatos para começar.')+'</p>')+'</div></div>'+
       '<div class="ldx-dcol card">'+(sel?ldDetalhe(sel,t):'<div class="ldx-vazio"><span>👈</span><b>Escolha um contato</b><p class="small muted">Os detalhes, as mensagens e o histórico aparecem aqui.</p></div>')+'</div></div></div>';}
@@ -4182,6 +4197,7 @@ var MSG_DATAS={
   pais:['Feliz Dia dos Pais! 👔 Um abraço para todos os pais da sua equipe. — {eu}'],
   cliente:['Hoje é Dia do Cliente e eu não podia deixar de agradecer: obrigado por confiar seus casos ao meu trabalho! 💜 — {eu}'],
   secretaria:['Hoje é Dia da Secretária! 💐 Um agradecimento especial a quem organiza tudo aí, envia os casos e cuida de cada detalhe. Obrigado pela parceria de sempre! — {eu}'],
+  protetico:['Feliz Dia do Protético! 🦷 Obrigado pela parceria em cada caso. Que o seu trabalho continue transformando sorrisos! — {eu}'],
   dentista:['Feliz Dia do Dentista! 🦷 Obrigado pela confiança em cada caso que fazemos juntos. Que seu trabalho continue transformando sorrisos! — {eu}'],
   natal:['Feliz Natal! 🎄 Que a sua noite seja cheia de paz e alegria. Obrigado por cada caso confiado a mim neste ano. Boas festas! — {eu}'],
   anonovo:['Feliz Ano Novo! 🎆 Obrigado pela parceria em {ano}. Que {anoSeg} venha com muitos sorrisos, saúde e trabalhos lindos juntos! — {eu}']
@@ -4199,6 +4215,7 @@ function eventosAno(y){var P=pascoa(y),F=function(m,d){return y+'-'+pad(m)+'-'+p
     {id:'trabalho',nome:'Dia do Trabalho',d:F(5,1),fer:true},
     {id:'maes',nome:'Dia das Mães',d:nDomingo(y,5,2),com:'maes'},
     {id:'corpus',nome:'Corpus Christi',d:addDays(P,60),fer:true},
+    {id:'protetico',nome:'Dia do Protético',d:F(7,9),com:'protetico'},
     {id:'pais',nome:'Dia dos Pais',d:nDomingo(y,8,2),com:'pais'},
     {id:'independencia',nome:'Independência do Brasil',d:F(9,7),fer:true},
     {id:'cliente',nome:'Dia do Cliente',d:F(9,15),com:'cliente'},
@@ -5874,6 +5891,7 @@ impGrava:function(){impGrava();},
   memDel:function(d){var m=memDe();if(d.v&&m.c[d.v])m.c[d.v]=m.c[d.v].filter(function(n){return n.id!==d.id;});else m.g=m.g.filter(function(n){return n.id!==d.id;});save();
     Object.keys(ui.iaConv||{}).forEach(function(k){(ui.iaConv[k]||[]).forEach(function(b){if(b.lst)b.lst=b.lst.filter(function(x){return !(x.bt&&x.bt.a==='memDel'&&x.bt.id===d.id);});});});toast('Apagado da memória.');render();},
   capCopia:function(d){try{navigator.clipboard.writeText(d.v);toast('Link copiado! Cole no destino do seu anúncio.');}catch(e){prompt('Copie o link:',d.v);}},
+  ldOcVer:function(){closeSheet();ui.tab='leads';ui.sub=null;ui.leadModo='cli';ui.leadFil='oc';ui.ldSel=null;ui.ldComp=null;render();window.scrollTo(0,0);},
   lfVer:function(){var F=ui.lfesta;festaFecha();var id=F&&F.ids&&F.ids[0];closeSheet();ui.tab='leads';ui.sub=null;ui.leadModo='cli';ui.leadFil='todos';ui.ldSel=id||null;ui.ldComp=null;render();window.scrollTo(0,0);},
   admSimLead:function(){var nomes=['Dra. Fernanda Lima','Dr. Rafael Costa','Lab. Sorriso Pleno','Dra. Camila Rocha'],tipos=['dentista','dentista','protetico','dentista'],i=Math.floor(Math.random()*nomes.length);
     var mo=ui.leadModo;ui.leadModo='cli';var l=leadNovoObj(nomes[i]+' (simulação)','119'+String(Math.floor(10000000+Math.random()*89999999)),'insta');l.tipo=tipos[i];l.pag=1;l.pago=1;l.sim=1;l.obs=(CAP_TIPO[l.tipo]||'')+' · veio pela página (simulação)';leadsDe().push(l);ui.leadModo=mo;save();leadFesta([l],true);},
@@ -5886,7 +5904,9 @@ impGrava:function(){impGrava();},
     var SQ=leadSeq(),e=SQ[Math.min(l.etapa||0,SQ.length-1)],nome=(C.opsN&&C.opsN[C.op])||e.n;
     if(d.v==='img'){try{var b=await (await fetch('/og.jpg')).blob(),f=new File([b],'ideali-cad.jpg',{type:'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.clipboard.writeText(txt);}catch(x){}await navigator.share({files:[f],text:txt});}else{toast('Neste aparelho não dá para anexar imagem: mandei só o texto (o link mostra a imagem na prévia).');window.open(waLink(txt,l.tel),'_blank','noopener');}}catch(x){if(x&&x.name==='AbortError')return;window.open(waLink(txt,l.tel),'_blank','noopener');}}
     else window.open(waLink(txt,l.tel),'_blank','noopener');
-    l.hist=l.hist||[];l.hist.push({d:today(),n:'Enviou: '+nome,txt:txt});if(l.hist.length>30)l.hist.splice(0,l.hist.length-30);
+    l.hist=l.hist||[];
+    if(C.oc&&C.op===0){l.hist.push({d:today(),n:'Mensagem especial: '+nome,txt:txt});if(l.hist.length>30)l.hist.splice(0,l.hist.length-30);l.oc=C.oc;ui.ldComp=null;save();render();toast('Enviada! A fila de espera de '+(l.nome||'o contato')+' continua: retorno em '+dmy(l.prox).slice(0,5)+'.');return;}
+    l.hist.push({d:today(),n:'Enviou: '+nome,txt:txt});if(l.hist.length>30)l.hist.splice(0,l.hist.length-30);
     l.etapa=(l.etapa||0)+1;l.ult=today();if(l.st==='fim'||l.st==='nao')l.st='seq';
     if(l.etapa>=SQ.length+1){l.st='fim';l.prox=null;}else{l.st='seq';l.prox=addDays(today(),C.dias||7);}
     ui.ldComp=null;save();render();toast(l.st==='fim'?'Enviada. Já foram todas as mensagens da sequência: encerrei este contato.':'Enviada! '+(l.nome||'O contato')+' volta para "Chamar hoje" em '+dmy(l.prox).slice(0,5)+'. ⏳');},
