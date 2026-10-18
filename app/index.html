@@ -1632,7 +1632,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 01h40';
+var VERSAO='18/10 · 02h05';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1694,6 +1694,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
     '<div class="content">'+top+'<main class="main">'+
     (w?'':'<div class="banner bad"><span><b>Conta bloqueada.</b> Seus dados estão guardados. Você pode ver e exportar, mas não pode criar nem alterar.</span><button class="btn sm" data-a="tab" data-v="config">Ver assinatura</button></div>')+
     (emCfg()?'<div class="cfg">'+cfgTabs(lix)+body+'</div>':body)+'</main></div>'+bnav+'</div>'+(ui.tour!=null?tourCard():'');
+  rotaSync();
 }
 /* Suporte e dúvidas (aparece no cadastro, no menu da conta e em Perfil e conta) */
 var SUPORTE={email:'contato.idealisystem@gmail.com',wa:'5511960680814',waTxt:'(11) 96068-0814'};
@@ -6017,7 +6018,7 @@ tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l
     sb.auth.resend({type:'signup',email:ce.email,options:{emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){ui.loginBusy=false;ui.loginMsg=r.error?msgAuth(r.error):'Enviamos de novo. Pode levar 1 minuto.';render();});},
   jaConfirmei:function(){var ce=ui.checaEmail;ui.checaEmail=null;ui.loginCriar=false;ui.loginMsg='';if(ce)ui.loginEmail=ce.email;render();},
   confirmar:function(d){if(d.dig){var v=(document.getElementById('cf-dig').value||'').trim().toUpperCase();if(v!==d.dig){toast('Digite '+d.dig+' para confirmar.');return;}}var f=ui.confirmAcao;ui.confirmAcao=null;if(f)f();},
-  sair:function(){sb.auth.signOut().then(function(){S=estadoVazio();ui.rede=null;ui.tab='dashboard';ui.sub=null;render();});},
+  sair:function(){sb.auth.signOut().then(function(){S=estadoVazio();ui.rede=null;ui.tab='dashboard';ui.sub=null;ui._rotaTab=null;try{history.replaceState(null,'',location.pathname);}catch(e){}render();});},
   fechar:function(){closeSheet();},
   bg:function(d,el,e){if(e.target===el)closeSheet();}
 };
@@ -6305,7 +6306,14 @@ function msgAuth(e){var m=(e&&e.message)||'';
   if(/rate limit|too many/i.test(m))return 'Muitas tentativas. Aguarde alguns minutos e tente de novo.';
   if(/fetch|network/i.test(m))return 'Sem conexão com a internet.';
   return 'Não foi possível concluir: '+m;}
+/* Rota na URL (#/aba ou #/aba/sub): F5 volta para a mesma tela e o botão Voltar do navegador troca de aba */
+var ROTAS=['dashboard','pedidos','clientes','financeiro','ranking','arquivos','tipos','lixeira','tabela','rede','lab','analises','metas','secretarios','visu','config','admin','mais'];
+function rotaLe(){var m=/^#\/([a-z]+)(?:\/([A-Za-z0-9_-]+))?$/.exec(location.hash||'');return m&&ROTAS.indexOf(m[1])>=0?{tab:m[1],sub:m[2]||null}:null;}
+function rotaSync(){if(!S.sessao||S.carregando||!ui.dadosOk||ui.tour!=null||ui.equipe!=null)return;var h='#/'+ui.tab+(ui.sub&&typeof ui.sub==='string'?'/'+ui.sub:'');if(location.hash===h){ui._rotaTab=ui.tab;return;}
+  try{if(ui._rotaTab&&ui._rotaTab!==ui.tab)history.pushState(null,'',location.pathname+h);else history.replaceState(null,'',location.pathname+h);}catch(e){}ui._rotaTab=ui.tab;}
+window.addEventListener('popstate',function(){var r=rotaLe();if(!r||!S.sessao)return;ui.tab=r.tab;ui.sub=r.sub;ui._rotaTab=r.tab;if(ui.sheet)closeSheet();render();window.scrollTo(0,0);});
 function boot(){
+  ui.rotaIni=rotaLe();
   if(location.hash==='#criar'){ui.loginCriar=true;history.replaceState(null,'',location.pathname);}
   if(/error_code=otp_expired|error=access_denied/.test(location.hash)){ui.loginMsg='Esse link de confirmação expirou ou já foi usado. Entre com seu e-mail e senha; se pedir confirmação, crie a conta de novo para receber outro link.';history.replaceState(null,'',location.pathname);}
   if(!sb){document.getElementById('app').innerHTML='<div class="login"><div class="box card" style="padding:24px"><h1>Ideali CAD</h1><p>Não foi possível carregar o sistema. Verifique sua internet e recarregue a página.</p></div></div>';return;}
@@ -6314,7 +6322,7 @@ function boot(){
     if(ev==='SIGNED_OUT'){S=estadoVazio();render();return;}
     if(session&&/access_token|type=signup/.test(location.hash))history.replaceState(null,'',location.pathname);
     if(session&&(!S.sessao||S.sessao.id!==session.user.id)&&!ui.recuperar){ui.checaEmail=null;
-      S.sessao={id:session.user.id,email:session.user.email};ui.loginMsg='';ui.tab='dashboard';setTimeout(carregar,0);
+      S.sessao={id:session.user.id,email:session.user.email};ui.loginMsg='';ui.tab=ui.rotaIni?ui.rotaIni.tab:'dashboard';ui.sub=ui.rotaIni?ui.rotaIni.sub:null;ui.rotaIni=null;setTimeout(carregar,0);
     }
   });
   sb.auth.getSession().then(function(r){var se=r.data&&r.data.session;if(!se)render();});
