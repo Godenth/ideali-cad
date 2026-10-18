@@ -641,6 +641,7 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .zb .ia-hr{display:block;text-align:right;font-size:.68rem!important;font-weight:500!important;color:var(--muted)!important;margin-top:3px;opacity:.85}.zb.ia-eu .ia-hr{color:inherit!important;opacity:.75}
 .suporte{display:grid;gap:2px;font-size:.82rem;color:var(--muted);padding:10px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)}.suporte b{color:var(--ink);font-size:.86rem}.suporte a{color:var(--accent);font-weight:600}
 .dd-sup{display:block;padding:9px 12px;color:var(--ink);text-decoration:none;border-radius:8px}.dd-sup:hover{background:var(--accent-soft)}
+.ld-prevs{display:flex;gap:6px;overflow-x:auto}.ld-prevs img{height:110px;border-radius:8px;border:1px solid var(--line)}
 .ld-head{display:flex;gap:12px;align-items:center;margin-bottom:12px}
 .ld-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}.ld-bar .up{position:relative}
 .ld-imp{border:1px solid var(--line);background:var(--soft);border-radius:14px;padding:12px;margin-bottom:10px;display:grid;gap:8px}
@@ -1576,7 +1577,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 21h40';
+var VERSAO='17/10 · 21h55';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2714,9 +2715,18 @@ function leadsDoTexto(txt){var L=String(txt).split(/\n+/).map(function(s){return
   return R;}
 function carregaOCR(){if(window.Tesseract)return Promise.resolve();return new Promise(function(ok,ruim){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=ok;s.onerror=function(){ruim(new Error('não consegui carregar o leitor de imagem'));};document.head.appendChild(s);});}
 async function leadsLePrint(file){var fs=[].concat(file).filter(Boolean);if(!fs.length)return;if(!ui.sheet||ui.sheet.fn!==fLeads){ui.leadFil='hoje';openSheet(fLeads);}ui.leadImp={st:'lendo',p:0,lista:[]};renderSheet();
-  try{await carregaOCR();var txt='';for(var i=0;i<fs.length;i++){var r=await window.Tesseract.recognize(fs[i],'por',{logger:function(m){if(m.status==='recognizing text'&&ui.leadImp){ui.leadImp.p=Math.round(m.progress*100);var e=document.getElementById('ld-prog');if(e)e.textContent='Lendo o print '+(i+1)+' de '+fs.length+'… '+ui.leadImp.p+'%';}}});txt+='\n'+(r.data.text||'');}
+  ui.leadImp.prev=fs.map(function(f){return URL.createObjectURL(f);});renderSheet();
+  var etapa=function(s,p){if(!ui.leadImp)return;ui.leadImp.msg=s;ui.leadImp.p=p;var e=document.getElementById('ld-prog');if(e)e.textContent=s+(p!=null?' '+p+'%':'');};
+  var limite=function(pr,ms){return Promise.race([pr,new Promise(function(_,ruim){setTimeout(function(){ruim(new Error('demorou demais. Confira a internet e tente de novo'));},ms);})]);};
+  try{etapa('Baixando o leitor de texto (só na primeira vez)…',0);await limite(carregaOCR(),60000);var txt='',wk=null;
+    var NOMES={'loading tesseract core':'Baixando o leitor','initializing tesseract':'Preparando o leitor','loading language traineddata':'Baixando o português','initializing api':'Preparando','recognizing text':'Lendo o print'};
+    wk=await limite(window.Tesseract.createWorker('por',1,{langPath:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/por@1.0.0/4.0.0_best_int',
+      logger:function(m){var n=NOMES[m.status];if(n)etapa(n+(fs.length>1&&m.status==='recognizing text'?' '+(ui.leadImp.i+1)+' de '+fs.length:'')+'…',Math.round((m.progress||0)*100));},
+      errorHandler:function(e){console.warn('ocr',e);}}),120000);
+    for(var i=0;i<fs.length;i++){ui.leadImp.i=i;var r=await limite(wk.recognize(fs[i]),120000);txt+='\n'+(r.data.text||'');}
+    try{wk.terminate();}catch(x){}
     var lista=leadsDoTexto(txt),ja={};leadsDe().forEach(function(l){ja[l.tel]=1;});lista.forEach(function(x){if(ja[x.tel]){x.ok=false;x.dup=true;}});
-    ui.leadImp={st:'revisar',lista:lista};}
+    ui.leadImp={st:'revisar',lista:lista,prev:(ui.leadImp&&ui.leadImp.prev)||[],txt:txt.trim().slice(0,1500)};}
   catch(e){ui.leadImp={st:'erro',msg:(e&&e.message)||String(e)};}
   if(ui.sheet)renderSheet();}
 function leadCard(l){var t=today(),hoje=l.st==='seq'&&(!l.prox||l.prox<=t),e=LEAD_SEQ[Math.min(l.etapa||0,LEAD_SEQ.length-1)],ic=l.orig==='insta'?'📸':l.orig==='face'?'📘':'👤';
@@ -2732,10 +2742,12 @@ function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
   var g=SECS.filter(function(x){return x.id==='mkt';})[0];
   var topo='<div class="ld-head">'+(g?avSec(g,0,'gravando'):'')+'<div><h2 style="margin:0">Leads da Mika</h2><p class="small muted" style="margin:2px 0 0">Contatos dos anúncios. Eu cuido da sequência: 4 mensagens em 10 dias e paro, para não virar spam.</p></div><button class="icon-btn" data-a="fechar" aria-label="Fechar" style="margin-left:auto">✕</button></div>';
   var importa='';
-  if(imp&&imp.st==='lendo')importa='<div class="ld-imp"><p id="ld-prog">Lendo o print… '+(imp.p||0)+'%</p><p class="small muted">Na primeira vez demora um pouco mais (baixa o leitor de texto).</p></div>';
+  var prevs=imp&&imp.prev&&imp.prev.length?'<div class="ld-prevs">'+imp.prev.map(function(u){return '<img src="'+u+'" alt="Print colado">';}).join('')+'</div>':'';
+  if(imp&&imp.st==='lendo')importa='<div class="ld-imp">'+prevs+'<p id="ld-prog">'+esc(imp.msg||'Lendo o print…')+(imp.p!=null?' '+imp.p+'%':'')+'</p><p class="small muted">Na primeira vez demora um pouco mais: o celular baixa o leitor de texto (uns 5 MB).</p></div>';
   else if(imp&&imp.st==='erro')importa='<div class="ld-imp"><p>Não consegui ler o print: '+esc(imp.msg)+'</p><button class="btn sm" data-a="leadImpX">Ok</button></div>';
-  else if(imp&&imp.st==='revisar')importa='<div class="ld-imp"><b>'+(imp.lista.length?'Achei '+plural(imp.lista.length,'contato','contatos')+'. Confira antes de salvar:':'Não achei telefone no print. Tente um print mais nítido ou adicione à mão.')+'</b>'+
+  else if(imp&&imp.st==='revisar')importa='<div class="ld-imp">'+prevs+'<b>'+(imp.lista.length?'Achei '+plural(imp.lista.length,'contato','contatos')+'. Confira antes de salvar:':'Não achei telefone no print. Tente um print mais nítido ou adicione à mão.')+'</b>'+
     imp.lista.map(function(x,i){return '<div class="ld-rev"><input type="checkbox" class="ld-ok" data-i="'+i+'" '+(x.ok?'checked':'')+'><input class="ld-in" data-i="'+i+'" data-k="nome" value="'+esc(x.nome)+'" placeholder="Nome"><input class="ld-in" data-i="'+i+'" data-k="tel" value="'+esc(telFmt(x.tel))+'" inputmode="tel"><select class="ld-in" data-i="'+i+'" data-k="orig"><option value="">Origem</option><option value="face"'+(x.orig==='face'?' selected':'')+'>Facebook</option><option value="insta"'+(x.orig==='insta'?' selected':'')+'>Instagram</option></select>'+(x.dup?'<small class="muted">já está na lista</small>':'')+'</div>';}).join('')+
+    (!imp.lista.length&&imp.txt?'<details><summary class="small">Ver o texto que eu consegui ler</summary><pre class="small" style="white-space:pre-wrap">'+esc(imp.txt)+'</pre></details>':'')+
     '<div class="row wrap" style="gap:8px;margin-top:8px">'+(imp.lista.length?'<button class="btn pri" data-a="leadSalva">Salvar leads</button>':'')+'<button class="btn" data-a="leadImpX">Cancelar</button></div></div>';
   return topo+
     '<div class="ld-bar"><button class="btn pri" data-a="leadCola">📋 Colar print</button><label class="btn up">📷 Escolher prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar à mão</button><span class="small muted">Dá para mandar vários prints de uma vez (rolando a lista da etiqueta).</span></div>'+importa+
