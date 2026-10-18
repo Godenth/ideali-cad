@@ -631,6 +631,8 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .zb.ia-erro small{color:var(--muted)}
 .val-chip{display:inline-flex;align-items:baseline;gap:6px;border:1px solid color-mix(in srgb,var(--ok,#1DAE8A) 40%,var(--line));background:color-mix(in srgb,var(--ok,#1DAE8A) 10%,transparent);color:var(--ink);border-radius:999px;padding:5px 12px;font:inherit;cursor:pointer;white-space:nowrap}
 .val-chip small{font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}.val-chip b{font-size:.9rem;font-weight:800}
+.pr-chip{gap:10px;align-items:center;border-color:color-mix(in srgb,#FFB13D 45%,var(--line));background:color-mix(in srgb,#FFB13D 12%,transparent);margin-left:6px}.pr-chip span{display:inline-flex;align-items:center;gap:3px}.pr-chip i{font-size:1.05rem!important}.pr-chip.pop{animation:prPop .9s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes prPop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
 .val-chip i{font-style:normal;font-size:.72rem;font-weight:700}.val-chip i.up,.val-li i.up{color:var(--ok,#1DAE8A)}.val-chip i.dn,.val-li i.dn{color:#E5484D}
 .val-big{display:grid;gap:2px;text-align:center;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--ok,#1DAE8A) 10%,transparent);margin-bottom:10px}
 .val-big b{font-size:2rem;font-weight:800}.val-big small{color:var(--muted);font-weight:600}
@@ -1597,7 +1599,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 23h30';
+var VERSAO='17/10 · 23h45';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1641,7 +1643,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
     '<h1 class="mb">'+titulo+'</h1><span class="spacer dk"></span>'+
     '<input class="search dk" id="busca-top" type="search" placeholder="Buscar pedido, paciente, cliente…" value="'+(ui.tab==='pedidos'?'':esc(ui.busca))+'">'+
-    (EM_DEMO?'':valChip())+'<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
+    (EM_DEMO?'':valChip()+prChip())+'<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
     '<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>'+
     contaMenu(nome,lix)+
     '<span class="menu-btn">'+chip.replace('Grátis no lançamento','Grátis')+'</span></div>'+
@@ -1920,6 +1922,8 @@ function valHist(v){try{var h=(S.prefs&&S.prefs.val)||{},k=monthOf(today());if(S
   var ant=h[prevMonth(k)];return ant!=null?ant:null;}catch(e){return null;}}
 function valChip(){var v=null;try{v=valuation();}catch(e){return '';}var ant=valHist(v),d=ant!=null&&ant>0?Math.round((v.val-ant)/ant*100):null;
   return '<button class="val-chip" data-a="valuation" title="Valuation: quanto sua empresa de CAD vale hoje"><small>Valuation</small><b>'+brlCurto(v.val)+'</b>'+(d!=null&&d!==0?'<i class="'+(d>0?'up':'dn')+'">'+(d>0?'▲':'▼')+Math.abs(d)+'%</i>':'')+'</button>';}
+function prChip(){var c;try{c=premiosDe().c;}catch(e){return '';}var it=PRESENTES.filter(function(x){return c[x[0]]>0;});if(!it.length)return '';var pop=ui.prPop;ui.prPop=false;
+  return '<button class="val-chip pr-chip'+(pop?' pop':'')+'" data-a="tab" data-v="metas" title="Seus presentes por meta batida: '+esc(premiosTxt())+'">'+it.map(function(x){return '<span><i>'+x[1]+'</i><b>'+c[x[0]]+'</b></span>';}).join('')+'</button>';}
 function fValuation(){var v=valuation(),ant=null;try{ant=((S.prefs&&S.prefs.val)||{})[prevMonth(monthOf(today()))];}catch(e){}
   var dica={Crescimento:'Chame clientes sumidos e peça indicações: crescer é o que mais valoriza.',Concentração:'Busque clientes novos para não depender de um só (a Mika ajuda com mensagens).','Carteira ativa':'Mantenha contato com quem parou de mandar (plano de reconquista da Mika).',Prazo:'Prazo cumprido aumenta o valor: priorize os atrasados.',Qualidade:'Menos ajustes = clientes fiéis. Confira os motivos em Análises.',Inadimplência:'Cobre o que está parado há mais de 30 dias (a Bia gera a cobrança com Pix).','Tempo de casa':'Continue registrando seus pedidos: com histórico, o valor fica mais sólido.'};
   var neg=v.F.filter(function(f){return f.d<0;}).sort(function(a,b){return a.d-b.d;});
@@ -5626,7 +5630,7 @@ impGrava:function(){impGrava();},
   leadPed:function(d){if(!guard())return;var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;ui.pdRede=false;ui.pdInit=true;openSheet(fPedido,null,'lead:'+l.id);ui.sheet.after=depoisFormPedido;depoisFormPedido();toast('Ao salvar, '+(String(l.nome||'').split(' ')[0]||'o lead')+' vira cliente automaticamente. 🎉');},
   leadDel:function(d){var L=leadsDe(),i=L.map(function(x){return x.id;}).indexOf(d.id);if(i<0)return;L.splice(i,1);save();renderSheet();},
   premioOk:function(d){var P=ui.premio;if(!P)return;var x=PRESENTES.filter(function(y){return y[0]===d.v;})[0];if(!x)return;var pr=premiosDe();
-    pr.c[x[0]]=(pr.c[x[0]]||0)+1;pr.h[P.m+':'+P.k]={g:x[0],d:today(),v:P.real,meta:P.meta};save();var k=P.k;festaFecha();fogos(1800);
+    pr.c[x[0]]=(pr.c[x[0]]||0)+1;pr.h[P.m+':'+P.k]={g:x[0],d:today(),v:P.real,meta:P.meta};save();var k=P.k;festaFecha();fogos(1800);ui.prPop=true;render();
     agenteCanto(k==='fat'?'ger':'ven',k==='fat'?'satisfeito':'feliz',x[1]+' '+x[2]+' na conta!',(k==='fat'?'Aproveite, você mereceu. Mês que vem tem mais, se a meta vier. ':'Saúde! Bora pra próxima. ')+'Sua coleção: '+premiosTxt()+'.',[],8000);if(ui.tab==='config'||ui.tab==='metas')render();},
   premioDepois:function(){ui.premioAdiado=true;festaFecha();toast('Tudo bem! O presente fica guardado: ele volta na próxima vez que você entrar.');},
   festaOrig:function(d){var F=ui.festa;if(!F)return;F.c=d.v;F.s=d.x;festaRender();},
