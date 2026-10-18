@@ -1633,7 +1633,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 02h20';
+var VERSAO='18/10 · 02h35';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2772,7 +2772,7 @@ var LEAD_SEQ=[
   {n:'Última tentativa',dias:0,t:'{oi}, {nome}! Não quero te incomodar, então esta é minha última mensagem. Quando precisar de um cadista, é só me chamar aqui. Sucesso nos atendimentos! 🙌'}];
 /* Modo "Prospecção Ideali" (só admin): mesma ferramenta, outra lista e outras mensagens, para divulgar o próprio Ideali CAD. Sem IA: custo zero. */
 var LEAD_SEQ_IDEALI=[
-  {n:'Apresentação',dias:2,t:'{oi}, {nome}! Aqui é o {eu}, do Ideali CAD 🦷 Vi que você se interessou pelo sistema. Ele foi feito para cadista: pedidos e prazos, arquivos STL/HTML, envio pro dentista direto no WhatsApp, financeiro com Pix e uma equipe de IA que te avisa de atrasos e clientes sumidos. Dá uma olhada: https://idealisystems.com'},
+  {n:'Apresentação',dias:2,t:'{oi}, {nome}! Aqui é o {eu}, cadista e criador do Ideali CAD 🦷 Fiz um sistema pensado para o dia a dia de quem é cadista: pedidos e prazos, arquivos STL/HTML, envio pro dentista direto no WhatsApp, financeiro com Pix e uma equipe de IA que te avisa de atrasos e clientes sumidos. Dá uma olhada: https://idealisystems.com'},
   {n:'Convite',dias:3,t:'{oi}, {nome}! Conseguiu ver o Ideali CAD? O cadastro leva 1 minuto e você já começa a organizar seus pedidos: https://idealisystems.com/app/#criar . Qualquer dúvida, me chama aqui.'},
   {n:'Demonstração',dias:5,t:'{oi}, {nome}! O que o pessoal mais gosta: mandar o STL e o HTML pro dentista pelo WhatsApp, com uma página pra ele aprovar o caso. Quer que eu te mostre em 5 minutos por vídeo?'},
   {n:'Última tentativa',dias:0,t:'{oi}, {nome}! Última mensagem para não incomodar 🙂 Quando quiser organizar seus pedidos, o Ideali CAD está aqui: https://idealisystems.com . Sucesso!'}];
@@ -2788,10 +2788,11 @@ function telFmt(d){return d.length===11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d
 /* Lê o texto do print: cada telefone vira um lead; o nome é o texto da mesma linha ou da linha de cima */
 function leadsDoTexto(txt){var L=String(txt).split(/\n+/).map(function(s){return s.trim();}).filter(Boolean),R=[],vistos={},orig=/insta/i.test(txt)?'insta':/face|messenger|meta/i.test(txt)?'face':'';
   var re=/(\+?55[\s.-]?)?\(?\b(\d{2})\)?[\s.-]?(9?\s?\d{4})[\s.-]?(\d{4})\b/g;
-  L.forEach(function(lin,i){var m;re.lastIndex=0;while((m=re.exec(lin))){var d=telNorm(m[0]);if(!d||vistos[d])continue;vistos[d]=1;
+  var re2=/\+?\d{10,13}(?!\d)/g;
+  L.forEach(function(lin,i){var m;[re2,re].forEach(function(rx){rx.lastIndex=0;while((m=rx.exec(lin))){var d=rx===re2&&m[0][0]==='+'&&!/^\+55\d{10,11}$/.test(m[0])?'':telNorm(m[0]);if(!d||vistos[d])continue;vistos[d]=1;
     var nome=lin.slice(0,m.index).replace(/[|:•·\-–—,;]+$/,'').replace(/[^A-Za-zÀ-ÿ' ]/g,' ').replace(/\s+/g,' ').trim();
     if(nome.length<2){for(var k=i-1;k>=0&&k>=i-2;k--){var c=L[k].replace(/[^A-Za-zÀ-ÿ' ]/g,' ').replace(/\s+/g,' ').trim();if(c.length>=2&&!/^(hoje|ontem|lead|leads|nome|telefone|whatsapp|formul|instagram|facebook)/i.test(c)){nome=c;break;}}}
-    R.push({nome:nome.split(' ').slice(0,3).join(' '),tel:d,orig:orig,ok:true});}});
+    R.push({nome:nome.split(' ').slice(0,3).join(' '),tel:d,orig:orig,ok:true});}});});
   return R;}
 function carregaOCR(){if(window.Tesseract)return Promise.resolve();return new Promise(function(ok,ruim){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=ok;s.onerror=function(){ruim(new Error('não consegui carregar o leitor de imagem'));};document.head.appendChild(s);});}
 async function leadsLePrint(file){var fs=[].concat(file).filter(Boolean);if(!fs.length)return;if(!ui.sheet||ui.sheet.fn!==fLeads){ui.leadFil='hoje';openSheet(fLeads);}ui.leadImp={st:'lendo',p:0,lista:[]};renderSheet();
@@ -2818,6 +2819,8 @@ function leadEdForm(l){var o=function(v,t){return '<option value="'+v+'"'+((l.or
     '<label class="fld"><span>Veio de</span><select class="ld-e" data-k="orig">'+o('','Outro')+o('face','Facebook')+o('insta','Instagram')+'</select></label>'+
     '<label class="fld ld-obs"><span>Anotação</span><input class="ld-e" data-k="obs" maxlength="200" value="'+esc(l.obs||'')+'" placeholder="Ex.: faz muito protocolo, pediu tabela"></label></div>'+
     '<div class="row wrap" style="gap:8px"><button class="btn sm pri" data-a="leadEdSalva" data-id="'+l.id+'">Salvar</button><button class="btn sm" data-a="leadEdX">Cancelar</button></div></div>';}
+/* Lista de números colada como texto (ex.: copiada de um PDF ou de uma planilha): vai direto para a revisão, sem ler imagem */
+function leadsTextoImp(tx){var lista=leadsDoTexto(tx),ja={},cn={};lista.forEach(function(x){if(x.nome)cn[x.nome]=(cn[x.nome]||0)+1;});lista.forEach(function(x){if(cn[x.nome]>1)x.nome='';});leadsDe().forEach(function(l){ja[l.tel]=1;});lista.forEach(function(x){if(ja[x.tel]){x.ok=false;x.dup=true;}});ui.leadImp={st:'revisar',lista:lista};renderSheet();}
 function leadCard(l){if(ui.leadEd===l.id)return leadEdForm(l);var SQ=leadSeq(),ID=leadIdeali(),t=today(),hoje=l.st==='seq'&&(!l.prox||l.prox<=t),e=SQ[Math.min(l.etapa||0,SQ.length-1)],ic=l.orig==='insta'?'📸':l.orig==='face'?'📘':'👤';
   var stTxt=l.st==='seq'?(hoje?'<b class="ld-hoje">Chamar hoje</b> · '+e.n:'Próxima: '+dmy(l.prox).slice(0,5)+' · '+e.n):l.st==='resp'?'💬 Respondeu':l.st==='cli'?(ID?'✅ Criou conta no Ideali':'✅ Virou cliente')+(l.cli&&cliente(l.cli)?' · '+esc(cliente(l.cli).nome):''):l.st==='fim'?'Encerrado (sem resposta)':'Sem interesse';
   return '<div class="ld-card'+(hoje?' hoje':'')+'"><div class="ld-top"><span class="ld-ic">'+ic+'</span><span class="ld-nm"><b>'+esc(l.nome||'Sem nome')+'</b><small>'+esc(telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade)+(l.uf?'/'+l.uf:''):'')+' · chegou '+(l.criado===t?'hoje':dmy(l.criado).slice(0,5))+(l.etapa?' · '+plural(l.etapa,'mensagem','mensagens'):'')+'</small></span><button class="icon-btn ld-edb" data-a="leadEd" data-id="'+l.id+'" aria-label="Editar lead" title="Editar">✏️</button></div>'+
@@ -2840,7 +2843,7 @@ function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
     (!imp.lista.length&&imp.txt?'<details><summary class="small">Ver o texto que eu consegui ler</summary><pre class="small" style="white-space:pre-wrap">'+esc(imp.txt)+'</pre></details>':'')+
     '<div class="row wrap" style="gap:8px;margin-top:8px">'+(imp.lista.length?'<button class="btn pri" data-a="leadSalva">Salvar leads</button>':'')+'<button class="btn" data-a="leadImpX">Cancelar</button></div></div>';
   return topo+
-    '<div class="ld-bar"><button class="btn pri" data-a="leadCola">📋 Colar print</button><label class="btn up">📷 Escolher prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar à mão</button><span class="small muted">Dá para mandar vários prints de uma vez (rolando a lista da etiqueta).</span></div>'+importa+
+    '<div class="ld-bar"><button class="btn pri" data-a="leadCola">📋 Colar print ou lista</button><label class="btn up">📷 Escolher prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar à mão</button><span class="small muted">Dá para mandar vários prints de uma vez, ou colar uma lista de números copiada (de um PDF, planilha ou mensagem).</span></div>'+importa+
     '<div class="chips ld-chips">'+[['hoje','Chamar hoje'],['seq','Em andamento'],['resp','Responderam'],['cli',leadIdeali()?'Criaram conta':'Viraram clientes'],['fim','Encerrados']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-a="leadFil" data-v="'+c[0]+'">'+c[1]+' <b>'+cont[c[0]]+'</b></button>';}).join('')+'</div>'+
     '<div class="ld-lista">'+(lista.length?lista.map(leadCard).join(''):'<p class="empty">'+(f==='hoje'?(L.length?'Ninguém para chamar hoje. 🎉':'Mande o print dos contatos que chegaram pelos anúncios e eu monto a lista.'):'Nada aqui.')+'</p>')+'</div>';}
 function leadOrigPre(l){return {c:'pago',s:l.orig==='insta'?'Instagram Ads':l.orig==='face'?'Facebook Ads':''};}
@@ -5724,7 +5727,7 @@ impGrava:function(){impGrava();},
   leadAbre:function(d){ui.leadModo=d&&d.v==='ideali'&&S.admin?'ideali':'cli';ui.leadImp=null;ui.leadFil=leadsHoje().length?'hoje':'seq';openSheet(fLeads);},
   leadCola:async function(){try{if(!navigator.clipboard||!navigator.clipboard.read)throw new Error('x');var its=await navigator.clipboard.read(),fs=[];
       for(var i=0;i<its.length;i++){var ty=its[i].types.filter(function(x){return /^image\//.test(x);})[0];if(ty){var b=await its[i].getType(ty);fs.push(new File([b],'print.png',{type:ty}));}}
-      if(!fs.length){toast('Não achei imagem copiada. Copie o print (ou use “Escolher prints”).');return;}leadsLePrint(fs);}
+      if(!fs.length){var tx=null;try{tx=await navigator.clipboard.readText();}catch(e){}if(tx&&leadsDoTexto(tx).length){leadsTextoImp(tx);return;}toast('Não achei print nem lista de números copiada. Copie o print ou a lista (ou use “Escolher prints”).');return;}leadsLePrint(fs);}
     catch(e){toast('Neste aparelho use “Escolher prints” ou Ctrl+V.');}},
   leadFil:function(d){ui.leadFil=d.v;renderSheet();},
   leadImpX:function(){ui.leadImp=null;renderSheet();},
@@ -6259,7 +6262,7 @@ document.addEventListener('input',function(e){
   if(t.id==='px-valor')desenhaPix();
   if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
 });
-document.addEventListener('paste',function(e){if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet&&ui.tab==='secretarios'&&ui.secAg==='mkt'){var im0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(im0){e.preventDefault();leadsLePrint(im0.getAsFile());return;}}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it)return;if(ui.sheet&&ui.sheet.fn===fLeads){e.preventDefault();leadsLePrint(it.getAsFile());return;}
+document.addEventListener('paste',function(e){if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet&&ui.tab==='secretarios'&&ui.secAg==='mkt'){var im0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(im0){e.preventDefault();leadsLePrint(im0.getAsFile());return;}}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it&&ui.sheet&&ui.sheet.fn===fLeads){var ae1=document.activeElement;if(ae1&&/^(INPUT|TEXTAREA)$/.test(ae1.tagName))return;var tx1=e.clipboardData&&e.clipboardData.getData('text');if(tx1&&leadsDoTexto(tx1).length){e.preventDefault();leadsTextoImp(tx1);}return;}if(!it)return;if(ui.sheet&&ui.sheet.fn===fLeads){e.preventDefault();leadsLePrint(it.getAsFile());return;}
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.type!=='file')return;
   var f=it.getAsFile();if(!f)return;e.preventDefault();
   if(ui.sheet.fn===fPedidoDet){var pa=ui.sheet.args[0];sbEditor(f,function(g){sbProcessa(pa,g);});}else if(ui.sheet.fn===fTrabRede){var ra=ui.sheet.args[0];sbEditor(f,function(g){rdSbCola(ra,g);});}});
