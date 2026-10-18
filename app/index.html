@@ -656,6 +656,7 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .ld-top{display:flex;gap:10px;align-items:center}.ld-ic{font-size:1.3rem}.ld-nm{display:grid;min-width:0}.ld-nm small{color:var(--muted);font-size:.78rem}
 .ld-st{font-size:.82rem;color:var(--muted)}.ld-hoje{color:#1FAF5B}
 .lg-lembra{font-size:.88rem;color:var(--muted);margin-top:-4px}
+.cap-link{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:space-between;background:var(--soft);border-radius:12px;padding:10px 12px}.cap-link code{font-size:.85rem;word-break:break-all}.cap-link.sm{background:transparent;border:1px solid var(--line);padding:6px 10px}.cap-link.sm span{font-weight:600;min-width:100px}
 .ld-logo{display:grid;place-items:center;flex:none}
 .ld-edb{margin-left:auto;font-size:.9rem}.ld-edit{gap:8px}.ld-edg{display:grid;grid-template-columns:1.4fr 1fr;gap:6px 10px}.ld-edg .fld{margin:0}.ld-edg .ld-obs{grid-column:1/-1}
 @media (max-width:600px){.ld-edg{grid-template-columns:1fr}}
@@ -1455,7 +1456,7 @@ async function carregar2(){
     novo.faixas=novo.faixas.filter(function(x){return !x.deleted;});
     novo.pagamentos.forEach(function(g){g.pedidos=novo.pedidos.filter(function(x){return x.pagamentoId===g.id;}).map(function(x){return x.id;});});
     novo.seq=novo.pedidos.reduce(function(m,x){return Math.max(m,x.num||0);},0);
-    S=novo;tiraFoto();ui.dadosOk=true;passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);setTimeout(libCheca,2500);
+    S=novo;tiraFoto();ui.dadosOk=true;passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);setTimeout(capSync,4500);setTimeout(libCheca,2500);
     try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
   S.carregando=false;ui.autoArqMes=null;aplicaTema(temaAtual(),modoAtual());autoArquivar();render();iniciaUso();secAbreDia();
@@ -1634,7 +1635,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 03h15';
+var VERSAO='18/10 · 03h35';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2831,6 +2832,33 @@ function leadsTextoImp(tx){var lista=leadsDoTexto(tx),ja={},cn={};lista.forEach(
 function mikaListaLeads(tx){var g=SECS.filter(function(x){return x.id==='mkt';})[0],n=leadsDoTexto(tx).length;iaEu('mkt','📋 Lista com '+plural(n,'número','números'));
   iaDiz('mkt',{t:'Achei '+plural(n,'número','números')+' na sua lista! 📲 Abri meu tablet: confira, ajuste os nomes se quiser e clique em "Salvar leads". Os repetidos eu já desmarquei.'});
   try{iaMostra();}catch(e){}ui.leadModo='cli';ui.leadFil='hoje';openSheet(fLeads);leadsTextoImp(tx);}
+/* ===== Página de captura dos anúncios (idealisystems.com/c/?u=APELIDO) =====
+   Tabela captura_paginas (1 por cadista) e captura_leads (contatos que chegam pela página, gravados pela função "captura").
+   Ao abrir o sistema, os contatos novos viram leads da Mika e são apagados da fila. */
+var CAP_TIPO={dentista:'Dentista',protetico:'Protético/Laboratório',outro:'Outro'};
+function capUrl(slug,src){return 'https://idealisystems.com/c/?u='+slug+(src?'&utm_source='+src:'');}
+function capSlugSug(){var n=(S.perfil.nome||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');return (n||'cadista').slice(0,30);}
+function capCarrega(){if(EM_DEMO||!S.sessao||ui.cap&&ui.cap.busy)return;ui.cap={busy:true};
+  sb.from('captura_paginas').select('*').maybeSingle().then(function(r){ui.cap={row:r.data||null,ok:true};if(emCfg())render();},function(){ui.cap={ok:true,row:null,erro:1};});}
+function secCaptura(){if(!ui.cap)capCarrega();var C=ui.cap||{},r=C.row;
+  var top='<section class="card stack" id="cap"><div><h2 style="margin:0">📣 Página para anúncios</h2><p class="small muted" style="margin:4px 0 0">Use como destino do seu anúncio no Instagram ou Facebook. A pessoa deixa nome, se é dentista ou protético e o WhatsApp: o contato cai direto nos <b>Leads da Mika</b> e ela é levada para conversar com você no WhatsApp.</p></div>';
+  if(!C.ok)return top+'<p class="small muted">Carregando…</p></section>';
+  if(!r)return top+'<form data-form="capCria" class="row wrap" style="gap:8px;align-items:end"><label class="fld" style="flex:1;min-width:220px;margin:0"><span>Seu apelido no link</span><input name="slug" required pattern="[a-z0-9][a-z0-9\-]{2,39}" maxlength="40" value="'+esc(capSlugSug())+'"><small>idealisystems.com/c/?u=<b>apelido</b> · letras minúsculas, números e hífen</small></label><button class="btn pri" type="submit">Criar minha página</button></form>'+(soDig(S.perfil.telefone||'').length<10?'<p class="small" style="color:var(--urgent)">Cadastre o seu WhatsApp no perfil: é para ele que a pessoa vai.</p>':'')+'</section>';
+  var u=capUrl(r.slug);
+  return top+'<div class="cap-link"><code>'+esc(u)+'</code><div class="row wrap" style="gap:6px"><button class="btn sm pri" data-a="capCopia" data-v="'+esc(u)+'">Copiar link</button><a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener">Ver página</a></div></div>'+
+    '<details class="small"><summary class="muted" style="cursor:pointer">Links separados por anúncio (para saber de onde veio cada contato)</summary><div class="stack" style="gap:6px;margin-top:8px">'+[['instagram','📸 Instagram'],['facebook','📘 Facebook'],['google','🔎 Google']].map(function(x){var l=capUrl(r.slug,x[0]);return '<div class="cap-link sm"><span>'+x[1]+'</span><code>'+esc(l)+'</code><button class="btn sm" data-a="capCopia" data-v="'+esc(l)+'">Copiar</button></div>';}).join('')+'</div></details>'+
+    '<form data-form="capSalva" class="stack" style="gap:10px"><label class="fld" style="margin:0"><span>Título da página <i class="muted" style="font-style:normal;font-weight:400">(opcional)</i></span><input name="titulo" maxlength="80" value="'+esc(r.titulo||'')+'" placeholder="Fale com '+esc(primeiroNome()||'o cadista')+', cadista"></label>'+
+    '<label class="fld" style="margin:0"><span>Mensagem que a pessoa manda no WhatsApp <i class="muted" style="font-style:normal;font-weight:400">(opcional)</i></span><textarea name="msg" maxlength="300" rows="2" placeholder="Em branco: Olá! Sou {nome}, dentista, de Campinas. Vim pelo anúncio…">'+esc(r.msg||'')+'</textarea><small>Use {nome} para o nome da pessoa.</small></label>'+
+    '<label class="check"><input type="checkbox" name="ativo" '+(r.ativo?'checked':'')+'> Página no ar</label><div class="row wrap" style="gap:8px"><button class="btn sm pri" type="submit">Salvar</button></div></form></section>';}
+function capSync(manual){if(EM_DEMO||!S.sessao||ui.capSync)return Promise.resolve(0);ui.capSync=1;
+  return sb.from('captura_leads').select('id,nome,tipo,telefone,cidade,origem,criado_em').order('criado_em').limit(500).then(function(r){ui.capSync=0;var R=(r&&r.data)||[];if(!R.length){if(manual)toast('Nenhum contato novo pela página.');return 0;}
+    var mo=ui.leadModo;ui.leadModo='cli';var L=leadsDe(),ja={},n=0;L.forEach(function(l){ja[l.tel]=l;});
+    R.forEach(function(x){var o=x.origem==='insta'||x.origem==='face'?x.origem:'';var tx=(CAP_TIPO[x.tipo]||'')+' · veio pela página'+(x.origem&&!o?' ('+x.origem+')':'');
+      if(ja[x.telefone]){var l0=ja[x.telefone];if(!l0.obs)l0.obs=tx;return;}var l=leadNovoObj(x.nome,x.telefone,o);l.cidade=x.cidade||'';l.obs=tx;l.criado=String(x.criado_em).slice(0,10);L.push(l);ja[l.tel]=l;n++;});
+    if(L.length>500)L.splice(0,L.length-500);ui.leadModo=mo;save();
+    return sb.from('captura_leads').delete().in('id',R.map(function(x){return x.id;})).then(function(){
+      if(n){var g=agOk('mkt')?'mkt':'ven';agenteCanto(g,g==='mkt'?'animada':'feliz',plural(n,'contato novo','contatos novos')+' pela sua página! 📲',(n===1?'Chegou ':'Chegaram ')+plural(n,'pessoa','pessoas')+' pelo anúncio. Já coloquei nos leads: é só chamar no WhatsApp.',[{a:'leadAbre',l:'Ver leads',pri:1}],12000,true);}
+      if(ui.sheet&&ui.sheet.fn===fLeads)renderSheet();return n;});},function(){ui.capSync=0;return 0;});}
 function leadCard(l){if(ui.leadEd===l.id)return leadEdForm(l);var SQ=leadSeq(),ID=leadIdeali(),t=today(),hoje=l.st==='seq'&&(!l.prox||l.prox<=t),e=SQ[Math.min(l.etapa||0,SQ.length-1)],ic=l.orig==='insta'?'📸':l.orig==='face'?'📘':'👤';
   var stTxt=l.st==='seq'?(hoje?'<b class="ld-hoje">Chamar hoje</b> · '+e.n:'Próxima: '+dmy(l.prox).slice(0,5)+' · '+e.n):l.st==='resp'?'💬 Respondeu':l.st==='cli'?(ID?'✅ Criou conta no Ideali':'✅ Virou cliente')+(l.cli&&cliente(l.cli)?' · '+esc(cliente(l.cli).nome):''):l.st==='fim'?'Encerrado (sem resposta)':'Sem interesse';
   return '<div class="ld-card'+(hoje?' hoje':'')+'"><div class="ld-top"><span class="ld-ic">'+ic+'</span><span class="ld-nm"><b>'+esc(l.nome||'Sem nome')+'</b><small>'+esc(telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade)+(l.uf?'/'+l.uf:''):'')+' · chegou '+(l.criado===t?'hoje':dmy(l.criado).slice(0,5))+(l.etapa?' · '+plural(l.etapa,'mensagem','mensagens'):'')+'</small></span><button class="icon-btn ld-edb" data-a="leadEd" data-id="'+l.id+'" aria-label="Editar lead" title="Editar">✏️</button></div>'+
@@ -4954,7 +4982,7 @@ function rConfig(){
     '<section class="card stack"><h2>Use como aplicativo</h2>'+(window._instalar?'<p class="small muted">Coloque o Ideali CAD na tela inicial e abra como um app, sem a barra do navegador.</p><button class="btn pri" data-a="instalarApp">Instalar no celular / computador</button>':
       (window.matchMedia&&matchMedia('(display-mode: standalone)').matches?'<p class="small muted">Você já está usando como aplicativo. ✓</p>':'<p class="small muted"><b>Android (Chrome):</b> menu ⋮ → <b>Adicionar à tela inicial</b>.<br><b>iPhone (Safari):</b> botão Compartilhar → <b>Adicionar à Tela de Início</b>.</p>'))+'</section>'+
     '<section class="card stack"><h2>Perfil na Rede</h2><p class="small muted">Foto, especialidades, softwares, portfólio e vídeo. Você escolhe se publica para outros usuários verem.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="prEditar">Editar perfil na Rede</button><button class="btn" data-a="rdPerfil" data-id="eu">Ver como fica</button></div></section>'+
-    secTema()+'<section class="card stack"><h2>Apresentação</h2><p class="small muted">Veja de novo as boas-vindas, o tour e a sua equipe, do jeito que aparece para quem acabou de criar a conta. Seus dados não mudam.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="novaConta">Ver como conta nova</button><button class="btn" data-a="eqIr" data-v="rever">Só a equipe</button></div>'+(S.admin?'<label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="libTg"'+(libEstado().all?' checked':'')+'><span>Mostrar todas as funções <span class="muted small">(só admin: desligado, as funções aparecem aos poucos)</span></span></label>':'')+'<label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="passeioTg"'+(passeioOff()?'':' checked')+'><span>Equipe passeando pelo sistema <span class="muted small">(de vez em quando alguém aparece no canto da tela com um aviso ou dica)</span></span></label><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="decoTg"'+(decoOff()?'':' checked')+'><span>Decorações de datas especiais <span class="muted small">(Halloween, Natal, Dia do Dentista… aparecem 10 dias antes)</span></span></label></section><section class="card stack"><h2>Importar dados</h2><p class="small muted">Traga clientes, pedidos e pagamentos de outro sistema (arquivo .json de importação). Antes de gravar, você confere tudo numa prévia.</p><div><label class="btn up">Escolher arquivo .json<input type="file" accept=".json,application/json" id="imp-file" hidden></label></div></section>'+
+    (EM_DEMO?'':secCaptura())+secTema()+'<section class="card stack"><h2>Apresentação</h2><p class="small muted">Veja de novo as boas-vindas, o tour e a sua equipe, do jeito que aparece para quem acabou de criar a conta. Seus dados não mudam.</p><div class="row wrap" style="gap:8px"><button class="btn pri" data-a="novaConta">Ver como conta nova</button><button class="btn" data-a="eqIr" data-v="rever">Só a equipe</button></div>'+(S.admin?'<label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="libTg"'+(libEstado().all?' checked':'')+'><span>Mostrar todas as funções <span class="muted small">(só admin: desligado, as funções aparecem aos poucos)</span></span></label>':'')+'<label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="passeioTg"'+(passeioOff()?'':' checked')+'><span>Equipe passeando pelo sistema <span class="muted small">(de vez em quando alguém aparece no canto da tela com um aviso ou dica)</span></span></label><label class="row" style="gap:8px;align-items:center"><input type="checkbox" data-a="decoTg"'+(decoOff()?'':' checked')+'><span>Decorações de datas especiais <span class="muted small">(Halloween, Natal, Dia do Dentista… aparecem 10 dias antes)</span></span></label></section><section class="card stack"><h2>Importar dados</h2><p class="small muted">Traga clientes, pedidos e pagamentos de outro sistema (arquivo .json de importação). Antes de gravar, você confere tudo numa prévia.</p><div><label class="btn up">Escolher arquivo .json<input type="file" accept=".json,application/json" id="imp-file" hidden></label></div></section>'+
     '<section class="card stack"><h2>Aparência</h2><label class="check"><input type="checkbox" id="cf-anim" data-a="animTog" '+(animOff()?'':'checked')+'> Animações ligadas (clima, saudação e efeitos)</label><p class="small muted">Desligue se preferir uma tela sem movimento.</p><p class="small muted">'+CREDITO_CLIMA+'.</p></section>'+
     '<section class="card stack"><h2>Plano</h2>'+
       '<div class="between"><span>Conta</span><b>'+esc(S.sessao.email)+'</b></div>'+
@@ -5734,7 +5762,8 @@ impGrava:function(){impGrava();},
   valuation:function(){openSheet(fValuation);},
   memDel:function(d){var m=memDe();if(d.v&&m.c[d.v])m.c[d.v]=m.c[d.v].filter(function(n){return n.id!==d.id;});else m.g=m.g.filter(function(n){return n.id!==d.id;});save();
     Object.keys(ui.iaConv||{}).forEach(function(k){(ui.iaConv[k]||[]).forEach(function(b){if(b.lst)b.lst=b.lst.filter(function(x){return !(x.bt&&x.bt.a==='memDel'&&x.bt.id===d.id);});});});toast('Apagado da memória.');render();},
-  leadAbre:function(d){ui.leadModo=d&&d.v==='ideali'&&S.admin?'ideali':'cli';ui.leadImp=null;ui.leadFil=leadsHoje().length?'hoje':'seq';openSheet(fLeads);},
+  capCopia:function(d){try{navigator.clipboard.writeText(d.v);toast('Link copiado! Cole no destino do seu anúncio.');}catch(e){prompt('Copie o link:',d.v);}},
+  leadAbre:function(d){ui.leadModo=d&&d.v==='ideali'&&S.admin?'ideali':'cli';if(ui.leadModo==='cli')capSync();ui.leadImp=null;ui.leadFil=leadsHoje().length?'hoje':'seq';openSheet(fLeads);},
   leadCola:async function(){try{if(!navigator.clipboard||!navigator.clipboard.read)throw new Error('x');var its=await navigator.clipboard.read(),fs=[];
       for(var i=0;i<its.length;i++){var ty=its[i].types.filter(function(x){return /^image\//.test(x);})[0];if(ty){var b=await its[i].getType(ty);fs.push(new File([b],'print.png',{type:ty}));}}
       if(!fs.length){var tx=null;try{tx=await navigator.clipboard.readText();}catch(e){}if(tx&&leadsDoTexto(tx).length){leadsTextoImp(tx);return;}toast('Não achei print nem lista de números copiada. Copie o print ou a lista (ou use “Escolher prints”).');return;}leadsLePrint(fs);}
@@ -6112,6 +6141,10 @@ var F={
     var lm=novo?leadDoTel(o.telefone):null;if(lm){lm.st='cli';lm.prox=null;lm.cli=id;save();}
     if(novo&&!EM_DEMO){var pre=ui.origLead||(lm?leadOrigPre(lm):null);ui.origLead=null;setTimeout(function(){festaCliente(id,pre);},350);}
   },
+  capCria:function(fd){var sl=String(fd.get('slug')||'').trim().toLowerCase();if(!/^[a-z0-9][a-z0-9-]{2,39}$/.test(sl)){toast('Use só letras minúsculas, números e hífen (3 a 40).');return;}
+    sb.from('captura_paginas').insert({slug:sl}).select('*').single().then(function(r){if(r.error){toast(/duplicate|unique/i.test(r.error.message)?'Esse apelido já está em uso. Tente outro.':'Não foi possível criar: '+r.error.message);return;}ui.cap={ok:true,row:r.data};render();toast('Página criada! Copie o link e use no anúncio. 🚀');});},
+  capSalva:function(fd){var r=ui.cap&&ui.cap.row;if(!r)return;var o={titulo:String(fd.get('titulo')||'').trim().slice(0,80)||null,msg:String(fd.get('msg')||'').trim().slice(0,300)||null,ativo:!!fd.get('ativo')};
+    sb.from('captura_paginas').update(o).eq('user_id',r.user_id).select('*').single().then(function(x){if(x.error){toast('Não foi possível salvar.');return;}ui.cap.row=x.data;render();toast('Página salva.');});},
   precos:function(fd,f){
     if(!guard())return;var cid=f.dataset.id;
     alive(S.tipos).forEach(function(t){var v=fd.get(t.id);if(v==null)return;var pr=S.precos.filter(function(p){return p.clienteId===cid&&p.tipoId===t.id;})[0];

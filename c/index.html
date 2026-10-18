@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Fale com o cadista · Ideali CAD</title>
+<meta name="description" content="Planejamento digital de próteses: coroas, facetas, protocolos e mais. Deixe seu WhatsApp e fale direto com o cadista.">
+<meta property="og:title" content="Fale com o cadista">
+<meta property="og:description" content="Planejamento digital de próteses. Deixe seu WhatsApp e fale direto com o cadista.">
+<meta property="og:image" content="https://idealisystems.com/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Página pública dos anúncios: o visitante deixa nome, tipo e WhatsApp, o contato cai na lista da Mika
+   do cadista dono do link e o visitante é levado para a conversa no WhatsApp. */
+:root{--bg:#F6F5F8;--surface:#fff;--ink:#1B1830;--muted:#625E75;--line:#E2DFEA;--accent:#5B45E0;--accent-ink:#fff;--soft:#EEEBFD;--ok:#1E8A5A;--bad:#D2433A;--wa:#1FAF5B;
+  --paint:linear-gradient(90deg,#EF5F5A,#F0A53A,#1DAE8A,#3A96EC,#7B5CF2,#DD5A9E);--f-d:"Plus Jakarta Sans",system-ui,sans-serif;--f-b:"Figtree",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#121019;--surface:#1B1826;--ink:#ECEAF4;--muted:#A39FB6;--line:#2D2940;--accent:#9E8CFF;--accent-ink:#121019;--soft:#2A2450}}
+*{box-sizing:border-box}html,body{margin:0}[hidden]{display:none!important}
+body{min-height:100vh;background:var(--bg);color:var(--ink);font:400 1rem/1.5 var(--f-b);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+body::before{content:"";display:block;height:5px;background:var(--paint)}
+main{width:min(460px,100%);margin:0 auto;padding:28px 16px 40px;flex:1}
+.hero{text-align:center;margin-bottom:18px}
+.av{width:68px;height:68px;border-radius:20px;margin:0 auto 12px;display:grid;place-items:center;font:800 1.7rem var(--f-d);color:#fff;background:linear-gradient(135deg,#DD5A9E,#7B5CF2,#3A96EC)}
+h1{font:800 1.75rem/1.15 var(--f-d);letter-spacing:-.02em;margin:0 0 6px}
+.sub{color:var(--muted);margin:0}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:14px 0 0}
+.chips span{font-size:.82rem;background:var(--soft);color:var(--accent);border-radius:999px;padding:4px 10px;font-weight:600}
+form{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:grid;gap:14px;box-shadow:0 18px 50px -30px rgba(27,24,48,.5)}
+label{display:grid;gap:6px;font-weight:600;font-size:.92rem}
+input[type=text],input[type=tel]{font:inherit;font-size:1.05rem;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);width:100%}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--soft)}
+.tipos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tipos label{display:block;cursor:pointer}.tipos input{position:absolute;opacity:0;pointer-events:none}
+.tipos span{display:grid;place-items:center;gap:2px;text-align:center;border:1.5px solid var(--line);border-radius:12px;padding:10px 4px;font-size:.86rem;background:var(--bg);min-height:72px}
+.tipos span b{font-size:1.4rem;line-height:1}
+.tipos input:checked+span{border-color:var(--accent);background:var(--soft);color:var(--accent)}
+.tipos input:focus-visible+span{box-shadow:0 0 0 3px var(--soft)}
+.ok{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:.84rem;color:var(--muted)}
+.ok input{width:18px;height:18px;margin-top:2px;accent-color:var(--accent);flex:none}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+button{font:700 1.08rem var(--f-b);border:0;border-radius:14px;padding:15px;background:var(--wa);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+button:disabled{opacity:.6;cursor:wait}
+.erro{color:var(--bad);font-weight:600;font-size:.9rem;margin:0}
+.fim{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px 20px}
+.fim a{display:inline-flex;margin-top:12px;background:var(--wa);color:#fff;text-decoration:none;font-weight:700;border-radius:14px;padding:13px 20px}
+footer{text-align:center;font-size:.78rem;color:var(--muted);padding:0 16px 24px}footer a{color:inherit}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <div id="carregando" class="hero"><p class="muted">Carregando…</p></div>
+  <div id="erro-pg" class="hero" hidden><h1>Página indisponível</h1><p class="sub" id="erro-msg"></p></div>
+  <div id="pg" hidden>
+    <div class="hero">
+      <div class="av" id="av" aria-hidden="true">🦷</div>
+      <h1 id="tit">Fale com o cadista</h1>
+      <p class="sub" id="sub">Planejamento digital de próteses com prazo combinado e ajuste incluso.</p>
+      <div class="chips" aria-hidden="true"><span>Coroas</span><span>Facetas</span><span>Protocolos</span><span>Placas</span><span>Enceramento</span></div>
+    </div>
+    <form id="f" novalidate>
+      <label>Seu nome<input type="text" name="nome" autocomplete="name" maxlength="60" required placeholder="Ex.: Dra. Ana Souza"></label>
+      <fieldset style="border:0;padding:0;margin:0;display:grid;gap:6px"><legend style="font-weight:600;font-size:.92rem;padding:0;margin-bottom:6px">Você é</legend>
+        <div class="tipos">
+          <label><input type="radio" name="tipo" value="dentista" checked><span><b>🦷</b>Dentista</span></label>
+          <label><input type="radio" name="tipo" value="protetico"><span><b>🔬</b>Protético / Laboratório</span></label>
+          <label><input type="radio" name="tipo" value="outro"><span><b>✨</b>Outro</span></label>
+        </div>
+      </fieldset>
+      <label>Seu WhatsApp (com DDD)<input type="tel" name="tel" autocomplete="tel" inputmode="tel" maxlength="20" required placeholder="(11) 99999-9999"></label>
+      <label>Cidade <span class="muted" style="font-weight:400">(opcional)</span><input type="text" name="cidade" autocomplete="address-level2" maxlength="60"></label>
+      <div class="hp" aria-hidden="true"><label>Site<input type="text" name="site" tabindex="-1" autocomplete="off"></label></div>
+      <label class="ok"><input type="checkbox" name="aceite" required><span>Autorizo o contato pelo WhatsApp sobre os serviços. Meus dados ficam só com este cadista e não são compartilhados.</span></label>
+      <p class="erro" id="err" role="alert" hidden></p>
+      <button type="submit" id="bt"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg><span>Falar no WhatsApp</span></button>
+    </form>
+    <div class="fim" id="fim" hidden><h1 style="font-size:1.4rem">Tudo certo! 🎉</h1><p class="sub">Estamos abrindo o WhatsApp para você conversar com <b id="fim-nome">o cadista</b>.</p><a id="fim-a" href="#">Abrir o WhatsApp</a></div>
+  </div>
+</main>
+<footer>Página feita com <a href="https://idealisystems.com" target="_blank" rel="noopener">Ideali CAD</a> · <a href="https://idealisystems.com/privacidade.html" target="_blank" rel="noopener">Privacidade</a></footer>
+<script>
+var URL_FN='https://qxspiaqaigjkmilxxfri.supabase.co/functions/v1/captura';
+var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4c3BpYXFhaWdqa21pbHh4ZnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjYwMzMsImV4cCI6MjEwNzIwMjAzM30.TeIHiEvHx1PmvS5PQ3lzvByYP9ppYuq5GLZURtutXc0';
+var Q=new URLSearchParams(location.search),U=(Q.get('u')||'').toLowerCase(),INFO=null;
+var src=(Q.get('utm_source')||'').toLowerCase(),ORIG=/insta|^ig$/.test(src)?'insta':(/face|^fb$|meta/.test(src)||Q.get('fbclid'))?'face':/google|gclid/.test(src)||Q.get('gclid')?'google':src.slice(0,30);
+function $(i){return document.getElementById(i);}
+function api(b){return fetch(URL_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+ANON},body:JSON.stringify(Object.assign({u:U},b))}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.erro||'Erro');return j;});});}
+function falha(m){$('carregando').hidden=true;$('pg').hidden=true;$('erro-pg').hidden=false;$('erro-msg').textContent=m;}
+var TIPO={dentista:'dentista',protetico:'protético/laboratório',outro:''};
+if(!U)falha('Link incompleto.');
+else api({acao:'info'}).then(function(j){INFO=j;$('carregando').hidden=true;$('pg').hidden=false;
+  var n=j.nome||'';if(n){$('av').textContent=n.charAt(0).toUpperCase();$('tit').textContent=j.titulo||('Fale com '+n+', cadista');document.title=$('tit').textContent;}
+  if(j.cidade)$('sub').textContent='Planejamento digital de próteses com prazo combinado e ajuste incluso · '+j.cidade+'.';
+}).catch(function(e){falha(e.message);});
+document.querySelector('[name=tel]').addEventListener('input',function(e){var d=e.target.value.replace(/\D/g,'').slice(0,11);e.target.value=d.length>10?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length>6?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d.length>2?'('+d.slice(0,2)+') '+d.slice(2):d;});
+$('f').addEventListener('submit',function(e){e.preventDefault();var f=e.target,err=$('err');err.hidden=true;
+  var d={acao:'enviar',nome:f.nome.value.trim(),tipo:(f.querySelector('[name=tipo]:checked')||{}).value||'outro',tel:f.tel.value,cidade:f.cidade.value.trim(),site:f.site.value,aceite:f.aceite.checked,origem:ORIG};
+  var dg=d.tel.replace(/\D/g,'');
+  if(d.nome.length<2){err.textContent='Digite o seu nome.';err.hidden=false;f.nome.focus();return;}
+  if(dg.length<10||dg.length>11){err.textContent='Digite o seu WhatsApp com DDD.';err.hidden=false;f.tel.focus();return;}
+  if(!d.aceite){err.textContent='Marque a autorização para o contato pelo WhatsApp.';err.hidden=false;return;}
+  $('bt').disabled=true;$('bt').querySelector('span').textContent='Enviando…';
+  api(d).then(function(j){
+    var cad=j.nome||(INFO&&INFO.nome)||'',tp=TIPO[d.tipo];
+    var txt=(j.msg&&j.msg.trim())?j.msg.replace(/\{nome\}/g,d.nome.split(' ')[0]):('Olá'+(cad?' '+cad:'')+'! Sou '+d.nome+(tp?', '+tp:'')+(d.cidade?', de '+d.cidade:'')+'. Vim pelo anúncio e quero saber mais sobre o seu trabalho.');
+    var link=j.wa?'https://wa.me/'+j.wa+'?text='+encodeURIComponent(txt):'';
+    $('f').hidden=true;$('fim').hidden=false;$('fim-nome').textContent=cad||'o cadista';
+    if(link){$('fim-a').href=link;setTimeout(function(){location.href=link;},900);}else{$('fim-a').hidden=true;$('fim').querySelector('.sub').textContent='Recebemos o seu contato. O cadista vai te chamar no WhatsApp em breve.';}
+  }).catch(function(e2){err.textContent=e2.message;err.hidden=false;$('bt').disabled=false;$('bt').querySelector('span').textContent='Falar no WhatsApp';});});
+</script>
+</body>
+</html>
