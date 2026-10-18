@@ -781,6 +781,7 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .zb .pr{font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 .zb.alta .pr{color:var(--urgent)}.zb.media .pr{color:var(--warn)}
 .zb .ac{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.zb .rec-hr{font-style:normal;opacity:.85;margin-right:auto}
 .zb .hr{justify-self:end;font-size:.7rem;color:var(--muted);display:flex;gap:6px;align-items:center}
 .zb .okb{border:0;background:none;color:var(--muted);font:inherit;font-size:.72rem;cursor:pointer;padding:2px 4px;border-radius:6px}.zb .okb:hover{color:var(--ink);background:var(--soft)}
 .zb.vista{opacity:.55}
@@ -1664,7 +1665,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 05h15';
+var VERSAO='18/10 · 11h35';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2751,13 +2752,17 @@ function secChats(){var F={ger:msgsGer,ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:m
     return {g:g,ms:ms,nl:nl,urg:urg,prev:ult?ult.tit:''};});}
 function secNaoLidas(){try{return secChats().reduce(function(s,c){return s+c.nl;},0);}catch(e){return 0;}}
 function linhaChat(c,on){return '<button class="zc'+(on?' on':'')+'" data-a="secChat" data-v="'+c.g.id+'">'+avSec(c.g,0,c.g.humores?humorDe(c.ms):null)+'<span class="tx"><b>'+c.g.nome+' <i class="zcargo">'+c.g.cargo+'</i></b><span>'+(c.urg?'🔴 ':'')+esc(c.prev)+'</span></span><span class="meta"><span>hoje</span>'+(c.nl?'<span class="zbadge">'+c.nl+'</span>':'')+'</span></button>';}
-function bolha(m){var ok=secOkHoje(m.k);
+/* Hora em que cada recado apareceu pela primeira vez (guardada neste aparelho, some depois de 30 dias) */
+function recHora(k){if(!ui.recT){var o={};try{o=JSON.parse(localStorage.getItem('idealicad_rect_'+(S.sessao?S.sessao.id:''))||'{}')||{};}catch(e){}var lim=Date.now()-30*864e5;Object.keys(o).forEach(function(x){if(o[x]<lim)delete o[x];});ui.recT=o;}
+  var t=ui.recT[k];if(!t){t=ui.recT[k]=Date.now();clearTimeout(ui.recTs);ui.recTs=setTimeout(function(){try{localStorage.setItem('idealicad_rect_'+(S.sessao?S.sessao.id:''),JSON.stringify(ui.recT));}catch(e){}},800);}
+  var d=new Date(t),hh=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'),dia=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');return dia===today()?hh:dmy(dia).slice(0,5)+' '+hh;}
+function bolha(m){var ok=secOkHoje(m.k),hr=m.k?recHora(m.k):'';
   if(m.de){var q=SECS.filter(function(x){return x.id===m.de;})[0];
-    return '<div class="zb resp">'+(q?avSec(q,1,m.h):'')+'<span><small>'+(q?q.nome:'')+'</small><b>'+esc(m.tit)+'</b></span></div>';}
+    return '<div class="zb resp">'+(q?avSec(q,1,m.h):'')+'<span><small>'+(q?q.nome:'')+(hr?' · '+hr:'')+'</small><b>'+esc(m.tit)+'</b></span></div>';}
   return '<div class="zb '+m.n+(ok?' vista':'')+'"'+(m.h?' data-h="'+m.h+'"':'')+'>'+(m.n==='alta'?'<span class="pr">Urgente</span>':m.n==='media'?'<span class="pr">Atenção</span>':'')+'<b>'+esc(m.tit)+'</b>'+(m.sub?'<p>'+esc(m.sub)+'</p>':'')+(m.txt?fraseBox(m.txt):'')+
     ((m.a&&m.bt)||m.href?'<span class="ac">'+(m.a&&m.bt?'<button class="btn sm'+(m.n==='alta'?' pri':'')+'" data-a="'+m.a+'"'+(m.id?' data-id="'+m.id+'"':'')+(m.v?' data-v="'+m.v+'"':'')+'>'+m.bt+'</button>':'')+
       (m.href?'<a class="btn sm" target="_blank" rel="noopener" href="'+m.href+'">WhatsApp do cliente</a>':'')+'</span>':'')+
-    '<span class="hr">'+(m.k.slice(-3)==='_oi'?'':ok?'✓ visto':'<button class="okb" data-a="secOk" data-k="'+m.k+'">Ok, visto ✓</button>')+'</span></div>';}
+    '<span class="hr">'+(hr?'<i class="rec-hr">'+hr+'</i>':'')+(m.k.slice(-3)==='_oi'?'':ok?'✓ visto':'<button class="okb" data-a="secOk" data-k="'+m.k+'">Ok, visto ✓</button>')+'</span></div>';}
 /* IA dos agentes: conversa livre. As contas continuam no app; a IA (servidor "agente") só conversa sobre estes dados. */
 function iaContexto(id,q){var t=today(),L=[],P=alive(S.pedidos),ab=P.filter(aberto),F={ger:msgsGer,ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},ms=[];
   try{ms=F[id]();}catch(e){}
@@ -3113,10 +3118,11 @@ function celebraPedido(p,antes){var c=cliente(p.clienteId);if(!c)return;var n=no
   if(antes&&antes.n&&agOk('dad')&&cliRisco(antes)){var m=memDe().c[c.id]||[],plano=leadsDe().some(function(l){return l.tel===telNorm(c.telefone);})||m.length>0;
     agenteCanto('dad','comemorando',n+' voltou! 📊','Estava há '+plural(antes.diasSem,'dia','dias')+' sem mandar'+(antes.freq?' (antes mandava a cada '+plural(antes.freq,'dia','dias')+')':'')+'. '+(plano?'Parece que a reconquista funcionou! 👏 ':'')+'Vou acompanhar se ele volta ao ritmo de antes.',[{a:'iaCmd',g:'dad',v:'comport',x:c.id,l:'Ver análise'}],11000);
     try{memAdd(c.id,'Voltou a mandar trabalho em '+dmy(t)+' depois de '+antes.diasSem+' dias sem mandar.','dad',plano?'funcionou':'nota');}catch(e){}}}
+function iaQuando(m){return m.d&&m.d!==today()?dmy(m.d).slice(0,5)+' '+m.hr:m.hr;}
 function iaBolhas(id){var L=(ui.iaConv&&ui.iaConv[id])||[],g=SECS.filter(function(x){return x.id===id;})[0];
   var hoje=today(),ult=null;
-  return L.map(function(m){var sep='';if(m.d&&m.d!==ult){ult=m.d;sep='<span class="zdia">'+(m.d===hoje?'Conversa de hoje':'Conversa de '+dmy(m.d).slice(0,5))+'</span>';}
-    return sep+(m.r==='u'?'<div class="zb ia-eu"><p>'+esc(m.t)+'</p>'+(m.hr?'<small class="ia-hr">'+m.hr+'</small>':'')+'</div>':iaBolhaA(m,g));}).join('')+
+  return L.map(function(m){var sep='';if(m.d&&m.d!==ult){ult=m.d;sep='<span class="zdia">'+(m.d===hoje?'Conversa de hoje · '+dmy(m.d).slice(0,5):'Conversa de '+dmy(m.d).slice(0,5))+'</span>';}
+    return sep+(m.r==='u'?'<div class="zb ia-eu"><p>'+esc(m.t)+'</p>'+(m.hr?'<small class="ia-hr">'+iaQuando(m)+'</small>':'')+'</div>':iaBolhaA(m,g));}).join('')+
     (ui.iaEsperando===id?'<div class="zb ia-ag ia-dig"><small>'+esc(g.nome)+'</small><p><i></i><i></i><i></i></p></div>':'');}
 function iaForm(g){var ph={ger:'Pergunte ao Sr. Otávio sobre as metas…',ven:'Pergunte à Ana sobre pedidos e prazos…',fin:'Pergunte à Bia sobre cobranças…',mkt:'Peça uma mensagem para a Mika…',dad:'Pergunte ao Klose sobre os números…'}[g.id]||'Escreva sua pergunta…';
   return '<form class="ia-in" data-form="iaPerg" data-g="'+g.id+'"><input name="q" id="ia-q" maxlength="500" autocomplete="off" placeholder="'+esc(ph)+'"'+(ui.iaEsperando?' disabled':'')+'><button class="btn pri" type="submit" aria-label="Enviar"'+(ui.iaEsperando?' disabled':'')+'>➤</button></form>';}
@@ -3151,7 +3157,7 @@ function iaBolhaA(m,g){
     (m.msgs&&m.msgs.length?m.msgs.map(function(x){return '<div class="ia-msgt">'+esc(x.tit)+'</div><div class="msg-card zfrase"><div class="msg-txt">'+esc(x.txt)+'</div><div class="msg-acts"><span></span><span class="row" style="gap:6px"><button type="button" class="btn sm" data-a="msgCopiar">Copiar</button>'+(x.wa?'<a class="btn sm pri" target="_blank" rel="noopener" href="'+esc(x.wa)+'">WhatsApp</a>':'<button type="button" class="btn sm pri" data-a="fraseWa">WhatsApp</button>')+'</span></div></div>';}).join(''):'')+
     (m.depois?'<p>'+esc(m.depois)+'</p>':'')+
     (m.bts&&m.bts.length?'<span class="ac">'+m.bts.map(btnIa).join('')+'</span>':'')+
-    (m.chips&&m.chips.length?'<div class="ia-chips">'+m.chips.map(btnIa).join('')+'</div>':'')+(m.hr?'<small class="ia-hr">'+m.hr+'</small>':'')+'</div>';}
+    (m.chips&&m.chips.length?'<div class="ia-chips">'+m.chips.map(btnIa).join('')+'</div>':'')+(m.hr?'<small class="ia-hr">'+iaQuando(m)+'</small>':'')+'</div>';}
 function iaConvDe(id){iaGaranta();ui.iaConv=ui.iaConv||{};var L=ui.iaConv[id]=ui.iaConv[id]||[];if(!L._p){L._p=1;var ps=L.push;L.push=function(){var ag=new Date(),hr=String(ag.getHours()).padStart(2,'0')+':'+String(ag.getMinutes()).padStart(2,'0');for(var i=0;i<arguments.length;i++)if(arguments[i]){if(!arguments[i].d)arguments[i].d=today();if(!arguments[i].hr)arguments[i].hr=hr;}var r=ps.apply(L,arguments);iaSalva();return r;};}return L;}
 function iaDiz(id,m){m.r='a';if(!m.ia)m.loc=1;iaConvDe(id).push(m);}
 function iaEu(id,t){iaConvDe(id).push({r:'u',t:t});}
@@ -3419,14 +3425,14 @@ function rSala(){var v=salaAtual(),anim=ui.salaAnim;ui.salaAnim=0;var G=function
   else if(ui.salaErro)corpo='<div class="zap-vazio"><b>A equipe não conseguiu se reunir agora</b><span>Parece que a conexão caiu.</span><button class="btn pri" data-a="salaTenta">Tentar de novo</button></div>';
   else corpo='<div class="sala-esp">'+salaRostos()+'<b>A equipe está entrando na sala…</b><span class="ia-dig"><p><i></i><i></i><i></i></p></span><small class="muted">O Sr. Otávio está abrindo a reunião com os números de hoje.</small></div>';
   return '<div class="zap-c sala"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+salaRostos()+'<span class="tx"><b>Sala de reunião</b><span>Ana, Bia, Mika, Klose e o Sr. Otávio decidem juntos o que fazer hoje</span></span></div>'+
-    '<div class="zap-b" id="zap-b"><span class="zdia">Hoje</span>'+corpo+'</div></div>';}
+    '<div class="zap-b" id="zap-b"><span class="zdia">Hoje · '+dmy(today()).slice(0,5)+'</span>'+corpo+'</div></div>';}
 
 function rSecretarios(){iaGaranta();if(ui.secRolado!==(ui.secAg||'_')){ui.secRolado=ui.secAg||'_';setTimeout(function(){var b=document.getElementById('zap-b');if(b)b.scrollTop=b.scrollHeight;},30);}var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth>820){var pr=C.filter(function(x){return x.urg;})[0]||C.filter(function(x){return x.nl;})[0]||C[0];sel=pr.g.id;}var c=C.filter(function(x){return x.g.id===sel;})[0];
   if(sel==='reu')return '<div class="zap aberto"><div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+linhaSala(true)+C.map(function(x){return linhaChat(x,false);}).join('')+vagasHtml()+'</div>'+rSala()+'</div>';
   if(c)setTimeout(function(){secMarca(c.ms.map(function(m){return m.k;}));ui.secCharVisto=c.g.id;},0);
   var lista='<div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+(libOk('sala')?linhaSala(false):'')+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+vagasHtml()+'</div>';
   var conv=c?'<div class="zap-c'+(c.g.corpo?' com-char':'')+'"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+avSec(c.g,1)+'<span class="tx"><b>'+c.g.nome+' · '+c.g.cargo+'</b><span>'+c.g.papel.replace(/^[^·]+· /,'')+'</span></span></div>'+
-      '<div class="zap-b" id="zap-b"><span class="zdia">Hoje</span>'+c.ms.map(bolha).join('')+(function(){var s=null;try{s=iaSugestao(c.g.id);}catch(e){}if(!s)return '';s.sug=1;s.loc=1;return iaBolhaA(s,c.g);})()+iaBolhas(c.g.id)+'</div>'+iaCmdsHtml(c.g.id)+iaForm(c.g)+
+      '<div class="zap-b" id="zap-b"><span class="zdia">Hoje · '+dmy(today()).slice(0,5)+'</span>'+c.ms.map(bolha).join('')+(function(){var s=null;try{s=iaSugestao(c.g.id);}catch(e){}if(!s)return '';s.sug=1;s.loc=1;return iaBolhaA(s,c.g);})()+iaBolhas(c.g.id)+'</div>'+iaCmdsHtml(c.g.id)+iaForm(c.g)+
       (c.g.corpo?(function(){var h=humorDe(c.ms);return '<div class="zfala'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zfala">'+esc(HUMOR_FALA[h])+'</div><img class="zchar'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zchar" data-g="'+c.g.id+'" src="'+corpoDe(c.g,h)+'" alt="" aria-hidden="true">';})():'')+'</div>':
     '<div class="zap-c"><div class="zap-vazio">'+avSec(SECS[0])+'<b>Escolha uma conversa</b><span>Ana, Bia, Mika e Klose cuidam cada um de uma parte do seu negócio.</span></div></div>';
   return '<div class="zap'+(c?' aberto':'')+'">'+lista+conv+'</div>';}
