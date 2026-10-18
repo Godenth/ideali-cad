@@ -674,6 +674,8 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .mo-l{display:grid;gap:8px;padding:6px 0}.mo-bar{position:relative;height:12px;border-radius:99px;background:var(--line);margin:14px 0 4px}.mo-bar i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:linear-gradient(90deg,#FFB13D,#E0559B)}
 .mo-bar s{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--muted);text-decoration:none}.mo-bar s.ok{background:#1DAE8A}.mo-bar s em{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-style:normal;font-size:.95rem}
 .mo-fx{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem;color:var(--muted)}.mo-fx .ok{color:var(--ok,#1DAE8A);font-weight:700}
+.vg{margin:10px 12px 14px;border:1px dashed var(--line);border-radius:14px;padding:10px}.vg-h{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;gap:6px;align-items:center;margin-bottom:6px}.vg-h span{background:var(--accent);color:#fff;border-radius:99px;padding:1px 7px;font-size:.68rem}
+.vg-it{display:flex;align-items:center;gap:10px;padding:7px 4px;opacity:.75}.vg-it .zav{filter:grayscale(1) brightness(.85)}.vg-it .tx{display:grid;min-width:0;flex:1}.vg-it .tx b{font-size:.9rem}.vg-it .tx span{font-size:.78rem;color:var(--muted)}.vg-l{font-size:.9rem}.vg-p{font-size:.76rem;color:var(--muted);margin:6px 4px 0}
 .mh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}.mh-c{display:flex;gap:12px;align-items:center;text-align:left;cursor:pointer;font:inherit;color:var(--ink);border:1px solid var(--line)}
 .mh-c:hover{border-color:var(--accent)}.mh-n{display:inline-block;vertical-align:middle;margin-left:6px;background:var(--ok,#1DAE8A);color:#fff;font-size:.7rem;font-weight:800;border-radius:99px;padding:2px 8px}.mh-c b{display:block}.mh-c small{color:var(--muted);font-size:.8rem}.mh-ic{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);flex:none}.mh-ic svg{width:22px;height:22px}
 .mh-fora{display:grid;gap:6px;font-size:.88rem;color:var(--muted)}.mh-fora span{display:block}.mh-fora svg{vertical-align:-3px}.mh-fora svg{width:16px;height:16px;opacity:.6}
@@ -1630,7 +1632,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 01h30';
+var VERSAO='18/10 · 01h40';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1715,6 +1717,9 @@ function cfgTabs(lix){
     return '<button class="'+(ui.tab===x[0]?'on':'')+'" data-a="tab" data-v="'+x[0]+'">'+ICON[x[0]]+'<span class="lg">'+x[1]+'</span><span class="sm">'+x[2]+'</span>'+(x[0]==='lixeira'&&lix?'<span class="n">'+lix+'</span>':'')+'</button>';}).join('')+'</nav>';
 }
 function logo(s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 28 28" aria-hidden="true"><defs><linearGradient id="lgP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--p6)"/><stop offset=".5" stop-color="var(--p5)"/><stop offset="1" stop-color="var(--p4)"/></linearGradient></defs><rect width="28" height="28" rx="8" fill="url(#lgP)"/><path d="M8 9c0-1.5 1.4-2.3 3-2 1.3.2 2 .9 3 .9s1.7-.7 3-.9c1.6-.3 3 .5 3 2 0 3-1 5-1.6 8.5-.4 2.3-1 3.5-1.9 3.5-1.2 0-1.2-4-2.5-4s-1.3 4-2.5 4c-.9 0-1.5-1.2-1.9-3.5C9 14 8 12 8 9z" fill="#fff"/></svg>';}
+function agVagas(){return [['fin','com 3 pedidos'],['mkt','no primeiro cliente'],['ger','com 10 pedidos'],['dad','quando seu primeiro mês fechar']].filter(function(v){return !agOk(v[0]);}).map(function(v){return {g:SECS.filter(function(x){return x.id===v[0];})[0],q:v[1]};});}
+function vagasHtml(){var V=agVagas();if(!V.length)return '';
+  return '<div class="vg"><div class="vg-h">Cargos em aberto <span>'+V.length+'</span></div>'+V.map(function(v){return '<div class="vg-it">'+avSec(v.g,0)+'<span class="tx"><b>'+esc(v.g.cargo)+'</b><span>'+esc(v.g.nome)+' · contrata '+esc(v.q)+'</span></span><span class="vg-l">🔒</span></div>';}).join('')+'<p class="vg-p">Sua equipe cresce junto com o seu negócio. Cada contratação chega com novas funções.</p></div>';}
 function rMaisHub(){var it=MENU[1][1],ok=it.filter(function(x){return libOk(x[0]);}),fora=it.filter(function(x){return !libOk(x[0]);}),NL=secNaoLidas();
   var vagas=[['fin','com 3 pedidos'],['mkt','no primeiro cliente'],['ger','com 10 pedidos'],['dad','quando seu primeiro mês fechar']].filter(function(v){return !agOk(v[0]);});
   fora=fora.concat(vagas.map(function(v){var g=SECS.filter(function(x){return x.id===v[0];})[0];return ['_ag',g.nome+' ('+g.cargo.toLowerCase()+')',v[1]];}));
@@ -2509,14 +2514,14 @@ function msgsFat(){var t=today(),m=monthOf(t),pm=prevMonth(m),d=+t.slice(8),R=[]
   var ate=function(mm,dd){return alive(S.pedidos).filter(function(p){return monthOf(p.recebido)===mm&&+p.recebido.slice(8)<=dd;});};
   var A=ate(m,d),B=ate(pm,d),fa=soma(A),fb=soma(B),el=elems(A),nd=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();
   var dif=fb?Math.round((fa-fb)/fb*100):null;
-  R.push({k:'fat_oi',n:'info',tit:capMes(m)+' até agora: '+brl(fa),sub:plural(A.length,'pedido','pedidos')+' e '+plural(el,'elemento','elementos')+'.'+(fb?' No mesmo ponto de '+MESES[+pm.slice(5,7)-1]+' eram '+brl(fb)+' ('+(dif>=0?'+':'')+dif+'%).':''),a:'tab',v:'dashboard',bt:'Ver Dashboard'});
+  R.push({k:'fat_oi',n:'info',tit:capMes(m)+' até agora: '+brl(fa),sub:plural(A.length,'pedido','pedidos')+' e '+plural(el,'elemento','elementos')+'.'+(fb?' No mesmo ponto de '+MESES[+pm.slice(5,7)-1]+' eram '+brl(fb)+' ('+(dif>=0?'+':'')+dif+'%).':''),a:'tab',v:'dashboard',bt:'Ver Início'});
   if(fb&&dif<=-20)R.push({k:'fat_caiu',h:'pensativa',n:'media',tit:'O mês está mais fraco que o anterior',sub:'Faturamento '+Math.abs(dif)+'% abaixo do mesmo período de '+MESES[+pm.slice(5,7)-1]+'. Pode ser uma boa hora de chamar clientes que andam sumidos.',a:'tab',v:'analises',bt:'Ver Análises'});
   if(fb&&dif>=20)R.push({k:'fat_subiu',h:'feliz',n:'info',tit:'O mês está melhor que o anterior 🚀',sub:'Faturamento '+dif+'% acima do mesmo período de '+MESES[+pm.slice(5,7)-1]+'.'});
   if(d>=5&&fa){var proj=fa/d*nd;R.push({k:'fat_proj',n:'info',tit:'Neste ritmo, o mês fecha perto de '+brl(Math.round(proj/10)*10),sub:'Conta simples: média por dia até hoje vezes os '+nd+' dias do mês.'});}
   var meta=metaDe(m);if(meta&&meta.fat){var falta=meta.fat-fa,rest=nd-d;
     R.push(falta>0?{k:'fat_meta',h:falta/meta.fat<=0.2?'determinada':d>=5&&fa/d*nd<meta.fat?'pensativa':'tranquila',n:d>=5&&fa/d*nd<meta.fat?'media':'info',tit:'Faltam '+brl(falta)+' para a meta de '+brl(meta.fat),sub:(rest>0?'Dá '+brl(Math.ceil(falta/rest))+' por dia nos '+plural(rest,'dia que falta','dias que faltam')+'.':'Hoje é o último dia do mês.')+(d>=5&&fa/d*nd<meta.fat?' No ritmo atual não chega lá, então vale buscar mais trabalho.':''),a:'tab',v:'metas',bt:'Ver metas'}:
       {k:'fat_meta',h:'feliz',n:'info',tit:'Meta do mês batida! 🎯',sub:'Você já passou dos '+brl(meta.fat)+' de meta.',a:'tab',v:'metas',bt:'Ver metas'});}
-  else R.push({k:'fat_semmeta',n:'info',tit:'Você ainda não tem meta de faturamento',sub:'Com uma meta eu consigo dizer quanto falta por dia.',a:'tab',v:'metas',bt:'Criar meta'});
+  else if(libOk('metas'))R.push({k:'fat_semmeta',n:'info',tit:'Você ainda não tem meta de faturamento',sub:'Com uma meta eu consigo dizer quanto falta por dia.',a:'tab',v:'metas',bt:'Criar meta'});
   var por={};A.forEach(function(p){por[p.clienteId]=(por[p.clienteId]||0)+(+p.valor||0);});var top=Object.keys(por).sort(function(x,y){return por[y]-por[x];})[0];
   if(top&&cliente(top)&&A.length>=3)R.push({k:'fat_top',n:'info',tit:'Maior cliente do mês: '+nomeCurtoCli(cliente(top)),sub:brl(por[top])+' até agora ('+Math.round(por[top]/fa*100)+'% do mês).',a:'verCliente',id:top,bt:'Ver cliente'});
   return R;}
@@ -3110,7 +3115,7 @@ var IA_CMD={
   'ger.meta':function(g){var s=gerSit();iaDiz(g,{t:s.tipo==='semmeta'?'Ainda não tem meta! Cadastre a meta de faturamento do mês e eu cobro a equipe todo dia.':s.resumo+' Meta diária: '+brl(Math.round(s.metaDia))+'.',bts:[{a:'tab',v:'metas',l:s.tipo==='semmeta'?'Criar meta':'Abrir metas',pri:1}]});},
   'ger.sugira':function(g){iaPerguntaCmd(g,'Olhando os dados de hoje, me dê 3 decisões práticas para hoje, em tópicos curtos.','O que faço hoje?');},
   'dad.sugira':function(g){iaPerguntaCmd(g,'Olhando os números, me dê 3 sugestões práticas para melhorar prazo, qualidade ou clientes, em tópicos curtos.','O que melhorar?');},
-  'ven.relVendas':function(g){var R=relDados('vendas');iaDiz(g,{t:R.resumo+' 📄',bts:[{a:'iaRel',v:'vendas',l:'Baixar PDF',pri:1},{a:'tab',v:'dashboard',l:'Ver Dashboard'}]});},
+  'ven.relVendas':function(g){var R=relDados('vendas');iaDiz(g,{t:R.resumo+' 📄',bts:[{a:'iaRel',v:'vendas',l:'Baixar PDF',pri:1},{a:'tab',v:'dashboard',l:'Ver Início'}]});},
   'fin.relFin':function(g){var R=relDados('fin');iaDiz(g,{t:R.resumo+' 📄',bts:[{a:'iaRel',v:'fin',l:'Baixar PDF',pri:1},{a:'tab',v:'financeiro',l:'Abrir financeiro'}]});},
   'dad.relAn':function(g){var R=relDados('an');iaDiz(g,{t:R.resumo+' 📄',bts:[{a:'iaRel',v:'an',l:'Baixar PDF',pri:1},{a:'tab',v:'analises',l:'Ver Análises'}]});},
   'ven.atrasados':function(g){var t=today(),L=alive(S.pedidos).filter(function(p){return atrasado(p,t);}).sort(function(a,b){return a.prazo<b.prazo?-1:1;});
@@ -3262,9 +3267,9 @@ function rSala(){var v=salaAtual(),anim=ui.salaAnim;ui.salaAnim=0;var G=function
     '<div class="zap-b" id="zap-b"><span class="zdia">Hoje</span>'+corpo+'</div></div>';}
 
 function rSecretarios(){iaGaranta();if(ui.secRolado!==(ui.secAg||'_')){ui.secRolado=ui.secAg||'_';setTimeout(function(){var b=document.getElementById('zap-b');if(b)b.scrollTop=b.scrollHeight;},30);}var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth>820){var pr=C.filter(function(x){return x.urg;})[0]||C.filter(function(x){return x.nl;})[0]||C[0];sel=pr.g.id;}var c=C.filter(function(x){return x.g.id===sel;})[0];
-  if(sel==='reu')return '<div class="zap aberto"><div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+linhaSala(true)+C.map(function(x){return linhaChat(x,false);}).join('')+'</div>'+rSala()+'</div>';
+  if(sel==='reu')return '<div class="zap aberto"><div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+linhaSala(true)+C.map(function(x){return linhaChat(x,false);}).join('')+vagasHtml()+'</div>'+rSala()+'</div>';
   if(c)setTimeout(function(){secMarca(c.ms.map(function(m){return m.k;}));ui.secCharVisto=c.g.id;},0);
-  var lista='<div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+(libOk('sala')?linhaSala(false):'')+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+'</div>';
+  var lista='<div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+(libOk('sala')?linhaSala(false):'')+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+vagasHtml()+'</div>';
   var conv=c?'<div class="zap-c'+(c.g.corpo?' com-char':'')+'"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+avSec(c.g,1)+'<span class="tx"><b>'+c.g.nome+' · '+c.g.cargo+'</b><span>'+c.g.papel.replace(/^[^·]+· /,'')+'</span></span></div>'+
       '<div class="zap-b" id="zap-b"><span class="zdia">Hoje</span>'+c.ms.map(bolha).join('')+(function(){var s=null;try{s=iaSugestao(c.g.id);}catch(e){}if(!s)return '';s.sug=1;s.loc=1;return iaBolhaA(s,c.g);})()+iaBolhas(c.g.id)+'</div>'+iaCmdsHtml(c.g.id)+iaForm(c.g)+
       (c.g.corpo?(function(){var h=humorDe(c.ms);return '<div class="zfala'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zfala">'+esc(HUMOR_FALA[h])+'</div><img class="zchar'+(ui.secCharVisto===c.g.id?'':' entra')+'" id="zchar" data-g="'+c.g.id+'" src="'+corpoDe(c.g,h)+'" alt="" aria-hidden="true">';})():'')+'</div>':
