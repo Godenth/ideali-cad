@@ -1497,7 +1497,7 @@ var TRAB_REF=[['Elemento sobre dente','elemento'],['Elemento sobre implante','el
   ['Provisório com aleta','elemento'],['Placa de bruxismo','elemento'],['Enceramento digital (planejamento)','elemento'],
   ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo 3D','trabalho']];
 function refFaltando(){var tem={};S.tipos.forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
-function toast(t){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){el.hidden=true;},2800);}
+function toast(t,ms){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){el.hidden=true;},ms||2800);}
 function save(){agendaSync();}
 /* Uso do sistema: a cada minuto, se a aba está visível e a pessoa mexeu nos últimos 5 minutos, soma 1 minuto.
    Só tempo e "visto por último": nenhuma página, clique ou localização é enviada. */
@@ -1666,7 +1666,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 19h30';
+var VERSAO='18/10 · 20h35';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3304,7 +3304,7 @@ var IA_CMD={
     iaQuem(g,'relProd','Relatório de produção para qual cliente?',Object.keys(m).filter(function(k){return cliente(k);}).sort(function(a,b){return m[b]-m[a];}).map(function(k){return {c:cliente(k),s:plural(m[k],'pedido','pedidos')};}),'Nenhum cliente com trabalho em produção agora.');},
   'fin.cobrar':function(g,x){if(x){ui.iaUltCli=x;var c=cliente(x),ps=aReceber(x);ui.cobSel={};
       if(!ps.length){iaDiz(g,{t:nomeCurtoCli(c)+' não está devendo nada. 👏'});return;}
-      iaDiz(g,{t:'Separei '+plural(ps.length,'pedido','pedidos')+' de '+nomeCurtoCli(c)+': total '+brl(soma(ps))+'. A cobrança está pronta, é só mandar! 💸',bts:[{a:'cobrancaPdf',id:x,l:'Gerar PDF com Pix',pri:1},{a:'cobrancaMsg',id:x,l:'Copiar mensagem'},{a:'cobranca',id:x,l:'Escolher pedidos'}]});return;}
+      iaDiz(g,{t:'Separei '+plural(ps.length,'pedido','pedidos')+' de '+nomeCurtoCli(c)+': total '+brl(soma(ps))+'. A cobrança está pronta, é só mandar! 💸',bts:[{a:'cobrancaEnvia',id:x,l:'Enviar no WhatsApp',pri:1},{a:'cobrancaPdf',id:x,l:'Só o PDF'},{a:'cobrancaMsg',id:x,l:'Copiar mensagem'},{a:'cobranca',id:x,l:'Escolher pedidos'}]});return;}
     iaQuem(g,'cobrar','De quem? 🤔',devedores().slice().sort(function(a,b){return b.v-a.v;}).map(function(d){return {c:d.c,s:brl(d.v)};}),'Ninguém está devendo agora. 👏');},
   'fin.devendo':function(g){var dv=devedores().slice().sort(function(a,b){return b.v-a.v;}),t=today();
     iaDiz(g,dv.length?{t:'Quem está devendo ('+brl(dv.reduce(function(s,d){return s+d.v;},0))+' no total):',lst:dv.slice(0,12).map(function(d){var v=aReceber(d.c.id).map(function(p){return p.entregue||p.recebido;}).filter(Boolean).sort()[0];return {t:nomeCurtoCli(d.c)+' · '+brl(d.v),s:plural(d.n,'pedido','pedidos')+(v?' · mais antigo '+quandoTxt(daysBetween(v,t)):''),bt:{a:'iaCmd',g:'fin',v:'cobrar',x:d.c.id,l:'Cobrar'}};})}:{t:'Ninguém está devendo. Tudo pago! 💚'});},
@@ -5522,16 +5522,18 @@ function fCobranca(cid){
     '<p class="small muted">Desmarque o que não quer cobrar agora.</p>'+
     '<div class="list cb-list">'+ps.map(function(p){var t=nomeTrab(p);return '<label class="li cb-li"><input type="checkbox" class="cb-ped" data-id="'+p.id+'" '+(sel[p.id]?'checked':'')+'><span class="t"><b>#'+p.num+' · '+esc(t||'Trabalho')+'</b><span>'+esc(p.paciente||'')+(p.elementos&&p.elementos.length?' · '+elTxt(p.elementos):'')+' · '+(p.entregue?'enviado '+dmy(p.entregue):'finalizado')+'</span></span><span class="mono val">'+brl(p.valor)+'</span></label>';}).join('')+'</div>'+
     '<div class="between cb-tot"><b>Total da cobrança</b><b class="mono val" id="cb-total">'+brl(cobTotal(cid))+'</b></div>'+
-    '<div class="row wrap" style="gap:8px"><button class="btn pri" data-a="cobrancaPdf" data-id="'+cid+'">Gerar PDF com Pix</button><button class="btn" data-a="cobrancaMsg" data-id="'+cid+'">Copiar mensagem</button></div>'+
-    '<p class="small muted">O PDF tem a lista dos pedidos, o total e o QR Code Pix com o valor certo. No celular, dá para mandar direto pelo WhatsApp.</p>';
+    '<div class="row wrap" style="gap:8px"><button class="btn pri ld-wa" data-a="cobrancaEnvia" data-id="'+cid+'">Enviar no WhatsApp</button><button class="btn" data-a="cobrancaPdf" data-id="'+cid+'">Só o PDF</button><button class="btn" data-a="cobrancaMsg" data-id="'+cid+'">Copiar mensagem</button></div>'+
+    '<p class="small muted"><b>Enviar no WhatsApp</b> manda o PDF (lista dos pedidos, total e QR Code Pix) com a mensagem e o Pix copia e cola. No computador, o PDF é baixado para você arrastar na conversa.</p>';
 }
 function cobPeds(cid){var sel=ui.cobSel||{};return aReceber(cid).filter(function(p){return sel[p.id]!==false;}).sort(function(a,b){return (a.entregue||a.recebido)<(b.entregue||b.recebido)?-1:1;});}
+function cobMsgTxt(cid,comPdf){var c=cliente(cid),ps=cobPeds(cid),v=soma(ps),nm=c?String(nomeCurtoCli(c)||'').trim():'';
+  return saudTxt()+(nm?', '+nm:'')+'! Segue a cobrança dos trabalhos entregues e ainda não pagos'+(comPdf?' (o PDF com os detalhes e o QR Code vai junto)':'')+':\n'+ps.map(function(p){return '• '+['#'+p.num,nomeTrab(p)||'',p.paciente||''].filter(Boolean).join(' ')+(p.elementos&&p.elementos.length?' ('+p.elementos.join(', ')+')':'')+': '+brl(p.valor);}).join('\n')+'\nTotal: '+brl(v)+(S.perfil.chave?'\n\nPix copia e cola:\n'+brcode(v,'CAD'+Date.now().toString(36).toUpperCase()):'')+'\n\nObrigado!';}
 function cobTotal(cid){return soma(cobPeds(cid));}
 function carregaJsPDF(){if(window.jspdf)return Promise.resolve();return new Promise(function(ok,ruim){var sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';sc.onload=ok;sc.onerror=function(){ruim(new Error('Não consegui carregar o gerador de PDF. Confira a internet.'));};document.head.appendChild(sc);});}
 function qrDataURL(code){var box=document.createElement('div');box.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(box);
   try{new QRCode(box,{text:code,width:360,height:360,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});var cv=box.querySelector('canvas');return cv?cv.toDataURL('image/png'):null;}catch(e){return null;}finally{box.remove();}}
 function pdfTxt(t){return String(t==null?'':t).replace(/[^\u0000-ÿ]/g,'');}
-async function geraPdfCobranca(cid){
+async function geraPdfCobranca(cid,soGerar){
   var c=cliente(cid),ps=cobPeds(cid),tot=soma(ps);if(!ps.length){toast('Marque pelo menos um pedido.');return;}
   await carregaJsPDF();var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,M=16,y=0;
   var roxo=[91,69,224],cinza=[98,94,117],tinta=[27,24,48];
@@ -5571,8 +5573,21 @@ async function geraPdfCobranca(cid){
     doc.setTextColor.apply(doc,tinta);doc.text('Pix copia e cola:',tx,y+29);doc.setFont('courier','normal');doc.setFontSize(8);doc.text(lines,tx,y+34);doc.setFont('helvetica','normal');
   }else{doc.setFontSize(10);doc.setTextColor.apply(doc,cinza);doc.text('Combine a forma de pagamento com o cadista.',M,y);}
   var n=doc.getNumberOfPages();for(var i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(160,156,180);doc.text('Gerado pelo Ideali CAD · página '+i+' de '+n,W/2,292,{align:'center'});}
+  var nomeArq='cobranca_'+norm(c?c.nome:'cliente',30).replace(/\s+/g,'_').toLowerCase()+'_'+today()+'.pdf';
+  if(soGerar)return {blob:doc.output('blob'),nome:nomeArq,tot:tot};
   if(await salvaPdf(doc,'cobranca_'+norm(c?c.nome:'cliente',30).replace(/\s+/g,'_').toLowerCase()+'_'+today()+'.pdf','Cobrança','Segue a cobrança dos trabalhos. Total '+brl(tot)+'.'))toast('PDF da cobrança baixado: '+brl(tot)+'.');
 }
+/* Enviar cobrança: PDF + mensagem com Pix. No celular, vai junto pelo Compartilhar (PDF com a mensagem de legenda).
+   No computador, baixa o PDF, copia a mensagem e abre a conversa do cliente no WhatsApp com o texto pronto. */
+async function enviaCobranca(cid){var c=cliente(cid);if(!cobPeds(cid).length){toast('Marque pelo menos um pedido.');return;}
+  var r=await geraPdfCobranca(cid,true);if(!r)return;var file=null;try{file=new File([r.blob],r.nome,{type:'application/pdf'});}catch(e){}
+  var cel=/Android|iPhone|iPad/i.test(navigator.userAgent),txt=cobMsgTxt(cid,true);
+  try{if(navigator.clipboard)await navigator.clipboard.writeText(txt);}catch(e){}
+  if(cel&&file&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],text:txt});toast('Escolha a conversa de '+(c?nomeCurtoCli(c):'cliente')+'. A mensagem também ficou copiada.');return;}catch(e){if(e&&e.name==='AbortError')return;}}
+  var u=URL.createObjectURL(r.blob),a=document.createElement('a');a.href=u;a.download=r.nome;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},60000);
+  var tel=c&&c.telefone?c.telefone:'';window.open(waLink(txt,tel),'_blank','noopener');
+  toast(soDig(tel).length>=10?'Mensagem com Pix aberta no WhatsApp. O PDF foi baixado: arraste para a conversa.':'Cliente sem WhatsApp cadastrado: escolha a conversa. O PDF foi baixado: arraste para a conversa.',7000);}
 async function salvaPdf(doc,nomeArq,titulo,texto){var blob=doc.output('blob'),file=null;try{file=new File([blob],nomeArq,{type:'application/pdf'});}catch(e){}
   if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&/Android|iPhone|iPad/i.test(navigator.userAgent)){try{await navigator.share({files:[file],title:titulo,text:texto});return false;}catch(e){if(e&&e.name==='AbortError')return false;}}
   var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nomeArq;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},30000);return true;}
@@ -6232,9 +6247,10 @@ tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l
     var m='Olá! Por este link você acompanha os seus casos comigo: a situação de cada pedido e os arquivos em 3D. '+urlLink(k.token);window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(m),'_blank','noopener');},
   cobranca:function(d,el,e){if(e)e.stopPropagation();ui.cobSel={};openSheet(fCobranca,d.id||null);},
   cobrancaCli:function(d){ui.cobSel={};ui.sheet.args=[d.id||null];renderSheet();},
+  cobrancaEnvia:function(d,el){var t=el.textContent;el.disabled=true;el.textContent='Preparando…';enviaCobranca(d.id).catch(function(x){toast((x&&x.message)||'Não foi possível preparar a cobrança.');}).then(function(){el.disabled=false;el.textContent=t;});},
   cobrancaPdf:function(d,el){var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraPdfCobranca(d.id).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
   cobrancaMsg:function(d){var c=cliente(d.id),ps=cobPeds(d.id),v=soma(ps);if(!ps.length){toast('Marque pelo menos um pedido.');return;}
-    var m='Olá! Segue a cobrança dos trabalhos entregues e ainda não pagos:\n'+ps.map(function(p){return '• #'+p.num+' '+(nomeTrab(p)||'')+' '+(p.paciente||'')+(p.elementos&&p.elementos.length?' ('+p.elementos.join(', ')+')':'')+': '+brl(p.valor);}).join('\n')+'\nTotal: '+brl(v)+(S.perfil.chave?'\n\nPix copia e cola:\n'+brcode(v,'CAD'+Date.now().toString(36).toUpperCase()):'')+'\n\nObrigado!';
+    var m=cobMsgTxt(d.id);
     (navigator.clipboard?navigator.clipboard.writeText(m):Promise.reject()).then(function(){toast('Mensagem copiada. É só colar no WhatsApp.');},function(){toast('Não consegui copiar.');});},
   pix:function(d,el,e){if(e)e.stopPropagation();openSheet(fPix,d.id);ui.sheet.after=desenhaPix;desenhaPix();},
   irConfig:function(){closeSheet();ui.tab='config';ui.sub=null;render();},
