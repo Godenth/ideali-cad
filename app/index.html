@@ -1576,7 +1576,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 21h30';
+var VERSAO='17/10 · 21h40';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2656,6 +2656,9 @@ function iaContexto(id,q){var t=today(),L=[],P=alive(S.pedidos),ab=P.filter(aber
   L.push('Hoje: '+DIAS[new Date(t+'T12:00:00').getDay()]+', '+dmy(t)+'. Cadista: '+((S.perfil.nome||'').trim()||'sem nome')+'.');
   var mes=monthOf(t),fat=P.filter(function(p){return p.recebido&&monthOf(p.recebido)===mes;}).reduce(function(s,p){return s+(+p.valor||0);},0),meta=null;try{meta=metaDe(mes);}catch(e){}
   L.push('Faturamento do mês até agora: '+brl(fat)+(meta&&meta.fat?' (meta '+brl(meta.fat)+')':' (sem meta cadastrada)')+'. Pedidos em produção: '+ab.length+'. Atrasados: '+ab.filter(function(p){return atrasado(p,t);}).length+'.');
+  try{var hm=[],m0=mes;for(var q=0;q<12;q++){var pp=P.filter(function(x){return x.recebido&&monthOf(x.recebido)===m0;});if(pp.length||q<3)hm.push(capMes(m0)+': '+brl(soma(pp))+' ('+plural(pp.length,'pedido','pedidos')+', '+plural(elems(pp),'elemento','elementos')+')');m0=prevMonth(m0);}
+    L.push('Faturamento por mês (pela data de recebimento do pedido):\n'+hm.join('\n'));
+    var rec={};alive(S.pagamentos).forEach(function(g){if(g.data){var k=monthOf(g.data);rec[k]=(rec[k]||0)+(+g.valor||0);}});var rk=Object.keys(rec).sort().reverse().slice(0,6);if(rk.length)L.push('Recebido (pagamentos) por mês: '+rk.map(function(k){return capMes(k)+' '+brl(rec[k]);}).join('; '));}catch(e){}
   var dv=[];try{dv=devedores();}catch(e){}
   L.push('A receber: '+brl(dv.reduce(function(s,d){return s+d.v;},0))+(dv.length?' — '+dv.slice(0,8).map(function(d){return nomeCurtoCli(d.c)+' '+brl(d.v);}).join('; '):'')+'.');
   if(ms.length)L.push('Seus recados de hoje:\n'+ms.slice(0,14).map(function(m){return '- '+m.tit+(m.sub?': '+m.sub:'');}).join('\n'));
@@ -2739,6 +2742,16 @@ function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
     '<div class="chips ld-chips">'+[['hoje','Chamar hoje'],['seq','Em andamento'],['resp','Responderam'],['cli','Viraram clientes'],['fim','Encerrados']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-a="leadFil" data-v="'+c[0]+'">'+c[1]+' <b>'+cont[c[0]]+'</b></button>';}).join('')+'</div>'+
     '<div class="ld-lista">'+(lista.length?lista.map(leadCard).join(''):'<p class="empty">'+(f==='hoje'?(L.length?'Ninguém para chamar hoje. 🎉':'Mande o print dos contatos que chegaram pelos anúncios e eu monto a lista.'):'Nada aqui.')+'</p>')+'</div>';}
 function leadNovoObj(nome,tel,orig){return {id:uid(),nome:String(nome||'').trim().slice(0,60),tel:tel,orig:orig||'',criado:today(),etapa:0,st:'seq',prox:today(),ult:null};}
+/* Perguntas de faturamento de um mês: o próprio sistema responde com o número exato (sem IA) */
+var MES_NOMES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function respFaturamento(q){if(!/fatur|vend|ganh|receb|entrou|quanto (fiz|fizemos|deu)/i.test(q))return null;var n=norm(q,200).toLowerCase(),t=today(),y=+t.slice(0,4),m=null;
+  MES_NOMES.forEach(function(nm,i){if(n.indexOf(norm(nm,20).toLowerCase())>=0)m=i+1;});
+  if(m==null){if(/mes passado|ultimo mes/.test(n))m=+prevMonth(monthOf(t)).slice(5,7);else if(/este mes|esse mes|mes atual|neste mes|nesse mes/.test(n))m=+t.slice(5,7);}
+  if(m==null)return null;var mm=(m>+t.slice(5,7)?y-1:y)+'-'+pad(m),P=alive(S.pedidos).filter(function(p){return p.recebido&&monthOf(p.recebido)===mm;}),fa=soma(P);
+  var rec=alive(S.pagamentos).filter(function(g){return g.data&&monthOf(g.data)===mm;}).reduce(function(s,g){return s+(+g.valor||0);},0);
+  var por={};P.forEach(function(p){por[p.clienteId]=(por[p.clienteId]||0)+(+p.valor||0);});var top=Object.keys(por).sort(function(a,b){return por[b]-por[a];})[0];
+  if(!P.length&&!rec)return 'Em '+capMes(mm)+' não há pedidos nem pagamentos registrados no sistema.';
+  return 'Em '+capMes(mm)+' faturamos '+brl(fa)+' em '+plural(P.length,'pedido','pedidos')+' ('+plural(elems(P),'elemento','elementos')+'), ticket médio de '+brl(P.length?Math.round(fa/P.length):0)+'. Recebido em pagamentos no mês: '+brl(rec)+'.'+(top&&cliente(top)?' Quem mais mandou: '+nomeCurtoCli(cliente(top))+' ('+brl(por[top])+').':'');}
 function iaBolhas(id){var L=(ui.iaConv&&ui.iaConv[id])||[],g=SECS.filter(function(x){return x.id===id;})[0];
   var hoje=today(),ult=null;
   return L.map(function(m){var sep='';if(m.d&&m.d!==ult){ult=m.d;sep='<span class="zdia">'+(m.d===hoje?'Conversa de hoje':'Conversa de '+dmy(m.d).slice(0,5))+'</span>';}
@@ -5761,6 +5774,7 @@ var F={
   whatsObrig:function(fd){var v=String(fd.get('tel')||'').trim();if(soDig(v).length<10||soDig(v).length>13){toast('Digite o WhatsApp com DDD.');return;}S.perfil.telefone=v;save();render();toast('WhatsApp salvo. Obrigado!');},
   iaPerg:function(fd,f){var q=String(fd.get('q')||'').trim(),g=f.dataset.g;if(!q||ui.iaEsperando)return;var it=null;try{it=iaIntent(g,q);}catch(e){}
     var memo=null;try{memo=memDetecta(g,q);}catch(e){}if(memo){var mm=memDe();memo.cid=Object.keys(mm.c).filter(function(k){return (mm.c[k]||[]).indexOf(memo)>=0;})[0]||'';iaPergunta(g,q,null,memo);return;}
+    var rf=null;try{rf=respFaturamento(q);}catch(e){}if(rf){iaEu(g,q);iaDiz(g,{t:rf,chips:iaSugs(g)});iaMostra();return;}
     if(it){if(it.c==='reuniao'){ui.secAg='reu';render();return;}iaEu(g,q);iaCmd(g,it.c,it.x);return;}iaPergunta(g,q);},
   login:function(fd){
     var email=String(fd.get('email')||'').trim(),senha=String(fd.get('senha')||'');ui.loginEmail=email;ui.loginMsg='';ui.loginBusy=true;render();
