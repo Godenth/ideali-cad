@@ -653,6 +653,8 @@ body.na-conversa .rd-fab:not(.on){display:none}
 .ld-card{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--surface);display:grid;gap:6px}.ld-card.hoje{border-color:#1FAF5B;box-shadow:0 0 0 2px rgba(31,175,91,.15)}
 .ld-top{display:flex;gap:10px;align-items:center}.ld-ic{font-size:1.3rem}.ld-nm{display:grid;min-width:0}.ld-nm small{color:var(--muted);font-size:.78rem}
 .ld-st{font-size:.82rem;color:var(--muted)}.ld-hoje{color:#1FAF5B}
+.ld-edb{margin-left:auto;font-size:.9rem}.ld-edit{gap:8px}.ld-edg{display:grid;grid-template-columns:1.4fr 1fr;gap:6px 10px}.ld-edg .fld{margin:0}.ld-edg .ld-obs{grid-column:1/-1}
+@media (max-width:600px){.ld-edg{grid-template-columns:1fr}}
 .ld-acs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ld-acs .icon-btn{margin-left:auto}
 .btn.ld-wa{background:#1FAF5B;border-color:#1FAF5B;color:#fff;font-weight:700}
 @media (max-width:600px){.ld-rev{grid-template-columns:auto 1fr}.ld-rev select{grid-column:2}}
@@ -1590,7 +1592,7 @@ var MENU=[
   ['Ferramentas',[['visu','Visualizador 3D'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['tipos','Tipos de trabalho'],['rede','Rede']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var VERSAO='17/10 · 22h10';
+var VERSAO='17/10 · 23h00';
 var CFG=['config','tabela','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={visu:'Visualizador 3D',secretarios:'Agentes de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Dashboard',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2743,12 +2745,22 @@ async function leadsLePrint(file){var fs=[].concat(file).filter(Boolean);if(!fs.
     ui.leadImp={st:'revisar',lista:lista,prev:(ui.leadImp&&ui.leadImp.prev)||[],txt:txt.trim().slice(0,1500)};}
   catch(e){ui.leadImp={st:'erro',msg:(e&&e.message)||String(e)};}
   if(ui.sheet)renderSheet();}
-function leadCard(l){var t=today(),hoje=l.st==='seq'&&(!l.prox||l.prox<=t),e=LEAD_SEQ[Math.min(l.etapa||0,LEAD_SEQ.length-1)],ic=l.orig==='insta'?'📸':l.orig==='face'?'📘':'👤';
-  var stTxt=l.st==='seq'?(hoje?'<b class="ld-hoje">Chamar hoje</b> · '+e.n:'Próxima: '+dmy(l.prox).slice(0,5)+' · '+e.n):l.st==='resp'?'💬 Respondeu':l.st==='cli'?'✅ Virou cliente':l.st==='fim'?'Encerrado (sem resposta)':'Sem interesse';
-  return '<div class="ld-card'+(hoje?' hoje':'')+'"><div class="ld-top"><span class="ld-ic">'+ic+'</span><span class="ld-nm"><b>'+esc(l.nome||'Sem nome')+'</b><small>'+esc(telFmt(l.tel))+' · chegou '+(l.criado===t?'hoje':dmy(l.criado).slice(0,5))+(l.etapa?' · '+plural(l.etapa,'mensagem','mensagens'):'')+'</small></span></div>'+
+function leadEdForm(l){var o=function(v,t){return '<option value="'+v+'"'+((l.orig||'')===v?' selected':'')+'>'+t+'</option>';};
+  return '<div class="ld-card ld-edit" data-id="'+l.id+'"><b>Editar lead</b><div class="ld-edg">'+
+    '<label class="fld"><span>Nome</span><input class="ld-e" data-k="nome" maxlength="60" value="'+esc(l.nome||'')+'" placeholder="Nome do dentista ou clínica"></label>'+
+    '<label class="fld"><span>WhatsApp</span><input class="ld-e" data-k="tel" inputmode="tel" value="'+esc(telFmt(l.tel||''))+'"></label>'+
+    '<label class="fld"><span>Cidade</span><input class="ld-e" data-k="cidade" maxlength="60" value="'+esc(l.cidade||'')+'" placeholder="Ex.: Campinas"></label>'+
+    '<label class="fld"><span>UF</span><select class="ld-e" data-k="uf"><option value="">—</option>'+UFS.map(function(u){return '<option'+(l.uf===u?' selected':'')+'>'+u+'</option>';}).join('')+'</select></label>'+
+    '<label class="fld"><span>Veio de</span><select class="ld-e" data-k="orig">'+o('','Outro')+o('face','Facebook')+o('insta','Instagram')+'</select></label>'+
+    '<label class="fld ld-obs"><span>Anotação</span><input class="ld-e" data-k="obs" maxlength="200" value="'+esc(l.obs||'')+'" placeholder="Ex.: faz muito protocolo, pediu tabela"></label></div>'+
+    '<div class="row wrap" style="gap:8px"><button class="btn sm pri" data-a="leadEdSalva" data-id="'+l.id+'">Salvar</button><button class="btn sm" data-a="leadEdX">Cancelar</button></div></div>';}
+function leadCard(l){if(ui.leadEd===l.id)return leadEdForm(l);var t=today(),hoje=l.st==='seq'&&(!l.prox||l.prox<=t),e=LEAD_SEQ[Math.min(l.etapa||0,LEAD_SEQ.length-1)],ic=l.orig==='insta'?'📸':l.orig==='face'?'📘':'👤';
+  var stTxt=l.st==='seq'?(hoje?'<b class="ld-hoje">Chamar hoje</b> · '+e.n:'Próxima: '+dmy(l.prox).slice(0,5)+' · '+e.n):l.st==='resp'?'💬 Respondeu':l.st==='cli'?'✅ Virou cliente'+(l.cli&&cliente(l.cli)?' · '+esc(cliente(l.cli).nome):''):l.st==='fim'?'Encerrado (sem resposta)':'Sem interesse';
+  return '<div class="ld-card'+(hoje?' hoje':'')+'"><div class="ld-top"><span class="ld-ic">'+ic+'</span><span class="ld-nm"><b>'+esc(l.nome||'Sem nome')+'</b><small>'+esc(telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade)+(l.uf?'/'+l.uf:''):'')+' · chegou '+(l.criado===t?'hoje':dmy(l.criado).slice(0,5))+(l.etapa?' · '+plural(l.etapa,'mensagem','mensagens'):'')+'</small></span><button class="icon-btn ld-edb" data-a="leadEd" data-id="'+l.id+'" aria-label="Editar lead" title="Editar">✏️</button></div>'+
+    (l.obs?'<div class="small muted">📝 '+esc(l.obs)+'</div>':'')+
     '<div class="ld-st">'+stTxt+'</div>'+
     '<div class="ld-acs">'+(l.st==='seq'?'<button class="btn sm ld-wa" data-a="leadWa" data-id="'+l.id+'">WhatsApp · '+esc(e.n)+'</button>':l.st==='resp'?'<a class="btn sm ld-wa" target="_blank" rel="noopener" href="'+waLink('',l.tel)+'">Abrir conversa</a>':'')+
-      (l.st==='seq'||l.st==='resp'?'<button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="resp"'+(l.st==='resp'?' hidden':'')+'>Respondeu</button><button class="btn sm" data-a="leadCli" data-id="'+l.id+'">Virou cliente</button><button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="nao">Sem interesse</button>':'')+
+      (l.st==='seq'||l.st==='resp'?'<button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="resp"'+(l.st==='resp'?' hidden':'')+'>Respondeu</button><button class="btn sm" data-a="leadPed" data-id="'+l.id+'">📦 Mandou pedido</button><button class="btn sm" data-a="leadCli" data-id="'+l.id+'">Virou cliente</button><button class="btn sm" data-a="leadSt" data-id="'+l.id+'" data-v="nao">Sem interesse</button>':'')+
       '<button class="icon-btn" data-a="leadDel" data-id="'+l.id+'" aria-label="Apagar lead" title="Apagar">🗑</button></div></div>';}
 function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
   var cont={hoje:leadsHoje().length,seq:leadsAtivos().length,resp:L.filter(function(l){return l.st==='resp';}).length,cli:L.filter(function(l){return l.st==='cli';}).length,fim:L.filter(function(l){return l.st==='fim'||l.st==='nao';}).length};
@@ -2767,6 +2779,12 @@ function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
     '<div class="ld-bar"><button class="btn pri" data-a="leadCola">📋 Colar print</button><label class="btn up">📷 Escolher prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar à mão</button><span class="small muted">Dá para mandar vários prints de uma vez (rolando a lista da etiqueta).</span></div>'+importa+
     '<div class="chips ld-chips">'+[['hoje','Chamar hoje'],['seq','Em andamento'],['resp','Responderam'],['cli','Viraram clientes'],['fim','Encerrados']].map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-a="leadFil" data-v="'+c[0]+'">'+c[1]+' <b>'+cont[c[0]]+'</b></button>';}).join('')+'</div>'+
     '<div class="ld-lista">'+(lista.length?lista.map(leadCard).join(''):'<p class="empty">'+(f==='hoje'?(L.length?'Ninguém para chamar hoje. 🎉':'Mande o print dos contatos que chegaram pelos anúncios e eu monto a lista.'):'Nada aqui.')+'</p>')+'</div>';}
+function leadOrigPre(l){return {c:'pago',s:l.orig==='insta'?'Instagram Ads':l.orig==='face'?'Facebook Ads':''};}
+function leadDoTel(tel){var d=telNorm(tel);if(!d)return null;return leadsDe().filter(function(l){return l.tel===d&&l.st!=='cli';})[0]||null;}
+/* Primeiro pedido de um lead: vira cliente sozinho, com nome, WhatsApp, cidade e origem que estavam no lead */
+function leadViraCliente(lid){var l=leadsDe().filter(function(x){return x.id===lid;})[0];if(!l)return null;
+  var ps=String(l.nome||'').trim().split(/\s+/).filter(Boolean),c=nomeia({id:uid(),criado:today(),titulo:'',pnome:nomeProprio(ps[0]||'Lead'),sobrenome:nomeProprio(ps.slice(1).join(' '),true),empresa:'',doc:'',cidade:l.cidade||'',uf:l.uf||'',tipo:'dentista',telefone:telFmt(l.tel),email:'',obs:l.obs||''});
+  S.clientes.push(c);l.st='cli';l.prox=null;l.cli=c.id;return {cid:c.id,pre:leadOrigPre(l)};}
 function leadNovoObj(nome,tel,orig){return {id:uid(),nome:String(nome||'').trim().slice(0,60),tel:tel,orig:orig||'',criado:today(),etapa:0,st:'seq',prox:today(),ult:null};}
 /* Perguntas de faturamento de um mês: o próprio sistema responde com o número exato (sem IA) */
 var MES_NOMES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -4827,7 +4845,8 @@ function fPedido(id,preCli){
   (ui.pdRede&&!p?'<div class="banner"><span><b>Vai para a Rede.</b> Anexe o escaneamento. Em dente sobre implante, a <b>marca do implante</b> e o <b>scanbody</b> são obrigatórios. Depois de salvar, você escolhe o repasse e o prazo.</span></div>':'')+
   '<form data-form="pedido" data-id="'+(id||'')+'" class="stack">'+
     '<div class="pdf"><div class="pdf-b1">'+
-    '<label class="fld"><span>Cliente</span><select id="pd-cli" name="clienteId" required><option value="">Escolha…</option>'+cs.map(function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select>'+(cs.length?'':'<small>Cadastre um cliente primeiro.</small>')+'</label>'+
+    '<label class="fld"><span>Cliente</span><select id="pd-cli" name="clienteId" required><option value="">Escolha…</option>'+(function(){var ld=p?[]:leadsDe().filter(function(l){return l.st==='seq'||l.st==='resp';}).sort(function(a,b){return String(a.nome).localeCompare(String(b.nome));}),op=function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';};
+      return ld.length?'<optgroup label="Clientes">'+cs.map(op).join('')+'</optgroup><optgroup label="Leads (viram clientes ao salvar)">'+ld.map(function(l){var v='lead:'+l.id;return '<option value="'+v+'" '+(v===cid?'selected':'')+'>🌱 '+esc(l.nome||telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade):'')+'</option>';}).join('')+'</optgroup>':cs.map(op).join('');})()+'</select>'+(cs.length?'':'<small>Cadastre um cliente primeiro ou escolha um lead.</small>')+'</label>'+
     '<label class="fld"><span>Paciente</span><input id="pd-pac" class="nome-p" name="paciente" required maxlength="40" placeholder="Iniciais, ex.: M.A.S." value="'+esc(p?p.paciente:'')+'"><small>Guarde só as iniciais ou o primeiro nome (LGPD).</small></label>'+
     '</div><div class="pdf-a">'+
     '<div class="fld"><span>Elementos <b id="pd-qtd" class="mono"></b></span><div id="pd-odo" class="pd-odo"></div><small>Toque em cada dente e diga o trabalho dele. Para unir dentes vizinhos (fixo / ponte), toque na bolinha entre eles.</small></div>'+
@@ -5566,7 +5585,15 @@ impGrava:function(){impGrava();},
     toast(l.st==='fim'?'Última mensagem enviada. Encerrei a sequência deste lead.':'Próxima mensagem para '+(l.nome||'este lead')+' em '+dmy(l.prox).slice(0,5)+'.');},
   leadSt:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;l.st=d.v;l.prox=null;save();renderSheet();toast(d.v==='resp'?'Boa! Parei a sequência: agora é com você na conversa. 💬':'Ok, encerrei este lead.');},
   leadCli:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;var ps=String(l.nome||'').trim().split(/\s+/);l.st='cli';l.prox=null;save();
-    ui.preCli={tipo:'dentista',pnome:ps[0]||'',sobrenome:ps.slice(1).join(' '),telefone:l.tel};ui.origLead={c:'pago',s:l.orig==='insta'?'Instagram Ads':l.orig==='face'?'Facebook Ads':''};openSheet(fCliente);ui.preCli=null;toast('Complete o cadastro do novo cliente. 🎉');},
+    ui.preCli={tipo:'dentista',pnome:ps[0]||'',sobrenome:ps.slice(1).join(' '),telefone:l.tel};ui.origLead=leadOrigPre(l);openSheet(fCliente);ui.preCli=null;toast('Complete o cadastro do novo cliente. 🎉');},
+  leadEd:function(d){ui.leadEd=d.id;renderSheet();setTimeout(function(){var e=document.querySelector('.ld-edit .ld-e[data-k=nome]');if(e)e.focus();},50);},
+  leadEdX:function(){ui.leadEd=null;renderSheet();},
+  leadEdSalva:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0],box=document.querySelector('.ld-edit[data-id="'+d.id+'"]');if(!l||!box)return;var v={};
+    [].forEach.call(box.querySelectorAll('.ld-e'),function(e){v[e.dataset.k]=String(e.value||'').trim();});
+    var tel=telNorm(v.tel);if(!tel){toast('Confira o WhatsApp (com DDD).');return;}
+    if(leadsDe().some(function(x){return x.id!==l.id&&x.tel===tel;})){toast('Já existe outro lead com esse número.');return;}
+    l.nome=v.nome.slice(0,60);l.tel=tel;l.cidade=v.cidade.slice(0,60);l.uf=v.uf;l.orig=v.orig;l.obs=v.obs.slice(0,200);ui.leadEd=null;save();renderSheet();toast('Lead atualizado.');},
+  leadPed:function(d){if(!guard())return;var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;ui.pdRede=false;ui.pdInit=true;openSheet(fPedido,null,'lead:'+l.id);ui.sheet.after=depoisFormPedido;depoisFormPedido();toast('Ao salvar, '+(String(l.nome||'').split(' ')[0]||'o lead')+' vira cliente automaticamente. 🎉');},
   leadDel:function(d){var L=leadsDe(),i=L.map(function(x){return x.id;}).indexOf(d.id);if(i<0)return;L.splice(i,1);save();renderSheet();},
   festaOrig:function(d){var F=ui.festa;if(!F)return;F.c=d.v;F.s=d.x;festaRender();},
   festaFecha:function(){festaFecha();},
@@ -5883,12 +5910,14 @@ var F={
     var id=f.dataset.id,p;
     var sl=String(fd.get('scanLink')||'').trim(),host='';
     if(sl){if(!/^https:\/\//i.test(sl)){toast('O link do escaneamento precisa começar com https://');var si=document.getElementById('pd-scan');if(si)si.focus();return;}try{host=new URL(sl).hostname.replace(/^www\./,'');}catch(x){toast('Link do escaneamento inválido.');return;}}
-    var antesCli=null;if(!id&&o.clienteId){try{antesCli=cliStats(o.clienteId);}catch(e){}}
+    var virou=null;if(!id&&/^lead:/.test(o.clienteId||'')){virou=leadViraCliente(o.clienteId.slice(5));if(!virou){toast('Esse lead não está mais na lista. Escolha o cliente de novo.');return;}o.clienteId=virou.cid;}
+    var antesCli=null;if(!id&&o.clienteId&&!virou){try{antesCli=cliStats(o.clienteId);}catch(e){}}
     if(id){p=byId(S.pedidos,id);Object.assign(p,o);}else{p=Object.assign({id:uid(),num:++S.seq,status:'entrada',entregue:null,pago:null,pagamentoId:null},o);S.pedidos.push(p);}
     if(sl)S.arquivos.push({id:uid(),pedidoId:p.id,origem:'link',nome:'Escaneamento · '+host,url:sl,criado:today()});
     if(ui.pdRede&&!id){save();if(anexos.length)enviaArquivo(p.id,anexos);toast('Pedido #'+p.num+' criado. Agora defina o repasse e o prazo.');vaiDelegar(p.id);return;}
     save();render();openSheet(fPedidoDet,p.id);toast(id?'Pedido salvo.':'Pedido #'+p.num+' criado.');
-    if(!id&&!EM_DEMO)setTimeout(function(){try{celebraPedido(p,antesCli);}catch(e){}},700);
+    if(virou&&!EM_DEMO)setTimeout(function(){festaCliente(virou.cid,virou.pre);},500);
+    if(!id&&!EM_DEMO)setTimeout(function(){try{celebraPedido(p,antesCli);}catch(e){}},virou?1500:700);
     if(anexos.length)enviaArquivo(p.id,anexos);
   },
   cliente:function(fd,f){
@@ -5898,7 +5927,8 @@ var F={
     if(o.doc&&!(o.doc.length===11?cpfOk(o.doc):o.doc.length===14?cnpjOk(o.doc):false)){toast(o.doc.length===11?'CPF inválido. Confira os números.':o.doc.length===14?'CNPJ inválido. Confira os números.':'CPF tem 11 números e CNPJ tem 14.');var di=document.getElementById('cl-doc');if(di)di.focus();return;}
     var id=f.dataset.id,novo=!id;if(id)nomeia(Object.assign(cliente(id),o));else{var c=nomeia(Object.assign({id:uid(),criado:today()},o));S.clientes.push(c);id=c.id;}
     save();closeSheet();ui.tab='clientes';ui.sub=id;render();toast('Cliente salvo.');
-    if(novo&&!EM_DEMO){var pre=ui.origLead||null;ui.origLead=null;setTimeout(function(){festaCliente(id,pre);},350);}
+    var lm=novo?leadDoTel(o.telefone):null;if(lm){lm.st='cli';lm.prox=null;lm.cli=id;save();}
+    if(novo&&!EM_DEMO){var pre=ui.origLead||(lm?leadOrigPre(lm):null);ui.origLead=null;setTimeout(function(){festaCliente(id,pre);},350);}
   },
   precos:function(fd,f){
     if(!guard())return;var cid=f.dataset.id;
