@@ -32,7 +32,7 @@ Deno.serve(async (req: Request) => {
   const slug = String(body?.u ?? "").toLowerCase();
   if (!SLUG.test(slug)) return json(404, { erro: "Página não encontrada." });
   const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  const { data: pg } = await admin.from("captura_paginas").select("user_id,ativo,titulo,msg,wa").eq("slug", slug).maybeSingle();
+  const { data: pg } = await admin.from("captura_paginas").select("user_id,ativo,titulo,msg,wa,pixel").eq("slug", slug).maybeSingle();
   if (!pg || !pg.ativo) return json(404, { erro: "Esta página não está disponível." });
   const { data: perfil } = await admin.from("perfis").select("nome,telefone,cidade,uf").eq("user_id", pg.user_id).maybeSingle();
   const tel = telNorm(pg.wa) || telNorm(perfil?.telefone); // número próprio da página, se houver
@@ -40,7 +40,7 @@ Deno.serve(async (req: Request) => {
   const primeiro = nome.split(" ")[0] || "";
 
   if (body.acao === "info") {
-    return json(200, { nome: primeiro, nomeCompleto: nome, titulo: pg.titulo ?? "", cidade: [perfil?.cidade, perfil?.uf].filter(Boolean).join("/"), temWhats: !!tel });
+    return json(200, { nome: primeiro, nomeCompleto: nome, titulo: pg.titulo ?? "", cidade: [perfil?.cidade, perfil?.uf].filter(Boolean).join("/"), temWhats: !!tel, pixel: pg.pixel ?? "" });
   }
 
   if (body.acao === "enviar") {

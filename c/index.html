@@ -142,7 +142,7 @@ function falha(m){$('carregando').hidden=true;$('pg').hidden=true;$('erro-pg').h
 var TIPO={dentista:'dentista',protetico:'protético/laboratório',outro:''};
 function cap(s){return String(s||'').replace(/(^|\s)\S/g,function(c){return c.toUpperCase();});}
 if(!U)falha('Link incompleto.');
-else api({acao:'info'}).then(function(j){INFO=j;$('carregando').hidden=true;$('pg').hidden=false;
+else api({acao:'info'}).then(function(j){INFO=j;if(j.pixel&&/^\d{10,20}$/.test(j.pixel)&&!window.IDEALI_PIXEL_ID){window.IDEALI_PIXEL_ID=j.pixel;var px=document.createElement('script');px.src='/pixel.js';document.body.appendChild(px);}$('carregando').hidden=true;$('pg').hidden=false;
   var n=j.nome||'';if(n){$('av').textContent=n.charAt(0).toUpperCase();$('marca-n').textContent=n+' · Equipe de cadistas';}
   if(j.titulo){$('tit').textContent=j.titulo;document.title=j.titulo;}
   if(j.cidade){var p=document.createElement('span');p.textContent=' Atendimento digital a partir de '+cap(j.cidade)+'.';$('lead').appendChild(p);}
@@ -161,6 +161,7 @@ $('f').addEventListener('submit',function(e){e.preventDefault();var f=e.target,e
     var txt=(j.msg&&j.msg.trim())?j.msg.replace(/\{nome\}/g,d.nome.split(' ')[0]):('Olá'+(cad?' '+cad:'')+'! Sou '+d.nome+(tp?', '+tp:'')+(d.cidade?', de '+d.cidade:'')+'. Vim pelo anúncio e quero saber mais sobre o trabalho de vocês.');
     var link=j.wa?'https://wa.me/'+j.wa+'?text='+encodeURIComponent(txt):'';
     $('f').hidden=true;$('fim').hidden=false;
+    try{window.idealiEvento&&window.idealiEvento('Lead');}catch(x){}
     if(link){$('fim-a').href=link;setTimeout(function(){location.href=link;},900);}else{$('fim-a').hidden=true;$('fim-t').textContent='Recebemos o seu contato. A nossa equipe vai te chamar no WhatsApp em breve.';}
   }).catch(function(e2){err.textContent=e2.message;err.hidden=false;$('bt').disabled=false;$('bt').querySelector('span').textContent='Quero falar com a equipe';});});
 </script>
