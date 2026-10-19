@@ -1666,7 +1666,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 23h45';
+var VERSAO='19/10 · 07h15';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -5061,11 +5061,11 @@ function rAdmin0(){
 
 /* Boas-vindas aos novos cadistas (admin): a Ana sugere a próxima mensagem e o admin envia pelo WhatsApp. */
 var BV_SEQ=[
-  {k:'bv',n:'Boas-vindas',t:'{oi}, {nome}! Aqui é a equipe do Ideali CAD. Seja muito bem-vindo(a)! {teste}Para começar com o pé direito, veja em 2 minutos como o sistema funciona: https://idealisystems.com/tour.html Qualquer dúvida, é só responder esta mensagem.'},
+  {k:'bv',n:'Boas-vindas',t:'{oi}, {nome}! Aqui é a equipe do Ideali CAD. Seja muito bem-vindo(a)! Para começar com o pé direito, veja em 2 minutos como o sistema funciona: https://idealisystems.com/tour.html Qualquer dúvida, é só responder esta mensagem.'},
   {k:'link',n:'Link do sistema',t:'{nome}, aqui está o link do sistema para salvar nos favoritos: https://idealisystems.com/app/ No celular, abra o link e toque em "Adicionar à tela inicial" para usar como aplicativo.'},
   {k:'p1',n:'Primeiro pedido',t:'{oi}, {nome}! Conseguiu lançar o seu primeiro pedido no Ideali CAD? É só clicar em "+ Novo pedido", escolher o cliente e os dentes. Se preferir, te mostro numa chamada rápida de 10 minutos. Qual o melhor horário para você?'},
   {k:'duv',n:'Dúvidas',t:'{oi}, {nome}! Como está sendo usar o Ideali CAD? Ficou alguma dúvida ou tem algo que você sente falta? A sua opinião ajuda muito a melhorar o sistema.'},
-  {k:'fim',n:'Teste acabando',t:'{oi}, {nome}! Seu teste grátis do Ideali CAD termina em {fim}. Para continuar com seus pedidos, clientes e arquivos, é só me responder aqui que eu te passo as opções de plano.'}];
+  {k:'fim',n:'Plano completo',t:'{oi}, {nome}! Como está sendo usar o Ideali CAD? Se quiser, te mostro o que o plano completo libera para o seu dia a dia. É só me responder aqui.'}];
 function bvEnv(){S.prefs=S.prefs||{};if(!S.prefs.bvEnv||typeof S.prefs.bvEnv!=='object')S.prefs.bvEnv={};return S.prefs.bvEnv;}
 function bvDias(a){return a.cadastro?Math.floor((Date.now()-new Date(a.cadastro).getTime())/864e5):999;}
 function bvProx(a){if(a.admin)return null;var e=bvEnv()[a.user_id]||{},d=bvDias(a),ped=+((a.m&&a.m.pedidos_total)||0),st=sitAss(a);
@@ -5081,7 +5081,7 @@ function bvFill(t,a){var nome=String(a.nome||'').trim().split(/\s+/)[0]||'tudo b
 function admBoas(){var L=(ui.admLista||[]).map(function(a){return {a:a,k:bvProx(a)};}).filter(function(x){return x.k;});
   L.sort(function(x,y){return String(y.a.cadastro||'').localeCompare(String(x.a.cadastro||''));});
   var nome=function(k){return BV_SEQ.filter(function(q){return q.k===k;})[0].n;};
-  return '<section class="card stack" style="margin-bottom:16px"><div class="row" style="gap:12px;align-items:center"><img src="equipe/ana-av-feliz.webp" alt="" width="48" height="48" style="border-radius:50%;flex:none"><div><h2 style="margin:0">👋 Boas-vindas aos novos cadistas</h2><p class="small muted" style="margin:4px 0 0">A Ana separa quem se cadastrou e sugere a mensagem certa: boas-vindas com o passo a passo, primeiro pedido, dúvidas e fim do teste. Você revisa e envia pelo WhatsApp.</p></div></div>'+
+  return '<section class="card stack" style="margin-bottom:16px"><div class="row" style="gap:12px;align-items:center"><img src="equipe/ana-av-feliz.webp" alt="" width="48" height="48" style="border-radius:50%;flex:none"><div><h2 style="margin:0">👋 Boas-vindas aos novos cadistas</h2><p class="small muted" style="margin:4px 0 0">A Ana separa quem se cadastrou e sugere a mensagem certa: boas-vindas com o passo a passo, primeiro pedido, dúvidas e plano completo. Você revisa e envia pelo WhatsApp.</p></div></div>'+
     (L.length?'<div class="stack" style="gap:8px">'+L.map(function(x){var a=x.a;return '<div class="between wrap" style="gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px"><div><b>'+esc(a.nome||a.email||'(sem nome)')+'</b> <span class="muted small">· cadastrou '+relTempo(a.cadastro)+' · '+((a.m&&+a.m.pedidos_total)||0)+' pedido(s)</span><br><span class="small">Sugestão da Ana: <b>'+nome(x.k)+'</b></span></div><button class="btn pri sm" data-a="bvAbre" data-id="'+a.user_id+'" data-k="'+x.k+'">Escrever</button></div>';}).join('')+'</div>'
       :'<p class="small muted" style="margin:0">Tudo em dia: nenhum cadastro novo esperando mensagem.</p>')+'</section>';}
 function fBv(uidAlvo){var a=(ui.admLista||[]).filter(function(x){return x.user_id===uidAlvo;})[0];if(!a)return head('Mensagem')+'<p class="empty">Não encontrado.</p>';
