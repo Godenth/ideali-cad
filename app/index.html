@@ -1666,13 +1666,13 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='18/10 · 20h35';
+var VERSAO='18/10 · 23h45';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
-function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAplica)decoAplica();},0);
+function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAplica)decoAplica();},0);if(ui.tab!=='secretarios')ui.secRolado=null;
   var app=document.getElementById('app');document.body.classList.toggle('sem-anim',animOff());document.body.classList.toggle('na-conversa',ui.tab==='secretarios');setTimeout(rdDock,0);
   if(!S.sessao){app.innerHTML=rLogin();return;}
   if(S.carregando){app.innerHTML=rCarregando();return;}
@@ -3443,7 +3443,8 @@ function rSala(){var v=salaAtual(),anim=ui.salaAnim;ui.salaAnim=0;var G=function
   return '<div class="zap-c sala"><div class="zap-ch"><button class="icon-btn voltar" data-a="secChat" data-v="" aria-label="Voltar para a lista">‹</button>'+salaRostos()+'<span class="tx"><b>Sala de reunião</b><span>Ana, Bia, Mika, Klose e o Sr. Otávio decidem juntos o que fazer hoje</span></span></div>'+
     '<div class="zap-b" id="zap-b"><span class="zdia">Hoje · '+dmy(today()).slice(0,5)+'</span>'+corpo+'</div></div>';}
 
-function rSecretarios(){iaGaranta();if(ui.secRolado!==(ui.secAg||'_')){ui.secRolado=ui.secAg||'_';setTimeout(function(){var b=document.getElementById('zap-b');if(b)b.scrollTop=b.scrollHeight;},30);}var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth>820){var pr=C.filter(function(x){return x.urg;})[0]||C.filter(function(x){return x.nl;})[0]||C[0];sel=pr.g.id;}var c=C.filter(function(x){return x.g.id===sel;})[0];
+function secFim(){[30,250,700].forEach(function(t){setTimeout(function(){var b=document.getElementById('zap-b');if(b)b.scrollTop=b.scrollHeight;},t);});}
+function rSecretarios(){iaGaranta();if(ui.secRolado!==(ui.secAg||'_')){ui.secRolado=ui.secAg||'_';secFim();}var C=secChats(),sel=ui.secAg;if(!sel&&window.innerWidth>820){var pr=C.filter(function(x){return x.urg;})[0]||C.filter(function(x){return x.nl;})[0]||C[0];sel=pr.g.id;}var c=C.filter(function(x){return x.g.id===sel;})[0];
   if(sel==='reu')return '<div class="zap aberto"><div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+linhaSala(true)+C.map(function(x){return linhaChat(x,false);}).join('')+vagasHtml()+'</div>'+rSala()+'</div>';
   if(c)setTimeout(function(){secMarca(c.ms.map(function(m){return m.k;}));ui.secCharVisto=c.g.id;},0);
   var lista='<div class="zap-l"><div class="zap-lh"><h2>Agentes de IA</h2><p class="small muted">Um agente para cada área do seu negócio. Eles analisam seus dados todo dia, avisam aqui e fazem as tarefas por você.</p></div>'+(libOk('sala')?linhaSala(false):'')+C.map(function(x){return linhaChat(x,x.g.id===sel);}).join('')+vagasHtml()+'</div>';
@@ -6014,7 +6015,7 @@ impGrava:function(){impGrava();},
     var k=d.x?cliente(d.x):null;iaEu(g,k?(d.sala?cmdNome(g,d.v)+' · ':'')+nomeCurtoCli(k):cmdNome(g,d.v));iaCmd(g,d.v,d.x||null);},
   iaRel:function(d,el){var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraRelGeral(d.v).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
   salaTenta:function(){ui.salaErro=0;render();},
-  secChat:function(d){ui.tab='secretarios';ui.secAg=d.v||null;ui.drawer=false;closeSheet();render();var b=document.getElementById('zap-b');if(b)b.scrollTop=b.scrollHeight;},
+  secChat:function(d){ui.tab='secretarios';ui.secAg=d.v||null;ui.drawer=false;closeSheet();ui.secRolado=null;render();},
   secAuto:function(d,el){S.prefs=S.prefs||{};S.prefs.secAuto=el&&el.checked?null:false;save();toast(el&&el.checked?'Os agentes de IA vão aparecer 1 vez por dia ao entrar.':'Ok, os recados ficam só na aba Agentes IA.');},
   lembFora:function(d){try{localStorage.setItem('idealicad_lemb_'+d.k,'1');}catch(e){}render();},
   labModo:function(d){ui.modoLab=d.v==='1';ui.ddOpen=null;closeSheet();if(ui.modoLab){labIni().filtro='abertos';}render();window.scrollTo(0,0);},
