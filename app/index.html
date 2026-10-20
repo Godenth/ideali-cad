@@ -1666,7 +1666,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='19/10 · 22h35';
+var VERSAO='19/10 · 22h40';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -5707,7 +5707,10 @@ function waArqsPrepara(pid,tipo){if(!podeCompartilharArq())return;ui.waArqs=ui.w
   Promise.all(L.map(function(a){return waArqFileDe(a);})).then(function(fs){var tudo=[].concat.apply([],fs);ui.waArqs[k]={st:'ok',files:tudo};},function(){ui.waArqs[k]={st:'erro'};});}
 /* No computador o link do WhatsApp não leva arquivo: baixa o(s) arquivo(s) do caso para arrastar na conversa. */
 function waBaixaArqs(pid,tipo){if(/Android|iPhone|iPad/i.test(navigator.userAgent))return false;var L=alive(S.arquivos).filter(function(x){return x.pedidoId===pid&&x.origem!=='link'&&catArq(x)===tipo;});if(!L.length)return false;
-  L.forEach(function(a){waArqFileDe(a).then(function(fs){fs.forEach(function(f,i){setTimeout(function(){var u=URL.createObjectURL(f),l=document.createElement('a');l.href=u;l.download=f.name||a.nome;document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u);},30000);},i*400);});},function(){toast('Não consegui baixar o arquivo. Use o botão de baixar ao lado do nome.');});});return true;}
+  L.forEach(function(a,i){setTimeout(function(){
+    if(blobs.has(a.id)){var u=URL.createObjectURL(blobs.get(a.id)),l=document.createElement('a');l.href=u;l.download=a.nome;document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u);},30000);return;}
+    fnArq('baixar',{arquivo_id:a.id,salvar:true}).then(function(r){var f=document.createElement('iframe');f.style.display='none';f.src=r.url;document.body.appendChild(f);setTimeout(function(){f.remove();},60000);})
+      .catch(function(e){toast('Não consegui baixar o arquivo: '+((e&&e.message)||'erro')+'. Use o botão ⤓ ao lado do nome.',7000);});},i*600);});return true;}
 function waArqFileDe(a){return vzBlob(a.id).then(function(bl){return bl.slice(0,2).text().then(function(h){if(h!=='PK'||!window.JSZip)return [new File([bl],a.nome)];
   return JSZip.loadAsync(bl).then(function(z){var ns=Object.keys(z.files).filter(function(n){return !z.files[n].dir;});if(!ns.length||ns.length>10)return [new File([bl],a.nome,{type:'application/zip'})];
     return Promise.all(ns.map(function(n){return z.files[n].async('blob').then(function(b){return new File([b],n.split('/').pop(),{type:/\.html?$/i.test(n)?'text/html':'application/octet-stream'});});}));});});});}
