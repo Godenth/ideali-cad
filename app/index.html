@@ -1668,7 +1668,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='19/10 · 23h30';
+var VERSAO='19/10 · 23h50';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -5213,7 +5213,7 @@ function ppDataDe(tx){var t=ppNorm(tx),hj=today(),m;
   m=t.match(/(?:em|ate|prazo\s+de)\s+(\d{1,2})\s+dias?/);if(m&&+m[1]<=30)return addDays(hj,+m[1]);
   return '';}
 function ppTipo(t){var T=alive(S.tipos||[]).filter(function(x){return x.ativo!==false;}),acha=function(re){return T.filter(function(x){return re.test(ppNorm(x.nome));})[0]||null;};
-  var imp=/implante|parafus|munhao|mua\b|tibase|ti-base|scanbody|scan body/.test(t);
+  var imp=/implante|parafus|munhao|mua\b|t-?base|ti-?base|t\s+base|scanbody|scan body/.test(t);
   if(/protocolo/.test(t))return acha(/protocolo/);
   if(/placa|bruxismo|miorrelax/.test(t))return acha(/placa/);
   if(/faceta|lente\s+de\s+contato/.test(t))return acha(/faceta/);
@@ -5223,15 +5223,18 @@ function ppTipo(t){var T=alive(S.tipos||[]).filter(function(x){return x.ativo!==
   if(/modelo/.test(t)&&!/coroa/.test(t))return acha(/modelo/);
   if(/coroa|copping|copi|elemento|unitari|ponte|fixa/.test(t)||imp)return imp?(acha(/coroa sobre implante|sobre implante/)||acha(/coroa/)):(acha(/coroa sobre dente|sobre dente/)||acha(/coroa/));
   return null;}
-function ppCliente(tx){var t=ppNorm(tx),dg=String(tx).replace(/\D/g,''),best=null,bs=0;
-  alive(S.clientes).forEach(function(c){var sc=0,tel=soDig(c.telefone||'');if(tel.length>=10&&dg.indexOf(tel.slice(-8))>=0)sc=100;
-    var nomes=[c.nome,[c.pnome,c.sobrenome].filter(Boolean).join(' '),c.empresa].filter(Boolean).map(ppNorm).map(function(x){return x.replace(/^(dra?|lab|clinica)\.?\s+/,'').trim();});
-    nomes.forEach(function(n){if(n.length>=4&&t.indexOf(n)>=0)sc=Math.max(sc,40+n.length);});
-    if(sc>bs){bs=sc;best=c;}});
-  return best;}
+function ppClientes(tx){var t=ppNorm(tx),dg=String(tx).replace(/\D/g,''),L=[];
+  alive(S.clientes).forEach(function(c){var sc=0,tel=soDig(c.telefone||'');if(tel.length>=10&&dg.indexOf(tel.slice(-8))>=0)sc=1000;
+    var nomes=[c.nome,[c.pnome,c.sobrenome].filter(Boolean).join(' '),c.empresa].filter(Boolean).map(ppNorm).map(function(x){return x.replace(/^(dra?|lab|clinica)\.?\s+/,'').replace(/&/g,'e').trim();});
+    var tt=t.replace(/&/g,'e');nomes.forEach(function(n){if(n.length<4)return;var k=tt.split(n).length-1;if(k)sc=Math.max(sc,k*100+n.length);});
+    if(sc)L.push({c:c,sc:sc});});
+  return L.sort(function(a,b){return b.sc-a.sc;});}
+/* Cliente: quem aparece mais vezes (topo da conversa + citações). Empate = não chuta: mostra as opções. */
+function ppCliente(tx){var L=ppClientes(tx);if(!L.length)return null;if(L.length>1&&Math.floor(L[0].sc/100)===Math.floor(L[1].sc/100)&&L[0].sc<1000)return null;return L[0].c;}
 function pedDoTexto(tx){var raw=String(tx||''),t=ppNorm(raw);
   var limpo=t.replace(/\+?\d[\d\s().-]{8,}\d/g,' ').replace(/\b\d{1,2}:\d{2}\b/g,' ').replace(/\b\d{1,2}\s*\/\s*\d{1,2}(\s*\/\s*\d{2,4})?\b/g,' ').replace(/\b\d+\s*(mb|kb|gb|%)\b/g,' ');
-  var dentes=[],re=/\b([1-4][1-8])\b/g,m;while((m=re.exec(limpo))){var n=+m[1];if(dentes.indexOf(n)<0)dentes.push(n);}
+  var KW=/coroa|faceta|onlay|inlay|overlay|placa|protocolo|provisori|enceramento|elemento|dente|implante|t-?base|ti-?base|pontico|ponte|copping|unitari/,kl=limpo.split(/\n/).filter(function(l){return KW.test(l);}),fonte=kl.length?kl.join('\n'):limpo;
+  var dentes=[],re=/\b([1-4][1-8])\b/g,m;while((m=re.exec(fonte))){var n=+m[1];if(dentes.indexOf(n)<0)dentes.push(n);}
   var arcada=/protocolo|placa/.test(t);if(arcada&&!dentes.length){if(/superior/.test(t))dentes=UP.slice();else if(/inferior/.test(t))dentes=LO.slice();}
   var tp=ppTipo(t),c=ppCliente(raw);
   var pm=raw.match(/(?:paciente|pacient|pac\.?)\s*[:\-]?\s*([A-Za-zÀ-ú]+(?:\s+[A-Za-zÀ-ú]+){0,4})/i),pac='';
@@ -5239,9 +5242,33 @@ function pedDoTexto(tx){var raw=String(tx||''),t=ppNorm(raw);
     pm[1].split(/\s+/).some(function(w){if(PARA.test(w)&&ws.length)return true;if(!PARA.test(w))ws.push(w);return ws.length>=3;});pac=pacIniciais(ws.join(' '));}
   var cor=(raw.match(/\b(?:cor\s*)?((?:A|B|C|D)[1-4](?:[.,]5)?|BL\s?[1-4])\b/)||[])[1]||'';
   var mat=/zirconi/.test(t)?'Zircônia':/dissilicato|e\.?max/.test(t)?'Dissilicato de lítio':/pmma/.test(t)?'PMMA':/impress[a-z]*\s*3d|resina\s*3d/.test(t)?'Impressão 3D':'';
-  var marca=(raw.match(/\b(Neodent|Straumann|Nobel|SIN|Conexão|Conexao|Implacil|Titanium Fix|Bionnovation|Dentoflex|Kopp|Osstem|Megagen)\b/i)||[])[1]||'';
-  var con=(raw.match(/\b(cone\s*morse|hexagono\s*externo|hexágono\s*externo|hex\s*externo|hexagono\s*interno|hexágono\s*interno|hex\s*interno|HE\b|HI\b|CM\b|munh[aã]o\s*universal|mini\s*pilar)\b/i)||[])[1]||'';
-  return {cli:c,dentes:dentes,tipo:tp,pac:pac,prazo:ppDataDe(raw),cor:cor,mat:mat,urg:/urgent|correndo|pra\s+hoje|para\s+hoje/.test(t),imp:/implante|parafus|munhao|tibase|ti-base|scanbody|scan body/.test(t)&&!(tp&&/faceta|placa|protocolo|onlay|inlay/.test(ppNorm(tp.nome))),marca:marca,con:con,scan:/\.(stl|ply|obj|zip)\b|wetransfer|drive\.google|dropbox|medit|3shape|itero/.test(t)};}
+  var marca=(raw.match(/\b(Neodent|Straumann|Nobel|SIN|Conexão|Conexao|Implacil|Titanium Fix|Bionnovation|Dentoflex|Kopp|Osstem|Megagen|Eff\s*Dental|EFF|Systhex|Singular|Emfils|Biomet|Zimmer|Dentsply|Ankylos|Intraoss|Plenum)\b/i)||[])[1]||'';
+  var con=(raw.match(/\b(he\s*\d[.,]\d|hi\s*\d[.,]\d|cm\s*\d[.,]\d|cone\s*morse|hexagono\s*externo|hexágono\s*externo|hex\s*externo|hexagono\s*interno|hexágono\s*interno|hex\s*interno|HE\b|HI\b|CM\b|munh[aã]o\s*universal|mini\s*pilar)\b/i)||[])[1]||'';
+  return {cli:c,dentes:dentes,tipo:tp,pac:pac,prazo:ppDataDe(raw),cor:cor,mat:mat,urg:/urgent|correndo|pra\s+hoje|para\s+hoje/.test(t),imp:/implante|parafus|munhao|t-?base|ti-?base|t\s+base|scanbody|scan body/.test(t)&&!(tp&&/faceta|placa|protocolo|onlay|inlay/.test(ppNorm(tp.nome))),marca:marca,con:con,scan:/\.(stl|ply|obj|zip)\b|wetransfer|drive\.google|dropbox|medit|3shape|itero/.test(t)};}
+var PP_ARQ=/(\d{8})\s*[-–]\s*(\d{6})\s*[-–]\s*([A-Za-zÀ-ú][A-Za-zÀ-ú .'-]{1,60}?)\s*\.\s*(rar|zip|7z|stl|ply|obj|dcm)\b/i;
+function ppCasos(txt){var ls=String(txt||'').split(/\n/).map(function(l){return l.trim();}).filter(Boolean),arqs=[],ords=[],porNome={},EXT=/([A-Za-zÀ-ú]+)\s*\.\s*(rar|zip|7z|stl|ply|obj|dcm)\b/i;
+  var KW=/coroa|faceta|onlay|inlay|overlay|placa|protocolo|provisori|enceramento|elemento|dente|implante|t-?base|ti-?base|pontico|ponte|copping|unitari/;
+  var limpaNm=function(x){return String(x||'').replace(/[^A-Za-zÀ-ú\s'-]/g,' ').replace(/\s+/g,' ').trim();};
+  ls.forEach(function(l,i){var m=l.match(/(\d{8})\s*[-–]\s*(\d{6})\s*[-–]\s*(.+)$/);
+    if(m){var resto=m[3],e=resto.match(/^(.*?)\s*\.\s*(rar|zip|7z|stl|ply|obj|dcm)\b/i),nm;
+      if(e)nm=limpaNm(e[1]);else{var e2=(ls[i+1]||'').match(EXT);nm=limpaNm(resto)+(e2?' '+e2[1]:'');}
+      nm=nm.split(' ').slice(0,5).join(' ');var k=ppNorm(nm);if(nm.length<2)return;
+      if(porNome[k])porNome[k].cit.push(i);else{porNome[k]={i:i,nome:nm,ords:[],cit:[]};arqs.push(porNome[k]);}return;}
+    var n=ppNorm(l).replace(/\b\d{1,2}:\d{2}\b/g,' ');if(KW.test(n)&&(/\b[1-4][1-8]\b/.test(n)||/protocolo|placa/.test(n)))ords.push({i:i,t:l});});
+  if(!arqs.length)return null;
+  var linhasArq=[];arqs.forEach(function(a){[a.i].concat(a.cit).forEach(function(ai){linhasArq.push({i:ai,a:a});});});
+  ords.forEach(function(o){
+    var acima=linhasArq.filter(function(x){return x.i<o.i&&o.i-x.i<=1;})[0];           /* resposta citando o arquivo logo acima */
+    var abaixo=linhasArq.filter(function(x){return x.i>o.i&&x.i-o.i<=5;}).sort(function(x,y){return x.i-y.i;})[0]; /* descrição e arquivo logo depois */
+    var antes=linhasArq.filter(function(x){return x.i<o.i&&o.i-x.i<=8;}).sort(function(x,y){return y.i-x.i;})[0];
+    var alvo=acima||abaixo||antes;if(alvo)alvo.a.ords.push(o.t);else o.solto=1;});
+  var cli=ppCliente(txt),casos=[],rescans=[];
+  arqs.forEach(function(a){var nN=ppNorm(a.nome),iN=pacIniciais(a.nome);
+    if(a.ords.length){var r=pedDoTexto(a.ords.join('\n'));r.cli=cli;r.pac=iN;r.scan=true;r.arq=a.nome;casos.push(r);return;}
+    var ex=alive(S.pedidos).filter(function(p){if(p.status==='arquivado')return false;var pn=ppNorm(p.paciente||'');if(!pn)return false;var w1=pn.split(' ')[0];return pn===nN||nN.indexOf(pn)>=0||pn.indexOf(nN)>=0||(w1.length>=4&&nN.indexOf(w1)>=0&&(!cli||p.clienteId===cli.id))||(pacIniciais(p.paciente)===iN&&cli&&p.clienteId===cli.id);}).sort(function(x,y){return (y.recebido||'').localeCompare(x.recebido||'');})[0];
+    rescans.push({nome:a.nome,ini:iN,ped:ex||null});});
+  ords.filter(function(o){return o.solto;}).forEach(function(o){var r=pedDoTexto(o.t);r.cli=cli;casos.push(r);});
+  return {cli:cli,cands:ppClientes(txt).slice(0,4).map(function(x){return x.c;}),casos:casos,rescans:rescans};}
 function ppAbrePedido(r){ui.ppImp=null;closeSheet();ui.pdRede=false;ui.pdInit=false;
   ui.pdItens=r.dentes.map(function(d){return {d:d,t:r.tipo?r.tipo.id:'',imp:!!r.imp,m:r.imp?r.marca:'',c:r.imp?r.con:''};});ui.pdExtras=[];ui.pdEd=null;
   var obs=[r.cor?'Cor '+r.cor:'',r.scan?'Escaneamento enviado no WhatsApp':''].filter(Boolean).join(' · ');
@@ -5254,6 +5281,12 @@ function ppResumo(r){var ok=[],falta=[];
   return {ok:ok,falta:falta};}
 function fPrintPed(){var I=ui.ppImp||{};
   var topo='<div class="row" style="gap:12px;align-items:center"><img src="equipe/ana-av'+(I.st==='lendo'?'-pensativa':'')+'.webp" alt="" width="44" height="44" style="border-radius:50%;flex:none"><p class="small muted" style="margin:0">';
+  if(I.st==='lista'){var M=I.M,cid=ui.ppCli||(M.cli&&M.cli.id)||'';
+    var selCli='<label class="fld"><span>Cliente desta conversa</span><select id="pp-cli"><option value="">Escolha…</option>'+alive(S.clientes).sort(function(a,b){return a.nome.localeCompare(b.nome);}).map(function(c){return '<option value="'+c.id+'"'+(c.id===cid?' selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select>'+(!cid&&M.cands.length?'<small>Vi no print: '+esc(M.cands.map(function(c){return c.nome;}).join(', '))+'. Confira qual é a conversa.</small>':'')+'</label>';
+    return head('Pedido pelo print')+topo+'Achei <b>'+plural(M.casos.length,'pedido novo','pedidos novos')+'</b>'+(M.rescans.length?' e <b>'+plural(M.rescans.length,'escaneamento novo','escaneamentos novos')+'</b> de pedido que já existe':'')+'. Crie um de cada vez.</p></div>'+selCli+
+      '<div class="stack" style="gap:8px">'+M.casos.map(function(r,i){var R=ppResumo(r);return '<div class="between wrap" style="gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px"><div><b>Pedido '+(i+1)+(r.pac?' · '+esc(r.pac):'')+'</b><br><span class="small muted">'+esc(R.ok.filter(function(x){return !/^cliente/.test(x);}).join(' · ')||'confira os dados')+(r.arq?' · arquivo '+esc(r.arq):'')+'</span></div>'+(I.feito['c'+i]?'<span class="tag ok">aberto ✓</span> ':'')+'<button class="btn sm pri" data-a="ppCaso" data-i="'+i+'">'+(I.feito['c'+i]?'Abrir de novo':'Criar este pedido')+'</button></div>';}).join('')+
+      M.rescans.map(function(x,i){return '<div class="between wrap" style="gap:8px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px"><div><b>Novo escaneamento · '+esc(x.ini)+'</b><br><span class="small muted">'+(x.ped?'É do pedido #'+x.ped.num+' ('+esc(stLabel(x.ped.status))+'). Baixe o arquivo no WhatsApp e anexe nele.':'Não achei pedido com esse paciente. Se for caso novo, crie o pedido.')+'</span></div>'+(x.ped?'<button class="btn sm" data-a="ppVerPed" data-id="'+x.ped.id+'">Abrir pedido #'+x.ped.num+'</button>':'<button class="btn sm" data-a="ppResc" data-i="'+i+'">Criar pedido</button>')+'</div>';}).join('')+'</div>'+
+      '<button class="btn sm" data-a="ppAbreNovo">Ler outro print</button>';}
   if(I.st==='lendo')return head('Pedido pelo print')+topo+'Lendo o print… <b id="pp-prog">'+esc(I.msg||'')+'</b></p></div>'+(I.prev?'<img src="'+I.prev+'" alt="" style="max-height:260px;max-width:100%;border-radius:12px;align-self:center">':'');
   return head('Pedido pelo print')+topo+'Cole aqui o <b>print da conversa</b> do WhatsApp (<b>Ctrl+V</b>) ou escolha a imagem. Eu leio e preencho o pedido para você conferir. O print é lido aqui no seu aparelho e não é guardado.</p></div>'+
     (I.st==='erro'?'<div class="banner"><span>'+esc(I.msg||'Não consegui ler.')+'</span></div>':'')+
@@ -5271,7 +5304,10 @@ async function ppLe(files){var fs=[].concat(files).filter(Boolean);if(!fs.length
     try{wk.terminate();}catch(x){}
     ppProcessa(txt);}
   catch(e){ui.ppImp={st:'erro',msg:'Não consegui ler o print: '+((e&&e.message)||e)+'. Tente colar o texto da conversa.'};if(ui.sheet&&ui.sheet.fn===fPrintPed)renderSheet();}}
-function ppProcessa(txt){var r=pedDoTexto(txt);if(!r.dentes.length&&!r.tipo&&!r.cli){ui.ppImp={st:'erro',msg:'Não achei informação de pedido nesse print. Confira se aparece o texto da mensagem (dentes, trabalho, paciente).'};if(ui.sheet&&ui.sheet.fn===fPrintPed)renderSheet();else openSheet(fPrintPed);return;}
+function ppProcessa(txt){var M=ppCasos(txt);
+  if(M&&(M.casos.length+M.rescans.length>1||M.rescans.length)){ui.ppImp={st:'lista',M:M,feito:{}};if(ui.sheet&&ui.sheet.fn===fPrintPed)renderSheet();else openSheet(fPrintPed);return;}
+  if(M&&M.casos.length===1){ppAbrePedido(M.casos[0]);return;}
+  var r=pedDoTexto(txt);if(!r.dentes.length&&!r.tipo&&!r.cli){ui.ppImp={st:'erro',msg:'Não achei informação de pedido nesse print. Confira se aparece o texto da mensagem (dentes, trabalho, paciente).'};if(ui.sheet&&ui.sheet.fn===fPrintPed)renderSheet();else openSheet(fPrintPed);return;}
   ppAbrePedido(r);}
 function fPedido(id,preCli){
   var p=id?byId(S.pedidos,id):null, cs=alive(S.clientes).sort(function(a,b){return a.nome.localeCompare(b.nome);});
@@ -6263,7 +6299,11 @@ impGrava:function(){impGrava();},
     .catch(function(e){ui.mfaNovo={erro:'Não foi possível iniciar: '+((e&&e.message)||e)};renderSheet();});},
   admRecarregar:function(){ui.admLista=null;ui.admErro=null;render();},
   buscaLimpa:function(){ui.busca='';var t=document.getElementById('busca-top');if(t)t.value='';render();},
-  ppAbre:function(){if(!guard())return;ui.ppImp=null;openSheet(fPrintPed);},
+  ppAbre:function(){if(!guard())return;if(!(ui.ppImp&&ui.ppImp.st==='lista'))ui.ppImp=null;openSheet(fPrintPed);},
+  ppAbreNovo:function(){ui.ppImp=null;ui.ppCli=null;renderSheet();},
+  ppCaso:function(d){var I=ui.ppImp;if(!I||!I.M)return;var r=I.M.casos[+d.i];if(!r)return;var cid=(document.getElementById('pp-cli')||{}).value||ui.ppCli||'';ui.ppCli=cid||null;r.cli=cid?cliente(cid):r.cli;I.feito['c'+d.i]=1;var keep=I;ppAbrePedido(r);ui.ppImp=keep;},
+  ppResc:function(d){var I=ui.ppImp;if(!I||!I.M)return;var x=I.M.rescans[+d.i],cid=(document.getElementById('pp-cli')||{}).value||'';var keep=I;ppAbrePedido({cli:cid?cliente(cid):I.M.cli,dentes:[],tipo:null,pac:x.ini,prazo:'',cor:'',mat:'',urg:false,imp:false,marca:'',con:'',scan:true});ui.ppImp=keep;},
+  ppVerPed:function(d){openSheet(fPedidoDet,d.id);},
   ppTexto:function(){var t=(document.getElementById('pp-txt')||{}).value||'';if(!t.trim()){toast('Cole o texto da conversa.');return;}ppProcessa(t);},
   admAbrir:function(d){openSheet(fAdmin,d.id);},
   bvAbre:function(d){ui.bv={id:d.id,k:d.k};openSheet(fBv,d.id);},
@@ -6621,7 +6661,7 @@ document.addEventListener('paste',function(e){var its=(e.clipboardData&&e.clipbo
   if(!(noPP||livre))return;var ae=document.activeElement;
   if(im){if(!noPP&&ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName))return;e.preventDefault();e.stopImmediatePropagation();ppLe(im.getAsFile());return;}
   if(noPP&&!(ae&&ae.id==='pp-txt')){var tx=e.clipboardData&&e.clipboardData.getData('text');if(tx&&tx.trim()){e.preventDefault();e.stopImmediatePropagation();ppProcessa(tx);}}},true);
-document.addEventListener('change',function(e){if(e.target&&e.target.id==='pp-file'){var fl=[].slice.call(e.target.files||[]);if(fl.length)ppLe(fl);return;}
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='pp-cli'){ui.ppCli=e.target.value||null;return;}if(e.target&&e.target.id==='pp-file'){var fl=[].slice.call(e.target.files||[]);if(fl.length)ppLe(fl);return;}
   if(e.target&&e.target.id==='ld-file'&&e.target.files&&e.target.files[0]){var f0=[].slice.call(e.target.files);e.target.value='';leadsLePrint(f0);return;}
   if(e.target&&e.target.classList&&e.target.classList.contains('ld-ok')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i].ok=e.target.checked;return;}
   if(e.target&&e.target.classList&&e.target.classList.contains('ld-in')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i][e.target.dataset.k]=e.target.value;}
