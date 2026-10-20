@@ -1668,7 +1668,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='19/10 · 23h05';
+var VERSAO='19/10 · 23h30';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3153,7 +3153,7 @@ async function iaPergunta(id,q,label,memo){var C=iaConvDe(id);C.push({r:'u',t:la
    As contas e as ações são do app (grátis e sem erro). A IA só escreve: conversa, reunião, mensagem e análise. */
 var CMDS={
   ger:[['reuniao','👥 Sala de reunião'],['resumo','📋 Resumo do dia'],['meta','🎯 Meta do mês'],['sugira','💡 O que faço hoje?'],['memoria','🧠 Memória da equipe']],
-  ven:[['relVendas','📄 Relatório de vendas'],['atrasados','⏰ Atrasados'],['semana','📅 Prazos da semana'],['relProd','🧾 Relatório p/ cliente']],
+  ven:[['printPed','📷 Pedido pelo print'],['relVendas','📄 Relatório de vendas'],['atrasados','⏰ Atrasados'],['semana','📅 Prazos da semana'],['relProd','🧾 Relatório p/ cliente']],
   fin:[['cobrar','💸 Gerar cobrança'],['devendo','📋 Quem está devendo'],['relFin','📄 Relatório financeiro'],['pagou','✅ Registrar pagamento']],
   mkt:[['colaLead','📋 Colar print de leads'],['leads','📱 Leads'],['plano','🎯 Reconquistar cliente'],['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post'],['memoria','🧠 Memória']],
   dad:[['relAn','📄 Relatório de análise'],['top','🏆 Melhores clientes'],['comport','🔎 Analisar um cliente'],['sugira','💡 O que melhorar?'],['memoria','🧠 Memória']]};
@@ -3320,6 +3320,7 @@ var IA_CMD={
   'mkt.plano':function(g,x){if(x){var s=cliStats(x);mikaPlano(x,s);return;}
     var sm=clisSumidos(),ja={},L=sm.map(function(o){ja[o.c.id]=1;return {c:o.c,s:o.s.padrao==='caindo'?'esfriou':'sumido '+quandoTxt(o.d).replace('há ','')};});
     cliRanking(365).forEach(function(o){if(!ja[o.c.id])L.push({c:o.c});});iaQuem(g,'plano','Qual cliente a gente vai reconquistar? 🎯',L,'Ainda não há clientes com pedidos.');},
+  'ven.printPed':function(g){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();A.ppAbre();},
   'mkt.colaLead':function(g){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();A.leadCola();},
   'mkt.leads':function(g){var n=leadsHoje().length;iaDiz(g,{t:(n?'Tenho '+plural(n,'lead para chamar','leads para chamar')+' hoje! 📲 ':'')+'É comigo sim! 💜 Cola aqui na conversa (Ctrl+V) a sua lista de números, do bloco de notas, de uma planilha ou de um PDF, ou o print dos contatos. Eu separo os números, você confere e eu salvo nos leads para a gente mandar as mensagens.',bts:[{a:'leadAbre',l:'📱 Abrir os leads',pri:1}]});A.leadAbre();},
   'mkt.sumidos':function(g){var L=clisSumidos();
@@ -3804,6 +3805,7 @@ function rPedidos(){
   var abertos=ps.filter(aberto),atr=abertos.filter(function(p){return atrasado(p);}).length,rec=soma(aReceber());
   var head_='<div class="between wrap"><div class="row wrap">'+
       '<input class="search so-cel" id="busca" type="search" autocomplete="off" placeholder="Buscar paciente, cliente, dente ou nº" value="'+esc(ui.busca)+'" style="width:min(280px,100%)">'+(ui.busca.trim()?'<span class="btn sm so-pc" style="cursor:default">🔎 '+esc(ui.busca.trim())+'</span><button class="btn sm pri" data-a="buscaLimpa" title="Limpar a busca e mostrar todos os pedidos">✕ Limpar busca</button>':'')+
+      '<button class="btn sm pri" data-a="ppAbre" title="Cole o print da conversa do WhatsApp e a Ana preenche o pedido">📷 Pedido pelo print</button>'+
       '<span class="btn sm" style="cursor:default">Atrasados '+atr+'</span>'+
       '<button class="btn sm" data-a="tab" data-v="financeiro">A receber '+brl(rec)+'</button></div>'+
       '<div class="row wrap"><button class="btn sm" data-a="relProd">Relatório PDF</button>'+dd('cliProd')+(ui.cliProd?'<button class="btn sm" data-a="limpaCliProd" aria-label="Mostrar todos os clientes">✕ Limpar</button>':'')+dd('filtro')+dd('vista')+'</div></div>';
@@ -5197,26 +5199,101 @@ function calcItens(cid,itens,extras,data){
   var f=faixaDe(totalMes(cid,prevMonth(monthOf(data||today())))),pct=f?f.pct:0;
   return {linhas:linhas,bruto:bruto,pct:pct,total:Math.round(bruto*(100-pct))/100};
 }
+
+/* ===== Pedido pelo print: a Ana lê o print (ou o texto) da conversa do WhatsApp e preenche o pedido.
+   O print é lido aqui no aparelho (Tesseract), nada é enviado para fora e a imagem não é guardada. ===== */
+function ppNorm(t){return String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();}
+var PP_SEM=['domingo','segunda','terca','quarta','quinta','sexta','sabado'];
+function ppDataDe(tx){var t=ppNorm(tx),hj=today(),m;
+  m=t.match(/(?:prazo|entrega|entregar|pra|para|ate|dia)\s*(?:o\s+dia\s+|dia\s+)?(\d{1,2})\s*\/\s*(\d{1,2})(?:\s*\/\s*(\d{2,4}))?/);
+  if(m){var d=+m[1],mo=+m[2],y=m[3]?(+m[3]<100?2000+ +m[3]:+m[3]):+hj.slice(0,4);if(d>=1&&d<=31&&mo>=1&&mo<=12){var iso=y+'-'+pad(mo)+'-'+pad(d);if(!m[3]&&iso<hj)iso=(y+1)+'-'+pad(mo)+'-'+pad(d);return iso;}}
+  if(/depois\s+de\s+amanha/.test(t))return addDays(hj,2);if(/\bamanha\b/.test(t))return addDays(hj,1);
+  m=t.match(/(?:prazo|entrega|pra|para|ate|na|no)\s+(?:a\s+|o\s+)?(segunda|terca|quarta|quinta|sexta|sabado|domingo)/);
+  if(m){var w=PP_SEM.indexOf(m[1]),cur=new Date(hj+'T12:00:00').getDay(),k=(w-cur+7)%7||7;return addDays(hj,k);}
+  m=t.match(/(?:em|ate|prazo\s+de)\s+(\d{1,2})\s+dias?/);if(m&&+m[1]<=30)return addDays(hj,+m[1]);
+  return '';}
+function ppTipo(t){var T=alive(S.tipos||[]).filter(function(x){return x.ativo!==false;}),acha=function(re){return T.filter(function(x){return re.test(ppNorm(x.nome));})[0]||null;};
+  var imp=/implante|parafus|munhao|mua\b|tibase|ti-base|scanbody|scan body/.test(t);
+  if(/protocolo/.test(t))return acha(/protocolo/);
+  if(/placa|bruxismo|miorrelax/.test(t))return acha(/placa/);
+  if(/faceta|lente\s+de\s+contato/.test(t))return acha(/faceta/);
+  if(/onlay|inlay|overlay/.test(t))return acha(/onlay|inlay/);
+  if(/enceramento|planejamento|mock/.test(t))return acha(/enceramento/);
+  if(/provisori/.test(t))return acha(/provisori/);
+  if(/modelo/.test(t)&&!/coroa/.test(t))return acha(/modelo/);
+  if(/coroa|copping|copi|elemento|unitari|ponte|fixa/.test(t)||imp)return imp?(acha(/coroa sobre implante|sobre implante/)||acha(/coroa/)):(acha(/coroa sobre dente|sobre dente/)||acha(/coroa/));
+  return null;}
+function ppCliente(tx){var t=ppNorm(tx),dg=String(tx).replace(/\D/g,''),best=null,bs=0;
+  alive(S.clientes).forEach(function(c){var sc=0,tel=soDig(c.telefone||'');if(tel.length>=10&&dg.indexOf(tel.slice(-8))>=0)sc=100;
+    var nomes=[c.nome,[c.pnome,c.sobrenome].filter(Boolean).join(' '),c.empresa].filter(Boolean).map(ppNorm).map(function(x){return x.replace(/^(dra?|lab|clinica)\.?\s+/,'').trim();});
+    nomes.forEach(function(n){if(n.length>=4&&t.indexOf(n)>=0)sc=Math.max(sc,40+n.length);});
+    if(sc>bs){bs=sc;best=c;}});
+  return best;}
+function pedDoTexto(tx){var raw=String(tx||''),t=ppNorm(raw);
+  var limpo=t.replace(/\+?\d[\d\s().-]{8,}\d/g,' ').replace(/\b\d{1,2}:\d{2}\b/g,' ').replace(/\b\d{1,2}\s*\/\s*\d{1,2}(\s*\/\s*\d{2,4})?\b/g,' ').replace(/\b\d+\s*(mb|kb|gb|%)\b/g,' ');
+  var dentes=[],re=/\b([1-4][1-8])\b/g,m;while((m=re.exec(limpo))){var n=+m[1];if(dentes.indexOf(n)<0)dentes.push(n);}
+  var arcada=/protocolo|placa/.test(t);if(arcada&&!dentes.length){if(/superior/.test(t))dentes=UP.slice();else if(/inferior/.test(t))dentes=LO.slice();}
+  var tp=ppTipo(t),c=ppCliente(raw);
+  var pm=raw.match(/(?:paciente|pacient|pac\.?)\s*[:\-]?\s*([A-Za-zÀ-ú]+(?:\s+[A-Za-zÀ-ú]+){0,4})/i),pac='';
+  if(pm){var PARA=/^(cor|coroa|coroas|dente|dentes|elemento|elementos|no|na|nos|nas|pra|para|com|faceta|facetas|placa|protocolo|implante|sobre|e|urgente|prazo|ate|até|segue|caso|zirconia|zircônia|o|a)$/i,ws=[];
+    pm[1].split(/\s+/).some(function(w){if(PARA.test(w)&&ws.length)return true;if(!PARA.test(w))ws.push(w);return ws.length>=3;});pac=pacIniciais(ws.join(' '));}
+  var cor=(raw.match(/\b(?:cor\s*)?((?:A|B|C|D)[1-4](?:[.,]5)?|BL\s?[1-4])\b/)||[])[1]||'';
+  var mat=/zirconi/.test(t)?'Zircônia':/dissilicato|e\.?max/.test(t)?'Dissilicato de lítio':/pmma/.test(t)?'PMMA':/impress[a-z]*\s*3d|resina\s*3d/.test(t)?'Impressão 3D':'';
+  var marca=(raw.match(/\b(Neodent|Straumann|Nobel|SIN|Conexão|Conexao|Implacil|Titanium Fix|Bionnovation|Dentoflex|Kopp|Osstem|Megagen)\b/i)||[])[1]||'';
+  var con=(raw.match(/\b(cone\s*morse|hexagono\s*externo|hexágono\s*externo|hex\s*externo|hexagono\s*interno|hexágono\s*interno|hex\s*interno|HE\b|HI\b|CM\b|munh[aã]o\s*universal|mini\s*pilar)\b/i)||[])[1]||'';
+  return {cli:c,dentes:dentes,tipo:tp,pac:pac,prazo:ppDataDe(raw),cor:cor,mat:mat,urg:/urgent|correndo|pra\s+hoje|para\s+hoje/.test(t),imp:/implante|parafus|munhao|tibase|ti-base|scanbody|scan body/.test(t)&&!(tp&&/faceta|placa|protocolo|onlay|inlay/.test(ppNorm(tp.nome))),marca:marca,con:con,scan:/\.(stl|ply|obj|zip)\b|wetransfer|drive\.google|dropbox|medit|3shape|itero/.test(t)};}
+function ppAbrePedido(r){ui.ppImp=null;closeSheet();ui.pdRede=false;ui.pdInit=false;
+  ui.pdItens=r.dentes.map(function(d){return {d:d,t:r.tipo?r.tipo.id:'',imp:!!r.imp,m:r.imp?r.marca:'',c:r.imp?r.con:''};});ui.pdExtras=[];ui.pdEd=null;
+  var obs=[r.cor?'Cor '+r.cor:'',r.scan?'Escaneamento enviado no WhatsApp':''].filter(Boolean).join(' · ');
+  ui.pdPre={pac:r.pac,prazo:r.prazo,mat:r.mat,urg:r.urg,obs:obs,resumo:r};
+  openSheet(fPedido,null,r.cli?r.cli.id:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();}
+function ppResumo(r){var ok=[],falta=[];
+  (r.cli?ok.push('cliente '+r.cli.nome):falta.push('cliente'));(r.dentes.length?ok.push('dentes '+r.dentes.join(', ')):falta.push('dentes'));
+  (r.tipo?ok.push(r.tipo.nome):falta.push('tipo de trabalho'));(r.pac?ok.push('paciente '+r.pac):falta.push('paciente'));
+  if(r.prazo)ok.push('prazo '+dmy(r.prazo));if(r.cor)ok.push('cor '+r.cor);if(r.mat)ok.push(r.mat);if(r.marca)ok.push(r.marca+(r.con?' '+r.con:''));if(r.urg)ok.push('urgente');
+  return {ok:ok,falta:falta};}
+function fPrintPed(){var I=ui.ppImp||{};
+  var topo='<div class="row" style="gap:12px;align-items:center"><img src="equipe/ana-av'+(I.st==='lendo'?'-pensativa':'')+'.webp" alt="" width="44" height="44" style="border-radius:50%;flex:none"><p class="small muted" style="margin:0">';
+  if(I.st==='lendo')return head('Pedido pelo print')+topo+'Lendo o print… <b id="pp-prog">'+esc(I.msg||'')+'</b></p></div>'+(I.prev?'<img src="'+I.prev+'" alt="" style="max-height:260px;max-width:100%;border-radius:12px;align-self:center">':'');
+  return head('Pedido pelo print')+topo+'Cole aqui o <b>print da conversa</b> do WhatsApp (<b>Ctrl+V</b>) ou escolha a imagem. Eu leio e preencho o pedido para você conferir. O print é lido aqui no seu aparelho e não é guardado.</p></div>'+
+    (I.st==='erro'?'<div class="banner"><span>'+esc(I.msg||'Não consegui ler.')+'</span></div>':'')+
+    '<label class="btn pri block" style="position:relative">📷 Escolher print<input id="pp-file" type="file" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
+    '<label class="fld"><span>Ou cole o texto da conversa</span><textarea id="pp-txt" rows="5" placeholder="Ex.: Boa tarde! Segue caso da paciente Maria Souza, coroa sobre implante no 36, Neodent cone morse, cor A2, pra sexta."></textarea></label>'+
+    '<button class="btn" data-a="ppTexto">Ler texto</button>';}
+async function ppLe(files){var fs=[].concat(files).filter(Boolean);if(!fs.length)return;
+  ui.ppImp={st:'lendo',msg:'',prev:URL.createObjectURL(fs[0])};if(!ui.sheet||ui.sheet.fn!==fPrintPed)openSheet(fPrintPed);else renderSheet();
+  var etapa=function(t){if(ui.ppImp)ui.ppImp.msg=t;var e=document.getElementById('pp-prog');if(e)e.textContent=t;};
+  var limite=function(pr,ms){return Promise.race([pr,new Promise(function(_,ruim){setTimeout(function(){ruim(new Error('demorou demais. Confira a internet e tente de novo'));},ms);})]);};
+  try{etapa('baixando o leitor (só na primeira vez)');await limite(carregaOCR(),60000);
+    var wk=await limite(window.Tesseract.createWorker('por',1,{langPath:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/por@1.0.0/4.0.0_best_int',
+      logger:function(m){if(m.status==='recognizing text')etapa(Math.round((m.progress||0)*100)+'%');},errorHandler:function(e){console.warn('ocr',e);}}),120000),txt='';
+    for(var i=0;i<fs.length;i++){var r=await limite(wk.recognize(fs[i]),120000);txt+='\n'+(r.data.text||'');}
+    try{wk.terminate();}catch(x){}
+    ppProcessa(txt);}
+  catch(e){ui.ppImp={st:'erro',msg:'Não consegui ler o print: '+((e&&e.message)||e)+'. Tente colar o texto da conversa.'};if(ui.sheet&&ui.sheet.fn===fPrintPed)renderSheet();}}
+function ppProcessa(txt){var r=pedDoTexto(txt);if(!r.dentes.length&&!r.tipo&&!r.cli){ui.ppImp={st:'erro',msg:'Não achei informação de pedido nesse print. Confira se aparece o texto da mensagem (dentes, trabalho, paciente).'};if(ui.sheet&&ui.sheet.fn===fPrintPed)renderSheet();else openSheet(fPrintPed);return;}
+  ppAbrePedido(r);}
 function fPedido(id,preCli){
   var p=id?byId(S.pedidos,id):null, cs=alive(S.clientes).sort(function(a,b){return a.nome.localeCompare(b.nome);});
   var cid=p?p.clienteId:(preCli||'');
   if(ui.pdInit||!ui.pdItens){ui.pdInit=false;ui.pdItens=JSON.parse(JSON.stringify(itensDe(p)));ui.pdExtras=JSON.parse(JSON.stringify((p&&p.extras)||[]));ui.pdEd=null;}
-  var mat=p?p.material||'':'',fr=p?p.fresadora||'':'';
+  var pre=(!p&&ui.pdPre)||{},mat=p?p.material||'':(pre.mat||''),fr=p?p.fresadora||'':'';
   function arch(list){return '<div class="arch">'+list.map(function(n,i){return '<button type="button" class="tooth '+(i===8?'mid':'')+'" data-a="tooth" data-n="'+n+'">'+n+'</button>';}).join('')+'</div>';}
   function conn(list){return '<div class="conn" aria-label="Uniões entre dentes">'+list.map(function(n,i){return '<span data-cn="'+n+'">'+(i<15?'<button type="button" class="cn" data-a="pdUne" data-n="'+n+'" aria-label="Unir '+n+' e '+list[i+1]+'"></button>':'')+'</span>';}).join('')+'</div>';}
   return head(p?'Editar pedido #'+p.num:(ui.pdRede?'Publicar trabalho novo':'Novo pedido'))+
+  (!p&&pre.resumo?(function(){var R=ppResumo(pre.resumo);return '<div class="banner" style="align-items:flex-start"><img src="equipe/ana-av-feliz.webp" alt="" width="36" height="36" style="border-radius:50%;flex:none"><span><b>A Ana preencheu pelo print.</b> Achei: '+esc(R.ok.join(' · ')||'pouca coisa')+'.'+(R.falta.length?' <b>Falta conferir:</b> '+esc(R.falta.join(', '))+'.':'')+' Confira antes de salvar.</span></div>';})():'')+
   (ui.pdRede&&!p?'<div class="banner"><span><b>Vai para a Rede.</b> Anexe o escaneamento. Em dente sobre implante, a <b>marca do implante</b> e o <b>scanbody</b> são obrigatórios. Depois de salvar, você escolhe o repasse e o prazo.</span></div>':'')+
   '<form data-form="pedido" data-id="'+(id||'')+'" class="stack">'+
     '<div class="pdf"><div class="pdf-b1">'+
     '<label class="fld"><span>Cliente</span><select id="pd-cli" name="clienteId" required><option value="">Escolha…</option>'+(function(){var ld=p?[]:leadsDe().filter(function(l){return l.st==='seq'||l.st==='resp';}).sort(function(a,b){return String(a.nome).localeCompare(String(b.nome));}),op=function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';};
       return ld.length?'<optgroup label="Clientes">'+cs.map(op).join('')+'</optgroup><optgroup label="Leads (viram clientes ao salvar)">'+ld.map(function(l){var v='lead:'+l.id;return '<option value="'+v+'" '+(v===cid?'selected':'')+'>🌱 '+esc(l.nome||telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade):'')+'</option>';}).join('')+'</optgroup>':cs.map(op).join('');})()+'</select>'+(cs.length?'':'<small>Cadastre um cliente primeiro ou escolha um lead.</small>')+'</label>'+
-    '<label class="fld"><span>Paciente</span><input id="pd-pac" class="nome-p" name="paciente" required maxlength="40" placeholder="Iniciais, ex.: M.A.S." value="'+esc(p?p.paciente:'')+'"><small>Guarde só as iniciais ou o primeiro nome (LGPD).</small></label>'+
+    '<label class="fld"><span>Paciente</span><input id="pd-pac" class="nome-p" name="paciente" required maxlength="40" placeholder="Iniciais, ex.: M.A.S." value="'+esc(p?p.paciente:(pre.pac||''))+'"><small>Guarde só as iniciais ou o primeiro nome (LGPD).</small></label>'+
     '</div><div class="pdf-a">'+
     '<div class="fld"><span>Elementos <b id="pd-qtd" class="mono"></b></span><div id="pd-odo" class="pd-odo"></div><small>Toque em cada dente e diga o trabalho dele. Para unir dentes vizinhos (fixo / ponte), toque na bolinha entre eles.</small></div>'+
     '<div id="pd-ed"></div>'+
     '<div id="pd-lista" class="pd-lista"></div>'+
     '<div><button type="button" class="btn sm" data-a="pdExtra">+ Trabalho sem dente (ex.: Modelo 3D)</button></div>'+
-    '<label class="fld"><span>Observações</span><textarea id="pd-obs" name="obs" maxlength="500">'+esc(p?p.obs:'')+'</textarea></label>'+
+    '<label class="fld"><span>Observações</span><textarea id="pd-obs" name="obs" maxlength="500">'+esc(p?p.obs:(pre.obs||''))+'</textarea></label>'+
     (p?'':'<div class="fld"><span>Escaneamento</span>'+
       (canFile()?'<label class="btn block" style="position:relative">Anexar arquivos (viram zip)<input id="pd-files" type="file" multiple accept=".stl,.ply,.obj,.zip,.html,.htm,.png,.jpg,.jpeg,.webp" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>'+
       '<small id="pd-files-info">STL, HTML do exocad, prints/fotos ou ZIP. Vários arquivos viram um zip só.</small>':
@@ -5226,8 +5303,8 @@ function fPedido(id,preCli){
     '<div class="pd-mf"><div class="fld"><span>Material</span>'+selOutro('material',MATERIAIS,mat,'Digite o material')+'</div>'+
     '<div class="fld"><span>Fresadora</span><div class="fres" role="radiogroup">'+[['','Não se aplica'],['3 eixos','3 eixos'],['4 eixos','4 eixos']].map(function(o){return '<label class="check"><input type="radio" name="fresadora" value="'+o[0]+'" '+(fr===o[0]?'checked':'')+'> '+o[1]+'</label>';}).join('')+'</div></div></div>'+
     '<div class="grid2"><label class="fld"><span>Recebido em</span><input id="pd-rec" name="recebido" type="date" required value="'+(p?p.recebido:today())+'"></label>'+
-    '<label class="fld"><span>Prazo</span><input id="pd-prazo" name="prazo" type="date" value="'+(p?p.prazo||'':addDays(today(),2))+'"></label></div>'+
-    '<label class="check"><input type="checkbox" id="pd-urg" name="urgente" '+(p&&p.urgente?'checked':'')+'> Urgente</label>'+
+    '<label class="fld"><span>Prazo</span><input id="pd-prazo" name="prazo" type="date" value="'+(p?p.prazo||'':(pre.prazo||addDays(today(),2)))+'"></label></div>'+
+    '<label class="check"><input type="checkbox" id="pd-urg" name="urgente" '+((p&&p.urgente)||(!p&&pre.urg)?'checked':'')+'> Urgente</label>'+
     '<div class="calc" id="pd-calc"></div>'+
     '<label class="fld"><span>Valor do pedido (R$)</span><input id="pd-valor" name="valor" type="number" step="0.01" min="0" inputmode="decimal" value="'+(p?p.valor:'')+'" data-manual="'+(p?'1':'')+'"><small>Calculado pela tabela do cliente. Pode ajustar.</small></label>'+
     '<button class="btn pri block" type="submit">'+(p?'Salvar':'Criar pedido')+'</button>'+
@@ -6004,7 +6081,7 @@ impGrava:function(){impGrava();},
     var tel=telNorm(v.tel);if(!tel){toast('Confira o WhatsApp (com DDD).');return;}
     if(leadsDe().some(function(x){return x.id!==l.id&&x.tel===tel;})){toast('Já existe outro lead com esse número.');return;}
     l.nome=v.nome.slice(0,60);l.tel=tel;l.cidade=v.cidade.slice(0,60);l.uf=v.uf;l.orig=v.orig;l.obs=v.obs.slice(0,200);ui.leadEd=null;save();ldR();toast('Lead atualizado.');},
-  leadPed:function(d){if(!guard())return;var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;ui.pdRede=false;ui.pdInit=true;openSheet(fPedido,null,'lead:'+l.id);ui.sheet.after=depoisFormPedido;depoisFormPedido();toast('Ao salvar, '+(String(l.nome||'').split(' ')[0]||'o lead')+' vira cliente automaticamente. 🎉');},
+  leadPed:function(d){if(!guard())return;ui.pdPre=null;var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;ui.pdRede=false;ui.pdInit=true;openSheet(fPedido,null,'lead:'+l.id);ui.sheet.after=depoisFormPedido;depoisFormPedido();toast('Ao salvar, '+(String(l.nome||'').split(' ')[0]||'o lead')+' vira cliente automaticamente. 🎉');},
   leadDel:function(d){var L=leadsDe(),i=L.map(function(x){return x.id;}).indexOf(d.id);if(i<0)return;if(!confirm('Apagar este contato da lista?'))return;if(ui.ldSel===d.id)ui.ldSel=null;L.splice(i,1);save();ldR();},
   premioOk:function(d){var P=ui.premio;if(!P)return;var x=PRESENTES.filter(function(y){return y[0]===d.v;})[0];if(!x)return;var pr=premiosDe();
     pr.c[x[0]]=(pr.c[x[0]]||0)+1;pr.h[P.m+':'+P.k+':'+P.f[0]]={g:x[0],d:today(),v:P.real,meta:P.meta};save();var k=P.k;festaFecha();fogos(1800);ui.prPop=true;render();
@@ -6148,9 +6225,9 @@ impGrava:function(){impGrava();},
   pubLista:function(){ui.pubVer='lista';renderSheet();},
   pubVolta:function(){ui.pubVer=null;renderSheet();},
   pubEscolhe:function(d){vaiDelegar(d.id);},
-  pubNovo:function(){if(!guard())return;ui.pubVer=null;ui.pdRede=true;ui.pdInit=true;openSheet(fPedido,null,null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
-  novoPedido:function(){if(!guard())return;ui.pdRede=false;ui.pdInit=true;openSheet(fPedido,null,ui.tab==='clientes'?ui.sub:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
-  editPedido:function(d){if(!guard())return;ui.pdInit=true;openSheet(fPedido,d.id);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
+  pubNovo:function(){if(!guard())return;ui.pdPre=null;ui.pubVer=null;ui.pdRede=true;ui.pdInit=true;openSheet(fPedido,null,null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
+  novoPedido:function(){if(!guard())return;ui.pdRede=false;ui.pdInit=true;ui.pdPre=null;openSheet(fPedido,null,ui.tab==='clientes'?ui.sub:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
+  editPedido:function(d){if(!guard())return;ui.pdInit=true;ui.pdPre=null;openSheet(fPedido,d.id);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
   verPedido:function(d){openSheet(fPedidoDet,d.id);},
   st:function(d,el,e){e.stopPropagation();setStatus(d.id,d.st);},
   pendencia:function(d,el,e){e.stopPropagation();if(!guard())return;openSheet(fPendencia,d.id);},
@@ -6186,6 +6263,8 @@ impGrava:function(){impGrava();},
     .catch(function(e){ui.mfaNovo={erro:'Não foi possível iniciar: '+((e&&e.message)||e)};renderSheet();});},
   admRecarregar:function(){ui.admLista=null;ui.admErro=null;render();},
   buscaLimpa:function(){ui.busca='';var t=document.getElementById('busca-top');if(t)t.value='';render();},
+  ppAbre:function(){if(!guard())return;ui.ppImp=null;openSheet(fPrintPed);},
+  ppTexto:function(){var t=(document.getElementById('pp-txt')||{}).value||'';if(!t.trim()){toast('Cole o texto da conversa.');return;}ppProcessa(t);},
   admAbrir:function(d){openSheet(fAdmin,d.id);},
   bvAbre:function(d){ui.bv={id:d.id,k:d.k};openSheet(fBv,d.id);},
   bvTpl:function(d){var C=ui.bv||{},a=(ui.admLista||[]).filter(function(x){return x.user_id===C.id;})[0],q=BV_SEQ.filter(function(x){return x.k===d.k;})[0];if(!a||!q)return;C.k=q.k;C.txt=bvFill(q.t,a);renderSheet();},
@@ -6537,7 +6616,12 @@ document.addEventListener('paste',function(e){if(!SBED&&!ui.sheet&&ui.tab==='lea
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.type!=='file')return;
   var f=it.getAsFile();if(!f)return;e.preventDefault();
   if(ui.sheet.fn===fPedidoDet){var pa=ui.sheet.args[0];sbEditor(f,function(g){sbProcessa(pa,g);});}else if(ui.sheet.fn===fTrabRede){var ra=ui.sheet.args[0];sbEditor(f,function(g){rdSbCola(ra,g);});}});
-document.addEventListener('change',function(e){
+document.addEventListener('paste',function(e){var its=(e.clipboardData&&e.clipboardData.items)||[],im=[].filter.call(its,function(x){return /^image\//.test(x.type);})[0];
+  var noPP=ui.sheet&&ui.sheet.fn===fPrintPed,livre=!ui.sheet&&!SBED&&(ui.tab==='pedidos'||(ui.tab==='secretarios'&&ui.secAg==='ven'));
+  if(!(noPP||livre))return;var ae=document.activeElement;
+  if(im){if(!noPP&&ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName))return;e.preventDefault();e.stopImmediatePropagation();ppLe(im.getAsFile());return;}
+  if(noPP&&!(ae&&ae.id==='pp-txt')){var tx=e.clipboardData&&e.clipboardData.getData('text');if(tx&&tx.trim()){e.preventDefault();e.stopImmediatePropagation();ppProcessa(tx);}}},true);
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='pp-file'){var fl=[].slice.call(e.target.files||[]);if(fl.length)ppLe(fl);return;}
   if(e.target&&e.target.id==='ld-file'&&e.target.files&&e.target.files[0]){var f0=[].slice.call(e.target.files);e.target.value='';leadsLePrint(f0);return;}
   if(e.target&&e.target.classList&&e.target.classList.contains('ld-ok')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i].ok=e.target.checked;return;}
   if(e.target&&e.target.classList&&e.target.classList.contains('ld-in')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i][e.target.dataset.k]=e.target.value;}
