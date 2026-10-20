@@ -96,10 +96,12 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .bnav button.on{color:var(--accent);font-weight:600}
 .bnav .plus{width:52px;height:52px;border-radius:16px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:1.7rem;margin:-18px auto 0;box-shadow:0 8px 20px -8px color-mix(in srgb,var(--accent) 80%,transparent)}
 .bnav button:disabled{opacity:.45}
+@media (max-width:959px){.so-pc{display:none!important}}
 @media (min-width:960px){
   .content{margin-left:0}
   .bnav,.menu-btn,.scrim,.top .mb{display:none!important}
   .top .dk{display:inline-flex}
+  .so-cel{display:none!important}
   .main{padding:24px 28px 48px}
   .top-in{padding:12px 28px}
   .tnav{display:block}
@@ -1666,7 +1668,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='19/10 · 22h40';
+var VERSAO='19/10 · 23h05';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1709,7 +1711,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
     '<button class="icon-btn menu-btn" data-a="drawer" aria-label="Abrir menu">'+ICON.menu+'</button>'+
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
     '<h1 class="mb">'+titulo+'</h1><span class="spacer dk"></span>'+
-    '<input class="search dk" id="busca-top" type="search" placeholder="Buscar pedido, paciente, cliente…" value="'+(ui.tab==='pedidos'?'':esc(ui.busca))+'">'+
+    '<input class="search dk" id="busca-top" type="search" autocomplete="off" placeholder="Buscar pedido, paciente, cliente…" value="'+(ui.tab==='pedidos'?esc(ui.busca):'')+'">'+
     (EM_DEMO?'':valChip()+prChip())+'<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
     '<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>'+
     contaMenu(nome,lix)+
@@ -3801,7 +3803,7 @@ function rPedidos(){
   var arq=ps.filter(function(p){return p.status==='arquivado';});
   var abertos=ps.filter(aberto),atr=abertos.filter(function(p){return atrasado(p);}).length,rec=soma(aReceber());
   var head_='<div class="between wrap"><div class="row wrap">'+
-      '<input class="search" id="busca" type="search" placeholder="Buscar paciente, cliente, dente ou nº" value="'+esc(ui.busca)+'" style="width:min(280px,100%)">'+
+      '<input class="search so-cel" id="busca" type="search" autocomplete="off" placeholder="Buscar paciente, cliente, dente ou nº" value="'+esc(ui.busca)+'" style="width:min(280px,100%)">'+(ui.busca.trim()?'<span class="btn sm so-pc" style="cursor:default">🔎 '+esc(ui.busca.trim())+'</span><button class="btn sm pri" data-a="buscaLimpa" title="Limpar a busca e mostrar todos os pedidos">✕ Limpar busca</button>':'')+
       '<span class="btn sm" style="cursor:default">Atrasados '+atr+'</span>'+
       '<button class="btn sm" data-a="tab" data-v="financeiro">A receber '+brl(rec)+'</button></div>'+
       '<div class="row wrap"><button class="btn sm" data-a="relProd">Relatório PDF</button>'+dd('cliProd')+(ui.cliProd?'<button class="btn sm" data-a="limpaCliProd" aria-label="Mostrar todos os clientes">✕ Limpar</button>':'')+dd('filtro')+dd('vista')+'</div></div>';
@@ -6183,6 +6185,7 @@ impGrava:function(){impGrava();},
     .then(function(r){if(r.error)throw r.error;ui.mfaNovo={id:r.data.id,qr:r.data.totp.qr_code,secret:r.data.totp.secret};renderSheet();})
     .catch(function(e){ui.mfaNovo={erro:'Não foi possível iniciar: '+((e&&e.message)||e)};renderSheet();});},
   admRecarregar:function(){ui.admLista=null;ui.admErro=null;render();},
+  buscaLimpa:function(){ui.busca='';var t=document.getElementById('busca-top');if(t)t.value='';render();},
   admAbrir:function(d){openSheet(fAdmin,d.id);},
   bvAbre:function(d){ui.bv={id:d.id,k:d.k};openSheet(fBv,d.id);},
   bvTpl:function(d){var C=ui.bv||{},a=(ui.admLista||[]).filter(function(x){return x.user_id===C.id;})[0],q=BV_SEQ.filter(function(x){return x.k===d.k;})[0];if(!a||!q)return;C.k=q.k;C.txt=bvFill(q.t,a);renderSheet();},
@@ -6492,7 +6495,7 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='Escape'&&ui.rede&&ui.rede.dock&&ui.rede.dock.open)A.rdDock();
   if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('kcard')){e.preventDefault();A.verPedido(e.target.dataset);}
 });
-document.addEventListener('keydown',function(e){if(e.target.id==='busca-top'&&e.key==='Enter'){ui.busca=e.target.value;ui.tab='pedidos';ui.sub=null;ui.filtro='todos';render();var b=document.getElementById('busca');if(b)b.focus();}});
+document.addEventListener('keydown',function(e){if(e.target.id==='busca-top'&&e.key==='Enter'){ui.busca=e.target.value;ui.tab='pedidos';ui.sub=null;ui.filtro='todos';render();var b=document.getElementById('busca-top');if(b)b.focus();}});
 document.addEventListener('pointerover',function(e){
   var h=e.target.closest&&e.target.closest('.hit');[].forEach.call(document.querySelectorAll('.chart .tip'),function(x){if(!h||x.parentNode!==h.ownerSVGElement.parentNode)x.hidden=true;});if(!h)return;var tip=h.ownerSVGElement.parentNode.querySelector('.tip');
   var svg=h.ownerSVGElement,box=svg.getBoundingClientRect(),k=box.width/svg.viewBox.baseVal.width,wrap=svg.parentNode.getBoundingClientRect();
@@ -6524,6 +6527,7 @@ document.addEventListener('input',function(e){
   if(t.id==='adm-busca'){ui.admBusca=t.value;var pa=t.selectionStart;render();var ab=document.getElementById('adm-busca');ab.focus();try{ab.setSelectionRange(pa,pa);}catch(x){}}
   if(t.id==='cl-doc'){var d=soDig(t.value).slice(0,14),v=d;if(d.length>11)v=d.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})(\d{0,2}).*/,function(m,a,b,c,e,f){return a+'.'+b+'.'+c+'/'+e+(f?'-'+f:'');});else if(d.length>9)v=d.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');else if(d.length>6)v=d.replace(/^(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');else if(d.length>3)v=d.replace(/^(\d{3})(\d{0,3})/,'$1.$2');if(v!==t.value)t.value=v;}
   if(t.id==='cli-busca'){ui.cliBusca=t.value;var ps=t.selectionStart;render();var cb=document.getElementById('cli-busca');cb.focus();try{cb.setSelectionRange(ps,ps);}catch(x){}}
+  if(t.id==='busca-top'&&ui.tab==='pedidos'){ui.busca=t.value;var pt=t.selectionStart;render();var tb=document.getElementById('busca-top');if(tb){tb.focus();try{tb.setSelectionRange(pt,pt);}catch(x){}}}
   if(t.id==='busca'){ui.busca=t.value;var pos=t.selectionStart;render();var b=document.getElementById('busca');b.focus();try{b.setSelectionRange(pos,pos);}catch(x){}}
   if(t.closest&&t.closest('form[data-form="pedido"]')){if(t.id==='pd-valor')t.dataset.manual='1';else atualizaCalc();}
   if(t.id==='px-valor')desenhaPix();
