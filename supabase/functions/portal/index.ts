@@ -84,8 +84,8 @@ Deno.serve(async (req: Request) => {
     if (!a || a.origem !== "upload" || !a.storage_key) return json(404, { erro: "Arquivo não encontrado." });
     const { data: ped } = await admin.from("pedidos").select("id").eq("id", a.pedido_id).eq("user_id", dono).eq("cliente_id", cid).is("deleted_at", null).in("status", VISIVEIS).maybeSingle();
     if (!ped) return json(404, { erro: "Arquivo não encontrado." });
-    const acc = Deno.env.get("R2_ACCOUNT_ID"), kid = Deno.env.get("R2_ACCESS_KEY_ID");
-    const sec = Deno.env.get("R2_SECRET_ACCESS_KEY"), bucket = Deno.env.get("R2_BUCKET");
+    const acc = Deno.env.get("R2_ACCOUNT_ID")?.trim(), kid = Deno.env.get("R2_ACCESS_KEY_ID")?.trim();
+    const sec = Deno.env.get("R2_SECRET_ACCESS_KEY")?.trim(), bucket = Deno.env.get("R2_BUCKET")?.trim();
     if (!acc || !kid || !sec || !bucket) return json(503, { erro: "O armazenamento de arquivos ainda não foi configurado." });
     const r2 = new AwsClient({ accessKeyId: kid, secretAccessKey: sec, service: "s3", region: "auto" });
     const u = new URL(`https://${acc}.r2.cloudflarestorage.com/${bucket}/${a.storage_key.split("/").map(encodeURIComponent).join("/")}`);
