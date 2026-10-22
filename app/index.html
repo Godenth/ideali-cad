@@ -1668,7 +1668,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='19/10 · 23h50';
+var VERSAO='22/10 · 10h10';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3160,7 +3160,7 @@ var CMDS={
 var IA_INT={
   fin:[[/registr\w*\s+(o\s+|um\s+)?pag|recebi|pagou/i,'pagou'],[/cobr|gera\w*\s+(o\s+|um\s+)?pag|pix/i,'cobrar'],[/relat/i,'relFin'],[/devend|quem\s+(me\s+)?deve/i,'devendo']],
   ven:[[/relat\w*\s+(de\s+)?(produ|p\/|para|pro)/i,'relProd'],[/relat/i,'relVendas'],[/atras/i,'atrasados'],[/prazos?\s+da\s+semana|vence\w*\s+(essa|esta)\s+semana/i,'semana']],
-  mkt:[[/\ble+a?ds?\b|\blead|lista\s+(de\s+)?(contat|n[uú]mer|telef)|(salv|cadastr|guard|import)\w*.{0,30}(contat|n[uú]mer|telefon)|(contat|n[uú]mer|telefon)\w*.{0,30}(salv|cadastr|guard|import)/i,'leads'],[/plano|reconquist|trazer\s+de\s+volta|recuperar/i,'plano'],[/sumid|inativ|parou|perdid/i,'sumidos'],[/(mensag|msg)\w*\s+(p\/|para|pro|pra|ao|a)\b|escrev\w*\s+(uma\s+)?(mensag|msg)/i,'msgCli'],[/frase/i,'frase'],[/\bpost|status|instagram/i,'post']],
+  mkt:[[/tr[aá]fego|an[uú]ncio|campanha|p[aá]gina\s+(de\s+)?(captura|an[uú]ncio)|quem\s+(veio|chegou|entrou|preencheu)|chegar\w*|contatos?\s+novos?|leads?\s+novos?|novos?\s+leads?|veio\s+(pelo|do)\s+(an[uú]ncio|instagram|face)/i,'pagos'],[/\ble+a?ds?\b|\blead|lista\s+(de\s+)?(contat|n[uú]mer|telef)|(salv|cadastr|guard|import)\w*.{0,30}(contat|n[uú]mer|telefon)|(contat|n[uú]mer|telefon)\w*.{0,30}(salv|cadastr|guard|import)/i,'leads'],[/plano|reconquist|trazer\s+de\s+volta|recuperar/i,'plano'],[/sumid|inativ|parou|perdid/i,'sumidos'],[/(mensag|msg)\w*\s+(p\/|para|pro|pra|ao|a)\b|escrev\w*\s+(uma\s+)?(mensag|msg)/i,'msgCli'],[/frase/i,'frase'],[/\bpost|status|instagram/i,'post']],
   dad:[[/mika|recaptur|reconquist|trazer\s+de\s+volta|recuperar/i,'passaMika'],[/relat/i,'relAn'],[/comport|analis\w*\s+(o\s+|a\s+)?(cliente|dr|dra|lab)/i,'comport'],[/melhor\w*\s+cliente|maior\w*\s+cliente/i,'top']],
   ger:[[/reuni/i,'reuniao'],[/resumo/i,'resumo']]};
 var IA_COM_CLI={relProd:1,cobrar:1,pagou:1,msgCli:1,comport:1,plano:1,passaMika:1};
@@ -3322,6 +3322,12 @@ var IA_CMD={
     cliRanking(365).forEach(function(o){if(!ja[o.c.id])L.push({c:o.c});});iaQuem(g,'plano','Qual cliente a gente vai reconquistar? 🎯',L,'Ainda não há clientes com pedidos.');},
   'ven.printPed':function(g){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();A.ppAbre();},
   'mkt.colaLead':function(g){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();A.leadCola();},
+  'mkt.pagos':function(g){var L=leadsDe().filter(function(l){return l.pago||l.pag;}).sort(function(a,b){return String(b.criado||'').localeCompare(String(a.criado||''));}),SI={seq:'chamar',resp:'em conversa',cli:'virou cliente',fim:'encerrado'};
+    if(!L.length){iaDiz(g,{t:'Ainda não chegou ninguém pelo tráfego pago. Quando alguém preencher a sua página do anúncio, eu aviso na hora e o contato aparece aqui. 📣',bts:[{a:'capVai',l:'🌐 Minha página'},{a:'leadAbre',l:'📱 Abrir os leads'}]});return;}
+    var hj=L.filter(function(l){return l.criado===today();}).length,cl=L.filter(function(l){return l.st==='cli';}).length;
+    iaDiz(g,{t:'Chegaram '+plural(L.length,'contato','contatos')+' pelo tráfego pago'+(hj?' ('+hj+' hoje)':'')+(cl?'. '+plural(cl,'já virou cliente','já viraram clientes'):'')+'. 🚀',
+      lst:L.slice(0,20).map(function(l){return {t:(l.nome||telFmt(l.tel)),s:[telFmt(l.tel),l.criado?'chegou '+dmy(l.criado):'',SI[l.st]||''].filter(Boolean).join(' · '),bt:{a:'mkLead',id:l.id,l:'Abrir'}};}),
+      bts:[{a:'leadAbre',l:'📱 Abrir os leads',pri:1}]});},
   'mkt.leads':function(g){var n=leadsHoje().length;iaDiz(g,{t:(n?'Tenho '+plural(n,'lead para chamar','leads para chamar')+' hoje! 📲 ':'')+'É comigo sim! 💜 Cola aqui na conversa (Ctrl+V) a sua lista de números, do bloco de notas, de uma planilha ou de um PDF, ou o print dos contatos. Eu separo os números, você confere e eu salvo nos leads para a gente mandar as mensagens.',bts:[{a:'leadAbre',l:'📱 Abrir os leads',pri:1}]});A.leadAbre();},
   'mkt.sumidos':function(g){var L=clisSumidos();
     iaDiz(g,L.length?{t:plural(L.length,'cliente esfriou ou sumiu','clientes esfriaram ou sumiram')+' (comparando com o ritmo de cada um). Monto um plano para trazer de volta?',lst:L.slice(0,12).map(function(o){return {t:nomeCurtoCli(o.c),s:cliPadraoTxt(o.s),bt:{a:'iaCmd',g:'mkt',v:'plano',x:o.c.id,l:'Montar plano'}};})}:{t:'Ninguém sumido nem esfriando! Todo mundo está no ritmo de sempre. 😎'});},
@@ -6069,6 +6075,7 @@ impGrava:function(){impGrava();},
     Object.keys(ui.iaConv||{}).forEach(function(k){(ui.iaConv[k]||[]).forEach(function(b){if(b.lst)b.lst=b.lst.filter(function(x){return !(x.bt&&x.bt.a==='memDel'&&x.bt.id===d.id);});});});toast('Apagado da memória.');render();},
   capCopia:function(d){try{navigator.clipboard.writeText(d.v);toast('Link copiado! Cole no destino do seu anúncio.');}catch(e){prompt('Copie o link:',d.v);}},
   ldOcVer:function(){closeSheet();ui.tab='leads';ui.sub=null;ui.leadModo='cli';ui.leadFil='oc';ui.ldSel=null;ui.ldComp=null;render();window.scrollTo(0,0);},
+  mkLead:function(d){closeSheet();ui.tab='leads';ui.sub=null;ui.leadModo='cli';ui.leadFil='todos';ui.ldSel=d.id||null;ui.ldComp=null;render();window.scrollTo(0,0);},
   lfVer:function(){var F=ui.lfesta;festaFecha();var id=F&&F.ids&&F.ids[0];closeSheet();ui.tab='leads';ui.sub=null;ui.leadModo='cli';ui.leadFil='todos';ui.ldSel=id||null;ui.ldComp=null;render();window.scrollTo(0,0);},
   admSimLead:function(){var nomes=['Dra. Fernanda Lima','Dr. Rafael Costa','Lab. Sorriso Pleno','Dra. Camila Rocha'],tipos=['dentista','dentista','protetico','dentista'],i=Math.floor(Math.random()*nomes.length);
     var mo=ui.leadModo;ui.leadModo='cli';var l=leadNovoObj(nomes[i]+' (simulação)','119'+String(Math.floor(10000000+Math.random()*89999999)),'insta');l.tipo=tipos[i];l.pag=1;l.pago=1;l.sim=1;l.obs=(CAP_TIPO[l.tipo]||'')+' · veio pela página (simulação)';leadsDe().push(l);ui.leadModo=mo;save();leadFesta([l],true);},
