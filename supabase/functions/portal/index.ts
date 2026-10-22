@@ -36,7 +36,7 @@ Deno.serve(async (req: Request) => {
     const { data: perfil } = await admin.from("perfis").select("nome,telefone").eq("user_id", dono).maybeSingle();
     const { data: peds } = await admin.from("pedidos")
       .select("id,numero,paciente,elementos,itens,extras,tipo_trabalho_id,status,urgente,recebido_em,prazo,enviado_em,pago_em,valor,pendencia_motivos,pendencia_obs,aprovacao_desde,ajustes,material,fresadora,scanbody_img")
-      .eq("user_id", dono).eq("cliente_id", cid).is("deleted_at", null)
+      .eq("user_id", dono).eq("cliente_id", cid).is("deleted_at", null).is("cancelado_em", null)
       .in("status", VISIVEIS)
       .order("numero", { ascending: false }).limit(300);
     // deno-lint-ignore no-explicit-any
@@ -82,7 +82,7 @@ Deno.serve(async (req: Request) => {
     const { data: a } = await admin.from("arquivos").select("nome,storage_key,pedido_id,origem")
       .eq("id", id).eq("user_id", dono).is("deleted_at", null).is("removido_em", null).maybeSingle();
     if (!a || a.origem !== "upload" || !a.storage_key) return json(404, { erro: "Arquivo não encontrado." });
-    const { data: ped } = await admin.from("pedidos").select("id").eq("id", a.pedido_id).eq("user_id", dono).eq("cliente_id", cid).is("deleted_at", null).in("status", VISIVEIS).maybeSingle();
+    const { data: ped } = await admin.from("pedidos").select("id").eq("id", a.pedido_id).eq("user_id", dono).eq("cliente_id", cid).is("deleted_at", null).is("cancelado_em", null).in("status", VISIVEIS).maybeSingle();
     if (!ped) return json(404, { erro: "Arquivo não encontrado." });
     const acc = Deno.env.get("R2_ACCOUNT_ID")?.trim(), kid = Deno.env.get("R2_ACCESS_KEY_ID")?.trim();
     const sec = Deno.env.get("R2_SECRET_ACCESS_KEY")?.trim(), bucket = Deno.env.get("R2_BUCKET")?.trim();
