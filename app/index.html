@@ -1126,7 +1126,9 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .cp-th{grid-row:1/span 4;width:64px;height:64px;object-fit:contain;border-radius:10px;background:var(--soft)}
 .cp-gal{display:flex;gap:10px;overflow-x:auto;margin:12px 0 0;padding-bottom:4px}
 .cp-gal figure{margin:0;flex:0 0 150px;display:grid;gap:4px}
-.cp-gal img{width:150px;height:150px;object-fit:contain;border-radius:12px;background:var(--soft)}
+.cp-gal img{width:150px;height:150px;object-fit:contain;border-radius:12px;background:var(--soft);display:block}
+.cp-3d{position:relative;border:0;padding:0;background:none;cursor:zoom-in;border-radius:12px}.cp-3d:hover img{outline:2px solid var(--accent)}
+.cp-3d span{position:absolute;right:6px;bottom:6px;font-size:.7rem;font-weight:700;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:2px 7px}
 .cp-gal figcaption{font-size:.74rem;color:var(--muted);line-height:1.3}
 .cp-libs{display:grid;gap:6px}
 .cp-lib{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
@@ -1726,7 +1728,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='22/10 · 17h00';
+var VERSAO='22/10 · 17h30';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -6059,7 +6061,19 @@ function compNotaSalva(id,o){var n=COMP.notas[id]=Object.assign({texto:'',fav:fa
 function compTabela(cols,rows){return '<div class="cp-tw"><table class="cp-tb"><thead><tr>'+cols.map(function(h){return '<th>'+esc(h)+'</th>';}).join('')+'</tr></thead><tbody>'+
   rows.map(function(r){return '<tr>'+r.map(function(v,j){var al=/⚠/.test(v),cod=/^[A-Z0-9][A-Z0-9-]{3,}$/.test(String(v).replace(/\s*⚠/,''))&&/\d/.test(v);return '<td'+(j===0?' class="cp-h"':'')+'>'+(cod?'<button type="button" class="cp-cod'+(al?' al':'')+'" data-a="copiaTxt" data-v="'+esc(String(v).replace(/\s*⚠/,''))+'" title="Copiar código">'+esc(v)+'</button>':esc(v))+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
 function compImg(f){return 'img/comp/'+encodeURIComponent(f)+'.webp?v=1';}
-function compGal(c){if(!c.img||!c.img.length)return '';return '<div class="cp-gal">'+c.img.map(function(x){return '<figure><img src="'+compImg(x[0])+'" alt="'+esc(x[1])+'" loading="lazy"><figcaption>'+esc(x[1])+'</figcaption></figure>';}).join('')+'</div><p class="small muted" style="margin:4px 0 0">Imagens geradas pelo Ideali CAD a partir dos modelos 3D da biblioteca Exocad da Implacil Osstem.</p>';}
+function compGal(c){if(!c.img||!c.img.length)return '';return '<div class="cp-gal">'+c.img.map(function(x){return '<figure><button type="button" class="cp-3d" data-a="comp3d" data-v="'+esc(x[0])+'" data-x="'+esc(x[1])+'" title="Abrir em 3D"><img src="'+compImg(x[0])+'" alt="'+esc(x[1])+'" loading="lazy"><span>3D ↻</span></button><figcaption>'+esc(x[1])+'</figcaption></figure>';}).join('')+'</div><p class="small muted" style="margin:4px 0 0">Toque na imagem para abrir em 3D e girar. Modelos simplificados, gerados a partir da biblioteca Exocad da Implacil Osstem (só para visualizar).</p>';}
+/* Modelo 3D: o arquivo fica cifrado no site; a chave só vem para quem está logado (função catalogo3d) */
+function comp3dChave(){if(COMP.k3)return Promise.resolve(COMP.k3);
+  return sb.functions.invoke('catalogo3d',{body:{}}).then(function(r){var k=r&&r.data&&r.data.k;if(!k)throw new Error('sem chave');
+    var raw=Uint8Array.from(atob(k),function(c){return c.charCodeAt(0);});return crypto.subtle.importKey('raw',raw,'AES-GCM',false,['decrypt']);}).then(function(ck){COMP.k3=ck;return ck;});}
+function comp3dStl(buf){var dv=new DataView(buf),nv=dv.getUint32(0,true),nf=dv.getUint32(4,true),lo=[dv.getFloat32(8,true),dv.getFloat32(12,true),dv.getFloat32(16,true)],sc=dv.getFloat32(20,true)/65535,
+  qo=24,fo=24+nv*6,out=new ArrayBuffer(84+nf*50),o=new DataView(out),P=function(i,j){return lo[j]+dv.getUint16(qo+(i*3+j)*2,true)*sc;};
+  o.setUint32(80,nf,true);for(var f=0;f<nf;f++){var b=84+f*50;for(var v=0;v<3;v++){var id=dv.getUint16(fo+(f*3+v)*2,true);for(var j=0;j<3;j++)o.setFloat32(b+12+v*12+j*4,P(id,j),true);}}return out;}
+function comp3dAbre(nome,leg){toast('Abrindo o modelo 3D…',1500);
+  Promise.all([comp3dChave(),fetch('img/comp3d/'+encodeURIComponent(nome)+'.bin?v=1').then(function(r){if(!r.ok)throw new Error('modelo');return r.arrayBuffer();})])
+  .then(function(x){var b=new Uint8Array(x[1]);return crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(0,12)},x[0],b.slice(12));})
+  .then(function(buf){vzPop(new Blob([comp3dStl(buf)],{type:'model/stl'}),(leg||nome)+'.stl');})
+  .catch(function(e){toast(/sem chave/.test(e&&e.message)?'Entre na sua conta para ver o modelo 3D.':'Não consegui abrir o modelo 3D. Confira a internet e tente de novo.');});}
 function compLib(c){if(!c.lib||!c.lib.length)return '';
   return '<h3 class="cp-h3">No Exocad</h3><p class="small muted" style="margin:0 0 6px">Na biblioteca oficial da Implacil Osstem, escolha:</p><div class="cp-libs">'+c.lib.map(function(L){return '<details class="cp-lib"><summary><b>'+esc(L.n||L.k)+'</b><span class="mono small muted">'+esc(L.k)+'</span></summary>'+
     ((L.t||[]).length?'<ul>'+L.t.map(function(t){return '<li><b>'+esc(t[0])+'</b>'+(t[1]&&t[1].length?'<span>'+t[1].map(esc).join(' · ')+'</span>':'')+'</li>';}).join('')+'</ul>':'<p class="small muted">Só o scanbody (sem opções de pilar).</p>')+'</details>';}).join('')+'</div>';}
@@ -6444,6 +6458,7 @@ impGrava:function(){impGrava();},
   compMais:function(){ui.compMais=true;render();},
   compLimpa:function(){ui.compQ='';ui.compLin='';ui.compTipo='';ui.compFav=false;ui.compMais=false;render();},
   compTenta:function(){COMP.erro=false;render();},
+  comp3d:function(d){comp3dAbre(d.v,d.x);},
   compAbre:function(d){ui.compQ=d.v||'';ui.compLin='';ui.compTipo='';ui.compFav=false;ui.tab='comp';ui.sub=null;closeSheet();render();window.scrollTo(0,0);},
   compVer:function(d){var go=function(){openSheet(fComp,d.id);};if(COMP.ok)go();else compCarrega().then(go);},
   compFav:function(d){var n=COMP.notas[d.id]||{};compNotaSalva(d.id,{fav:!n.fav}).then(function(ok){if(ok)toast(!n.fav?'Guardado em “Meus componentes”.':'Tirado dos seus.');});renderSheet();if(ui.tab==='comp')render();},
