@@ -1120,6 +1120,42 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .ask .row{justify-content:flex-end}
 .ask.env{background:color-mix(in srgb,var(--c-val) 12%,var(--surface))}.ask.env b{color:var(--c-val)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
+/* Guia de componentes */
+.cp-hd{display:grid;gap:10px}
+.cp-hd .search{width:100%}
+.cp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.cp-it{display:grid;gap:6px;text-align:left;cursor:pointer;padding:12px 14px;border:1px solid var(--line);color:var(--ink);min-width:0}
+.cp-it:hover{border-color:var(--accent)}
+.cp-t{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.cp-t b{line-height:1.25}
+.cp-pg{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.cp-star{color:var(--p2)}
+.cp-tags{display:flex;flex-wrap:wrap;gap:4px}
+.cp-lin,.cp-tp,.cp-exo,.cp-al{font-size:.72rem;border-radius:99px;padding:2px 8px;border:1px solid var(--line);white-space:nowrap}
+.cp-lin{font-weight:700;background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.cp-lin.l-HE{background:color-mix(in srgb,var(--p3) 15%,transparent);color:color-mix(in srgb,var(--p3) 70%,var(--ink))}
+.cp-lin.l-HI{background:color-mix(in srgb,var(--p4) 15%,transparent);color:color-mix(in srgb,var(--p4) 70%,var(--ink))}
+.cp-lin.l-TS{background:color-mix(in srgb,var(--p1) 14%,transparent);color:color-mix(in srgb,var(--p1) 70%,var(--ink))}
+.cp-lin.l-Stretto,.cp-lin.l-Slim{background:color-mix(in srgb,var(--p6) 14%,transparent);color:color-mix(in srgb,var(--p6) 70%,var(--ink))}
+.cp-exo{color:var(--ok)}.cp-al{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent)}
+.cp-sub{font-size:.8rem;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cp-ach{display:grid;gap:2px;font-size:.8rem}.cp-ach b{color:var(--accent)}
+.cp-nt{font-size:.78rem;color:var(--muted)}
+.cp-tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+.cp-tb{border-collapse:collapse;width:100%;font-size:.82rem}
+.cp-tb th,.cp-tb td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.cp-tb th{background:var(--soft);font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+.cp-tb tr:last-child td{border-bottom:0}.cp-tb td.cp-h{color:var(--muted)}
+.cp-cod{font-family:var(--f-mono);font-size:.82rem;background:none;border:0;padding:0;color:var(--ink);cursor:copy;border-bottom:1px dashed var(--line)}
+.cp-cod:hover{color:var(--accent);border-color:var(--accent)}.cp-cod.al{color:var(--warn)}
+.cp-h3{margin:14px 0 2px;font-size:.92rem}
+.cp-rel{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.cp-kv{margin-top:6px}
+.cp-ban{margin-top:10px}
+.cp-nform{display:grid;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+.cp-favb.on{color:var(--p2);border-color:var(--p2)}
+.cp-pdb{margin-left:auto}
+.pd-it:has(.cp-pdb){display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+@media (max-width:640px){.cp-list{grid-template-columns:1fr}}
 .chipck{cursor:pointer}
 .chipck input{position:absolute;opacity:0;pointer-events:none}
 .chipck span{display:inline-block;border:1.5px solid var(--line);border-radius:99px;padding:.45em .9em;font-size:.9rem;background:var(--surface)}
@@ -1633,6 +1669,7 @@ function ic(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 var ICON={
   dashboard:ic('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
   visu:ic('<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/>'),
+  comp:ic('<rect x="8.5" y="2.5" width="7" height="4" rx="1"/><path d="M7 6.5h10l-1.5 4h-7z"/><path d="M9 10.5l1 10h4l1-10M9.6 13.5h4.8M9.9 16.5h4.2"/>'),
   pedidos:ic('<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/>'),
   clientes:ic('<circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><path d="M16 5.5a3 3 0 0 1 0 5.6M18 14.5c1.6.6 2.7 2.2 3 4.5"/>'),
   financeiro:ic('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
@@ -1653,11 +1690,11 @@ var ICON={
 };
 var MENU=[
   ['Principal',[['dashboard','Início'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
-  ['Mais',[['leads','Leads'],['secretarios','Equipe de IA'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['rede','Rede'],['visu','Visualizador 3D']]],
+  ['Mais',[['leads','Leads'],['secretarios','Equipe de IA'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['rede','Rede'],['visu','Visualizador 3D'],['comp','Componentes']]],
   ['Conta',[['admin','Admin'],['config','Configurações']]]
 ];
-var MAIS_IDS=['leads','secretarios','metas','analises','ranking','rede','visu','mais'];
-var MAIS_DESC={leads:'Seus contatos dos anúncios: agenda, mensagens e retornos',secretarios:'Sua equipe: começa com a Ana e cresce junto com você',metas:'Meta oficial com medalhas 🥉🥈🥇 e presentes',analises:'Saúde do negócio, clientes sumidos e sinais',ranking:'Quem são seus melhores clientes',rede:'Seu perfil público e cadistas da Rede',visu:'Abra STL, PLY e OBJ no navegador'};
+var MAIS_IDS=['leads','secretarios','metas','analises','ranking','rede','visu','comp','mais'];
+var MAIS_DESC={leads:'Seus contatos dos anúncios: agenda, mensagens e retornos',secretarios:'Sua equipe: começa com a Ana e cresce junto com você',metas:'Meta oficial com medalhas 🥉🥈🥇 e presentes',analises:'Saúde do negócio, clientes sumidos e sinais',ranking:'Quem são seus melhores clientes',rede:'Seu perfil público e cadistas da Rede',visu:'Abra STL, PLY e OBJ no navegador',comp:'Scanbody, Ti-Base, mini pilar e códigos da Implacil'};
 /* ===== Liberação aos poucos: conta nova começa só com o núcleo; cada função chega na hora certa, apresentada por um agente =====
    S.prefs.lib = {ini:'AAAA-MM-DD', all:1 (tudo liberado), metas:'data', ...}. Contas que já tinham pedidos ganham tudo liberado. */
 var LIBS=[
@@ -1678,10 +1715,10 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='22/10 · 11h00';
+var VERSAO='22/10 · 16h30';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
-var TITULOS={leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
+var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAplica)decoAplica();},0);if(ui.tab!=='secretarios')ui.secRolado=null;
@@ -1697,7 +1734,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
   if(!w) chip='<span class="tag u">Conta bloqueada</span>';
   else chip='';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
-    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,lab:rLab,mais:rMaisHub,leads:rLeads,analises:rAnalisesTab,metas:rMetasTab,secretarios:rSecretarios,visu:rVisu,config:rConfig,admin:rAdmin};
+    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,lab:rLab,mais:rMaisHub,leads:rLeads,analises:rAnalisesTab,metas:rMetasTab,secretarios:rSecretarios,visu:rVisu,comp:rComp,config:rConfig,admin:rAdmin};
   var body=ui.tour!=null&&ui.tab!=='config'?comDemo(R[ui.tab]||rDashboard):(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
@@ -1721,7 +1758,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
     '<button class="icon-btn menu-btn" data-a="drawer" aria-label="Abrir menu">'+ICON.menu+'</button>'+
     '<div class="brand dk">'+logo(28)+'<span>Ideali CAD</span></div>'+
     '<h1 class="mb">'+titulo+'</h1><span class="spacer dk"></span>'+
-    '<input class="search dk" id="busca-top" type="search" autocomplete="off" placeholder="Buscar pedido, paciente, cliente…" value="'+(ui.tab==='pedidos'?esc(ui.busca):'')+'">'+
+    '<input class="search dk" id="busca-top" type="search" autocomplete="off" placeholder="'+(ui.tab==='comp'?'Buscar componente, tipo ou código…':'Buscar pedido, paciente, cliente…')+'" value="'+(ui.tab==='pedidos'?esc(ui.busca):ui.tab==='comp'?esc(ui.compQ||''):'')+'">'+
     (EM_DEMO?'':valChip()+prChip())+'<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
     '<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>'+
     contaMenu(nome,lix)+
@@ -3169,13 +3206,13 @@ async function iaPergunta(id,q,label,memo){var C=iaConvDe(id);C.push({r:'u',t:la
    As contas e as ações são do app (grátis e sem erro). A IA só escreve: conversa, reunião, mensagem e análise. */
 var CMDS={
   ger:[['reuniao','👥 Sala de reunião'],['resumo','📋 Resumo do dia'],['meta','🎯 Meta do mês'],['sugira','💡 O que faço hoje?'],['memoria','🧠 Memória da equipe']],
-  ven:[['printPed','📷 Pedido pelo print'],['relVendas','📄 Relatório de vendas'],['atrasados','⏰ Atrasados'],['semana','📅 Prazos da semana'],['relProd','🧾 Relatório p/ cliente']],
+  ven:[['printPed','📷 Pedido pelo print'],['comp','🔩 Componentes'],['relVendas','📄 Relatório de vendas'],['atrasados','⏰ Atrasados'],['semana','📅 Prazos da semana'],['relProd','🧾 Relatório p/ cliente']],
   fin:[['cobrar','💸 Gerar cobrança'],['devendo','📋 Quem está devendo'],['relFin','📄 Relatório financeiro'],['pagou','✅ Registrar pagamento']],
   mkt:[['colaLead','📋 Colar print de leads'],['leads','📱 Leads'],['plano','🎯 Reconquistar cliente'],['msgCli','💬 Mensagem p/ cliente'],['sumidos','👋 Clientes sumidos'],['frase','📣 Frase do dia'],['post','✨ Ideia de post'],['memoria','🧠 Memória']],
   dad:[['relAn','📄 Relatório de análise'],['top','🏆 Melhores clientes'],['comport','🔎 Analisar um cliente'],['sugira','💡 O que melhorar?'],['memoria','🧠 Memória']]};
 var IA_INT={
   fin:[[/registr\w*\s+(o\s+|um\s+)?pag|recebi|pagou/i,'pagou'],[/cobr|gera\w*\s+(o\s+|um\s+)?pag|pix/i,'cobrar'],[/relat/i,'relFin'],[/devend|quem\s+(me\s+)?deve/i,'devendo']],
-  ven:[[/relat\w*\s+(de\s+)?(produ|p\/|para|pro)/i,'relProd'],[/relat/i,'relVendas'],[/atras/i,'atrasados'],[/prazos?\s+da\s+semana|vence\w*\s+(essa|esta)\s+semana/i,'semana']],
+  ven:[[/scan\s*-?\s*body|scancorp|ti\s*-?\s*base|base\s*t\b|mini\s*-?\s*pilar|mini\s*c[oô]nico|micro\s*c[oô]nico|pilar\s+(multi|ideale|link|transfer|provis)|munh[aã]o|an[aá]logo|cicatrizador|\bucla\b|transfer(ente)?\b|implacil|osstem|componente|c[oó]digo\s+(do|da|de)\s/i,'comp'],[/relat\w*\s+(de\s+)?(produ|p\/|para|pro)/i,'relProd'],[/relat/i,'relVendas'],[/atras/i,'atrasados'],[/prazos?\s+da\s+semana|vence\w*\s+(essa|esta)\s+semana/i,'semana']],
   mkt:[[/tr[aá]fego|an[uú]ncio|campanha|p[aá]gina\s+(de\s+)?(captura|an[uú]ncio)|quem\s+(veio|chegou|entrou|preencheu)|chegar\w*|contatos?\s+novos?|leads?\s+novos?|novos?\s+leads?|veio\s+(pelo|do)\s+(an[uú]ncio|instagram|face)/i,'pagos'],[/\ble+a?ds?\b|\blead|lista\s+(de\s+)?(contat|n[uú]mer|telef)|(salv|cadastr|guard|import)\w*.{0,30}(contat|n[uú]mer|telefon)|(contat|n[uú]mer|telefon)\w*.{0,30}(salv|cadastr|guard|import)/i,'leads'],[/plano|reconquist|trazer\s+de\s+volta|recuperar/i,'plano'],[/sumid|inativ|parou|perdid/i,'sumidos'],[/(mensag|msg)\w*\s+(p\/|para|pro|pra|ao|a)\b|escrev\w*\s+(uma\s+)?(mensag|msg)/i,'msgCli'],[/frase/i,'frase'],[/\bpost|status|instagram/i,'post']],
   dad:[[/mika|recaptur|reconquist|trazer\s+de\s+volta|recuperar/i,'passaMika'],[/relat/i,'relAn'],[/comport|analis\w*\s+(o\s+|a\s+)?(cliente|dr|dra|lab)/i,'comport'],[/melhor\w*\s+cliente|maior\w*\s+cliente/i,'top']],
   ger:[[/reuni/i,'reuniao'],[/resumo/i,'resumo']]};
@@ -3336,7 +3373,10 @@ var IA_CMD={
   'mkt.plano':function(g,x){if(x){var s=cliStats(x);mikaPlano(x,s);return;}
     var sm=clisSumidos(),ja={},L=sm.map(function(o){ja[o.c.id]=1;return {c:o.c,s:o.s.padrao==='caindo'?'esfriou':'sumido '+quandoTxt(o.d).replace('há ','')};});
     cliRanking(365).forEach(function(o){if(!ja[o.c.id])L.push({c:o.c});});iaQuem(g,'plano','Qual cliente a gente vai reconquistar? 🎯',L,'Ainda não há clientes com pedidos.');},
-  'ven.printPed':function(g){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();A.ppAbre();},
+  'ven.comp':function(g){var C=iaConvDe(g),u=C.length&&C[C.length-1].r==='u'?C[C.length-1].t:'';
+  if(!u){iaDiz(g,{t:'Me diga o componente que você procura (nome, conexão ou código) que eu acho no catálogo da Implacil Osstem.',chips:[{a:'compAbre',l:'Scanbody Cone Morse',v:'scanbody cm',chip:1},{a:'compAbre',l:'Base T HE',v:'base t he',chip:1},{a:'compAbre',l:'Mini pilar Osstem',v:'mini pilar ts',chip:1},{a:'compAbre',l:'Abrir o guia',v:'',chip:1}]});return;}
+  ui.iaEsperando=g;compCarrega().then(function(){ui.iaEsperando=null;if(COMP.erro){iaDiz(g,{t:'Não consegui abrir o catálogo agora. Confira a internet e tente de novo.'});}else compAnaResp(g,u);iaMostra();});},
+'ven.printPed':function(g){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();A.ppAbre();},
   'mkt.colaLead':function(g){var C=iaConvDe(g);if(C.length&&C[C.length-1].r==='u')C.pop();A.leadCola();},
   'mkt.pagos':function(g){var L=leadsDe().filter(function(l){return l.pago||l.pag;}).sort(function(a,b){return String(b.criado||'').localeCompare(String(a.criado||''));}),SI={seq:'chamar',resp:'em conversa',cli:'virou cliente',fim:'encerrado'};
     if(!L.length){iaDiz(g,{t:'Ainda não chegou ninguém pelo tráfego pago. Quando alguém preencher a sua página do anúncio, eu aviso na hora e o contato aparece aqui. 📣',bts:[{a:'capVai',l:'🌐 Minha página'},{a:'leadAbre',l:'📱 Abrir os leads'}]});return;}
@@ -5524,7 +5564,7 @@ function fPedidoDet(id){
       (p.entregue?kv('Enviado ao cliente',dmy(p.entregue)):'')+(p.pago?kv('Pago',dmy(p.pago)):'')+
       kv('Valor','<span class="mono" style="font-size:1.1rem"><b>'+brl(p.valor)+'</b></span>')+(g?kv('Pagamento',formaNome(g.forma)+' de '+dmy(g.data)):'')+
     '</div>'+
-    (itensDe(p).length||(p.extras||[]).length?'<div class="pd-lista">'+itensDe(p).map(function(i){return '<div class="pd-it"><span class="pd-it-t">'+descItem(i)+'</span></div>';}).join('')+(p.extras||[]).map(function(x){var t=tipo(x.t);return '<div class="pd-it"><span class="pd-it-t">'+(t?esc(t.nome):'')+' · '+(x.q||1)+'×</span></div>';}).join('')+'</div>':'')+
+    (itensDe(p).length||(p.extras||[]).length?'<div class="pd-lista">'+itensDe(p).map(function(i){var cq=compQDe(i);return '<div class="pd-it"><span class="pd-it-t">'+descItem(i)+'</span>'+(cq!=null?'<button type="button" class="btn sm cp-pdb" data-a="compAbre" data-v="'+esc(cq)+'" title="Abrir o guia de componentes">🔩 Componentes</button>':'')+'</div>';}).join('')+(p.extras||[]).map(function(x){var t=tipo(x.t);return '<div class="pd-it"><span class="pd-it-t">'+(t?esc(t.nome):'')+' · '+(x.q||1)+'×</span></div>';}).join('')+'</div>':'')+
     (p.obs?'<div class="calc"><b>Observações</b><span>'+esc(p.obs)+'</span></div>':'')+
     (p.status==='pendente'&&p.pendencia?'<div class="pend" style="padding:12px">'+p.pendencia.motivos.map(function(m){return '<span>'+esc(m)+'</span>';}).join('')+(p.pendencia.obs?'<em>'+esc(p.pendencia.obs)+'</em>':'')+'</div>':'')+
     '</div><div class="pdet-b">'+
@@ -5964,6 +6004,98 @@ function vzPop(bl,nome){vzArquivo(bl,nome).then(function(f){var old=document.que
 function vzBlob(id){var a=byId(S.arquivos,id);if(!a)return Promise.reject(new Error('arquivo não encontrado'));if(blobs.has(id))return Promise.resolve(blobs.get(id));
   if(a.exemplo)return Promise.reject(new Error('este é um arquivo de exemplo, sem conteúdo'));
   return fnArq('baixar',{arquivo_id:id}).then(function(r){return fetch(r.url);}).then(function(res){if(!res.ok)throw new Error('download recusado');return res.blob();}).then(function(bl){blobs.set(id,bl);return bl;});}
+/* ===== Guia de componentes (catálogo Implacil Osstem 2026). Os dados ficam em componentes.js, carregado só quando abre a aba.
+   Anotações e favoritos de cada cadista ficam na tabela comp_notas (com dono e RLS). ===== */
+var COMP={ok:false,busy:false,erro:false,notas:{},notasOk:false,notasBusy:false};
+var COMP_LIN=[['','Todas'],['CM','Cone Morse'],['HE','Hexágono Externo'],['HI','Hexágono Interno'],['Stretto','Stretto / Slim'],['TS','Osstem TS']];
+var COMP_TIPOS=[['Scanbody','Scanbody'],['Ti-Base / Base T','Ti-Base / Base T'],['Mini pilar','Mini pilar'],['Munhão / Pilar','Munhão / Pilar'],['UCLA','UCLA'],['Pilar provisório','Provisório'],['Análogo','Análogo'],['Transfer','Transfer'],['Cicatrizador','Cicatrizador'],['Parafuso','Parafuso'],['O’Ring / Overdenture','Overdenture'],['Kit / Seleção','Kit seleção']];
+var COMP_LIN_NOME={CM:'Cone Morse',HE:'Hexágono Externo',HI:'Hexágono Interno',Stretto:'Stretto',Slim:'Slim',TS:'Osstem TS'};
+var COMP_SIN=[[/scan\s*-?\s*body|transfer(ente)?\s+digital|corpo\s+de\s+escaneamento|scancorp|escaneamento/g,' scanbody '],[/ti\s*-?\s*base|base\s*-?\s*t\b|tibase|pilar\s+link/g,' tibase '],[/mini\s*-?\s*pilar(es)?|mini\s*-?\s*conico|micro\s*-?\s*conico|pilar\s+multi|multi\s+(angled\s+)?abutment|conico\s+estetico|\bmua\b/g,' minipilar '],[/munhao|pilar\s+ideale|pilar\s+reto|pilar\s+angulado|pilar\s+transfer/g,' munhao '],[/cone\s*-?\s*morse/g,' cm '],[/hex(agono|\.)?\s*externo/g,' he '],[/hex(agono|\.)?\s*interno/g,' hi '],[/analogo/g,' analogo '],[/tampa\s+de\s+cicatriza\w*|cicatrizador(es)?/g,' cicatrizador '],[/o\s*ring|overdenture|barra\s+clip/g,' oring '],[/osstem|\bts\s*i{3,4}\b|\btsi{3,4}\b|\bts\s*iv\b|\btsiv\b/g,' ts '],[/provisori[oa]s?|temporar(y|io)/g,' provisorio '],[/parafusos?/g,' parafuso '],[/\bstretto\b|\bslim\b/g,' stretto ']];
+function compNorm(s){s=String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[ø’'`´“”"]/g,' ').replace(/(\d),(\d)/g,'$1.$2').replace(/°/g,' graus ');
+  COMP_SIN.forEach(function(x){s=s.replace(x[0],x[1]);});return s.replace(/[()|/:;·–—?!¿¡*+=\[\]{}<>]/g,' ').replace(/\.(?!\d)|(^|[^\d])\./g,'$1 ').replace(/\s+/g,' ').trim();}
+function compCarrega(){if(COMP.ok)return Promise.resolve();if(COMP._p)return COMP._p;COMP.busy=true;
+  COMP._p=new Promise(function(ok){var sc=document.createElement('script');sc.src='componentes.js?v='+encodeURIComponent(VERSAO);
+    sc.onload=function(){COMP.busy=false;var C=window.COMP_CAT;if(!C||!C.itens){COMP.erro=true;COMP._p=null;ok();return;}
+      C.itens.forEach(function(c,i){c._i=i;var cel=[];(c.rows||[]).forEach(function(r){cel=cel.concat(r);});if(c.extra)(c.extra.rows||[]).forEach(function(r){cel=cel.concat(r);});
+        c._h=' '+compNorm([c.nome,c.tipo,c.lin,COMP_LIN_NOME[c.lin]||'',c.desc,c.imp,c.chave,c.torque,c.nota,c.exo?'exocad biblioteca':'',(c.cols||[]).join(' '),cel.join(' '),c.extra?c.extra.t+' '+c.extra.cols.join(' ')+' '+(c.extra.nota||''):''].join(' '))+' ';
+        c._n=' '+compNorm(c.nome+' '+c.tipo)+' ';});
+      COMP.ok=true;ok();};
+    sc.onerror=function(){COMP.busy=false;COMP.erro=true;COMP._p=null;ok();};document.head.appendChild(sc);});
+  return COMP._p;}
+function compItens(){return (window.COMP_CAT&&window.COMP_CAT.itens)||[];}
+function compById(id){return compItens().filter(function(c){return c.id===id;})[0]||null;}
+function compToks(q){return compNorm(q).split(' ').filter(function(t){return t&&['de','do','da','para','pra','o','a','e','com','qual','quais','que','um','uma','no','na','em','me','mostra','mostre','ver','sobre','implante','implantes','componente','componentes','codigo','implacil','tem','eu','uso','usar','preciso','procuro','onde','acho','o','os','as','dos','das','é','e'].indexOf(t)<0;});}
+function compTokOk(h,t){if(/^\d+(\.\d+)?$/.test(t)&&t.length<4)return new RegExp('(^|[^0-9.])'+t.replace('.','\\.')+'([^0-9]|$)').test(h);
+  if(t.length<=2)return new RegExp('(^|[^a-z0-9])'+t+'([^a-z0-9]|$)').test(h);return h.indexOf(t)>=0;}
+function compBusca(q,lin,tipo,soFav){var T=compToks(q),LT={cm:'CM',he:'HE',hi:'HI',ts:'TS',stretto:'Stretto'},tl=T.filter(function(t){return LT[t];});
+  if(!lin&&tl.length===1){lin=LT[tl[0]];T=T.filter(function(t){return !LT[t];});}
+  return compItens().filter(function(c){if(lin&&!(c.lin===lin||(lin==='Stretto'&&c.lin==='Slim')))return false;if(tipo&&c.tipo!==tipo)return false;if(soFav&&!(COMP.notas[c.id]&&COMP.notas[c.id].fav))return false;
+    return T.every(function(t){return compTokOk(c._h,t);});})
+    .map(function(c){var sc=0;T.forEach(function(t){if(compTokOk(c._n,t))sc+=3;});if(COMP.notas[c.id]&&COMP.notas[c.id].fav)sc+=1;return {c:c,s:sc};})
+    .sort(function(a,b){return b.s-a.s||a.c._i-b.c._i;}).map(function(x){return x.c;});}
+/* onde o código buscado aparece dentro do cartão (linha + coluna) */
+function compAchados(c,q){var T=compToks(q).filter(function(t){return /\d{4,}|[a-z]{2,}\d{2,}/.test(t);});if(!T.length)return [];var out=[];
+  function olha(cols,rows,tit){(rows||[]).forEach(function(r){r.forEach(function(v,j){if(j===0&&cols.length>1)return;var nv=compNorm(v);T.forEach(function(t){if(nv.indexOf(t)>=0&&out.length<4)out.push({cod:v.replace(/\s*⚠/,''),onde:(cols.length>1?r[0]+(cols[j]&&cols[j]!=='Código'?' · '+cols[j]:''):'')+(tit?' ('+tit+')':''),al:/⚠/.test(v)});});});});}
+  olha(c.cols||[],c.rows,'');if(c.extra)olha(c.extra.cols,c.extra.rows,c.extra.t);return out;}
+/* pergunta tipo "scanbody do mini pilar": mostra a peça que combina, de dentro do cartão */
+function compPeca(c,q){var K=compToks(q).filter(function(t){return ['scanbody','analogo','tibase','parafuso','cicatrizador','transfer','provisorio'].indexOf(t)>=0&&c._n.indexOf(' '+t+' ')<0;}),out=[];if(!K.length)return out;
+  [[c.cols||[],c.rows],c.extra?[c.extra.cols,c.extra.rows]:null].forEach(function(T){if(!T||T[0].length<2)return;T[1].forEach(function(r){var n=' '+compNorm(r[0])+' ';if(K.some(function(k){return n.indexOf(' '+k+' ')>=0;})&&out.length<2)out.push({cod:r.slice(1).filter(function(v){return v&&v!=='–';}).join(' / '),onde:r[0]});});});return out;}
+function compNotasCarrega(){if(COMP.notasOk||COMP.notasBusy||EM_DEMO||!S.sessao)return;COMP.notasBusy=true;
+  sb.from('comp_notas').select('comp_id,texto,fav').then(function(r){COMP.notasBusy=false;COMP.notasOk=true;(r.data||[]).forEach(function(n){COMP.notas[n.comp_id]={texto:n.texto||'',fav:!!n.fav};});if(ui.tab==='comp'&&!ui.sheet)render();},function(){COMP.notasBusy=false;});}
+function compNotaSalva(id,o){var n=COMP.notas[id]=Object.assign({texto:'',fav:false},COMP.notas[id]||{},o);
+  if(EM_DEMO||!S.sessao)return Promise.resolve(true);
+  return sb.from('comp_notas').upsert({user_id:S.sessao.id,comp_id:id,texto:n.texto||null,fav:!!n.fav,atualizado_em:new Date().toISOString()},{onConflict:'user_id,comp_id'}).then(function(r){if(r&&r.error){toast('Não foi possível salvar a anotação.');return false;}return true;},function(){toast('Sem conexão: a anotação não foi salva.');return false;});}
+function compTabela(cols,rows){return '<div class="cp-tw"><table class="cp-tb"><thead><tr>'+cols.map(function(h){return '<th>'+esc(h)+'</th>';}).join('')+'</tr></thead><tbody>'+
+  rows.map(function(r){return '<tr>'+r.map(function(v,j){var al=/⚠/.test(v),cod=/^[A-Z0-9][A-Z0-9-]{3,}$/.test(String(v).replace(/\s*⚠/,''))&&/\d/.test(v);return '<td'+(j===0?' class="cp-h"':'')+'>'+(cod?'<button type="button" class="cp-cod'+(al?' al':'')+'" data-a="copiaTxt" data-v="'+esc(String(v).replace(/\s*⚠/,''))+'" title="Copiar código">'+esc(v)+'</button>':esc(v))+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
+function compTags(c){return '<span class="cp-lin l-'+esc(c.lin)+'">'+esc(c.lin==='TS'?'Osstem TS':c.lin)+'</span><span class="cp-tp">'+esc(c.tipo)+'</span>'+(c.exo?'<span class="cp-exo">Exocad</span>':'')+(c.alerta?'<span class="cp-al" title="Tem código para confirmar">⚠ conferir</span>':'');}
+function rComp(){
+  if(!COMP.ok){if(!COMP.busy&&!COMP.erro)compCarrega().then(function(){if(ui.tab==='comp')render();});
+    return COMP.erro?'<section class="card stack"><b>Não consegui abrir o catálogo.</b><span class="muted">Confira a internet e tente de novo.</span><button class="btn sm" data-a="compTenta">Tentar de novo</button></section>':'<section class="card"><span class="muted">Abrindo o catálogo…</span></section>';}
+  compNotasCarrega();
+  var q=ui.compQ||'',lin=ui.compLin||'',tp=ui.compTipo||'',fav=!!ui.compFav,L=compBusca(q,lin,tp,fav),nFav=Object.keys(COMP.notas).filter(function(k){return COMP.notas[k].fav;}).length;
+  var gm=/\bgm\b|grand\s*morse|neodent|straumann|nobel|\bsin\b|megagen|eff\s*dental|conexao|titanium\s*fix/i.test(q);
+  var lst=L.slice(0,ui.compMais?400:60);
+  return '<div class="stack cp" style="gap:14px">'+
+    '<section class="card cp-hd"><div><h2 style="margin:0">Guia de componentes</h2><p class="muted small" style="margin:2px 0 0">'+esc(window.COMP_CAT.fonte)+' · '+compItens().length+' componentes. Busque por nome, tipo, conexão, medida ou código.</p></div>'+
+      '<input class="search so-cel" id="comp-busca" type="search" autocomplete="off" placeholder="Ex.: scanbody cm, mini pilar 4.8, 24538" value="'+esc(q)+'">'+
+      '<div class="seg" role="group" aria-label="Linha">'+COMP_LIN.map(function(x){return '<button class="'+(lin===x[0]?'on':'')+'" data-a="compLin" data-v="'+x[0]+'">'+esc(x[1])+'</button>';}).join('')+'</div>'+
+      '<div class="seg" role="group" aria-label="Tipo">'+(nFav||fav?'<button class="'+(fav?'on':'')+'" data-a="compFavFil">★ Meus ('+nFav+')</button>':'')+'<button class="'+(tp?'':'on')+'" data-a="compTipo" data-v="">Todos os tipos</button>'+COMP_TIPOS.map(function(x){return '<button class="'+(tp===x[0]?'on':'')+'" data-a="compTipo" data-v="'+esc(x[0])+'">'+esc(x[1])+'</button>';}).join('')+'</div>'+
+    '</section>'+
+    (L.length?'<div class="small muted">'+L.length+' resultado'+(L.length>1?'s':'')+(q?' para “'+esc(q)+'”':'')+'</div><div class="cp-list">'+lst.map(function(c){var n=COMP.notas[c.id],ach=compAchados(c,q);if(!ach.length)ach=compPeca(c,q);
+      return '<button class="card cp-it" data-a="compVer" data-id="'+esc(c.id)+'"><span class="cp-t"><b>'+(n&&n.fav?'<span class="cp-star">★</span> ':'')+esc(c.nome)+'</b><span class="cp-pg">pág. '+c.pag+'</span></span>'+
+        '<span class="cp-tags">'+compTags(c)+'</span>'+
+        (ach.length?'<span class="cp-ach">'+ach.map(function(a){return '<span><b class="mono">'+esc(a.cod)+'</b>'+(a.onde?' · '+esc(a.onde):'')+(a.al?' ⚠':'')+'</span>';}).join('')+'</span>':
+          '<span class="cp-sub">'+esc([c.chave?'Chave: '+c.chave:'',c.torque?'Torque: '+c.torque:''].filter(Boolean).join(' · ')||c.desc||'')+'</span>')+
+        (n&&n.texto?'<span class="cp-nt">📝 '+esc(n.texto.length>90?n.texto.slice(0,90)+'…':n.texto)+'</span>':'')+'</button>';}).join('')+'</div>'+
+      (L.length>lst.length?'<button class="btn block" data-a="compMais">Mostrar todos ('+L.length+')</button>':''):
+      '<section class="card stack"><b>Nada encontrado'+(q?' para “'+esc(q)+'”':'')+'.</b>'+(gm?'<span>Este guia tem só o catálogo da <b>Implacil Osstem</b>. GM é da Neodent: quando você mandar o catálogo dela (ou de outra marca), a gente inclui aqui.</span>':'<span class="muted">Tente menos palavras (ex.: “scanbody he”) ou tire os filtros.</span>')+
+        (q||lin||tp||fav?'<button class="btn sm" data-a="compLimpa">Limpar busca e filtros</button>':'')+'</section>')+
+    '<p class="small muted" style="margin:4px 0 0">Transcrito do catálogo da marca para consulta. Confira o código na embalagem antes de pedir. Os códigos marcados com ⚠ estão assim no catálogo e parecem erro de impressão.</p></div>';}
+function fComp(id){var c=compById(id);if(!c)return head('Componente')+'<p class="empty">Componente não encontrado.</p>';var n=COMP.notas[id]||{texto:'',fav:false};
+  var rel=(c.usa||[]).map(compById).filter(Boolean);
+  return head(esc(c.nome))+
+    '<div class="row wrap" style="gap:6px">'+compTags(c)+'<button class="btn sm cp-favb'+(n.fav?' on':'')+'" data-a="compFav" data-id="'+esc(c.id)+'">'+(n.fav?'★ Nos meus':'☆ Guardar nos meus')+'</button></div>'+
+    (c.desc?'<p style="margin:10px 0">'+esc(c.desc)+'</p>':'')+
+    '<div class="grid2 small cp-kv">'+(c.imp?kv('Implantes',esc(c.imp)):'')+(c.chave?kv('Chave',esc(c.chave)):'')+(c.torque?kv('Torque',esc(c.torque)):'')+kv('Linha',esc(COMP_LIN_NOME[c.lin]||c.lin))+'</div>'+
+    (c.alerta?'<div class="banner cp-ban"><span>⚠ '+esc(c.alerta)+'</span></div>':'')+
+    '<h3 class="cp-h3">Códigos</h3>'+compTabela(c.cols,c.rows)+
+    (c.extra?'<h3 class="cp-h3">'+esc(c.extra.t)+'</h3>'+compTabela(c.extra.cols,c.extra.rows)+(c.extra.nota?'<p class="small muted" style="margin:6px 0 0">'+esc(c.extra.nota)+'</p>':''):'')+
+    (c.nota?'<p class="small muted" style="margin:8px 0 0">'+esc(c.nota)+'</p>':'')+
+    (c.exo?'<p class="small" style="margin:8px 0 0">🧩 <b>Exocad:</b> a biblioteca oficial fica no site da Implacil Osstem (QR “Saiba mais” no catálogo).</p>':'')+
+    (rel.length?'<h3 class="cp-h3">Combina com</h3><div class="cp-rel">'+rel.map(function(r){return '<button class="chip" data-a="compVer" data-id="'+esc(r.id)+'">'+esc(r.nome)+'</button>';}).join('')+'</div>':'')+
+    '<form class="cp-nform" data-form="compNota"><input type="hidden" name="id" value="'+esc(c.id)+'"><label class="fld"><span>Minha anotação <small class="muted">(só você vê)</small></span><textarea name="t" maxlength="600" rows="3" placeholder="Ex.: uso a cinta 2.5 nos casos do Dr. X; pedir com 2 dias de antecedência">'+esc(n.texto||'')+'</textarea></label><button class="btn sm pri" type="submit">Salvar anotação</button></form>'+
+    '<p class="small muted" style="margin:10px 0 0">Fonte: '+esc(window.COMP_CAT.fonte)+', página '+c.pag+'.</p>';}
+/* No pedido sobre implante Implacil/Osstem: atalho para o guia já filtrado pela conexão */
+function compQDe(i){if(!i||!i.imp)return null;var m=String(i.m||''),c=compNorm(i.c||'');if(!/implacil|osstem/i.test(m+' '+(i.c||'')))return null;
+  var lin=/osstem/i.test(m)?'ts':/\bcm\b/.test(c)?'cm':/\bhe\b/.test(c)?'he':/\bhi\b/.test(c)?'hi':/stretto/.test(c)?'stretto':'';
+  var tp=/minipilar/.test(c)?'minipilar':/tibase/.test(c)?'tibase':/munhao/.test(c)?'munhao':'';return [tp,lin].filter(Boolean).join(' ');}
+/* Ana: "qual o scanbody do mini pilar cm?" */
+function compAnaResp(g,q){var L=compBusca(q,'','',false);
+  if(!L.length){iaDiz(g,{t:/\bgm\b|grand\s*morse|neodent/i.test(q)?'Esse é Neodent (GM). No guia por enquanto só tem o catálogo da Implacil Osstem. Se você me mandar o catálogo da Neodent, eu incluo.':'Não achei esse componente no catálogo da Implacil Osstem. Tente com outras palavras, tipo “scanbody he” ou o código.',bts:[{a:'compAbre',l:'Abrir o guia de componentes',v:''}]});return;}
+  var top=L.slice(0,5);
+  iaDiz(g,{t:L.length===1?'Achei no catálogo da Implacil Osstem:':'Achei '+L.length+' no catálogo da Implacil Osstem'+(L.length>5?'. Os 5 mais próximos:':':'),
+    lst:top.map(function(c){var a=compAchados(c,q)[0]||compPeca(c,q)[0];return {t:c.nome,s:(a?a.cod+(a.onde?' · '+a.onde:'')+' · ':'')+(COMP_LIN_NOME[c.lin]||c.lin)+' · pág. '+c.pag,bt:{a:'compVer',id:c.id,l:'Ver'}};}),
+    bts:[{a:'compAbre',l:L.length>5?'Ver todos no guia':'Abrir o guia',v:q}]});}
 function rVisu(){setTimeout(vzBox,0);
   var side=VZ.lado?'<div class="between"><h3 style="margin:0">Meus pedidos</h3><button class="icon-btn" data-a="vzLado" aria-label="Recolher a lista" title="Recolher">‹</button></div>'+
     '<p class="small muted" style="margin:0">Abra os arquivos de um pedido direto no visualizador. Ou arraste os arquivos do computador para a tela ao lado.</p>'+vzPedidosHtml()
@@ -6290,6 +6422,15 @@ impGrava:function(){impGrava();},
   instalarApp:function(){var e=window._instalar;if(!e)return;e.prompt();e.userChoice.then(function(r){window._instalar=null;render();toast(r.outcome==='accepted'?'Pronto! O Ideali CAD está na sua tela inicial.':'Tudo bem, dá para instalar depois.');});},
   addRef:function(){if(!guard())return;var f=refFaltando();f.forEach(function(r){S.tipos.push({id:uid(),nome:r[0],forma:r[1],valor:0,ativo:true});});save();render();toast(f.length+' trabalho(s) adicionado(s) com R$ 0,00.');},
   contaIr:function(d){ui.ddOpen=null;A.tab(d);},
+  compLin:function(d){ui.compLin=d.v||'';ui.compMais=false;render();},
+  compTipo:function(d){ui.compTipo=d.v||'';ui.compMais=false;render();},
+  compFavFil:function(){ui.compFav=!ui.compFav;render();},
+  compMais:function(){ui.compMais=true;render();},
+  compLimpa:function(){ui.compQ='';ui.compLin='';ui.compTipo='';ui.compFav=false;ui.compMais=false;render();},
+  compTenta:function(){COMP.erro=false;render();},
+  compAbre:function(d){ui.compQ=d.v||'';ui.compLin='';ui.compTipo='';ui.compFav=false;ui.tab='comp';ui.sub=null;closeSheet();render();window.scrollTo(0,0);},
+  compVer:function(d){var go=function(){openSheet(fComp,d.id);};if(COMP.ok)go();else compCarrega().then(go);},
+  compFav:function(d){var n=COMP.notas[d.id]||{};compNotaSalva(d.id,{fav:!n.fav}).then(function(ok){if(ok)toast(!n.fav?'Guardado em “Meus componentes”.':'Tirado dos seus.');});renderSheet();if(ui.tab==='comp')render();},
   tab:function(d){ui.tab=d.v;ui.msgs=false;ui.sub=d.sub||null;ui.drawer=false;if('f' in d)ui.filtro=d.f==='urg'?'urg':'todos';closeSheet();render();window.scrollTo(0,0);passeioTira();passeioAgenda();},
   libTg:function(d,el){var L=libEstado();if(el.checked)L.all=1;else delete L.all;save();render();toast(el.checked?'Todas as funções liberadas.':'As funções vão aparecer aos poucos.');},
   libTudo:function(){var L=libEstado();L.all=1;save();render();toast('Pronto! Tudo liberado.');},
@@ -6465,6 +6606,7 @@ tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l
   bg:function(d,el,e){if(e.target===el)closeSheet();}
 };
 var F={
+  compNota:function(fd){var id=String(fd.get('id')||''),t=String(fd.get('t')||'').trim().slice(0,600);compNotaSalva(id,{texto:t}).then(function(ok){if(ok)toast(t?'Anotação salva.':'Anotação apagada.');});renderSheet();},
   whatsObrig:function(fd){var v=String(fd.get('tel')||'').trim();if(soDig(v).length<10||soDig(v).length>13){toast('Digite o WhatsApp com DDD.');return;}S.perfil.telefone=v;save();render();toast('WhatsApp salvo. Obrigado!');},
   iaPerg:function(fd,f){var q=String(fd.get('q')||'').trim(),g=f.dataset.g;if(!q||ui.iaEsperando)return;
     if(g==='mkt'){var nl0=[];try{nl0=leadsDoTexto(q);}catch(e){}if(nl0.length){f.reset();mikaListaLeads(q);return;}}
@@ -6690,6 +6832,7 @@ document.addEventListener('input',function(e){
   if(t.id==='adm-busca'){ui.admBusca=t.value;var pa=t.selectionStart;render();var ab=document.getElementById('adm-busca');ab.focus();try{ab.setSelectionRange(pa,pa);}catch(x){}}
   if(t.id==='cl-doc'){var d=soDig(t.value).slice(0,14),v=d;if(d.length>11)v=d.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})(\d{0,2}).*/,function(m,a,b,c,e,f){return a+'.'+b+'.'+c+'/'+e+(f?'-'+f:'');});else if(d.length>9)v=d.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');else if(d.length>6)v=d.replace(/^(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');else if(d.length>3)v=d.replace(/^(\d{3})(\d{0,3})/,'$1.$2');if(v!==t.value)t.value=v;}
   if(t.id==='cli-busca'){ui.cliBusca=t.value;var ps=t.selectionStart;render();var cb=document.getElementById('cli-busca');cb.focus();try{cb.setSelectionRange(ps,ps);}catch(x){}}
+  if(t.id==='comp-busca'||(t.id==='busca-top'&&ui.tab==='comp')){ui.compQ=t.value;ui.compMais=false;var pc=t.selectionStart,idc=t.id;render();var cbx=document.getElementById(idc);if(cbx){cbx.focus();try{cbx.setSelectionRange(pc,pc);}catch(x){}}}
   if(t.id==='busca-top'&&ui.tab==='pedidos'){ui.busca=t.value;var pt=t.selectionStart;render();var tb=document.getElementById('busca-top');if(tb){tb.focus();try{tb.setSelectionRange(pt,pt);}catch(x){}}}
   if(t.id==='busca'){ui.busca=t.value;var pos=t.selectionStart;render();var b=document.getElementById('busca');b.focus();try{b.setSelectionRange(pos,pos);}catch(x){}}
   if(t.closest&&t.closest('form[data-form="pedido"]')){if(t.id==='pd-valor')t.dataset.manual='1';else atualizaCalc();}
@@ -6764,7 +6907,7 @@ function msgAuth(e){var m=(e&&e.message)||'';
   if(/fetch|network/i.test(m))return 'Sem conexão com a internet.';
   return 'Não foi possível concluir: '+m;}
 /* Rota na URL (#/aba ou #/aba/sub): F5 volta para a mesma tela e o botão Voltar do navegador troca de aba */
-var ROTAS=['leads','dashboard','pedidos','clientes','financeiro','ranking','arquivos','tipos','lixeira','tabela','rede','lab','analises','metas','secretarios','visu','config','admin','mais'];
+var ROTAS=['leads','dashboard','pedidos','clientes','financeiro','ranking','arquivos','tipos','lixeira','tabela','rede','lab','analises','metas','secretarios','visu','comp','config','admin','mais'];
 function rotaLe(){var m=/^#\/([a-z]+)(?:\/([A-Za-z0-9_-]+))?$/.exec(location.hash||'');return m&&ROTAS.indexOf(m[1])>=0?{tab:m[1],sub:m[2]||null}:null;}
 function rotaSync(){if(!S.sessao||S.carregando||!ui.dadosOk||ui.tour!=null||ui.equipe!=null)return;var h='#/'+ui.tab+(ui.sub&&typeof ui.sub==='string'?'/'+ui.sub:'');if(location.hash===h){ui._rotaTab=ui.tab;return;}
   try{if(ui._rotaTab&&ui._rotaTab!==ui.tab)history.pushState(null,'',location.pathname+h);else history.replaceState(null,'',location.pathname+h);}catch(e){}ui._rotaTab=ui.tab;}

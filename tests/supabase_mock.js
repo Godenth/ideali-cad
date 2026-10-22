@@ -2,7 +2,7 @@
 (function(){
   var U='dddddddd-0000-0000-0000-000000000004';
   var tabelas={perfis:[{user_id:U,nome:'Danilo',preferencias:{}}],assinaturas:[{user_id:U,plano:'basico',status:'teste',teste_ate:new Date(Date.now()+13*864e5).toISOString(),limite_bytes:5368709120,bytes_usados:0}],
-    clientes:[],tipos_trabalho:[],precos_cliente:[],faixas_desconto:[],pagamentos:[],pedidos:[],arquivos:[],links_cliente:[],perfil_rede:[]};
+    clientes:[],tipos_trabalho:[],precos_cliente:[],faixas_desconto:[],pagamentos:[],pedidos:[],arquivos:[],links_cliente:[],perfil_rede:[],comp_notas:[]};
   window.__ops=[];var cbs=[],sessao=null;
   function Q(t){this.t=t;this.f=[];}
   Q.prototype.select=function(){this.op='select';return this;};
@@ -15,7 +15,7 @@
   Q.prototype.then=function(ok,ko){var me=this;return Promise.resolve().then(function(){
     var rows=tabelas[me.t];
     if(me.op==='insert'){window.__ops.push({op:'insert',t:me.t,row:JSON.parse(JSON.stringify(me.row))});rows.push(Object.assign({},me.row,{criado_em:new Date().toISOString()}));return {error:null};}
-    if(me.op==='upsert'){window.__ops.push({op:'upsert',t:me.t,row:JSON.parse(JSON.stringify(me.row))});var ex=rows.filter(function(r){return r.user_id===me.row.user_id;})[0];if(ex)Object.assign(ex,me.row);else rows.push(Object.assign({},me.row));return {error:null};}
+    if(me.op==='upsert'){window.__ops.push({op:'upsert',t:me.t,row:JSON.parse(JSON.stringify(me.row))});var ex=rows.filter(function(r){return r.user_id===me.row.user_id&&(me.row.comp_id==null||r.comp_id===me.row.comp_id);})[0];if(ex)Object.assign(ex,me.row);else rows.push(Object.assign({},me.row));return {error:null};}
     var sel=rows.filter(function(r){return me.f.every(function(f){return r[f[0]]===f[1];});});
     if(me.op==='update'){window.__ops.push({op:'update',t:me.t,row:JSON.parse(JSON.stringify(me.row)),where:me.f});sel.forEach(function(r){Object.assign(r,me.row);});return {error:null};}
     return {data:me.single?(sel[0]||null):JSON.parse(JSON.stringify(sel)),error:null};
