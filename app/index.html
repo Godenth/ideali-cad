@@ -1735,7 +1735,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='23/10 · 21h00';
+var VERSAO='23/10 · 21h15';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -5757,6 +5757,7 @@ function fPagamento(cid,preIds){
     '<label class="fld"><span>Cliente</span><select id="pg-cli" name="clienteId" required data-a2="pgCli"><option value="">Escolha…</option>'+cs.map(function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select></label>'+
     (cid?'<div class="fld"><span>Pedidos que este pagamento quita</span>'+(abertos.length?'<div class="list card" style="padding:4px 12px">'+abertos.map(function(p){var t=tipoPed(p);
       return '<label class="li check" style="justify-content:flex-start"><input type="checkbox" name="pedidos" value="'+p.id+'" data-v="'+p.valor+'" '+(preIds.indexOf(p.id)>=0?'checked':'')+'><span class="t" style="flex:1"><b>#'+p.num+' '+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</b><span>'+stLabel(p.status)+' · '+dm(p.recebido)+'</span></span><span class="mono small">'+brl(p.valor)+'</span></label>';}).join('')+'</div>':'<p class="small muted">Este cliente não tem pedidos em aberto.</p>')+'</div>':'')+
+    (cid&&abertos.length?'<div class="grid2"><label class="fld"><span>Desconto</span><span class="row" style="gap:6px"><input id="pg-desc" name="desc" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0" style="flex:1"><select id="pg-dtipo" name="dtipo" style="width:76px"><option value="r">R$</option><option value="p">%</option></select></span></label><div class="fld"><span>Total com desconto</span><b id="pg-tot" class="mono" style="font-size:1.1rem;padding-top:8px">'+brl(tot)+'</b></div></div>':'')+
     '<div class="grid2"><label class="fld"><span>Valor recebido (R$)</span><input id="pg-valor" name="valor" type="number" step="0.01" min="0.01" required value="'+(tot?tot.toFixed(2):'')+'"></label>'+
     '<label class="fld"><span>Data</span><input id="pg-data" name="data" type="date" required value="'+today()+'"></label></div>'+
     '<label class="fld"><span>Forma</span><select id="pg-forma" name="forma"><option value="pix">Pix</option><option value="transferencia">Transferência</option><option value="dinheiro">Dinheiro</option><option value="cartao">Cartão</option></select></label>'+
@@ -5764,6 +5765,9 @@ function fPagamento(cid,preIds){
     '<label class="fld"><span>Observações</span><input id="pg-obs" name="obs" maxlength="200"></label>'+
     '<button class="btn pri block" type="submit">Registrar</button></form>';
 }
+/* soma dos pedidos marcados menos o desconto (em R$ ou %) */
+function pgDesconto(f){var s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});var dv=f.desc?Math.max(0,parseFloat(f.desc.value)||0):0,pc=f.dtipo&&f.dtipo.value==='p';var d=pc?s*Math.min(dv,100)/100:Math.min(dv,s);return {soma:s,d:Math.round(d*100)/100};}
+function pgCalc(f){var r=pgDesconto(f),liq=Math.max(0,r.soma-r.d);f.valor.value=liq?liq.toFixed(2):'';var e=f.querySelector('#pg-tot');if(e)e.innerHTML=r.d?'<s class="muted" style="font-size:.85rem">'+brl(r.soma)+'</s> '+brl(liq):brl(liq);}
 function fPagDet(id){
   var g=byId(S.pagamentos,id),c=cliente(g.clienteId),w=canWrite()?'':'disabled';
   return head('Pagamento')+'<div class="grid2 small">'+kv('Cliente',esc(c?c.nome:''))+kv('Valor','<b class="mono">'+brl(g.valor)+'</b>')+kv('Data',dmy(g.data))+kv('Forma',formaNome(g.forma))+'</div>'+
@@ -6872,10 +6876,15 @@ var F={
     var g={id:uid(),clienteId:cid,valor:parseFloat(fd.get('valor'))||0,data:fd.get('data'),forma:fd.get('forma'),obs:(fd.get('obs')||'').trim(),pedidos:ids,
       comprovante:file&&file.size?{nome:file.name,tam:file.size}:null};
     if(g.comprovante&&file.size>10*MB){toast('Comprovante maior que 10 MB.');return;}
-    var soma_=soma(ids.map(function(i){return byId(S.pedidos,i);}));
-    ids.forEach(function(i){var p=byId(S.pedidos,i);p.pago=g.data;p.pagamentoId=g.id;});
+    var peds=ids.map(function(i){return byId(S.pedidos,i);}).filter(Boolean),soma_=soma(peds),fm=document.querySelector('form[data-form="pagamento"]'),dsc=fm?pgDesconto(fm).d:0;
+    /* recebeu menos que o total e não marcou desconto: pergunta se a diferença é desconto */
+    if(!dsc&&peds.length&&g.valor<soma_-0.009&&confirm('Recebido '+brl(g.valor)+', mas os pedidos somam '+brl(soma_)+'.\n\nOK = a diferença ('+brl(soma_-g.valor)+') foi DESCONTO e os pedidos ficam quitados.\nCancelar = registrar sem desconto.'))dsc=Math.round((soma_-g.valor)*100)/100;
+    if(dsc>0&&soma_>0){var resto=dsc;peds.forEach(function(p,k){var orig=+p.valor||0,parte=k===peds.length-1?resto:Math.round(orig*dsc/soma_*100)/100;parte=Math.min(parte,orig);resto=Math.round((resto-parte)*100)/100;
+        p.valor=Math.round((orig-parte)*100)/100;p.obs=((p.obs?p.obs+' · ':'')+'Desconto de '+brl(parte)+' no pagamento (era '+brl(orig)+')').slice(-500);});
+      g.obs=((g.obs?g.obs+' · ':'')+'Desconto de '+brl(dsc)+' (pedidos somavam '+brl(soma_)+')').slice(-140);soma_=Math.round((soma_-dsc)*100)/100;}
+    peds.forEach(function(p){p.pago=g.data;p.pagamentoId=g.id;});
     S.pagamentos.push(g);save();closeSheet();render();
-    toast('Pagamento de '+brl(g.valor)+' registrado'+(ids.length?', '+ids.length+' pedido(s) pago(s)':'')+(ids.length&&Math.abs(soma_-g.valor)>0.009?'. Atenção: diferença de '+brl(g.valor-soma_)+' para os pedidos.':'.'));
+    toast('Pagamento de '+brl(g.valor)+' registrado'+(peds.length?', '+peds.length+' pedido(s) pago(s)':'')+(dsc>0?' com desconto de '+brl(dsc):'')+(peds.length&&Math.abs(soma_-g.valor)>0.009?'. Atenção: diferença de '+brl(g.valor-soma_)+' para os pedidos.':'.'),4500);
   },
   pendencia:function(fd,f){
     if(!guard())return;var p=byId(S.pedidos,f.dataset.id),m=fd.getAll('motivo'),o=(fd.get('obs')||'').trim();
@@ -6973,7 +6982,7 @@ document.addEventListener('input',function(e){
   if(t.id==='busca'){ui.busca=t.value;var pos=t.selectionStart;render();var b=document.getElementById('busca');b.focus();try{b.setSelectionRange(pos,pos);}catch(x){}}
   if(t.closest&&t.closest('form[data-form="pedido"]')){if(t.id==='pd-valor')t.dataset.manual='1';else atualizaCalc();}
   if(t.id==='px-valor')desenhaPix();
-  if(t.name==='pedidos'){var f=t.closest('form'),s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});f.valor.value=s?s.toFixed(2):'';}
+  if(t.name==='pedidos'||t.id==='pg-desc'||t.id==='pg-dtipo'){var f=t.closest('form');if(f)pgCalc(f);}
 });
 document.addEventListener('paste',function(e){if(!SBED&&!ui.sheet&&ui.tab==='leads'){var ae2=document.activeElement,im2=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(im2){e.preventDefault();leadsLePrint(im2.getAsFile());return;}if(ae2&&/^(INPUT|TEXTAREA)$/.test(ae2.tagName))return;var tx2=e.clipboardData&&e.clipboardData.getData('text');if(tx2&&leadsDoTexto(tx2).length){e.preventDefault();leadsTextoImp(tx2);}return;}if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet&&ui.tab==='secretarios'&&ui.secAg==='mkt'){var tx0=e.clipboardData&&e.clipboardData.getData('text'),hasImg=[].some.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);});if(!hasImg&&tx0&&/\n/.test(tx0.trim())&&leadsDoTexto(tx0).length){e.preventDefault();mikaListaLeads(tx0);return;}var im0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(im0){e.preventDefault();leadsLePrint(im0.getAsFile());return;}}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it&&ui.sheet&&ui.sheet.fn===fLeads){var ae1=document.activeElement;if(ae1&&/^(INPUT|TEXTAREA)$/.test(ae1.tagName))return;var tx1=e.clipboardData&&e.clipboardData.getData('text');if(tx1&&leadsDoTexto(tx1).length){e.preventDefault();leadsTextoImp(tx1);}return;}if(!it)return;if(ui.sheet&&ui.sheet.fn===fLeads){e.preventDefault();leadsLePrint(it.getAsFile());return;}
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.type!=='file')return;
@@ -6993,6 +7002,7 @@ document.addEventListener('change',function(e){if(e.target&&e.target.id==='pp-cl
   if(e.target&&e.target.classList&&e.target.classList.contains('rd-sb-up')&&e.target.files.length){var f1=e.target.files[0],id1=e.target.dataset.id;e.target.value='';sbEditor(f1,function(f){rdSbCola(id1,f);});}
   if(e.target&&e.target.id==='ed-t'&&ui.pdRede){var tt=tipo(e.target.value);if(tt&&/implante/.test(semAcento(tt.nome))){var cb=document.getElementById('ed-imp');if(cb&&!cb.checked){cb.checked=true;var bx=document.getElementById('ed-impbox');if(bx)bx.hidden=false;}}}
   if(e.target&&e.target.id==='pr-uf'){var ci=document.getElementById('pr-cidade');if(ci){ci.disabled=!e.target.value;ci.value='';ci.placeholder=e.target.value?'Comece a digitar…':'Escolha o estado primeiro';var sb2=document.getElementById('pr-sug');if(sb2){sb2.hidden=true;sb2.innerHTML='';}if(e.target.value)ci.focus();}}
+  if(e.target.id==='pg-dtipo'){var fp=e.target.closest('form');if(fp)pgCalc(fp);return;}
   if(e.target.dataset&&e.target.dataset.a2==='juntaSel'){ui.juntaCom=e.target.value||null;renderSheet();return;}
   if(e.target.dataset&&e.target.dataset.a2==='labQuem'){labIni().novo.quem=e.target.value;var lc=document.getElementById('lab-cad');if(lc)lc.hidden=e.target.value!=='um';return;}
   if(e.target.dataset&&e.target.dataset.a2==='labTipo'){labIni().perfil.tipo=e.target.value;toast('Na conta final, isso muda o texto do painel (clínica ou laboratório).');return;}
