@@ -1735,7 +1735,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='23/10 · 12h30';
+var VERSAO='23/10 · 19h00';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2884,7 +2884,7 @@ var LEAD_SEQ=[
   {n:'Última mensagem',dias:0,t:'{oi}, {nome}! Vou parar de te chamar para não incomodar. Quando precisar de um cadista, é só me mandar mensagem aqui. Sucesso nos atendimentos!'}];
 /* Modo "Prospecção Ideali" (só admin): mesma ferramenta, outra lista e outras mensagens, para divulgar o próprio Ideali CAD. Sem IA: custo zero. */
 var LEAD_SEQ_IDEALI=[
-  {n:'Apresentação',dias:2,t:'CADISTA, QUE TAL AUMENTAR SUAS VENDAS?\n\nConheça o Ideali CAD, um sistema de gestão feito para cadistas odontológicos, com agentes de IA para ajudar na sua rotina! 🤖\n\n✅ Organize pedidos, arquivos STL e prazos\n💰 Controle seu financeiro e suas cobranças\n🤖 Conte com agentes de inteligência artificial\n🤝 Conecte-se com outros cadistas\n🆓 Comece grátis!\n\n👉 Conheça agora: https://idealisystems.com/\n\nMenos bagunça, mais organização e mais tempo para crescer! 💙'},
+  {n:'Apresentação',dias:2,t:'CADISTA, QUE TAL AUMENTAR SUAS VENDAS?\n\nConheça o Ideali CAD, um sistema de gestão feito para cadistas odontológicos, com agentes de IA para ajudar na sua rotina! 🤖\n\n✅ Organize pedidos, arquivos STL e prazos\n💰 Controle seu financeiro e suas cobranças\n🤖 Conte com agentes de inteligência artificial\n🤝 Rede para se conectar com dentistas e laboratórios de todo o Brasil\n🆓 Comece grátis!\n\n👉 Conheça agora: https://idealisystems.com/\n\nMenos bagunça, mais organização e mais tempo para crescer! 💙'},
   {n:'Convite',dias:3,t:'{oi}, {nome}! Aqui é a equipe do Ideali CAD. Conseguiu conhecer o sistema? O cadastro leva 1 minuto e você já começa a organizar seus pedidos: https://idealisystems.com/app/#criar'},
   {n:'Demonstração',dias:5,t:'{oi}, {nome}! O que os cadistas mais gostam no Ideali CAD: mandar o STL e o HTML pro dentista pelo WhatsApp, com uma página para ele aprovar o caso. Veja como funciona: https://idealisystems.com/tour.html'},
   {n:'Última mensagem',dias:0,t:'{oi}, {nome}! Esta é a nossa última mensagem, para não incomodar. Quando quiser organizar seus pedidos e cobranças, o Ideali CAD está aqui: https://idealisystems.com/ Sucesso!'}];
