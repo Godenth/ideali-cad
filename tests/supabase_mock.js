@@ -2,23 +2,24 @@
 (function(){
   var U='dddddddd-0000-0000-0000-000000000004';
   var tabelas={perfis:[{user_id:U,nome:'Danilo',preferencias:{}}],assinaturas:[{user_id:U,plano:'basico',status:'teste',teste_ate:new Date(Date.now()+13*864e5).toISOString(),limite_bytes:5368709120,bytes_usados:0}],
-    clientes:[],tipos_trabalho:[],precos_cliente:[],faixas_desconto:[],pagamentos:[],pedidos:[],arquivos:[],links_cliente:[],perfil_rede:[],comp_notas:[]};
+    clientes:[],tipos_trabalho:[],precos_cliente:[],faixas_desconto:[],pagamentos:[],pedidos:[],arquivos:[],links_cliente:[],perfil_rede:[],comp_notas:[],prospec_contatos:[],prospec_equipe:[]};window.__tab=tabelas;
   window.__ops=[];var cbs=[],sessao=null;
   function Q(t){this.t=t;this.f=[];}
-  Q.prototype.select=function(){this.op='select';return this;};
+  Q.prototype.select=function(){if(!this.op)this.op='select';return this;};
   Q.prototype.eq=function(c,v){this.f.push([c,v]);return this;};
   Q.prototype.range=function(){return this;};Q.prototype.limit=function(){return this;};Q.prototype.is=function(){return this;};Q.prototype.order=function(){return this;};
-  Q.prototype.maybeSingle=function(){this.single=true;return this;};
+  Q.prototype.maybeSingle=function(){this._um=true;return this;};Q.prototype.single=function(){this._um=true;return this;};Q.prototype.delete=function(){this.op='delete';return this;};
   Q.prototype.insert=function(r){this.op='insert';this.row=r;return this;};
   Q.prototype.update=function(r){this.op='update';this.row=r;return this;};
   Q.prototype.upsert=function(r){this.op='upsert';this.row=r;return this;};
   Q.prototype.then=function(ok,ko){var me=this;return Promise.resolve().then(function(){
     var rows=tabelas[me.t];
-    if(me.op==='insert'){window.__ops.push({op:'insert',t:me.t,row:JSON.parse(JSON.stringify(me.row))});rows.push(Object.assign({},me.row,{criado_em:new Date().toISOString()}));return {error:null};}
+    if(me.op==='insert'){window.__ops.push({op:'insert',t:me.t,row:JSON.parse(JSON.stringify(me.row))});var nr=Object.assign({id:me.row.id||String(Math.random()).slice(2)},me.row,{criado_em:new Date().toISOString()});rows.push(nr);return {data:me._um?nr:[nr],error:null};}
     if(me.op==='upsert'){window.__ops.push({op:'upsert',t:me.t,row:JSON.parse(JSON.stringify(me.row))});var ex=rows.filter(function(r){return r.user_id===me.row.user_id&&(me.row.comp_id==null||r.comp_id===me.row.comp_id);})[0];if(ex)Object.assign(ex,me.row);else rows.push(Object.assign({},me.row));return {error:null};}
     var sel=rows.filter(function(r){return me.f.every(function(f){return r[f[0]]===f[1];});});
+    if(me.op==='delete'){window.__ops.push({op:'delete',t:me.t,where:me.f});sel.forEach(function(r){rows.splice(rows.indexOf(r),1);});return {error:null};}
     if(me.op==='update'){window.__ops.push({op:'update',t:me.t,row:JSON.parse(JSON.stringify(me.row)),where:me.f});sel.forEach(function(r){Object.assign(r,me.row);});return {error:null};}
-    return {data:me.single?(sel[0]||null):JSON.parse(JSON.stringify(sel)),error:null};
+    return {data:me._um?(sel[0]||null):JSON.parse(JSON.stringify(sel)),error:null};
   }).then(ok,ko);};
   var client={
     from:function(t){return new Q(t);},
@@ -41,7 +42,7 @@
     rpc:function(n,a){window.__ops.push({op:'rpc',name:n,args:a});
       if(n==='criar_link_cliente')return Promise.resolve({data:'TesteTokenSecreto_abcdefghijklmnopqrstuvwxyz012',error:null});
       if(n==='rede_stats')return Promise.resolve({data:{trabalhos:8,elementos:34,no_prazo:100,dias_medio:0.4,desde:'2026-09-02',tipos:[{nome:'Coroa sobre implante',n:4},{nome:'Faceta',n:2},{nome:'Placa de bruxismo',n:1},{nome:'Protocolo',n:1}]},error:null});
-      if(n==='sou_admin')return Promise.resolve({data:true,error:null});
+      if(n==='sou_admin')return Promise.resolve({data:window.__adm!==false,error:null});if(n==='prospec_meu_acesso')return Promise.resolve({data:window.__memb?[window.__memb]:[],error:null});
       if(n==='admin_metricas')return Promise.resolve({data:[
         {user_id:U,visto_em:new Date().toISOString(),dispositivo:'computador',seg_hoje:5400,seg_7d:36000,seg_30d:140000,seg_total:260000,dias_ativos_30:22,pedidos_total:312,pedidos_30d:48,clientes_total:27,cidade:'São Paulo',uf:'SP'},
         {user_id:'eeee',visto_em:new Date(Date.now()-3*36e5).toISOString(),dispositivo:'celular',seg_hoje:0,seg_7d:7200,seg_30d:21000,seg_total:21000,dias_ativos_30:6,pedidos_total:14,pedidos_30d:14,clientes_total:4,cidade:'Belo Horizonte',uf:'MG'},

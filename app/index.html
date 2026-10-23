@@ -1120,6 +1120,12 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .ask .row{justify-content:flex-end}
 .ask.env{background:color-mix(in srgb,var(--c-val) 12%,var(--surface))}.ask.env b{color:var(--c-val)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
+/* Prospecção: pergunta do 7º dia e tela da equipe */
+.pr-ask{position:fixed;inset:0;z-index:80;background:color-mix(in srgb,#000 45%,transparent);display:grid;place-items:center;padding:16px}
+.pr-box{background:var(--surface);border-radius:18px;padding:22px;max-width:420px;width:100%;display:grid;gap:10px;justify-items:start;box-shadow:0 20px 60px #0005}
+.pr-box h2{font-size:1.3rem}.pr-ic{font-size:2rem}.pr-bts{display:grid;gap:8px;width:100%;margin-top:6px}.pr-bts .btn{width:100%;justify-content:center}.pr-dep{justify-self:center}
+.pr-shell{min-height:100%}.pr-top{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.pr-top .spacer{flex:1}
 /* Guia de componentes */
 .cp-hd{display:grid;gap:10px}
 .cp-it.cp-com{grid-template-columns:64px 1fr;column-gap:12px}.cp-it.cp-com>*:not(.cp-th){grid-column:2}
@@ -1537,6 +1543,7 @@ async function carregar2(){
     var rp=await sb.from('perfis').select('*').eq('user_id',uidAtual).maybeSingle();if(rp.error)throw rp.error;
     var ra=await sb.from('assinaturas').select('*').eq('user_id',uidAtual).maybeSingle();if(ra.error)throw ra.error;
     var dados=await Promise.all(ORDEM.map(function(k){return todos(MAP[k].t);}));
+    var adm0=false,pm=null;try{var x1=await sb.rpc('sou_admin');adm0=!x1.error&&x1.data===true;}catch(x){}if(!adm0){try{var x2=await sb.rpc('prospec_meu_acesso');pm=(x2&&!x2.error&&x2.data&&x2.data[0])||null;}catch(x){}}
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
@@ -1547,10 +1554,10 @@ async function carregar2(){
     novo.faixas=novo.faixas.filter(function(x){return !x.deleted;});
     novo.pagamentos.forEach(function(g){g.pedidos=novo.pedidos.filter(function(x){return x.pagamentoId===g.id;}).map(function(x){return x.id;});});
     novo.seq=novo.pedidos.reduce(function(m,x){return Math.max(m,x.num||0);},0);
-    S=novo;tiraFoto();ui.dadosOk=true;passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);setTimeout(capSync,4500);setTimeout(ldOcAviso,9000);clearInterval(window._capT);window._capT=setInterval(function(){if(!document.hidden)capSync();},90000);setTimeout(libCheca,2500);
+    S=novo;S.prospMembro=!!pm;S.prospAcesso=pm;PR.ok=false;PR.lista.length=0;PR.snap={};PR.equipe=null;tiraFoto();ui.dadosOk=true;if(!S.prospMembro){passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);setTimeout(capSync,4500);setTimeout(ldOcAviso,9000);clearInterval(window._capT);window._capT=setInterval(function(){if(!document.hidden)capSync();},90000);setTimeout(libCheca,2500);}
     try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
-  S.carregando=false;ui.autoArqMes=null;aplicaTema(temaAtual(),modoAtual());autoArquivar();render();iniciaUso();secAbreDia();
+  S.carregando=false;ui.autoArqMes=null;aplicaTema(temaAtual(),modoAtual());autoArquivar();render();iniciaUso();if(!S.prospMembro)secAbreDia();
 }
 setInterval(function(){if(autoArquivar())render();},3600000);
 var TRAB_REF=[['Elemento sobre dente','elemento'],['Elemento sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
@@ -1558,7 +1565,7 @@ var TRAB_REF=[['Elemento sobre dente','elemento'],['Elemento sobre implante','el
   ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo 3D','trabalho']];
 function refFaltando(){var tem={};S.tipos.forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
 function toast(t,ms){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){el.hidden=true;},ms||2800);}
-function save(){agendaSync();}
+function save(){if(S.prospMembro){prSyncLogo();return;}agendaSync();if(PR.ok)prSyncLogo();}
 /* Uso do sistema: a cada minuto, se a aba está visível e a pessoa mexeu nos últimos 5 minutos, soma 1 minuto.
    Só tempo e "visto por último": nenhuma página, clique ou localização é enviada. */
 var USO={ult:Date.now(),timer:null};
@@ -1728,7 +1735,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='22/10 · 17h30';
+var VERSAO='23/10 · 12h30';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1738,6 +1745,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
   var app=document.getElementById('app');document.body.classList.toggle('sem-anim',animOff());document.body.classList.toggle('na-conversa',ui.tab==='secretarios');setTimeout(rdDock,0);
   if(!S.sessao){app.innerHTML=rLogin();return;}
   if(S.carregando){app.innerHTML=rCarregando();return;}
+  if(S.prospMembro&&!S.admin){app.innerHTML=rMembro();return;}
   if(ui.modoLab&&S.admin){app.innerHTML=rLabModo();return;}
   if(ui.equipe!=null&&eqIntroLista()[ui.equipe]){app.innerHTML=rEquipeIntro();return;}
   if(precisaWhats()){app.innerHTML=rPedeWhats();return;}
@@ -2880,11 +2888,67 @@ var LEAD_SEQ_IDEALI=[
   {n:'Convite',dias:3,t:'{oi}, {nome}! Aqui é a equipe do Ideali CAD. Conseguiu conhecer o sistema? O cadastro leva 1 minuto e você já começa a organizar seus pedidos: https://idealisystems.com/app/#criar'},
   {n:'Demonstração',dias:5,t:'{oi}, {nome}! O que os cadistas mais gostam no Ideali CAD: mandar o STL e o HTML pro dentista pelo WhatsApp, com uma página para ele aprovar o caso. Veja como funciona: https://idealisystems.com/tour.html'},
   {n:'Última mensagem',dias:0,t:'{oi}, {nome}! Esta é a nossa última mensagem, para não incomodar. Quando quiser organizar seus pedidos e cobranças, o Ideali CAD está aqui: https://idealisystems.com/ Sucesso!'}];
+/* ===== Prospecção Ideali com equipe: a lista fica na tabela prospec_contatos (dono = admin, RLS).
+   Quem é da equipe (prospec_equipe) entra com login próprio e vê só esta lista. Fluxo: envia → aguarda 7 dias →
+   "respondeu?" Sim = êxito; Não = próxima mensagem. Depois da 4ª sem resposta, encerra. ===== */
+var PR={ok:false,busy:false,erro:false,lista:[],snap:{},t:0,equipe:null};
+var PR_DIAS=7;
+function prDono(){return S.prospMembro?(S.prospAcesso&&S.prospAcesso.dono):(S.sessao&&S.sessao.id);}
+function prLimite(){return S.prospMembro?((S.prospAcesso&&S.prospAcesso.limite_dia)||40):40;}
+function prCarrega(forca){if(EM_DEMO||!S.sessao||PR.busy)return;if(PR.ok&&!forca&&Date.now()-PR.t<60000)return;PR.busy=true;
+  sb.from('prospec_contatos').select('id,dados').then(function(r){PR.busy=false;PR.t=Date.now();if(r.error){PR.erro=true;if(!PR.ok&&ldAberto())ldR();return;}
+    var novo=(r.data||[]).map(function(x){return Object.assign({},x.dados||{},{id:x.id});});
+    /* mantém o que está sendo editado agora e troca o resto pela versão do banco */
+    var loc={};PR.lista.forEach(function(l){if(PR.snap[l.id]!==JSON.stringify(l))loc[l.id]=l;});
+    PR.lista.length=0;novo.forEach(function(l){PR.lista.push(loc[l.id]||l);});PR.snap={};novo.forEach(function(l){PR.snap[l.id]=JSON.stringify(l);});
+    PR.ok=true;PR.erro=false;prMigra();if(ldAberto()&&leadIdeali())ldR();else if(ui.tab==='admin'&&!ui.sheet)render();},function(){PR.busy=false;PR.erro=true;});}
+/* contatos que estavam nas preferências do admin vão para a tabela (uma vez só) */
+function prMigra(){if(S.prospMembro||!S.admin||!S.prefs||!Array.isArray(S.prefs.leadsIdeali)||!S.prefs.leadsIdeali.length)return;
+  var ja={};PR.lista.forEach(function(l){ja[l.tel]=1;});S.prefs.leadsIdeali.forEach(function(l){if(l&&telNorm(l.tel)&&!ja[l.tel]){ja[l.tel]=1;PR.lista.push(l);}});
+  S.prefs.leadsIdeali=[];save();toast('Mudei a sua lista de prospecção para o banco: agora a equipe também vê.',4000);}
+var _prT=null;function prSyncLogo(){clearTimeout(_prT);_prT=setTimeout(prSync,500);}
+function prSync(){if(!PR.ok||EM_DEMO)return;var dono=prDono(),vistos={},tarefas=[];
+  PR.lista.forEach(function(l){vistos[l.id]=1;var js=JSON.stringify(l);if(PR.snap[l.id]===js)return;var d=Object.assign({},l);delete d.id;
+    if(PR.snap[l.id]==null){if(S.prospMembro)return;tarefas.push(sb.from('prospec_contatos').insert({id:l.id,user_id:dono,tel:l.tel,st:l.st||'seq',dados:d}).then(function(r){if(r.error){if(/duplicate|unique/i.test(r.error.message))return;throw r.error;}PR.snap[l.id]=js;}));}
+    else tarefas.push(sb.from('prospec_contatos').update({st:l.st||'seq',dados:d}).eq('id',l.id).then(function(r){if(r.error)throw r.error;PR.snap[l.id]=js;}));});
+  Object.keys(PR.snap).forEach(function(id){if(!vistos[id]&&!S.prospMembro)tarefas.push(sb.from('prospec_contatos').delete().eq('id',id).then(function(r){if(r.error)throw r.error;delete PR.snap[id];}));});
+  if(tarefas.length)Promise.all(tarefas).catch(function(e){toast('Não consegui salvar a prospecção: '+((e&&e.message)||e));});}
+function prQuem(){var n=S.prospMembro?((S.prospAcesso&&S.prospAcesso.nome)||''):(S.perfil&&S.perfil.nome)||'';return (String(n).trim().split(/\s+/)[0])||String(S.sessao&&S.sessao.email||'').split('@')[0];}
+function prEnviadosHoje(quem){var t=today(),n=0;PR.lista.forEach(function(l){(l.hist||[]).forEach(function(h){if(h.d===t&&/^Enviou/.test(h.n)&&(!quem||h.por===quem))n++;});});return n;}
+function prPodeEnviar(){var n=prEnviadosHoje(S.sessao.id),lim=prLimite();if(n>=lim){toast('Limite de '+lim+' mensagens por dia atingido. Amanhã continua (protege o seu WhatsApp de bloqueio).',5000);return false;}return true;}
+function prDepoisEnvio(l,nome,txt){l.hist=l.hist||[];l.hist.push({d:today(),n:'Enviou: '+nome,txt:txt,por:S.sessao.id,quem:prQuem()});if(l.hist.length>30)l.hist.splice(0,l.hist.length-30);
+  l.etapa=(l.etapa||0)+1;l.ult=today();l.st='seq';l.aguarda=true;l.prox=addDays(today(),PR_DIAS);}
+/* janela do 7º dia: "Fulano respondeu?" */
+function prPendentes(){var t=today();return PR.lista.filter(function(l){return l.st==='seq'&&l.aguarda&&l.prox&&l.prox<=t&&!(ui.prDepois&&ui.prDepois[l.id]);});}
+function prPergunta(){if(!leadIdeali()||!PR.ok)return '';var P=prPendentes();if(!P.length)return '';var l=P[0],SQ=leadSeq(),ult=SQ[Math.min((l.etapa||1)-1,SQ.length-1)],fim=(l.etapa||0)>=SQ.length;
+  return '<div class="pr-ask" role="dialog" aria-modal="true" aria-label="Respondeu?"><div class="pr-box"><span class="pr-ic">⏳</span><small>'+(P.length>1?'1 de '+P.length+' · ':'')+'Faz '+PR_DIAS+' dias da mensagem “'+esc(ult.n)+'”</small>'+
+    '<h2>'+esc(l.nome||telFmt(l.tel))+' respondeu?</h2><p class="small muted">'+esc(telFmt(l.tel))+' · confira a conversa no WhatsApp</p>'+
+    '<a class="btn sm" href="'+waLink('',l.tel)+'" target="_blank" rel="noopener">Abrir conversa</a>'+
+    '<div class="pr-bts"><button class="btn pri" data-a="prResp" data-id="'+esc(l.id)+'" data-v="sim">✅ Sim, respondeu</button><button class="btn" data-a="prResp" data-id="'+esc(l.id)+'" data-v="nao">Não respondeu'+(fim?' (encerrar)':' → próxima mensagem')+'</button></div>'+
+    '<button class="btn sm pr-dep" data-a="prResp" data-id="'+esc(l.id)+'" data-v="depois">Perguntar depois</button></div></div>';}
+/* tela de quem é da equipe: só a prospecção */
+function rMembro(){ui.tab='leads';ui.sub='ideali';ui.leadModo='ideali';prCarrega();var nome=prQuem();
+  return '<div class="pr-shell"><header class="pr-top">'+logo(28)+'<b>Prospecção Ideali</b><span class="spacer"></span><span class="small muted">'+esc(nome)+' · '+prEnviadosHoje(S.sessao.id)+'/'+prLimite()+' hoje</span><button class="btn sm" data-a="sair">Sair</button></header>'+
+    '<main class="main">'+(PR.ok?rLeads():PR.erro?'<section class="card"><b>Não consegui abrir a lista.</b> <button class="btn sm" data-a="prTenta">Tentar de novo</button></section>':'<section class="card"><span class="muted">Abrindo a lista…</span></section>')+'</main></div>';}
+/* Admin: quem dispara e como está indo */
+function prEquipeCarrega(){if(PR.eqBusy||EM_DEMO)return;PR.eqBusy=true;sb.from('prospec_equipe').select('*').order('criado_em').then(function(r){PR.eqBusy=false;PR.equipe=r.error?{erro:r.error.message}:(r.data||[]);if(ui.tab==='admin'&&!ui.sheet)render();},function(){PR.eqBusy=false;});}
+function prStats(){var t=today(),d7=addDays(t,-6),Q={};
+  PR.lista.forEach(function(l){(l.hist||[]).forEach(function(h){if(!/^Enviou/.test(h.n))return;var k=h.quem||'você';var q=Q[k]=Q[k]||{hoje:0,d7:0,tot:0,resp:0};q.tot++;if(h.d===t)q.hoje++;if(h.d>=d7)q.d7++;});
+    if(l.st==='resp'||l.st==='cli'){var ult=(l.hist||[]).filter(function(h){return /^Enviou/.test(h.n);}).pop();if(ult){var k2=ult.quem||'você';Q[k2]=Q[k2]||{hoje:0,d7:0,tot:0,resp:0};Q[k2].resp++;}}});return Q;}
+function admProspec(){prCarrega();if(PR.equipe==null)prEquipeCarrega();var L=PR.lista,t=today(),hj=L.filter(function(l){return ldCat(l,t)==='hoje';}).length,esp=L.filter(function(l){return l.st==='seq'&&l.aguarda;}).length,
+  ex=L.filter(function(l){return l.st==='resp'||l.st==='cli';}).length,cli=L.filter(function(l){return l.st==='cli';}).length,Q=prStats(),E=Array.isArray(PR.equipe)?PR.equipe:[];
+  return '<section class="card stack" style="gap:12px;margin-bottom:16px"><div class="between wrap" style="gap:12px"><div><h2 style="margin:0">📣 Prospecção Ideali</h2><p class="small muted" style="margin:4px 0 0">Você cola os prints, a equipe dispara. Cada envio espera '+PR_DIAS+' dias e o sistema pergunta se respondeu.'+
+      (PR.ok?' · <b>'+L.length+'</b> contatos · <b>'+hj+'</b> a disparar · <b>'+esp+'</b> aguardando · <b>'+ex+'</b> com êxito'+(cli?' ('+cli+' criaram conta)':''):'')+'</p></div><button class="btn pri" data-a="leadAbre" data-v="ideali">Abrir prospecção</button></div>'+
+    (Object.keys(Q).length?'<div class="cp-tw"><table class="cp-tb"><thead><tr><th>Quem dispara</th><th>Hoje</th><th>7 dias</th><th>Total</th><th>Responderam</th><th>Taxa</th></tr></thead><tbody>'+Object.keys(Q).map(function(k){var q=Q[k];return '<tr><td>'+esc(k)+'</td><td>'+q.hoje+'</td><td>'+q.d7+'</td><td>'+q.tot+'</td><td>'+q.resp+'</td><td>'+(q.tot?Math.round(q.resp/q.tot*100):0)+'%</td></tr>';}).join('')+'</tbody></table></div>':'')+
+    '<div><b>Equipe de prospecção</b><p class="small muted" style="margin:2px 0 8px">Coloque o e-mail da pessoa. Ela cria a própria senha em idealisystems.com/app (Criar conta), confirma o e-mail e, ao entrar, vê só esta lista: nada de clientes, pedidos ou financeiro.</p>'+
+      (PR.equipe&&PR.equipe.erro?'<p class="small" style="color:var(--urgent)">Falta rodar a migração 032 no Supabase.</p>':'')+
+      (E.length?'<div class="stack" style="gap:6px">'+E.map(function(e){return '<div class="row wrap pr-eq" style="gap:8px;align-items:center"><span class="tag '+(e.ativo?'ok':'')+'">'+(e.ativo?'Ativo':'Desativado')+'</span><b>'+esc(e.nome||'')+'</b><span class="mono small">'+esc(e.email)+'</span><span class="small muted">limite '+e.limite_dia+'/dia</span><span class="spacer"></span><button class="btn sm" data-a="prEqAtivo" data-id="'+e.id+'">'+(e.ativo?'Desativar':'Reativar')+'</button><button class="btn sm" data-a="prEqDel" data-id="'+e.id+'">Remover</button></div>';}).join('')+'</div>':'')+
+      '<form class="row wrap" data-form="prEqAdd" style="gap:8px;margin-top:8px"><input name="nome" maxlength="60" placeholder="Nome (ex.: Carla)" style="flex:1 1 140px"><input name="email" type="email" required maxlength="120" placeholder="E-mail dela" style="flex:2 1 200px"><input name="lim" type="number" min="1" max="200" value="40" title="Limite de envios por dia" style="width:80px"><button class="btn sm pri" type="submit">Autorizar</button></form></div></section>';}
 function ldAberto(){return (!ui.sheet&&ui.tab==='leads')||(!!ui.sheet&&ui.sheet.fn===fLeads);}
 function ldR(){if(ui.sheet&&ui.sheet.fn===fLeads)renderSheet();else if(ui.tab==='leads')render();}
-function leadIdeali(){return !!S.admin&&ldAberto()&&(ui.tab==='leads'?ui.sub==='ideali':ui.leadModo==='ideali');}
+function leadIdeali(){return (!!S.admin||!!S.prospMembro)&&ldAberto()&&(ui.tab==='leads'?ui.sub==='ideali':ui.leadModo==='ideali');}
 function leadSeq(){return leadIdeali()?LEAD_SEQ_IDEALI:LEAD_SEQ;}
-function leadsDe(){S.prefs=S.prefs||{};var k=leadIdeali()?'leadsIdeali':'leads';if(!Array.isArray(S.prefs[k]))S.prefs[k]=[];return S.prefs[k];}
+function leadsDe(){S.prefs=S.prefs||{};if(leadIdeali()&&!(PR.erro&&!PR.ok&&!S.prospMembro)){prCarrega();return PR.lista;}var k=leadIdeali()?'leadsIdeali':'leads';if(!Array.isArray(S.prefs[k]))S.prefs[k]=[];return S.prefs[k];}
 function leadsAtivos(){return leadsDe().filter(function(l){return l.st==='seq';});}
 function leadsHoje(){var t=today();return leadsAtivos().filter(function(l){return !l.prox||l.prox<=t;});}
 function ldFill(t,l){var eu=((S.perfil.nome||'').trim().split(' ')[0])||'seu cadista',nome=String(l.nome||'').trim().split(/\s+/).filter(function(w){return w&&!/^(dra?|lab|cl[ií]nica)\.?$/i.test(w);})[0]||'tudo bem';return t.replace(/\{oi\}/g,saudTxt()).replace(/\{nome\}/g,nome).replace(/\{eu\}/g,eu);}
@@ -2996,13 +3060,13 @@ function ldOcElegivel(l,oc){return !!oc&&l.st==='seq'&&!!l.prox&&l.prox>today()&
 function ldOcAviso(){try{var oc=ldOcasiao();if(!oc||EM_DEMO||!S.sessao)return;var k='idealicad_ocav_'+oc.k;if(localStorage.getItem(k))return;var mo=ui.leadModo;ui.leadModo='cli';var n=leadsDe().filter(function(l){return ldOcElegivel(l,oc);}).length;ui.leadModo=mo;if(!n)return;
   localStorage.setItem(k,'1');var g=agOk('mkt')?'mkt':'ven';agenteCanto(g,g==='mkt'?'ideia':'feliz','Hoje é '+oc.ev.nome+'! 🎉',plural(n,'contato da fila de espera pode','contatos da fila de espera podem')+' receber uma mensagem especial hoje, sem atrapalhar a sequência. É um bom motivo para lembrar de você!',[{a:'ldOcVer',l:'Ver contatos',pri:1}],14000,true);}catch(e){}}
 var LD_F=[['hoje','Chamar hoje','📲'],['espera','Aguardando retorno','⏳'],['resp','Em conversa','💬'],['cli','Clientes','✅'],['fim','Encerrados','🗂'],['todos','Todos','👥']];
-function ldCat(l,t){return l.st==='seq'?((!l.prox||l.prox<=t)?'hoje':'espera'):l.st==='resp'?'resp':l.st==='cli'?'cli':'fim';}
+function ldCat(l,t){if(l.st==='seq'&&l.aguarda)return 'espera';return l.st==='seq'?((!l.prox||l.prox<=t)?'hoje':'espera'):l.st==='resp'?'resp':l.st==='cli'?'cli':'fim';}
 function ldOrig(l){return l.orig==='insta'?'📸 Instagram':l.orig==='face'?'📘 Facebook':l.pag?'🌐 Página de anúncio':'👤 Contato';}
 function ldIni(n){var p=String(n||'?').trim().split(/\s+/).filter(function(w){return /^[A-Za-zÀ-ÿ]/.test(w)&&!/^(dra?|lab)\.?$/i.test(w);});if(!p.length)p=['?'];return ((p[0]||'?')[0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();}
 function ldCor(id){var c=['#7B5CF2','#DD5A9E','#3A96EC','#1DAE8A','#F0A53A','#EF5F5A'];var h=0;String(id).split('').forEach(function(ch){h=(h*31+ch.charCodeAt(0))%997;});return c[h%c.length];}
 function ldStatus(l,t){var SQ=leadSeq(),e=SQ[Math.min(l.etapa||0,SQ.length-1)],c=ldCat(l,t);
   if(c==='hoje')return {c:'hoje',tx:(l.etapa?'Retornar hoje':'Novo: chamar hoje'),sub:'Próxima mensagem: '+e.n+' ('+((l.etapa||0)+1)+' de '+SQ.length+')'};
-  if(c==='espera'){var d=Math.round((new Date(l.prox+'T12:00:00')-new Date(t+'T12:00:00'))/864e5);return {c:'espera',tx:'Aguardando retorno até '+dmy(l.prox).slice(0,5),sub:'Faltam '+plural(d,'dia','dias')+' · última mensagem '+(l.ult?dmy(l.ult).slice(0,5):'')};}
+  if(c==='espera'){var d=Math.round((new Date(l.prox+'T12:00:00')-new Date(t+'T12:00:00'))/864e5);if(l.aguarda&&d<=0)return {c:'espera',tx:'Hora de perguntar: respondeu?',sub:'Faz '+PR_DIAS+' dias da última mensagem ('+(l.etapa||0)+' de '+SQ.length+')'};return {c:'espera',tx:'Aguardando retorno até '+dmy(l.prox).slice(0,5),sub:'Faltam '+plural(d,'dia','dias')+' · última mensagem '+(l.ult?dmy(l.ult).slice(0,5):'')};}
   if(c==='resp')return {c:'resp',tx:'Em conversa',sub:'Respondeu: a sequência parou, agora é com você.'};
   if(c==='cli')return {c:'cli',tx:leadIdeali()?'Criou conta no Ideali':'Virou cliente',sub:l.cli&&cliente(l.cli)?cliente(l.cli).nome:''};
   return {c:'fim',tx:l.st==='nao'?'Sem interesse':'Encerrado (sem resposta)',sub:''};}
@@ -3013,7 +3077,7 @@ function ldComposer(l){var C=ui.ldComp,SQ=leadSeq(),e=SQ[Math.min(l.etapa||0,SQ.
   C.ops=ops.map(function(o){return o[1];});C.opsN=ops.map(function(o){return o[0].replace(' (recomendada)','').replace(' (especial)','').replace(/^🎉 /,'');});if(C.txt==null)C.txt=ops[0][1];
   return '<div class="ldx-comp"><b>Escolha a mensagem</b><div class="ldx-ops">'+ops.map(function(o,i){return '<button class="ldx-op'+(C.op===i?' on':'')+'" data-a="ldOp" data-v="'+i+'"><span>'+esc(o[0])+'</span><small>'+esc(o[1].slice(0,120))+(o[1].length>120?'…':'')+'</small></button>';}).join('')+'</div>'+
     '<label class="fld" style="margin:0"><span>Mensagem (dá para editar)</span><textarea id="ldx-txt" rows="5" maxlength="1200">'+esc(C.txt)+'</textarea></label>'+
-    (C.oc&&C.op===0?'<p class="small muted" style="margin:0">Mensagem especial: o contato continua na fila de espera, com retorno em '+dmy(l.prox).slice(0,5)+'.</p>':'<div class="ldx-dias"><span>Depois de enviar, retornar em</span>'+[3,7,15,30].map(function(d){return '<button class="chip'+(C.dias===d?' on':'')+'" data-a="ldDias" data-v="'+d+'">'+plural(d,'dia','dias')+'</button>';}).join('')+'</div>')+
+    (ID?'<p class="small muted" style="margin:0">Depois de enviar, o contato fica '+PR_DIAS+' dias aguardando e o sistema pergunta se respondeu.</p>':C.oc&&C.op===0?'<p class="small muted" style="margin:0">Mensagem especial: o contato continua na fila de espera, com retorno em '+dmy(l.prox).slice(0,5)+'.</p>':'<div class="ldx-dias"><span>Depois de enviar, retornar em</span>'+[3,7,15,30].map(function(d){return '<button class="chip'+(C.dias===d?' on':'')+'" data-a="ldDias" data-v="'+d+'">'+plural(d,'dia','dias')+'</button>';}).join('')+'</div>')+
     '<div class="row wrap" style="gap:8px"><button class="btn pri ld-wa" data-a="ldEnvia">Enviar no WhatsApp</button>'+(ID?'<button class="btn" data-a="ldEnvia" data-v="img">📷 Enviar com imagem</button>':'')+'<button class="btn" data-a="ldCompX">Cancelar</button></div>'+'</div>';}
 function ldDetalhe(l,t){if(ui.leadEd===l.id)return '<div class="ldx-det">'+leadEdForm(l)+'</div>';var st=ldStatus(l,t),ID=leadIdeali(),H=(l.hist||[]).slice().reverse();
   var tipo=l.tipo?(CAP_TIPO[l.tipo]||l.tipo):'';
@@ -3028,10 +3092,10 @@ function ldDetalhe(l,t){if(ui.leadEd===l.id)return '<div class="ldx-det">'+leadE
         (l.st!=='cli'?(ID?'<button class="btn" data-a="leadSt" data-id="'+l.id+'" data-v="cli">✅ Criou conta</button>':'<button class="btn" data-a="leadPed" data-id="'+l.id+'">📦 Mandou pedido</button><button class="btn" data-a="leadCli" data-id="'+l.id+'">✅ Virou cliente</button>'):'')+
         (l.st==='seq'||l.st==='resp'?'<button class="btn" data-a="leadSt" data-id="'+l.id+'" data-v="nao">Sem interesse</button>':'')+
         (l.st==='fim'||l.st==='nao'?'<button class="btn" data-a="ldReabre" data-id="'+l.id+'">↺ Reabrir</button>':'')+
-        '<button class="icon-btn" data-a="leadDel" data-id="'+l.id+'" title="Apagar" aria-label="Apagar">🗑</button></div>')+
+        (S.prospMembro?'':'<button class="icon-btn" data-a="leadDel" data-id="'+l.id+'" title="Apagar" aria-label="Apagar">🗑</button>')+'</div>')+
     '<div class="ldx-hist"><h3>Histórico</h3>'+(H.length?H.map(function(h){return '<div class="ldx-h"><span>'+dmy(h.d).slice(0,5)+'</span><div><b>'+esc(h.n)+'</b>'+(h.txt?'<small>'+esc(h.txt.slice(0,160))+(h.txt.length>160?'…':'')+'</small>':'')+'</div></div>';}).join(''):'')+
       '<div class="ldx-h"><span>'+dmy(l.criado).slice(0,5)+'</span><div><b>Entrou na lista</b><small>'+esc(ldOrig(l).replace(/^\S+\s/,''))+'</small></div></div></div></div>';}
-function rLeads(){if(ui.sub==='ideali'&&!S.admin)ui.sub=null;ui.leadModo=ui.sub==='ideali'?'ideali':'cli';var ID=leadIdeali(),L=leadsDe(),t=today(),f=ui.leadFil||'hoje',q=(ui.ldBusca||'').trim().toLowerCase(),imp=ui.leadImp;
+function rLeads(){if(ui.sub==='ideali'&&!S.admin&&!S.prospMembro)ui.sub=null;ui.leadModo=ui.sub==='ideali'?'ideali':'cli';var ID=leadIdeali(),L=leadsDe(),t=today(),f=ui.leadFil||'hoje',q=(ui.ldBusca||'').trim().toLowerCase(),imp=ui.leadImp;
   var cont={};LD_F.forEach(function(x){cont[x[0]]=0;});L.forEach(function(l){cont[ldCat(l,t)]++;});cont.todos=L.length;
   var OC=ldOcasiao(),nOc=OC?L.filter(function(l){return ldOcElegivel(l,OC);}).length:0;if(f==='oc'&&!nOc)f=ui.leadFil='espera';
   var ehPago=function(l){return !!(l.pago||l.pag);},LP=L.filter(ehPago);cont.pago=LP.length;if(f==='pago'&&ID)f=ui.leadFil='todos';
@@ -3047,16 +3111,16 @@ function rLeads(){if(ui.sub==='ideali'&&!S.admin)ui.sub=null;ui.leadModo=ui.sub=
     imp.lista.map(function(x,i){return '<div class="ld-rev"><input type="checkbox" class="ld-ok" data-i="'+i+'" '+(x.ok?'checked':'')+'><input class="ld-in" data-i="'+i+'" data-k="nome" value="'+esc(x.nome)+'" placeholder="Nome"><input class="ld-in" data-i="'+i+'" data-k="tel" value="'+esc(telFmt(x.tel))+'" inputmode="tel"><select class="ld-in" data-i="'+i+'" data-k="orig"><option value="">Origem</option><option value="face"'+(x.orig==='face'?' selected':'')+'>Facebook</option><option value="insta"'+(x.orig==='insta'?' selected':'')+'>Instagram</option></select>'+(x.dup?'<small class="muted">já está na lista</small>':'')+'</div>';}).join('')+
     (!imp.lista.length&&imp.txt?'<details><summary class="small">Ver o texto que eu consegui ler</summary><pre class="small" style="white-space:pre-wrap">'+esc(imp.txt)+'</pre></details>':'')+
     '<div class="row wrap" style="gap:8px;margin-top:8px">'+(imp.lista.length?'<button class="btn pri" data-a="leadSalva">Salvar leads</button>':'')+'<button class="btn" data-a="leadImpX">Cancelar</button></div></div>';
-  var head='<div class="ldx-head"><div class="ldx-ht">'+(ID?'<span class="ld-logo">'+logo(40)+'</span>':(g&&agOk('mkt')?avSec(g,0,'gravando'):''))+'<div><h1>'+(ID?'Prospecção Ideali <span class="tag a">só admin</span>':'Leads')+'</h1><p class="small muted">'+(ID?'Cadistas para apresentar o Ideali CAD. Mensagens em nome da empresa, com o link do site e do tour.':'Contatos dos anúncios e da sua página. Depois de cada mensagem o contato espera o prazo que você escolher e volta para "Chamar hoje".')+'</p></div></div>'+
-    '<div class="ldx-hb"><button class="btn pri" data-a="leadCola">📋 Colar print ou lista</button><label class="btn up">📷 Prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar</button>'+(ID?'':'<button class="btn" data-a="capVai" title="Página para anúncios">🌐 Minha página</button>')+'</div></div>'+
-    '<div class="ldx-kpis">'+LD_F.map(function(x){return '<button class="ldx-k'+(f===x[0]?' on':'')+(x[0]==='hoje'&&cont.hoje?' alerta':'')+'" data-a="leadFil" data-v="'+x[0]+'"><span>'+x[2]+' '+(ID&&x[0]==='cli'?'Criaram conta':x[1])+'</span><b>'+cont[x[0]]+'</b></button>';}).join('')+(ID?'':'<button class="ldx-k ldx-pago'+(f==='pago'?' on':'')+'" data-a="leadFil" data-v="pago"><span>🚀 Tráfego pago</span><b>'+cont.pago+'</b></button>')+'</div>';
+  var head='<div class="ldx-head"><div class="ldx-ht">'+(ID?'<span class="ld-logo">'+logo(40)+'</span>':(g&&agOk('mkt')?avSec(g,0,'gravando'):''))+'<div><h1>'+(ID?'Prospecção Ideali'+(S.prospMembro?'':' <span class="tag a">só admin</span>'):'Leads')+'</h1><p class="small muted">'+(ID?'Cadistas para apresentar o Ideali CAD. Mensagens em nome da empresa, com o link do site e do tour.':'Contatos dos anúncios e da sua página. Depois de cada mensagem o contato espera o prazo que você escolher e volta para "Chamar hoje".')+'</p></div></div>'+
+    (S.prospMembro?'<div class="ldx-hb small muted">'+prEnviadosHoje(S.sessao.id)+' de '+prLimite()+' envios hoje</div></div>':'<div class="ldx-hb"><button class="btn pri" data-a="leadCola">📋 Colar print ou lista</button><label class="btn up">📷 Prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar</button>'+(ID?'':'<button class="btn" data-a="capVai" title="Página para anúncios">🌐 Minha página</button>')+'</div></div>')+
+    '<div class="ldx-kpis">'+LD_F.map(function(x){return '<button class="ldx-k'+(f===x[0]?' on':'')+(x[0]==='hoje'&&cont.hoje?' alerta':'')+'" data-a="leadFil" data-v="'+x[0]+'"><span>'+x[2]+' '+(ID&&x[0]==='cli'?'Criaram conta':ID&&x[0]==='resp'?'Êxito (responderam)':ID&&x[0]==='hoje'?'A disparar':x[1])+'</span><b>'+cont[x[0]]+'</b></button>';}).join('')+(ID?'':'<button class="ldx-k ldx-pago'+(f==='pago'?' on':'')+'" data-a="leadFil" data-v="pago"><span>🚀 Tráfego pago</span><b>'+cont.pago+'</b></button>')+'</div>';
   var ocB=nOc?'<div class="ldx-oc"><span>🎉</span><div><b>Hoje é '+esc(OC.ev.nome)+'!</b><small>'+plural(nOc,'contato da fila de espera pode','contatos da fila de espera podem')+' receber uma mensagem especial hoje. O retorno de cada um continua na mesma data.</small></div><button class="btn sm pri" data-a="leadFil" data-v="oc">'+(f==='oc'?'Mostrando':'Ver contatos')+'</button></div>':'';
   var pgB='';if(f==='pago'){var d7=addDays(t,-6),mes=t.slice(0,7),cl=LP.filter(function(l){return l.st==='cli';}).length,semR=LP.filter(function(l){return l.st==='seq'&&!(l.hist&&l.hist.length);}).length;
     var k=function(n,r){return '<div><b>'+n+'</b><small>'+r+'</small></div>';};
     pgB='<div class="ldx-pg"><div class="ldx-pg-t"><b>🚀 Tráfego pago</b><small>Contatos que vieram da sua página do anúncio</small></div><div class="ldx-pg-n">'+
       k(LP.filter(function(l){return l.criado===t;}).length,'hoje')+k(LP.filter(function(l){return (l.criado||'')>=d7;}).length,'7 dias')+k(LP.filter(function(l){return String(l.criado||'').slice(0,7)===mes;}).length,'no mês')+
       k(cl,'viraram cliente')+k((LP.length?Math.round(cl/LP.length*100):0)+'%','conversão')+k(semR,'sem resposta')+'</div></div>';}
-  return '<div class="ldx'+(sel?' com-sel':'')+'">'+head+ocB+pgB+importa+
+  return prPergunta()+'<div class="ldx'+(sel?' com-sel':'')+'">'+head+ocB+pgB+importa+
     '<div class="ldx-grid"><div class="ldx-lista card"><input class="ldx-busca" id="ldx-busca" type="search" placeholder="Buscar nome, telefone ou cidade" value="'+esc(ui.ldBusca||'')+'">'+
       '<div class="ldx-itens">'+(itens||'<p class="empty">'+(L.length?(f==='hoje'?'Ninguém para chamar hoje. 🎉':'Nenhum contato aqui.'):'Cole a sua lista de números ou o print dos contatos para começar.')+'</p>')+'</div></div>'+
       '<div class="ldx-dcol card">'+(sel?ldDetalhe(sel,t):'<div class="ldx-vazio"><span>👈</span><b>Escolha um contato</b><p class="small muted">Os detalhes, as mensagens e o histórico aparecem aqui.</p></div>')+'</div></div></div>';}
@@ -5092,8 +5156,6 @@ function admTestes(){var at=ui.decoTeste,b=decoAtual(at),y=+today().slice(0,4);
       return '<button class="btn sm'+(on?' pri':'')+'" data-a="admDeco" data-v="'+addDays(d,-3)+'">'+x.emoji+' '+esc(x.nome)+'</button>';}).join('')+
     '<button class="btn sm danger" data-a="admDeco" data-v=""'+(at?'':' disabled')+'>Desativar teste</button></div>'+
     '<div class="row wrap" style="gap:8px;align-items:center"><button class="btn sm" data-a="admPasseio">🚶 Fazer alguém da equipe aparecer agora</button>'+(decoOff()?'<span class="small muted">As decorações estão desligadas em Configurações; o teste liga mesmo assim.</span>':'')+'</div></section>'+'<section class="card stack" style="margin-bottom:14px"><h2 style="margin:0">📥 Importar dados</h2><p class="small muted" style="margin:0">Traga clientes, pedidos e pagamentos de outro sistema (arquivo .json de importação). Antes de gravar, você confere tudo numa prévia.</p><div><label class="btn pri up">Escolher arquivo .json<input type="file" accept=".json,application/json" id="imp-file" hidden></label></div></section>';}
-function admProspec(){var L=(S.prefs&&S.prefs.leadsIdeali)||[],t=today(),hj=L.filter(function(l){return l.st==='seq'&&(!l.prox||l.prox<=t);}).length,cli=L.filter(function(l){return l.st==='cli';}).length;
-  return '<section class="card between wrap" style="gap:12px;margin-bottom:16px"><div><h2 style="margin:0">📣 Prospecção Ideali</h2><p class="small muted" style="margin:4px 0 0">Cole o print dos contatos dos anúncios do Ideali CAD e mande a sequência no WhatsApp com a imagem do sistema. Sem IA, custo zero.'+(L.length?' · <b>'+L.length+'</b> contatos'+(hj?' · <b>'+hj+'</b> para chamar hoje':'')+(cli?' · <b>'+cli+'</b> criaram conta':''):'')+'</p></div><button class="btn pri" data-a="leadAbre" data-v="ideali">Abrir prospecção</button></section>';}
 function admSim(){return '<section class="card between wrap" style="gap:12px;margin-bottom:16px"><div><h2 style="margin:0">🧪 Simular lead do tráfego pago</h2><p class="small muted" style="margin:4px 0 0">Mostra o aviso da Mika como se alguém tivesse preenchido a sua página de anúncio agora. O contato de teste entra nos seus Leads marcado como "simulação" (pode apagar depois).</p></div><button class="btn pri" data-a="admSimLead">Simular agora</button></section>';}
 function rAdmin(){var h=rAdmin0(),ok=S.admin&&ui.mfa&&ui.admLista&&!(ui.mfa.fat&&ui.mfa.aal!=='aal2');return (ok?admBoas()+admProspec()+admSim()+admTestes():'')+h;}
 function rAdmin0(){
@@ -6284,16 +6346,26 @@ impGrava:function(){impGrava();},
   ldDias:function(d){var C=ui.ldComp;if(!C)return;var ta=document.getElementById('ldx-txt');if(ta)C.txt=ta.value;C.dias=+d.v;render();},
   ldCompX:function(){ui.ldComp=null;render();},
   ldEnvia:async function(d){var C=ui.ldComp;if(!C)return;var l=leadsDe().filter(function(x){return x.id===C.id;})[0];if(!l)return;var ta=document.getElementById('ldx-txt'),txt=(ta?ta.value:C.txt||'').trim();if(!txt){toast('Escreva a mensagem.');return;}
-    var SQ=leadSeq(),e=SQ[Math.min(l.etapa||0,SQ.length-1)],nome=(C.opsN&&C.opsN[C.op])||e.n;
+    var SQ=leadSeq(),e=SQ[Math.min(l.etapa||0,SQ.length-1)],nome=(C.opsN&&C.opsN[C.op])||e.n,PRI=leadIdeali();if(PRI&&!prPodeEnviar())return;
     if(d.v==='img'){try{var b=await (await fetch('/og.jpg')).blob(),f=new File([b],'ideali-cad.jpg',{type:'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.clipboard.writeText(txt);}catch(x){}await navigator.share({files:[f],text:txt});}else{toast('Neste aparelho não dá para anexar imagem: mandei só o texto (o link mostra a imagem na prévia).');window.open(waLink(txt,l.tel),'_blank','noopener');}}catch(x){if(x&&x.name==='AbortError')return;window.open(waLink(txt,l.tel),'_blank','noopener');}}
     else window.open(waLink(txt,l.tel),'_blank','noopener');
     l.hist=l.hist||[];
     if(C.oc&&C.op===0){l.hist.push({d:today(),n:'Mensagem especial: '+nome,txt:txt});if(l.hist.length>30)l.hist.splice(0,l.hist.length-30);l.oc=C.oc;ui.ldComp=null;save();render();toast('Enviada! A fila de espera de '+(l.nome||'o contato')+' continua: retorno em '+dmy(l.prox).slice(0,5)+'.');return;}
+    if(PRI){prDepoisEnvio(l,nome,txt);ui.ldComp=null;save();render();toast('Enviada! '+(l.nome||'O contato')+' fica aguardando. Em '+dmy(l.prox).slice(0,5)+' eu pergunto se respondeu. ⏳');return;}
     l.hist.push({d:today(),n:'Enviou: '+nome,txt:txt});if(l.hist.length>30)l.hist.splice(0,l.hist.length-30);
     l.etapa=(l.etapa||0)+1;l.ult=today();if(l.st==='fim'||l.st==='nao')l.st='seq';
     if(l.etapa>=SQ.length+1){l.st='fim';l.prox=null;}else{l.st='seq';l.prox=addDays(today(),C.dias||7);}
     ui.ldComp=null;save();render();toast(l.st==='fim'?'Enviada. Já foram todas as mensagens da sequência: encerrei este contato.':'Enviada! '+(l.nome||'O contato')+' volta para "Chamar hoje" em '+dmy(l.prox).slice(0,5)+'. ⏳');},
-  ldReabre:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;l.st='seq';l.prox=today();l.hist=l.hist||[];l.hist.push({d:today(),n:'Reaberto'});save();render();},
+  prResp:function(d){var l=PR.lista.filter(function(x){return x.id===d.id;})[0];if(!l)return;if(d.v==='depois'){ui.prDepois=ui.prDepois||{};ui.prDepois[l.id]=1;ldR();if(S.prospMembro)render();return;}
+    var SQ=leadSeq();l.hist=l.hist||[];l.aguarda=false;
+    if(d.v==='sim'){l.st='resp';l.prox=null;l.hist.push({d:today(),n:'Respondeu ✅',por:S.sessao.id,quem:prQuem()});toast('Êxito! '+(l.nome||'O contato')+' foi para "Em conversa".');}
+    else if((l.etapa||0)>=SQ.length){l.st='fim';l.prox=null;l.hist.push({d:today(),n:'Sem resposta depois de '+SQ.length+' mensagens',por:S.sessao.id,quem:prQuem()});toast('Encerrado: foram as '+SQ.length+' mensagens sem resposta.');}
+    else{l.prox=today();l.hist.push({d:today(),n:'Não respondeu: próxima mensagem',por:S.sessao.id,quem:prQuem()});toast((l.nome||'O contato')+' voltou para "Chamar hoje" com a próxima mensagem.');}
+    save();if(S.prospMembro)render();else ldR();},
+  prTenta:function(){PR.erro=false;prCarrega(true);render();},
+  prEqAtivo:function(d){var e=(PR.equipe||[]).filter(function(x){return x.id===d.id;})[0];if(!e)return;sb.from('prospec_equipe').update({ativo:!e.ativo}).eq('id',e.id).then(function(r){if(r.error){toast('Não consegui alterar: '+r.error.message);return;}e.ativo=!e.ativo;render();toast(e.ativo?'Acesso reativado.':'Acesso desativado: ela não vê mais a lista.');});},
+  prEqDel:function(d){var e=(PR.equipe||[]).filter(function(x){return x.id===d.id;})[0];if(!e||!confirm('Remover o acesso de '+e.email+'?'))return;sb.from('prospec_equipe').delete().eq('id',e.id).then(function(r){if(r.error){toast('Não consegui remover: '+r.error.message);return;}PR.equipe=PR.equipe.filter(function(x){return x.id!==e.id;});render();toast('Acesso removido.');});},
+  ldReabre:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;l.st='seq';l.aguarda=false;l.prox=today();l.hist=l.hist||[];l.hist.push({d:today(),n:'Reaberto'});save();render();},
   capVai:function(){ui.tab='config';ui.sub=null;render();setTimeout(function(){var e=document.getElementById('cap');if(e)e.scrollIntoView({behavior:'smooth'});},120);},
   leadAbre:function(d){var id=d&&d.v==='ideali'&&S.admin;ui.leadModo=id?'ideali':'cli';closeSheet();ui.tab='leads';ui.sub=id?'ideali':null;ui.leadImp=null;ui.ldSel=null;ui.ldComp=null;ui.leadFil=leadsHoje().length?'hoje':'todos';if(!id)capSync();render();window.scrollTo(0,0);},
   leadCola:async function(){try{if(!navigator.clipboard||!navigator.clipboard.read)throw new Error('x');var its=await navigator.clipboard.read(),fs=[];
@@ -6306,14 +6378,14 @@ impGrava:function(){impGrava();},
   leadSalva:function(){var imp=ui.leadImp;if(!imp)return;var L=leadsDe(),ja={},n=0,ruim=0;L.forEach(function(l){ja[l.tel]=1;});
     imp.lista.forEach(function(x){if(!x.ok)return;var d=telNorm(x.tel);if(!d){ruim++;return;}if(ja[d])return;ja[d]=1;L.push(leadNovoObj(x.nome,d,x.orig));n++;});
     if(L.length>500)L.splice(0,L.length-500);ui.leadImp=null;ui.leadFil='hoje';save();ldR();toast(n?plural(n,'lead salvo','leads salvos')+'. Bora chamar! 📲':'Nenhum lead novo.'+(ruim?' Confira os telefones (com DDD).':''));},
-  leadWaImg:async function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;var txt=leadMsg(l);
+  leadWaImg:async function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;if(leadIdeali()&&!prPodeEnviar())return;var txt=leadMsg(l);
     try{var b=await (await fetch('/og.jpg')).blob(),f=new File([b],'ideali-cad.jpg',{type:'image/jpeg'});
       if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.clipboard.writeText(txt);}catch(e){}await navigator.share({files:[f],text:txt});A.leadWa(d,true);return;}}catch(e){if(e&&e.name==='AbortError')return;}
     toast('Neste aparelho não dá para anexar imagem. Mandei só o texto: o link já mostra a imagem do Ideali na prévia.');A.leadWa(d);},
-  leadWa:function(d,soMarca){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;if(soMarca!==true)window.open(waLink(leadMsg(l),l.tel),'_blank','noopener');
+  leadWa:function(d,soMarca){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;if(leadIdeali()){if(soMarca!==true){if(!prPodeEnviar())return;window.open(waLink(leadMsg(l),l.tel),'_blank','noopener');}var SQ0=leadSeq();prDepoisEnvio(l,SQ0[Math.min(l.etapa||0,SQ0.length-1)].n,leadMsg(l));save();ldR();toast('Enviada! Em '+dmy(l.prox).slice(0,5)+' eu pergunto se respondeu.');return;}if(soMarca!==true)window.open(waLink(leadMsg(l),l.tel),'_blank','noopener');
     var e=l.etapa||0;l.etapa=e+1;l.ult=today();if(l.etapa>=leadSeq().length){l.st='fim';l.prox=null;}else l.prox=addDays(today(),leadSeq()[e].dias);save();ldR();
     toast(l.st==='fim'?'Última mensagem enviada. Encerrei a sequência deste lead.':'Próxima mensagem para '+(l.nome||'este lead')+' em '+dmy(l.prox).slice(0,5)+'.');},
-  leadSt:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;l.st=d.v;l.prox=null;l.hist=l.hist||[];l.hist.push({d:today(),n:d.v==='resp'?'Respondeu':d.v==='cli'?'Virou cliente':'Sem interesse'});save();ldR();toast(d.v==='resp'?'Boa! Parei a sequência: agora é com você na conversa. 💬':'Ok, encerrei este lead.');},
+  leadSt:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;l.st=d.v;l.prox=null;l.aguarda=false;l.hist=l.hist||[];l.hist.push({d:today(),n:d.v==='resp'?'Respondeu':d.v==='cli'?'Virou cliente':'Sem interesse'});save();ldR();toast(d.v==='resp'?'Boa! Parei a sequência: agora é com você na conversa. 💬':'Ok, encerrei este lead.');},
   leadCli:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;var ps=String(l.nome||'').trim().split(/\s+/);l.st='cli';l.prox=null;save();
     ui.preCli={tipo:'dentista',pnome:ps[0]||'',sobrenome:ps.slice(1).join(' '),telefone:l.tel};ui.origLead=leadOrigPre(l);openSheet(fCliente);ui.preCli=null;toast('Complete o cadastro do novo cliente. 🎉');},
   leadEd:function(d){ui.leadEd=d.id;ldR();setTimeout(function(){var e=document.querySelector('.ld-edit .ld-e[data-k=nome]');if(e)e.focus();},50);},
@@ -6638,6 +6710,8 @@ tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l
 };
 var F={
   compNota:function(fd){var id=String(fd.get('id')||''),t=String(fd.get('t')||'').trim().slice(0,600);compNotaSalva(id,{texto:t}).then(function(ok){if(ok)toast(t?'Anotação salva.':'Anotação apagada.');});renderSheet();},
+  prEqAdd:function(fd,f){var email=String(fd.get('email')||'').trim().toLowerCase(),nome=String(fd.get('nome')||'').trim().slice(0,60),lim=Math.max(1,Math.min(200,+fd.get('lim')||40));if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){toast('E-mail inválido.');return;}
+    sb.from('prospec_equipe').insert({email:email,nome:nome||null,limite_dia:lim}).select('*').single().then(function(r){if(r.error){toast(/duplicate|unique/i.test(r.error.message)?'Esse e-mail já está na equipe.':'Não consegui autorizar: '+r.error.message);return;}PR.equipe=(Array.isArray(PR.equipe)?PR.equipe:[]).concat([r.data]);render();toast('Pronto! Peça para '+(nome||'ela')+' criar a conta com '+email+' e confirmar o e-mail.',5000);});},
   whatsObrig:function(fd){var v=String(fd.get('tel')||'').trim();if(soDig(v).length<10||soDig(v).length>13){toast('Digite o WhatsApp com DDD.');return;}S.perfil.telefone=v;save();render();toast('WhatsApp salvo. Obrigado!');},
   iaPerg:function(fd,f){var q=String(fd.get('q')||'').trim(),g=f.dataset.g;if(!q||ui.iaEsperando)return;
     if(g==='mkt'){var nl0=[];try{nl0=leadsDoTexto(q);}catch(e){}if(nl0.length){f.reset();mikaListaLeads(q);return;}}
