@@ -1750,7 +1750,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='24/10 · 00h30';
+var VERSAO='24/10 · 00h45';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3291,7 +3291,7 @@ function pedComprovado(p){if(p.deleted||!(p.status==='finalizado'||p.status==='a
   if(!s1||!h1)return null;return s1>h1?s1:h1;}
 function pedFaltaComprovar(p){var A=alive(S.arquivos).filter(function(a){return a.pedidoId===p.id;});var f=[];if(!A.some(function(a){return arqOk(a,'stl');}))f.push('STL');if(!A.some(function(a){return arqOk(a,'html');}))f.push('HTML');return f;}
 function realOficial(m){var o={el:0,fat:0,n:0};alive(S.pedidos).forEach(function(p){var d=pedComprovado(p);if(!d||monthOf(d)!==m)return;o.n++;o.fat+=+p.valor||0;o.el+=contaPed(p).el;});return o;}
-function metaOficial(m){var pr=premiosDe();pr.of=pr.of&&typeof pr.of==='object'?pr.of:{};if(pr.of[m])return pr.of[m];
+function metaOficial(m){var pr=premiosDe();pr.of=pr.of&&typeof pr.of==='object'?pr.of:{};if(pr.of[m]&&!(pr.of[m].calib&&pr.of[m].d!==today()&&m===monthOf(today())))return pr.of[m];
   if(m!==monthOf(today())||!ui.verifOk)return null;
   var ms=[],x=m;for(var i=0;i<3;i++){x=prevMonth(x);var r=realOficial(x);if(r.n)ms.push(r);}
   var o=ms.length?{fat:Math.round(ms.reduce(function(s,r){return s+r.fat;},0)/ms.length*100)/100,el:Math.round(ms.reduce(function(s,r){return s+r.el;},0)/ms.length),meses:ms.length,d:today()}:{calib:1,d:today()};
@@ -3326,13 +3326,13 @@ function secMetaOficial(){var m=monthOf(today()),of=metaOficial(m),r=realOficial
   var semComp=alive(S.pedidos).filter(function(p){return (p.status==='finalizado'||p.status==='arquivado')&&monthOf(p.entregue||p.recebido||'')===m&&!pedComprovado(p);});
   var topo='<div class="between wrap"><div><h2>🏆 Meta oficial de '+nomeMes(m).toLowerCase()+' <span class="tag ok" style="vertical-align:middle">vale presente</span></h2><p class="small muted">Calculada pelo sistema e travada no começo do mês. Conta só pedido <b>finalizado</b> com <b>STL e HTML</b> guardados aqui (o servidor confere se os arquivos são de verdade).</p></div></div>';
   if(!ui.verifOk){setTimeout(verificaAntigos,0);return '<section class="card stack">'+topo+'<p class="small muted">Conferindo seus arquivos…</p></section>';}
-  if(!of||of.calib)return '<section class="card stack">'+topo+'<p>Mês de calibragem: ainda não há pedidos comprovados nos últimos 3 meses para calcular sua meta. Finalize pedidos com STL e HTML guardados no sistema e, no mês que vem, sua meta oficial aparece aqui. Até lá você já soma <b>'+plural(r.n,'pedido comprovado','pedidos comprovados')+'</b>.</p></section>';
+  if(!of||of.calib)return '<section class="card stack">'+topo+'<p><b>Primeiro mês: calibragem.</b> A meta oficial é a média dos seus meses anteriores: começa com <b>1 mês</b> e vai aumentando até usar os <b>últimos 3 meses</b>. Como ainda não há mês anterior com pedido comprovado, ela aparece no começo do mês que vem, calculada com este mês.</p><p class="small">Até agora este mês tem <b>'+plural(r.n,'pedido comprovado','pedidos comprovados')+'</b>'+(r.n?' ('+brl(r.fat)+')':'')+'. Quanto mais você finalizar com STL e HTML guardados aqui, maior a base da sua meta.</p></section>';
   var lin=function(k,tit){var base=of[k];if(!base)return '';var alvos=FAIXAS.map(function(f){return k==='fat'?Math.round(base*f[3]*100)/100:Math.ceil(base*f[3]);}),max=alvos[2]*1.05,v=r[k],fm=function(x){return k==='fat'?brl(x):plural(x,'elemento','elementos');};
     return '<div class="mo-l"><div class="between"><b>'+tit+'</b><span><b>'+fm(v)+'</b> <span class="muted small">comprovados</span></span></div>'+
       '<div class="mo-bar"><i style="width:'+Math.min(100,v/max*100).toFixed(1)+'%"></i>'+FAIXAS.map(function(f,i){var ok=v>=alvos[i];return '<s class="'+(ok?'ok':'')+'" style="left:'+(alvos[i]/max*100).toFixed(1)+'%" title="'+f[2]+': '+fm(alvos[i])+'"><em>'+f[1]+'</em></s>';}).join('')+'</div>'+
       '<div class="mo-fx">'+FAIXAS.map(function(f,i){var ok=v>=alvos[i],dado=H[m+':'+k+':'+f[0]];return '<span class="'+(ok?'ok':'')+'">'+f[1]+' '+f[2]+' · '+fm(alvos[i])+(ok?(dado?' ✓':' 🎁'):' · faltam '+fm(Math.max(0,alvos[i]-v)))+'</span>';}).join('')+'</div></div>';};
   return '<section class="card stack mo">'+topo+lin('fat','Valor (presente do Sr. Otávio)')+lin('el','Elementos (presente da Ana)')+
-    '<p class="small muted">Base: média de '+plural(of.meses,'mês','meses')+' comprovados ('+brl(of.fat)+' e '+plural(of.el,'elemento','elementos')+'). Cada faixa batida = 1 presente.</p>'+
+    '<p class="small muted">Base: média de '+plural(of.meses,'mês','meses')+' comprovados ('+brl(of.fat)+' e '+plural(of.el,'elemento','elementos')+')'+(of.meses<3?'. A base cresce mês a mês até usar os últimos 3 meses':'')+'. Cada faixa batida = 1 presente.</p>'+
     (semComp.length?'<div class="banner"><span>⚠️ <b>'+plural(semComp.length,'pedido finalizado','pedidos finalizados')+'</b> neste mês ainda não conta'+(semComp.length>1?'m':'')+' para a meta: '+semComp.slice(0,5).map(function(p){return '<a href="#" data-a="verPedido" data-id="'+p.id+'">#'+p.num+'</a> (falta '+pedFaltaComprovar(p).join(' e ')+')';}).join(', ')+(semComp.length>5?'…':'')+'</span></div>':'')+'</section>';}
 
 /* Ana (e Klose, se o cliente estava sumido) no cantinho quando entra pedido novo */
