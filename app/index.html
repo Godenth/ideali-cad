@@ -1128,6 +1128,13 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .tut-card p{margin:0;line-height:1.45}.tut-h{display:flex;gap:10px;align-items:center}.tut-h img{width:46px;height:46px;border-radius:50%;object-fit:cover;background:var(--soft)}
 .tut-h small{display:block;color:var(--muted);font-size:.75rem}.tut-bts{display:flex;gap:6px;align-items:center}.tut-bts .spacer{flex:1}
 .tut-q{font-weight:800;font-size:1rem}
+.tut-q.pisca{animation:tutQ 14s ease-in-out 3s infinite}.tut-q.pisca-r{animation:tutQr 1.3s ease-in-out infinite;color:#fff;background:var(--accent)}
+@keyframes tutQ{0%,88%,100%{box-shadow:0 0 0 0 transparent}91%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 35%,transparent);transform:scale(1.08)}94%{box-shadow:0 0 0 0 transparent;transform:none}97%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 35%,transparent);transform:scale(1.08)}}
+@keyframes tutQr{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}50%{box-shadow:0 0 0 7px transparent;transform:scale(1.1)}}
+body.sem-anim .tut-q{animation:none}
+.tut-nova{background:var(--accent);color:#fff;border-radius:99px;padding:1px 8px;font-weight:700;font-size:.72rem}
+.tut-bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.tut-bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.mh-fora .mh-por{display:inline}.mh-fb{all:unset;cursor:pointer;display:block}.mh-fb:hover b,.mh-fb:focus-visible b{text-decoration:underline}.mh-por{color:var(--accent);font-weight:700;font-size:.85em;white-space:nowrap}
 .tut-modo-intro{display:grid;place-items:center;padding:16px}
 .tut-intro{position:relative;z-index:2;display:grid;grid-template-columns:minmax(200px,300px) minmax(0,460px);align-items:end;max-width:800px;width:100%;max-height:calc(100vh - 32px)}
 .tut-pers{align-self:end;display:flex;justify-content:center}.tut-pers img{max-height:min(78vh,560px);max-width:100%;object-fit:contain;filter:drop-shadow(0 18px 30px #0008);animation:tutEntra .6s cubic-bezier(.2,1.3,.4,1) both}
@@ -1519,7 +1526,7 @@ var MAP={
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
-  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,mem:(S.prefs||{}).mem||null,leads:(S.prefs||{}).leads||null,orig:(S.prefs||{}).orig||null,premios:(S.prefs||{}).premios||null,lib:(S.prefs||{}).lib||null,leadsIdeali:(S.prefs||{}).leadsIdeali||null,dupIgn:(S.prefs||{}).dupIgn||null,tut:(S.prefs||{}).tut||null,tutOff:(S.prefs||{}).tutOff||null,tutSim:(S.prefs||{}).tutSim||null,bvEnv:(S.prefs||{}).bvEnv||null,dashFull:(S.prefs||{}).dashFull||null,cidadeGeo:p.cidadeGeo||null}};}
+  cidade_cptec_id:null,preferencias:{anim:(S.prefs||{}).anim||'on',tab:(S.prefs||{}).tab||{},msgs:(S.prefs||{}).msgs||{},metas:(S.prefs||{}).metas||null,onb:(S.prefs||{}).onb||null,tema:(S.prefs||{}).tema||null,modo:(S.prefs||{}).modo||null,secAuto:(S.prefs||{}).secAuto===false?false:null,boas:(S.prefs||{}).boas||null,equipe:(S.prefs||{}).equipe||null,passeio:(S.prefs||{}).passeio||null,deco:(S.prefs||{}).deco||null,fraseEnv:(S.prefs||{}).fraseEnv||null,val:(S.prefs||{}).val||null,mem:(S.prefs||{}).mem||null,leads:(S.prefs||{}).leads||null,orig:(S.prefs||{}).orig||null,premios:(S.prefs||{}).premios||null,lib:(S.prefs||{}).lib||null,leadsIdeali:(S.prefs||{}).leadsIdeali||null,dupIgn:(S.prefs||{}).dupIgn||null,tut:(S.prefs||{}).tut||null,tutOff:(S.prefs||{}).tutOff||null,tutSim:(S.prefs||{}).tutSim||null,dicas:(S.prefs||{}).dicas||null,bvEnv:(S.prefs||{}).bvEnv||null,dashFull:(S.prefs||{}).dashFull||null,cidadeGeo:p.cidadeGeo||null}};}
 function tiraFoto(){SNAP={perfil:JSON.stringify(perfilRow())};ORDEM.forEach(function(k){var m={};S[k].forEach(function(x){m[x.id]=JSON.stringify(MAP[k].to(x));});SNAP[k]=m;});}
 function agendaSync(){if(!S.sessao)return;clearTimeout(syncTimer);marcaSync('salvando');syncTimer=setTimeout(function(){syncFila=syncFila.then(sincroniza);},350);}
 function marcaSync(st){ui.sync=st;var el=document.getElementById('syncSt');if(el){el.textContent=st==='salvando'?'Salvando…':st==='erro'?'Erro ao salvar':'Salvo';el.className='sync '+st;}}
@@ -1572,7 +1579,7 @@ async function carregar2(){
     var novo=estadoVazio();novo.sessao=S.sessao;
     var p=rp.data||{},pref=p.preferencias||{};
     novo.perfil={nome:p.nome||'',telefone:p.telefone||'',tipoChave:p.tipo_chave_pix||'email',chave:p.chave_pix||'',recebedor:p.nome_recebedor||'',cidade:p.cidade||'',uf:p.uf||(pref.cidadeGeo&&pref.cidadeGeo.uf)||'',cidadeGeo:pref.cidadeGeo||null};
-    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null,mem:pref.mem||null,leads:pref.leads||null,orig:pref.orig||null,premios:pref.premios||null,lib:pref.lib||null,leadsIdeali:pref.leadsIdeali||null,dupIgn:pref.dupIgn||null,tut:pref.tut||null,tutOff:pref.tutOff||null,tutSim:pref.tutSim||null,bvEnv:pref.bvEnv||null,dashFull:pref.dashFull||null};
+    novo.prefs={anim:pref.anim||'on',tab:pref.tab||{},msgs:pref.msgs||{},metas:pref.metas||null,onb:pref.onb||null,tema:pref.tema||null,modo:pref.modo||null,secAuto:pref.secAuto===false?false:null,boas:pref.boas||null,equipe:pref.equipe||null,passeio:pref.passeio||null,deco:pref.deco||null,fraseEnv:pref.fraseEnv||null,val:pref.val||null,mem:pref.mem||null,leads:pref.leads||null,orig:pref.orig||null,premios:pref.premios||null,lib:pref.lib||null,leadsIdeali:pref.leadsIdeali||null,dupIgn:pref.dupIgn||null,tut:pref.tut||null,tutOff:pref.tutOff||null,tutSim:pref.tutSim||null,dicas:pref.dicas||null,bvEnv:pref.bvEnv||null,dashFull:pref.dashFull||null};
     var a=ra.data||{};
     novo.assinatura={plano:a.plano||'basico',status:a.status||'teste',testeAte:dia(a.teste_ate),venceEm:dia(a.vence_em),limite:+a.limite_bytes||5*GB,usadoServidor:+a.bytes_usados||0};
     ORDEM.forEach(function(k,i){novo[k]=dados[i].map(MAP[k].from);});
@@ -1760,7 +1767,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='24/10 · 01h20';
+var VERSAO='24/10 · 00h30';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1806,7 +1813,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
     '<h1 class="mb">'+titulo+'</h1><span class="spacer dk"></span>'+
     '<input class="search dk" id="busca-top" type="search" autocomplete="off" placeholder="'+(ui.tab==='comp'?'Buscar componente, tipo ou código…':'Buscar pedido, paciente, cliente…')+'" value="'+(ui.tab==='pedidos'?esc(ui.busca):ui.tab==='comp'?esc(ui.compQ||''):'')+'">'+
     (EM_DEMO?'':valChip()+prChip())+'<span class="dk">'+chip+'</span><span id="syncSt" class="sync '+(ui.sync||'salvo')+'">'+(ui.sync==='salvando'?'Salvando…':ui.sync==='erro'?'Erro ao salvar':'Salvo')+'</span>'+
-    (TUT[ui.tab]?'<button class="icon-btn tut-q" data-a="tutVer" title="Como usar esta tela" aria-label="Como usar esta tela">?</button>':'')+'<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>'+
+    (TUT[ui.tab]?'<button class="icon-btn tut-q '+tutQClasse(ui.tab)+'" data-a="tutVer" title="Como usar esta tela" aria-label="Como usar esta tela">?</button>':'')+'<button class="btn pri dk" data-a="novoPedido" '+(w?'':'disabled')+'>+ Novo pedido</button>'+
     contaMenu(nome,lix)+
     '<span class="menu-btn">'+chip.replace('Grátis no lançamento','Grátis')+'</span></div>'+
     '<nav class="tnav" aria-label="Menu principal"><div class="tnav-in">'+flat.map(function(it){
@@ -1852,11 +1859,11 @@ function vagasHtml(){var V=agVagas();if(!V.length)return '';
   return '<div class="vg"><div class="vg-h">Cargos em aberto <span>'+V.length+'</span></div>'+V.map(function(v){return '<div class="vg-it">'+avSec(v.g,0)+'<span class="tx"><b>'+esc(v.g.cargo)+'</b><span>'+esc(v.g.nome)+' · contrata '+esc(v.q)+'</span></span><span class="vg-l">🔒</span></div>';}).join('')+'<p class="vg-p">Sua equipe cresce junto com o seu negócio. Cada contratação chega com novas funções.</p></div>';}
 function rMaisHub(){var it=MENU[1][1],ok=it.filter(function(x){return libOk(x[0]);}),fora=it.filter(function(x){return !libOk(x[0]);}),NL=secNaoLidas();
   var vagas=[['fin','com 3 pedidos'],['mkt','no primeiro cliente'],['ger','com 10 pedidos'],['dad','quando seu primeiro mês fechar']].filter(function(v){return !agOk(v[0]);});
-  fora=fora.concat(vagas.map(function(v){var g=SECS.filter(function(x){return x.id===v[0];})[0];return ['_ag',g.nome+' ('+g.cargo.toLowerCase()+')',v[1]];}));
+  fora=fora.concat(vagas.map(function(v){var g=SECS.filter(function(x){return x.id===v[0];})[0];return ['_ag',g.nome+' ('+g.cargo.toLowerCase()+')',v[1],v[0]];}));
   var dica={metas:'com 10 pedidos',analises:'quando seu primeiro mês fechar',ranking:'quando seu primeiro mês fechar',rede:'com 30 trabalhos comprovados e uma meta batida'};
   return '<div class="stack" style="gap:16px"><div class="mh-grid">'+ok.map(function(x){return '<button class="card mh-c" data-a="tab" data-v="'+x[0]+'"><span class="mh-ic">'+ICON[x[0]]+'</span><span><b>'+esc(x[1])+(x[0]==='secretarios'&&NL?' <span class="mh-n">'+NL+' novo'+(NL>1?'s':'')+'</span>':'')+'</b><small>'+esc(MAIS_DESC[x[0]]||'')+'</small></span></button>';}).join('')+
     '</div>'+
-    (fora.length?'<section class="card stack"><h2 style="margin:0">Chegando para você 🔒</h2><p class="small muted" style="margin:0">Essas funções aparecem sozinhas na hora certa, e alguém da equipe te apresenta.</p><div class="mh-fora">'+fora.map(function(x){return '<span>'+(x[0]==='_ag'?'👤':ICON[x[0]])+' <b>'+esc(x[1])+'</b> · '+(x[0]==='_ag'?'contratação '+esc(x[2]):esc(dica[x[0]]||'em breve'))+'</span>';}).join('')+'</div></section>':'')+'</div>';}
+    (fora.length?'<section class="card stack"><h2 style="margin:0">Chegando para você 🔒</h2><p class="small muted" style="margin:0">Essas funções aparecem sozinhas na hora certa, e alguém da equipe te apresenta.</p><div class="mh-fora">'+fora.map(function(x){var k=x[0]==='_ag'?x[3]:x[0];return '<button class="mh-fb" data-a="libVer" data-v="'+esc(k)+'">'+(x[0]==='_ag'?'👤':ICON[x[0]])+' <b>'+esc(x[1])+'</b> · '+(x[0]==='_ag'?'contratação '+esc(x[2]):esc(dica[x[0]]||'em breve'))+' <span class="mh-por">Por quê? ›</span></button>';}).join('')+'</div></section>':'')+'</div>';}
 function bn(v,l){return '<button data-a="tab" data-v="'+v+'" class="'+(ui.tab===v?'on':'')+'">'+ICON[v]+'<span>'+l+'</span></button>';}
 
 /* ---------- Login ---------- */
@@ -2790,6 +2797,7 @@ function psGrava(v){try{localStorage.setItem('idealicad_passeio',JSON.stringify(
    Passo = [agente, alvo, texto, humor]. Alvo: seletor CSS, ou "seletor|texto" (primeiro visível que contém o texto), ou null (sem destaque).
    Admin pode ligar "Simular tutoriais" para ver em toda visita. ===== */
 var TUT={
+  mais:[['ven','.mh-fora','Estas ainda estão fechadas. Elas se desbloqueiam sozinhas conforme você usa o sistema. Toque em uma para ver o que falta.','feliz']],
   dashboard:[['ger',null,'Bem-vindo! Eu sou o Sr. Otávio, o gerente. Aqui no Início você vê o resumo do dia: o que entrega hoje, quem está devendo e como está o mês.','serio'],
     ['ger','[data-a="secChat"]','Esta é a sua equipe. Cada um cuida de uma área e deixa recados para você. Clique para conversar.','satisfeito'],
     ['ger','[data-a="novoPedido"]','Chegou caso novo? Comece sempre por aqui: + Novo pedido.','serio'],
@@ -2866,31 +2874,78 @@ function tutIntroHtml(t){var I=TUT_INTRO[t];if(!I)return '';var g=SECS.filter(fu
     '<div class="tut-ic"><small>'+esc(g.nome)+' · '+esc(g.cargo)+'</small><h2>'+esc(I.t)+'</h2>'+pre+I.f.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')+
     (I.s&&I.s.length?'<div class="tut-sabia"><b>💡 Você sabia?</b><ul>'+I.s.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>':'')+
     '<div class="tut-bts"><button class="btn sm" data-tut="nunca">Não mostrar mais</button><span class="spacer"></span><button class="btn sm" data-tut="pular">Pular</button>'+(n?'<button class="btn sm pri" data-tut="mostra">Me mostra na tela →</button>':'<button class="btn sm pri" data-tut="pular">Entendi</button>')+'</div></div></div>';}
+TUT_INTRO.mais={ag:'ven',h:'feliz',t:'Mais funções',f:['Aqui ficam as outras áreas do sistema: Leads, Equipe de IA, Metas, Análises, Componentes, Visualizador 3D e a Rede.','Algumas ainda estão fechadas com 🔒. Não é plano pago: elas se desbloqueiam sozinhas conforme você vai usando o sistema, e quem cuida de cada uma chega para te apresentar.'],
+  s:['Toque em qualquer item de "Chegando para você" para ver o que falta para liberar.','Quanto mais pedidos você lança, mais a equipe cresce.']};
+/* Dicas extras: o "?" pisca rápido quando a tela tem dica que a pessoa ainda não viu */
+var TUT_DICAS={
+  dashboard:[{id:'d1',ag:'ger',h:'satisfeito',t:'Busca rápida',x:'A busca lá em cima acha qualquer pedido, paciente ou cliente. É o jeito mais rápido de chegar num caso.'}],
+  pedidos:[{id:'p1',ag:'ven',h:'feliz',t:'Visão em planilha',x:'No campo "Mostrar", em Produção, dá para trocar o quadro pela visão Planilha. Fica ótimo para ver muitos pedidos de uma vez.'},
+    {id:'p2',ag:'ven',h:'determinada',t:'Duplicar pedido',x:'Caso parecido com um que você já fez? Abra o pedido e toque em Duplicar: vem tudo preenchido, é só ajustar.'},
+    {id:'p3',ag:'ven',h:'pensativa',t:'Print do scanbody',x:'No pedido de implante tem um espaço para colar (Ctrl+V) o print do scanbody do Exocad. Ele fica guardado junto com o caso.'},
+    {id:'p4',ag:'ven',h:'tranquila',t:'Arquivados',x:'Pedido já enviado ao cliente pode ir para Arquivados. O quadro fica limpo e o histórico continua guardado.'}],
+  financeiro:[{id:'f1',ag:'fin',h:'contente',t:'Vários pedidos num pagamento só',x:'Um pagamento pode quitar vários pedidos do mesmo cliente. Se tiver desconto, eu divido entre eles proporcionalmente.'}],
+  clientes:[{id:'c1',ag:'mkt',h:'ideia',t:'Preço por cliente',x:'Cada cliente pode ter o próprio preço por tipo de trabalho. Aí o pedido novo já vem com o valor certo dele.'}],
+  leads:[{id:'l1',ag:'mkt',h:'gravando',t:'Contatos do tráfego pago',x:'O quadro 🚀 Tráfego pago filtra só quem chegou pelos anúncios. Assim você vê se o anúncio está trazendo gente.'}],
+  comp:[{id:'k1',ag:'ven',h:'feliz',t:'Seus favoritos',x:'Toque na ★ de uma peça para guardar nos favoritos. Depois o filtro "★ Meus" mostra só as que você usa.'},
+    {id:'k2',ag:'ven',h:'pensativa',t:'Suas anotações',x:'Dentro de cada peça dá para escrever uma anotação sua, como um truque de encaixe. Só você vê.'}],
+  visu:[{id:'v1',ag:'ven',h:'pensativa',t:'Medir e anotar',x:'No visualizador dá para medir em milímetros e deixar anotações presas no modelo.'},
+    {id:'v2',ag:'ven',h:'determinada',t:'Oclusão e mapa de alteração',x:'Use a Oclusão para ver os contatos e o Mapa de alteração para mostrar ao cliente o que mudou no caso.'},
+    {id:'v3',ag:'mkt',h:'gravando',t:'Vídeo do caso',x:'Dá para gravar um vídeo curto girando o trabalho. Fica ótimo para mandar ao cliente ou postar no Instagram.'}],
+  config:[{id:'g1',ag:'fin',h:'focada',t:'Seus dados são seus',x:'Em Configurações tem "Exportar meus dados": você baixa tudo o que guardou aqui quando quiser.'},
+    {id:'g2',ag:'mkt',h:'animada',t:'Cores do sistema',x:'Você pode trocar o tema e as cores do sistema do seu jeito.'}]};
+function dicasVistas(){S.prefs=S.prefs||{};if(!S.prefs.dicas||typeof S.prefs.dicas!=='object')S.prefs.dicas={};return S.prefs.dicas;}
+function dicasNovas(t){var V=dicasVistas();return (TUT_DICAS[t]||[]).filter(function(d){return !V[d.id];});}
+/* Rápido = tem dica nova numa tela cujo tutorial a pessoa já viu. Lento = de vez em quando, só para lembrar que existe. */
+function tutQClasse(t){var P=tutPrefs(),visto=!!(P[t]||(S.prefs&&S.prefs.tutOff));return visto&&dicasNovas(t).length?'pisca-r':'pisca';}
+function tutQAtualiza(){var b=document.querySelector('.tut-q');if(b){b.classList.remove('pisca','pisca-r');b.classList.add(tutQClasse(ui.tab));b.title=b.classList.contains('pisca-r')?'Tem dica nova aqui':'Como usar esta tela';}}
+/* Recursos bloqueados: o que é e o que falta para liberar */
+var LIB_EXP={
+  leads:{ag:'mkt',h:'novo',t:'Leads e Marketing',x:'Aqui você organiza os contatos que podem virar cliente, com mensagens prontas e retornos automáticos.',falta:function(){return 'Libera quando você cadastrar o seu primeiro cliente.';}},
+  fin:{ag:'fin',h:'desconfiada',t:'Bia, do financeiro',x:'Eu aviso quem está devendo, quanto, e monto a cobrança com Pix.',falta:function(){var n=alive(S.pedidos).length;return 'Sou contratada com 3 pedidos. Você tem '+Math.min(n,3)+' de 3.';},n:function(){return [alive(S.pedidos).length,3];}},
+  metas:{ag:'ger',h:'serio',t:'Metas e o Sr. Otávio',x:'Meta oficial do mês, medalhas 🥉🥈🥇 e presente quando você bate as faixas.',falta:function(){var n=alive(S.pedidos).length;return 'Libera com 10 pedidos. Você tem '+Math.min(n,10)+' de 10.';},n:function(){return [alive(S.pedidos).length,10];}},
+  analises:{ag:'dad',h:'desconfiado',t:'Análises, Ranking e o Klose',x:'Saúde do negócio, clientes que sumiram, previsão e o ranking dos seus melhores clientes.',falta:function(){return 'Libera quando o seu primeiro mês com pedidos fechar. Aí já tenho o que comparar.';}},
+  rede:{ag:'mkt',h:'animada',t:'Rede de cadistas',x:'Seu perfil público para laboratórios e clínicas, e a troca de trabalhos com outros cadistas.',falta:function(){var n=alive(S.pedidos).filter(function(p){try{return pedComprovado(p);}catch(e){return false;}}).length;return 'Libera com 30 trabalhos comprovados (finalizados com STL e HTML guardados aqui) e uma meta batida. Você tem '+Math.min(n,30)+' de 30.';},n:function(){return [alive(S.pedidos).filter(function(p){try{return pedComprovado(p);}catch(e){return false;}}).length,30];}}};
+LIB_EXP.ranking=LIB_EXP.analises;LIB_EXP.mkt=LIB_EXP.leads;LIB_EXP.ger=LIB_EXP.metas;LIB_EXP.dad=LIB_EXP.analises;
+function tutCena(o){var g=SECS.filter(function(x){return x.id===o.ag;})[0];
+  return '<div class="tut-intro" role="dialog" aria-label="'+esc(o.t)+'"><div class="tut-pers" style="--zc:'+g.cor+'"><img src="'+esc(corpoDe(g,o.h))+'" alt="'+esc(g.nome)+'"></div>'+
+    '<div class="tut-ic"><small>'+esc(g.nome)+' · '+esc(g.cargo)+(o.rot?' · '+o.rot:'')+'</small><h2>'+esc(o.t)+'</h2>'+(o.pre||'')+(o.f||[]).map(function(x){return '<p>'+esc(x)+'</p>';}).join('')+(o.meio||'')+
+    (o.s&&o.s.length?'<div class="tut-sabia"><b>💡 Você sabia?</b><ul>'+o.s.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>':'')+
+    '<div class="tut-bts">'+o.bts+'</div></div></div>';}
+function tutDicaHtml(t){var d=(TUT_DICAS[t]||[]).filter(function(x){return x.id===ui.tut.dica;})[0];if(!d)return '';var ag=d.ag,h=d.h;if(!agOk(ag)){ag='ven';h='feliz';}
+  var resto=dicasNovas(t).filter(function(x){return x.id!==d.id;}).length;
+  return tutCena({ag:ag,h:h,t:d.t,rot:'<span class="tut-nova">dica nova</span>',f:[d.x],
+    bts:'<button class="btn sm" data-tut="intro">Explicação da tela</button><span class="spacer"></span>'+(resto?'<button class="btn sm" data-tut="dica">Outra dica ('+resto+')</button>':'')+'<button class="btn sm pri" data-tut="fecha">Entendi</button>'});}
+function tutLibHtml(k){var L=LIB_EXP[k];if(!L)return '';var nn=L.n?L.n():null,bar='';
+  if(nn){var pc=Math.min(100,Math.round(nn[0]/nn[1]*100));bar='<div class="tut-bar" aria-label="'+pc+'%"><i style="width:'+pc+'%"></i></div>';}
+  return tutCena({ag:L.ag,h:L.h,t:L.t+' 🔒',rot:'chegando',f:[L.x,'Não é plano pago: libera sozinho conforme você vai usando o sistema.'],meio:'<p><b>'+esc(L.falta())+'</b></p>'+bar,
+    bts:'<span class="spacer"></span><button class="btn sm pri" data-tut="fecha">Entendi</button>'});}
 function tutPrefs(){S.prefs=S.prefs||{};if(!S.prefs.tut||typeof S.prefs.tut!=='object')S.prefs.tut={};return S.prefs.tut;}
 function tutAlvo(sel){if(!sel)return null;var p=sel.split('|'),L=[].slice.call(document.querySelectorAll('main '+p[0]+', .top '+p[0]+', .bnav '+p[0]));
   return L.filter(function(e){var r=e.getBoundingClientRect();return r.width>4&&r.height>4&&getComputedStyle(e).visibility!=='hidden'&&(!p[1]||e.textContent.indexOf(p[1])>=0);})[0]||null;}
 function tutPode(){return !!(S.sessao&&ui.dadosOk&&!S.carregando&&!S.prospMembro&&!EM_DEMO&&ui.tour==null&&ui.equipe==null&&!ui.sheet&&!ui.modoLab&&!document.hidden);}
-function tutChecar(){var t=ui.tab;if(ui.tutTabVista===t)return;ui.tutTabVista=t;if((!TUT[t]&&!TUT_INTRO[t])||document.getElementById('tut'))return;
+function tutChecar(){var t=ui.tab;if(ui.tutTabVista===t)return;ui.tutTabVista=t;if((!TUT[t]&&!TUT_INTRO[t])||document.getElementById('tut'))return;if(t==='mais'&&!document.querySelector('.mh-fora'))return;
   var P=tutPrefs();if(!(S.prefs&&S.prefs.tutSim)&&(S.prefs&&S.prefs.tutOff||P[t]))return;if(S.prefs&&S.prefs.tutSim&&!S.admin)return;
   setTimeout(function(){if(ui.tab===t&&tutPode()&&!document.getElementById('tut'))tutInicia(t);},700);}
 function tutInicia(t){if(!TUT[t]&&!TUT_INTRO[t])return;if(window.passeioTira)passeioTira();ui.tut={t:t,i:0,intro:!!TUT_INTRO[t]};tutMostra();}
 function tutCliques(el){el.onclick=function(e){var b=e.target.closest('[data-tut]');if(!b||!ui.tut)return;var T=ui.tut,k=b.dataset.tut,n=(TUT[T.t]||[]).length;
     if(k==='mostra'){T.intro=false;if(!n)tutFecha(true);else tutMostra();}
+    else if(k==='fecha')tutFecha(!T.lib);else if(k==='intro'){T.dica=null;T.intro=!!TUT_INTRO[T.t];T.i=0;tutMostra();}
+    else if(k==='dica'){var nv=dicasNovas(T.t);if(nv.length){T.dica=nv[0].id;tutMostra();}else tutFecha(true);}
     else if(k==='prox'){T.i++;if(T.i>=n)tutFecha(true);else tutMostra();}else if(k==='pular')tutFecha(true);else if(k==='nunca'){S.prefs.tutOff=true;tutFecha(true);toast('Ok, não mostro mais os tutoriais. Dá para rever no "?" de cada tela.',4000);}};}
 function tutFecha(marcar){var e=document.getElementById('tut');if(e)e.remove();window.removeEventListener('resize',tutPos);window.removeEventListener('scroll',tutPos,true);
-  if(ui.tut&&marcar){tutPrefs()[ui.tut.t]=today();save();}ui.tut=null;}
+  if(ui.tut&&marcar&&ui.tut.t!=='_lib'){tutPrefs()[ui.tut.t]=today();save();}ui.tut=null;tutQAtualiza();}
 function tutPasso(){var T=ui.tut;if(!T)return null;var st=TUT[T.t][T.i];if(!st)return null;var ag=st[0],txt=st[2],h=st[3],g=SECS.filter(function(x){return x.id===ag;})[0];
   if(!agOk(ag)){var dono=g;g=SECS.filter(function(x){return x.id==='ven';})[0];txt=txt.replace(/^(Oi!|E aí!|Bem-vindo!)?\s*(Eu sou|Sou|Klose aqui)[^.!]*[.!]\s*/,'');txt='Quem cuida daqui é '+(dono.nome||'')+', que chega em breve. Por enquanto eu explico: '+txt;h='tranquila';}
   return {g:g,txt:txt,h:h,alvo:tutAlvo(st[1])};}
-function tutMostra(){var T=ui.tut;if(T&&T.intro){var el0=document.getElementById('tut');if(!el0){el0=document.createElement('div');el0.id='tut';document.body.appendChild(el0);window.addEventListener('resize',tutPos);window.addEventListener('scroll',tutPos,true);}
-    el0.className='tut-modo-intro';el0.innerHTML='<i class="tut-d" style="left:0;top:0;width:100%;height:100%"></i>'+tutIntroHtml(T.t);tutCliques(el0);return;}
+function tutMostra(){var T=ui.tut;if(T&&(T.intro||T.dica||T.lib)){if(T.dica){dicasVistas()[T.dica]=today();save();}var el0=document.getElementById('tut');if(!el0){el0=document.createElement('div');el0.id='tut';document.body.appendChild(el0);window.addEventListener('resize',tutPos);window.addEventListener('scroll',tutPos,true);}
+    el0.className='tut-modo-intro';el0.innerHTML='<i class="tut-d" style="left:0;top:0;width:100%;height:100%"></i>'+(T.lib?tutLibHtml(T.lib):T.dica?tutDicaHtml(T.t):tutIntroHtml(T.t));tutCliques(el0);return;}
   var ps=tutPasso();if(!ps){tutFecha(true);return;}var n=TUT[T.t].length,g=ps.g;
   var el=document.getElementById('tut');if(!el){el=document.createElement('div');el.id='tut';document.body.appendChild(el);window.addEventListener('resize',tutPos);window.addEventListener('scroll',tutPos,true);}
   el.innerHTML='<i class="tut-d"></i><i class="tut-d"></i><i class="tut-d"></i><i class="tut-d"></i><div class="tut-luz"></div><div class="tut-card" role="dialog" aria-label="Tutorial"><div class="tut-h"><img src="'+esc(rostoDe(g,ps.h)||g.foto)+'" alt=""><div><b>'+esc(g.nome)+'</b><small>'+esc(g.cargo)+' · '+(T.i+1)+' de '+n+'</small></div></div><p>'+esc(ps.txt)+'</p>'+
     '<div class="tut-bts"><button class="btn sm" data-tut="nunca">Não mostrar mais</button><span class="spacer"></span><button class="btn sm" data-tut="pular">Pular</button><button class="btn sm pri" data-tut="prox">'+(T.i+1<n?'Próximo':'Entendi')+'</button></div></div>';
   el.className='';tutCliques(el);
   ui.tut.el=ps.alvo;if(ps.alvo){try{ps.alvo.scrollIntoView({block:'center',behavior:animOff()?'auto':'smooth'});}catch(x){}}setTimeout(tutPos,ps.alvo?380:0);tutPos();}
-function tutPos(){var el=document.getElementById('tut');if(!el||!ui.tut||ui.tut.intro)return;var a=ui.tut.el,luz=el.querySelector('.tut-luz'),c=el.querySelector('.tut-card');if(!luz||!c)return;
+function tutPos(){var el=document.getElementById('tut');if(!el||!ui.tut||ui.tut.intro||ui.tut.dica||ui.tut.lib)return;var a=ui.tut.el,luz=el.querySelector('.tut-luz'),c=el.querySelector('.tut-card');if(!luz||!c)return;
   var vw=innerWidth,vh=innerHeight,cw=Math.min(360,vw-24);c.style.width=cw+'px';var D=el.querySelectorAll('.tut-d'),dim=function(x,y,w,h){return 'left:'+x+'px;top:'+y+'px;width:'+Math.max(0,w)+'px;height:'+Math.max(0,h)+'px';};
   var R=null;if(a&&a.isConnected){var r0=a.getBoundingClientRect();R={l:r0.left-6,t:r0.top-6,r:r0.right+6,b:r0.bottom+6};}
   if(R){D[0].style.cssText=dim(0,0,vw,R.t);D[1].style.cssText=dim(0,R.b,vw,vh-R.b);D[2].style.cssText=dim(0,R.t,R.l,R.b-R.t);D[3].style.cssText=dim(R.r,R.t,vw-R.r,R.b-R.t);}
@@ -3387,7 +3442,7 @@ function secMetaOficial(){var m=monthOf(today()),of=metaOficial(m),r=realOficial
 /* Ana (e Klose, se o cliente estava sumido) no cantinho quando entra pedido novo */
 var AVISOS=[];
 function agenteCanto(gid,h,tit,txt,bts,ms,fg){AVISOS.push({gid:gid,h:h,tit:tit,txt:txt,bts:bts||[],ms:ms||9000,fg:fg});if(AVISOS.length===1)avisoProx();}
-function avisoProx(){var a=AVISOS[0];if(!a)return;if(window.passeioTira)passeioTira();var g=SECS.filter(function(x){return x.id===a.gid;})[0];if(!g){AVISOS.shift();avisoProx();return;}var img=corpoDe(g,a.h);
+function avisoProx(){var a=AVISOS[0];if(!a)return;if(document.getElementById('tut')){clearTimeout(window._avEsp);window._avEsp=setTimeout(avisoProx,1500);return;}if(window.passeioTira)passeioTira();var g=SECS.filter(function(x){return x.id===a.gid;})[0];if(!g){AVISOS.shift();avisoProx();return;}var img=corpoDe(g,a.h);
   var d=document.createElement('div');d.className='passeio aviso-ag';d.id='aviso-ag';d.style.setProperty('--zc',g.cor);
   d.innerHTML='<div class="ps-fala" role="status"><button class="ps-x" type="button" aria-label="Fechar">×</button><div class="ps-quem"><span><b>'+esc(g.nome)+'</b><small>'+esc(g.cargo)+'</small></span></div><strong>'+esc(a.tit)+'</strong><p>'+esc(a.txt)+'</p>'+
     (a.bts.length?'<div class="ps-bt">'+a.bts.map(function(b){return '<button class="btn sm'+(b.pri?' pri':'')+'" data-a="'+b.a+'"'+(b.id?' data-id="'+esc(b.id)+'"':'')+(b.v?' data-v="'+esc(b.v)+'"':'')+(b.g?' data-g="'+b.g+'"':'')+(b.x?' data-x="'+esc(b.x)+'"':'')+'>'+esc(b.l)+'</button>';}).join('')+'</div>':'')+'</div>'+(img?'<img class="ps-img" src="'+esc(img)+'" alt="">':'');
@@ -6568,9 +6623,10 @@ impGrava:function(){impGrava();},
     else if((l.etapa||0)>=SQ.length){l.st='fim';l.prox=null;l.hist.push({d:today(),n:'Sem resposta depois de '+SQ.length+' mensagens',por:S.sessao.id,quem:prQuem()});toast('Encerrado: foram as '+SQ.length+' mensagens sem resposta.');}
     else{l.prox=today();l.hist.push({d:today(),n:'Não respondeu: próxima mensagem',por:S.sessao.id,quem:prQuem()});toast((l.nome||'O contato')+' voltou para "Chamar hoje" com a próxima mensagem.');}
     save();if(S.prospMembro)render();else ldR();},
-  tutVer:function(){tutFecha(false);tutInicia(ui.tab);},
+  tutVer:function(){tutFecha(false);var nv=dicasNovas(ui.tab),P=tutPrefs();if(nv.length&&(P[ui.tab]||S.prefs.tutOff)){if(window.passeioTira)passeioTira();ui.tut={t:ui.tab,i:0,dica:nv[0].id};tutMostra();}else tutInicia(ui.tab);},
+  libVer:function(d){tutFecha(false);if(!LIB_EXP[d.v])return;if(window.passeioTira)passeioTira();ui.tut={t:'_lib',i:0,lib:d.v};tutMostra();},
   tutSim:function(){S.prefs.tutSim=!S.prefs.tutSim;if(S.prefs.tutSim){S.prefs.tutOff=false;ui.tutTabVista=null;}save();render();toast(S.prefs.tutSim?'Simulação ligada: o tutorial aparece toda vez que você entra numa tela.':'Simulação desligada: cada tutorial aparece só na primeira vez.',4000);},
-  tutZera:function(){S.prefs.tut={};S.prefs.tutOff=false;ui.tutTabVista=null;save();render();toast('Pronto: os tutoriais vão aparecer de novo em cada tela.');},
+  tutZera:function(){S.prefs.tut={};S.prefs.dicas={};S.prefs.tutOff=false;ui.tutTabVista=null;save();render();toast('Pronto: os tutoriais vão aparecer de novo em cada tela.');},
   admUsoAt:function(){ui.admTelasU={};admUsoCarrega(true);toast('Atualizando…');},
   prTenta:function(){PR.erro=false;prCarrega(true);render();},
   prEqAtivo:function(d){var e=(PR.equipe||[]).filter(function(x){return x.id===d.id;})[0];if(!e)return;sb.from('prospec_equipe').update({ativo:!e.ativo}).eq('id',e.id).then(function(r){if(r.error){toast('Não consegui alterar: '+r.error.message);return;}e.ativo=!e.ativo;render();toast(e.ativo?'Acesso reativado.':'Acesso desativado: ela não vê mais a lista.');});},
