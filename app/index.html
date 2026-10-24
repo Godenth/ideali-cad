@@ -1735,7 +1735,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='23/10 · 21h15';
+var VERSAO='23/10 · 22h45';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -5246,7 +5246,15 @@ var BV_SEQ=[
   {k:'link',n:'Link do sistema',t:'{nome}, aqui está o link do sistema para salvar nos favoritos: https://idealisystems.com/app/ No celular, abra o link e toque em "Adicionar à tela inicial" para usar como aplicativo.'},
   {k:'p1',n:'Primeiro pedido',t:'{oi}, {nome}! Conseguiu lançar o seu primeiro pedido no Ideali CAD? É só clicar em "+ Novo pedido", escolher o cliente e os dentes. Se preferir, te mostro numa chamada rápida de 10 minutos. Qual o melhor horário para você?'},
   {k:'duv',n:'Dúvidas',t:'{oi}, {nome}! Como está sendo usar o Ideali CAD? Ficou alguma dúvida ou tem algo que você sente falta? A sua opinião ajuda muito a melhorar o sistema.'},
-  {k:'fim',n:'Plano completo',t:'{oi}, {nome}! Como está sendo usar o Ideali CAD? Se quiser, te mostro o que o plano completo libera para o seu dia a dia. É só me responder aqui.'}];
+  {k:'fim',n:'Plano completo',t:'{oi}, {nome}! Como está sendo usar o Ideali CAD? Se quiser, te mostro o que o plano completo libera para o seu dia a dia. É só me responder aqui.'},
+  /* Prospecção (venda): para convencer quem já se cadastrou a usar de verdade e assinar */
+  {k:'vd1',g:'vd',n:'O que você ganha',t:'{oi}, {nome}! Já pensou em ter todos os seus pedidos, prazos e arquivos STL num lugar só? No Ideali CAD você manda o STL e o HTML pro dentista pelo WhatsApp, cobra com PDF e Pix e ainda tem uma equipe de IA te ajudando no dia a dia. Quer que eu te mostre na prática?'},
+  {k:'vd2',g:'vd',n:'Tempo',t:'{nome}, quanto tempo você perde por semana procurando arquivo, conferindo quem pagou e respondendo prazo? O Ideali CAD organiza isso: produção em quadro, financeiro mostrando quem está devendo e avisos dos prazos. Bora colocar os seus pedidos desta semana lá?'},
+  {k:'vd3',g:'vd',n:'Cobrança no WhatsApp',t:'{oi}, {nome}! Uma função que faz diferença no fim do mês: o Ideali CAD gera a cobrança de cada cliente com PDF e QR Code Pix e manda no WhatsApp em um clique. Já experimentou? Te mostro em 5 minutos.'},
+  {k:'vd4',g:'vd',n:'Rede',t:'{nome}, no Ideali CAD você pode ter um perfil público na Rede, uma vitrine do seu trabalho para se conectar com dentistas e laboratórios de todo o Brasil. Quer ajuda para montar o seu?'},
+  {k:'vd5',g:'vd',n:'Ajuda para começar',t:'{oi}, {nome}! Posso te ajudar a cadastrar seus clientes e os primeiros pedidos numa chamada rápida? Em 15 minutos o sistema fica pronto com a sua rotina.'},
+  {k:'vd6',g:'vd',n:'Valores',t:'{oi}, {nome}! Quer que eu te passe os valores do plano completo e as condições para começar? É só me responder aqui.'}];
+var BV_GRUPOS=[['','Acompanhamento'],['vd','📣 Prospecção (venda)']];
 function bvEnv(){S.prefs=S.prefs||{};if(!S.prefs.bvEnv||typeof S.prefs.bvEnv!=='object')S.prefs.bvEnv={};return S.prefs.bvEnv;}
 function bvDias(a){return a.cadastro?Math.floor((Date.now()-new Date(a.cadastro).getTime())/864e5):999;}
 function bvProx(a){if(a.admin)return null;var e=bvEnv()[a.user_id]||{},d=bvDias(a),ped=+((a.m&&a.m.pedidos_total)||0),st=sitAss(a);
@@ -5270,7 +5278,7 @@ function fBv(uidAlvo){var a=(ui.admLista||[]).filter(function(x){return x.user_i
   if(C.id!==a.user_id||C.txt==null){C={id:a.user_id,k:q.k,txt:bvFill(q.t,a)};ui.bv=C;}
   return head('Mensagem para '+esc((a.nome||a.email||'').split(' ')[0]))+
     '<div class="row" style="gap:10px;align-items:center"><img src="equipe/ana-av.webp" alt="" width="40" height="40" style="border-radius:50%"><p class="small muted" style="margin:0">Escolha a mensagem. Você pode editar o texto antes de enviar.</p></div>'+
-    '<div class="row wrap" style="gap:6px">'+BV_SEQ.map(function(x){return '<button class="btn sm'+(x.k===C.k?' pri':'')+'" data-a="bvTpl" data-k="'+x.k+'">'+x.n+(e[x.k]?' ✓':'')+'</button>';}).join('')+'</div>'+
+    BV_GRUPOS.map(function(G){return '<div class="small muted" style="margin-top:6px">'+G[1]+'</div><div class="row wrap" style="gap:6px">'+BV_SEQ.filter(function(x){return (x.g||'')===G[0];}).map(function(x){return '<button class="btn sm'+(x.k===C.k?' pri':'')+'" data-a="bvTpl" data-k="'+x.k+'">'+x.n+(e[x.k]?' ✓':'')+'</button>';}).join('')+'</div>';}).join('')+
     (e[C.k]?'<p class="small muted" style="margin:0">Já enviada em '+dmy(e[C.k])+'.</p>':'')+
     '<label class="fld"><span>Texto</span><textarea id="bv-txt" rows="7">'+esc(C.txt)+'</textarea></label>'+
     (tel.length>=10?'<button class="btn pri ld-wa" data-a="bvEnvia" data-id="'+a.user_id+'">Abrir no WhatsApp</button>':'<p class="small" style="margin:0">Esse cadastro não tem WhatsApp. Copie o texto e mande por e-mail para <b>'+esc(a.email||'')+'</b>.</p>')+
@@ -5291,7 +5299,7 @@ function fAdmin(uidAlvo){
       '<button class="btn" data-a="admAcao" data-k="sempre" data-id="'+a.user_id+'">Ativar sem vencimento</button>'+
       '<button class="btn" data-a="admAcao" data-k="teste7" data-id="'+a.user_id+'">+7 dias de teste</button>'+
       '<button class="btn danger" data-a="admAcao" data-k="bloquear" data-id="'+a.user_id+'">Bloquear conta</button></div>'+
-    '<h3>Mensagem pelo WhatsApp</h3><div class="row wrap">'+BV_SEQ.map(function(x){var e=bvEnv()[a.user_id]||{};return '<button class="btn sm" data-a="bvAbre" data-id="'+a.user_id+'" data-k="'+x.k+'">'+x.n+(e[x.k]?' ✓':'')+'</button>';}).join('')+'</div>'+
+    '<h3>Mensagem pelo WhatsApp</h3>'+BV_GRUPOS.map(function(G){return (G[0]?'<h3 style="margin-top:10px">'+G[1]+'</h3>':'')+'<div class="row wrap">'+BV_SEQ.filter(function(x){return (x.g||'')===G[0];}).map(function(x){var e=bvEnv()[a.user_id]||{};return '<button class="btn sm" data-a="bvAbre" data-id="'+a.user_id+'" data-k="'+x.k+'">'+x.n+(e[x.k]?' ✓':'')+'</button>';}).join('')+'</div>';}).join('')+
     '<form data-form="admPlano" data-id="'+a.user_id+'" class="stack"><h3>Plano e espaço</h3><div class="grid2">'+
       '<label class="fld"><span>Plano</span><select id="ad-plano" name="plano">'+[['basico','Básico'],['plus','Plus'],['rede','Rede'],['vitrine','Vitrine']].map(function(o){return '<option value="'+o[0]+'" '+(a.plano===o[0]?'selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label>'+
       '<label class="fld"><span>Espaço (GB)</span><input id="ad-gb" name="gb" type="number" min="1" max="1000" step="1" value="'+Math.round((+a.limite_bytes||0)/GB)+'"></label></div>'+
