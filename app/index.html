@@ -1120,6 +1120,12 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .ask .row{justify-content:flex-end}
 .ask.env{background:color-mix(in srgb,var(--c-val) 12%,var(--surface))}.ask.env b{color:var(--c-val)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
+/* Uso e funil (Admin) */
+.us-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}.us-grid h3{margin:0 0 8px;font-size:.95rem}
+.us-fun{display:grid;gap:6px}.us-f{display:grid;grid-template-columns:52px 1fr auto;gap:8px;align-items:baseline;padding:6px 10px;border:1px solid var(--line);border-radius:10px}.us-f b{font-size:1.1rem}.us-f small{color:var(--muted)}
+.us-bars{display:grid;gap:6px}.us-b{display:grid;grid-template-columns:minmax(90px,40%) 1fr auto;gap:8px;align-items:center;font-size:.82rem}.us-l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.us-t{height:8px;border-radius:99px;background:var(--soft);overflow:hidden}.us-t i{display:block;height:100%;background:var(--accent);border-radius:99px}.us-v{color:var(--muted);font-size:.78rem}
+.us-ps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}.us-p{display:grid;grid-template-columns:auto auto;column-gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;font-size:.8rem}.us-p span{grid-row:1/span 2;font-weight:700;color:var(--muted)}.us-p.ok span{color:var(--ok)}.us-p small{color:var(--muted)}
 /* Prospecção: pergunta do 7º dia e tela da equipe */
 .pr-ask{position:fixed;inset:0;z-index:80;background:color-mix(in srgb,#000 45%,transparent);display:grid;place-items:center;padding:16px}
 .pr-box{background:var(--surface);border-radius:18px;padding:22px;max-width:420px;width:100%;display:grid;gap:10px;justify-items:start;box-shadow:0 20px 60px #0005}
@@ -1570,7 +1576,7 @@ function save(){if(S.prospMembro){prSyncLogo();return;}agendaSync();if(PR.ok)prS
    Só tempo e "visto por último": nenhuma página, clique ou localização é enviada. */
 var USO={ult:Date.now(),timer:null};
 ['pointerdown','keydown','wheel','touchstart','scroll'].forEach(function(ev){window.addEventListener(ev,function(){USO.ult=Date.now();},{passive:true,capture:true});});
-function pingUso(seg){if(!sb||!S.sessao)return;try{sb.rpc('registrar_uso',{seg:seg,disp:matchMedia('(max-width:820px)').matches?'celular':'computador'}).then(function(){},function(){});}catch(x){}}
+function pingUso(seg){if(!sb||!S.sessao)return;var disp=matchMedia('(max-width:820px)').matches?'celular':'computador';try{if(USO.semTela){sb.rpc('registrar_uso',{seg:seg,disp:disp}).then(function(){},function(){});return;}sb.rpc('registrar_uso_tela',{seg:seg,disp:disp,tela:telaAtual()}).then(function(r){if(r&&r.error){USO.semTela=true;sb.rpc('registrar_uso',{seg:seg,disp:disp}).then(function(){},function(){});}},function(){});}catch(x){}}
 function iniciaUso(){if(USO.timer)return;pingUso(0);USO.timer=setInterval(function(){if(document.visibilityState==='visible'&&Date.now()-USO.ult<5*60e3)pingUso(60);},60e3);}
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&S&&S.sessao){USO.ult=Date.now();pingUso(0);}});
 /* Enviado ao cliente: o pedido fica em Finalizado até o mês virar e então vai sozinho para o arquivo. */
@@ -1735,7 +1741,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='23/10 · 22h45';
+var VERSAO='23/10 · 23h40';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -5183,7 +5189,7 @@ function admTestes(){var at=ui.decoTeste,b=decoAtual(at),y=+today().slice(0,4);
     '<button class="btn sm danger" data-a="admDeco" data-v=""'+(at?'':' disabled')+'>Desativar teste</button></div>'+
     '<div class="row wrap" style="gap:8px;align-items:center"><button class="btn sm" data-a="admPasseio">🚶 Fazer alguém da equipe aparecer agora</button>'+(decoOff()?'<span class="small muted">As decorações estão desligadas em Configurações; o teste liga mesmo assim.</span>':'')+'</div></section>'+'<section class="card stack" style="margin-bottom:14px"><h2 style="margin:0">📥 Importar dados</h2><p class="small muted" style="margin:0">Traga clientes, pedidos e pagamentos de outro sistema (arquivo .json de importação). Antes de gravar, você confere tudo numa prévia.</p><div><label class="btn pri up">Escolher arquivo .json<input type="file" accept=".json,application/json" id="imp-file" hidden></label></div></section>';}
 function admSim(){return '<section class="card between wrap" style="gap:12px;margin-bottom:16px"><div><h2 style="margin:0">🧪 Simular lead do tráfego pago</h2><p class="small muted" style="margin:4px 0 0">Mostra o aviso da Mika como se alguém tivesse preenchido a sua página de anúncio agora. O contato de teste entra nos seus Leads marcado como "simulação" (pode apagar depois).</p></div><button class="btn pri" data-a="admSimLead">Simular agora</button></section>';}
-function rAdmin(){var h=rAdmin0(),ok=S.admin&&ui.mfa&&ui.admLista&&!(ui.mfa.fat&&ui.mfa.aal!=='aal2');return (ok?admBoas()+admProspec()+admSim()+admTestes():'')+h;}
+function rAdmin(){var h=rAdmin0(),ok=S.admin&&ui.mfa&&ui.admLista&&!(ui.mfa.fat&&ui.mfa.aal!=='aal2');return (ok?admBoas()+admUso()+admProspec()+admSim()+admTestes():'')+h;}
 function rAdmin0(){
   if(!S.admin)return '<div class="card empty">Esta área é só para o administrador do sistema.</div>';
   if(!ui.mfa){if(!ui.mfaBusy)setTimeout(checaMfa,0);return '<div class="card empty">Verificando segurança…</div>';}
@@ -5284,6 +5290,36 @@ function fBv(uidAlvo){var a=(ui.admLista||[]).filter(function(x){return x.user_i
     (tel.length>=10?'<button class="btn pri ld-wa" data-a="bvEnvia" data-id="'+a.user_id+'">Abrir no WhatsApp</button>':'<p class="small" style="margin:0">Esse cadastro não tem WhatsApp. Copie o texto e mande por e-mail para <b>'+esc(a.email||'')+'</b>.</p>')+
     '<div class="row wrap" style="gap:8px"><button class="btn sm" data-a="bvCopia">Copiar texto</button><button class="btn sm" data-a="bvMarca" data-id="'+a.user_id+'">Marcar como enviada</button><button class="btn sm" data-a="admAbrir" data-id="'+a.user_id+'">Voltar</button></div>';}
 function bvMarcaEnv(id,k){var E=bvEnv();E[id]=E[id]||{};E[id][k]=today();save();}
+/* ===== Uso por tela, primeiros passos e visitas do site (só números; ver migração 033) ===== */
+var TELA_NOMES={dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',leads:'Leads',secretarios:'Equipe de IA',metas:'Metas',analises:'Análises',ranking:'Ranking',rede:'Rede',visu:'Visualizador 3D',comp:'Componentes',config:'Configurações',tabela:'Tabela de preços',tipos:'Tipos de trabalho',arquivos:'Arquivos STL',lixeira:'Lixeira',mais:'Mais',admin:'Admin',lab:'Laboratório',prospec:'Prospecção (equipe)',login:'Login'};
+var PAG_NOMES={inicio:'Página inicial',tour:'Tour',rede:'Rede (site)',privacidade:'Privacidade',termos:'Termos',app:'Abriu o app',cadastro:'Cadastros feitos',captura:'Páginas de anúncio dos cadistas'};
+function telaAtual(){if(S.prospMembro)return 'prospec';var t=String(ui.tab||'dashboard').replace(/[^a-z0-9_]/g,'').slice(0,20);return t||'dashboard';}
+function admUsoCarrega(forca){var U=ui.admUso=ui.admUso||{};if(U.busy||(!forca&&U.t&&Date.now()-U.t<120000))return;U.busy=true;
+  Promise.all([sb.rpc('admin_marcos'),sb.rpc('admin_telas',{alvo:null,dias:30}),sb.rpc('admin_site',{dias:30})]).then(function(r){U.busy=false;U.t=Date.now();
+    if(r[0].error){U.erro=r[0].error.message;}else{U.erro=null;U.marcos={};(r[0].data||[]).forEach(function(m){U.marcos[m.user_id]=m;});}
+    U.telas=r[1].error?[]:(r[1].data||[]);U.site=r[2].error?[]:(r[2].data||[]);if(ui.tab==='admin')ui.sheet?renderSheet():render();},function(e){U.busy=false;U.erro=String(e&&e.message||e);});}
+function barras(L,fmt){var mx=Math.max.apply(null,L.map(function(x){return x.v;}).concat([1]));return '<div class="us-bars">'+L.map(function(x){return '<div class="us-b"><span class="us-l">'+esc(x.l)+'</span><span class="us-t"><i style="width:'+Math.max(2,Math.round(x.v/mx*100))+'%"></i></span><span class="us-v mono">'+fmt(x.v)+'</span></div>';}).join('')+'</div>';}
+function admUso(){admUsoCarrega();var U=ui.admUso||{};if(U.erro&&/function|does not exist|schema cache/i.test(U.erro))return '<section class="card" style="margin-bottom:16px"><h2 style="margin:0">📈 Uso e funil</h2><p class="small" style="color:var(--urgent);margin:6px 0 0">Falta rodar a migração 033 no Supabase.</p></section>';
+  if(!U.t)return '<section class="card" style="margin-bottom:16px"><h2 style="margin:0">📈 Uso e funil</h2><p class="small muted">Carregando…</p></section>';
+  var L=(ui.admLista||[]).filter(function(a){return !a.admin;}),agora=Date.now(),d30=agora-30*864e5,novos=L.filter(function(a){return a.cadastro&&new Date(a.cadastro).getTime()>=d30;}),M=U.marcos||{};
+  var tem=function(a,k){return M[a.user_id]&&M[a.user_id][k];},n=novos.length,pc=function(x){return n?Math.round(x/n*100)+'%':'—';};
+  var cli=novos.filter(function(a){return tem(a,'primeiro_cliente');}).length,ped=novos.filter(function(a){return tem(a,'primeiro_pedido');}).length,apr=novos.filter(function(a){return tem(a,'primeira_aprovacao');}).length,pag=novos.filter(function(a){return tem(a,'primeiro_pagamento');}).length;
+  var velhos=novos.filter(function(a){return agora-new Date(a.cadastro).getTime()>=7*864e5;}),volt=velhos.filter(function(a){return M[a.user_id]&&M[a.user_id].voltou_7d;}).length;
+  var etapas=[['Cadastraram',n,''],['Criaram cliente',cli,pc(cli)],['Criaram pedido',ped,pc(ped)],['Mandaram caso para aprovação',apr,pc(apr)],['Registraram pagamento',pag,pc(pag)],['Voltaram depois de 7 dias',volt,velhos.length?Math.round(volt/velhos.length*100)+'% de '+velhos.length:'—']];
+  var tel=(U.telas||[]).slice(0,12).map(function(t){return {l:(TELA_NOMES[t.tela]||t.tela)+' · '+t.usuarios+' pessoa(s)',v:+t.segundos};});
+  var pg={},orig={};(U.site||[]).forEach(function(v){pg[v.pagina]=(pg[v.pagina]||0)+(+v.visitas);if((v.pagina==='inicio'||v.pagina==='tour')&&v.origem!=='interno')orig[v.origem]=(orig[v.origem]||0)+(+v.visitas);});
+  var pgL=Object.keys(pg).sort(function(a,b){return pg[b]-pg[a];}).map(function(k){return {l:PAG_NOMES[k]||k,v:pg[k]};}),orL=Object.keys(orig).sort(function(a,b){return orig[b]-orig[a];}).map(function(k){return {l:k,v:orig[k]};});
+  var conv=pg.inicio?Math.round((pg.cadastro||0)/pg.inicio*1000)/10:null;
+  return '<section class="card stack" style="gap:14px;margin-bottom:16px"><div class="between wrap"><div><h2 style="margin:0">📈 Uso e funil (últimos 30 dias)</h2><p class="small muted" style="margin:4px 0 0">Só números: nome da tela e tempo, e visitas do site sem nenhum dado pessoal.</p></div><button class="btn sm" data-a="admUsoAt">Atualizar</button></div>'+
+    '<div class="us-grid"><div><h3>Funil dos novos cadastros</h3><div class="us-fun">'+etapas.map(function(e,i){return '<div class="us-f"><b class="mono">'+e[1]+'</b><span>'+e[0]+'</span>'+(i?'<small>'+e[2]+'</small>':'')+'</div>';}).join('')+'</div></div>'+
+    '<div><h3>Telas mais usadas</h3>'+(tel.length?barras(tel,horasTxt):'<p class="small muted">Ainda sem dados. Começa a contar a partir de agora.</p>')+'</div>'+
+    '<div><h3>Site: páginas visitadas</h3>'+(pgL.length?barras(pgL,function(v){return v;})+(conv!=null?'<p class="small" style="margin:6px 0 0">Conversão: <b>'+conv+'%</b> das visitas na página inicial viraram cadastro.</p>':''):'<p class="small muted">Ainda sem visitas registradas.</p>')+'</div>'+
+    '<div><h3>De onde vêm (início e tour)</h3>'+(orL.length?barras(orL,function(v){return v;}):'<p class="small muted">Ainda sem dados.</p>')+'</div></div></section>';}
+function admUsoUser(a){var U=ui.admUso||{},m=U.marcos&&U.marcos[a.user_id],T=(ui.admTelasU||{})[a.user_id];
+  if(T===undefined){ui.admTelasU=ui.admTelasU||{};ui.admTelasU[a.user_id]=null;sb.rpc('admin_telas',{alvo:a.user_id,dias:30}).then(function(r){ui.admTelasU[a.user_id]=r.error?[]:(r.data||[]);if(ui.sheet)renderSheet();});}
+  var passo=function(n,v){return '<div class="us-p'+(v?' ok':'')+'"><span>'+(v?'✓':'·')+'</span><b>'+n+'</b><small>'+(v?dmy(dia(v)):'ainda não')+'</small></div>';};
+  return '<h3>Primeiros passos</h3>'+(m?'<div class="us-ps">'+passo('Cadastro',m.cadastro)+passo('1º cliente',m.primeiro_cliente)+passo('1º pedido',m.primeiro_pedido)+passo('1º arquivo',m.primeiro_arquivo)+passo('1ª aprovação',m.primeira_aprovacao)+passo('1º pagamento',m.primeiro_pagamento)+'</div>':'<p class="small muted">Carregando…</p>')+
+    '<h3>Telas mais usadas (30 dias)</h3>'+(T==null?'<p class="small muted">Carregando…</p>':T.length?barras(T.slice(0,8).map(function(t){return {l:TELA_NOMES[t.tela]||t.tela,v:+t.segundos};}),horasTxt):'<p class="small muted">Ainda sem dados de telas.</p>');}
 function fAdmin(uidAlvo){
   var a=(ui.admLista||[]).filter(function(x){return x.user_id===uidAlvo;})[0];if(!a)return head('Assinante')+'<p class="empty">Não encontrado.</p>';
   var s=sitAss(a);
@@ -5293,7 +5329,7 @@ function fAdmin(uidAlvo){
       kv('Pedidos',((a.m&&+a.m.pedidos_total)||0)+' no total · '+((a.m&&+a.m.pedidos_30d)||0)+' em 30 dias')+kv('Clientes',String((a.m&&+a.m.clientes_total)||0))+
       kv('Situação','<span class="tag '+SIT_TAG[s]+'">'+SIT_TXT[s]+'</span>')+
       kv(s==='teste'?'Teste até':'Vence em',s==='teste'?dmy(dia(a.teste_ate)):a.vence_em?dmy(dia(a.vence_em)):(a.status==='ativa'?'sem vencimento':'—'))+'</div>'+
-    '<h3>Ações rápidas</h3><div class="row wrap">'+
+    admUsoUser(a)+'<h3>Ações rápidas</h3><div class="row wrap">'+
       '<button class="btn pri" data-a="admAcao" data-k="mes" data-id="'+a.user_id+'">Ativar +30 dias</button>'+
       '<button class="btn" data-a="admAcao" data-k="ano" data-id="'+a.user_id+'">Ativar +1 ano</button>'+
       '<button class="btn" data-a="admAcao" data-k="sempre" data-id="'+a.user_id+'">Ativar sem vencimento</button>'+
@@ -6400,6 +6436,7 @@ impGrava:function(){impGrava();},
     else if((l.etapa||0)>=SQ.length){l.st='fim';l.prox=null;l.hist.push({d:today(),n:'Sem resposta depois de '+SQ.length+' mensagens',por:S.sessao.id,quem:prQuem()});toast('Encerrado: foram as '+SQ.length+' mensagens sem resposta.');}
     else{l.prox=today();l.hist.push({d:today(),n:'Não respondeu: próxima mensagem',por:S.sessao.id,quem:prQuem()});toast((l.nome||'O contato')+' voltou para "Chamar hoje" com a próxima mensagem.');}
     save();if(S.prospMembro)render();else ldR();},
+  admUsoAt:function(){ui.admTelasU={};admUsoCarrega(true);toast('Atualizando…');},
   prTenta:function(){PR.erro=false;prCarrega(true);render();},
   prEqAtivo:function(d){var e=(PR.equipe||[]).filter(function(x){return x.id===d.id;})[0];if(!e)return;sb.from('prospec_equipe').update({ativo:!e.ativo}).eq('id',e.id).then(function(r){if(r.error){toast('Não consegui alterar: '+r.error.message);return;}e.ativo=!e.ativo;render();toast(e.ativo?'Acesso reativado.':'Acesso desativado: ela não vê mais a lista.');});},
   prEqDel:function(d){var e=(PR.equipe||[]).filter(function(x){return x.id===d.id;})[0];if(!e||!confirm('Remover o acesso de '+e.email+'?'))return;sb.from('prospec_equipe').delete().eq('id',e.id).then(function(r){if(r.error){toast('Não consegui remover: '+r.error.message);return;}PR.equipe=PR.equipe.filter(function(x){return x.id!==e.id;});render();toast('Acesso removido.');});},
@@ -6770,7 +6807,7 @@ var F={
       var tel=String(fd.get('tel')||'').trim();if(soDig(tel).length<10){ui.loginBusy=false;ui.loginMsg='Digite o seu WhatsApp com DDD.';render();return;}
       sb.auth.signUp({email:email,password:senha,options:{data:{nome:(pn+' '+sn).trim(),telefone:tel},emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){
         if(r.error)return fim(msgAuth(r.error));
-        try{window.idealiEvento&&window.idealiEvento('CompleteRegistration');}catch(x){}
+        try{window.idealiEvento&&window.idealiEvento('CompleteRegistration');}catch(x){}try{window.idealiVisita&&window.idealiVisita('cadastro',false);}catch(x){}
         if(!r.data.session){ui.loginCriar=false;ui.checaEmail={email:email,nome:pn};return fim();}
         ui.loginBusy=false;});
     }else{
@@ -7086,3 +7123,4 @@ function boot(){
 boot();
 </script>
 <script src="../pixel.js" defer></script>
+<script src="../visita.js" defer></script>
