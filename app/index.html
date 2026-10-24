@@ -1750,7 +1750,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='24/10 · 00h45';
+var VERSAO='24/10 · 01h00';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2810,7 +2810,7 @@ var TUT={
     ['ger','h2|Meta oficial','A meta oficial vale presente quando você bate bronze, prata ou ouro.','presente']],
   secretarios:[['ven',null,'Aqui você conversa com a equipe. Cada um tem atalhos do que sabe fazer: é só clicar ou escrever.','feliz'],
     ['ger','[data-a="secChat"][data-v="reu"]','Na sala de reunião a equipe toda analisa o seu mês junto.','serio']],
-  comp:[['ven','h2|Guia de componentes','Este é o guia de componentes da Implacil Osstem. No pedido de implante, eu abro ele já na conexão certa.','tranquila'],
+  comp:[['ven','h2|Guia de componentes','Este é o guia de componentes. Por enquanto ele já tem a biblioteca completa da Implacil Osstem, e as outras marcas estão sendo incluídas aos poucos. No pedido de implante Implacil, eu abro o guia já na conexão certa.','tranquila'],
     ['dad','[data-a="compLin"]','Filtre pela conexão e pelo tipo. Também dá para buscar direto pelo código.','analisando'],
     ['mkt','[data-a="compVer"]','Abra a peça para ver em 3D, o nome no Exocad e guardar nos seus favoritos.','ideia']],
   visu:[['ven','#vz-slot','Abra aqui STL, PLY ou OBJ: gire, meça em milímetros e anote no caso.','tranquila'],
