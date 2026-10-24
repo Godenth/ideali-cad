@@ -1128,6 +1128,16 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .tut-card p{margin:0;line-height:1.45}.tut-h{display:flex;gap:10px;align-items:center}.tut-h img{width:46px;height:46px;border-radius:50%;object-fit:cover;background:var(--soft)}
 .tut-h small{display:block;color:var(--muted);font-size:.75rem}.tut-bts{display:flex;gap:6px;align-items:center}.tut-bts .spacer{flex:1}
 .tut-q{font-weight:800;font-size:1rem}
+.tut-modo-intro{display:grid;place-items:center;padding:16px}
+.tut-intro{position:relative;z-index:2;display:grid;grid-template-columns:minmax(200px,300px) minmax(0,460px);align-items:end;max-width:800px;width:100%;max-height:calc(100vh - 32px)}
+.tut-pers{align-self:end;display:flex;justify-content:center}.tut-pers img{max-height:min(78vh,560px);max-width:100%;object-fit:contain;filter:drop-shadow(0 18px 30px #0008);animation:tutEntra .6s cubic-bezier(.2,1.3,.4,1) both}
+.tut-ic{background:var(--surface);color:var(--ink);border-radius:20px;padding:20px 22px;box-shadow:0 24px 60px #0008;display:grid;gap:10px;align-self:center;margin-left:-20px;overflow:auto;max-height:calc(100vh - 40px);animation:tutBolha .45s .15s ease both;position:relative}
+.tut-ic:before{content:"";position:absolute;left:-10px;bottom:40px;border:10px solid transparent;border-right-color:var(--surface);border-left:0}
+.tut-ic .tut-bts{position:sticky;bottom:-20px;background:var(--surface);padding:8px 0 4px;margin-bottom:-4px}.tut-ic small{color:var(--muted);font-size:.78rem}.tut-ic h2{margin:0;font-size:1.35rem}.tut-ic p{margin:0;line-height:1.5}.tut-sub{font-size:.88rem;color:var(--muted)}
+.tut-sabia{background:var(--accent-soft);border-radius:14px;padding:10px 14px}.tut-sabia ul{margin:6px 0 0;padding-left:18px;display:grid;gap:5px;font-size:.9rem;line-height:1.4}
+@keyframes tutEntra{from{transform:translateY(40px) scale(.9);opacity:0}to{transform:none;opacity:1}}@keyframes tutBolha{from{transform:translateY(10px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:700px){.tut-modo-intro{padding:10px}.tut-intro{grid-template-columns:minmax(0,1fr);align-items:start}.tut-pers img{max-height:28vh}.tut-ic{margin:-16px 0 0;max-height:66vh;padding:16px;min-width:0}.tut-ic h2{font-size:1.15rem}.tut-bts{flex-wrap:wrap}.tut-ic:before{left:50%;top:-10px;bottom:auto;border:10px solid transparent;border-bottom-color:var(--surface);border-top:0;margin-left:-10px}}
+body.sem-anim .tut-pers img,body.sem-anim .tut-ic{animation:none}
 body.sem-anim .tut-luz,body.sem-anim .tut-card{transition:none}
 /* Uso e funil (Admin) */
 .us-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}.us-grid h3{margin:0 0 8px;font-size:.95rem}
@@ -1750,7 +1760,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='24/10 · 01h00';
+var VERSAO='24/10 · 01h20';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2821,27 +2831,66 @@ var TUT={
   config:[['fin','h2|Chave Pix','Coloque a sua chave Pix aqui: é com ela que eu gero as cobranças.','dinheiro'],
     ['mkt','h2|Página para anúncios','Aqui você monta a sua página para anúncios.','megafone'],
     ['ger','h2|Tema','E escolha um tema com a sua cara.','satisfeito']]};
+/* Apresentação grande antes do mini tutorial: o personagem de corpo inteiro conta o que é a aba e dá dicas ("Você sabia?") */
+var TUT_INTRO={
+  dashboard:{ag:'ger',h:'serio',t:'Início: o seu painel do dia',f:['Toda manhã comece por aqui. Eu junto o que importa: o que entrega hoje, o que está atrasado, quem está devendo e como está o mês.','Os recados da equipe também aparecem aqui. Cada um de nós cuida de uma área e te avisa quando precisa de atenção.'],
+    s:['Dá para trocar o período e ver qualquer mês.','Em "Ver painel completo" tem gráficos de produção e faturamento.','Sem meta não dá para saber se o mês foi bom: crie a sua em Metas.']},
+  pedidos:{ag:'ven',h:'determinada',t:'Produção: todos os seus casos',f:['Aqui fica cada caso, do momento em que chega até ser entregue: Entrada, Pendência, Aguardando aprovação e Finalizado.','Eu acompanho os prazos e te aviso do que está vencendo.'],
+    s:['Você pode mandar o print da conversa do WhatsApp que eu preencho o pedido sozinha.','Faltou informação? Mande o pedido para Pendência com o motivo e eu monto o aviso para o cliente.','O cliente aprova o caso pelo link em 3D, sem instalar nada.','Dá para pausar ou cancelar um pedido, e o prazo para de contar.']},
+  financeiro:{ag:'fin',h:'dinheiro',t:'Financeiro: quem pagou e quem deve',f:['Aqui você enxerga o dinheiro: quanto faturou, quanto entrou e quanto falta receber, mês a mês.','Eu separo quem está devendo e monto a cobrança para você.'],
+    s:['A cobrança sai em PDF com QR Code Pix e vai pelo WhatsApp em um toque.','Ao registrar o pagamento dá para dar desconto em R$ ou em %.','Cadastre a sua chave Pix em Configurações para o QR Code funcionar.']},
+  clientes:{ag:'mkt',h:'animada',t:'Clientes: quem manda trabalho para você',f:['Cada dentista, clínica ou laboratório que te manda caso fica aqui, com quanto pediu e há quanto tempo não pede.','Eu fico de olho em quem sumiu e te dou a mensagem pronta para reconquistar.'],
+    s:['Cliente sem pedido há mais de 60 dias aparece como inativo.','Datas especiais, como o Dia do Dentista, viram mensagem pronta para o WhatsApp.','Cadastro duplicado? O sistema avisa e junta os dois.']},
+  leads:{ag:'mkt',h:'megafone',t:'Leads: novos clientes chegando',f:['Lead é quem ainda não é cliente, mas pode virar. Eu organizo cada contato numa agenda: quem chamar hoje, quem está aguardando resposta e quem já virou cliente.','Depois de cada mensagem, o contato espera alguns dias e volta sozinho para a fila. Assim ninguém fica esquecido.'],
+    s:['Você pode captar clientes com tráfego pago: um anúncio no Instagram ou no Facebook levando para a sua página, e os contatos caem aqui marcados com 🚀.','Grupos de WhatsApp de dentistas e laboratórios também são uma fonte: copie a lista de participantes e cole aqui que eu separo nome e telefone. Uma mensagem por vez, sem spam.','Mande o print da tela de contatos que eu leio os números sozinha.','Em datas especiais eu preparo uma mensagem para quem está na fila.']},
+  analises:{ag:'dad',h:'analisando',t:'Análises: o que os números dizem',f:['Eu comparo o seu ritmo recente com o seu histórico e transformo isso numa nota de saúde do negócio.','Também aviso de cliente que parou de pedir, de atraso e de quem está devendo, antes de virar problema.'],
+    s:['A aba muda de cor e de nome quando a saúde cai: Atenção, Perigo.','A previsão mostra quantos pedidos devem chegar nas próximas semanas.','Cada sinal vem com mensagem pronta para o WhatsApp.']},
+  ranking:{ag:'dad',h:'orgulhoso',t:'Ranking: seus melhores clientes',f:['Quem mais comprou no mês, com medalhas, e quanto cada um pesa no seu faturamento.','Se poucos clientes concentram quase tudo, eu aviso: é risco.'],
+    s:['Você pode criar faixas de desconto por volume para premiar quem pede mais.','Dá para ver o ranking de qualquer mês.']},
+  metas:{ag:'ger',h:'presente',t:'Metas: o seu alvo do mês',f:['Meta é o que separa um mês bom de um mês qualquer. Aqui você define a sua e acompanha quanto falta por dia.','A meta oficial é calculada por mim e vale presente quando você bate as faixas.'],
+    s:['A meta oficial conta só pedido finalizado com STL e HTML guardados no sistema.','Bronze, prata e ouro: cada faixa batida é um presente.','Pode usar a minha sugestão pela média dos últimos meses.']},
+  secretarios:{ag:'ven',h:'feliz',t:'Equipe de IA: a gente trabalha com você',f:['Aqui você conversa com cada um de nós. Eu cuido de vendas e produção, a Bia do financeiro, a Mika do marketing, o Klose dos dados e o Sr. Otávio das metas.','A equipe vai sendo contratada conforme você usa o sistema.'],
+    s:['Pode escrever do seu jeito, como "quem está devendo?" ou "qual o scanbody do mini pilar CM?".','Na sala de reunião todos analisam o seu mês juntos.','Os botões de atalho fazem relatórios e cobranças na hora.']},
+  comp:{ag:'ven',h:'pensativa',t:'Guia de componentes',f:['Aqui você consulta scanbody, Ti-Base, mini pilar e os outros componentes, com código, chave, torque e o que combina com o quê.','Por enquanto já temos a biblioteca completa da Implacil Osstem. As outras marcas estão sendo incluídas aos poucos.'],
+    s:['Dá para buscar pelo código da peça.','Toque na imagem para girar a peça em 3D.','Cada cartão mostra o nome exato para escolher na biblioteca do Exocad.']},
+  visu:{ag:'ven',h:'tranquila',t:'Visualizador 3D',f:['Abra STL, PLY ou OBJ direto no navegador, sem instalar nada.','Dá para medir em milímetros, anotar e tirar foto ou vídeo do caso.'],
+    s:['Os arquivos guardados nos pedidos também abrem aqui.']},
+  rede:{ag:'ger',h:'serio',t:'Rede de cadistas',f:['Lotou de trabalho? Delegue para outro cadista, com sigilo. Sobrou tempo? Pegue trabalhos oferecidos.','Cada trabalho tem valor, prazo e avaliação de quem pede.'],
+    s:['Quem pega o trabalho não vê o seu cliente, o paciente nem o valor que você cobra.','O seu perfil público funciona como vitrine do seu trabalho.']},
+  config:{ag:'fin',h:'focada',t:'Configurações',f:['Aqui ficam o seu perfil, a chave Pix, a página para anúncios, a tabela de preços e o tema.','Vale gastar 2 minutos aqui no começo: deixa o resto do sistema redondo.'],
+    s:['Com a chave Pix cadastrada, as cobranças saem com QR Code.','A tabela de preços preenche o valor do pedido sozinha.','Você pode instalar o Ideali CAD como aplicativo no celular.']}};
+function tutIntroHtml(t){var I=TUT_INTRO[t];if(!I)return '';var g=SECS.filter(function(x){return x.id===I.ag;})[0],h=I.h,pre='';
+  if(!agOk(I.ag)){pre='<p class="tut-sub">Quem cuida daqui é <b>'+esc(g.nome)+'</b>, que chega em breve. Por enquanto eu, a Ana, te apresento.</p>';g=SECS.filter(function(x){return x.id==='ven';})[0];h='tranquila';}
+  var n=(TUT[t]||[]).length;
+  return '<div class="tut-intro" role="dialog" aria-label="'+esc(I.t)+'"><div class="tut-pers" style="--zc:'+g.cor+'"><img src="'+esc(corpoDe(g,h))+'" alt="'+esc(g.nome)+'"></div>'+
+    '<div class="tut-ic"><small>'+esc(g.nome)+' · '+esc(g.cargo)+'</small><h2>'+esc(I.t)+'</h2>'+pre+I.f.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')+
+    (I.s&&I.s.length?'<div class="tut-sabia"><b>💡 Você sabia?</b><ul>'+I.s.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>':'')+
+    '<div class="tut-bts"><button class="btn sm" data-tut="nunca">Não mostrar mais</button><span class="spacer"></span><button class="btn sm" data-tut="pular">Pular</button>'+(n?'<button class="btn sm pri" data-tut="mostra">Me mostra na tela →</button>':'<button class="btn sm pri" data-tut="pular">Entendi</button>')+'</div></div></div>';}
 function tutPrefs(){S.prefs=S.prefs||{};if(!S.prefs.tut||typeof S.prefs.tut!=='object')S.prefs.tut={};return S.prefs.tut;}
 function tutAlvo(sel){if(!sel)return null;var p=sel.split('|'),L=[].slice.call(document.querySelectorAll('main '+p[0]+', .top '+p[0]+', .bnav '+p[0]));
   return L.filter(function(e){var r=e.getBoundingClientRect();return r.width>4&&r.height>4&&getComputedStyle(e).visibility!=='hidden'&&(!p[1]||e.textContent.indexOf(p[1])>=0);})[0]||null;}
 function tutPode(){return !!(S.sessao&&ui.dadosOk&&!S.carregando&&!S.prospMembro&&!EM_DEMO&&ui.tour==null&&ui.equipe==null&&!ui.sheet&&!ui.modoLab&&!document.hidden);}
-function tutChecar(){var t=ui.tab;if(ui.tutTabVista===t)return;ui.tutTabVista=t;if(!TUT[t]||document.getElementById('tut'))return;
+function tutChecar(){var t=ui.tab;if(ui.tutTabVista===t)return;ui.tutTabVista=t;if((!TUT[t]&&!TUT_INTRO[t])||document.getElementById('tut'))return;
   var P=tutPrefs();if(!(S.prefs&&S.prefs.tutSim)&&(S.prefs&&S.prefs.tutOff||P[t]))return;if(S.prefs&&S.prefs.tutSim&&!S.admin)return;
   setTimeout(function(){if(ui.tab===t&&tutPode()&&!document.getElementById('tut'))tutInicia(t);},700);}
-function tutInicia(t){if(!TUT[t])return;if(window.passeioTira)passeioTira();ui.tut={t:t,i:0};tutMostra();}
+function tutInicia(t){if(!TUT[t]&&!TUT_INTRO[t])return;if(window.passeioTira)passeioTira();ui.tut={t:t,i:0,intro:!!TUT_INTRO[t]};tutMostra();}
+function tutCliques(el){el.onclick=function(e){var b=e.target.closest('[data-tut]');if(!b||!ui.tut)return;var T=ui.tut,k=b.dataset.tut,n=(TUT[T.t]||[]).length;
+    if(k==='mostra'){T.intro=false;if(!n)tutFecha(true);else tutMostra();}
+    else if(k==='prox'){T.i++;if(T.i>=n)tutFecha(true);else tutMostra();}else if(k==='pular')tutFecha(true);else if(k==='nunca'){S.prefs.tutOff=true;tutFecha(true);toast('Ok, não mostro mais os tutoriais. Dá para rever no "?" de cada tela.',4000);}};}
 function tutFecha(marcar){var e=document.getElementById('tut');if(e)e.remove();window.removeEventListener('resize',tutPos);window.removeEventListener('scroll',tutPos,true);
   if(ui.tut&&marcar){tutPrefs()[ui.tut.t]=today();save();}ui.tut=null;}
 function tutPasso(){var T=ui.tut;if(!T)return null;var st=TUT[T.t][T.i];if(!st)return null;var ag=st[0],txt=st[2],h=st[3],g=SECS.filter(function(x){return x.id===ag;})[0];
   if(!agOk(ag)){var dono=g;g=SECS.filter(function(x){return x.id==='ven';})[0];txt=txt.replace(/^(Oi!|E aí!|Bem-vindo!)?\s*(Eu sou|Sou|Klose aqui)[^.!]*[.!]\s*/,'');txt='Quem cuida daqui é '+(dono.nome||'')+', que chega em breve. Por enquanto eu explico: '+txt;h='tranquila';}
   return {g:g,txt:txt,h:h,alvo:tutAlvo(st[1])};}
-function tutMostra(){var T=ui.tut,ps=tutPasso();if(!ps){tutFecha(true);return;}var n=TUT[T.t].length,g=ps.g;
+function tutMostra(){var T=ui.tut;if(T&&T.intro){var el0=document.getElementById('tut');if(!el0){el0=document.createElement('div');el0.id='tut';document.body.appendChild(el0);window.addEventListener('resize',tutPos);window.addEventListener('scroll',tutPos,true);}
+    el0.className='tut-modo-intro';el0.innerHTML='<i class="tut-d" style="left:0;top:0;width:100%;height:100%"></i>'+tutIntroHtml(T.t);tutCliques(el0);return;}
+  var ps=tutPasso();if(!ps){tutFecha(true);return;}var n=TUT[T.t].length,g=ps.g;
   var el=document.getElementById('tut');if(!el){el=document.createElement('div');el.id='tut';document.body.appendChild(el);window.addEventListener('resize',tutPos);window.addEventListener('scroll',tutPos,true);}
   el.innerHTML='<i class="tut-d"></i><i class="tut-d"></i><i class="tut-d"></i><i class="tut-d"></i><div class="tut-luz"></div><div class="tut-card" role="dialog" aria-label="Tutorial"><div class="tut-h"><img src="'+esc(rostoDe(g,ps.h)||g.foto)+'" alt=""><div><b>'+esc(g.nome)+'</b><small>'+esc(g.cargo)+' · '+(T.i+1)+' de '+n+'</small></div></div><p>'+esc(ps.txt)+'</p>'+
     '<div class="tut-bts"><button class="btn sm" data-tut="nunca">Não mostrar mais</button><span class="spacer"></span><button class="btn sm" data-tut="pular">Pular</button><button class="btn sm pri" data-tut="prox">'+(T.i+1<n?'Próximo':'Entendi')+'</button></div></div>';
-  el.onclick=function(e){var b=e.target.closest('[data-tut]');if(!b){if(e.target.classList.contains('tut-luz')||e.target===el){}return;}var k=b.dataset.tut;
-    if(k==='prox'){T.i++;if(T.i>=n)tutFecha(true);else tutMostra();}else if(k==='pular')tutFecha(true);else if(k==='nunca'){S.prefs.tutOff=true;tutFecha(true);toast('Ok, não mostro mais os tutoriais. Dá para rever no "?" de cada tela.',4000);}};
+  el.className='';tutCliques(el);
   ui.tut.el=ps.alvo;if(ps.alvo){try{ps.alvo.scrollIntoView({block:'center',behavior:animOff()?'auto':'smooth'});}catch(x){}}setTimeout(tutPos,ps.alvo?380:0);tutPos();}
-function tutPos(){var el=document.getElementById('tut');if(!el||!ui.tut)return;var a=ui.tut.el,luz=el.querySelector('.tut-luz'),c=el.querySelector('.tut-card');if(!luz||!c)return;
+function tutPos(){var el=document.getElementById('tut');if(!el||!ui.tut||ui.tut.intro)return;var a=ui.tut.el,luz=el.querySelector('.tut-luz'),c=el.querySelector('.tut-card');if(!luz||!c)return;
   var vw=innerWidth,vh=innerHeight,cw=Math.min(360,vw-24);c.style.width=cw+'px';var D=el.querySelectorAll('.tut-d'),dim=function(x,y,w,h){return 'left:'+x+'px;top:'+y+'px;width:'+Math.max(0,w)+'px;height:'+Math.max(0,h)+'px';};
   var R=null;if(a&&a.isConnected){var r0=a.getBoundingClientRect();R={l:r0.left-6,t:r0.top-6,r:r0.right+6,b:r0.bottom+6};}
   if(R){D[0].style.cssText=dim(0,0,vw,R.t);D[1].style.cssText=dim(0,R.b,vw,vh-R.b);D[2].style.cssText=dim(0,R.t,R.l,R.b-R.t);D[3].style.cssText=dim(R.r,R.t,vw-R.r,R.b-R.t);}
