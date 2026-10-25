@@ -453,6 +453,17 @@ html[data-tema="abrigo"] .top,html[data-tema="abrigo"] .side,html[data-tema="abr
 html[data-tema="abrigo"] .tnav button.on,html[data-tema="abrigo"] .side .it.on{box-shadow:inset 0 -3px 0 #F2C230}
 html[data-tema="abrigo"] body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px)}
 html[data-tema="abrigo"] #chuva{display:block;opacity:1}
+:root[data-tema="norte"]{color-scheme:dark;--bg:#0A1018;--surface:rgba(18,26,36,.88);--ink:#E6ECF1;--muted:#93A2B2;--line:#2B3A4A;--accent:#C9D6E3;--accent-ink:#0B121A;--accent-soft:#1E2B39;--soft:#152030;
+  --urgent:#D0614F;--ok:#7FB8A4;--warn:#D9B46A;--c-pac:#C9A88A;--c-cli:#9CC3E6;--c-val:#E1C27A;--p1:#9CC3E6;--p2:#7FB8A4;--p3:#E1C27A;--p4:#B59CD6;--p5:#D0614F;--p6:#C9D6E3;
+  --f-display:Georgia,"Times New Roman",serif}
+html[data-tema="norte"] body{background:#0A1018}
+html[data-tema="norte"] h1,html[data-tema="norte"] h2{font-family:Georgia,"Times New Roman",serif;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#E6ECF1;text-shadow:0 0 14px rgba(156,195,230,.25)}
+html[data-tema="norte"] .btn.pri{background:linear-gradient(180deg,#DCE5EE,#AEBBC8);border-color:#E6ECF1;color:#0B121A;border-radius:4px;font-family:Georgia,serif;letter-spacing:.06em;text-transform:uppercase;font-weight:700;box-shadow:0 0 16px -4px rgba(201,214,227,.45)}
+html[data-tema="norte"] .btn{border-radius:4px}
+html[data-tema="norte"] .card,html[data-tema="norte"] .zap{border-radius:6px;border:1px solid rgba(201,214,227,.22);backdrop-filter:blur(6px);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 20px 40px -24px #000}
+html[data-tema="norte"] .top,html[data-tema="norte"] .side,html[data-tema="norte"] .bnav{background:rgba(10,16,24,.9);border-color:rgba(201,214,227,.18);backdrop-filter:blur(8px)}
+html[data-tema="norte"] .tnav button.on,html[data-tema="norte"] .side .it.on{box-shadow:inset 0 -2px 0 #C9D6E3}
+html[data-tema="norte"] #chuva{display:block;opacity:1}
 html[data-tema="sombria"] body{background:#07080C}
 html[data-tema="sombria"] h1,html[data-tema="sombria"] h2{letter-spacing:.02em}
 html[data-tema="sombria"] .btn.pri{background:#E0B341;border-color:#E0B341;color:#0B0B0B;border-radius:3px;box-shadow:0 0 18px -6px rgba(224,179,65,.6)}
@@ -1793,7 +1804,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='24/10 · 18h20';
+var VERSAO='24/10 · 22h40';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2374,10 +2385,10 @@ function secPrevisao(){var tot=alive(S.pedidos).length,par=ui.prevPar||(ui.prevP
 /* ---------- Dashboard ---------- */
 /* ---------- Temas (cor do sistema por personalidade) + modo claro/escuro ----------
    Guardado em perfis.preferencias (tema, modo) e copiado no navegador para abrir já com o tema certo. */
-var TEMAS=[['ideali','Ideali','#5B45E0','#F6F5F8','#E2DFEA','Criativo'],['oceano','Oceano','#1F6FD1','#F4F7FB','#DCE5F0','Calmo'],['esmeralda','Esmeralda','#138A63','#F4F8F6','#DCE8E2','Equilibrado'],['brasa','Brasa','#D9531E','#FBF6F3','#F0E1D9','Energético'],['rose','Rosé','#C2367A','#FBF5F8','#F0DEE7','Acolhedor'],['dourado','Dourado','#9A7419','#F8F6F1','#E9E3D3','Elegante'],['grafite','Grafite','#2B2F36','#F5F5F6','#E2E3E6','Focado'],['neon','Neon','linear-gradient(135deg,#4FC8FF,#3D4BF2 45%,#B44DFF 75%,#E45CFF)','#0A0A24','#29285E','Vibrante'],['codigo','Código','#00FF66','#000400','#0F3D1F','Hacker'],['horizonte','Horizonte','#E8B66A','#04060B','#1E2434','Espacial'],['sakura','Sakura','#F0508C','#FFF6FA','#F6D9E6','Anime'],['cyber','Cyber','#FCEE0A','#07070B','#2A2638','Futurista'],['japao','Japão','#C8322A','#FFF4E6','#EBD7C6','Tradicional'],['sombria','Sombria','#E0B341','#07080C','#24252D','Noturno'],['bambu','Bambu','#2F8F4E','#EEF7EA','#D2E6CF','Natureza'],['abrigo','Abrigo','#F2C230','#0B1526','#2A4572','Retrô atômico']];
+var TEMAS=[['ideali','Ideali','#5B45E0','#F6F5F8','#E2DFEA','Criativo'],['oceano','Oceano','#1F6FD1','#F4F7FB','#DCE5F0','Calmo'],['esmeralda','Esmeralda','#138A63','#F4F8F6','#DCE8E2','Equilibrado'],['brasa','Brasa','#D9531E','#FBF6F3','#F0E1D9','Energético'],['rose','Rosé','#C2367A','#FBF5F8','#F0DEE7','Acolhedor'],['dourado','Dourado','#9A7419','#F8F6F1','#E9E3D3','Elegante'],['grafite','Grafite','#2B2F36','#F5F5F6','#E2E3E6','Focado'],['neon','Neon','linear-gradient(135deg,#4FC8FF,#3D4BF2 45%,#B44DFF 75%,#E45CFF)','#0A0A24','#29285E','Vibrante'],['codigo','Código','#00FF66','#000400','#0F3D1F','Hacker'],['horizonte','Horizonte','#E8B66A','#04060B','#1E2434','Espacial'],['sakura','Sakura','#F0508C','#FFF6FA','#F6D9E6','Anime'],['cyber','Cyber','#FCEE0A','#07070B','#2A2638','Futurista'],['japao','Japão','#C8322A','#FFF4E6','#EBD7C6','Tradicional'],['sombria','Sombria','#E0B341','#07080C','#24252D','Noturno'],['bambu','Bambu','#2F8F4E','#EEF7EA','#D2E6CF','Natureza'],['abrigo','Abrigo','#F2C230','#0B1526','#2A4572','Retrô atômico'],['norte','Norte','#C9D6E3','#0A1018','#2B3A4A','Gélido']];
 /* Chuva de caracteres do tema Código (canvas leve, ~18 quadros por segundo, para quando a aba some) */
 var CHUVA={on:false};
-function chuvaLiga(){if(!document.body){document.addEventListener('DOMContentLoaded',chuvaLiga);return;}var r=document.documentElement;if(r.getAttribute('data-tema')==='horizonte'){espacoLiga();return;}if(r.getAttribute('data-tema')==='sakura'){sakuraLiga();return;}if(r.getAttribute('data-tema')==='cyber'){cyberLiga();return;}if(r.getAttribute('data-tema')==='japao'){japaoLiga();return;}if(r.getAttribute('data-tema')==='sombria'){sombriaLiga();return;}if(r.getAttribute('data-tema')==='bambu'){bambuLiga();return;}if(r.getAttribute('data-tema')==='abrigo'){abrigoLiga();return;}if(r.getAttribute('data-tema')!=='codigo'){CHUVA.on=false;return;}
+function chuvaLiga(){if(!document.body){document.addEventListener('DOMContentLoaded',chuvaLiga);return;}var r=document.documentElement;if(r.getAttribute('data-tema')==='horizonte'){espacoLiga();return;}if(r.getAttribute('data-tema')==='sakura'){sakuraLiga();return;}if(r.getAttribute('data-tema')==='cyber'){cyberLiga();return;}if(r.getAttribute('data-tema')==='japao'){japaoLiga();return;}if(r.getAttribute('data-tema')==='sombria'){sombriaLiga();return;}if(r.getAttribute('data-tema')==='bambu'){bambuLiga();return;}if(r.getAttribute('data-tema')==='abrigo'){abrigoLiga();return;}if(r.getAttribute('data-tema')==='norte'){norteLiga();return;}if(r.getAttribute('data-tema')!=='codigo'){CHUVA.on=false;return;}
   var c=document.getElementById('chuva');if(!c){c=document.createElement('canvas');c.id='chuva';c.setAttribute('aria-hidden','true');document.body.insertBefore(c,document.body.firstChild);}
   if(CHUVA.on&&CHUVA.modo==='codigo')return;CHUVA.on=true;CHUVA.modo='codigo';var x=c.getContext('2d'),fs=16,cols=0,gotas=[],ch='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン0123456789ABCDEF$#@%&*+=<>'.split(''),ult=0,red=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   var tam=function(){c.width=innerWidth;c.height=innerHeight;cols=Math.ceil(c.width/fs);gotas=[];for(var i=0;i<cols;i++)gotas.push(Math.random()*-c.height/fs);x.fillStyle='#000400';x.fillRect(0,0,c.width,c.height);};tam();window.addEventListener('resize',tam);
@@ -2533,6 +2544,25 @@ function abrigoLiga(){fundoLiga('abrigo',function(s,W,H){var hz=Math.round(H*.74
   function(x,s,W,H,ts,red){x.drawImage(s.base,0,0);if(!red)s.t++;
     var on=(Math.floor(ts/900)%2)===0;if(on){var lg=x.createRadialGradient(s.tx,s.ty,0,s.tx,s.ty,22);lg.addColorStop(0,'rgba(255,70,50,.95)');lg.addColorStop(1,'rgba(255,70,50,0)');x.fillStyle=lg;x.fillRect(s.tx-22,s.ty-22,44,44);}
     x.fillStyle='rgba(214,170,120,.35)';for(var i=0;i<s.p.length;i++){var q=s.p[i];if(!red){q.x+=q.v;q.y+=Math.sin((s.t+i)*.05)*.2;if(q.x>W+5)q.x=-5;}x.beginPath();x.arc(q.x,q.y,q.r,0,6.29);x.fill();}},60);}
+/* Norte: céu estrelado com aurora, montanhas nevadas em camadas, névoa passando e neve caindo (arte original) */
+function norteLiga(){fundoLiga('norte',function(s,W,H){var o=document.createElement('canvas');o.width=W;o.height=H;var x=o.getContext('2d');s.base=o;
+    var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#03060C');g.addColorStop(.45,'#0B1626');g.addColorStop(.75,'#1A2A3C');g.addColorStop(1,'#2A3A4C');x.fillStyle=g;x.fillRect(0,0,W,H);
+    var mw=x.createLinearGradient(0,0,W,H*.5);mw.addColorStop(0,'rgba(0,0,0,0)');mw.addColorStop(.5,'rgba(170,180,210,.07)');mw.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=mw;x.fillRect(0,0,W,H*.6);
+    for(var i=0;i<Math.round(W*H/2600);i++){var r=Math.random();x.fillStyle='rgba(230,236,245,'+(.25+r*.7)+')';x.fillRect(Math.random()*W,Math.random()*H*.62,r<.93?1:1.8,r<.93?1:1.8);}
+    s.br=[];for(var b=0;b<40;b++)s.br.push({x:Math.random()*W,y:Math.random()*H*.5,f:Math.random()*6.28});
+    var serra=function(base,amp,n,cor,neve,seed){var pts=[],k;for(k=0;k<=n;k++){var px=W*k/n,py=base-Math.abs(Math.sin(k*1.7+seed))*amp-Math.random()*amp*.35;pts.push([px,py]);}
+      x.fillStyle=cor;x.beginPath();x.moveTo(0,H);pts.forEach(function(p){x.lineTo(p[0],p[1]);});x.lineTo(W,H);x.fill();
+      if(neve){x.fillStyle=neve;for(k=1;k<pts.length-1;k++){var p=pts[k];if(p[1]<pts[k-1][1]&&p[1]<pts[k+1][1]){var d=amp*.28;x.beginPath();x.moveTo(p[0],p[1]);x.lineTo(p[0]-d*.9,p[1]+d);x.lineTo(p[0]-d*.3,p[1]+d*.75);x.lineTo(p[0],p[1]+d*1.05);x.lineTo(p[0]+d*.35,p[1]+d*.7);x.lineTo(p[0]+d*.85,p[1]+d);x.fill();}}}};
+    serra(H*.62,H*.26,9,'#22344A','rgba(220,232,244,.85)',.4);serra(H*.74,H*.2,12,'#17263A','rgba(200,215,232,.7)',2.1);serra(H*.86,H*.13,16,'#0E1928','rgba(180,198,218,.5)',4.3);
+    x.fillStyle='#0A121D';for(var t=0;t<Math.round(W/18);t++){var tx=Math.random()*W,th=18+Math.random()*34,ty=H-Math.random()*H*.06;x.beginPath();x.moveTo(tx,ty-th);x.lineTo(tx-th*.28,ty);x.lineTo(tx+th*.28,ty);x.fill();}
+    s.n=[];for(var j=0;j<Math.round(W/9);j++)s.n.push({x:Math.random()*W,y:Math.random()*H,v:.4+Math.random()*1.1,r:.6+Math.random()*1.8,f:Math.random()*6.28});
+    s.nv=[];for(var q=0;q<4;q++)s.nv.push({x:Math.random()*W,y:H*(.6+q*.09),w:W*(.5+Math.random()*.5),v:.12+Math.random()*.2});s.t=0;},
+  function(x,s,W,H,ts,red){x.drawImage(s.base,0,0);if(!red)s.t++;
+    x.save();x.globalCompositeOperation='lighter';for(var a=0;a<3;a++){var ay=H*(.16+a*.06),ag=x.createLinearGradient(0,ay-60,0,ay+70);ag.addColorStop(0,'rgba(80,220,170,0)');ag.addColorStop(.5,'rgba('+(a===2?'120,140,230':'80,220,170')+','+(.07-a*.015)+')');ag.addColorStop(1,'rgba(80,220,170,0)');x.fillStyle=ag;
+      x.beginPath();x.moveTo(0,ay+70);for(var k=0;k<=24;k++){var px=W*k/24;x.lineTo(px,ay+Math.sin(k*.6+s.t*.008+a)*26-30);}for(k=24;k>=0;k--){var px2=W*k/24;x.lineTo(px2,ay+Math.sin(k*.6+s.t*.008+a)*26+70);}x.fill();}x.restore();
+    for(var b=0;b<s.br.length;b++){var e=s.br[b],al=.3+.7*Math.abs(Math.sin(e.f+s.t*.03));x.fillStyle='rgba(235,242,255,'+al+')';x.fillRect(e.x,e.y,1.6,1.6);}
+    for(var i=0;i<s.nv.length;i++){var n=s.nv[i];if(!red){n.x+=n.v;if(n.x-n.w>W)n.x=-n.w*.2;}var ng=x.createRadialGradient(n.x,n.y,0,n.x,n.y,n.w*.5);ng.addColorStop(0,'rgba(190,205,222,.13)');ng.addColorStop(1,'rgba(190,205,222,0)');x.fillStyle=ng;x.beginPath();x.ellipse(n.x,n.y,n.w*.5,60,0,0,6.29);x.fill();}
+    x.fillStyle='rgba(240,245,252,.8)';for(var j=0;j<s.n.length;j++){var f=s.n[j];if(!red){f.y+=f.v;f.x+=Math.sin(f.f+s.t*.02)*.4-.15;if(f.y>H){f.y=-4;f.x=Math.random()*W;}}x.beginPath();x.arc(f.x,f.y,f.r,0,6.29);x.fill();}},50);}
 /* Bambu: bambuzal balançando, cachoeira com névoa e um panda comendo bambu */
 function bambuLiga(){fundoLiga('bambu',function(s,W,H){s.b=[];var add=function(x0,n){for(var i=0;i<n;i++)s.b.push({x:x0+i*(26+Math.random()*18),w:9+Math.random()*7,h:H*(.6+Math.random()*.45),f:Math.random()*6.28,c:Math.random()<.5?'#5FA347':'#4C8F3A'});};add(-10,5);add(W-70,3);
     s.g=[];for(var j=0;j<70;j++)s.g.push({x:Math.random(),y:Math.random(),v:2+Math.random()*3});s.t=0;},
