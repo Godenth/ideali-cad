@@ -627,13 +627,13 @@ body.sem-anim .deco *{animation:none!important}
 body.na-conversa .rd-fab:not(.on){display:none}
 .pac-lgpd{margin-top:6px;padding:8px 10px;border-radius:10px;font-size:.84rem;background:color-mix(in srgb,var(--urgent) 12%,transparent);color:var(--ink);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pd-odo .odonto-box{padding:8px}
-.ar-box{display:grid;gap:6px;padding:8px;border:1px solid var(--line);border-radius:14px;background:var(--soft)}.ar-svg{width:100%;max-width:420px;margin:0 auto;display:block;touch-action:manipulation}
-.ar-t{cursor:pointer}.ar-t ellipse{fill:var(--surface);stroke:var(--line);stroke-width:1.5;transition:fill .15s,stroke .15s}.ar-t text{font:700 10px var(--f-mono,monospace);fill:var(--muted);text-anchor:middle;pointer-events:none}
-.ar-t:hover ellipse{stroke:var(--accent);stroke-width:2}.ar-t.on text{fill:#fff}.ar-t.falta ellipse{fill:var(--surface);stroke:var(--warn);stroke-dasharray:3 2;stroke-width:2}.ar-t.falta text{fill:var(--ink)}
-.ar-t.ed ellipse{stroke:var(--ink)!important;stroke-width:3}.ar-imp{fill:#fff;stroke:#14A3A3;stroke-width:2;pointer-events:none}
-.ar-ponte{stroke:var(--ink);stroke-width:5;stroke-linecap:round;opacity:.35}.ar-placa{fill:none;stroke-width:28;stroke-linecap:round;stroke-linejoin:round;opacity:.22}
+.ar-box{display:grid;gap:6px;padding:8px;border:1px solid var(--line);border-radius:14px;background:var(--soft)}.ar-svg{width:100%;max-width:470px;margin:0 auto;display:block;touch-action:manipulation}
+.ar-t{cursor:pointer}.ar-hit{fill:transparent;stroke:none}.ar-t:hover .ar-hit{fill:color-mix(in srgb,var(--accent) 12%,transparent)}.ar-t.ed .ar-hit{fill:color-mix(in srgb,var(--accent) 18%,transparent);stroke:var(--accent);stroke-width:2.5}
+.ar-t.falta .ar-hit{stroke:var(--warn);stroke-width:2.5;stroke-dasharray:5 4}.ar-num{font:600 12px var(--f-mono,monospace);fill:var(--muted);text-anchor:middle;cursor:pointer}.ar-num.on{fill:var(--accent);font-weight:800}
+.ar-svg .od-n{fill:var(--surface);stroke:color-mix(in srgb,var(--ink) 38%,transparent);stroke-width:1.4}.ar-ponte{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.55}
+.ar-placa{fill:none;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;opacity:.16;stroke:var(--accent)}.ar-placa.ar-pro{stroke:#E0559B;opacity:.22}
 .ar-cn{cursor:pointer}.ar-cn-h{fill:transparent}.ar-cn circle:last-child{fill:var(--surface);stroke:var(--muted);stroke-width:1.5}.ar-cn.u circle:last-child{fill:var(--accent);stroke:var(--accent)}
-.ar-lbl{font:600 11px var(--f-ui,sans-serif);fill:var(--muted);text-anchor:middle;letter-spacing:.08em;text-transform:uppercase}.ar-meio{stroke:var(--line);stroke-dasharray:3 3}
+.ar-lbl{font:600 13px var(--f-ui,sans-serif);fill:var(--muted);text-anchor:middle;letter-spacing:.08em;text-transform:uppercase}
 .od-leg i[style]{border-radius:50%}.ar-i-uni{display:inline-block;width:14px;height:4px;border-radius:2px;background:var(--ink);opacity:.4}
 .tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}.tg-b{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;border:0;cursor:pointer;text-align:left;font:600 .86rem var(--f-ui,sans-serif);color:#fff;background:color-mix(in srgb,var(--tc) 82%,#000);box-shadow:inset 0 0 0 2px transparent;transition:transform .1s}
 .tg-b:hover{transform:translateY(-1px);background:var(--tc)}.tg-b.on{box-shadow:inset 0 0 0 3px #fff,0 0 0 2px var(--tc)}.tg-b .ti{background:#ffffff26;border-radius:7px;flex:none}.tg-b .ti svg{stroke:#fff}
@@ -1825,7 +1825,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='29/10 · 11h40';
+var VERSAO='29/10 · 12h10';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={painel:'Painel do dono',comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -6006,25 +6006,45 @@ var TIPO_ICO={
   mod:'<path d="M12 2.5 L20.5 7 V16.5 L12 21 L3.5 16.5 V7 Z" class="ti-c ti-tr"/><path d="M3.5 7 L12 11.5 L20.5 7 M12 11.5 V21" class="ti-l"/>'};
 function tipoIco(t){var k=t&&TIPO_ICO_NOME[semAcento(String(t.nome||'')).toLowerCase().trim()];
   return '<span class="ti'+(k?'':' ti-vazio')+'" aria-hidden="true">'+(k?'<svg viewBox="0 0 24 24">'+TIPO_ICO[k]+'</svg>':'')+'</span>';}
-/* ===== Arcadas em formato de arco (tipo programa de CAD): toque no dente, escolha o trabalho na grade colorida ===== */
-var ARCO_LARG={8:1.3,7:1.3,6:1.35,5:1,4:1,3:.95,2:.82,1:.95};
-function arcoPos(list,sup){var cx=180,cy=sup?194:168,rx=150,ry=150,a0=Math.PI*.94,a1=Math.PI*.06,ws=list.map(function(n){return ARCO_LARG[n%10]||1;}),tot=ws.reduce(function(a,b){return a+b;},0),acc=0;
-  return list.map(function(n,k){var mid=(acc+ws[k]/2)/tot;acc+=ws[k];var th=a0-(a0-a1)*mid,x=cx+rx*Math.cos(th),y=sup?cy-ry*Math.sin(th):cy+ry*Math.sin(th);
-    return {n:n,x:x,y:y,r:8.5+ws[k]*5,ang:(sup?-1:1)*(90-th*180/Math.PI)};});}
+/* ===== Arcadas em formato de arco: cada dente desenhado com o formato dele (incisivo, canino, pré-molar, molar)
+   e com a ilustração do trabalho (implante com parafuso, preparo, pôntico, faceta). Coroa virada para o centro. ===== */
+var ARCO_LARG={8:1.28,7:1.28,6:1.32,5:1.05,4:1.05,3:1,2:.9,1:1};
+function arcoPos(list,sup){var cx=240,cy=sup?228:262,rx=200,ry=168,a0=Math.PI*.95,a1=Math.PI*.05,ws=list.map(function(n){return ARCO_LARG[n%10]||1;}),tot=ws.reduce(function(a,b){return a+b;},0),acc=0;
+  return list.map(function(n,k){var mid=(acc+ws[k]/2)/tot;acc+=ws[k];var th=a0-(a0-a1)*mid,x=cx+rx*Math.cos(th),y=sup?cy-ry*Math.sin(th):cy+ry*Math.sin(th),dx=cx-x,dy=cy-y,dl=Math.sqrt(dx*dx+dy*dy)||1;
+    return {n:n,x:x,y:y,w:ws[k],ux:dx/dl,uy:dy/dl,rot:Math.atan2(dy,dx)*180/Math.PI-90};});}
+var DENTE_FORMA={
+  inc:{c:'M9 56 Q7 72 9.5 88 Q20 91.5 30.5 88 Q33 72 31 56 Z',r:'M13 56 L15.5 16 Q20 9 24.5 16 L27 56 Z'},
+  can:{c:'M8 56 Q6 70 10 82 Q15 89 20 94 Q25 89 30 82 Q34 70 32 56 Z',r:'M12.5 56 L15 7 Q20 1 25 7 L27.5 56 Z'},
+  pre:{c:'M7 56 Q5 72 8 86 Q12 91.5 16 88 Q20 92 24 88 Q28 91.5 32 86 Q35 72 33 56 Z',r:'M13 56 L15.5 14 Q20 7 24.5 14 L27 56 Z'},
+  mol:{c:'M5 56 Q3 72 6 86 Q9.5 91.5 13.5 87.5 Q17 92.5 20 88.5 Q23 92.5 26.5 87.5 Q30.5 91.5 34 86 Q37 72 35 56 Z',r:'M7 56 L9 20 Q11.5 14 14 20 L18 56 Z M22 56 L26 20 Q28.5 14 31 20 L33 56 Z'}};
+function denteClasse(n){var k=n%10;return k<=2?'inc':k===3?'can':k<=5?'pre':'mol';}
+function denteArco(n,i){var F=DENTE_FORMA[denteClasse(n)],c=F.c,r=F.r;
+  if(!i)return '<path d="'+r+'" class="od-n"/><path d="'+c+'" class="od-n"/>';
+  var k=i.t?tipoDesenho(i):'out';
+  if(k==='imp'){var o='<rect x="14.5" y="12" width="11" height="40" rx="3" class="od-par"/>';for(var y=17;y<50;y+=5)o+='<path d="M14.5 '+y+' L25.5 '+(y+3)+'" class="od-rosca"/>';return o+'<rect x="16" y="50" width="8" height="9" rx="1.5" class="od-pil"/><path d="'+c+'" class="od-c"/>';}
+  if(k==='pro')return '<path d="M5 57 H35" class="od-pro-g"/><path d="'+c+'" class="od-pro"/>';
+  if(k==='pla')return '<path d="'+r+'" class="od-r"/><path d="'+c+'" class="od-r"/><path d="'+c+'" class="od-pla"/>';
+  if(k==='pon')return '<path d="M6 57 H34" class="od-gengiva"/><path d="'+c+'" class="od-c"/>';
+  if(k==='fac')return '<path d="'+r+'" class="od-r"/><path d="'+c+'" class="od-r"/><path d="'+c+'" class="od-fac" transform="translate(20 74) scale(.82) translate(-20 -74)"/>';
+  if(k==='prep')return '<path d="'+r+'" class="od-r"/><path d="'+c+'" class="od-c od-trans"/><path d="M12.5 56 L14.5 73 Q20 78 25.5 73 L27.5 56 Z" class="od-prep"/>';
+  return '<path d="'+r+'" class="od-r"/><path d="'+c+'" class="od-c"/>';}
+function arcoSVG(its,ed){var mapa={},usados={};(its||[]).forEach(function(i){mapa[i.d]=i;});var g='',S0=.68,f=function(v){return v.toFixed(1);};
+  [[UP,true],[LO,false]].forEach(function(A){var P=arcoPos(A[0],A[1]),pl=null;A[0].forEach(function(n){if(mapa[n]&&mapa[n].t&&ehPlaca(mapa[n].t))pl=mapa[n];});
+    var dentro=function(p,d){return [p.x+p.ux*d,p.y+p.uy*d];};
+    if(pl){var kk=tipoDesenho(pl);usados[kk]=1;g+='<path d="M'+P.map(function(p){var q=dentro(p,14);return f(q[0])+' '+f(q[1]);}).join(' L')+'" class="ar-placa ar-'+kk+'"/>';}
+    gruposUniao(its).forEach(function(gr){if(A[0].indexOf(gr[0])<0)return;usados.uni=1;var pts=P.filter(function(p){return gr.indexOf(p.n)>=0;});
+      g+='<path d="M'+pts.map(function(p){var q=dentro(p,13);return f(q[0])+' '+f(q[1]);}).join(' L')+'" class="ar-ponte"/>';});
+    P.forEach(function(p){var i=mapa[p.n];if(i&&i.t)usados[tipoDesenho(i)]=1;var sx=S0*(denteClasse(p.n)==='mol'?1.05:1);
+      g+='<g class="ar-t'+(i?' on':'')+(ed===p.n?' ed':'')+(i&&!i.t?' falta':'')+'" data-a="tooth" data-n="'+p.n+'" role="button" aria-label="Dente '+p.n+'" transform="translate('+f(p.x)+' '+f(p.y)+') rotate('+f(p.rot)+') scale('+sx+' '+S0+') translate(-20 -56)">'+
+        '<rect x="1" y="2" width="38" height="96" rx="9" class="ar-hit"/>'+denteArco(p.n,i)+'</g>';
+      var q=dentro(p,40);g+='<text x="'+f(q[0])+'" y="'+f(q[1]+3.5)+'" class="ar-num'+(i?' on':'')+'" data-a="tooth" data-n="'+p.n+'">'+p.n+'</text>';});
+    P.forEach(function(p,k){var a=mapa[p.n],q=P[k+1],b=q&&mapa[q.n];if(!a||!b||ehPlaca(a.t)||ehPlaca(b.t))return;var u=unido(a,b),m1=dentro(p,30),m2=dentro(q,30),mx=(m1[0]+m2[0])/2,my=(m1[1]+m2[1])/2;
+      g+='<g data-a="pdUne" data-n="'+p.n+'" class="ar-cn'+(u?' u':'')+'" role="button" aria-label="'+(u?'Separar ':'Unir ')+p.n+' e '+q.n+'"><circle cx="'+f(mx)+'" cy="'+f(my)+'" r="10" class="ar-cn-h"/><circle cx="'+f(mx)+'" cy="'+f(my)+'" r="5"/></g>';});});
+  var LEG={pro:'Protocolo',pla:'Placa de bruxismo',imp:'Sobre implante (parafuso)',prep:'Sobre dente (preparo)',pon:'Pôntico',fac:'Faceta',out:'Outro trabalho',uni:'Unidos (fixo)'};
+  return '<div class="ar-box"><svg class="ar-svg" viewBox="0 0 480 486" role="group" aria-label="Arcadas: toque no dente para escolher o trabalho">'+
+    '<text x="240" y="196" class="ar-lbl">Superior</text><text x="240" y="300" class="ar-lbl">Inferior</text>'+g+'</svg>'+
+    '<div class="od-leg">'+Object.keys(LEG).filter(function(k){return usados[k];}).map(function(k){return '<span><i class="od-i-'+k+'"></i>'+LEG[k]+'</span>';}).join('')+'</div></div>';}
 function corTrab(i){var c=ICO_TRAB[catTrab(i.t,i)]||ICO_TRAB.out;return c[1];}
-function arcoSVG(its,ed){var mapa={},usados={};(its||[]).forEach(function(i){mapa[i.d]=i;});var g='';
-  [[UP,true],[LO,false]].forEach(function(A){var P=arcoPos(A[0],A[1]),kinds={};A[0].forEach(function(n){if(mapa[n]&&mapa[n].t&&ehPlaca(mapa[n].t))kinds.pl=mapa[n];});
-    if(kinds.pl){var c0=corTrab(kinds.pl);g+='<path d="M'+P.map(function(p){return p.x.toFixed(1)+' '+p.y.toFixed(1);}).join(' L')+'" class="ar-placa" style="stroke:'+c0+'"/>';usados[catTrab(kinds.pl.t,kinds.pl)]=1;}
-    P.forEach(function(p,k){var a=mapa[p.n],b=P[k+1]&&mapa[P[k+1].n];if(unido(a,b)){g+='<line x1="'+p.x.toFixed(1)+'" y1="'+p.y.toFixed(1)+'" x2="'+P[k+1].x.toFixed(1)+'" y2="'+P[k+1].y.toFixed(1)+'" class="ar-ponte"/>';usados.uni=1;}});
-    P.forEach(function(p){var i=mapa[p.n],cor=i&&i.t?corTrab(i):null;if(cor)usados[catTrab(i.t,i)]=1;
-      g+='<g class="ar-t'+(i?' on':'')+(ed===p.n?' ed':'')+(i&&!i.t?' falta':'')+'" data-a="tooth" data-n="'+p.n+'" role="button" aria-label="Dente '+p.n+'"><ellipse cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" rx="'+(p.r*.86).toFixed(1)+'" ry="'+p.r.toFixed(1)+'" transform="rotate('+p.ang.toFixed(1)+' '+p.x.toFixed(1)+' '+p.y.toFixed(1)+')"'+(cor?' style="fill:'+cor+';stroke:'+cor+'"':'')+'/>'+
-        (i&&i.imp?'<circle cx="'+(p.x+p.r*.55).toFixed(1)+'" cy="'+(p.y-p.r*.55).toFixed(1)+'" r="4.5" class="ar-imp"/>':'')+'<text x="'+p.x.toFixed(1)+'" y="'+(p.y+4).toFixed(1)+'">'+p.n+'</text></g>';});
-    P.forEach(function(p,k){var a=mapa[p.n],q=P[k+1],b=q&&mapa[q.n];if(!a||!b||ehPlaca(a.t)||ehPlaca(b.t))return;var u=unido(a,b),mx=(p.x+q.x)/2,my=(p.y+q.y)/2,dx=180-mx,dy=180-my,dl=Math.sqrt(dx*dx+dy*dy)||1;mx+=dx/dl*14;my+=dy/dl*14;
-      g+='<g data-a="pdUne" data-n="'+p.n+'" class="ar-cn'+(u?' u':'')+'" role="button" aria-label="'+(u?'Separar ':'Unir ')+p.n+' e '+q.n+'"><circle cx="'+mx.toFixed(1)+'" cy="'+my.toFixed(1)+'" r="11" class="ar-cn-h"/><circle cx="'+mx.toFixed(1)+'" cy="'+my.toFixed(1)+'" r="5.5"/></g>';});});
-  var LEG={};Object.keys(ICO_TRAB).forEach(function(k){LEG[k]=ICO_TRAB[k];});
-  return '<div class="ar-box"><svg class="ar-svg" viewBox="0 0 360 362" role="group" aria-label="Arcadas: toque no dente para escolher o trabalho">'+
-    '<text x="180" y="132" class="ar-lbl">Superior</text><text x="180" y="238" class="ar-lbl">Inferior</text><line x1="180" y1="14" x2="180" y2="36" class="ar-meio"/><line x1="180" y1="326" x2="180" y2="348" class="ar-meio"/>'+g+'</svg>'+
-    '<div class="od-leg">'+Object.keys(usados).map(function(k){if(k==='uni')return '<span><i class="ar-i-uni"></i>Unidos (fixo)</span>';var c=ICO_TRAB[k]||ICO_TRAB.out;return '<span><i style="background:'+c[1]+'"></i>'+c[0]+'</span>';}).join('')+'</div></div>';}
 function tipoGrade(sel){var ts=alive(S.tipos).filter(function(t){return t.ativo!==false||t.id===sel;}).filter(function(t){return !/modelo/i.test(semAcento(t.nome))||t.id===sel;});
   if(!ts.length)return '<p class="small muted">Sua tabela de preços está vazia. <button type="button" class="btn sm" data-a="tab" data-v="tabela">Abrir tabela</button></p>';
   var grupos={};ts.forEach(function(t){var k=catTrab(t.id,{t:t.id});(grupos[k]=grupos[k]||[]).push(t);});
