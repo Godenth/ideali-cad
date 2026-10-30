@@ -1163,6 +1163,7 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .tut-card p{margin:0;line-height:1.45}.tut-h{display:flex;gap:10px;align-items:center}.tut-h img{width:46px;height:46px;border-radius:50%;object-fit:cover;background:var(--soft)}
 .tut-h small{display:block;color:var(--muted);font-size:.75rem}.tut-bts{display:flex;gap:6px;align-items:center}.tut-bts .spacer{flex:1}
 .tut-q{font-weight:800;font-size:1rem}
+.cx a.btn{color:inherit;text-decoration:none}.cx a.btn.pri{color:#fff}.cx-url{padding:10px 12px;border-radius:10px;background:var(--soft);font-size:.85rem;word-break:break-all}.cx-it.novo{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent)}.cx-desc{margin:0;white-space:pre-wrap;line-height:1.5}
 .pn-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}.pn-tabs button{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:8px 14px;font-weight:600;cursor:pointer}.pn-tabs button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .pn-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.pn-k{display:grid;gap:2px;padding:14px}.pn-k b{font-size:1.6rem}.pn-k span{font-weight:600}.pn-k small{color:var(--muted);font-size:.75rem}
 .pn-graf{display:flex;align-items:flex-end;gap:3px;height:120px;padding:6px 0;border-bottom:1px solid var(--line)}.pn-graf i{flex:1;background:var(--accent);border-radius:4px 4px 0 0;min-width:3px;opacity:.85}
@@ -1643,12 +1644,13 @@ async function carregar2(){
     novo.faixas=novo.faixas.filter(function(x){return !x.deleted;});
     novo.pagamentos.forEach(function(g){g.pedidos=novo.pedidos.filter(function(x){return x.pagamentoId===g.id;}).map(function(x){return x.id;});});
     novo.seq=novo.pedidos.reduce(function(m,x){return Math.max(m,x.num||0);},0);
-    S=novo;S.prospMembro=!!pm;S.prospAcesso=pm;PR.ok=false;PR.lista.length=0;PR.snap={};PR.equipe=null;tiraFoto();ui.dadosOk=true;if(!S.prospMembro){passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);setTimeout(capSync,4500);setTimeout(ldOcAviso,9000);clearInterval(window._capT);window._capT=setInterval(function(){if(!document.hidden)capSync();},90000);setTimeout(libCheca,2500);}
+    S=novo;S.prospMembro=!!pm;S.prospAcesso=pm;PR.ok=false;PR.lista.length=0;PR.snap={};PR.equipe=null;tiraFoto();ui.dadosOk=true;if(!S.prospMembro){setTimeout(function(){cxCarrega(true);},4000);passeioAgenda(7000);setTimeout(salaAuto,6000);setTimeout(premioCheca,3500);setTimeout(capSync,4500);setTimeout(ldOcAviso,9000);clearInterval(window._capT);window._capT=setInterval(function(){if(!document.hidden)capSync();},90000);setTimeout(libCheca,2500);}
     try{var ra2=await sb.rpc('sou_admin');S.admin=!ra2.error&&ra2.data===true;}catch(x){S.admin=false;}
   }catch(e){console.error(e);toast('Não consegui carregar seus dados: '+((e&&e.message)||e));}
   S.carregando=false;ui.autoArqMes=null;aplicaTema(temaAtual(),modoAtual());autoArquivar();render();iniciaUso();if(!S.prospMembro)secAbreDia();
 }
 setInterval(function(){if(autoArquivar())render();},3600000);
+setInterval(function(){if(S&&S.sessao&&ui.dadosOk&&!document.hidden&&CX.ok)cxCarrega(true);},120000);
 var TRAB_REF=[['Elemento sobre dente','elemento'],['Elemento sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
   ['Provisório com aleta','elemento'],['Placa de bruxismo','elemento'],['Enceramento digital (planejamento)','elemento'],
   ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo 3D','trabalho'],['Gengiva','elemento']];
@@ -1776,6 +1778,7 @@ var ui={per:monthOf(today()),tab:'dashboard',sub:null,mes:monthOf(today()),filtr
 try{var _vs=localStorage.getItem('idealicad_vista');if(_vs==='tabela')ui.vista='tabela';}catch(e){}
 function ic(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
 var ICON={
+  caixa:ic('<path d="M3 13l3-8h12l3 8v6H3z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/>'),
   dashboard:ic('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
   visu:ic('<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/>'),
   comp:ic('<rect x="8.5" y="2.5" width="7" height="4" rx="1"/><path d="M7 6.5h10l-1.5 4h-7z"/><path d="M9 10.5l1 10h4l1-10M9.6 13.5h4.8M9.9 16.5h4.2"/>'),
@@ -1800,11 +1803,11 @@ var ICON={
 };
 var MENU=[
   ['Principal',[['dashboard','Início'],['pedidos','Produção'],['clientes','Clientes'],['financeiro','Financeiro']]],
-  ['Mais',[['leads','Leads'],['secretarios','Equipe de IA'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['rede','Rede'],['visu','Visualizador 3D'],['comp','Componentes']]],
+  ['Mais',[['leads','Leads'],['caixa','Caixa de entrada'],['secretarios','Equipe de IA'],['metas','Metas'],['analises','Análises'],['ranking','Ranking'],['rede','Rede'],['visu','Visualizador 3D'],['comp','Componentes']]],
   ['Conta',[['admin','Admin'],['painel','Painel'],['config','Configurações']]]
 ];
-var MAIS_IDS=['leads','secretarios','metas','analises','ranking','rede','visu','comp','mais'];
-var MAIS_DESC={leads:'Seus contatos dos anúncios: agenda, mensagens e retornos',secretarios:'Sua equipe: começa com a Ana e cresce junto com você',metas:'Meta oficial com medalhas 🥉🥈🥇 e presentes',analises:'Saúde do negócio, clientes sumidos e sinais',ranking:'Quem são seus melhores clientes',rede:'Seu perfil público e cadistas da Rede',visu:'Abra STL, PLY e OBJ no navegador',comp:'Scanbody, Ti-Base, mini pilar e códigos da Implacil'};
+var MAIS_IDS=['leads','caixa','secretarios','metas','analises','ranking','rede','visu','comp','mais'];
+var MAIS_DESC={caixa:'Trabalhos enviados pelos clientes no seu link',leads:'Seus contatos dos anúncios: agenda, mensagens e retornos',secretarios:'Sua equipe: começa com a Ana e cresce junto com você',metas:'Meta oficial com medalhas 🥉🥈🥇 e presentes',analises:'Saúde do negócio, clientes sumidos e sinais',ranking:'Quem são seus melhores clientes',rede:'Seu perfil público e cadistas da Rede',visu:'Abra STL, PLY e OBJ no navegador',comp:'Scanbody, Ti-Base, mini pilar e códigos da Implacil'};
 /* ===== Liberação aos poucos: conta nova começa só com o núcleo; cada função chega na hora certa, apresentada por um agente =====
    S.prefs.lib = {ini:'AAAA-MM-DD', all:1 (tudo liberado), metas:'data', ...}. Contas que já tinham pedidos ganham tudo liberado. */
 var LIBS=[
@@ -1825,10 +1828,10 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='30/10 · 12h30';
+var VERSAO='30/10 · 13h20';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
-var TITULOS={painel:'Painel do dono',comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
+var TITULOS={caixa:'Caixa de entrada',painel:'Painel do dono',comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
 
 /* ===================== Render principal ===================== */
 function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAplica)decoAplica();},0);if(ui.tab!=='secretarios')ui.secRolado=null;
@@ -1845,7 +1848,7 @@ function render(){setTimeout(function(){if(window.vzPos)vzPos();if(window.decoAp
   if(!w) chip='<span class="tag u">Conta bloqueada</span>';
   else chip='';
   var R={dashboard:rDashboard,pedidos:rPedidos,clientes:function(){return ui.msgs?rMensagens():ui.sub?rCliente(ui.sub):rClientes();},financeiro:rFinanceiro,
-    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,lab:rLab,mais:rMaisHub,painel:rPainel,leads:rLeads,analises:rAnalisesTab,metas:rMetasTab,secretarios:rSecretarios,visu:rVisu,comp:rComp,config:rConfig,admin:rAdmin};
+    ranking:rRanking,arquivos:rArmaz,tipos:rTipos,lixeira:rLixeira,tabela:rTabela,rede:rRede,lab:rLab,mais:rMaisHub,caixa:rCaixa,painel:rPainel,leads:rLeads,analises:rAnalisesTab,metas:rMetasTab,secretarios:rSecretarios,visu:rVisu,comp:rComp,config:rConfig,admin:rAdmin};
   var body=ui.tour!=null&&ui.tab!=='config'?comDemo(R[ui.tab]||rDashboard):(R[ui.tab]||rDashboard)();
   var urg=alive(S.pedidos).filter(function(p){return p.urgente&&aberto(p);}).length;
   var lix=S.clientes.concat(S.pedidos,S.pagamentos,S.arquivos,S.tipos).filter(function(x){return x.deleted;}).length;
@@ -5602,7 +5605,7 @@ function fBv(uidAlvo){var a=(ui.admLista||[]).filter(function(x){return x.user_i
     '<div class="row wrap" style="gap:8px"><button class="btn sm" data-a="bvCopia">Copiar texto</button><button class="btn sm" data-a="bvMarca" data-id="'+a.user_id+'">Marcar como enviada</button><button class="btn sm" data-a="admAbrir" data-id="'+a.user_id+'">Voltar</button></div>';}
 function bvMarcaEnv(id,k){var E=bvEnv();E[id]=E[id]||{};E[id][k]=today();save();}
 /* ===== Uso por tela, primeiros passos e visitas do site (só números; ver migração 033) ===== */
-var TELA_NOMES={painel:'Painel',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',leads:'Leads',secretarios:'Equipe de IA',metas:'Metas',analises:'Análises',ranking:'Ranking',rede:'Rede',visu:'Visualizador 3D',comp:'Componentes',config:'Configurações',tabela:'Tabela de preços',tipos:'Tipos de trabalho',arquivos:'Arquivos STL',lixeira:'Lixeira',mais:'Mais',admin:'Admin',lab:'Laboratório',prospec:'Prospecção (equipe)',login:'Login'};
+var TELA_NOMES={caixa:'Caixa de entrada',painel:'Painel',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',leads:'Leads',secretarios:'Equipe de IA',metas:'Metas',analises:'Análises',ranking:'Ranking',rede:'Rede',visu:'Visualizador 3D',comp:'Componentes',config:'Configurações',tabela:'Tabela de preços',tipos:'Tipos de trabalho',arquivos:'Arquivos STL',lixeira:'Lixeira',mais:'Mais',admin:'Admin',lab:'Laboratório',prospec:'Prospecção (equipe)',login:'Login'};
 var PAG_NOMES={inicio:'Página inicial',tour:'Tour',rede:'Rede (site)',privacidade:'Privacidade',termos:'Termos',app:'Abriu o app',cadastro:'Cadastros feitos',captura:'Páginas de anúncio dos cadistas'};
 function telaAtual(){if(S.prospMembro)return 'prospec';var t=String(ui.tab||'dashboard').replace(/[^a-z0-9_]/g,'').slice(0,20);return t||'dashboard';}
 function admUsoCarrega(forca){var U=ui.admUso=ui.admUso||{};if(U.busy||(!forca&&U.t&&Date.now()-U.t<120000))return;U.busy=true;
@@ -5695,6 +5698,56 @@ function pnTestes(){return '<section class="card stack"><h2 style="margin:0">Ani
 function rPainel(){var ok=S.admin&&ui.mfa&&ui.admLista&&!(ui.mfa.fat&&ui.mfa.aal!=='aal2');if(!ok)return rAdmin0();pnCarrega();var t=ui.pnTab||'geral';
   return '<div class="stack" style="gap:16px"><div class="pn-tabs" role="tablist">'+PN_TABS.map(function(x){return '<button role="tab" class="'+(t===x[0]?'on':'')+'" data-a="pnTab" data-v="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</div>'+
     (t==='usuarios'?pnUsuarios():t==='uso'?pnUso():t==='captacao'?pnCaptacao():t==='testes'?pnTestes():pnGeral())+'</div>';}
+/* ===== Caixa de entrada: envios pelo link "Envie seu trabalho" (tabela caixa_entrada, RLS do dono).
+   A Ana avisa quando chega envio novo e monta o pré-cadastro do pedido; o cadista revisa e salva. Anexos diretos: ainda não liberados (só links). ===== */
+var CX={ok:false,falta:false,lista:[],link:null,t:0,vistos:null,busy:false};
+function cxUrl(){return CX.link?'https://idealisystems.com/enviar/#'+CX.link.token:'';}
+function cxNovos(){return CX.lista.filter(function(x){return x.status==='novo';}).length;}
+function cxCarrega(avisa){if(!sb||!S.sessao||EM_DEMO||S.prospMembro||CX.busy)return;CX.busy=true;
+  Promise.all([sb.from('caixa_entrada').select('*').order('criado_em',{ascending:false}).limit(100),sb.from('caixa_links').select('*').maybeSingle()]).then(function(r){CX.busy=false;CX.t=Date.now();
+    if(r[0].error){CX.falta=/does not exist|schema cache|relation/i.test(r[0].error.message||'');CX.ok=false;if(ui.tab==='caixa')render();return;}
+    CX.ok=true;CX.falta=false;CX.lista=r[0].data||[];CX.link=r[1].error?null:r[1].data;
+    var ids=CX.lista.map(function(x){return x.id;}),novos=CX.lista.filter(function(x){return x.status==='novo'&&CX.vistos&&CX.vistos.indexOf(x.id)<0;});
+    if(CX.vistos===null&&avisa)novos=CX.lista.filter(function(x){return x.status==='novo';});
+    CX.vistos=ids;
+    if(novos.length&&avisa!==false&&precisaWhats()){CX.vistos=null;novos=[];}
+    if(novos.length&&avisa!==false){var x=novos[0],q=novos.length;agenteCanto('ven','feliz',q>1?q+' trabalhos novos na Caixa de entrada! 📥':'Chegou trabalho novo! 📥',(q>1?'O mais recente é de ':'Enviado por ')+cxQuem(x)+'. Já deixei o pré-cadastro pronto: é só revisar e salvar.',[{a:'cxPre',id:x.id,l:'Revisar pedido',pri:1},{a:'tab',v:'caixa',l:'Ver caixa'}],14000,true);}
+    if(ui.tab==='caixa'&&!ui.sheet)render();},function(){CX.busy=false;});}
+function cxQuem(x){var r=x.remetente||'';return [x.tipo==='Dentista'||!x.tipo||r.toLowerCase().indexOf(x.tipo.toLowerCase())===0?'':x.tipo,r].filter(Boolean).join(' ')+(x.doutor&&x.doutor!==x.remetente?' ('+x.doutor+')':'');}
+function cxToken(){var a=new Uint8Array(24);crypto.getRandomValues(a);return btoa(String.fromCharCode.apply(null,a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+function cxMarca(id,st,pid){var x=CX.lista.filter(function(i){return i.id===id;})[0];if(x){x.status=st;if(pid)x.pedido_id=pid;}var o={status:st};if(pid)o.pedido_id=pid;return sb.from('caixa_entrada').update(o).eq('id',id).then(function(r){if(r&&r.error)toast('Não consegui atualizar a caixa: '+r.error.message);});}
+/* Ana: lê o envio e abre o pedido pré-preenchido */
+function cxPre(id){var x=CX.lista.filter(function(i){return i.id===id;})[0];if(!x)return;if(!guard())return;
+  var r=pedDoTexto(x.descricao||'');var cli=null;try{cli=ppCliente([x.remetente,x.doutor,x.telefone].filter(Boolean).join(' '));}catch(e){}
+  r.cli=cli;if(x.paciente)r.pac=pacIniciais(x.paciente)||x.paciente;r.scan=false;
+  if(x.status==='novo')cxMarca(id,'lido');
+  ui.caixaPend={id:id,links:(x.links||[]).slice(1)};
+  ppAbrePedido(r);
+  var tenta=function(n){var s=document.getElementById('pd-scan'),o=document.getElementById('pd-obs');if(!s&&n<10){setTimeout(function(){tenta(n+1);},80);return;}
+    if(s&&x.links&&x.links[0])s.value=x.links[0];
+    if(o)o.value=[o.value,'Recebido pela Caixa de entrada: '+cxQuem(x)+'.',x.descricao].filter(Boolean).join('\n').slice(0,500);};tenta(0);
+  if(!cli)setTimeout(function(){toast('Não achei o cliente "'+x.remetente+'" no seu cadastro. Escolha na lista ou cadastre antes de salvar.',5500);},400);}
+function cxDepoisPedido(p){var C=ui.caixaPend;if(!C)return;ui.caixaPend=null;(C.links||[]).forEach(function(u,i){var h='';try{h=new URL(u).hostname.replace(/^www\./,'');}catch(e){}S.arquivos.push({id:uid(),pedidoId:p.id,origem:'link',nome:'Arquivos · '+(h||'link '+(i+2)),url:u,criado:today()});});
+  cxMarca(C.id,'aprovado',p.id);}
+function rCaixa(){if(!CX.t&&!CX.busy)cxCarrega(false);
+  if(CX.falta)return '<section class="card"><h2 style="margin:0">📥 Caixa de entrada</h2><p class="small" style="color:var(--urgent)">Falta rodar a migração 035 no Supabase para ligar a Caixa de entrada.</p></section>';
+  if(!CX.ok)return '<section class="card"><h2 style="margin:0">📥 Caixa de entrada</h2><p class="small muted">Carregando…</p></section>';
+  var L=CX.lista,f=ui.cxFil||'abertos',vis=L.filter(function(x){return f==='todos'?true:f==='aprovados'?x.status==='aprovado':(x.status==='novo'||x.status==='lido');});
+  var linkCard='<section class="card stack"><div class="between wrap"><div><h2 style="margin:0">🔗 Seu link "Envie seu trabalho"</h2><p class="small muted" style="margin:4px 0 0">Mande para dentistas, laboratórios e clínicas. Eles preenchem o caso e o envio cai aqui. Por enquanto aceita <b>links</b> de arquivos (Drive, WeTransfer); o anexo direto chega em breve.</p></div>'+
+    (CX.link?'<span class="tag '+(CX.link.ativo?'ok':'')+'">'+(CX.link.ativo?'Ligado':'Desligado')+'</span>':'')+'</div>'+
+    (CX.link?'<div class="cx-url mono">'+esc(cxUrl())+'</div><div class="row wrap"><button class="btn sm pri" data-a="cxCopia">Copiar link</button><a class="btn sm" target="_blank" rel="noopener" href="'+esc(waLink('Oi! Para me enviar um trabalho, é só preencher aqui: '+cxUrl(),''))+'">Mandar no WhatsApp</a><button class="btn sm" data-a="cxLiga">'+(CX.link.ativo?'Desligar link':'Ligar link')+'</button><button class="btn sm" data-a="cxTroca">Trocar link</button></div>'
+      :'<div><button class="btn pri" data-a="cxCria">Criar meu link</button></div>')+'</section>';
+  var itens=vis.map(function(x){var st=x.status,dt=new Date(x.criado_em),quando=dmy(dia(x.criado_em))+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+    return '<article class="card cx-it'+(st==='novo'?' novo':'')+'"><div class="between wrap"><div><b>'+esc(cxQuem(x))+'</b><div class="small muted">'+esc(quando)+(x.paciente?' · paciente '+esc(x.paciente):'')+(x.telefone?' · '+esc(telFmt(x.telefone)):'')+'</div></div>'+
+      '<span class="tag '+(st==='novo'?'u':st==='aprovado'?'ok':st==='recusado'?'':'a')+'">'+({novo:'Novo',lido:'Lido',aprovado:'Virou pedido',recusado:'Recusado'})[st]+'</span></div>'+
+      '<p class="cx-desc">'+esc(x.descricao)+'</p>'+
+      ((x.links||[]).length?'<div class="row wrap">'+x.links.map(function(u){var h='';try{h=new URL(u).hostname.replace(/^www\./,'');}catch(e){}return '<a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">📎 '+esc(h||'Abrir arquivos')+'</a>';}).join('')+'</div>':'<p class="small muted" style="margin:0">Sem link de arquivos.</p>')+
+      '<div class="row wrap">'+(st==='aprovado'?(x.pedido_id&&byId(S.pedidos,x.pedido_id)?'<button class="btn sm" data-a="verPedido" data-id="'+esc(x.pedido_id)+'">Ver pedido</button>':''):'<button class="btn sm pri" data-a="cxPre" data-id="'+x.id+'">✨ Ana: montar pré-cadastro</button>'+(st==='novo'?'<button class="btn sm" data-a="cxLido" data-id="'+x.id+'">Marcar como lido</button>':'')+'<button class="btn sm" data-a="cxRecusa" data-id="'+x.id+'">Recusar</button>')+
+      (x.telefone?'<a class="btn sm" target="_blank" rel="noopener" href="'+esc(waLink('Oi! Recebi o seu caso'+(x.paciente?' do paciente '+x.paciente:'')+'. ',x.telefone))+'">Responder no WhatsApp</a>':'')+'<button class="btn sm danger" data-a="cxApaga" data-id="'+x.id+'">Apagar</button></div></article>';}).join('');
+  return '<div class="stack cx" style="gap:16px">'+linkCard+
+    '<section class="card stack"><div class="between wrap"><h2 style="margin:0">📥 Caixa de entrada'+(cxNovos()?' <span class="tag u">'+cxNovos()+' novo'+(cxNovos()>1?'s':'')+'</span>':'')+'</h2><button class="btn sm" data-a="cxAtualiza">Atualizar</button></div>'+
+    '<div class="row wrap">'+[['abertos','Para revisar'],['aprovados','Viraram pedido'],['todos','Todos']].map(function(o){return '<button class="btn sm'+(f===o[0]?' pri':'')+'" data-a="cxFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></section>'+
+    (itens||'<div class="card empty">'+(L.length?'Nada aqui neste filtro.':'Nenhum envio ainda. Mande o seu link para os clientes.')+'</div>')+'</div>';}
 function barras(L,fmt){var mx=Math.max.apply(null,L.map(function(x){return x.v;}).concat([1]));return '<div class="us-bars">'+L.map(function(x){return '<div class="us-b"><span class="us-l">'+esc(x.l)+'</span><span class="us-t"><i style="width:'+Math.max(2,Math.round(x.v/mx*100))+'%"></i></span><span class="us-v mono">'+fmt(x.v)+'</span></div>';}).join('')+'</div>';}
 function admTut(){var on=!!(S.prefs&&S.prefs.tutSim);return '<section class="card between wrap" style="gap:12px;margin-bottom:16px"><div><h2 style="margin:0">🎓 Simular tutoriais '+(on?'<span class="tag ok">ligado</span>':'')+'</h2><p class="small muted" style="margin:4px 0 0">Ligado, o mini tutorial aparece <b>toda vez</b> que você entra numa tela (só para você testar). Desligado, cada cadista vê só na primeira vez.</p></div><span class="row" style="gap:8px"><button class="btn '+(on?'':'pri')+'" data-a="tutSim">'+(on?'Desligar simulação':'Ligar simulação')+'</button><button class="btn" data-a="tutZera">Rever todos</button></span></section>';}
 function admUso(){admUsoCarrega();var U=ui.admUso||{};if(U.erro&&/function|does not exist|schema cache/i.test(U.erro))return '<section class="card" style="margin-bottom:16px"><h2 style="margin:0">📈 Uso e funil</h2><p class="small" style="color:var(--urgent);margin:6px 0 0">Falta rodar a migração 033 no Supabase.</p></section>';
@@ -5963,7 +6016,7 @@ function fPedido(id,preCli){
   function arch(list){return '<div class="arch">'+list.map(function(n,i){return '<button type="button" class="tooth '+(i===8?'mid':'')+'" data-a="tooth" data-n="'+n+'">'+n+'</button>';}).join('')+'</div>';}
   function conn(list){return '<div class="conn" aria-label="Uniões entre dentes">'+list.map(function(n,i){return '<span data-cn="'+n+'">'+(i<15?'<button type="button" class="cn" data-a="pdUne" data-n="'+n+'" aria-label="Unir '+n+' e '+list[i+1]+'"></button>':'')+'</span>';}).join('')+'</div>';}
   return head(p?'Editar pedido #'+p.num:(ui.pdRede?'Publicar trabalho novo':'Novo pedido'))+
-  (!p&&pre.resumo?(function(){var R=ppResumo(pre.resumo);return '<div class="banner" style="align-items:flex-start"><img src="equipe/ana-av-feliz.webp" alt="" width="36" height="36" style="border-radius:50%;flex:none"><span><b>A Ana preencheu pelo print.</b> Achei: '+esc(R.ok.join(' · ')||'pouca coisa')+'.'+(R.falta.length?' <b>Falta conferir:</b> '+esc(R.falta.join(', '))+'.':'')+' Confira antes de salvar.</span></div>';})():'')+
+  (!p&&pre.resumo?(function(){var R=ppResumo(pre.resumo);return '<div class="banner" style="align-items:flex-start"><img src="equipe/ana-av-feliz.webp" alt="" width="36" height="36" style="border-radius:50%;flex:none"><span><b>'+(ui.caixaPend?'A Ana montou o pré-cadastro pela Caixa de entrada.':'A Ana preencheu pelo print.')+'</b> Achei: '+esc(R.ok.join(' · ')||'pouca coisa')+'.'+(R.falta.length?' <b>Falta conferir:</b> '+esc(R.falta.join(', '))+'.':'')+' Confira antes de salvar.</span></div>';})():'')+
   (ui.pdRede&&!p?'<div class="banner"><span><b>Vai para a Rede.</b> Anexe o escaneamento. Em dente sobre implante, a <b>marca do implante</b> e o <b>scanbody</b> são obrigatórios. Depois de salvar, você escolhe o repasse e o prazo.</span></div>':'')+
   '<form data-form="pedido" data-id="'+(id||'')+'" class="stack">'+
     '<div class="pdf"><div class="pdf-b1">'+
@@ -6970,6 +7023,16 @@ impGrava:function(){impGrava();},
     else if(v==='premio'){var o=document.getElementById('festa');if(o)o.remove();ui.premio={k:'fat',m:monthOf(today()),real:1500,meta:1200,f:FAIXAS[Math.min(1,FAIXAS.length-1)],teste:1};var dv=document.createElement('div');dv.id='festa';dv.className='festa-bg pr-bg';document.body.appendChild(dv);premioRender();fogos(4000);}
     else if(v==='fogos')fogos(4000);
     else if(v==='equipe'){ui.equipe=0;render();}}catch(e){toast('Não consegui mostrar: '+(e&&e.message||e));}},
+  cxPre:function(d){cxPre(d.id);},
+  cxLido:function(d){cxMarca(d.id,'lido');render();},
+  cxRecusa:function(d){cxMarca(d.id,'recusado');render();toast('Envio recusado. Ele sai da lista "Para revisar".');},
+  cxApaga:function(d){var id=d.id;sb.from('caixa_entrada').delete().eq('id',id).then(function(r){if(r&&r.error){toast('Não consegui apagar: '+r.error.message);return;}CX.lista=CX.lista.filter(function(x){return x.id!==id;});render();toast('Envio apagado.');});},
+  cxFil:function(d){ui.cxFil=d.v;render();},
+  cxAtualiza:function(){cxCarrega(true);toast('Atualizando…',1200);},
+  cxCria:function(){if(!guard())return;var tk=cxToken();sb.from('caixa_links').insert({user_id:S.sessao.id,token:tk,ativo:true}).select('*').single().then(function(r){if(r.error){toast('Não consegui criar o link: '+r.error.message);return;}CX.link=r.data;render();toast('Link criado! Copie e mande para os seus clientes.');});},
+  cxTroca:function(){if(!guard())return;var tk=cxToken();sb.from('caixa_links').update({token:tk,ativo:true}).eq('user_id',S.sessao.id).then(function(r){if(r&&r.error){toast('Não consegui trocar: '+r.error.message);return;}CX.link.token=tk;CX.link.ativo=true;render();toast('Link trocado. O antigo parou de funcionar.');});},
+  cxLiga:function(){var v=!CX.link.ativo;sb.from('caixa_links').update({ativo:v}).eq('user_id',S.sessao.id).then(function(r){if(r&&r.error){toast('Não consegui: '+r.error.message);return;}CX.link.ativo=v;render();toast(v?'Link ligado.':'Link desligado: ninguém consegue enviar até você ligar de novo.');});},
+  cxCopia:function(){var u=cxUrl();try{navigator.clipboard.writeText(u).then(function(){toast('Link copiado.');},function(){toast(u,6000);});}catch(e){toast(u,6000);}},
   libVer:function(d){tutFecha(false);if(!LIB_EXP[d.v])return;if(window.passeioTira)passeioTira();ui.tut={t:'_lib',i:0,lib:d.v};tutMostra();},
   tutSim:function(){S.prefs.tutSim=!S.prefs.tutSim;if(S.prefs.tutSim){S.prefs.tutOff=false;ui.tutTabVista=null;}save();render();toast(S.prefs.tutSim?'Simulação ligada: o tutorial aparece toda vez que você entra numa tela.':'Simulação desligada: cada tutorial aparece só na primeira vez.',4000);},
   tutZera:function(){S.prefs.tut={};S.prefs.dicas={};S.prefs.tutOff=false;ui.tutTabVista=null;save();render();toast('Pronto: os tutoriais vão aparecer de novo em cada tela.');},
@@ -7162,7 +7225,7 @@ impGrava:function(){impGrava();},
   pubVolta:function(){ui.pubVer=null;renderSheet();},
   pubEscolhe:function(d){vaiDelegar(d.id);},
   pubNovo:function(){if(!guard())return;ui.pdPre=null;ui.pubVer=null;ui.pdRede=true;ui.pdInit=true;openSheet(fPedido,null,null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
-  novoPedido:function(){if(!guard())return;ui.pdRede=false;ui.pdInit=true;ui.pdPre=null;openSheet(fPedido,null,ui.tab==='clientes'?ui.sub:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
+  novoPedido:function(){ui.caixaPend=null;if(!guard())return;ui.pdRede=false;ui.pdInit=true;ui.pdPre=null;openSheet(fPedido,null,ui.tab==='clientes'?ui.sub:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
   editPedido:function(d){if(!guard())return;ui.pdInit=true;ui.pdPre=null;openSheet(fPedido,d.id);ui.sheet.after=depoisFormPedido;depoisFormPedido();},
   verPedido:function(d){openSheet(fPedidoDet,d.id);},
   st:function(d,el,e){e.stopPropagation();setStatus(d.id,d.st);},
@@ -7413,7 +7476,7 @@ var F={
     if(id){p=byId(S.pedidos,id);Object.assign(p,o);}else{p=Object.assign({id:uid(),num:++S.seq,status:'entrada',entregue:null,pago:null,pagamentoId:null},o);S.pedidos.push(p);}
     if(sl)S.arquivos.push({id:uid(),pedidoId:p.id,origem:'link',nome:'Escaneamento · '+host,url:sl,criado:today()});
     if(ui.pdRede&&!id){save();if(anexos.length)enviaArquivo(p.id,anexos);toast('Pedido #'+p.num+' criado. Agora defina o repasse e o prazo.');vaiDelegar(p.id);return;}
-    rec('pedido_salvo');save();render();openSheet(fPedidoDet,p.id);toast(id?'Pedido salvo.':'Pedido #'+p.num+' criado.');
+    if(!id)cxDepoisPedido(p);rec('pedido_salvo');save();render();openSheet(fPedidoDet,p.id);toast(id?'Pedido salvo.':'Pedido #'+p.num+' criado.');
     if(virou&&!EM_DEMO)setTimeout(function(){festaCliente(virou.cid,virou.pre);},500);
     if(!id&&!EM_DEMO)setTimeout(function(){try{celebraPedido(p,antesCli);}catch(e){}},virou?1500:700);
     if(!EM_DEMO){setTimeout(premioCheca,virou?2500:1800);setTimeout(libCheca,virou?9000:6000);}
@@ -7675,7 +7738,7 @@ function msgAuth(e){var m=(e&&e.message)||'';
   if(/fetch|network/i.test(m))return 'Sem conexão com a internet.';
   return 'Não foi possível concluir: '+m;}
 /* Rota na URL (#/aba ou #/aba/sub): F5 volta para a mesma tela e o botão Voltar do navegador troca de aba */
-var ROTAS=['painel','leads','dashboard','pedidos','clientes','financeiro','ranking','arquivos','tipos','lixeira','tabela','rede','lab','analises','metas','secretarios','visu','comp','config','admin','mais'];
+var ROTAS=['caixa','painel','leads','dashboard','pedidos','clientes','financeiro','ranking','arquivos','tipos','lixeira','tabela','rede','lab','analises','metas','secretarios','visu','comp','config','admin','mais'];
 function rotaLe(){var m=/^#\/([a-z]+)(?:\/([A-Za-z0-9_-]+))?$/.exec(location.hash||'');return m&&ROTAS.indexOf(m[1])>=0?{tab:m[1],sub:m[2]||null}:null;}
 function rotaSync(){if(!S.sessao||S.carregando||!ui.dadosOk||ui.tour!=null||ui.equipe!=null)return;var h='#/'+ui.tab+(ui.sub&&typeof ui.sub==='string'?'/'+ui.sub:'');if(location.hash===h){ui._rotaTab=ui.tab;return;}
   try{if(ui._rotaTab&&ui._rotaTab!==ui.tab)history.pushState(null,'',location.pathname+h);else history.replaceState(null,'',location.pathname+h);}catch(e){}ui._rotaTab=ui.tab;}

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Enviar trabalho · Ideali CAD</title>
+<link rel="icon" href="../app/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+/* Página pública "Envie seu trabalho": o dentista, laboratório ou clínica preenche o caso e envia para a Caixa de entrada do cadista.
+   Só grava pelo envio (função no servidor que confere o link). Não lê nada da conta do cadista. */
+:root{--bg:#F6F5F8;--surface:#FFFFFF;--ink:#1B1830;--muted:#625E75;--line:#E2DFEA;--accent:#5B45E0;--accent-ink:#fff;--soft:#EEEBFD;--ok:#13875F;--bad:#C23B3B;
+  --f-d:"Plus Jakarta Sans",system-ui,sans-serif;--f-b:"Figtree",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#121019;--surface:#1B1826;--ink:#ECEAF4;--muted:#A39FB6;--line:#2D2940;--accent:#9E8CFF;--accent-ink:#121019;--soft:#2A2450;--ok:#4FD1A0;--bad:#FF8080;color-scheme:dark}}
+*{box-sizing:border-box}[hidden]{display:none!important}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 1rem/1.5 var(--f-b);-webkit-font-smoothing:antialiased;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+h1,h2{font-family:var(--f-d);margin:0;letter-spacing:-.02em;line-height:1.15}
+.wrap{max-width:640px;margin:0 auto;display:grid;gap:16px}
+.top{display:flex;align-items:center;gap:10px}.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:800 1rem var(--f-d)}
+.top b{font-family:var(--f-d)}.top small{display:block;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:14px}
+.fld{display:grid;gap:6px}.fld>span{font-weight:600;font-size:.9rem}.hint{font-size:.8rem;color:var(--muted)}
+input,select,textarea{font:inherit;color:inherit;width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px}
+textarea{min-height:110px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent);border-color:var(--accent)}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.tipos{display:flex;gap:8px;flex-wrap:wrap}.tipos label{flex:1;min-width:120px;position:relative}
+.tipos input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;left:0;top:0;margin:0}
+.tipos span{display:block;text-align:center;padding:10px;border:1.5px solid var(--line);border-radius:12px;font-weight:600;cursor:pointer}
+.tipos input:checked+span{border-color:var(--accent);background:var(--soft)}
+.tipos input:focus-visible+span{outline:3px solid var(--accent)}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:13px 18px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn:disabled{opacity:.6;cursor:wait}
+.sec{border:1px dashed var(--line);border-radius:12px;padding:12px;display:grid;gap:8px}
+.anexo{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:.88rem}.anexo b{color:var(--ink)}
+.err{color:var(--bad);font-weight:600;font-size:.9rem}
+.ok{text-align:center;display:grid;gap:10px;justify-items:center}.ok .ic{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok);display:grid;place-items:center;font-size:2rem}
+.priv{font-size:.8rem;color:var(--muted);text-align:center}
+.trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><span class="logo" aria-hidden="true">i</span><div><b id="titulo">Enviar trabalho</b><small>Ideali CAD</small></div></header>
+
+  <section class="card" id="carregando"><p class="hint">Carregando…</p></section>
+
+  <section class="card" id="invalido" hidden><h1>Link indisponível</h1><p>Este link de envio foi desligado ou não existe. Peça um link novo para o seu cadista.</p></section>
+
+  <form class="card" id="form" hidden novalidate>
+    <div><h1 id="h1">Envie seu caso</h1><p class="hint" id="sub">Preencha os dados e envie. O cadista recebe na hora.</p></div>
+    <div class="fld"><span>Quem está enviando?</span>
+      <div class="tipos" role="radiogroup" aria-label="Quem está enviando">
+        <label><input type="radio" name="tipo" value="Dentista" checked><span>Dentista</span></label>
+        <label><input type="radio" name="tipo" value="Laboratório"><span>Laboratório</span></label>
+        <label><input type="radio" name="tipo" value="Clínica"><span>Clínica</span></label>
+      </div></div>
+    <div class="g2">
+      <label class="fld"><span id="lb-rem">Seu nome</span><input id="remetente" name="remetente" required maxlength="80" autocomplete="organization"></label>
+      <label class="fld"><span>Doutor(a) responsável</span><input id="doutor" name="doutor" maxlength="80" placeholder="Ex.: Dra. Ana Lima"></label>
+      <label class="fld"><span>WhatsApp <span class="hint">(opcional)</span></span><input id="telefone" name="telefone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999"></label>
+      <label class="fld"><span>Paciente</span><input id="paciente" name="paciente" maxlength="40" placeholder="Só as iniciais, ex.: M.A.S."><span class="hint">Por privacidade, use só as iniciais.</span></label>
+    </div>
+    <label class="fld"><span>Descrição do trabalho</span><textarea id="descricao" name="descricao" required maxlength="2000" placeholder="Ex.: Coroa sobre implante no 36, Neodent GM, cor A2. Prazo sexta."></textarea><span class="hint">Diga os dentes, o tipo de trabalho, material, cor e prazo, se souber.</span></label>
+    <div class="sec">
+      <label class="fld"><span>Link dos arquivos</span><input id="link1" type="url" inputmode="url" placeholder="https:// (Google Drive, WeTransfer, Dropbox…)"></label>
+      <input id="link2" type="url" inputmode="url" placeholder="Outro link (opcional)">
+      <div class="anexo">📎 <span><b>Anexar arquivos direto</b> · em breve. Por enquanto, mande o link do Drive ou do WeTransfer.</span></div>
+    </div>
+    <div class="trap" aria-hidden="true"><label>Site <input id="site" tabindex="-1" autocomplete="off"></label></div>
+    <p class="err" id="erro" hidden></p>
+    <button class="btn" id="enviar" type="submit">Enviar trabalho</button>
+    <p class="priv">Seus dados vão só para este cadista, para registrar o caso.</p>
+  </form>
+
+  <section class="card ok" id="feito" hidden><span class="ic">✓</span><h1>Trabalho enviado!</h1><p id="feito-t">O cadista já recebeu e vai conferir o caso.</p><button class="btn" id="outro" type="button">Enviar outro caso</button></section>
+</div>
+<script>
+(function(){
+  var URL_='https://qxspiaqaigjkmilxxfri.supabase.co',KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4c3BpYXFhaWdqa21pbHh4ZnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjYwMzMsImV4cCI6MjEwNzIwMjAzM30.TeIHiEvHx1PmvS5PQ3lzvByYP9ppYuq5GLZURtutXc0';
+  var $=function(id){return document.getElementById(id);},tk=(location.hash||'').replace(/^#/,''),nome='o cadista';
+  var sb=window.supabase&&window.supabase.createClient(URL_,KEY,{auth:{persistSession:false,autoRefreshToken:false}});
+  function mostra(id){['carregando','invalido','form','feito'].forEach(function(x){$(x).hidden=x!==id;});}
+  if(!sb||!/^[A-Za-z0-9_-]{24,64}$/.test(tk)){mostra('invalido');return;}
+  sb.rpc('caixa_info',{tk:tk}).then(function(r){var d=r&&r.data&&r.data[0];if(r.error||!d){mostra('invalido');return;}
+    nome=d.nome||nome;$('titulo').textContent='Enviar trabalho para '+nome;$('h1').textContent='Envie seu caso para '+nome;document.title='Enviar trabalho para '+nome+' · Ideali CAD';mostra('form');},function(){mostra('invalido');});
+  [].forEach.call(document.querySelectorAll('input[name=tipo]'),function(i){i.addEventListener('change',function(){$('lb-rem').textContent=i.value==='Dentista'?'Seu nome':'Nome do '+(i.value==='Clínica'?'a clínica':'laboratório');});});
+  function erro(t,foco){$('erro').textContent=t;$('erro').hidden=!t;if(foco)$(foco).focus();}
+  $('form').addEventListener('submit',function(e){e.preventDefault();erro('');
+    var g=function(id){return $(id).value.trim();},links=[g('link1'),g('link2')].filter(Boolean);
+    if(g('remetente').length<2)return erro('Preencha o nome de quem está enviando.','remetente');
+    if(g('descricao').length<3)return erro('Escreva uma breve descrição do trabalho.','descricao');
+    var tel=g('telefone').replace(/\D/g,'');if(tel&&(tel.length<10||tel.length>13))return erro('Confira o WhatsApp com DDD.','telefone');
+    var mau=links.filter(function(l){return !/^https:\/\/\S{4,}$/i.test(l);})[0];if(mau)return erro('O link precisa começar com https://','link1');
+    if(/@|\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/.test(g('paciente')))return erro('No campo paciente, use só as iniciais.','paciente');
+    var tipo=(document.querySelector('input[name=tipo]:checked')||{}).value||'Dentista';
+    $('enviar').disabled=true;$('enviar').textContent='Enviando…';
+    sb.rpc('caixa_enviar',{tk:tk,d:{tipo:tipo,remetente:g('remetente'),doutor:g('doutor'),telefone:tel,paciente:g('paciente'),descricao:g('descricao'),links:links,site:g('site')}}).then(function(r){
+      $('enviar').disabled=false;$('enviar').textContent='Enviar trabalho';
+      var st=r&&r.data;if(r.error||!st)return erro('Não foi possível enviar agora. Confira a internet e tente de novo.');
+      if(st==='link_invalido'){mostra('invalido');return;}
+      if(st==='limite')return erro('Este link recebeu muitos envios hoje. Fale com o cadista pelo WhatsApp.');
+      if(st==='dados_invalidos')return erro('Confira os dados: algum campo ficou grande demais ou vazio.');
+      $('feito-t').textContent=nome.charAt(0).toUpperCase()+nome.slice(1)+' já recebeu e vai conferir o caso.';mostra('feito');window.scrollTo(0,0);},
+      function(){$('enviar').disabled=false;$('enviar').textContent='Enviar trabalho';erro('Não foi possível enviar agora. Confira a internet e tente de novo.');});});
+  $('outro').addEventListener('click',function(){['doutor','paciente','descricao','link1','link2'].forEach(function(id){$(id).value='';});mostra('form');$('descricao').focus();});
+})();
+</script>
+</body>
+</html>

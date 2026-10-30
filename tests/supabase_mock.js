@@ -1,8 +1,9 @@
 // Supabase falso para testar as telas sem internet. Registra cada gravação em window.__ops.
 (function(){
   var U='dddddddd-0000-0000-0000-000000000004';
-  var tabelas={perfis:[{user_id:U,nome:'Danilo',preferencias:{}}],assinaturas:[{user_id:U,plano:'basico',status:'teste',teste_ate:new Date(Date.now()+13*864e5).toISOString(),limite_bytes:5368709120,bytes_usados:0}],
-    clientes:[],tipos_trabalho:[],precos_cliente:[],faixas_desconto:[],pagamentos:[],pedidos:[],arquivos:[],links_cliente:[],perfil_rede:[],comp_notas:[],prospec_contatos:[],prospec_equipe:[]};window.__tab=tabelas;
+  var tabelas={perfis:[{user_id:U,nome:'Danilo',telefone:'11999990000',preferencias:{}}],assinaturas:[{user_id:U,plano:'basico',status:'teste',teste_ate:new Date(Date.now()+13*864e5).toISOString(),limite_bytes:5368709120,bytes_usados:0}],
+    clientes:[],tipos_trabalho:[],precos_cliente:[],faixas_desconto:[],pagamentos:[],pedidos:[],arquivos:[],links_cliente:[],perfil_rede:[],comp_notas:[],prospec_contatos:[],prospec_equipe:[],caixa_links:[],
+    caixa_entrada:[{id:'cx1',user_id:U,origem:'link',tipo:'Clínica',remetente:'Clínica Sorriso',doutor:'Dr. Paulo',telefone:'11988887777',paciente:'J.S.',descricao:'Coroa sobre implante no 36, cor A2, Neodent CM. Prazo sexta.',links:['https://drive.google.com/abc','https://wetransfer.com/xyz'],status:'novo',pedido_id:null,criado_em:new Date().toISOString()}]};window.__tab=tabelas;
   window.__ops=[];var cbs=[],sessao=null;
   function Q(t){this.t=t;this.f=[];}
   Q.prototype.select=function(){if(!this.op)this.op='select';return this;};
@@ -40,6 +41,8 @@
         challengeAndVerify:function(o){if(o.code!=='123456')return Promise.resolve({error:{message:'invalid'}});this._f.status='verified';this._aal='aal2';return Promise.resolve({data:{},error:null});}}
     },
     rpc:function(n,a){window.__ops.push({op:'rpc',name:n,args:a});
+      if(n==='caixa_info')return Promise.resolve({data:a.tk==='TOKENVALIDO_abcdefghijklmnop'?[{nome:'Danilo'}]:[],error:null});
+      if(n==='caixa_enviar')return Promise.resolve({data:'ok',error:null});
       if(n==='criar_link_cliente')return Promise.resolve({data:'TesteTokenSecreto_abcdefghijklmnopqrstuvwxyz012',error:null});
       if(n==='rede_stats')return Promise.resolve({data:{trabalhos:8,elementos:34,no_prazo:100,dias_medio:0.4,desde:'2026-09-02',tipos:[{nome:'Coroa sobre implante',n:4},{nome:'Faceta',n:2},{nome:'Placa de bruxismo',n:1},{nome:'Protocolo',n:1}]},error:null});
       if(n==='sou_admin')return Promise.resolve({data:window.__adm!==false,error:null});if(n==='admin_marcos')return Promise.resolve({data:[{user_id:'eeee',cadastro:new Date(Date.now()-9*864e5).toISOString(),primeiro_cliente:new Date(Date.now()-9*864e5).toISOString(),primeiro_pedido:new Date(Date.now()-8*864e5).toISOString(),primeira_aprovacao:null,primeiro_arquivo:null,primeiro_pagamento:null,voltou_7d:true},{user_id:'ffff',cadastro:new Date(Date.now()-16*864e5).toISOString(),primeiro_cliente:null,primeiro_pedido:null,primeira_aprovacao:null,primeiro_arquivo:null,primeiro_pagamento:null,voltou_7d:false}],error:null});
