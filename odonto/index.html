@@ -500,6 +500,10 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .bmc ul{margin:8px 0 10px;padding-left:18px;font-size:.88rem;color:#3d3a73;line-height:1.5}
 .bmk{background:#FFF1D6;color:#5a3c00;border-radius:12px;padding:10px 12px;font-size:.88rem}
 @media (max-width:860px){.bm{grid-template-columns:1fr;gap:8px}.bmr{grid-template-columns:90px 1fr 80px;gap:6px;margin-bottom:8px}.bmr span{font-size:.75rem}.bmr b{font-size:.9rem}.bmb{padding:10px}.bmc ul{display:none}.bmc{padding:10px}.bmd span{font-size:.7rem;padding:4px 8px}}
+.avl2{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:980px;align-items:start}
+.ncard{background:#fff;color:#1B1830;border-radius:20px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.nh{color:#fff;font-weight:800;padding:10px 16px;font-size:.9rem}.nb{padding:14px 16px}.nb>b{display:block;font:800 1.02rem var(--f-display);line-height:1.3;margin-bottom:6px}
+@media (max-width:860px){.avl2{grid-template-columns:1fr;gap:8px}.avl2 .dsv,.avl2 .ix{display:none}.nb{padding:10px}.nb>b{font-size:.85rem}.avl2 .acons{font-size:.8rem;padding:8px}.avl2 .anota{display:block;font-size:.72rem}}
 </style>
 <body>
 <header class="top">
@@ -803,14 +807,17 @@ var CENAS=[
   go:function(){inn('.fx',100,250);at(700,function(){$$('.cmp i').forEach(function(e){e.classList.add('in');});});
    falas([[0,'Agora a parte que me deixa <b>bravo</b>: atrasos e trabalhos errados. 😤 Aqui está tudo medido, laboratório por laboratório.'],[5600,'E o motivo de cada ajuste: cor, adaptação, contato. Com isso, você <b>conversa com o lab com dados</b>, não no achismo.']]);}},
 
- {cap:'Avaliação automática',pt:3,who:'ot',p:'serio',d:15000,lab:1,h:'<div class="sc"><div class="avl"><div class="awarn fx"><div class="aw-h">⚠️ Desvio detectado pelo sistema</div><b>O seu laboratório de protocolos está com desempenho abaixo do que outras clínicas da região recebem.</b>'+
-   '<div class="ix"><div><small>Lab Digital Centro</small><b id="x0" style="color:#EF5F5A">0</b></div><div class="vs">vs</div><div><small>média da região</small><b id="x1" style="color:#1DAE8A">0</b></div></div>'+
-   '<ul class="dsv">'+[['Atrasos','14%','5%'],['Refações','11%','5%'],['Ajustes em protocolo acrilizado','3 por mês','1 por mês'],['Tempo de resposta','2 dias','4 horas']].map(function(d){return '<li><span>'+d[0]+'</span><em>'+d[1]+'</em><small>região: '+d[2]+'</small></li>';}).join('')+'</ul>'+
-   '<div class="acons">💡 Considere conhecer outros laboratórios.</div></div>'+
-   '<div class="arec"><div class="sl-k fx" style="color:#F0C46A">Recomendados para você</div>'+[['Lab Arte Dental',92,'Protocolos e coroas · 6 km'],['Lab Prótese Sul',89,'Especialista em protocolo acrilizado · 11 km'],['Lab Cerâmica Fina',84,'Facetas e coroas · 4 km']].map(function(l,i){return '<div class="rc fx"><span class="rk">'+(i+1)+'º</span><div style="flex:1"><b>'+l[0]+'</b><small>'+l[2]+'</small><i class="ib"><em style="--v:'+l[1]+'%"></em></i></div><span class="iv">'+l[1]+'</span></div>';}).join('')+
-   '<div class="anota fx">🚫⭐ <b>Sem estrelas e sem notas.</b> O <b>Índice Ideali</b> é calculado sozinho pelo sistema, com os dados reais dos pedidos: prazo, refações, ajustes e tempo de resposta.</div></div></div></div>',
-  go:function(){inn('.fx',100,200);at(700,function(){cnt($('#x0'),64);cnt($('#x1'),81);$$('.ib em').forEach(function(e){e.classList.add('in');});});
-   falas([[0,'Agora o mais importante: o sistema <b>compara o seu laboratório</b> com o que as outras clínicas da região estão recebendo.'],[5200,'Se o seu lab está abaixo, ele avisa: <b>"desempenho abaixo da região, considere conhecer outros laboratórios"</b>, e mostra os desvios.'],[10200,'E recomenda os melhores pelo <b>Índice Ideali</b>. Ninguém dá nota, ninguém compra avaliação: <b>o sistema mede sozinho.</b>']]);}},
+ {cap:'Abaixo da média',pt:3,who:'ot',p:'serio',d:15000,lab:1,h:'<div class="sc"><div class="avl2">'+
+   '<div class="ncard fx"><div class="nh" style="background:#5B45E0">🏥 Notificação para a clínica</div><div class="nb"><b>O seu laboratório de protocolos está abaixo da média da região.</b>'+
+   '<div class="ix"><div><small>seu laboratório</small><b id="x0" style="color:#EF5F5A">0</b></div><div class="vs">vs</div><div><small>média da região</small><b id="x1" style="color:#1DAE8A">0</b></div></div>'+
+   '<ul class="dsv">'+[['Atrasos','14%','5%'],['Retrabalho e ajuste','11%','5%']].map(function(d){return '<li><span>'+d[0]+'</span><em>'+d[1]+'</em><small>região: '+d[2]+'</small></li>';}).join('')+'</ul>'+
+   '<div class="acons">🌬️ Que tal respirar novos ares e conhecer outros laboratórios?</div></div></div>'+
+   '<div class="ncard fx"><div class="nh" style="background:#1DAE8A">🧪 Notificação para o laboratório</div><div class="nb"><b>O seu desempenho em protocolos está abaixo da média da região.</b>'+
+   '<ul class="dsv">'+[['Atrasos','14%','5%'],['Retrabalho e ajuste','11%','5%'],['Tempo de resposta','2 dias','4 horas']].map(function(d){return '<li><span>'+d[0]+'</span><em>'+d[1]+'</em><small>região: '+d[2]+'</small></li>';}).join('')+'</ul>'+
+   '<div class="acons" style="background:#E3F7F0;color:#0f5a3a">💪 Reconsidere os processos e melhore: os seus clientes estão percebendo.</div></div></div>'+
+   '<div class="anota fx" style="grid-column:1/-1">🤝 <b>O sistema não indica nenhum laboratório.</b> Ele só avisa. Com quem trabalhar é escolha da clínica: por indicação ou pesquisando na Rede. Ninguém é exposto e não existe ranking.</div></div></div>',
+  go:function(){inn('.fx',100,500);at(900,function(){cnt($('#x0'),64);cnt($('#x1'),81);});
+   falas([[0,'Quando o laboratório fica <b>abaixo da média</b> da região, o sistema avisa a clínica: <b>"que tal respirar novos ares?"</b>'],[5400,'E avisa o <b>laboratório</b> também: "você está abaixo da média, <b>reconsidere e melhore</b>". Todo mundo tem chance de corrigir.'],[10400,'O sistema <b>não indica ninguém</b>. Com quem trabalhar é escolha sua, por indicação ou pesquisa. Sem ranking, sem exposição.']]);}},
 
  {cap:'Gastos com laboratório',pt:3,who:'ot',p:'serio',d:11000,lab:1,h:'<div class="sc"><div class="sl">'+L('Gastos com laboratório')+'<div class="gst"><div class="gbars fx">'+[['mai',62],['jun',70],['jul',66],['ago',78],['set',74],['out',85]].map(function(m){return '<div><i style="--v:'+m[1]+'%"></i><span>'+m[0]+'</span></div>';}).join('')+'</div>'+
    '<div class="gside"><div class="nu fx"><b>R$ <i id="g0">0</i></b><span>gasto em outubro</span></div><div class="gtp fx">'+[['Coroas e facetas',38,'#5B45E0'],['Protocolos (acrilizado e zircônia)',34,'#1DAE8A'],['PPR e prótese total',18,'#F0A53A'],['Placas e provisórios',10,'#DD5A9E']].map(function(t){return '<div><span style="background:'+t[2]+'"></span>'+t[0]+'<em>'+t[1]+'%</em></div>';}).join('')+'</div></div></div><small class="src fx">Números de exemplo</small></div></div>',
