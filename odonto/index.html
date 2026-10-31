@@ -599,7 +599,9 @@ function digita(txt){ANA.classList.add('fala');var h=txt,i=0,out='';BAL.innerHTM
   (function tick(){k++;var n=Math.round(plain.length*k/passos);BAL.innerHTML=corta(h,n)+'<span class="cur"></span>';if(k<passos)T.push(setTimeout(tick,30));else{BAL.innerHTML=h;ANA.classList.remove('fala');}})();}
 function corta(h,n){var o='',c=0,tag=false,abre=[];for(var i=0;i<h.length&&c<n;i++){var ch=h[i];if(ch==='<'){tag=true;}o+=ch;if(tag){if(ch==='>')tag=false;}else c++;}
   var m=o.match(/<b>/g),f=o.match(/<\/b>/g);if((m?m.length:0)>(f?f.length:0))o+='</b>';return o;}
-function falas(lst){var t=0;lst.forEach(function(f){at(t,function(){digita(f[1]);});t+=f[0];});}
+var FIMFALA=0;
+function durFala(h){var n=h.replace(/<[^>]+>/g,'').length;return Math.min(2600,n*17)+Math.max(2400,n*40);}
+function falas(lst){var t=0;lst.forEach(function(f,i){t=Math.max(f[0],t);(function(tt,tx){at(tt,function(){digita(tx);});})(t,f[1]);t+=durFala(f[1]);});FIMFALA=t+600;}
 function mouse(){var m=$('.mouse');if(!m){m=document.createElement('div');m.className='mouse';STG.appendChild(m);}return m;}
 function clica(q,ms,fn){at(ms,function(){var el=$(q);if(!el)return;var m=mouse(),a=STG.getBoundingClientRect(),b=el.getBoundingClientRect();
   m.style.left=(b.left-a.left+b.width*.55)+'px';m.style.top=(b.top-a.top+b.height*.55)+'px';});
@@ -908,7 +910,7 @@ function vai(n){limpa();if(n<0)n=0;if(n>=CENAS.length)n=CENAS.length-1;cur=n;var
   var d=DOTS.children[n];void d.offsetWidth;d.className='at';d.style.setProperty('--d',c.d+'ms');
   document.getElementById('pn').textContent=n===CENAS.length-1?'Fechar':'Próximo ▶';
   var po=c.p||'tranquila',qm=c.who==='ot'?'otavio':c.who==='mi'?'mica':c.who==='bi'?'bia':'ana';document.getElementById('anaimg').src='../app/equipe/'+qm+'-'+po+'.webp';document.getElementById('anaav').src='../app/equipe/'+qm+'-av-'+po+'.webp';document.getElementById('anm').innerHTML={ot:'Sr. Otávio<small>o gerente</small>',mi:'Mika<small>do marketing</small>',bi:'Bia<small>do financeiro</small>'}[c.who]||'Ana<small>sua assistente de IA</small>';PL.classList.toggle('lab',!!c.lab);PL.classList.toggle('mk',!!c.mk);ANA.classList.toggle('ot',c.who==='ot');ANA.classList.toggle('mi',c.who==='mi'||c.who==='bi');
-  c.go();restante=c.d;iniT=Date.now();if(!pausado&&!c.fim)fimT=setTimeout(function(){vai(cur+1);},c.d);}
+  FIMFALA=0;c.go();var dd=Math.max(c.d,FIMFALA);d.style.setProperty('--d',dd+'ms');restante=dd;iniT=Date.now();if(!pausado&&!c.fim)fimT=setTimeout(function(){vai(cur+1);},dd);}
 function abre(){PL.classList.add('on');document.body.style.overflow='hidden';setTimeout(function(){PL.classList.add('vis');},20);pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';montaDots();vai(0);}
 function fecha(){limpa();PL.classList.remove('vis');setTimeout(function(){PL.classList.remove('on');STG.innerHTML='';},500);document.body.style.overflow='';}
 function pausa(){var c=CENAS[cur];if(!pausado){pausado=true;PL.classList.add('pause');clearTimeout(fimT);restante-=Date.now()-iniT;document.getElementById('pp').textContent='▶';}
