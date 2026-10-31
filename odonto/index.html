@@ -451,6 +451,14 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .pac{position:absolute;inset:0;width:100%;height:100%;transform-origin:50% 44%;transition:transform 1.4s cubic-bezier(.5,0,.2,1)}
 .pac.zm{transform:scale(3.4)}
 .guia{opacity:0;transition:opacity .4s}.guia.on{opacity:1}
+.frl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+.fr{background:#fff;color:#1B1830;border-radius:16px;padding:12px}
+.fr .fb{display:inline-block;color:#fff;font-size:.72rem;font-weight:800;border-radius:999px;padding:3px 10px}
+.fr b{display:block;font:800 .95rem var(--f-display);margin-top:8px;line-height:1.25}.fr small{display:block;color:#625E75;font-size:.8rem;margin-top:3px}
+.frx{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;background:rgba(124,240,200,.08);border:1px solid rgba(124,240,200,.3);border-radius:14px;padding:10px 14px}
+.frx small{color:#C9D0FF;flex-basis:100%}
+@media (min-width:861px){.frx small{flex-basis:auto}}
+@media (max-width:860px){.fr:nth-child(n+7){display:none}.frl{grid-template-columns:1fr 1fr;gap:6px}.fr{padding:8px}.fr b{font-size:.78rem}.fr small{font-size:.68rem}.frx small{display:none}}
 </style>
 <body>
 <header class="top">
@@ -543,6 +551,16 @@ var PERFIS=[
  ['🧪 Laboratórios',[['LD','Laboratório digital','CAD/CAM · fresagem própria',['Zircônia','Protocolos']],['LC','Laboratório de cerâmica','Estratificação',['Facetas','Coroas']],['LR','Laboratório de removíveis','PPR e flexíveis',['Próteses totais','PPR']]],'#1DAE8A'],
  ['🔧 Protéticos e equipe clínica',[['JV','J. V. · Projetista CAD','Exocad avançado',['Exocad','3Shape']],['DS','D. S. · ASB instrumentadora','6 anos',['Cirurgia','Biossegurança']],['KT','K. T. · TSB','Periodontia',['Profilaxia','Raspagem']]],'#DD5A9E'],
  ['🏢 Gestão e atendimento',[['MR','M. R. · Gerente de clínica','8 anos',['Equipe','Indicadores']],['TA','T. A. · CRC e leads','Conversão de pacientes',['WhatsApp','Agenda']],['PN','P. N. · Financeiro','Convênios e cobrança',['Faturamento','Glosas']],['GB','G. B. · Marketing','Clínicas odontológicas',['Instagram','Tráfego pago']]],'#F0A53A']
+];
+var FREL=[
+ ['🔴 Hoje','#D2433A','ASB para hoje, 14h às 18h','Clínica · Centro · Campinas'],
+ ['📅 10/dez','#5B45E0','Cirurgião-dentista por 1 dia','Rio Branco · AC'],
+ ['🔁 Toda segunda','#1DAE8A','ASB · período da manhã','Bairro Jardim'],
+ ['🔁 Toda terça','#1DAE8A','Especialista em protocolo acrilizado','Laboratório · Zona Sul'],
+ ['⭐ Por demanda','#B7791F','Ceramista especializado em facetas','Remoto ou presencial'],
+ ['🛠️ Serviço','#3A96EC','Técnico em cadeira odontológica','Manutenção mensal'],
+ ['❄️ Serviço','#3A96EC','Técnico em ar-condicionado','Manutenção mensal da clínica'],
+ ['🎬 Freela','#DD5A9E','Filmmaker para gravação na clínica','Dia 15/nov · 4 horas']
 ];
 var CENAS=[
 /* ================= PARTE 1 · A IDEALI ================= */
@@ -671,6 +689,11 @@ var CENAS=[
  {cap:'Contratado!',pt:2,p:'feliz',d:8000,rede:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="parab"><img class="port pop" src="../app/equipe/ana-av-feliz.webp" alt=""><h2 class="pop" style="margin-top:18px">🎉 Parabéns, você foi contratado(a)!</h2><p class="fx">Da candidatura à contratação, tudo dentro da Ideali.</p></div></div>',
   go:function(){inn('.pop',200,200);inn('.fx',900);at(400,function(){confete(200);});at(2600,function(){confete(120);});
    falas([[0,'E aí… <b>contratado!</b> 🎉 Do primeiro toque à contratação, tudo dentro da Ideali. É isso que a gente quer ver todo dia.']]);}},
+
+ {cap:'Freelas e plantões',pt:2,p:'determinada',d:15000,rede:1,h:'<div class="sc"><div class="sl">'+L('Não é só emprego fixo')+'<h3 class="fx">Freela por dia, plantão toda semana, urgência para hoje e serviços.</h3><div class="frl">'+FREL.map(function(f){return '<div class="fr pop"><span class="fb" style="background:'+f[1]+'">'+f[0]+'</span><b>'+f[2]+'</b><small>'+f[3]+'</small></div>';}).join('')+'</div>'+
+   '<div class="frx fx"><span class="swt on"><i></i></span><b>Disponível para freelas</b><small>Quem liga isso recebe os chamados da região na hora e aceita com 1 toque.</small></div></div></div>',
+  go:function(){inn('.fx',100,200);$$('.fr').forEach(function(e,i){at(700+i*380,function(){e.classList.add('in');});});
+   falas([[0,'E não é só emprego fixo! Precisa de um <b>dentista para um dia</b> em Rio Branco? De uma <b>ASB toda segunda</b>? De alguém <b>hoje</b>?'],[5600,'Tem também <b>especialista por demanda</b>, como ceramista de facetas ou protocolo acrilizado, e <b>serviços</b>: técnico de cadeira, ar-condicionado, filmmaker…'],[10800,'Quem está disponível recebe o chamado <b>na hora</b> e aceita com um toque. ⚡']]);}},
 
  {cap:'A Rede inteira',pt:2,p:'tranquila',d:10000,rede:1,h:'<div class="sc"><div class="tri">'+
    [['🏥','Clínicas e laboratórios','Vitrine com perfil, especialidades e vagas abertas. Dá para seguir e pedir contato.'],['🛒','Comércio e indústria','Fornecedores, representantes e catálogo, perto de você.'],['📚','Cursos e eventos','Cursos da sua área e da sua cidade.'],['📖','Área de estudos','Prótese e Odontologia, com a Ana. Em breve.']].map(function(c){return '<div class="card fx"><div style="font-size:2rem">'+c[0]+'</div><h3 style="margin-top:8px">'+c[1]+'</h3><p>'+c[2]+'</p></div>';}).join('')+'</div></div>',
@@ -903,14 +926,15 @@ var VG=[
  {id:8,ic:'🦷',cor:'#E6F0FD',t:'Ortodontista',crg:'#1F66B8',loc:'Clínica · São Paulo',km:92,tp:'PJ',sal:'Porcentagem',x:84,y:86,req:['Especialização em ortodontia']},
  {id:9,ic:'🔧',cor:'#E3F7F0',t:'Ceramista',crg:'#1E8A5A',loc:'Laboratório · Ribeirão Preto',km:225,tp:'CLT',sal:'A combinar',x:12,y:8,req:['Estratificação em cerâmica']}
 ];
+var FRD=[{id:1,b:'🔴 Hoje',c:'#D2433A',t:'ASB para hoje, 14h às 18h',l:'Clínica · Centro · 3 km',v:'R$ 180 o período'},{id:2,b:'🔁 Toda segunda',c:'#1DAE8A',t:'ASB · período da manhã',l:'Bairro Jardim · 5 km',v:'R$ 150 por manhã'},{id:3,b:'📅 15/nov',c:'#5B45E0',t:'Estudante para apoio em mutirão de prevenção',l:'Escola · 2 km',v:'Certificado de horas'},{id:4,b:'⭐ Por demanda',c:'#B7791F',t:'Ceramista especializado em facetas',l:'Laboratório · 9 km',v:'Por trabalho'},{id:5,b:'🔁 Toda terça',c:'#1DAE8A',t:'Especialista em protocolo acrilizado',l:'Laboratório · 12 km',v:'Por trabalho'},{id:6,b:'🛠️ Serviço',c:'#3A96EC',t:'Técnico em cadeira odontológica',l:'Manutenção mensal · 7 km',v:'A combinar'},{id:7,b:'❄️ Serviço',c:'#3A96EC',t:'Técnico em ar-condicionado',l:'Manutenção mensal · 4 km',v:'A combinar'},{id:8,b:'🎬 Freela',c:'#DD5A9E',t:'Filmmaker para gravação na clínica',l:'Dia 15/nov · 4 horas',v:'A combinar'}];
 var CUR=[{id:1,t:'Fluxo digital do escaneamento à fresagem',m:'Presencial · Campinas',d:'Sáb, 9h',ic:'💻'},{id:2,t:'Exocad para iniciantes',m:'Online · ao vivo',d:'Toda terça',ic:'🖥️'},{id:3,t:'Fotografia odontológica com celular',m:'Presencial · 4 km',d:'15/nov',ic:'📸'},{id:4,t:'Preparação para residência',m:'Online',d:'Começa em dez',ic:'📚'},{id:5,t:'Cirurgia para ASB e TSB',m:'Presencial · 9 km',d:'22/nov',ic:'🩺'},{id:6,t:'Anatomia dental em cera',m:'Presencial · Centro',d:'29/nov',ic:'🦷'}];
 var VIT=[{id:1,t:'Clínica Sorriso Centro',s:'Clínica · implantes e estética',ic:'🏥',v:2},{id:2,t:'Laboratório Arte Dental',s:'Laboratório digital · CAD/CAM',ic:'🧪',v:1},{id:3,t:'Dental Distribuidora',s:'Comércio · materiais',ic:'🛒',v:0},{id:4,t:'Instituto de Ensino Odonto',s:'Cursos e pós',ic:'🎓',v:0}];
-var BD=[['explorador','🧭','Explorador','Visitou 5 áreas'],['cv','📄','Currículo vivo','Mexeu no seu currículo'],['fav','⭐','De olho','Salvou uma vaga'],['cand1','🚀','Primeira candidatura','Se candidatou a uma vaga'],['entrev','💬','Chamado!','Recebeu convite para entrevista'],['rede','🤝','Conectado','Seguiu uma clínica ou laboratório'],['curso','📚','Sempre aprendendo','Marcou interesse num curso'],['estudo','📖','Futuro estudioso','Quer a área de estudos'],['contrata','🏥','Contratante','Publicou uma vaga como clínica'],['chama','📣','Recrutador','Chamou um candidato']];
+var BD=[['freela','⚡','Freelancer','Aceitou um freela'],['explorador','🧭','Explorador','Visitou 5 áreas'],['cv','📄','Currículo vivo','Mexeu no seu currículo'],['fav','⭐','De olho','Salvou uma vaga'],['cand1','🚀','Primeira candidatura','Se candidatou a uma vaga'],['entrev','💬','Chamado!','Recebeu convite para entrevista'],['rede','🤝','Conectado','Seguiu uma clínica ou laboratório'],['curso','📚','Sempre aprendendo','Marcou interesse num curso'],['estudo','📖','Futuro estudioso','Quer a área de estudos'],['contrata','🏥','Contratante','Publicou uma vaga como clínica'],['chama','📣','Recrutador','Chamou um candidato']];
 var D;
-function novo(){D={modo:'pro',tab:'inicio',raio:50,vista:'lista',tipo:'',vis:{},cand:{},fav:{},seg:{},cur:{},estA:{},bd:{},aberto:true,sk:{Prótese:1,Exocad:0,Dentística:1,Atendimento:2},
+function novo(){D={modo:'pro',tab:'inicio',fr:{},disp:true,raio:50,vista:'lista',tipo:'',vis:{},cand:{},fav:{},seg:{},cur:{},estA:{},bd:{},aberto:true,sk:{Prótese:1,Exocad:0,Dentística:1,Atendimento:2},
  tar:[{t:'Revisar o currículo antes de se candidatar',ok:0},{t:'Prova de prótese na quinta',ok:0},{t:'Ver o curso de Exocad',ok:0}],
  cvag:[{id:101,t:'ASB',tp:'CLT',reg:'Campinas · 20 km',n:3,conf:1}],cdt:[{id:1,n:'A. S.',d:'ASB · 4 anos · cirurgia',km:5,c:'#5B45E0',tg:['Cirurgia','CRO ativo']},{id:2,n:'R. P.',d:'TSB · 2 anos',km:9,c:'#1DAE8A',tg:['Periodontia']},{id:3,n:'J. C.',d:'Estudante TSB · último semestre',km:3,c:'#DD5A9E',tg:['Estágio em cirurgia']}],cham:{},msgs:0};}
-var TABS={pro:[['inicio','🏠 Início'],['vagas','💼 Vagas'],['cands','📤 Candidaturas'],['cv','📄 Currículo'],['estudos','📖 Estudos'],['cursos','📚 Cursos'],['rede','🏥 Rede'],['conq','🏅 Conquistas']],
+var TABS={pro:[['inicio','🏠 Início'],['vagas','💼 Vagas'],['freelas','⚡ Freelas'],['cands','📤 Candidaturas'],['cv','📄 Currículo'],['estudos','📖 Estudos'],['cursos','📚 Cursos'],['rede','🏥 Rede'],['conq','🏅 Conquistas']],
  cli:[['cinicio','🏠 Início'],['cvagas','📋 Minhas vagas'],['anunciar','➕ Anunciar vaga'],['cands2','👥 Candidatos'],['rede','🏥 Rede']]};
 var M=document.getElementById('dm'),IN=document.getElementById('dmin');
 function h(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -946,6 +970,7 @@ var R={
   '<div class="chipf" style="margin-bottom:8px">'+[[10,'Até 10 km'],[50,'50 km'],[100,'100 km'],[999,'Brasil todo']].map(function(r){return '<button data-d="raio" data-v="'+r[0]+'" class="'+(D.raio===r[0]?'on':'')+'">📍 '+r[1]+'</button>';}).join('')+'</div>'+
   '<div class="chipf" style="margin-bottom:14px">'+[['','Todas'],['est','🎓 Aceita estudante'],['Estágio','Estágio'],['CLT','CLT'],['PJ','PJ']].map(function(r){return '<button data-d="tipo" data-v="'+r[0]+'" class="'+(D.tipo===r[0]?'on':'')+'">'+r[1]+'</button>';}).join('')+'</div>'+
   (D.vista==='mapa'?mapa(L):(L.length?'<div class="dg dg2">'+L.map(vgCard).join('')+'</div>':'<p class="empt">Nenhuma vaga nesse filtro. Aumente o raio 😉</p>'));},
+ freelas:function(){return '<div class="dm-h"><div><h2>⚡ Freelas, plantões e serviços</h2><p>Trabalho por dia, toda semana, para hoje, e serviços para a clínica.</p></div><span class="swt'+(D.disp?' on':'')+'" data-d="disp"><i></i>Disponível para freelas</span></div><div class="dg dg2">'+FRD.map(function(f){var a=D.fr[f.id];return '<div class="dc"><span class="tagd" style="background:'+f.c+';color:#fff">'+f.b+'</span><h3 style="margin-top:8px">'+h(f.t)+'</h3><small style="color:#625E75">📍 '+h(f.l)+' · '+h(f.v)+'</small><div style="margin-top:10px"><button class="dbtn sm '+(a?'ok':'p')+'" data-d="frA" data-v="'+f.id+'">'+(a?'✓ Aceito, a clínica foi avisada':'⚡ Aceitar')+'</button></div></div>';}).join('')+'</div>';},
  cands:function(){D.msgs=0;var ks=Object.keys(D.cand);return '<div class="dm-h"><div><h2>Minhas candidaturas</h2><p>Acompanhe cada etapa. A Ana te avisa quando mudar.</p></div></div>'+
   (ks.length?ks.map(function(k){var v=VG.filter(function(x){return x.id==k;})[0],s=D.cand[k];return '<div class="dc" style="margin-bottom:12px"><div style="display:flex;gap:12px;align-items:center"><div class="ic" style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:'+v.cor+';font-size:1.3rem">'+v.ic+'</div><div><b>'+h(v.t)+'</b><br><small style="color:#625E75">'+h(v.loc)+' · '+v.km+' km</small></div></div><div class="tlz">'+['📤 Enviado','👀 Clínica viu','💬 Entrevista','🎉 Contratado'].map(function(e,i){return '<span class="'+(s>=i?'on':'')+'">'+e+'</span>';}).join('')+'</div>'+(s===2?'<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="dbtn m" data-d="aceita" data-v="'+k+'">Confirmar entrevista</button></div>':'')+'</div>';}).join(''):'<div class="dc"><p class="empt">Você ainda não se candidatou. Que tal ver as vagas?</p><button class="dbtn p" data-d="tab" data-v="vagas">Ver vagas</button></div>');},
  cv:function(){return '<div class="dm-h"><div><h2>Meu currículo</h2><p>Montado pela Ana no cadastro. Os dados com 🔒 não mudam.</p></div><span class="swt'+(D.aberto?' on':'')+'" data-d="aberto"><i></i>Aberto a propostas</span></div>'+
@@ -964,8 +989,8 @@ var R={
   '<div class="dc" style="margin-top:14px"><h3>Como funciona</h3><p style="color:#625E75;margin:0">Você anuncia, a Ana entrega a vaga para quem tem o perfil e mora perto, e os candidatos chegam com o currículo verificado. Dá para anunciar como <b>clínica confidencial</b>.</p></div>';},
  cvagas:function(){return '<div class="dm-h"><div><h2>Minhas vagas</h2></div><button class="dbtn p" data-d="tab" data-v="anunciar">➕ Nova vaga</button></div><div class="dg dg2">'+D.cvag.map(function(v){return '<div class="dc"><b style="font:800 1.05rem var(--f-display)">'+h(v.t)+'</b><div><span class="tagd">'+h(v.tp)+'</span>'+(v.conf?'<span class="tagd k">🕶️ Confidencial</span>':'')+'<span class="tagd g">'+v.n+' candidato'+(v.n===1?'':'s')+'</span></div><small style="color:#625E75;display:block;margin-top:6px">📍 '+h(v.reg)+'</small><button class="dbtn sm" style="margin-top:10px" data-d="tab" data-v="cands2">Ver candidatos</button></div>';}).join('')+'</div>';},
  anunciar:function(){return '<div class="dm-h"><div><h2>Anunciar vaga</h2><p>Leva um minuto. A Ana entrega para quem tem o perfil.</p></div></div><div class="dc"><div class="fm">'+
-  '<label>Cargo<select id="fCg"><option>Dentista clínico geral</option><option>Auxiliar de Saúde Bucal (ASB)</option><option>Técnico de Saúde Bucal (TSB)</option><option>Estágio para estudante</option><option>Técnico em prótese (TPD)</option><option>Recepção e CRC</option></select></label>'+
-  '<label>Tipo<select id="fTp"><option>CLT</option><option>PJ</option><option>Estágio</option><option>Meio período</option></select></label>'+
+  '<label>Cargo<select id="fCg"><option>Dentista clínico geral</option><option>Auxiliar de Saúde Bucal (ASB)</option><option>Técnico de Saúde Bucal (TSB)</option><option>Estágio para estudante</option><option>Técnico em prótese (TPD)</option><option>Recepção e CRC</option><option>Ceramista</option><option>Técnico em cadeira odontológica</option><option>Técnico em ar-condicionado</option><option>Filmmaker</option></select></label>'+
+  '<label>Tipo<select id="fTp"><option>CLT</option><option>PJ</option><option>Estágio</option><option>Meio período</option><option>Freela por dia</option><option>Plantão toda semana</option><option>Urgente: hoje</option><option>Serviço / manutenção</option></select></label>'+
   '<label>Região<select id="fRg"><option>Campinas · 10 km</option><option>Campinas · 20 km</option><option>Campinas · 50 km</option></select></label>'+
   '<label>Requisito principal<input id="fRq" value="CRO ativo" maxlength="60"></label></div>'+
   '<div style="margin-top:14px"><span class="swt" data-d="fconf" id="fConf"><i></i>Anunciar como clínica confidencial</span></div><button class="dbtn p" style="margin-top:16px;width:100%;padding:13px" data-d="publica">Publicar vaga</button></div>';},
@@ -994,6 +1019,8 @@ function A(a,v,el){
    setTimeout(function(){if(!D||D.cand[v]==null)return;D.cand[v]=1;D.msgs++;toast('A clínica <b>viu o seu currículo</b> 👀','ana-av-feliz.webp');if(M.classList.contains('on'))rend();},4500);
    setTimeout(function(){if(!D||D.cand[v]==null)return;D.cand[v]=2;D.msgs++;toast('💬 <b>Convite para entrevista!</b> Veja em Candidaturas.','ana-av-feliz.webp');ganha('entrev');if(M.classList.contains('on'))rend();},10000);return;}
  if(a==='aceita'){D.cand[v]=3;toast('🎉 <b>Contratado(a)!</b> Parabéns, L.!','ana-av-feliz.webp',1);cf(220);rend();return;}
+ if(a==='frA'){if(D.fr[v])return;D.fr[v]=1;ganha('freela');toast('⚡ Freela aceito! A clínica já recebeu o seu currículo.','ana-av-feliz.webp');rend();return;}
+ if(a==='disp'){D.disp=!D.disp;rend();return;}
  if(a==='tar'){D.tar[v].ok=!D.tar[v].ok;rend();return;}
  if(a==='anota'){var i=document.getElementById('anaIn'),t=(i.value||'').trim();if(!t){i.focus();return;}D.tar.unshift({t:t,ok:0});toast('📝 Anotado! Eu te lembro 💜','ana-av-feliz.webp');rend();return;}
  if(a==='aberto'){D.aberto=!D.aberto;ganha('cv');rend();return;}
