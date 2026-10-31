@@ -459,6 +459,19 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .frx small{color:#C9D0FF;flex-basis:100%}
 @media (min-width:861px){.frx small{flex-basis:auto}}
 @media (max-width:860px){.fr:nth-child(n+7){display:none}.frl{grid-template-columns:1fr 1fr;gap:6px}.fr{padding:8px}.fr b{font-size:.78rem}.fr small{font-size:.68rem}.frx small{display:none}}
+.pdw{position:relative;display:flex;align-items:center;justify-content:center;gap:24px;width:100%;max-width:1000px}
+.pdf{max-width:560px;transition:transform 1s cubic-bezier(.5,0,.2,1),opacity 1s}
+.pdf.voa{transform:translateX(140px) scale(.35) rotate(6deg);opacity:0}
+.anx{display:flex;align-items:center;gap:8px;margin-top:4px}
+.thumb{width:60px;height:40px;border-radius:8px;overflow:hidden;opacity:0;transform:scale(.5);transition:all .4s}.thumb.in{opacity:1;transform:none}.thumb svg{width:100%;height:100%;display:block}
+.anf{font-size:.82rem;font-weight:700;background:#EEEBFD;color:#5B45E0;border-radius:8px;padding:6px 10px;opacity:0;transition:opacity .4s}.anf.in{opacity:1}
+.labr{position:absolute;right:0;width:340px;background:#fff;color:#1B1830;border-radius:20px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.45);opacity:0;transform:translateX(40px) scale(.9);transition:all .6s cubic-bezier(.3,1.4,.5,1)}
+.labr.in{opacity:1;transform:none}
+.lh{background:#1DAE8A;color:#fff;font-weight:800;padding:12px 16px}
+.ln{padding:14px 16px;font-size:.9rem;line-height:1.5}.ln b{color:#D2433A}
+.ls{display:flex;gap:6px;padding:0 16px 16px}.ls span{flex:1;text-align:center;font-size:.76rem;font-weight:700;border-radius:10px;padding:8px 4px;background:#F3F1FA;color:#9a97ad;transition:all .4s}.ls span.on{background:#E3F7F0;color:#1E8A5A}
+@media (min-width:861px){.labr{right:40px}}
+@media (max-width:860px){.pdf .frm{gap:4px}.pdf .inp{min-height:28px;padding:5px 8px;font-size:.78rem}.pdf label{font-size:.68rem}.labr{left:10px;right:10px;width:auto;top:30%}}
 </style>
 <body>
 <header class="top">
@@ -728,6 +741,16 @@ var CENAS=[
   go:function(){inn('.fx',100,250);at(1300,function(){var z=$('#pac');if(z)z.classList.add('zm');});at(2700,function(){var t=$('#tab');if(t)t.setAttribute('opacity','1');var g=$('#gu');if(g)g.classList.add('on');});at(3500,function(){var f=$('#fl');if(f)f.classList.add('on');var s=$('#sh');if(s)s.classList.add('on');});
    ['f1','f2','f3','f4'].forEach(function(id,i){at(3700+i*1000,function(){var e=$('#'+id);if(e)e.classList.add('on');});});
    falas([[0,'Olha que beleza: o dentista tira a <b>foto na cadeira, com o celular</b>, e ela vai direto para o pedido.'],[5400,'O laboratório recebe <b>na hora</b>, com a cor e as observações. Menos erro, menos retrabalho e ajuste, menos dinheiro jogado fora.']]);}},
+
+ {cap:'Pedido para o laboratório',pt:3,who:'ot',p:'serio',d:15000,lab:1,h:'<div class="sc"><div class="pdw"><div class="win pdf" id="pf"><div class="wbar"><span>🧪 Novo pedido para o laboratório</span></div><div class="wbody"><div class="frm">'+
+   [['Paciente','C. M.'],['Trabalho','Protocolo acrilizado superior'],['Moldagem','✓ Feita hoje'],['Dentes','Delara · cor A2'],['Laboratório','Lab Prótese Sul'],['Prazo','3 dias · entrega 03/11']].map(function(f,i){return '<label>'+f[0]+'<span class="inp" id="pq'+i+'" data-t="'+f[1]+'"></span></label>';}).join('')+
+   '<label style="grid-column:1/-1">Anexos<span class="anx"><span class="thumb" id="th"><svg viewBox="0 0 60 40"><rect width="60" height="40" fill="#f2c4a0"/><path d="M14 14 Q30 11 46 14 Q44 32 30 33 Q16 32 14 14 Z" fill="#7a1f2b"/><rect x="14" y="13" width="32" height="7" fill="#fbf7ec"/></svg></span><span id="an2" class="anf">📄 Escaneamento.stl</span></span></label>'+
+   '<div class="tg" id="ur"><i></i><b style="color:#D2433A">🔴 Urgente</b></div></div><button class="pub" id="pe">Enviar ao laboratório</button></div></div>'+
+   '<div class="labr" id="lr"><div class="lh">🧪 Lab Prótese Sul</div><div class="ln">🔔 <b>Novo pedido URGENTE</b><br>Protocolo acrilizado superior · dentes Delara A2<br>Prazo: <b>3 dias</b> · foto e escaneamento anexados</div><div class="ls"><span class="on">Solicitado</span><span id="cs">Coleta agendada 🛵</span></div></div></div></div>',
+  go:function(){$$('.inp').forEach(function(e,i){at(500+i*700,function(){var v=e.getAttribute('data-t'),k=0;(function f(){k++;e.textContent=v.slice(0,k);if(k<v.length&&e.isConnected)setTimeout(f,16);})();});});
+   at(4900,function(){var t=$('#th');if(t)t.classList.add('in');});at(5400,function(){var t=$('#an2');if(t)t.classList.add('in');});at(6000,function(){var u=$('#ur i');if(u)u.classList.add('on');});
+   clica('#pe',6400,function(){var b=$('#pe');if(b){b.textContent='✓ Enviado';b.classList.add('ok');}at(500,function(){var f=$('#pf');if(f)f.classList.add('voa');var l=$('#lr');if(l)l.classList.add('in');});at(2400,function(){var c=$('#cs');if(c)c.classList.add('on');});});
+   falas([[0,'Foto tirada? Agora o <b>pedido</b>: paciente, trabalho, moldagem, <b>dentes Delara cor A2</b>, laboratório e prazo de <b>3 dias</b>.'],[6000,'Marca <b>urgente</b>, anexa a foto e o escaneamento e envia.'],[8600,'O laboratório recebe <b>na hora</b>, com tudo junto, e a coleta já fica agendada. 🛵']]);}},
 
  {cap:'IA vigiando as entregas',pt:3,who:'ot',p:'serio',d:11000,lab:1,h:'<div class="sc"><div class="alr">'+[['⚠️','#D2433A','Pedido #1043 vai atrasar 1 dia','O Lab Digital Centro ainda não iniciou a fresagem. Já avisei o lab e remarquei o paciente das 10h?'],['🕑','#B7791F','Prova da faceta chega hoje às 14h','Paciente C. M. confirmado às 15h. Está tudo encaixado.'],['✅','#1E8A5A','Coroa #1042 saiu para entrega','Previsão: amanhã cedo, dentro do prazo.'],['📈','#5B45E0','Lab Arte Dental: 3 entregas antecipadas este mês','Bom sinal. Ele está melhorando no prazo.']].map(function(a){return '<div class="al fx" style="--c:'+a[1]+'"><span>'+a[0]+'</span><div><b>'+a[2]+'</b><p>'+a[3]+'</p></div></div>';}).join('')+'</div></div>',
   go:function(){inn('.fx',200,700);falas([[0,'E tem uma <b>IA vigiando as entregas</b> 24 horas. Se um pedido vai atrasar, ela avisa <b>antes</b> do paciente chegar.'],[5400,'Prova chegando, trabalho saindo, lab melhorando ou piorando: <b>você fica sabendo de tudo.</b>']]);}},
