@@ -556,6 +556,17 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
   .pl-bot .cb{height:48px;min-width:48px;font-size:1rem}
   .pl-bot #pn{padding:0 22px}
 }
+@media (max-width:860px){
+  .pl-main{grid-template-rows:auto minmax(0,1fr)}
+  .ana{height:146px;flex:none}
+  .ana .bal{height:146px;min-height:0;overflow-y:auto;scrollbar-width:none;font-size:.88rem;line-height:1.42;padding:10px 12px;display:block}
+  .ana .anaav{margin-top:6px}
+  .stage{align-items:flex-start}
+}
+@media (max-width:860px) and (max-height:700px){.ana,.ana .bal{height:116px}.ana .bal{font-size:.86rem}}
+.bigl{width:110px;height:110px;margin:0 auto;border-radius:30px;background:linear-gradient(140deg,#5B45E0,#7B5CF2);display:grid;place-items:center;box-shadow:0 0 60px rgba(124,240,200,.35),0 0 0 4px rgba(124,240,200,.5)}
+.bigl i{font:800 3.6rem var(--f-display);font-style:normal;color:#fff}
+@media (max-width:860px){.bigl{width:72px;height:72px;border-radius:20px}.bigl i{font-size:2.4rem}.ana .bal.lg{font-size:.8rem;line-height:1.38}}
 </style>
 <body>
 <header class="top">
@@ -625,10 +636,10 @@ function limpa(){T.forEach(clearTimeout);T=[];clearTimeout(fimT);}
 function $(q){return STG.querySelector(q);}
 function $$(q){return Array.prototype.slice.call(STG.querySelectorAll(q));}
 function inn(q,ms,passo){$$(q).forEach(function(el,i){at(ms+(passo||0)*i,function(){el.classList.add('in');});});}
-function digita(txt){ANA.classList.add('fala');var h=txt,i=0,out='';BAL.innerHTML='<span class="cur"></span>';
+function digita(txt){ANA.classList.add('fala');BAL.classList.toggle('lg',txt.replace(/<[^>]+>/g,'').length>140);var h=txt,i=0,out='';BAL.innerHTML='<span class="cur"></span>';
   var plain=h.replace(/<[^>]+>/g,''),dur=Math.min(2600,plain.length*17);
   var passos=Math.max(1,Math.floor(dur/30)),k=0;
-  (function tick(){k++;var n=Math.round(plain.length*k/passos);BAL.innerHTML=corta(h,n)+'<span class="cur"></span>';if(k<passos)T.push(setTimeout(tick,30));else{BAL.innerHTML=h;ANA.classList.remove('fala');}})();}
+  (function tick(){k++;var n=Math.round(plain.length*k/passos);BAL.innerHTML=corta(h,n)+'<span class="cur"></span>';BAL.scrollTop=BAL.scrollHeight;if(k<passos)T.push(setTimeout(tick,30));else{BAL.innerHTML=h;ANA.classList.remove('fala');}})();}
 function corta(h,n){var o='',c=0,tag=false,abre=[];for(var i=0;i<h.length&&c<n;i++){var ch=h[i];if(ch==='<'){tag=true;}o+=ch;if(tag){if(ch==='>')tag=false;}else c++;}
   var m=o.match(/<b>/g),f=o.match(/<\/b>/g);if((m?m.length:0)>(f?f.length:0))o+='</b>';return o;}
 var FIMFALA=0;
@@ -671,7 +682,7 @@ var SETORES=[
 ];
 var CENAS=[
 /* ================= PARTE 1 · A IDEALI ================= */
- {cap:'A Ideali',pt:1,p:'tranquila',d:9000,h:'<div class="sc"><div class="big"><img class="port pop" src="../app/equipe/ana-av-feliz.webp" alt="Ana"><div class="sl-k fx" style="margin-top:22px">Ideali Odonto</div><h2 class="fx">Onde a odontologia <span class="mt">contrata</span>, aprende e cresce.</h2><p class="fx">A rede profissional da odontologia brasileira, com uma assistente de IA que trabalha por você.</p></div></div>',
+ {cap:'A Ideali',pt:1,p:'tranquila',d:9000,h:'<div class="sc"><div class="big"><div class="bigl pop"><i>i</i></div><div class="sl-k fx" style="margin-top:22px">Ideali Odonto</div><h2 class="fx">Onde a odontologia <span class="mt">contrata</span>, aprende e cresce.</h2><p class="fx">A rede profissional da odontologia brasileira, com uma assistente de IA que trabalha por você.</p></div></div>',
   go:function(){inn('.pop',100);inn('.fx',400,300);falas([[0,'Oi! Eu sou a <b>Ana</b> 💜 Antes de mostrar como funciona, deixa eu te apresentar a <b>Ideali</b>: o que ela é, por que existe e aonde a gente quer chegar.']]);}},
 
  {cap:'O problema',pt:1,p:'pensativa',d:12000,h:'<div class="sc"><div class="sl">'+L('O problema')+'<h3 class="fx">Na odontologia, achar trabalho (e achar gente boa) ainda é na sorte.</h3><div class="g4">'+
@@ -793,7 +804,7 @@ var CENAS=[
   go:function(){inn('.fx',100,300);clica('#ch0',2600,function(){var b=$('#ch0');if(b){b.textContent='✓ Chamado';b.classList.add('ok');}});
    falas([[0,'A clínica recebe os <b>candidatos</b> com o currículo completo, a distância e as habilidades.'],[4600,'Um clique em <b>"Chamar"</b> e o convite para a entrevista já vai.']]);}},
 
- {cap:'Contratado!',pt:2,p:'feliz',d:8000,rede:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="parab"><img class="port pop" src="../app/equipe/ana-av-feliz.webp" alt=""><h2 class="pop" style="margin-top:18px">🎉 Parabéns, você foi contratado(a)!</h2><p class="fx">Da candidatura à contratação, tudo dentro da Ideali.</p></div></div>',
+ {cap:'Contratado!',pt:2,p:'feliz',d:8000,rede:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="parab"><h2 class="pop" style="margin-top:18px">🎉 Parabéns, você foi contratado(a)!</h2><p class="fx">Da candidatura à contratação, tudo dentro da Ideali.</p></div></div>',
   go:function(){inn('.pop',200,200);inn('.fx',900);at(400,function(){confete(200);});at(2600,function(){confete(120);});
    falas([[0,'E aí… <b>contratado!</b> 🎉 Do primeiro toque à contratação, tudo dentro da Ideali. É isso que a gente quer ver todo dia.']]);}},
 
@@ -931,7 +942,7 @@ var CENAS=[
   go:function(){inn('.fx',100);$$('.fr').forEach(function(e,i){at(500+i*330,function(){e.classList.add('in');});});
    falas([[0,'E a <b>indústria e o comércio</b> também contratam: representante, vendedor de dental, técnico de equipamento, especialista de produto…'],[6400,'E as empresas ainda aparecem na <b>vitrine da Rede</b>, perto de quem compra. 📣']]);}},
 
- {cap:'Ideali Odonto',pt:2,p:'feliz',d:14000,fim:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="big"><img class="port pop" src="../app/equipe/ana-av-feliz.webp" alt="Ana"><h2 class="fx" style="margin-top:22px">Isso é a <span class="mt">Ideali Odonto</span>.</h2><p class="fx">Onde a odontologia contrata, aprende e cresce. Chegando em breve.</p><div class="fx" style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cb pri" id="xp1">👆 Experimentar agora</button><button class="cb" id="rv">↺ Ver de novo</button><button class="cb" id="fc">Fechar</button></div></div></div>',
+ {cap:'Ideali Odonto',pt:2,p:'feliz',d:14000,fim:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="big"><div class="bigl pop"><i>i</i></div><h2 class="fx" style="margin-top:22px">Isso é a <span class="mt">Ideali Odonto</span>.</h2><p class="fx">Onde a odontologia contrata, aprende e cresce. Chegando em breve.</p><div class="fx" style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cb pri" id="xp1">👆 Experimentar agora</button><button class="cb" id="rv">↺ Ver de novo</button><button class="cb" id="fc">Fechar</button></div></div></div>',
   go:function(){inn('.pop',200);inn('.fx',700,300);at(800,function(){confete(160);});$('#rv').onclick=function(){vai(0);};$('#fc').onclick=fecha;$('#xp1').onclick=function(){abreDemo();};
    falas([[0,'E isso é só o começo. Quero muito ter você com a gente nessa 💜'],[4200,'Agora é a sua vez: toque em <b>Experimentar agora</b> e use a plataforma como se fosse sua 👆']]);}}
 ];
