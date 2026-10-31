@@ -1165,6 +1165,7 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .tut-q{font-weight:800;font-size:1rem}
 .cx a.btn{color:inherit;text-decoration:none}.cx a.btn.pri{color:#fff}.cx-url{padding:10px 12px;border-radius:10px;background:var(--soft);font-size:.85rem;word-break:break-all}.cx-it.novo{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent)}.cx-desc{margin:0;white-space:pre-wrap;line-height:1.5}
 .pn-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}.pn-tabs button{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:8px 14px;font-weight:600;cursor:pointer}.pn-tabs button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.arm-bar{height:12px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:6px}.arm-bar i{display:block;height:100%;border-radius:99px;transition:width .5s}
 .pn-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.pn-k{display:grid;gap:2px;padding:14px}.pn-k b{font-size:1.6rem}.pn-k span{font-weight:600}.pn-k small{color:var(--muted);font-size:.75rem}
 .pn-graf{display:flex;align-items:flex-end;gap:3px;height:120px;padding:6px 0;border-bottom:1px solid var(--line)}.pn-graf i{flex:1;background:var(--accent);border-radius:4px 4px 0 0;min-width:3px;opacity:.85}
 .pn-al{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}.pn-al span{display:grid;min-width:0}.pn-al small{color:var(--muted)}
@@ -1828,7 +1829,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='30/10 · 13h20';
+var VERSAO='31/10 · 00h50';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={caixa:'Caixa de entrada',painel:'Painel do dono',comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -5643,6 +5644,16 @@ function pnAlerta(a){var M=(ui.admUso||{}).marcos||{},m=M[a.user_id]||{},d=a.cad
   if(ult!=null&&ult>=7)return 'Sem entrar há '+plural(ult,'dia','dias');
   if(m.primeiro_pedido&&!m.primeiro_arquivo&&d>=3)return 'Ainda não subiu arquivo';
   return '';}
+/* Armazenamento geral: soma do espaço usado por todas as contas (você + assinantes), pela contagem do sistema */
+function pnArmaz(){var T=ui.admLista||[],eu=T.filter(function(a){return a.admin;}),ou=T.filter(function(a){return !a.admin;}),soma=function(L){return L.reduce(function(t,a){return t+(+a.bytes_usados||0);},0);};
+  var tot=soma(T),bEu=soma(eu),bOu=soma(ou),gratis=10*GB,pc=Math.min(100,Math.round(tot/gratis*100)),exc=Math.max(0,tot-gratis),custo=exc/GB*0.015;
+  var top=ou.filter(function(a){return +a.bytes_usados>0;}).sort(function(a,b){return (+b.bytes_usados)-(+a.bytes_usados);}).slice(0,5);
+  return '<section class="card stack"><div class="between wrap"><h2 style="margin:0">💾 Armazenamento total</h2><span class="small muted">Soma de todas as contas</span></div>'+
+    '<div class="pn-kpis">'+pnKpi(bytes(tot),'usado no total','você + assinantes')+pnKpi(bytes(bEu),'você')+pnKpi(bytes(bOu),'assinantes',ou.length+' conta'+(ou.length===1?'':'s'))+'</div>'+
+    '<div><div class="between small"><span>Faixa grátis do armazenamento (10 GB)</span><b>'+pc+'%</b></div><div class="arm-bar"><i style="width:'+pc+'%;background:'+(pc>=90?'var(--urgent)':pc>=70?'var(--warn)':'var(--ok)')+'"></i></div>'+
+      '<p class="small muted" style="margin:6px 0 0">'+(exc>0?'Passou '+bytes(exc)+' da faixa grátis. Custo estimado: US$ '+custo.toFixed(2).replace('.',',')+' por mês (US$ 0,015 por GB).':'Ainda dentro da faixa grátis: faltam '+bytes(gratis-tot)+'.')+'</p></div>'+
+    (top.length?'<div><b class="small">Quem mais usa</b>'+top.map(function(a){var x=+a.bytes_usados;return '<div class="between small" style="padding:6px 0;border-top:1px solid var(--line)"><span>'+esc(a.nome||a.email||'Sem nome')+'</span><b class="mono">'+bytes(x)+'</b></div>';}).join('')+'</div>':'<p class="small muted" style="margin:0">Nenhum assinante enviou arquivos ainda.</p>')+
+    '<p class="small muted" style="margin:0">Pela contagem do próprio sistema (inclui os arquivos que os clientes enviam para cada cadista). O número oficial cobrado fica no painel da Cloudflare.</p></section>';}
 function pnGeral(){var L=pnUsers(),P=ui.pn||{},U=ui.admUso||{},M=U.marcos||{};
   var hoje=L.filter(function(a){return (a.m&&+a.m.seg_hoje>=60);}).length,s7=L.filter(function(a){return a.m&&+a.m.seg_7d>=60;}).length,s30=L.filter(function(a){return a.m&&+a.m.dias_ativos_30>0;}).length;
   var ped30=L.reduce(function(t,a){return t+(+((a.m||{}).pedidos_30d)||0);},0),seg30=L.reduce(function(t,a){return t+(+((a.m||{}).seg_30d)||0);},0);
@@ -5650,6 +5661,7 @@ function pnGeral(){var L=pnUsers(),P=ui.pn||{},U=ui.admUso||{},M=U.marcos||{};
   var D=P.dias||[],mx=Math.max.apply(null,D.map(function(x){return +x.pessoas;}).concat([1]));
   var graf=D.length?'<div class="pn-graf">'+D.map(function(x){return '<i title="'+dmy(dia(x.dia))+': '+x.pessoas+' pessoa(s), '+horasTxt(+x.segundos)+'" style="height:'+Math.max(4,Math.round(+x.pessoas/mx*100))+'%"></i>';}).join('')+'</div><p class="small muted" style="margin:6px 0 0">Pessoas ativas por dia (pelo menos 1 minuto de uso), últimos 30 dias.</p>':'<p class="small muted">'+(P.falta?'Falta rodar a migração 034 no Supabase.':'Carregando…')+'</p>';
   return '<div class="pn-kpis">'+pnKpi(L.length,'cadastros')+pnKpi(hoje,'ativos hoje')+pnKpi(s7,'ativos em 7 dias')+pnKpi(s30,'ativos em 30 dias')+pnKpi(ped30,'pedidos lançados','30 dias')+pnKpi(horasTxt(seg30),'tempo de uso','30 dias, todos')+'</div>'+
+    pnArmaz()+
     '<section class="card stack"><h2 style="margin:0">Atividade</h2>'+graf+'</section>'+
     admUso()+
     '<section class="card stack"><div class="between wrap"><h2 style="margin:0">⚠️ Precisam de ajuda ('+at.length+')</h2><button class="btn sm" data-a="pnTab" data-v="usuarios">Ver todos</button></div>'+(at.length?at.slice(0,8).map(function(a){return '<div class="pn-al"><span><b>'+esc(a.nome||a.email)+'</b><small>'+esc(pnAlerta(a))+'</small></span>'+(a.telefone?'<a class="btn sm" target="_blank" rel="noopener" href="'+waLink('Oi, '+esc(String(a.nome||'').split(' ')[0])+'! Aqui é '+(String(S.perfil.nome||'').split(' ')[0]?'o '+String(S.perfil.nome).split(' ')[0]+', ':'a equipe ')+'do Ideali CAD. Vi que você se cadastrou: posso te ajudar a colocar seus clientes e primeiros pedidos? Leva uns 15 minutos.',a.telefone)+'">WhatsApp</a>':'')+'</div>';}).join(''):'<p class="small muted">Ninguém travado agora. 🎉</p>')+'</section>';}
