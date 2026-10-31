@@ -489,6 +489,17 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .inp.ai{background:#F3F1FE;border-color:#b9b0f5;animation:aipop .45s}
 @keyframes aipop{0%{transform:scale(.96);background:#d9f7ec}100%{transform:none}}
 @media (max-width:860px){.pdw{flex-direction:column;gap:8px}.cmdp{flex-direction:row}.cmdc{width:120px;height:150px;padding:6px;border-radius:16px}.papel{padding:6px;gap:3px;font-size:.5rem}.papel i{font-size:.56rem}.papel b{font-size:.5rem}.pdw .pdf .wbody{padding:8px}}
+.bm{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start}
+.bmb{background:rgba(255,255,255,.05);border-radius:18px;padding:18px}
+.bmr{display:grid;grid-template-columns:140px 1fr 110px;gap:12px;align-items:center;margin-bottom:14px}
+.bmr span{font-weight:700;color:#e6dcc4}.bmr b{font:800 1.3rem var(--f-display);text-align:right}
+.bmr i{height:26px;border-radius:10px;background:rgba(255,255,255,.06);overflow:hidden}
+.bmr em{display:block;height:100%;width:0;border-radius:10px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}.bmr em.in{width:var(--v)}
+.bmd{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}.bmd span{background:rgba(255,255,255,.07);border-radius:999px;padding:6px 12px;font-size:.86rem;font-weight:600}.bmd em{font-style:normal;font-weight:800}
+.bmc{background:#fff;color:#1B1830;border-radius:18px;padding:16px}.bmc>b{font:800 1rem var(--f-display)}
+.bmc ul{margin:8px 0 10px;padding-left:18px;font-size:.88rem;color:#3d3a73;line-height:1.5}
+.bmk{background:#FFF1D6;color:#5a3c00;border-radius:12px;padding:10px 12px;font-size:.88rem}
+@media (max-width:860px){.bm{grid-template-columns:1fr;gap:8px}.bmr{grid-template-columns:90px 1fr 80px;gap:6px;margin-bottom:8px}.bmr span{font-size:.75rem}.bmr b{font-size:.9rem}.bmb{padding:10px}.bmc ul{display:none}.bmc{padding:10px}.bmd span{font-size:.7rem;padding:4px 8px}}
 </style>
 <body>
 <header class="top">
@@ -805,6 +816,14 @@ var CENAS=[
    '<div class="gside"><div class="nu fx"><b>R$ <i id="g0">0</i></b><span>gasto em outubro</span></div><div class="gtp fx">'+[['Coroas e facetas',38,'#5B45E0'],['Protocolos (acrilizado e zircônia)',34,'#1DAE8A'],['PPR e prótese total',18,'#F0A53A'],['Placas e provisórios',10,'#DD5A9E']].map(function(t){return '<div><span style="background:'+t[2]+'"></span>'+t[0]+'<em>'+t[1]+'%</em></div>';}).join('')+'</div></div></div><small class="src fx">Números de exemplo</small></div></div>',
   go:function(){inn('.fx',100,250);at(600,function(){$$('.gbars i').forEach(function(e){e.classList.add('in');});cnt($('#g0'),18450);});
    falas([[0,'Quanto a clínica <b>gasta com laboratório</b> por mês, por tipo de trabalho e por lab.'],[4800,'Subiu? Você vê na hora <b>onde</b> subiu e <b>por quê</b>.']]);}},
+
+ {cap:'Clínicas parecidas',pt:3,who:'ot',p:'bravo',d:15000,lab:1,h:'<div class="sc"><div class="sl">'+L('Comparação com clínicas parecidas com a sua')+'<h3 class="fx">Clínicas parecidas com a sua gastaram <span style="color:#F0C46A">13% a menos</span> com laboratório em outubro.</h3><div class="bm"><div class="bmb">'+
+   '<div class="bmr fx"><span>Sua clínica</span><i><em id="b0" style="--v:100%;background:#EF5F5A"></em></i><b>R$ 18.450</b></div>'+
+   '<div class="bmr fx"><span>Clínicas parecidas</span><i><em id="b1" style="--v:87%;background:#7CF0C8"></em></i><b>R$ 16.050</b></div>'+
+   '<div class="bmd fx">'+[['Protocolos','+22%','#EF5F5A'],['Coroas e facetas','+9%','#F0A53A'],['PPR e prótese total','+1%','#9aa3d8'],['Placas e provisórios','−3%','#7CF0C8']].map(function(d){return '<span>'+d[0]+' <em style="color:'+d[2]+'">'+d[1]+'</em></span>';}).join('')+'</div></div>'+
+   '<div class="bmc fx"><b>Como o sistema calcula</b><ul><li>Compara com clínicas de <b>faturamento</b> e <b>volume de compras</b> parecidos</li><li>Mesma região e tipos de trabalho parecidos</li><li>Dados <b>anônimos</b> e somados: nenhuma clínica é identificada</li></ul><div class="bmk">💡 A maior diferença está nos <b>protocolos</b>. Veja os preços na próxima tela.</div></div></div><small class="src fx">Números de exemplo</small></div></div>',
+  go:function(){inn('.fx',100,200);at(700,function(){$$('.bmr em').forEach(function(e){e.classList.add('in');});});
+   falas([[0,'Agora uma que dói: clínicas <b>parecidas com a sua</b> gastaram <b>13% a menos</b> com laboratório. 😤'],[5400,'O sistema compara com clínicas de <b>faturamento e compras parecidos</b>, na mesma região. Tudo <b>anônimo</b>: ninguém vê o nome de ninguém.'],[10600,'E mostra <b>onde</b> está a diferença. Aqui, nos protocolos. Vamos ver os preços?']]);}},
 
  {cap:'Comparação de preços',pt:3,who:'ot',p:'satisfeito',d:12000,lab:1,h:'<div class="sc"><div class="win" style="max-width:860px"><div class="wbar"><span>⚖️ Comparar preços</span></div><div class="wbody"><div class="chipf2"><span>Coroa em zircônia</span><span class="on">Protocolo acrilizado</span><span>Protocolo em zircônia</span><span>PPR</span><span>Faceta e.max</span></div><div class="pt">'+
    '<div class="ph"><span>Laboratório</span><span>Preço</span><span>Prazo</span><span>Refação</span><span>Índice Ideali</span></div>'+
