@@ -415,6 +415,18 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
   .ph,.pr{grid-template-columns:1.5fr .8fr .6fr;font-size:.76rem}.ph span:nth-child(n+4),.pr span:nth-child(n+4){display:none}
   .eco{grid-template-columns:1fr}.mot{display:none}.lbchips span{font-size:.75rem;padding:4px 10px}
 }
+.rst{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;width:100%;max-width:980px;align-items:center}
+.rmap{position:relative;border-radius:20px;background:#1a2230;border:1px solid rgba(255,255,255,.1);overflow:hidden;aspect-ratio:4/3}
+.rmap svg{position:absolute;inset:0;width:100%;height:100%}
+.eta{position:absolute;left:12px;top:12px;background:#fff;color:#1B1830;border-radius:999px;padding:7px 14px;font-weight:700;font-size:.9rem;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.eta b{color:#5B45E0}
+.rside{display:flex;flex-direction:column;gap:12px}
+.rped{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 14px}.rped small{display:block;color:#C9D0FF}
+.rst4{display:flex;flex-direction:column;gap:8px}
+.rs{display:flex;justify-content:space-between;align-items:center;border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.05);color:#7f7a6a;font-weight:700;font-size:.9rem;transition:all .4s}
+.rs.on{background:rgba(240,196,106,.14);color:#fff;border-left:4px solid #F0C46A}.rs small{font-weight:500;color:#C9B98a}
+.rpush{margin:0}
+@media (max-width:860px){.rst{grid-template-columns:1fr;gap:8px}.rmap{aspect-ratio:16/10}.rped{display:none}.rs{padding:6px 10px;font-size:.78rem}.rpush{display:none}}
 </style>
 <body>
 <header class="top">
@@ -666,6 +678,19 @@ var CENAS=[
 
  {cap:'IA vigiando as entregas',pt:3,who:'ot',p:'serio',d:11000,lab:1,h:'<div class="sc"><div class="alr">'+[['⚠️','#D2433A','Pedido #1043 vai atrasar 1 dia','O Lab Digital Centro ainda não iniciou a fresagem. Já avisei o lab e remarquei o paciente das 10h?'],['🕑','#B7791F','Prova da faceta chega hoje às 14h','Paciente C. M. confirmado às 15h. Está tudo encaixado.'],['✅','#1E8A5A','Coroa #1042 saiu para entrega','Previsão: amanhã cedo, dentro do prazo.'],['📈','#5B45E0','Lab Arte Dental: 3 entregas antecipadas este mês','Bom sinal. Ele está melhorando no prazo.']].map(function(a){return '<div class="al fx" style="--c:'+a[1]+'"><span>'+a[0]+'</span><div><b>'+a[2]+'</b><p>'+a[3]+'</p></div></div>';}).join('')+'</div></div>',
   go:function(){inn('.fx',200,700);falas([[0,'E tem uma <b>IA vigiando as entregas</b> 24 horas. Se um pedido vai atrasar, ela avisa <b>antes</b> do paciente chegar.'],[5400,'Prova chegando, trabalho saindo, lab melhorando ou piorando: <b>você fica sabendo de tudo.</b>']]);}},
+
+ {cap:'Rastreio do motoboy',pt:3,who:'ot',p:'satisfeito',d:14000,lab:1,h:'<div class="sc"><div class="rst"><div class="rmap fx"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet"><g stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none"><path d="M0 80 H400"/><path d="M0 200 H400"/><path d="M90 0 V300"/><path d="M250 0 V300"/><path d="M0 140 Q200 120 400 150"/></g>'+
+   '<path id="rota" d="M60 250 L90 250 L90 200 L250 200 L250 80 L340 80" stroke="#F0C46A" stroke-width="5" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>'+
+   '<g><circle cx="60" cy="250" r="11" fill="#1DAE8A"/><text x="60" y="255" font-size="12" text-anchor="middle">🧪</text></g><g><circle cx="340" cy="80" r="13" fill="#5B45E0"/><text x="340" y="85" font-size="13" text-anchor="middle">🏥</text></g>'+
+   '<g id="moto"><circle r="15" fill="#fff"/><text y="6" font-size="17" text-anchor="middle">🛵</text></g></svg>'+
+   '<div class="eta" id="eta">Chega em <b id="mn">18</b> min</div></div>'+
+   '<div class="rside"><div class="rped fx"><b>Pedido #1042 · Coroa em zircônia</b><small>Lab Arte Dental → Clínica Centro</small></div><div class="rst4">'+[['r0','📦 Coletado no laboratório','14:02'],['r1','🛵 Em rota','14:05'],['r2','📍 Chegando · 5 min','14:18'],['r3','✅ Entregue · código 4821','14:23']].map(function(r){return '<div class="rs fx" id="'+r[0]+'"><span>'+r[1]+'</span><small>'+r[2]+'</small></div>';}).join('')+'</div>'+
+   '<div class="psh rpush" id="rp"><img src="../app/equipe/ana-av-feliz.webp" alt=""><div><b>Ana · Ideali</b><p>O motoboy está a 5 minutos 🛵</p></div></div></div></div></div>',
+  go:function(){inn('.fx',100,200);var path=$('#rota'),mo=$('#moto'),L=path.getTotalLength(),t0=Date.now(),D=9000;
+   $('#r0').classList.add('on');at(900,function(){$('#r1').classList.add('on');});
+   (function f(){if(!mo.isConnected)return;var k=Math.min(1,(Date.now()-t0)/D),pt=path.getPointAtLength(L*k);mo.setAttribute('transform','translate('+pt.x+','+pt.y+')');var mn=$('#mn');if(mn)mn.textContent=Math.max(0,Math.round(18*(1-k)));if(k<1)requestAnimationFrame(f);})();
+   at(6200,function(){$('#r2').classList.add('on');$('#rp').classList.add('in');});at(9300,function(){$('#r3').classList.add('on');var e=$('#eta');if(e)e.innerHTML='✅ <b>Entregue!</b>';});
+   falas([[0,'E sabe aquela pergunta "o motoboy já saiu?" Acabou. Aqui você <b>acompanha a entrega no mapa</b>, ao vivo. 🛵'],[5200,'Coletou, saiu, está chegando… e a Ana ainda avisa: <b>"está a 5 minutos"</b>.'],[9600,'Na chegada, a clínica confirma com um <b>código</b>. Entregue, registrado, sem discussão.']]);}},
 
  {cap:'Atrasos e refações',pt:3,who:'ot',p:'bravo',d:12000,lab:1,h:'<div class="sc"><div class="sl">'+L('Análise por laboratório · últimos 6 meses')+'<div class="cmp">'+[['Lab Arte Dental',4,3,96],['Lab Digital Centro',14,6,82],['Lab Cerâmica Fina',6,9,90]].map(function(l){return '<div class="cl fx"><b>'+l[0]+'</b><div class="bx"><span>Atrasos</span><i style="--v:'+l[1]*5+'%;--c:#EF5F5A"></i><em>'+l[1]+'%</em></div><div class="bx"><span>Refações</span><i style="--v:'+l[2]*5+'%;--c:#F0A53A"></i><em>'+l[2]+'%</em></div><div class="bx"><span>No prazo</span><i style="--v:'+l[3]+'%;--c:#1DAE8A"></i><em>'+l[3]+'%</em></div></div>';}).join('')+
    '</div><div class="mot fx"><b>Por que voltou para ajuste?</b>'+[['Cor',38],['Adaptação',27],['Contato',21],['Outros',14]].map(function(m){return '<span>'+m[0]+' <em>'+m[1]+'%</em></span>';}).join('')+'</div><small class="src fx">Números de exemplo</small></div></div>',
