@@ -225,6 +225,18 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
   .wbar .tabs{display:none}.wbody{padding:12px}
   .sc{padding:8px;align-items:flex-start}.notif{left:10px;right:10px;top:auto;bottom:10px;max-width:none}
 }
+
+.anah{display:block;height:300px;margin:0 auto -6px;filter:drop-shadow(0 20px 40px rgba(0,0,0,.45));animation:flut 4s ease-in-out infinite}
+@keyframes flut{50%{transform:translateY(-8px)}}
+.anaf{position:relative;height:300px;display:flex;align-items:flex-end;justify-content:flex-start}
+.anaf::before{content:"";position:absolute;left:20px;bottom:0;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(124,240,200,.28),transparent 70%)}
+.anaf img{position:relative;height:100%;filter:drop-shadow(0 16px 30px rgba(0,0,0,.5));transition:opacity .25s}
+.ana.fala .anaf img{animation:fala .45s ease-in-out infinite alternate}
+@keyframes fala{to{transform:translateY(-3px) rotate(.4deg)}}
+.anaav{display:none;width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none;border:2px solid var(--mint2);box-shadow:0 0 18px rgba(124,240,200,.4)}
+.port{width:170px;height:170px;border-radius:50%;object-fit:cover;border:4px solid var(--mint2);box-shadow:0 0 60px rgba(124,240,200,.45);display:block;margin:0 auto}
+@media (max-width:860px){.anaf{display:none}.anaav{display:block}.anah{height:220px}.port{width:120px;height:120px}}
+@media (max-height:700px) and (min-width:861px){.anaf{height:220px}}
 </style>
 <body>
 <header class="top">
@@ -234,7 +246,7 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 
 <section class="hero">
   <div class="stars" id="st"></div>
-  <div class="orb"></div>
+  <img class="anah" src="../app/equipe/ana-tranquila.webp" alt="Ana, a assistente de IA">
   <div class="eyebrow" style="margin-top:30px">Ideali Odonto · em breve</div>
   <h1>A plataforma de <em>toda a odontologia.</em></h1>
   <p>Dentistas, protéticos, ASB/TSB, estudantes e toda a equipe da clínica no mesmo lugar. Com a Ana, uma assistente de IA que trabalha junto com você.</p>
@@ -272,7 +284,7 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
   <div class="bg"></div>
   <div class="pl-top"><span class="logo"><i>i</i>Ideali <small>Odonto</small></span><span class="pl-cap" id="cap"></span><button class="pl-x" id="px" aria-label="Fechar">✕</button></div>
   <div class="pl-main">
-    <div class="ana" id="ana"><div class="orb"></div><div class="nm">Ana<small>sua assistente de IA</small></div><div class="bal" id="bal"></div></div>
+    <div class="ana" id="ana"><div class="anaf"><img id="anaimg" src="../app/equipe/ana-tranquila.webp" alt="Ana"></div><img class="anaav" id="anaav" src="../app/equipe/ana-av-tranquila.webp" alt="Ana"><div class="nm">Ana<small>sua assistente de IA</small></div><div class="bal" id="bal"></div></div>
     <div class="stage" id="stg"></div>
   </div>
   <div class="pl-bot"><button class="cb" id="pv" aria-label="Voltar">◀</button><div class="dots" id="dots"></div><button class="cb" id="pp" aria-label="Pausar">❚❚</button><button class="cb pri" id="pn">Próximo ▶</button></div>
@@ -309,7 +321,7 @@ function confete(n){var c=$('#cf');if(!c)return;var W=c.width=STG.clientWidth,H=
     if(Date.now()-t0<4500)requestAnimationFrame(f);else x.clearRect(0,0,W,H);})();}
 
 var CENAS=[
- {cap:'Olá!',d:9000,h:'<div class="sc"><div class="big"><div class="orb pop" style="width:150px;height:150px"></div><h2 class="fx" style="margin-top:34px">Oi! Eu sou a <span style="color:#7CF0C8">Ana</span>.</h2><p class="fx">A assistente de IA da Ideali Odonto.</p></div></div>',
+ {cap:'Olá!',d:9000,h:'<div class="sc"><div class="big"><img class="port pop" src="../app/equipe/ana-av-feliz.webp" alt="Ana"><h2 class="fx" style="margin-top:34px">Oi! Eu sou a <span style="color:#7CF0C8">Ana</span>.</h2><p class="fx">A assistente de IA da Ideali Odonto.</p></div></div>',
   go:function(){inn('.pop',200);inn('.fx',900,500);falas([[0,'Oi! Eu sou a <b>Ana</b> 💜 Vou te mostrar a Ideali Odonto por dentro, do cadastro até o painel.'],[5200,'Pode relaxar: é só assistir. Se quiser, use as setas para voltar ou avançar.']]);}},
 
  {cap:'Cadastro',d:10000,h:'<div class="sc"><div style="text-align:center;width:100%"><h3 class="fx" style="font-size:1.5rem;margin-bottom:20px">Qual é a sua profissão?</h3><div class="chips">'+
@@ -385,12 +397,14 @@ var CENAS=[
   go:function(){at(50,function(){$('#tr').classList.add('go');});inn('.fx',900,250);at(2600,function(){var r=$('#ra');if(r){r.style.width=r.style.height='70%';r.style.margin='-35% 0 0 -35%';}});
    falas([[0,'Agora a gente entra na <b>Rede Ideali</b> ✨'],[3000,'Vagas perto de você, com distância e mapa. Dá até para a clínica anunciar como <b>confidencial</b>.'],[8200,'E ainda: clínicas, laboratórios, comércio e cursos. Tudo com o seu currículo pronto para enviar.']]);}},
 
- {cap:'Ideali Odonto',d:14000,fim:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="big"><div class="orb pop" style="width:110px;height:110px"></div><h2 class="fx" style="margin-top:28px">Isso é a <span style="color:#7CF0C8">Ideali Odonto</span>.</h2><p class="fx">A plataforma de toda a odontologia. Chegando em breve.</p><div class="fx" style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cb pri" id="rv">↺ Ver de novo</button><button class="cb" id="fc">Fechar</button></div></div></div>',
+ {cap:'Ideali Odonto',d:14000,fim:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="big"><img class="port pop" src="../app/equipe/ana-av-feliz.webp" alt="Ana"><h2 class="fx" style="margin-top:28px">Isso é a <span style="color:#7CF0C8">Ideali Odonto</span>.</h2><p class="fx">A plataforma de toda a odontologia. Chegando em breve.</p><div class="fx" style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cb pri" id="rv">↺ Ver de novo</button><button class="cb" id="fc">Fechar</button></div></div></div>',
   go:function(){inn('.pop',200);inn('.fx',800,400);at(900,function(){confete(160);});
    $('#rv').onclick=function(){vai(0);};$('#fc').onclick=fecha;
    falas([[0,'E isso é só o começo. Quero muito ter você com a gente 💜'],[4400,'A <b>Ideali Odonto</b> está chegando. Até já!']]);}}
 ];
 
+var POSES=['tranquila','determinada','pensativa','pensativa','determinada','feliz','tranquila','determinada','tranquila','determinada','tranquila','feliz','determinada','tranquila','feliz'];
+(function(){POSES.forEach(function(p){new Image().src='../app/equipe/ana-'+p+'.webp';new Image().src='../app/equipe/ana-av-'+p+'.webp';});})();
 function montaDots(){DOTS.innerHTML=CENAS.map(function(){return '<i></i>';}).join('');}
 function vai(n){limpa();if(n<0)n=0;if(n>=CENAS.length)n=CENAS.length-1;cur=n;var c=CENAS[n];
   PL.classList.toggle('rede',!!c.rede||n===CENAS.length-1&&false);
@@ -398,6 +412,7 @@ function vai(n){limpa();if(n<0)n=0;if(n>=CENAS.length)n=CENAS.length-1;cur=n;var
   Array.prototype.forEach.call(DOTS.children,function(d,i){d.className=i<n?'ok':'';});
   var d=DOTS.children[n];void d.offsetWidth;d.className='at';d.style.setProperty('--d',c.d+'ms');
   document.getElementById('pn').textContent=n===CENAS.length-1?'Fechar':'Próximo ▶';
+  var po=POSES[n]||'tranquila';document.getElementById('anaimg').src='../app/equipe/ana-'+po+'.webp';document.getElementById('anaav').src='../app/equipe/ana-av-'+po+'.webp';
   c.go();restante=c.d;iniT=Date.now();if(!pausado&&!c.fim)fimT=setTimeout(function(){vai(cur+1);},c.d);}
 function abre(){PL.classList.add('on');document.body.style.overflow='hidden';setTimeout(function(){PL.classList.add('vis');},20);pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';montaDots();vai(0);}
 function fecha(){limpa();PL.classList.remove('vis');setTimeout(function(){PL.classList.remove('on');STG.innerHTML='';},500);document.body.style.overflow='';}
