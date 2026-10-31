@@ -472,6 +472,23 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .ls{display:flex;gap:6px;padding:0 16px 16px}.ls span{flex:1;text-align:center;font-size:.76rem;font-weight:700;border-radius:10px;padding:8px 4px;background:#F3F1FA;color:#9a97ad;transition:all .4s}.ls span.on{background:#E3F7F0;color:#1E8A5A}
 @media (min-width:861px){.labr{right:40px}}
 @media (max-width:860px){.pdf .frm{gap:4px}.pdf .inp{min-height:28px;padding:5px 8px;font-size:.78rem}.pdf label{font-size:.68rem}.labr{left:10px;right:10px;width:auto;top:30%}}
+.cmdp{display:flex;flex-direction:column;align-items:center;gap:10px;transition:opacity .6s,transform .6s}
+.cmdp.sai{opacity:0;transform:translateX(-30px)}
+.cmdc{position:relative;width:230px;height:300px;border-radius:26px;background:#2a2f6e;border:2px solid rgba(255,255,255,.2);padding:12px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.papel{height:100%;background:#fdfaf0;border-radius:10px;padding:14px 12px;color:#334;transform:rotate(-2deg);display:flex;flex-direction:column;gap:9px;font-size:.74rem;box-shadow:inset 0 0 0 1px #e8e0c8;background-image:repeating-linear-gradient(#fdfaf0 0 21px,#e6eef8 21px 22px)}
+.papel b{font-size:.72rem;letter-spacing:.04em;color:#1B1830}
+.papel span{color:#556}.papel i{font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive;color:#1f3d8a;font-size:.86rem;font-style:normal}
+.papel .ass{margin-top:auto;text-align:right;font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive;color:#1f3d8a}
+.scan{position:absolute;left:12px;right:12px;top:12px;height:3px;background:#7CF0C8;box-shadow:0 0 18px 6px rgba(124,240,200,.6);opacity:0}
+.scan.on{animation:scan 2s ease-in-out}
+@keyframes scan{0%{top:12px;opacity:1}50%{top:calc(100% - 15px);opacity:1}100%{top:12px;opacity:0}}
+.cmdc .flash{position:absolute;inset:0;background:#fff;opacity:0}.cmdc .flash.on{animation:flash .6s}
+.ialb{font-weight:800;font-size:.9rem;color:#7CF0C8;background:rgba(124,240,200,.1);border:1px solid rgba(124,240,200,.35);border-radius:999px;padding:6px 14px}
+.ialb.ok{background:#7CF0C8;color:#0a0d24}
+.aib{margin-left:auto;font-size:.74rem;font-weight:800;background:#EEEBFD;color:#5B45E0;border-radius:999px;padding:4px 10px;opacity:0;transition:opacity .4s}.aib.in{opacity:1}
+.inp.ai{background:#F3F1FE;border-color:#b9b0f5;animation:aipop .45s}
+@keyframes aipop{0%{transform:scale(.96);background:#d9f7ec}100%{transform:none}}
+@media (max-width:860px){.pdw{flex-direction:column;gap:8px}.cmdp{flex-direction:row}.cmdc{width:120px;height:150px;padding:6px;border-radius:16px}.papel{padding:6px;gap:3px;font-size:.5rem}.papel i{font-size:.56rem}.papel b{font-size:.5rem}.pdw .pdf .wbody{padding:8px}}
 </style>
 <body>
 <header class="top">
@@ -742,15 +759,17 @@ var CENAS=[
    ['f1','f2','f3','f4'].forEach(function(id,i){at(3700+i*1000,function(){var e=$('#'+id);if(e)e.classList.add('on');});});
    falas([[0,'Olha que beleza: o dentista tira a <b>foto na cadeira, com o celular</b>, e ela vai direto para o pedido.'],[5400,'O laboratório recebe <b>na hora</b>, com a cor e as observações. Menos erro, menos retrabalho e ajuste, menos dinheiro jogado fora.']]);}},
 
- {cap:'Pedido para o laboratório',pt:3,who:'ot',p:'serio',d:15000,lab:1,h:'<div class="sc"><div class="pdw"><div class="win pdf" id="pf"><div class="wbar"><span>🧪 Novo pedido para o laboratório</span></div><div class="wbody"><div class="frm">'+
+ {cap:'Pedido para o laboratório',pt:3,who:'ot',p:'serio',d:15000,lab:1,h:'<div class="sc"><div class="pdw"><div class="cmdp fx" id="cp"><div class="cmdc"><div class="papel"><b>COMANDA · Lab Prótese Sul</b><span>Paciente: <i>C. M.</i></span><span>Trabalho: <i>Protocolo acril. sup.</i></span><span>Moldagem: <i>ok ✓</i></span><span>Dentes: <i>Delara A2</i></span><span>Prazo: <i>3 dias · URGENTE</i></span><span class="ass">Dr(a). A.</span></div><div class="scan" id="sc"></div><div class="flash" id="fl2"></div></div><div class="ialb" id="ia">✨ IA lendo a comanda…</div></div><div class="win pdf" id="pf"><div class="wbar"><span>🧪 Novo pedido para o laboratório</span><span class="aib" id="aib">✨ Preenchido pela IA</span></div><div class="wbody"><div class="frm">'+
    [['Paciente','C. M.'],['Trabalho','Protocolo acrilizado superior'],['Moldagem','✓ Feita hoje'],['Dentes','Delara · cor A2'],['Laboratório','Lab Prótese Sul'],['Prazo','3 dias · entrega 03/11']].map(function(f,i){return '<label>'+f[0]+'<span class="inp" id="pq'+i+'" data-t="'+f[1]+'"></span></label>';}).join('')+
    '<label style="grid-column:1/-1">Anexos<span class="anx"><span class="thumb" id="th"><svg viewBox="0 0 60 40"><rect width="60" height="40" fill="#f2c4a0"/><path d="M14 14 Q30 11 46 14 Q44 32 30 33 Q16 32 14 14 Z" fill="#7a1f2b"/><rect x="14" y="13" width="32" height="7" fill="#fbf7ec"/></svg></span><span id="an2" class="anf">📄 Escaneamento.stl</span></span></label>'+
    '<div class="tg" id="ur"><i></i><b style="color:#D2433A">🔴 Urgente</b></div></div><button class="pub" id="pe">Enviar ao laboratório</button></div></div>'+
    '<div class="labr" id="lr"><div class="lh">🧪 Lab Prótese Sul</div><div class="ln">🔔 <b>Novo pedido URGENTE</b><br>Protocolo acrilizado superior · dentes Delara A2<br>Prazo: <b>3 dias</b> · foto e escaneamento anexados</div><div class="ls"><span class="on">Solicitado</span><span id="cs">Coleta agendada 🛵</span></div></div></div></div>',
-  go:function(){$$('.inp').forEach(function(e,i){at(500+i*700,function(){var v=e.getAttribute('data-t'),k=0;(function f(){k++;e.textContent=v.slice(0,k);if(k<v.length&&e.isConnected)setTimeout(f,16);})();});});
-   at(4900,function(){var t=$('#th');if(t)t.classList.add('in');});at(5400,function(){var t=$('#an2');if(t)t.classList.add('in');});at(6000,function(){var u=$('#ur i');if(u)u.classList.add('on');});
-   clica('#pe',6400,function(){var b=$('#pe');if(b){b.textContent='✓ Enviado';b.classList.add('ok');}at(500,function(){var f=$('#pf');if(f)f.classList.add('voa');var l=$('#lr');if(l)l.classList.add('in');});at(2400,function(){var c=$('#cs');if(c)c.classList.add('on');});});
-   falas([[0,'Foto tirada? Agora o <b>pedido</b>: paciente, trabalho, moldagem, <b>dentes Delara cor A2</b>, laboratório e prazo de <b>3 dias</b>.'],[6000,'Marca <b>urgente</b>, anexa a foto e o escaneamento e envia.'],[8600,'O laboratório recebe <b>na hora</b>, com tudo junto, e a coleta já fica agendada. 🛵']]);}},
+  go:function(){inn('.fx',100);at(900,function(){var f=$('#fl2');if(f)f.classList.add('on');});at(1200,function(){var c=$('#sc');if(c)c.classList.add('on');});
+   at(3300,function(){var a=$('#ia');if(a){a.textContent='✓ Comanda lida';a.classList.add('ok');}var b=$('#aib');if(b)b.classList.add('in');});
+   $$('.inp').forEach(function(e,i){at(3500+i*230,function(){e.textContent=e.getAttribute('data-t');e.classList.add('ai');});});
+   at(5000,function(){var t=$('#th');if(t)t.classList.add('in');});at(5300,function(){var t=$('#an2');if(t)t.classList.add('in');});at(5700,function(){var u=$('#ur i');if(u)u.classList.add('on');});
+   clica('#pe',6400,function(){var b=$('#pe');if(b){b.textContent='✓ Enviado';b.classList.add('ok');}at(500,function(){var f=$('#pf');if(f)f.classList.add('voa');var cp=$('#cp');if(cp)cp.classList.add('sai');var l=$('#lr');if(l)l.classList.add('in');});at(2400,function(){var c=$('#cs');if(c)c.classList.add('on');});});
+   falas([[0,'E o pedido? Nem precisa digitar: <b>tire uma foto da comanda</b> de papel…'],[3400,'…e a <b>IA cadastra o pedido sozinha</b>: paciente, trabalho, dentes <b>Delara A2</b>, laboratório e prazo de <b>3 dias, urgente</b>.'],[8600,'O laboratório recebe <b>na hora</b>, com tudo junto, e a coleta já fica agendada. 🛵']]);}},
 
  {cap:'IA vigiando as entregas',pt:3,who:'ot',p:'serio',d:11000,lab:1,h:'<div class="sc"><div class="alr">'+[['⚠️','#D2433A','Pedido #1043 vai atrasar 1 dia','O Lab Digital Centro ainda não iniciou a fresagem. Já avisei o lab e remarquei o paciente das 10h?'],['🕑','#B7791F','Prova da faceta chega hoje às 14h','Paciente C. M. confirmado às 15h. Está tudo encaixado.'],['✅','#1E8A5A','Coroa #1042 saiu para entrega','Previsão: amanhã cedo, dentro do prazo.'],['📈','#5B45E0','Lab Arte Dental: 3 entregas antecipadas este mês','Bom sinal. Ele está melhorando no prazo.']].map(function(a){return '<div class="al fx" style="--c:'+a[1]+'"><span>'+a[0]+'</span><div><b>'+a[2]+'</b><p>'+a[3]+'</p></div></div>';}).join('')+'</div></div>',
   go:function(){inn('.fx',200,700);falas([[0,'E tem uma <b>IA vigiando as entregas</b> 24 horas. Se um pedido vai atrasar, ela avisa <b>antes</b> do paciente chegar.'],[5400,'Prova chegando, trabalho saindo, lab melhorando ou piorando: <b>você fica sabendo de tudo.</b>']]);}},
