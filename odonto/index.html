@@ -5,6 +5,10 @@
 <title>Ideali Odonto · conheça o projeto</title>
 <meta name="robots" content="noindex">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0a0d24">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="A plataforma de toda a odontologia: agenda, pedidos com laboratório, rede de vagas e a Ana, sua assistente de IA.">
 <meta property="og:title" content="Ideali Odonto · conheça o projeto">
 <meta property="og:description" content="Agenda, pedidos com laboratório, rede de vagas e a Ana, sua assistente de IA. Para toda a odontologia.">
@@ -567,6 +571,14 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .bigl{width:110px;height:110px;margin:0 auto;border-radius:30px;background:linear-gradient(140deg,#5B45E0,#7B5CF2);display:grid;place-items:center;box-shadow:0 0 60px rgba(124,240,200,.35),0 0 0 4px rgba(124,240,200,.5)}
 .bigl i{font:800 3.6rem var(--f-display);font-style:normal;color:#fff}
 @media (max-width:860px){.bigl{width:72px;height:72px;border-radius:20px}.bigl i{font-size:2.4rem}.ana .bal.lg{font-size:.8rem;line-height:1.38}}
+.tps{background:transparent;color:#C9D0FF;border:1px solid rgba(255,255,255,.2);margin-top:8px}
+@media (max-width:860px){
+  .pl-top{padding:8px 12px}
+  .pl-top .logo{font-size:.95rem;gap:7px}.pl-top .logo i{width:24px;height:24px;font-size:.8rem}
+  #px{display:none}
+  .pl-t{width:40px;height:40px;padding:0;border-radius:12px;font-size:1.2rem}.pl-t .tx{display:none}
+  .ana,.ana .bal{height:120px}
+}
 </style>
 <body>
 <header class="top">
@@ -614,7 +626,7 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 <!-- PLAYER -->
 <div id="pl" role="dialog" aria-label="Apresentação Ideali Odonto">
   <div class="bg"></div>
-  <div class="pl-top"><span class="logo"><i>i</i>Ideali <small>Odonto</small></span><span class="pl-cap" id="cap"></span><span class="pl-r"><button class="pl-t" id="ptp">☰ Tópicos</button><button class="pl-x" id="px" aria-label="Fechar">✕</button></span></div><div class="tpc" id="tpc"></div>
+  <div class="pl-top"><span class="logo"><i>i</i>Ideali <small>Odonto</small></span><span class="pl-cap" id="cap"></span><span class="pl-r"><button class="pl-t" id="ptp" aria-label="Tópicos"><span class="hb">☰</span><span class="tx"> Tópicos</span></button><button class="pl-x" id="px" aria-label="Fechar">✕</button></span></div><div class="tpc" id="tpc"></div>
   <div class="pl-main">
     <div class="ana" id="ana"><div class="anaf"><img id="anaimg" src="../app/equipe/ana-tranquila.webp" alt="Ana"></div><img class="anaav" id="anaav" src="../app/equipe/ana-av-tranquila.webp" alt="Ana"><div class="nm" id="anm">Ana<small>sua assistente de IA</small></div><div class="bal" id="bal"></div></div>
     <div class="stage" id="stg"></div>
@@ -957,8 +969,9 @@ function vai(n){limpa();if(n<0)n=0;if(n>=CENAS.length)n=CENAS.length-1;cur=n;var
   document.getElementById('pn').textContent=n===CENAS.length-1?'Fechar':'Próximo ▶';
   var po=c.p||'tranquila',qm=c.who==='ot'?'otavio':c.who==='mi'?'mica':c.who==='bi'?'bia':'ana';document.getElementById('anaimg').src='../app/equipe/'+qm+'-'+po+'.webp';document.getElementById('anaav').src='../app/equipe/'+qm+'-av-'+po+'.webp';document.getElementById('anm').innerHTML={ot:'Sr. Otávio<small>o gerente</small>',mi:'Mika<small>do marketing</small>',bi:'Bia<small>do financeiro</small>'}[c.who]||'Ana<small>sua assistente de IA</small>';PL.classList.toggle('lab',!!c.lab);PL.classList.toggle('mk',!!c.mk);ANA.classList.toggle('ot',c.who==='ot');ANA.classList.toggle('mi',c.who==='mi'||c.who==='bi');
   FIMFALA=0;c.go();var dd=Math.max(c.d,FIMFALA);d.style.setProperty('--d',dd+'ms');restante=dd;iniT=Date.now();if(!pausado&&!c.fim)fimT=setTimeout(function(){vai(cur+1);},dd);}
-function abre(){PL.classList.add('on');document.body.style.overflow='hidden';setTimeout(function(){PL.classList.add('vis');},20);pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';montaDots();vai(0);}
-function fecha(){limpa();PL.classList.remove('vis');setTimeout(function(){PL.classList.remove('on');STG.innerHTML='';},500);document.body.style.overflow='';}
+function telaCheia(on){try{var d=document,e=d.documentElement;if(on){if(innerWidth<=860&&!d.fullscreenElement&&e.requestFullscreen)e.requestFullscreen({navigationUI:'hide'}).catch(function(){});}else if(d.fullscreenElement&&d.exitFullscreen)d.exitFullscreen().catch(function(){});}catch(x){}}
+function abre(){telaCheia(1);PL.classList.add('on');document.body.style.overflow='hidden';setTimeout(function(){PL.classList.add('vis');},20);pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';montaDots();vai(0);}
+function fecha(){telaCheia(0);limpa();PL.classList.remove('vis');setTimeout(function(){PL.classList.remove('on');STG.innerHTML='';},500);document.body.style.overflow='';}
 function pausa(){var c=CENAS[cur];if(!pausado){pausado=true;PL.classList.add('pause');clearTimeout(fimT);restante-=Date.now()-iniT;document.getElementById('pp').textContent='▶';}
   else{pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';iniT=Date.now();if(!c.fim)fimT=setTimeout(function(){vai(cur+1);},Math.max(800,restante));}}
 Array.prototype.forEach.call(document.querySelectorAll('[data-play]'),function(b){b.onclick=abre;});
@@ -966,10 +979,11 @@ document.getElementById('px').onclick=fecha;
 var PARTES={1:'Parte 1 · A Ideali',2:'Parte 2 · Como funciona',3:'Parte 3 · Laboratório',4:'Parte 4 · Gestão, marketing e comércio',9:'Encerramento'};
 function topicos(){var T2=document.getElementById('tpc');if(T2.classList.contains('on')){T2.classList.remove('on');return;}
   var g={};CENAS.forEach(function(c,i){var k=c.fim?9:c.pt;(g[k]=g[k]||[]).push([i,c.cap]);});
-  T2.innerHTML='<div class="tpb"><div class="tph"><b>Tópicos</b><button id="tpx">✕</button></div>'+Object.keys(g).map(function(k){return '<div class="tpg"><div class="tpl">'+PARTES[k]+'</div>'+g[k].map(function(x){return '<button data-ti="'+x[0]+'" class="'+(x[0]===cur?'on':'')+'">'+x[1]+'</button>';}).join('')+'</div>';}).join('')+'<button class="tpd" data-demo2>👆 Pular para Experimentar a plataforma</button></div>';
+  T2.innerHTML='<div class="tpb"><div class="tph"><b>Tópicos</b><button id="tpx">✕</button></div>'+Object.keys(g).map(function(k){return '<div class="tpg"><div class="tpl">'+PARTES[k]+'</div>'+g[k].map(function(x){return '<button data-ti="'+x[0]+'" class="'+(x[0]===cur?'on':'')+'">'+x[1]+'</button>';}).join('')+'</div>';}).join('')+'<button class="tpd" data-demo2>👆 Pular para Experimentar a plataforma</button><button class="tpd tps" data-sair>✕ Sair da apresentação</button></div>';
   T2.classList.add('on');if(!pausado)pausa();}
 document.getElementById('ptp').onclick=topicos;
 document.getElementById('tpc').addEventListener('click',function(e){var T2=this,b=e.target.closest('button');if(e.target===T2||(b&&b.id==='tpx')){T2.classList.remove('on');return;}if(!b)return;
+  if(b.hasAttribute('data-sair')){T2.classList.remove('on');fecha();return;}
   if(b.hasAttribute('data-demo2')){T2.classList.remove('on');abreDemo();return;}var i=+b.getAttribute('data-ti');T2.classList.remove('on');if(pausado)pausa();vai(i);});
 document.getElementById('pv').onclick=function(){vai(cur-1);};
 document.getElementById('pn').onclick=function(){if(cur===CENAS.length-1)fecha();else vai(cur+1);};
