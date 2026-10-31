@@ -504,6 +504,26 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .ncard{background:#fff;color:#1B1830;border-radius:20px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.35)}
 .nh{color:#fff;font-weight:800;padding:10px 16px;font-size:.9rem}.nb{padding:14px 16px}.nb>b{display:block;font:800 1.02rem var(--f-display);line-height:1.3;margin-bottom:6px}
 @media (max-width:860px){.avl2{grid-template-columns:1fr;gap:8px}.avl2 .dsv,.avl2 .ix{display:none}.nb{padding:10px}.nb>b{font-size:.85rem}.avl2 .acons{font-size:.8rem;padding:8px}.avl2 .anota{display:block;font-size:.72rem}}
+#pl.mk .bg{background:radial-gradient(ellipse 80% 70% at 60% 60%,#4a1a4e 0%,#25103a 50%,#0e0818 100%)}
+#pl.mk .dots i.ok,#pl.mk .dots i.at::after{background:#FF8ED0}
+#pl.mk .bal b{color:#FF8ED0}#pl.mk .pl-cap{color:#FF8ED0}
+.ana.mi .anaf::before{background:radial-gradient(circle,rgba(255,142,208,.3),transparent 70%)}.ana.mi .anaav{border-color:#FF8ED0}
+.tr.tl4{background:radial-gradient(circle,#FF8ED0 0%,#4a1a4e 40%,transparent 70%)}
+.mkc span{background:rgba(255,142,208,.12);border-color:rgba(255,142,208,.4)}
+.setr{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.st4{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-top:4px solid var(--c);border-radius:16px;padding:12px}
+.st4>b{display:block;font:800 1rem var(--f-display);margin-bottom:8px}
+.st4 div{display:flex;flex-wrap:wrap;gap:5px}
+.st4 span{font-size:.78rem;font-weight:600;background:rgba(255,255,255,.08);border-radius:999px;padding:4px 10px;opacity:0;transform:scale(.6);transition:all .35s cubic-bezier(.3,1.6,.5,1)}
+.st4 span.in{opacity:1;transform:none}
+.p4g{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:960px}.p4g .win{max-width:none}
+.fun4 div{display:grid;grid-template-columns:1fr 90px 30px;gap:8px;align-items:center;margin-bottom:6px;font-size:.82rem}
+.fun4 i{height:14px;border-radius:6px;background:#ECEAF3;position:relative;overflow:hidden}.fun4 i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#3A96EC,#7CF0C8);transform-origin:left;transform:scaleX(0);transition:transform 1.2s}.fun4 i.in::after{transform:scaleX(var(--v))}
+.fun4 b{text-align:right}
+.cal4 div{display:flex;align-items:center;gap:8px;margin-bottom:6px}.cal4 code{width:30px;font-size:.75rem;color:#9a97ad}.cal4 span{flex:1;color:#fff;border-radius:8px;padding:5px 9px;font-weight:600;font-size:.8rem}
+.kp2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.kp2 div{background:#F6F5F8;border-radius:10px;padding:8px}.kp2 small{display:block;color:#625E75;font-size:.72rem}.kp2 b{font:800 1.05rem var(--f-display)}
+@media (max-width:860px){.setr{grid-template-columns:1fr 1fr;gap:6px}.st4{padding:8px}.st4>b{font-size:.78rem}.st4 span{font-size:.62rem;padding:2px 6px}.st4 span:nth-child(n+4){display:none}
+ .p4g{grid-template-columns:1fr;gap:6px}.p4g .win:nth-child(n+3){display:none}}
 </style>
 <body>
 <header class="top">
@@ -606,6 +626,14 @@ var FREL=[
  ['🛠️ Serviço','#3A96EC','Técnico em cadeira odontológica','Manutenção mensal'],
  ['❄️ Serviço','#3A96EC','Técnico em ar-condicionado','Manutenção mensal da clínica'],
  ['🎬 Freela','#DD5A9E','Filmmaker para gravação na clínica','Dia 15/nov · 4 horas']
+];
+var SETORES=[
+ ['🏢','Gerência e administrativo','#5B45E0',['Gerente de clínica','Coordenador de unidade','Administrativo','RH e departamento pessoal','Compras e estoque']],
+ ['💰','Financeiro','#1DAE8A',['Analista financeiro','Faturamento de convênios','Contas a pagar e receber','Cobrança']],
+ ['📞','Atendimento','#3A96EC',['Recepção','CRC','Atendimento de leads','Agendamento e confirmação','Pós-atendimento']],
+ ['🤝','Comercial','#F0A53A',['Consultor de vendas','Orçamentos e negociação','Comercial de laboratório','Parcerias com empresas']],
+ ['📣','Marketing','#DD5A9E',['Social media','Designer','Tráfego pago','Filmmaker','Fotógrafo','Copywriter']],
+ ['🏭','Indústria e comércio','#B7791F',['Representante comercial','Vendedor de dental','Técnico de equipamentos','Promotor de vendas','Especialista de produto']]
 ];
 var CENAS=[
 /* ================= PARTE 1 · A IDEALI ================= */
@@ -837,20 +865,49 @@ var CENAS=[
   go:function(){inn('.fx',100,250);at(900,function(){cnt($('#e0'),1440);cnt($('#e1'),17280);cnt($('#e2'),35);});at(2600,function(){confete(140);});
    falas([[0,'E o melhor: eu faço a <b>projeção de economia</b>. Se você mudar parte dos trabalhos de laboratório, quanto sobra no fim do mês?'],[5600,'Dinheiro que estava indo embora e <b>volta para o caixa</b>. Isso, sim, merece um presente! 🎁'],[9800,'Bom, vou voltar para o meu café. <b>Ana, é com você!</b> ☕']]);}},
 
+/* ================= PARTE 4 · GESTÃO, MARKETING E COMÉRCIO (Mika e Bia) ================= */
+ {cap:'Quem faz a clínica girar',pt:4,who:'mi',p:'megafone',d:11000,mk:1,h:'<div class="tr tl4" id="tr"></div><div class="sc"><div class="big"><div class="sl-k fx" style="color:#FF8ED0">Parte 4 · Gestão, marketing e comércio</div><h2 class="fx">Quem faz a clínica <span style="color:#FF8ED0">girar</span>.</h2><p class="fx">Gerência, administrativo, financeiro, atendimento, comercial, marketing, indústria e comércio. Também têm vez na Ideali.</p><div class="lbchips mkc fx"><span>🏢 Gerência</span><span>📋 Administrativo</span><span>💰 Financeiro</span><span>📞 Atendimento</span><span>🤝 Comercial</span><span>📣 Marketing</span><span>🏭 Indústria e comércio</span></div></div></div>',
+  go:function(){at(50,function(){$('#tr').classList.add('go');});inn('.fx',700,300);
+   falas([[0,'Ôôô, minha vez! 📣 Eu sou a <b>Mika</b>, do marketing. E agora a gente fala de quem faz a clínica <b>girar</b>.'],[5400,'Porque clínica não é só cadeira: tem <b>gerência, financeiro, atendimento, comercial, marketing</b>… e muita vaga nessas áreas!']]);}},
+
+ {cap:'Os cargos',pt:4,who:'mi',p:'ideia',d:14000,mk:1,h:'<div class="sc"><div class="sl">'+L('Os cargos de cada setor')+'<div class="setr">'+SETORES.map(function(g){return '<div class="st4 fx" style="--c:'+g[2]+'"><b>'+g[0]+' '+g[1]+'</b><div>'+g[3].map(function(c){return '<span>'+c+'</span>';}).join('')+'</div></div>';}).join('')+'</div></div></div>',
+  go:function(){inn('.fx',100,220);$$('.st4 span').forEach(function(e,i){at(700+i*55,function(){e.classList.add('in');});});
+   falas([[0,'Olha quanta gente! <b>Gerência e administrativo</b>, <b>financeiro</b>, <b>atendimento</b> com recepção, CRC e leads…'],[5200,'…<b>comercial</b>, <b>marketing</b> com social media, designer, tráfego, <b>filmmaker</b> e fotógrafo…'],[9600,'…e a <b>indústria e o comércio</b>: representantes, vendedores, técnicos de equipamento. <b>Cada um com o seu perfil e as suas vagas.</b>']]);}},
+
+ {cap:'Vagas e freelas',pt:4,who:'mi',p:'animada',d:13000,mk:1,h:'<div class="sc"><div class="sl">'+L('Vagas e freelas dessas áreas')+'<div class="frl">'+[['📣 Freela','#DD5A9E','Social media para clínica','3 posts por semana · remoto'],['🎬 15/nov','#DD5A9E','Filmmaker para vídeo institucional','4 horas · Centro'],['📸 Freela','#DD5A9E','Fotógrafo de antes e depois','Sábado · Zona Sul'],['📞 CLT','#3A96EC','CRC e atendimento de leads','Clínica · Campinas'],['🏢 CLT','#5B45E0','Gerente de clínica','Rede com 3 unidades'],['💰 Meio período','#1DAE8A','Financeiro e faturamento de convênios','Bairro Jardim'],['🤝 CLT','#F0A53A','Representante comercial odontológico','Região de Campinas'],['🛠️ Serviço','#3A96EC','Técnico de equipamentos','Autoclave e compressor']].map(function(f){return '<div class="fr pop"><span class="fb" style="background:'+f[1]+'">'+f[0]+'</span><b>'+f[2]+'</b><small>'+f[3]+'</small></div>';}).join('')+'</div></div></div>',
+  go:function(){inn('.fx',100);$$('.fr').forEach(function(e,i){at(500+i*350,function(){e.classList.add('in');});});
+   falas([[0,'E as <b>vagas</b>? Tem de tudo: social media, <b>filmmaker</b>, fotógrafo de antes e depois, CRC, gerente…'],[6000,'Fixo, meio período ou <b>freela</b> por dia. E quem é de marketing, como eu, monta o <b>portfólio</b> direto no perfil. 😎']]);}},
+
+ {cap:'Painel por setor',pt:4,who:'mi',p:'gravando',d:14000,mk:1,h:'<div class="sc"><div class="p4g">'+
+   '<div class="win fx"><div class="apb" style="background:#3A96EC">📞 Atendimento · leads</div><div class="wbody mini"><div class="fun4">'+[['Novos',24],['Em contato',15],['Agendados',9],['Compareceram',7]].map(function(f,i){return '<div><i style="--v:'+(100-i*22)+'%"></i><span>'+f[0]+'</span><b>'+f[1]+'</b></div>';}).join('')+'</div></div></div>'+
+   '<div class="win fx"><div class="apb" style="background:#DD5A9E">📣 Marketing · calendário</div><div class="wbody mini"><div class="cal4">'+[['Seg','Antes e depois','#DD5A9E'],['Qua','Dica de higiene','#5B45E0'],['Sex','Vídeo da equipe 🎬','#F0A53A'],['Sáb','Depoimento*','#1DAE8A']].map(function(c){return '<div><code>'+c[0]+'</code><span style="background:'+c[2]+'">'+c[1]+'</span></div>';}).join('')+'</div><small style="color:#9a97ad">*com autorização do paciente</small></div></div>'+
+   '<div class="win fx"><div class="apb" style="background:#1DAE8A">💰 Financeiro</div><div class="wbody mini"><div class="kp2"><div><small>A receber</small><b>R$ 42.300</b></div><div><small>Convênios</small><b>R$ 11.800</b></div><div><small>Em atraso</small><b style="color:#D2433A">R$ 3.150</b></div></div></div></div>'+
+   '<div class="win fx"><div class="apb" style="background:#F0A53A">🤝 Comercial · orçamentos</div><div class="wbody mini"><div class="kp2"><div><small>Enviados</small><b>18</b></div><div><small>Aprovados</small><b style="color:#1E8A5A">11</b></div><div><small>Em negociação</small><b>5</b></div></div></div></div></div></div>',
+  go:function(){inn('.fx',100,300);at(800,function(){$$('.fun4 i').forEach(function(e){e.classList.add('in');});});
+   falas([[0,'E quem trabalha nessas áreas tem o <b>painel do seu setor</b>: atendimento com o funil de leads, marketing com o calendário de posts…'],[6200,'…financeiro com o que entra e o que está atrasado, e comercial com os orçamentos. <b>Cada um com a sua ferramenta.</b>']]);}},
+
+ {cap:'Financeiro',pt:4,who:'bi',p:'dinheiro',d:11000,mk:1,h:'<div class="sc"><div class="sl" style="max-width:820px">'+L('Com a Bia, do financeiro')+'<div class="alr">'+[['💸','#1DAE8A','3 pacientes com parcela vencendo amanhã','Quer que eu mande o lembrete pelo WhatsApp?'],['🧾','#5B45E0','Faturamento de convênio fecha sexta','12 guias prontas, 2 com pendência de assinatura.'],['📉','#D2433A','Gastos com material subiram 9% no mês','Maior aumento: luvas e anestésico.']].map(function(a){return '<div class="al fx" style="--c:'+a[1]+'"><span>'+a[0]+'</span><div><b>'+a[2]+'</b><p>'+a[3]+'</p></div></div>';}).join('')+'</div></div></div>',
+  go:function(){inn('.fx',200,600);falas([[0,'Oi! Eu sou a <b>Bia</b>, do financeiro 🤑 Eu ajudo quem cuida do dinheiro da clínica.'],[4600,'Parcela vencendo, convênio para faturar, gasto que subiu: <b>eu aviso antes de virar problema.</b>']]);}},
+
+ {cap:'Indústria e comércio',pt:4,who:'mi',p:'novo',d:13000,mk:1,h:'<div class="sc"><div class="vg"><div>'+L('Indústria e comércio')+[['🏥','#5B45E0','Clínica Sorriso Centro','Cliente · última visita há 32 dias','Visitar'],['🧪','#1DAE8A','Laboratório Arte Dental','Pediu orçamento de zircônia','Responder'],['🏥','#3A96EC','Clínica Bem Estar','Nova na região · 2 km','Apresentar'],['🛠️','#F0A53A','Chamado técnico','Autoclave · Clínica Jardim','Agendar']].map(function(v){return '<div class="vc fx"><div class="ic" style="background:'+v[1]+'">'+v[0]+'</div><div><b>'+v[2]+'</b><small>'+v[3]+'</small></div><span class="km" style="color:#FF8ED0">'+v[4]+' ›</span></div>';}).join('')+'</div>'+
+   '<div class="mapa fx" style="background:#2a1236"><svg viewBox="0 0 400 300" preserveAspectRatio="none"><path d="M0 220 Q120 180 200 210 T400 190" stroke="rgba(255,142,208,.18)" stroke-width="2" fill="none"/><path d="M60 0 Q90 150 40 300" stroke="rgba(255,142,208,.14)" stroke-width="2" fill="none"/><path d="M300 0 Q250 140 330 300" stroke="rgba(255,142,208,.14)" stroke-width="2" fill="none"/></svg>'+
+   '<div class="pin eu" style="left:50%;top:50%"></div>'+[[30,35],[68,62],[62,28],[22,72],[78,40],[40,80]].map(function(p,i){return '<div class="pin" style="left:'+p[0]+'%;top:'+p[1]+'%;background:#FF8ED0;animation-delay:'+(i*.3)+'s"></div>';}).join('')+'<div class="eta" style="left:auto;right:12px">📍 6 clínicas na sua rota hoje</div></div></div></div>',
+  go:function(){inn('.fx',100,200);falas([[0,'E para quem é da <b>indústria e do comércio</b>: representantes, vendedores e técnicos.'],[4600,'Clientes no mapa, quem está sem visita, pedidos de orçamento, chamados técnicos e <b>clínicas novas na região</b> para apresentar. Tudo na rota do dia.']]);}},
+
  {cap:'Ideali Odonto',pt:2,p:'feliz',d:14000,fim:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="big"><img class="port pop" src="../app/equipe/ana-av-feliz.webp" alt="Ana"><h2 class="fx" style="margin-top:22px">Isso é a <span class="mt">Ideali Odonto</span>.</h2><p class="fx">Onde a odontologia contrata, aprende e cresce. Chegando em breve.</p><div class="fx" style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cb pri" id="xp1">👆 Experimentar agora</button><button class="cb" id="rv">↺ Ver de novo</button><button class="cb" id="fc">Fechar</button></div></div></div>',
   go:function(){inn('.pop',200);inn('.fx',700,300);at(800,function(){confete(160);});$('#rv').onclick=function(){vai(0);};$('#fc').onclick=fecha;$('#xp1').onclick=function(){abreDemo();};
    falas([[0,'E isso é só o começo. Quero muito ter você com a gente nessa 💜'],[4200,'Agora é a sua vez: toque em <b>Experimentar agora</b> e use a plataforma como se fosse sua 👆']]);}}
 ];
 
-(function(){['serio','satisfeito','bravo','presente'].forEach(function(p){new Image().src='../app/equipe/otavio-'+p+'.webp';new Image().src='../app/equipe/otavio-av-'+p+'.webp';});['tranquila','feliz','pensativa','determinada'].forEach(function(p){new Image().src='../app/equipe/ana-'+p+'.webp';new Image().src='../app/equipe/ana-av-'+p+'.webp';});})();
+(function(){['megafone','ideia','animada','gravando','novo'].forEach(function(p){new Image().src='../app/equipe/mica-'+p+'.webp';new Image().src='../app/equipe/mica-av-'+p+'.webp';});new Image().src='../app/equipe/bia-dinheiro.webp';new Image().src='../app/equipe/bia-av-dinheiro.webp';['serio','satisfeito','bravo','presente'].forEach(function(p){new Image().src='../app/equipe/otavio-'+p+'.webp';new Image().src='../app/equipe/otavio-av-'+p+'.webp';});['tranquila','feliz','pensativa','determinada'].forEach(function(p){new Image().src='../app/equipe/ana-'+p+'.webp';new Image().src='../app/equipe/ana-av-'+p+'.webp';});})();
 function montaDots(){DOTS.innerHTML=CENAS.map(function(){return '<i></i>';}).join('');}
 function vai(n){limpa();if(n<0)n=0;if(n>=CENAS.length)n=CENAS.length-1;cur=n;var c=CENAS[n];
   PL.classList.toggle('rede',!!c.rede||n===CENAS.length-1&&false);
-  STG.innerHTML=c.h;document.getElementById('cap').textContent=(c.fim?'Encerramento':c.pt===1?'Parte 1 · A Ideali':c.pt===3?'Parte 3 · Laboratório':'Parte 2 · Como funciona')+' · '+c.cap;
+  STG.innerHTML=c.h;document.getElementById('cap').textContent=(c.fim?'Encerramento':c.pt===1?'Parte 1 · A Ideali':c.pt===3?'Parte 3 · Laboratório':c.pt===4?'Parte 4 · Gestão e comércio':'Parte 2 · Como funciona')+' · '+c.cap;
   Array.prototype.forEach.call(DOTS.children,function(d,i){d.className=i<n?'ok':'';});
   var d=DOTS.children[n];void d.offsetWidth;d.className='at';d.style.setProperty('--d',c.d+'ms');
   document.getElementById('pn').textContent=n===CENAS.length-1?'Fechar':'Próximo ▶';
-  var po=c.p||'tranquila',qm=c.who==='ot'?'otavio':'ana';document.getElementById('anaimg').src='../app/equipe/'+qm+'-'+po+'.webp';document.getElementById('anaav').src='../app/equipe/'+qm+'-av-'+po+'.webp';document.getElementById('anm').innerHTML=c.who==='ot'?'Sr. Otávio<small>o gerente</small>':'Ana<small>sua assistente de IA</small>';PL.classList.toggle('lab',!!c.lab);ANA.classList.toggle('ot',c.who==='ot');
+  var po=c.p||'tranquila',qm=c.who==='ot'?'otavio':c.who==='mi'?'mica':c.who==='bi'?'bia':'ana';document.getElementById('anaimg').src='../app/equipe/'+qm+'-'+po+'.webp';document.getElementById('anaav').src='../app/equipe/'+qm+'-av-'+po+'.webp';document.getElementById('anm').innerHTML={ot:'Sr. Otávio<small>o gerente</small>',mi:'Mika<small>do marketing</small>',bi:'Bia<small>do financeiro</small>'}[c.who]||'Ana<small>sua assistente de IA</small>';PL.classList.toggle('lab',!!c.lab);PL.classList.toggle('mk',!!c.mk);ANA.classList.toggle('ot',c.who==='ot');ANA.classList.toggle('mi',c.who==='mi'||c.who==='bi');
   c.go();restante=c.d;iniT=Date.now();if(!pausado&&!c.fim)fimT=setTimeout(function(){vai(cur+1);},c.d);}
 function abre(){PL.classList.add('on');document.body.style.overflow='hidden';setTimeout(function(){PL.classList.add('vis');},20);pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';montaDots();vai(0);}
 function fecha(){limpa();PL.classList.remove('vis');setTimeout(function(){PL.classList.remove('on');STG.innerHTML='';},500);document.body.style.overflow='';}
