@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ideali Odonto · conheça o projeto</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="A plataforma de toda a odontologia: agenda, pedidos com laboratório, rede de vagas e a Ana, sua assistente de IA.">
+<meta property="og:title" content="Ideali Odonto · conheça o projeto">
+<meta property="og:description" content="Agenda, pedidos com laboratório, rede de vagas e a Ana, sua assistente de IA. Para toda a odontologia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--bg:#F6F5F8;--surface:#FFFFFF;--ink:#1B1830;--muted:#625E75;--line:#E2DFEA;--accent:#5B45E0;--accent-ink:#fff;--accent-soft:#EEEBFD;
+  --mint:#1DAE8A;--mint2:#7CF0C8;--navy:#0d1030;--gold:#F0A53A;
+  --paint:linear-gradient(90deg,#EF5F5A,#F0A53A,#1DAE8A,#3A96EC,#7B5CF2,#DD5A9E);
+  --f-display:"Plus Jakarta Sans",system-ui,"Segoe UI",Arial,sans-serif;--f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121019;--surface:#1B1826;--ink:#ECEAF4;--muted:#A39FB6;--line:#2D2940;--accent:#9E8CFF;--accent-ink:#121019;--accent-soft:#2A2450;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121019;--surface:#1B1826;--ink:#ECEAF4;--muted:#A39FB6;--line:#2D2940;--accent:#9E8CFF;--accent-ink:#121019;--accent-soft:#2A2450;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";display:block;height:3px;background:var(--paint)}
+a{color:inherit}button{font:inherit;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 16px;max-width:1180px;margin:0 auto}
+.logo{display:inline-flex;align-items:center;gap:9px;font:800 1.1rem var(--f-display);text-decoration:none}
+.logo i{width:28px;height:28px;border-radius:9px;background:#5B45E0;color:#fff;display:grid;place-items:center;font-style:normal;font-size:.95rem}
+.logo small{font:600 .7rem var(--f-mono);letter-spacing:.08em;color:var(--mint);text-transform:uppercase;margin-left:2px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;font:700 .95rem var(--f-body);text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);white-space:nowrap}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.eyebrow{font:600 .76rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1,h2,h3{font-family:var(--f-display);letter-spacing:-.02em;line-height:1.1;margin:0}
+/* HERO */
+.hero{position:relative;overflow:hidden;border-radius:28px;margin:8px 16px 0;padding:72px 24px 80px;text-align:center;color:#fff;
+  background:radial-gradient(ellipse 70% 60% at 50% 70%,#2d2b8f 0%,#151a4c 50%,#0a0d24 100%)}
+.hero h1{font-size:clamp(2.3rem,6vw,4.4rem);font-weight:800;max-width:900px;margin:18px auto 0}
+.hero h1 em{font-style:normal;color:var(--mint2)}
+.hero p{max-width:640px;margin:18px auto 0;color:#C9D0FF;font-size:1.12rem}
+.hero .eyebrow{color:var(--mint2)}
+.orb{width:120px;height:120px;border-radius:50%;margin:0 auto;position:relative;
+  background:radial-gradient(circle at 35% 30%,#d6fff1,#7CF0C8 18%,#5B45E0 55%,#241a6b);box-shadow:0 0 70px rgba(124,240,200,.5);animation:resp 3.2s ease-in-out infinite}
+.orb::before,.orb::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:2px solid rgba(124,240,200,.35);animation:onda 3.2s ease-out infinite}
+.orb::after{animation-delay:1.6s}
+@keyframes resp{50%{transform:scale(1.06);box-shadow:0 0 100px rgba(124,240,200,.7)}}
+@keyframes onda{from{transform:scale(.9);opacity:.9}to{transform:scale(1.6);opacity:0}}
+.play{margin-top:34px;display:inline-flex;align-items:center;gap:14px;padding:18px 30px 18px 18px;border-radius:999px;border:0;background:#fff;color:#1B1830;font:800 1.15rem var(--f-display);box-shadow:0 18px 50px rgba(0,0,0,.35);transition:transform .2s}
+.play:hover{transform:translateY(-2px) scale(1.02)}
+.play b{width:48px;height:48px;border-radius:50%;background:#5B45E0;color:#fff;display:grid;place-items:center;font-size:1.1rem}
+.hero .dur{display:block;margin-top:14px;font:600 .78rem var(--f-mono);color:#8E9AD8;letter-spacing:.06em}
+.stars i{position:absolute;border-radius:50%;background:#fff;animation:pisca 3s ease-in-out infinite}
+@keyframes pisca{50%{opacity:.15}}
+/* SEÇÕES */
+.sec{padding:72px 0 8px}
+.sec h2{font-size:clamp(1.7rem,3.6vw,2.5rem);margin-top:8px;max-width:760px}
+.sec .lead{color:var(--muted);max-width:680px;margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:28px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px}
+.card .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:1.4rem}
+.card h3{font-size:1.12rem;margin-top:14px}
+.card p{color:var(--muted);margin:6px 0 0;font-size:.97rem}
+.profs{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.profs span{padding:10px 16px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:600}
+.final{margin:72px 16px 0;border-radius:28px;padding:56px 24px;text-align:center;background:var(--navy);color:#fff}
+.final h2{font-size:clamp(1.7rem,4vw,2.6rem);margin:0 auto;max-width:720px}
+.final p{color:#C9D0FF;max-width:560px;margin:12px auto 0}
+footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9rem}
+
+/* ===== PLAYER ===== */
+#pl{position:fixed;inset:0;z-index:50;background:#0a0d24;color:#fff;display:none;flex-direction:column;opacity:0;transition:opacity .5s}
+#pl.on{display:flex}#pl.vis{opacity:1}
+#pl .bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 60% 60%,#262684 0%,#131848 50%,#090b20 100%);transition:background 1s}
+#pl.rede .bg{background:radial-gradient(ellipse 80% 70% at 60% 60%,#0f3b58 0%,#0b1c3c 50%,#050a18 100%)}
+.pl-top{position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;gap:10px}
+.pl-top .logo{color:#fff}
+.pl-x{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-size:1.2rem}
+.pl-cap{font:600 .72rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mint2)}
+.pl-main{position:relative;flex:1;display:grid;grid-template-columns:330px 1fr;gap:28px;padding:6px 28px 8px;min-height:0}
+.ana{display:flex;flex-direction:column;justify-content:center;gap:22px}
+.ana .orb{width:92px;height:92px;margin:0}
+.ana.fala .orb{animation:resp .9s ease-in-out infinite}
+.ana .nm{font:800 1.3rem var(--f-display)}.ana .nm small{display:block;font:500 .85rem var(--f-body);color:var(--mint2)}
+.bal{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:6px 22px 22px 22px;padding:18px 20px;font-size:1.12rem;line-height:1.5;min-height:120px;backdrop-filter:blur(6px)}
+.bal b{color:var(--mint2);font-weight:700}
+.bal .cur{display:inline-block;width:2px;height:1.05em;background:var(--mint2);vertical-align:-2px;margin-left:2px;animation:pisca .8s steps(1) infinite}
+.stage{position:relative;border-radius:24px;overflow:hidden;min-height:0;display:flex;align-items:center;justify-content:center}
+.pl-bot{position:relative;display:flex;align-items:center;gap:14px;padding:12px 28px 20px}
+.dots{flex:1;display:flex;gap:6px}
+.dots i{flex:1;height:5px;border-radius:5px;background:rgba(255,255,255,.14);overflow:hidden;position:relative}
+.dots i.ok{background:var(--mint2)}
+.dots i.at::after{content:"";position:absolute;inset:0;background:var(--mint2);transform-origin:left;animation:barra var(--d,8s) linear forwards}
+#pl.pause .dots i.at::after{animation-play-state:paused}
+@keyframes barra{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.cb{height:46px;min-width:46px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#fff;font-weight:700}
+.cb.pri{background:#fff;color:#1B1830;border-color:#fff}
+@media (max-width:860px){
+  .pl-main{grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:12px;padding:0 14px}
+  .ana{flex-direction:row;align-items:flex-start;gap:12px}
+  .ana .orb{width:52px;height:52px;flex:none}.ana .nm{display:none}
+  .bal{font-size:.98rem;min-height:0;padding:12px 14px;flex:1}
+  .pl-bot{padding:10px 14px 16px}.cb{padding:0 14px}
+  .pl-cap{display:none}
+}
+
+/* ===== peças das cenas ===== */
+.sc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px}
+.fx{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s cubic-bezier(.2,.8,.2,1)}
+.fx.in{opacity:1;transform:none}
+.pop{opacity:0;transform:scale(.6);transition:opacity .4s,transform .5s cubic-bezier(.3,1.6,.5,1)}
+.pop.in{opacity:1;transform:none}
+.mouse{position:absolute;z-index:9;width:26px;height:26px;pointer-events:none;transition:left .9s cubic-bezier(.5,0,.2,1),top .9s cubic-bezier(.5,0,.2,1);left:110%;top:110%}
+.mouse::before{content:"";position:absolute;inset:0;background:#fff;clip-path:polygon(0 0,0 80%,22% 62%,38% 100%,52% 94%,37% 58%,66% 58%);filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
+.mouse.clk::after{content:"";position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;border:3px solid var(--mint2);animation:clk .5s ease-out}
+@keyframes clk{from{transform:scale(.3);opacity:1}to{transform:scale(1.6);opacity:0}}
+.win{background:#fff;color:#1B1830;border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.45);overflow:hidden;width:100%;max-width:860px}
+.win.dk{background:#121638;color:#fff;border:1px solid rgba(255,255,255,.1)}
+.wbar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #eceaf3;font-weight:700;font-size:.92rem}
+.win.dk .wbar{border-color:rgba(255,255,255,.08)}
+.wbar .tabs{display:flex;gap:4px;margin-left:auto;overflow:hidden}
+.wbar .tabs span{padding:6px 11px;border-radius:999px;font-size:.8rem;color:#625E75;font-weight:600;white-space:nowrap}
+.wbar .tabs span.on{background:#EEEBFD;color:#5B45E0}
+.wbody{padding:18px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.prof{width:150px;padding:18px 12px;border-radius:18px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.12);text-align:center;font-weight:700;transition:all .35s}
+.prof span{display:block;font-size:2rem;margin-bottom:6px}
+.prof.sel{background:#5B45E0;border-color:var(--mint2);transform:scale(1.07);box-shadow:0 0 40px rgba(124,240,200,.35)}
+.qbox{width:100%;max-width:640px}
+.qrow{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 14px;margin-top:10px}
+.qrow b{flex:1;font-size:.98rem}
+.lv{display:flex;gap:6px}
+.lv span{padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:700;background:rgba(255,255,255,.08);color:#aab3ea;transition:all .3s}
+.lv span.on{background:var(--mint2);color:#0a0d24}
+.modal{width:100%;max-width:460px;background:#fff;color:#1B1830;border-radius:24px;padding:28px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.modal h3{font-size:1.5rem}.modal p{color:#625E75;margin:8px 0 18px}
+.modal .opts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.modal .opts span{padding:9px 14px;border-radius:999px;border:1.5px solid #E2DFEA;font-weight:700;font-size:.9rem;transition:all .3s}
+.modal .opts span.sel{background:#5B45E0;color:#fff;border-color:#5B45E0}
+/* CV */
+.cv{display:grid;grid-template-columns:150px 1fr;gap:22px;padding:24px}
+.foto{width:150px;height:180px;border-radius:18px;background:linear-gradient(160deg,#2a2f6e,#141838);position:relative;overflow:hidden}
+.foto::before{content:"";position:absolute;left:50%;top:30px;width:62px;height:62px;margin-left:-31px;border-radius:50%;background:#3a4190}
+.foto::after{content:"";position:absolute;left:50%;bottom:-40px;width:120px;height:100px;margin-left:-60px;border-radius:50%;background:#3a4190}
+.cv h3{font-size:2rem}.cv .crg{color:var(--mint2);font-weight:700;margin-top:4px}
+.cv .lk{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.cv .lk span{font-size:.8rem;padding:5px 10px;border-radius:8px;background:rgba(255,255,255,.07);color:#C9D0FF}
+.cv .xp{margin-top:14px;border-left:3px solid #5B45E0;padding-left:12px}
+.cv .xp b{display:block}.cv .xp small{color:#9aa3d8}
+.skb{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:.88rem}
+.skb i{flex:1;height:8px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden;position:relative}
+.skb i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#5B45E0,#7CF0C8);transform:scaleX(0);transform-origin:left;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.skb.in i::after{transform:scaleX(var(--v))}
+@media (max-width:860px){.cv{grid-template-columns:1fr;padding:16px}.foto{width:90px;height:100px}.foto::before{top:16px;width:40px;height:40px;margin-left:-20px}.cv h3{font-size:1.5rem}.prof{width:104px;padding:12px 8px;font-size:.85rem}.prof span{font-size:1.5rem}}
+/* final confete */
+.parab{text-align:center}
+.parab h2{font:800 clamp(2rem,6vw,4rem) var(--f-display)}.parab p{color:#C9D0FF;font-size:1.2rem}
+#cf{position:absolute;inset:0;pointer-events:none}
+/* painel */
+.apb{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#5B45E0;color:#fff;font-weight:700;font-size:.9rem}
+.apb .cl{margin-left:auto;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);padding:5px 11px;border-radius:999px;font-size:.8rem}
+.anab{display:flex;align-items:center;gap:10px;padding:9px 16px;background:#F3F1FE;font-size:.86rem;color:#3d3a73}
+.anab i{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d6fff1,#5B45E0 60%);flex:none}
+.agd{display:grid;grid-template-columns:52px repeat(3,1fr);font-size:.78rem}
+.agd>div{border-bottom:1px solid #f0eef6;border-right:1px solid #f0eef6;height:38px;position:relative}
+.agd .h{color:#9a97ad;padding:4px 6px;font-family:var(--f-mono)}
+.agd .hd{height:30px;font-weight:700;padding:6px 8px;color:#625E75}
+.ev{position:absolute;left:3px;right:3px;top:3px;border-radius:8px;padding:4px 7px;color:#fff;font-weight:600;font-size:.74rem;line-height:1.25;z-index:2}
+.ped{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.pc{border:1px solid #E2DFEA;border-radius:16px;padding:14px;background:#fff}
+.pc b{display:block}.pc small{color:#625E75}
+.etp{display:flex;gap:4px;margin-top:12px}
+.etp span{flex:1;height:7px;border-radius:7px;background:#ECEAF3;transition:background .5s}
+.etp span.on{background:var(--mint)}
+.etl{display:flex;justify-content:space-between;font-size:.66rem;color:#9a97ad;margin-top:4px;font-weight:600}
+.st{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:999px;font-size:.74rem;font-weight:800;background:#EEEBFD;color:#5B45E0}
+.notif{position:absolute;right:18px;top:18px;z-index:5;background:#fff;color:#1B1830;border-radius:16px;padding:12px 16px;box-shadow:0 18px 40px rgba(0,0,0,.35);display:flex;gap:10px;align-items:center;font-size:.9rem;max-width:300px}
+.kb{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kc{background:#F6F5F8;border-radius:14px;padding:10px;min-height:190px}
+.kc h4{margin:0 0 8px;font-size:.78rem;color:#625E75;font-family:var(--f-body)}
+.kt{background:#fff;border-radius:10px;padding:8px 10px;font-size:.78rem;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,.06);margin-bottom:8px;transition:all .8s cubic-bezier(.5,0,.2,1)}
+.kt small{display:block;color:#625E75;font-weight:500}
+.ck{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0eef6;font-size:.9rem}
+.ck i{width:22px;height:22px;border-radius:7px;border:2px solid #cfcbe0;flex:none;display:grid;place-items:center;font-style:normal;color:#fff;font-size:.75rem;transition:all .3s}
+.ck.on i{background:var(--mint);border-color:var(--mint)}
+.ck.on span{text-decoration:line-through;color:#9a97ad}
+.estq{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:.86rem}
+.estq em{flex:1;height:9px;border-radius:9px;background:#ECEAF3;position:relative;overflow:hidden;font-style:normal}
+.estq em::after{content:"";position:absolute;inset:0;transform-origin:left;transform:scaleX(var(--v));background:var(--c,#1DAE8A);transition:transform 1.4s}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:900px}
+.tri .card{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:#fff}
+.tri .card p{color:#C9D0FF}
+.tri .card ul{margin:10px 0 0;padding-left:18px;color:#C9D0FF;font-size:.9rem}
+.chat{max-width:560px;width:100%}
+.msg{max-width:85%;padding:12px 16px;border-radius:18px;margin-top:10px;font-size:.98rem}
+.msg.eu{margin-left:auto;background:#5B45E0;border-radius:18px 18px 4px 18px}
+.msg.an{background:rgba(255,255,255,.09);border-radius:18px 18px 18px 4px}
+.task{display:flex;align-items:center;gap:10px;background:#fff;color:#1B1830;border-radius:14px;padding:12px 14px;margin-top:14px;font-weight:600;box-shadow:0 14px 30px rgba(0,0,0,.3)}
+.task small{margin-left:auto;color:#5B45E0;font-weight:700}
+.ag{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:900px}
+.agc{border-radius:20px;padding:20px;background:linear-gradient(160deg,rgba(91,69,224,.35),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.14)}
+.agc .ic{font-size:2rem}.agc b{display:block;font:800 1.1rem var(--f-display);margin-top:8px}.agc p{color:#C9D0FF;font-size:.92rem;margin:6px 0 0}
+.agc .say{margin-top:12px;background:rgba(0,0,0,.25);border-radius:12px;padding:10px 12px;font-size:.85rem;color:#e6eaff}
+.vg{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:900px;align-items:stretch}
+.vc{display:flex;gap:12px;align-items:center;background:#121a3e;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.vc .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;flex:none}
+.vc b{display:block;font-size:.95rem}.vc small{color:#9aa3d8}
+.vc .km{margin-left:auto;font:700 .82rem var(--f-mono);color:var(--mint2)}
+.mapa{position:relative;border-radius:18px;background:#0d2440;border:1px solid rgba(255,255,255,.1);overflow:hidden;min-height:280px}
+.mapa svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--mint2);box-shadow:0 0 0 0 rgba(124,240,200,.6);animation:pin 2s infinite}
+.pin.eu{background:#fff;width:20px;height:20px;margin:-10px 0 0 -10px}
+@keyframes pin{70%{box-shadow:0 0 0 18px rgba(124,240,200,0)}100%{box-shadow:0 0 0 0 rgba(124,240,200,0)}}
+.raio{position:absolute;border-radius:50%;border:2px dashed rgba(124,240,200,.5);background:rgba(124,240,200,.06);transition:all 1.4s}
+.big{text-align:center;max-width:720px}
+.big h2{font:800 clamp(2rem,5.5vw,3.6rem) var(--f-display)}
+.big p{color:#C9D0FF;font-size:1.15rem}
+.tr{position:absolute;inset:0;z-index:20;pointer-events:none;background:radial-gradient(circle,#7CF0C8 0%,#0f3b58 40%,transparent 70%);transform:scale(0);opacity:0}
+.tr.go{animation:portal 1.4s ease-in-out}
+@keyframes portal{0%{transform:scale(0);opacity:0}45%{transform:scale(3);opacity:1}100%{transform:scale(4);opacity:0}}
+@media (min-width:1100px) and (min-height:700px){.sc>*:not(canvas){zoom:1.22}}
+@media (max-width:860px){
+  .dots{gap:3px}#pc2{display:none}
+  .tri,.ag{grid-template-columns:1fr;gap:8px}.tri .card,.agc{padding:12px}.tri .card ul,.agc p{display:none}.agc .say{margin-top:6px}
+  .vg{grid-template-columns:1fr}.mapa{min-height:150px}
+  .kb{grid-template-columns:repeat(2,1fr)}.kc{min-height:120px}
+  .agd{grid-template-columns:40px repeat(2,1fr)}.agd .c3{display:none}
+  .wbar .tabs{display:none}.wbody{padding:12px}
+  .sc{padding:8px;align-items:flex-start}.notif{left:10px;right:10px;top:auto;bottom:10px;max-width:none}
+}
+</style>
+<body>
+<header class="top">
+  <a class="logo" href="./"><i>i</i>Ideali <small>Odonto</small></a>
+  <nav><button class="btn pri" data-play>▶ Conheça o projeto</button></nav>
+</header>
+
+<section class="hero">
+  <div class="stars" id="st"></div>
+  <div class="orb"></div>
+  <div class="eyebrow" style="margin-top:30px">Ideali Odonto · em breve</div>
+  <h1>A plataforma de <em>toda a odontologia.</em></h1>
+  <p>Dentistas, protéticos, ASB/TSB, estudantes e toda a equipe da clínica no mesmo lugar. Com a Ana, uma assistente de IA que trabalha junto com você.</p>
+  <button class="play" data-play><b>▶</b>Clique aqui e conheça o projeto</button>
+  <span class="dur">A ANA TE MOSTRA TUDO · CERCA DE 3 MINUTOS</span>
+</section>
+
+<main class="wrap">
+  <section class="sec">
+    <div class="eyebrow">O que tem dentro</div>
+    <h2>Um painel feito para o trabalho de cada um.</h2>
+    <p class="lead">Cada pessoa entra com a sua profissão e recebe um painel pensado para a rotina dela. Tudo conversa entre si: a clínica, o laboratório e a equipe.</p>
+    <div class="grid">
+      <div class="card"><div class="ic" style="background:#EEEBFD">📅</div><h3>Agenda</h3><p>Agenda da clínica em grade por horário, compartilhada com a equipe por convite.</p></div>
+      <div class="card"><div class="ic" style="background:#E3F7F0">🦷</div><h3>Pedidos com laboratório</h3><p>Solicitado, coleta, recebido, em produção e entregue. O laboratório é avisado na hora.</p></div>
+      <div class="card"><div class="ic" style="background:#FDEBF4">✨</div><h3>Ana, assistente de IA</h3><p>Anota tarefas, lembra compromissos e tem agentes para laboratório, vagas e implantes.</p></div>
+      <div class="card"><div class="ic" style="background:#E6F0FD">💼</div><h3>Rede Ideali</h3><p>Currículo profissional, vagas perto de você, clínicas, laboratórios, comércio e cursos.</p></div>
+    </div>
+  </section>
+  <section class="sec">
+    <div class="eyebrow">Para quem</div>
+    <h2>Toda a odontologia, não só o consultório.</h2>
+    <div class="profs"><span>🦷 Dentista</span><span>🔧 Protético (TPD/APD)</span><span>🩺 ASB / TSB</span><span>🏢 Corporativo da clínica</span><span>🏭 Indústria e comércio</span><span>🎓 Estudante</span></div>
+  </section>
+</main>
+<section class="final">
+  <h2>Quer ver tudo funcionando?</h2>
+  <p>A Ana preparou uma apresentação animada. Leva uns 3 minutos.</p>
+  <button class="play" data-play style="margin-top:24px"><b>▶</b>Conheça o projeto</button>
+</section>
+<footer>Ideali Odonto · uma plataforma Ideali · <a href="../">idealisystems.com</a></footer>
+
+<!-- PLAYER -->
+<div id="pl" role="dialog" aria-label="Apresentação Ideali Odonto">
+  <div class="bg"></div>
+  <div class="pl-top"><span class="logo"><i>i</i>Ideali <small>Odonto</small></span><span class="pl-cap" id="cap"></span><button class="pl-x" id="px" aria-label="Fechar">✕</button></div>
+  <div class="pl-main">
+    <div class="ana" id="ana"><div class="orb"></div><div class="nm">Ana<small>sua assistente de IA</small></div><div class="bal" id="bal"></div></div>
+    <div class="stage" id="stg"></div>
+  </div>
+  <div class="pl-bot"><button class="cb" id="pv" aria-label="Voltar">◀</button><div class="dots" id="dots"></div><button class="cb" id="pp" aria-label="Pausar">❚❚</button><button class="cb pri" id="pn">Próximo ▶</button></div>
+</div>
+
+<script>
+(function(){
+var s=document.getElementById('st'),r=7;function R(){r=(r*9301+49297)%233280;return r/233280;}
+for(var i=0;i<60;i++){var e=document.createElement('i');e.style.left=(R()*100)+'%';e.style.top=(R()*100)+'%';var z=1+R()*2.5;e.style.width=e.style.height=z+'px';e.style.opacity=.15+R()*.5;e.style.animationDelay=(R()*3)+'s';s.appendChild(e);}
+})();
+
+/* ===== motor do tutorial ===== */
+var PL=document.getElementById('pl'),STG=document.getElementById('stg'),BAL=document.getElementById('bal'),ANA=document.getElementById('ana'),DOTS=document.getElementById('dots');
+var cur=0,T=[],pausado=false,fimT=null,restante=0,iniT=0;
+function at(ms,fn){T.push(setTimeout(fn,ms));}
+function limpa(){T.forEach(clearTimeout);T=[];clearTimeout(fimT);}
+function $(q){return STG.querySelector(q);}
+function $$(q){return Array.prototype.slice.call(STG.querySelectorAll(q));}
+function inn(q,ms,passo){$$(q).forEach(function(el,i){at(ms+(passo||0)*i,function(){el.classList.add('in');});});}
+function digita(txt){ANA.classList.add('fala');var h=txt,i=0,out='';BAL.innerHTML='<span class="cur"></span>';
+  var plain=h.replace(/<[^>]+>/g,''),dur=Math.min(3800,plain.length*28);
+  var passos=Math.max(1,Math.floor(dur/30)),k=0;
+  (function tick(){k++;var n=Math.round(plain.length*k/passos);BAL.innerHTML=corta(h,n)+'<span class="cur"></span>';if(k<passos)T.push(setTimeout(tick,30));else{BAL.innerHTML=h;ANA.classList.remove('fala');}})();}
+function corta(h,n){var o='',c=0,tag=false,abre=[];for(var i=0;i<h.length&&c<n;i++){var ch=h[i];if(ch==='<'){tag=true;}o+=ch;if(tag){if(ch==='>')tag=false;}else c++;}
+  var m=o.match(/<b>/g),f=o.match(/<\/b>/g);if((m?m.length:0)>(f?f.length:0))o+='</b>';return o;}
+function falas(lst){var t=0;lst.forEach(function(f){at(t,function(){digita(f[1]);});t+=f[0];});}
+function mouse(){var m=$('.mouse');if(!m){m=document.createElement('div');m.className='mouse';STG.appendChild(m);}return m;}
+function clica(q,ms,fn){at(ms,function(){var el=$(q);if(!el)return;var m=mouse(),a=STG.getBoundingClientRect(),b=el.getBoundingClientRect();
+  m.style.left=(b.left-a.left+b.width*.55)+'px';m.style.top=(b.top-a.top+b.height*.55)+'px';});
+  at(ms+950,function(){var m=mouse();m.classList.remove('clk');void m.offsetWidth;m.classList.add('clk');if(fn)fn();});}
+function confete(n){var c=$('#cf');if(!c)return;var W=c.width=STG.clientWidth,H=c.height=STG.clientHeight,x=c.getContext('2d'),P=[],cores=['#7CF0C8','#F0A53A','#EF5F5A','#3A96EC','#7B5CF2','#DD5A9E','#fff'];
+  for(var i=0;i<n;i++)P.push({x:W/2+(Math.random()-.5)*80,y:H*.55,vx:(Math.random()-.5)*16,vy:-Math.random()*16-6,r:Math.random()*6+3,c:cores[i%cores.length],a:Math.random()*6,va:(Math.random()-.5)*.4});
+  var t0=Date.now();(function f(){if(!c.isConnected)return;x.clearRect(0,0,W,H);P.forEach(function(p){p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore();});
+    if(Date.now()-t0<4500)requestAnimationFrame(f);else x.clearRect(0,0,W,H);})();}
+
+var CENAS=[
+ {cap:'Olá!',d:9000,h:'<div class="sc"><div class="big"><div class="orb pop" style="width:150px;height:150px"></div><h2 class="fx" style="margin-top:34px">Oi! Eu sou a <span style="color:#7CF0C8">Ana</span>.</h2><p class="fx">A assistente de IA da Ideali Odonto.</p></div></div>',
+  go:function(){inn('.pop',200);inn('.fx',900,500);falas([[0,'Oi! Eu sou a <b>Ana</b> 💜 Vou te mostrar a Ideali Odonto por dentro, do cadastro até o painel.'],[5200,'Pode relaxar: é só assistir. Se quiser, use as setas para voltar ou avançar.']]);}},
+
+ {cap:'Cadastro',d:10000,h:'<div class="sc"><div style="text-align:center;width:100%"><h3 class="fx" style="font-size:1.5rem;margin-bottom:20px">Qual é a sua profissão?</h3><div class="chips">'+
+   [['🦷','Dentista'],['🔧','Protético'],['🩺','ASB / TSB'],['🏢','Corporativo'],['🏭','Indústria e comércio'],['🎓','Estudante']].map(function(p,i){return '<div class="prof pop" id="pf'+i+'"><span>'+p[0]+'</span>'+p[1]+'</div>';}).join('')+'</div></div></div>',
+  go:function(){inn('.fx',100);inn('.prof',400,150);clica('#pf1',2600,function(){$('#pf1').classList.add('sel');});
+   falas([[0,'O cadastro começa comigo. Primeiro, você me conta <b>qual é a sua profissão</b>.'],[4800,'Dentista, protético, ASB, TSB, quem trabalha na clínica, no comércio, ou ainda estudante. <b>Tem lugar para todo mundo.</b>']]);}},
+
+ {cap:'Entrevista com a Ana',d:12000,h:'<div class="sc"><div class="qbox"><h3 class="fx" style="font-size:1.3rem">🔧 Protético · CAD/CAM digital</h3>'+
+   [['Exocad',2],['3Shape',1],['Anatomia: coroas e fixas',2],['Protocolos e facetas',0]].map(function(q,i){return '<div class="qrow fx" data-v="'+q[1]+'"><b>'+q[0]+'</b><div class="lv"><span>Básico</span><span>Médio</span><span>Avançado</span></div></div>';}).join('')+
+   '<div class="qrow fx"><b>Tempo de experiência</b><div class="lv" id="xp"><span>0 a 3 anos</span><span>2 a 7</span><span>+7 anos</span></div></div></div></div>',
+  go:function(){inn('.fx',100,250);$$('.qrow[data-v]').forEach(function(rw,i){at(2200+i*900,function(){rw.querySelectorAll('.lv span')[+rw.getAttribute('data-v')].classList.add('on');});});
+   at(6000,function(){$('#xp').children[1].classList.add('on');});
+   falas([[0,'Depois eu faço uma <b>mini entrevista</b>, só com perguntas da sua área.'],[5000,'Para o protético, por exemplo: digital ou analógico, quais softwares, qual nível em cada coisa. <b>Sem formulário chato.</b>']]);}},
+
+ {cap:'Segunda profissão',d:9000,h:'<div class="sc"><div class="modal pop"><div style="font-size:2.4rem">🤔</div><h3>Você possui mais uma profissão?</h3><p>Muita gente na odontologia faz mais de uma coisa.</p><div class="opts"><span>Não</span><span id="o2">ASB / TSB</span><span>Dentista</span><span>Estudante</span></div></div></div>',
+  go:function(){inn('.pop',200);clica('#o2',2400,function(){$('#o2').classList.add('sel');});
+   falas([[0,'E se você tiver <b>mais de uma profissão</b>? Sem problema.'],[4200,'Eu pergunto, e você preenche as habilidades da segunda também. Tudo vai para o seu currículo.']]);}},
+
+ {cap:'Seu currículo',d:11000,h:'<div class="sc"><div class="win dk"><div class="cv"><div class="foto fx"></div><div><h3 class="fx">M. S.</h3><div class="crg fx">Protético CAD/CAM · ASB</div><div class="lk fx"><span>🔒 Profissão</span><span>🔒 Formação</span><span>📍 Região</span><span style="color:#7CF0C8">● Aberto a propostas</span></div>'+
+   '<div class="xp fx"><b>Laboratório digital</b><small>Projetista CAD · 3 anos</small></div>'+
+   [['Exocad',.66],['Anatomia',.66],['3Shape',.33]].map(function(k){return '<div class="skb fx" style="--v:'+k[1]+'"><span style="width:90px">'+k[0]+'</span><i></i></div>';}).join('')+'</div></div></div></div>',
+  go:function(){inn('.fx',100,280);falas([[0,'Com as suas respostas, eu monto o seu <b>currículo profissional</b>, bonito e completo.'],[5000,'Os dados do cadastro ficam <b>travados 🔒</b>, para ninguém inventar profissão. Você edita foto, experiências e cursos.']]);}},
+
+ {cap:'Bem-vindo',d:8000,h:'<div class="sc"><canvas id="cf"></canvas><div class="parab"><h2 class="pop">🎉 Parabéns, M.!</h2><p class="fx">Agora você faz parte da Ideali Odonto.</p></div></div>',
+  go:function(){inn('.pop',300);inn('.fx',900);at(400,function(){confete(180);});at(2600,function(){confete(120);});falas([[0,'No fim do cadastro tem <b>festa</b>! 🎆 Fogos, confete e parabéns. E aí você vai direto para o seu painel.']]);}},
+
+ {cap:'Painel do dentista · Agenda',d:12000,h:'<div class="sc"><div class="win"><div class="apb">🦷 Ideali Odonto<span class="cl">⛅ 24° · São Paulo</span></div><div class="anab"><i></i><span id="anaf">Bom dia! Você tem 4 pacientes hoje.</span></div>'+
+   '<div class="wbar"><span>Agenda · hoje</span><div class="tabs"><span>Início</span><span class="on">Agenda</span><span>Pedidos</span><span>Agentes de IA</span><span>Rede</span></div></div>'+
+   '<div class="agd"><div class="hd"></div><div class="hd">Dr(a). A.</div><div class="hd">Dr(a). B.</div><div class="hd c3">Sala 3</div>'+
+   ['08:00','09:00','10:00','11:00','12:00'].map(function(h,i){return '<div class="h">'+h+'</div><div id="g'+i+'a"></div><div id="g'+i+'b"></div><div class="c3" id="g'+i+'c"></div>';}).join('')+'</div></div></div>',
+  go:function(){var ev=[['g0a','#5B45E0','R. A. · Limpeza'],['g1b','#1DAE8A','C. M. · Coroa'],['g2a','#3A96EC','J. P. · Avaliação'],['g3c','#DD5A9E','F. L. · Clareamento'],['g3a','#F0A53A','T. S. · Prova']];
+   ev.forEach(function(e,i){at(1200+i*600,function(){var d=document.createElement('div');d.className='ev pop';d.style.background=e[1];d.textContent=e[2];var c=document.getElementById(e[0]);if(c){c.appendChild(d);setTimeout(function(){d.classList.add('in');},30);}});});
+   at(6000,function(){var a=document.getElementById('anaf');if(a)a.textContent='Lembrete: ligar para o laboratório às 15h 📞';});
+   falas([[0,'Este é o <b>painel do dentista</b>. A agenda é em grade, por horário e por profissional.'],[5200,'Lá em cima fico eu, sempre com um recado do dia. E tem até a <b>previsão do tempo</b> ⛅']]);}},
+
+ {cap:'Pedidos com laboratório',d:13000,h:'<div class="sc"><div class="win"><div class="wbar"><span>🧪 Pedidos com laboratório</span><div class="tabs"><span>Agenda</span><span class="on">Pedidos</span></div></div><div class="wbody"><div class="ped">'+
+   [['Coroa em zircônia','R. A. · Lab Sorriso'],['Protocolo superior','C. M. · Lab Digital'],['Placa miorrelaxante','J. P. · Lab Sorriso']].map(function(p,i){return '<div class="pc fx" id="pc'+i+'"><b>'+p[0]+'</b><small>'+p[1]+'</small><div class="etp"><span></span><span></span><span></span><span></span><span></span></div><div class="etl"><span>Solic.</span><span>Coleta</span><span>Receb.</span><span>Produção</span><span>Entregue</span></div><span class="st">Solicitado</span></div>';}).join('')+
+   '</div></div></div><div class="notif pop" id="nt">🔔 <span><b>Lab Sorriso</b> recebeu o aviso: pedido em produção.</span></div></div>',
+  go:function(){inn('.fx',100,200);var ST=['Solicitado','Coleta','Recebido','Em produção','Entregue'],alvo=[4,3,1];
+   [0,1,2].forEach(function(p){$('#pc'+p+' .etp span').classList.add('on');for(var k=1;k<=alvo[p];k++)(function(k){at(1200+k*1100+p*250,function(){var c=$('#pc'+p);if(!c)return;c.querySelectorAll('.etp span')[k].classList.add('on');c.querySelector('.st').textContent=ST[k];});})(k);});
+   at(4800,function(){$('#nt').classList.add('in');});
+   falas([[0,'Agora a melhor parte: os <b>pedidos com o laboratório</b>. Cada trabalho vira um card.'],[4600,'Solicitado, coleta, recebido, <b>em produção</b> e entregue. Quando entra em produção, o laboratório é avisado na hora.'],[9400,'Acabou o "cadê o meu trabalho?" no WhatsApp 😄']]);}},
+
+ {cap:'Painel do protético',d:11000,h:'<div class="sc"><div class="win"><div class="wbar"><span>🔧 Produção</span><div class="tabs"><span class="on">Produção</span><span>Agenda</span><span>Rede</span></div></div><div class="wbody"><div class="kb">'+
+   ['Na fila','Projetando','Fresando','Pronto'].map(function(c,i){return '<div class="kc" id="k'+i+'"><h4>'+c+'</h4></div>';}).join('')+'</div></div></div></div>',
+  go:function(){var it=[['Coroa 36','Dr(a). A.'],['Faceta 11','Dr(a). B.'],['Ponte 24-26','Dr(a). A.']];
+   it.forEach(function(t,i){var d=document.createElement('div');d.className='kt';d.id='kt'+i;d.innerHTML=t[0]+'<small>'+t[1]+'</small>';$('#k0').appendChild(d);});
+   [[1500,0,1],[3000,0,2],[3600,1,1],[5200,0,3],[6600,1,2],[7600,2,1]].forEach(function(m){at(m[0],function(){var k=$('#kt'+m[1]),c=$('#k'+m[2]);if(k&&c)c.appendChild(k);});});
+   falas([[0,'O <b>protético</b> tem o painel de produção: cada trabalho anda pelas colunas.'],[5000,'E se um dia ele abrir o próprio laboratório, o painel ganha <b>clientes e financeiro</b>.']]);}},
+
+ {cap:'ASB e TSB',d:10000,h:'<div class="sc"><div class="win" style="max-width:640px"><div class="wbar"><span>🩺 Checklist da clínica</span><div class="tabs"><span class="on">Checklists</span><span>Estoque</span></div></div><div class="wbody">'+
+   ['Esterilizar instrumentais','Preparar sala 1','Conferir autoclave','Repor luvas e sugadores'].map(function(c,i){return '<div class="ck" id="ck'+i+'"><i>✓</i><span>'+c+'</span></div>';}).join('')+
+   '<div style="margin-top:14px;font-weight:700;font-size:.9rem">Estoque</div><div class="estq">Luvas M<em style="--v:.8"></em></div><div class="estq" id="es">Anestésico<em style="--v:1;--c:#EF5F5A"></em><b style="color:#D2433A;font-size:.8rem;opacity:0;transition:opacity .5s" id="esa">acabando!</b></div></div></div></div>',
+  go:function(){[0,1,2,3].forEach(function(i){at(1200+i*900,function(){var c=$('#ck'+i);if(c)c.classList.add('on');});});
+   at(5000,function(){var e=$('#es em');if(e)e.style.setProperty('--v',.12);});at(6200,function(){var a=$('#esa');if(a)a.style.opacity=1;});
+   falas([[0,'<b>ASB e TSB</b> têm a agenda delas, checklists do dia e o estoque da clínica.'],[5200,'Com convite, elas também veem a agenda do dentista e os pedidos do laboratório.']]);}},
+
+ {cap:'Mais perfis',d:10000,h:'<div class="sc"><div class="tri">'+
+   [['🏢','Corporativo','Recepção, CRC, comercial, marketing, administrativo, gerência.',['Painel por setor','Equipe por convite']],['🏭','Indústria e comércio','Representantes, vendedores, técnicos.',['Clientes e visitas','Pedidos e catálogo']],['🎓','Estudante','Da graduação ao técnico.',['Estudos e cursos','Oportunidades e estágios']]].map(function(c){return '<div class="card fx"><div style="font-size:2rem">'+c[0]+'</div><h3 style="margin-top:8px">'+c[1]+'</h3><p>'+c[2]+'</p><ul>'+c[3].map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>';}).join('')+'</div></div>',
+  go:function(){inn('.fx',200,500);falas([[0,'E não para no consultório. Tem painel para quem trabalha no <b>corporativo</b> da clínica, na <b>indústria e comércio</b> e para os <b>estudantes</b>.'],[5600,'Cada um com as ferramentas da sua rotina.']]);}},
+
+ {cap:'A Ana anota por você',d:10000,h:'<div class="sc"><div class="chat"><div class="msg eu fx">Ana, me lembra de pedir a moldagem da C. M. amanhã cedo</div><div class="msg an fx">Anotado! Te aviso amanhã às 8h 💜</div><div class="task pop">📝 Pedir moldagem · C. M.<small>amanhã · 08:00</small></div></div></div>',
+  go:function(){inn('.fx',600,1600);inn('.pop',3600);falas([[0,'Comigo é assim: você fala, <b>eu anoto</b>.'],[4200,'Tarefas, lembretes, recados. Nada de post-it perdido na mesa 😉']]);}},
+
+ {cap:'Agentes de IA',d:11000,h:'<div class="sc"><div class="ag">'+
+   [['🧪','Agente do laboratório','Acompanha os pedidos e cobra prazos.','"O pedido da R. A. atrasou 1 dia. Quer que eu avise o lab?"'],['💼','Agente de vagas','Procura vagas com o seu perfil.','"Achei 3 vagas perto de você 👀"'],['🔩','Guia de componentes','Tira dúvidas sobre implantes e componentes.','"Para esse implante, o pilar indicado é…"']].map(function(a){return '<div class="agc fx"><div class="ic">'+a[0]+'</div><b>'+a[1]+'</b><p>'+a[2]+'</p><div class="say">'+a[3]+'</div></div>';}).join('')+'</div></div>',
+  go:function(){inn('.fx',200,600);falas([[0,'E eu tenho uma equipe: os <b>agentes de IA</b>.'],[3800,'Um cuida do laboratório, outro procura <b>vagas</b> para você, e outro é um guia de <b>componentes e implantes</b>.']]);}},
+
+ {cap:'Rede Ideali',d:13000,rede:1,h:'<div class="tr" id="tr"></div><div class="sc"><div class="vg"><div>'+
+   [['🦷','#3a2a8a','Protético(a) CAD/CAM','Laboratório · Zona Sul','12 km'],['🩺','#1e5a4c','Cirurgião(ã)-dentista','Clínica confidencial','8 km'],['📋','#6a3a1e','ASB','Clínica · Centro','21 km'],['🎓','#24507a','Curso: fluxo digital','Presencial','5 km']].map(function(v){return '<div class="vc fx"><div class="ic" style="background:'+v[1]+'">'+v[0]+'</div><div><b>'+v[2]+'</b><small>'+v[3]+'</small></div><span class="km">'+v[4]+'</span></div>';}).join('')+
+   '</div><div class="mapa fx"><svg viewBox="0 0 400 300" preserveAspectRatio="none"><path d="M0 220 Q120 180 200 210 T400 190" stroke="rgba(124,240,200,.15)" stroke-width="2" fill="none"/><path d="M60 0 Q90 150 40 300" stroke="rgba(124,240,200,.12)" stroke-width="2" fill="none"/><path d="M300 0 Q250 140 330 300" stroke="rgba(124,240,200,.12)" stroke-width="2" fill="none"/></svg>'+
+   '<div class="raio" id="ra" style="left:50%;top:50%;width:0;height:0"></div><div class="pin eu" style="left:50%;top:50%"></div><div class="pin" style="left:30%;top:35%"></div><div class="pin" style="left:68%;top:62%;animation-delay:.5s"></div><div class="pin" style="left:62%;top:28%;animation-delay:1s"></div><div class="pin" style="left:22%;top:72%;animation-delay:1.4s"></div></div></div></div>',
+  go:function(){at(50,function(){$('#tr').classList.add('go');});inn('.fx',900,250);at(2600,function(){var r=$('#ra');if(r){r.style.width=r.style.height='70%';r.style.margin='-35% 0 0 -35%';}});
+   falas([[0,'Agora a gente entra na <b>Rede Ideali</b> ✨'],[3000,'Vagas perto de você, com distância e mapa. Dá até para a clínica anunciar como <b>confidencial</b>.'],[8200,'E ainda: clínicas, laboratórios, comércio e cursos. Tudo com o seu currículo pronto para enviar.']]);}},
+
+ {cap:'Ideali Odonto',d:14000,fim:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="big"><div class="orb pop" style="width:110px;height:110px"></div><h2 class="fx" style="margin-top:28px">Isso é a <span style="color:#7CF0C8">Ideali Odonto</span>.</h2><p class="fx">A plataforma de toda a odontologia. Chegando em breve.</p><div class="fx" style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="cb pri" id="rv">↺ Ver de novo</button><button class="cb" id="fc">Fechar</button></div></div></div>',
+  go:function(){inn('.pop',200);inn('.fx',800,400);at(900,function(){confete(160);});
+   $('#rv').onclick=function(){vai(0);};$('#fc').onclick=fecha;
+   falas([[0,'E isso é só o começo. Quero muito ter você com a gente 💜'],[4400,'A <b>Ideali Odonto</b> está chegando. Até já!']]);}}
+];
+
+function montaDots(){DOTS.innerHTML=CENAS.map(function(){return '<i></i>';}).join('');}
+function vai(n){limpa();if(n<0)n=0;if(n>=CENAS.length)n=CENAS.length-1;cur=n;var c=CENAS[n];
+  PL.classList.toggle('rede',!!c.rede||n===CENAS.length-1&&false);
+  STG.innerHTML=c.h;document.getElementById('cap').textContent=(n+1)+'/'+CENAS.length+' · '+c.cap;
+  Array.prototype.forEach.call(DOTS.children,function(d,i){d.className=i<n?'ok':'';});
+  var d=DOTS.children[n];void d.offsetWidth;d.className='at';d.style.setProperty('--d',c.d+'ms');
+  document.getElementById('pn').textContent=n===CENAS.length-1?'Fechar':'Próximo ▶';
+  c.go();restante=c.d;iniT=Date.now();if(!pausado&&!c.fim)fimT=setTimeout(function(){vai(cur+1);},c.d);}
+function abre(){PL.classList.add('on');document.body.style.overflow='hidden';setTimeout(function(){PL.classList.add('vis');},20);pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';montaDots();vai(0);}
+function fecha(){limpa();PL.classList.remove('vis');setTimeout(function(){PL.classList.remove('on');STG.innerHTML='';},500);document.body.style.overflow='';}
+function pausa(){var c=CENAS[cur];if(!pausado){pausado=true;PL.classList.add('pause');clearTimeout(fimT);restante-=Date.now()-iniT;document.getElementById('pp').textContent='▶';}
+  else{pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';iniT=Date.now();if(!c.fim)fimT=setTimeout(function(){vai(cur+1);},Math.max(800,restante));}}
+Array.prototype.forEach.call(document.querySelectorAll('[data-play]'),function(b){b.onclick=abre;});
+document.getElementById('px').onclick=fecha;
+document.getElementById('pv').onclick=function(){vai(cur-1);};
+document.getElementById('pn').onclick=function(){if(cur===CENAS.length-1)fecha();else vai(cur+1);};
+document.getElementById('pp').onclick=pausa;
+document.addEventListener('keydown',function(e){if(!PL.classList.contains('on'))return;if(e.key==='Escape')fecha();else if(e.key==='ArrowRight')vai(cur+1);else if(e.key==='ArrowLeft')vai(cur-1);else if(e.key===' '){e.preventDefault();pausa();}});
+if(/[?&]play/.test(location.search))abre();
+</script>
+<script src="../visita.js" defer></script>
+</body>
+</html>
