@@ -533,6 +533,19 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .pf2 i{background:linear-gradient(135deg,#1B1830,#3a3f9a);position:relative}.pf2 i::after{content:"▶";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:.9rem}
 .p4c .ptg{margin-top:8px}
 @media (max-width:860px){.pp4{grid-template-columns:1fr 1fr;gap:6px}.p4c{padding:8px}.p4h b{font-size:.7rem}.p4h small,.p4c .ptg{display:none}.pfl i{height:26px}.pav{width:24px;height:24px}}
+.pl-r{display:flex;gap:8px;align-items:center}
+.pl-t{height:42px;padding:0 16px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-weight:700}
+.tpc{position:fixed;inset:0;z-index:55;background:rgba(5,6,18,.6);display:none;justify-content:flex-end}
+.tpc.on{display:flex}
+.tpb{width:min(420px,100%);height:100%;overflow-y:auto;background:#12142e;border-left:1px solid rgba(255,255,255,.1);padding:16px 18px 30px;animation:tpin .3s ease-out}
+@keyframes tpin{from{transform:translateX(40px);opacity:0}}
+.tph{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.tph b{font:800 1.3rem var(--f-display)}
+.tph button{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:none;color:#fff}
+.tpg{margin-top:14px}.tpl{font:600 .72rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:#7CF0C8;margin-bottom:6px}
+.tpg button{display:block;width:100%;text-align:left;border:0;background:rgba(255,255,255,.05);color:#e6eaff;border-radius:10px;padding:9px 12px;margin-bottom:4px;font-weight:600;font-size:.92rem}
+.tpg button:hover{background:rgba(255,255,255,.12)}.tpg button.on{background:#7CF0C8;color:#0a0d24}
+.tpd{margin-top:18px;width:100%;border:0;border-radius:12px;padding:12px;background:#fff;color:#1B1830;font-weight:800}
+@media (max-width:860px){.pl-t{height:38px;padding:0 12px;font-size:.85rem}}
 </style>
 <body>
 <header class="top">
@@ -580,7 +593,7 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 <!-- PLAYER -->
 <div id="pl" role="dialog" aria-label="Apresentação Ideali Odonto">
   <div class="bg"></div>
-  <div class="pl-top"><span class="logo"><i>i</i>Ideali <small>Odonto</small></span><span class="pl-cap" id="cap"></span><button class="pl-x" id="px" aria-label="Fechar">✕</button></div>
+  <div class="pl-top"><span class="logo"><i>i</i>Ideali <small>Odonto</small></span><span class="pl-cap" id="cap"></span><span class="pl-r"><button class="pl-t" id="ptp">☰ Tópicos</button><button class="pl-x" id="px" aria-label="Fechar">✕</button></span></div><div class="tpc" id="tpc"></div>
   <div class="pl-main">
     <div class="ana" id="ana"><div class="anaf"><img id="anaimg" src="../app/equipe/ana-tranquila.webp" alt="Ana"></div><img class="anaav" id="anaav" src="../app/equipe/ana-av-tranquila.webp" alt="Ana"><div class="nm" id="anm">Ana<small>sua assistente de IA</small></div><div class="bal" id="bal"></div></div>
     <div class="stage" id="stg"></div>
@@ -655,19 +668,19 @@ var CENAS=[
    [['💬','Vagas perdidas','Circulam em grupos de WhatsApp, stories e indicação. Some em horas.'],['📄','Currículo que não diz nada','PDF genérico. Não mostra se a pessoa domina Exocad ou faz um protocolo.'],['🎓','Estudante sem porta','"Precisa de experiência para ter experiência." O primeiro emprego vira uma luta.'],['⏳','Clínica perdendo tempo','Dias filtrando currículo errado, longe ou sem o perfil da vaga.']].map(function(c){return '<div class="pb fx"><span>'+c[0]+'</span><b>'+c[1]+'</b><p>'+c[2]+'</p></div>';}).join('')+'</div></div></div>',
   go:function(){inn('.fx',100,250);falas([[0,'Hoje, vaga de odontologia fica espalhada em <b>grupo de WhatsApp, stories e indicação</b>. Quem não está no grupo certo, nem fica sabendo.'],[5600,'E do outro lado, a clínica e o laboratório perdem dias procurando o profissional certo. <b>Todo mundo perde.</b>']]);}},
 
- {cap:'Dor nº 1',pt:1,p:'pensativa',d:19000,h:'<div class="sc"><div class="dor" id="dq"><div class="dor-k">Seja sincero…</div><h2>Quantas vezes você procurou um <span class="mt">profissional qualificado</span>… <br>e não achou?</h2></div>'+
+ {cap:'Dor: achar profissional bom',pt:1,p:'pensativa',d:19000,h:'<div class="sc"><div class="dor" id="dq"><div class="dor-k">Seja sincero…</div><h2>Quantas vezes você procurou um <span class="mt">profissional qualificado</span>… <br>e não achou?</h2></div>'+
    '<div class="wall" id="wl"><div class="aqui">Aqui você encontra.</div><div class="wg">'+PERFIS.map(function(g){return '<div class="wh">'+g[0]+'</div>'+g[1].map(function(c){return '<div class="pf"><span class="pav" style="background:'+g[2]+'">'+c[0]+'</span><div><b>'+c[1]+'</b><small>'+c[2]+'</small><div class="ptg">'+c[3].map(function(t){return '<em>'+t+'</em>';}).join('')+'</div></div><span class="vf">✓</span></div>';}).join('');}).join('')+'</div></div></div>',
   go:function(){var q=$('#dq');at(100,function(){q.classList.add('in');});at(4200,function(){q.classList.add('out');$('#wl').classList.add('in');});
    var it=$$('.wg>*');it.forEach(function(e,i){at(4900+i*260,function(){e.classList.add('in');});});
    falas([[0,'Seja sincero… <b>quantas vezes</b> você precisou de alguém bom de verdade e não achou?'],[4300,'<b>Aqui você encontra.</b> Dentistas especialistas, laboratórios, protéticos, gestores, CRC, financeiro, marketing…'],[11500,'Todos com <b>currículo verificado</b>, mostrando o que sabem fazer de verdade. 💜']]);}},
 
- {cap:'Dor nº 2',pt:1,p:'determinada',d:13000,h:'<div class="sc"><div class="dor" id="dq"><div class="dor-k">E você, que procura trabalho…</div><h2>Quantas vezes uma <span class="mt">vaga boa</span> passou e você só viu <span style="color:#F0A53A">depois</span>?</h2></div>'+
+ {cap:'Dor: a vaga que passou',pt:1,p:'determinada',d:13000,h:'<div class="sc"><div class="dor" id="dq"><div class="dor-k">E você, que procura trabalho…</div><h2>Quantas vezes uma <span class="mt">vaga boa</span> passou e você só viu <span style="color:#F0A53A">depois</span>?</h2></div>'+
    '<div class="wall" id="wl"><div class="aqui">Aqui a Ana te avisa primeiro.</div><div class="pushes">'+[['Estágio em clínica · 3 km','agora'],['Projetista CAD júnior · 9 km','2 min'],['ASB · clínica confidencial · 6 km','5 min'],['Dentista clínico geral · 14 km','12 min']].map(function(n){return '<div class="psh"><img src="../app/equipe/ana-av-feliz.webp" alt=""><div><b>Ana · vaga nova com o seu perfil 👀</b><p>'+n[0]+'</p></div><small>'+n[1]+'</small></div>';}).join('')+'</div></div></div>',
   go:function(){var q=$('#dq');at(100,function(){q.classList.add('in');});at(3800,function(){q.classList.add('out');$('#wl').classList.add('in');});
    $$('.psh').forEach(function(e,i){at(4400+i*700,function(){e.classList.add('in');});});
    falas([[0,'E quem procura trabalho: quantas vezes a <b>vaga perfeita</b> passou num grupo e você só viu depois?'],[4000,'Aqui não. <b>Eu te aviso na hora</b>, só com vaga que combina com você.']]);}},
 
- {cap:'Dor nº 3',pt:1,p:'determinada',d:13000,h:'<div class="sc"><div class="dor" id="dq"><div class="dor-k">E a clínica…</div><h2>Quantas vezes você recebeu <span style="color:#F0A53A">50 currículos</span> e nenhum servia?</h2></div>'+
+ {cap:'Dor: currículo que não serve',pt:1,p:'determinada',d:13000,h:'<div class="sc"><div class="dor" id="dq"><div class="dor-k">E a clínica…</div><h2>Quantas vezes você recebeu <span style="color:#F0A53A">50 currículos</span> e nenhum servia?</h2></div>'+
    '<div class="wall" id="wl"><div class="aqui">Aqui só chega quem tem o perfil.</div><div class="fun"><div class="fu" style="--w:100%"><b>Todos os profissionais da região</b></div><div class="fu" style="--w:74%"><b>Com a profissão e a formação certas 🔒</b></div><div class="fu" style="--w:50%"><b>Com as habilidades da vaga</b></div><div class="fu" style="--w:30%;background:#7CF0C8;color:#0a0d24"><b>Perto de você ✓</b></div></div></div></div>',
   go:function(){var q=$('#dq');at(100,function(){q.classList.add('in');});at(3800,function(){q.classList.add('out');$('#wl').classList.add('in');});
    $$('.fu').forEach(function(e,i){at(4400+i*650,function(){e.classList.add('in');});});
@@ -929,6 +942,14 @@ function pausa(){var c=CENAS[cur];if(!pausado){pausado=true;PL.classList.add('pa
   else{pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';iniT=Date.now();if(!c.fim)fimT=setTimeout(function(){vai(cur+1);},Math.max(800,restante));}}
 Array.prototype.forEach.call(document.querySelectorAll('[data-play]'),function(b){b.onclick=abre;});
 document.getElementById('px').onclick=fecha;
+var PARTES={1:'Parte 1 · A Ideali',2:'Parte 2 · Como funciona',3:'Parte 3 · Laboratório',4:'Parte 4 · Gestão, marketing e comércio',9:'Encerramento'};
+function topicos(){var T2=document.getElementById('tpc');if(T2.classList.contains('on')){T2.classList.remove('on');return;}
+  var g={};CENAS.forEach(function(c,i){var k=c.fim?9:c.pt;(g[k]=g[k]||[]).push([i,c.cap]);});
+  T2.innerHTML='<div class="tpb"><div class="tph"><b>Tópicos</b><button id="tpx">✕</button></div>'+Object.keys(g).map(function(k){return '<div class="tpg"><div class="tpl">'+PARTES[k]+'</div>'+g[k].map(function(x){return '<button data-ti="'+x[0]+'" class="'+(x[0]===cur?'on':'')+'">'+x[1]+'</button>';}).join('')+'</div>';}).join('')+'<button class="tpd" data-demo2>👆 Pular para Experimentar a plataforma</button></div>';
+  T2.classList.add('on');if(!pausado)pausa();}
+document.getElementById('ptp').onclick=topicos;
+document.getElementById('tpc').addEventListener('click',function(e){var T2=this,b=e.target.closest('button');if(e.target===T2||(b&&b.id==='tpx')){T2.classList.remove('on');return;}if(!b)return;
+  if(b.hasAttribute('data-demo2')){T2.classList.remove('on');abreDemo();return;}var i=+b.getAttribute('data-ti');T2.classList.remove('on');if(pausado)pausa();vai(i);});
 document.getElementById('pv').onclick=function(){vai(cur-1);};
 document.getElementById('pn').onclick=function(){if(cur===CENAS.length-1)fecha();else vai(cur+1);};
 document.getElementById('pp').onclick=pausa;
