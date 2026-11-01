@@ -1534,6 +1534,7 @@ span.pd-it-t{cursor:default}
 .pisca-nv{animation:piscaNv 1.3s ease-in-out infinite}
 @keyframes piscaNv{0%,100%{box-shadow:0 0 0 0 rgba(30,138,90,.0)}50%{box-shadow:0 0 0 6px rgba(30,138,90,.35);border-color:#1E8A5A}}
 @media (prefers-reduced-motion:reduce){.pisca-nv{animation:none;border-color:#1E8A5A}.upd-i,.upd-img{animation:none;opacity:1;transform:none}}
+.ldx-k8{grid-template-columns:repeat(4,minmax(0,1fr))!important}@media(min-width:1200px){.ldx-k8{grid-template-columns:repeat(8,minmax(0,1fr))!important}}
 </style>
 
 <div id="app"></div>
@@ -1854,7 +1855,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='01/11 · 17h20';
+var VERSAO='01/11 · 17h30';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={caixa:'Caixa de entrada',painel:'Painel do dono',comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3247,7 +3248,7 @@ function prCarrega(forca){if(EM_DEMO||!S.sessao||PR.busy)return;if(PR.ok&&!forca
     /* mantém o que está sendo editado agora e troca o resto pela versão do banco */
     var loc={};PR.lista.forEach(function(l){if(PR.snap[l.id]!==JSON.stringify(l))loc[l.id]=l;});
     PR.lista.length=0;novo.forEach(function(l){PR.lista.push(loc[l.id]||l);});PR.snap={};novo.forEach(function(l){PR.snap[l.id]=JSON.stringify(l);});
-    PR.ok=true;PR.erro=false;prMigra();if(ldAberto()&&leadIdeali())ldR();else if((ui.tab==='admin'||ui.tab==='painel')&&!ui.sheet)render();},function(){PR.busy=false;PR.erro=true;});}
+    PR.ok=true;PR.erro=false;prMigra();if(ldAberto()&&leadIdeali())ldR();else if((ui.tab==='admin'||ui.tab==='painel'||leadIdeali())&&!ui.sheet)render();},function(){PR.busy=false;PR.erro=true;});}
 /* contatos que estavam nas preferências do admin vão para a tabela (uma vez só) */
 function prMigra(){if(S.prospMembro||!S.admin||!S.prefs||!Array.isArray(S.prefs.leadsIdeali)||!S.prefs.leadsIdeali.length)return;
   var ja={};PR.lista.forEach(function(l){ja[l.tel]=1;});S.prefs.leadsIdeali.forEach(function(l){if(l&&telNorm(l.tel)&&!ja[l.tel]){ja[l.tel]=1;PR.lista.push(l);}});
@@ -3429,7 +3430,7 @@ function ldDetalhe(l,t){if(ui.leadEd===l.id)return '<div class="ldx-det">'+leadE
   var tipo=l.tipo?(CAP_TIPO[l.tipo]||l.tipo):'';
   return '<div class="ldx-det"><button class="btn sm ldx-volta" data-a="ldSel" data-id="">‹ Voltar</button>'+
     '<div class="ldx-dh"><span class="ldx-av lg" style="background:'+ldCor(l.id)+'">'+esc(ldIni(l.nome))+'</span><div style="min-width:0"><h2>'+esc(l.nome||'Sem nome')+'</h2><a class="ldx-tel" href="'+waLink('',l.tel)+'" target="_blank" rel="noopener">'+esc(telFmt(l.tel))+'</a></div><button class="icon-btn" data-a="leadEd" data-id="'+l.id+'" title="Editar" aria-label="Editar">✏️</button></div>'+
-    '<div class="ldx-chips">'+(l.pago?'<span class="ldx-tpc">🚀 Tráfego pago</span>':'')+'<span>'+ldOrig(l)+'</span>'+(tipo?'<span>'+esc(tipo)+'</span>':'')+(l.cidade?'<span>📍 '+esc(l.cidade)+(l.uf?'/'+esc(l.uf):'')+'</span>':'')+'<span>📅 Chegou '+(l.criado===t?'hoje':dmy(l.criado))+'</span>'+(l.etapa?'<span>✉️ '+plural(l.etapa,'mensagem','mensagens')+'</span>':'')+'</div>'+
+    '<div class="ldx-chips">'+(function(){var a=ID&&leadConta(l);return a?'<span class="ldx-tpc" style="background:#E3F7F0;color:#1E8A5A">✅ Criou conta '+dmy(String(a.cadastro||'').slice(0,10)).slice(0,5)+(contaAtiva(a)?' · ativo':'')+'</span>':'';})()+(l.pago?'<span class="ldx-tpc">🚀 Tráfego pago</span>':'')+'<span>'+ldOrig(l)+'</span>'+(tipo?'<span>'+esc(tipo)+'</span>':'')+(l.cidade?'<span>📍 '+esc(l.cidade)+(l.uf?'/'+esc(l.uf):'')+'</span>':'')+'<span>📅 Chegou '+(l.criado===t?'hoje':dmy(l.criado))+'</span>'+(l.etapa?'<span>✉️ '+plural(l.etapa,'mensagem','mensagens')+'</span>':'')+'</div>'+
     '<div class="ldx-st s-'+st.c+'"><b>'+esc(st.tx)+'</b>'+(st.sub?'<small>'+esc(st.sub)+'</small>':'')+'</div>'+
     (l.obs?'<p class="ldx-obs">📝 '+esc(l.obs)+'</p>':'')+
     (ui.ldComp&&ui.ldComp.id===l.id?ldComposer(l):
@@ -3441,14 +3442,34 @@ function ldDetalhe(l,t){if(ui.leadEd===l.id)return '<div class="ldx-det">'+leadE
         (S.prospMembro?'':'<button class="icon-btn" data-a="leadDel" data-id="'+l.id+'" title="Apagar" aria-label="Apagar">🗑</button>')+'</div>')+
     '<div class="ldx-hist"><h3>Histórico</h3>'+(H.length?H.map(function(h){return '<div class="ldx-h"><span>'+dmy(h.d).slice(0,5)+'</span><div><b>'+esc(h.n)+'</b>'+(h.txt?'<small>'+esc(h.txt.slice(0,160))+(h.txt.length>160?'…':'')+'</small>':'')+'</div></div>';}).join(''):'')+
       '<div class="ldx-h"><span>'+dmy(l.criado).slice(0,5)+'</span><div><b>Entrou na lista</b><small>'+esc(ldOrig(l).replace(/^\S+\s/,''))+'</small></div></div></div></div>';}
+/* ===== Prospecção Ideali × contas criadas: quem se cadastrou e quem está usando (só admin) ===== */
+function telChave(t){var d=String(t||'').replace(/\D/g,'');if(d.length>11&&d.slice(0,2)==='55')d=d.slice(2);if(d.length<10)return '';return d.slice(0,2)+d.slice(-8);}
+function contasPlat(){return (ui.admLista||[]).filter(function(a){return !a.admin;});}
+function contaMapa(){if(ui._cmT===ui.admT&&ui._cm)return ui._cm;var m={};contasPlat().forEach(function(a){var k=telChave(a.telefone);if(k)m[k]=a;});ui._cm=m;ui._cmT=ui.admT;return m;}
+function leadConta(l){if(!S.admin||!ui.admLista)return null;var k=telChave(l.tel);return k?contaMapa()[k]||null:null;}
+function contaAtiva(a){return !!(a.ultimo_acesso&&String(a.ultimo_acesso).slice(0,10)>=addDays(today(),-7));}
+function contaLead(a){var k=telChave(a.telefone);if(!k)return null;return leadsDe().filter(function(l){return telChave(l.tel)===k;})[0]||null;}
+function ctItem(a,on){var nm=a.nome||a.email||'Sem nome',at=contaAtiva(a);return '<button class="ldx-it'+(on?' on':'')+'" data-a="ctSel" data-id="'+a.user_id+'"><span class="ldx-av" style="background:'+ldCor(a.user_id)+'">'+esc(ldIni(nm))+'</span><span class="ldx-tx"><b>'+esc(nm)+'</b><small>'+esc(a.telefone?telFmt(a.telefone):a.email||'')+(a.cidade?' · '+esc(a.cidade):'')+'</small></span><span class="ldx-pill '+(at?'p-cli':'p-espera')+'">'+(at?'ativo':dmy(String(a.cadastro||'').slice(0,10)).slice(0,5))+'</span></button>';}
+function ctDetalhe(a){var nm=a.nome||'Sem nome',t=today(),ua=a.ultimo_acesso?String(a.ultimo_acesso).slice(0,10):'',dias=ua?daysBetween(ua,t):null,m=a.m||{},ld=contaLead(a);
+  var msg='Oi, '+String(nm).split(' ')[0]+'! Aqui é o Danilo, do Ideali CAD. Vi que você criou a sua conta. Posso te ajudar a começar? 😊';
+  return '<div class="ldx-det"><button class="btn sm ldx-volta" data-a="ctSel" data-id="">‹ Voltar</button>'+
+    '<div class="ldx-dh"><span class="ldx-av lg" style="background:'+ldCor(a.user_id)+'">'+esc(ldIni(nm))+'</span><div style="min-width:0"><h2>'+esc(nm)+'</h2>'+(a.telefone?'<a class="ldx-tel" href="'+waLink('',a.telefone)+'" target="_blank" rel="noopener">'+esc(telFmt(a.telefone))+'</a>':'<span class="small muted">Sem WhatsApp no cadastro</span>')+'</div></div>'+
+    '<div class="ldx-chips"><span>'+(contaAtiva(a)?'🟢 Ativo':'⚪ Sem uso recente')+'</span><span>📅 Cadastro '+dmy(String(a.cadastro||'').slice(0,10))+'</span>'+(a.cidade?'<span>📍 '+esc(a.cidade)+'</span>':'')+'<span>💳 '+esc((a.plano||'—')+' · '+(a.status||'—'))+'</span>'+(ld?'<span>🎯 Veio da prospecção</span>':'')+'</div>'+
+    '<div class="ldx-st"><b>'+(ua?(dias===0?'Usou hoje':dias===1?'Usou ontem':'Último acesso há '+dias+' dias'):'Ainda não voltou depois do cadastro')+'</b><small>'+(a.email?esc(a.email):'')+'</small></div>'+
+    '<div class="grid2" style="margin-top:10px"><div class="stat" style="cursor:default"><span class="lbl">Pedidos</span><span class="v">'+(m.pedidos_total!=null?m.pedidos_total:'—')+'</span></div><div class="stat" style="cursor:default"><span class="lbl">Clientes</span><span class="v">'+(m.clientes_total!=null?m.clientes_total:'—')+'</span></div></div>'+
+    '<div class="row wrap" style="gap:8px;margin-top:12px">'+(a.telefone?'<a class="btn pri" href="'+waLink(msg,a.telefone)+'" target="_blank" rel="noopener">💬 WhatsApp</a>':'')+(ld?'<button class="btn" data-a="leadFil" data-v="todos" data-ld="'+ld.id+'">Ver na prospecção</button>':'')+'<button class="btn" data-a="tab" data-v="admin">Ver no painel</button></div></div>';}
 function rLeads(){if(ui.sub==='ideali'&&!S.admin&&!S.prospMembro)ui.sub=null;ui.leadModo=ui.sub==='ideali'?'ideali':'cli';var ID=leadIdeali(),L=leadsDe(),t=today(),f=ui.leadFil||'hoje',q=(ui.ldBusca||'').trim().toLowerCase(),imp=ui.leadImp;
-  var cont={};LD_F.forEach(function(x){cont[x[0]]=0;});L.forEach(function(l){cont[ldCat(l,t)]++;});cont.todos=L.length;
+  var CT=ID&&S.admin;if(CT&&!ui.admLista&&!ui.admBusy)carregaAdmin();var cat=function(l){return CT&&leadConta(l)?'cli':ldCat(l,t);};
+  var FF=CT?LD_F.concat([['cad','Cadastrados na plataforma','🆕'],['ativo','Usuários ativos','🟢']]):LD_F,CS=CT?contasPlat():[];
+  var cont={};FF.forEach(function(x){cont[x[0]]=0;});L.forEach(function(l){cont[cat(l)]++;});cont.todos=L.length;cont.cad=CS.length;cont.ativo=CS.filter(contaAtiva).length;
   var OC=ldOcasiao(),nOc=OC?L.filter(function(l){return ldOcElegivel(l,OC);}).length:0;if(f==='oc'&&!nOc)f=ui.leadFil='espera';
   var ehPago=function(l){return !!(l.pago||l.pag);},LP=L.filter(ehPago);cont.pago=LP.length;if(f==='pago'&&ID)f=ui.leadFil='todos';
-  var lista=L.filter(function(l){return (f==='todos'||(f==='pago'?ehPago(l):f==='oc'?ldOcElegivel(l,OC):ldCat(l,t)===f))&&(!q||(String(l.nome||'').toLowerCase().indexOf(q)>=0||String(l.tel).indexOf(q.replace(/\D/g,'')||'§')>=0||String(l.cidade||'').toLowerCase().indexOf(q)>=0));})
+  var lista=L.filter(function(l){return (f==='todos'||(f==='pago'?ehPago(l):f==='oc'?ldOcElegivel(l,OC):cat(l)===f))&&(!q||(String(l.nome||'').toLowerCase().indexOf(q)>=0||String(l.tel).indexOf(q.replace(/\D/g,'')||'§')>=0||String(l.cidade||'').toLowerCase().indexOf(q)>=0));})
     .sort(f==='pago'?function(a,b){return String(b.criado||'').localeCompare(String(a.criado||''));}:function(a,b){return String(a.nome||'~').localeCompare(String(b.nome||'~'),'pt');});
   var sel=L.filter(function(l){return l.id===ui.ldSel;})[0]||null,g=SECS.filter(function(x){return x.id==='mkt';})[0];
   var letra='',itens=lista.map(function(l){var c=(String(l.nome||'#').trim()[0]||'#').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(!/[A-Z]/.test(c))c='#';var h=f!=='pago'&&c!==letra?'<div class="ldx-letra">'+c+'</div>':'';letra=c;return h+ldItem(l,t,sel&&sel.id===l.id);}).join('');
+  var ctSel=null;if(CT&&(f==='cad'||f==='ativo')){var CL=CS.filter(function(a){return (f==='cad'||contaAtiva(a))&&(!q||String(a.nome||'').toLowerCase().indexOf(q)>=0||String(a.email||'').toLowerCase().indexOf(q)>=0||String(a.telefone||'').indexOf(q.replace(/\D/g,'')||'§')>=0||String(a.cidade||'').toLowerCase().indexOf(q)>=0);}).sort(function(a,b){return f==='ativo'?String(b.ultimo_acesso||'').localeCompare(String(a.ultimo_acesso||'')):String(b.cadastro||'').localeCompare(String(a.cadastro||''));});
+    ctSel=CS.filter(function(a){return a.user_id===ui.ctSel;})[0]||null;sel=null;itens=ui.admBusy&&!ui.admLista?'<p class="empty">Carregando as contas…</p>':CL.map(function(a){return ctItem(a,ctSel&&ctSel.user_id===a.user_id);}).join('');}
   var importa='';
   var prevs=imp&&imp.prev&&imp.prev.length?'<div class="ld-prevs">'+imp.prev.map(function(u){return '<img src="'+u+'" alt="Print colado">';}).join('')+'</div>':'';
   if(imp&&imp.st==='lendo')importa='<div class="ld-imp">'+prevs+'<p id="ld-prog">'+esc(imp.msg||'Lendo o print…')+(imp.p!=null?' '+imp.p+'%':'')+'</p><p class="small muted">Na primeira vez demora um pouco mais: o aparelho baixa o leitor de texto (uns 5 MB).</p></div>';
@@ -3459,17 +3480,17 @@ function rLeads(){if(ui.sub==='ideali'&&!S.admin&&!S.prospMembro)ui.sub=null;ui.
     '<div class="row wrap" style="gap:8px;margin-top:8px">'+(imp.lista.length?'<button class="btn pri" data-a="leadSalva">Salvar leads</button>':'')+'<button class="btn" data-a="leadImpX">Cancelar</button></div></div>';
   var head='<div class="ldx-head"><div class="ldx-ht">'+(ID?'<span class="ld-logo">'+logo(40)+'</span>':(g&&agOk('mkt')?avSec(g,0,'gravando'):''))+'<div><h1>'+(ID?'Prospecção Ideali'+(S.prospMembro?'':' <span class="tag a">só admin</span>'):'Leads')+'</h1><p class="small muted">'+(ID?'Cadistas para apresentar o Ideali CAD. Mensagens em nome da empresa, com o link do site e do tour.':'Contatos dos anúncios e da sua página. Depois de cada mensagem o contato espera o prazo que você escolher e volta para "Chamar hoje".')+'</p></div></div>'+
     (S.prospMembro?'<div class="ldx-hb small muted">'+prEnviadosHoje(S.sessao.id)+' de '+prLimite()+' envios hoje</div></div>':'<div class="ldx-hb"><button class="btn pri" data-a="leadCola">📋 Colar print ou lista</button><label class="btn up">📷 Prints<input type="file" accept="image/*" multiple id="ld-file" hidden></label><button class="btn" data-a="leadNovo">+ Adicionar</button>'+(ID?'':'<button class="btn" data-a="capVai" title="Página para anúncios">🌐 Minha página</button>')+'</div></div>')+
-    '<div class="ldx-kpis">'+LD_F.map(function(x){return '<button class="ldx-k'+(f===x[0]?' on':'')+(x[0]==='hoje'&&cont.hoje?' alerta':'')+'" data-a="leadFil" data-v="'+x[0]+'"><span>'+x[2]+' '+(ID&&x[0]==='cli'?'Criaram conta':ID&&x[0]==='resp'?'Êxito (responderam)':ID&&x[0]==='hoje'?'A disparar':x[1])+'</span><b>'+cont[x[0]]+'</b></button>';}).join('')+(ID?'':'<button class="ldx-k ldx-pago'+(f==='pago'?' on':'')+'" data-a="leadFil" data-v="pago"><span>🚀 Tráfego pago</span><b>'+cont.pago+'</b></button>')+'</div>';
+    '<div class="ldx-kpis'+(CT?' ldx-k8':'')+'">'+FF.map(function(x){return '<button class="ldx-k'+(f===x[0]?' on':'')+(x[0]==='hoje'&&cont.hoje?' alerta':'')+'" data-a="leadFil" data-v="'+x[0]+'"><span>'+x[2]+' '+(ID&&x[0]==='cli'?'Criaram conta':ID&&x[0]==='resp'?'Êxito (responderam)':ID&&x[0]==='hoje'?'A disparar':x[1])+'</span><b>'+cont[x[0]]+'</b></button>';}).join('')+(ID?'':'<button class="ldx-k ldx-pago'+(f==='pago'?' on':'')+'" data-a="leadFil" data-v="pago"><span>🚀 Tráfego pago</span><b>'+cont.pago+'</b></button>')+'</div>';
   var ocB=nOc?'<div class="ldx-oc"><span>🎉</span><div><b>Hoje é '+esc(OC.ev.nome)+'!</b><small>'+plural(nOc,'contato da fila de espera pode','contatos da fila de espera podem')+' receber uma mensagem especial hoje. O retorno de cada um continua na mesma data.</small></div><button class="btn sm pri" data-a="leadFil" data-v="oc">'+(f==='oc'?'Mostrando':'Ver contatos')+'</button></div>':'';
   var pgB='';if(f==='pago'){var d7=addDays(t,-6),mes=t.slice(0,7),cl=LP.filter(function(l){return l.st==='cli';}).length,semR=LP.filter(function(l){return l.st==='seq'&&!(l.hist&&l.hist.length);}).length;
     var k=function(n,r){return '<div><b>'+n+'</b><small>'+r+'</small></div>';};
     pgB='<div class="ldx-pg"><div class="ldx-pg-t"><b>🚀 Tráfego pago</b><small>Contatos que vieram da sua página do anúncio</small></div><div class="ldx-pg-n">'+
       k(LP.filter(function(l){return l.criado===t;}).length,'hoje')+k(LP.filter(function(l){return (l.criado||'')>=d7;}).length,'7 dias')+k(LP.filter(function(l){return String(l.criado||'').slice(0,7)===mes;}).length,'no mês')+
       k(cl,'viraram cliente')+k((LP.length?Math.round(cl/LP.length*100):0)+'%','conversão')+k(semR,'sem resposta')+'</div></div>';}
-  return prPergunta()+'<div class="ldx'+(sel?' com-sel':'')+'">'+head+ocB+pgB+importa+
+  return prPergunta()+'<div class="ldx'+(sel||ctSel?' com-sel':'')+'">'+head+ocB+pgB+importa+
     '<div class="ldx-grid"><div class="ldx-lista card"><input class="ldx-busca" id="ldx-busca" type="search" placeholder="Buscar nome, telefone ou cidade" value="'+esc(ui.ldBusca||'')+'">'+
       '<div class="ldx-itens">'+(itens||'<p class="empty">'+(L.length?(f==='hoje'?'Ninguém para chamar hoje. 🎉':'Nenhum contato aqui.'):'Cole a sua lista de números ou o print dos contatos para começar.')+'</p>')+'</div></div>'+
-      '<div class="ldx-dcol card">'+(sel?ldDetalhe(sel,t):'<div class="ldx-vazio"><span>👈</span><b>Escolha um contato</b><p class="small muted">Os detalhes, as mensagens e o histórico aparecem aqui.</p></div>')+'</div></div></div>';}
+      '<div class="ldx-dcol card">'+(ctSel?ctDetalhe(ctSel):sel?ldDetalhe(sel,t):'<div class="ldx-vazio"><span>👈</span><b>Escolha um contato</b><p class="small muted">Os detalhes, as mensagens e o histórico aparecem aqui.</p></div>')+'</div></div></div>';}
 function fLeads(){var L=leadsDe(),f=ui.leadFil||'hoje',t=today(),imp=ui.leadImp;
   var cont={hoje:leadsHoje().length,seq:leadsAtivos().length,resp:L.filter(function(l){return l.st==='resp';}).length,cli:L.filter(function(l){return l.st==='cli';}).length,fim:L.filter(function(l){return l.st==='fim'||l.st==='nao';}).length};
   var lista=L.filter(function(l){return f==='hoje'?l.st==='seq'&&(!l.prox||l.prox<=t):f==='seq'?l.st==='seq':f==='fim'?(l.st==='fim'||l.st==='nao'):l.st===f;}).sort(function(a,b){return (a.prox||'')<(b.prox||'')?-1:1;});
@@ -5471,7 +5492,7 @@ var PRECO_PLANO={basico:29.90,plus:59.90};
 var NOME_PLANO={basico:'Básico',plus:'Plus',rede:'Rede',vitrine:'Vitrine'};
 function sitAss(a){var agora=new Date();if(a.status==='vencida')return 'bloqueada';if(a.status==='ativa'&&(!a.vence_em||new Date(a.vence_em)>agora))return 'ativa';if(a.status==='teste'&&a.teste_ate&&new Date(a.teste_ate)>agora)return 'teste';return 'gratis';}
 var SIT_TXT={ativa:'Ativa',teste:'Teste',gratis:'Essencial',bloqueada:'Bloqueada'},SIT_TAG={ativa:'ok',teste:'a',gratis:'',bloqueada:'u'};
-function carregaAdmin(){ui.admBusy=true;Promise.all([sb.rpc('admin_assinantes'),sb.rpc('admin_metricas').then(function(x){return x;},function(){return {data:[]};})]).then(function(rr){var r=rr[0],mt={};((rr[1]&&rr[1].data)||[]).forEach(function(m){mt[m.user_id]=m;});ui.admBusy=false;if(r.error){ui.admErro=r.error.message;}else{ui.admLista=(r.data||[]).map(function(a){a.m=mt[a.user_id]||{};return a;});ui.admErro=null;ui.admT=Date.now();}if((ui.tab==='admin'||ui.tab==='painel')&&!ui.sheet)render();else if(ui.sheet&&ui.sheet.fn===fAdmin)renderSheet();});}
+function carregaAdmin(){ui.admBusy=true;Promise.all([sb.rpc('admin_assinantes'),sb.rpc('admin_metricas').then(function(x){return x;},function(){return {data:[]};})]).then(function(rr){var r=rr[0],mt={};((rr[1]&&rr[1].data)||[]).forEach(function(m){mt[m.user_id]=m;});ui.admBusy=false;if(r.error){ui.admErro=r.error.message;}else{ui.admLista=(r.data||[]).map(function(a){a.m=mt[a.user_id]||{};return a;});ui.admErro=null;ui.admT=Date.now();}if((ui.tab==='admin'||ui.tab==='painel'||leadIdeali())&&!ui.sheet)render();else if(ui.sheet&&ui.sheet.fn===fAdmin)renderSheet();});}
 /* ---------- Painel do administrador ----------
    Só cadastro, assinatura e números de uso (tempo no sistema, quando foi visto, quantos pedidos/clientes).
    Nada do conteúdo dos pedidos, clientes ou pacientes de cada cadista. */
@@ -7157,6 +7178,7 @@ impGrava:function(){impGrava();},
   lfVer:function(){var F=ui.lfesta;festaFecha();var id=F&&F.ids&&F.ids[0];closeSheet();ui.tab='leads';ui.sub=null;ui.leadModo='cli';ui.leadFil='todos';ui.ldSel=id||null;ui.ldComp=null;render();window.scrollTo(0,0);},
   admSimLead:function(){var nomes=['Dra. Fernanda Lima','Dr. Rafael Costa','Lab. Sorriso Pleno','Dra. Camila Rocha'],tipos=['dentista','dentista','protetico','dentista'],i=Math.floor(Math.random()*nomes.length);
     var mo=ui.leadModo;ui.leadModo='cli';var l=leadNovoObj(nomes[i]+' (simulação)','119'+String(Math.floor(10000000+Math.random()*89999999)),'insta');l.tipo=tipos[i];l.pag=1;l.pago=1;l.sim=1;l.obs=(CAP_TIPO[l.tipo]||'')+' · veio pela página (simulação)';leadsDe().push(l);ui.leadModo=mo;save();leadFesta([l],true);},
+  ctSel:function(d){ui.ctSel=d.id||null;render();if(d.id&&window.innerWidth<820)window.scrollTo(0,0);},
   ldSel:function(d){ui.ldSel=d.id||null;ui.ldComp=null;ui.leadEd=null;render();if(d.id&&window.innerWidth<820)window.scrollTo(0,0);},
   ldComp:function(d){var l=leadsDe().filter(function(x){return x.id===d.id;})[0];if(!l)return;ui.ldComp={id:l.id,op:0,txt:null,dias:7};render();},
   ldOp:function(d){var C=ui.ldComp;if(!C)return;var ops=C.ops||[];C.op=+d.v;C.txt=ops[+d.v]||C.txt;render();},
@@ -7218,7 +7240,7 @@ impGrava:function(){impGrava();},
       for(var i=0;i<its.length;i++){var ty=its[i].types.filter(function(x){return /^image\//.test(x);})[0];if(ty){var b=await its[i].getType(ty);fs.push(new File([b],'print.png',{type:ty}));}}
       if(!fs.length){var tx=null;try{tx=await navigator.clipboard.readText();}catch(e){}if(tx&&leadsDoTexto(tx).length){leadsTextoImp(tx);return;}toast('Não achei print nem lista de números copiada. Copie o print ou a lista (ou use “Escolher prints”).');return;}leadsLePrint(fs);}
     catch(e){toast('Neste aparelho use “Escolher prints” ou Ctrl+V.');}},
-  leadFil:function(d){ui.leadFil=d.v;ldR();},
+  leadFil:function(d){ui.leadFil=d.v;if(d.ld){ui.ldSel=d.ld;ui.ctSel=null;}ldR();},
   leadImpX:function(){ui.leadImp=null;ldR();},
   leadNovo:function(){ui.leadImp={st:'revisar',lista:[{nome:'',tel:'',orig:'',ok:true}]};ldR();setTimeout(function(){var e=document.querySelector('.ld-in[data-k=nome]');if(e)e.focus();},50);},
   leadSalva:function(){var imp=ui.leadImp;if(!imp)return;var L=leadsDe(),ja={},n=0,ruim=0;L.forEach(function(l){ja[l.tel]=1;});
