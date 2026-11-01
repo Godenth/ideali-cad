@@ -1511,6 +1511,7 @@ span.pd-it-t{cursor:default}
 
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:.92rem;max-width:calc(100% - 32px);box-shadow:0 10px 30px -10px #0008}
 .proto{font-size:.75rem;color:var(--muted);text-align:center}
+.ext-l .mono{white-space:nowrap}
 </style>
 
 <div id="app"></div>
@@ -1820,7 +1821,7 @@ var LIBS=[
   {k:'analises',g:'dad',h:'analisando',c:function(){var cm=monthOf(today());return alive(S.pedidos).some(function(p){return p.recebido&&monthOf(p.recebido)<cm;});},tit:'O Klose chegou na equipe! 📊',txt:'Olá, sou o Klose, da análise de dados. Seu primeiro mês fechou e eu vim medir tudo: liberei as Análises e o Ranking de clientes, com quem manda mais, quem sumiu e a saúde do seu negócio.',bts:[{a:'tab',v:'analises',l:'Ver análises',pri:1}],tambem:['ranking']},
   {k:'sala',g:'ger',h:'serio',c:function(){return libIdade()>=14&&['ger','fin','mkt','dad'].filter(agOk).length>=3;},tit:'Agora tem reunião de equipe ☕',txt:'Todo dia, no primeiro acesso, a equipe se reúne e te conta o que viu: pedidos, dinheiro, clientes e marketing.',bts:[{a:'tab',v:'secretarios',l:'Ver a equipe',pri:1}]},
   {k:'passeio',g:'ven',h:'feliz',so:1,c:function(){return libIdade()>=7;},tit:'Uma semana juntos! 💛',txt:'A partir de agora, de vez em quando um de nós aparece aqui no canto com um aviso ou uma dica. Dá para desligar em Configurações.',bts:[]},
-  {k:'rede',g:'mkt',h:'animada',c:function(){try{var H=premiosDe().h,meta=Object.keys(H).some(function(k){return k.split(':').length===3&&H[k].g;});return meta&&alive(S.pedidos).filter(function(p){return pedComprovado(p);}).length>=30;}catch(e){return false;}},tit:'Você entrou para a Rede! 🌐',txt:'Você já pode publicar seu perfil na Rede. Laboratórios veem seus trabalhos comprovados e podem te chamar.',bts:[{a:'tab',v:'rede',l:'Ver a Rede',pri:1}]}];
+  {k:'rede',g:'mkt',h:'animada',c:function(){try{var H=premiosDe().h,meta=Object.keys(H).some(function(k){return k.split(':').length===3&&H[k].g;});return meta&&alive(S.pedidos).filter(function(p){return pedComprovado(p);}).length>=30;}catch(e){return false;}},tit:'Você entrou para a Rede! 🌐',txt:'Você já pode publicar seu perfil na Rede. Laboratórios veem seus trabalhos e podem te chamar.',bts:[{a:'tab',v:'rede',l:'Ver a Rede',pri:1}]}];
 function libEstado(){S.prefs=S.prefs||{};var L=S.prefs.lib;if(!L||typeof L!=='object'){L=S.prefs.lib={ini:today()};if(alive(S.pedidos).length||alive(S.clientes).length)L.all=1;}return L;}
 function libIdade(){var L=libEstado();return L.ini?Math.round((new Date(today()+'T12:00:00')-new Date(L.ini+'T12:00:00'))/864e5):99;}
 function libOk(k){if(EM_DEMO||!S.sessao)return true;if(['metas','analises','ranking','rede','sala','passeio','painel','bia','leads'].indexOf(k)<0)return true;var L=libEstado();return !!(L.all||L[k]);}
@@ -1829,7 +1830,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='31/10 · 10h30';
+var VERSAO='01/11 · 16h50';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={caixa:'Caixa de entrada',painel:'Painel do dono',comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -1922,7 +1923,7 @@ function vagasHtml(){var V=agVagas();if(!V.length)return '';
 function rMaisHub(){var it=MENU[1][1],ok=it.filter(function(x){return libOk(x[0]);}),fora=it.filter(function(x){return !libOk(x[0]);}),NL=secNaoLidas();
   var vagas=[['fin','com 3 pedidos'],['mkt','no primeiro cliente'],['ger','com 10 pedidos'],['dad','quando seu primeiro mês fechar']].filter(function(v){return !agOk(v[0]);});
   fora=fora.concat(vagas.map(function(v){var g=SECS.filter(function(x){return x.id===v[0];})[0];return ['_ag',g.nome+' ('+g.cargo.toLowerCase()+')',v[1],v[0]];}));
-  var dica={metas:'com 10 pedidos',analises:'quando seu primeiro mês fechar',ranking:'quando seu primeiro mês fechar',rede:'com 30 trabalhos comprovados e uma meta batida'};
+  var dica={metas:'com 10 pedidos',analises:'quando seu primeiro mês fechar',ranking:'quando seu primeiro mês fechar',rede:'com 30 trabalhos finalizados e uma meta batida'};
   return '<div class="stack" style="gap:16px"><div class="mh-grid">'+ok.map(function(x){return '<button class="card mh-c" data-a="tab" data-v="'+x[0]+'"><span class="mh-ic">'+ICON[x[0]]+'</span><span><b>'+esc(x[1])+(x[0]==='secretarios'&&NL?' <span class="mh-n">'+NL+' novo'+(NL>1?'s':'')+'</span>':'')+'</b><small>'+esc(MAIS_DESC[x[0]]||'')+'</small></span></button>';}).join('')+
     '</div>'+
     (fora.length?'<section class="card stack"><h2 style="margin:0">Chegando para você 🔒</h2><p class="small muted" style="margin:0">Essas funções aparecem sozinhas na hora certa, e alguém da equipe te apresenta.</p><div class="mh-fora">'+fora.map(function(x){var k=x[0]==='_ag'?x[3]:x[0];return '<button class="mh-fb" data-a="libVer" data-v="'+esc(k)+'">'+(x[0]==='_ag'?'👤':ICON[x[0]])+' <b>'+esc(x[1])+'</b> · '+(x[0]==='_ag'?'contratação '+esc(x[2]):esc(dica[x[0]]||'em breve'))+' <span class="mh-por">Por quê? ›</span></button>';}).join('')+'</div></section>':'')+'</div>';}
@@ -4464,7 +4465,7 @@ function rCliente(id){
     '<div class="grid2"><div class="stat" style="cursor:default"><span class="lbl">A receber</span><span class="v" style="color:'+(ab?'var(--urgent)':'inherit')+'">'+brl(ab)+'</span></div>'+
     '<div class="stat" style="cursor:default"><span class="lbl">Este mês</span><span class="v">'+brl(mes)+'</span></div></div>'+
     (f?'<div class="banner"><span>Este cliente tem <b>'+f.pct+'% de desconto</b> nos pedidos deste mês pelo volume do mês passado.</span></div>':'')+
-    '<div class="row wrap"><button class="btn pri" data-a="pix" data-id="'+id+'">Cobrar por Pix</button><button class="btn" data-a="editCliente" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Editar</button><button class="btn" data-a="juntaAbre" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Juntar duplicado</button><button class="btn danger" data-a="delCliente" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Excluir</button></div>'+
+    '<div class="row wrap"><button class="btn pri" data-a="pix" data-id="'+id+'">Cobrar por Pix</button><button class="btn" data-a="extrato" data-id="'+id+'">Extrato</button><button class="btn" data-a="editCliente" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Editar</button><button class="btn" data-a="juntaAbre" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Juntar duplicado</button><button class="btn danger" data-a="delCliente" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Excluir</button></div>'+
     secLinkCli(c)+
     '<section class="card stack"><div><h2>Tabela de preços</h2><p class="small muted">Deixe em branco para usar o valor padrão do tipo de trabalho.</p></div>'+
     '<form data-form="precos" data-id="'+id+'" class="stack">'+alive(S.tipos).filter(function(t){return t.ativo;}).map(function(t){
@@ -4540,7 +4541,7 @@ function rFinanceiro(){
   var dev=devedores();
   var rv=meses.map(function(m){return alive(S.pagamentos).filter(function(g){return monthOf(g.data)===m;}).reduce(function(s,g){return s+(+g.valor||0);},0);});
   var porForma={};pgs.forEach(function(g){porForma[g.forma]=(porForma[g.forma]||0)+(+g.valor||0);});
-  return '<div class="stack" style="gap:12px"><div class="between wrap"><span class="muted">Cobranças, extratos e pagamentos de '+perNome()+'</span><span class="row wrap" style="gap:8px"><button class="btn sm" data-a="cobranca">Gerar cobrança</button><button class="btn sm pri" data-a="novoPagamento" '+(canWrite()?'':'disabled')+'>Registrar pagamento</button></span></div>'+perPicker()+'</div>'+
+  return '<div class="stack" style="gap:12px"><div class="between wrap"><span class="muted">Cobranças, extratos e pagamentos de '+perNome()+'</span><span class="row wrap" style="gap:8px"><button class="btn sm" data-a="extrato">Extrato do cliente</button><button class="btn sm" data-a="cobranca">Gerar cobrança</button><button class="btn sm pri" data-a="novoPagamento" '+(canWrite()?'':'disabled')+'>Registrar pagamento</button></span></div>'+perPicker()+'</div>'+
     '<div class="dash">'+
       kpi('Faturado',brl(tot),G?'<span>'+ps.length+' pedidos</span>':delta(tot,fatMes(prevMonth(ui.per))))+
       kpi('Recebido',brl(recebido),'<span>'+pgs.length+' pagamento(s) '+perCurto()+'</span>')+
@@ -5324,7 +5325,7 @@ function statsRede(uid){S.redeStats=S.redeStats||{};var c=S.redeStats[uid];if(c&
 function diasTxt(d){if(d==null)return '—';if(d<0.75)return 'mesmo dia';var n=Math.round(d);return n<=1?'1 dia':n+' dias';}
 function blocoStats(uid){var st=statsRede(uid);if(st===undefined)return '<p class="small muted">Carregando números…</p>';if(!st)return '';
   var mes=st.desde?MESES[+st.desde.slice(5,7)-1].slice(0,3)+'/'+st.desde.slice(0,4):'—',tp=st.tipos||[];
-  return '<div class="rd-kpis"><div><b>'+st.trabalhos+'</b><span>trabalhos comprovados</span></div><div><b>'+st.elementos+'</b><span>elementos</span></div><div><b>'+(st.no_prazo==null?'—':st.no_prazo+'%')+'</b><span>entregues no prazo</span></div><div><b>'+diasTxt(st.dias_medio)+'</b><span>entrega média</span></div></div>'+
+  return '<div class="rd-kpis"><div><b>'+st.trabalhos+'</b><span>trabalhos entregues</span></div><div><b>'+st.elementos+'</b><span>elementos</span></div><div><b>'+(st.no_prazo==null?'—':st.no_prazo+'%')+'</b><span>entregues no prazo</span></div><div><b>'+diasTxt(st.dias_medio)+'</b><span>entrega média</span></div></div>'+
     '<div class="stack" style="gap:6px"><div class="between"><h3 style="margin:6px 0 0">Tipos de trabalho que mais faz</h3><span class="small muted">no Ideali desde '+mes+'</span></div>'+
     hbars(tp.map(function(x){return {l:esc(x.nome),r:x.n+'',v:x.n};}),'Ainda sem trabalhos entregues.')+'<p class="small muted" style="margin:0">✓ <b>Trabalhos comprovados:</b> só contam pedidos finalizados com o STL e o HTML guardados no Ideali (o servidor confere os arquivos). Nunca mostram clientes, pacientes ou valores.</p>'+
     (st.sem_comprovar>0?'<div class="banner"><span>📈 Você tem <b>'+plural(st.sem_comprovar,'pedido finalizado','pedidos finalizados')+'</b> que ainda não aparece'+(st.sem_comprovar>1?'m':'')+' aqui. Guarde o STL e o HTML deles no sistema para entrarem no seu perfil e na meta oficial.</span></div>':'')+'</div>';}
@@ -6498,6 +6499,112 @@ async function geraPdfCobranca(cid,soGerar){
   if(soGerar)return {blob:doc.output('blob'),nome:nomeArq,tot:tot};
   if(await salvaPdf(doc,'cobranca_'+norm(c?c.nome:'cliente',30).replace(/\s+/g,'_').toLowerCase()+'_'+today()+'.pdf','Cobrança','Segue a cobrança dos trabalhos. Total '+brl(tot)+'.'))toast('PDF da cobrança baixado: '+brl(tot)+'.');
 }
+document.addEventListener('change',function(e){var t=e.target;if(t&&(t.id==='ext-de'||t.id==='ext-ate')&&t.value){var x=ui.ext||(ui.ext={modo:'per'});x[t.id==='ext-de'?'de':'ate']=t.value;if(x.de&&x.ate&&x.de>x.ate){var k=x.de;x.de=x.ate;x.ate=k;}renderSheet();}});
+/* ---------- Extrato do cliente (pedidos + pagamentos, com saldo) ----------
+   Débito = pedido finalizado/arquivado (não cancelado), na data de entrada (recebido).
+   Crédito = pagamento registrado, na data do pagamento. Saldo negativo = o cliente deve. */
+function extPer(){var e=ui.ext||(ui.ext={modo:'mes'}),t=today(),m=monthOf(t);
+  if(e.modo==='mes')return {de:m+'-01',ate:fimMes(m)};
+  if(e.modo==='ant'){var p=prevMonth(m);return {de:p+'-01',ate:fimMes(p)};}
+  if(e.modo==='3m'){var q=prevMonth(prevMonth(m));return {de:q+'-01',ate:fimMes(m)};}
+  return {de:e.de||m+'-01',ate:e.ate||t};}
+function fimMes(m){var a=+m.slice(0,4),b=+m.slice(5,7),d=new Date(a,b,0).getDate();return m+'-'+(d<10?'0':'')+d;}
+function extItens(p){var g={},o=[];itensDe(p).forEach(function(i){var k=i.t||'_';if(!g[k]){g[k]={t:k,d:[]};o.push(g[k]);}if(i.d)g[k].d.push(i.d);});
+  (p.extras||[]).forEach(function(x){var k=x.t||'_x';if(!g[k]){g[k]={t:k,d:[]};o.push(g[k]);}});
+  var L=o.map(function(x){var t=tipo(x.t),n=x.d.length||1;return n+'  '+(t?t.nome:'Trabalho')+(x.d.length?' ('+x.d.join(', ')+')':'');});
+  return L.length?L:[(nomeTrab(p)||'Trabalho')];}
+function extrato(cid,de,ate){
+  var E=[];
+  alive(S.pedidos).forEach(function(p){if(p.clienteId!==cid||p.cancelado||!(p.status==='finalizado'||p.status==='arquivado'))return;var d=p.recebido||p.entregue;if(!d)return;
+    E.push({d:d,k:0,v:-(+p.valor||0),ped:p});});
+  alive(S.pagamentos).forEach(function(g){if(g.clienteId!==cid||!g.data)return;E.push({d:g.data,k:1,v:+g.valor||0,pg:g});});
+  E.sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:a.k-b.k||(a.ped&&b.ped?(+a.ped.num)-(+b.ped.num):0);});
+  var ant=0,L=[],deb=0,cred=0;
+  E.forEach(function(x){if(x.d<de)ant+=x.v;else if(x.d<=ate){L.push(x);if(x.v<0)deb+=x.v;else cred+=x.v;}});
+  var s=ant;L.forEach(function(x){s=Math.round((s+x.v)*100)/100;x.saldo=s;});
+  return {ant:Math.round(ant*100)/100,L:L,deb:Math.round(deb*100)/100,cred:Math.round(cred*100)/100,saldo:Math.round(s*100)/100,de:de,ate:ate};}
+function brlS(v){return (v<0?'-':'')+brl(Math.abs(v));}
+function clientesComMov(){var m={};alive(S.pedidos).forEach(function(p){if(p.clienteId)m[p.clienteId]=1;});alive(S.pagamentos).forEach(function(g){if(g.clienteId)m[g.clienteId]=1;});
+  return Object.keys(m).map(cliente).filter(Boolean).sort(function(a,b){return a.nome.localeCompare(b.nome,'pt');});}
+function fExtrato(cid){
+  if(!cid){var cs=clientesComMov();
+    return head('Extrato do cliente')+'<p class="small muted">Escolha o cliente. O extrato mostra os pedidos finalizados, os pagamentos e o saldo do período.</p>'+
+      (cs.length?'<div class="list">'+cs.map(function(c){var sd=extrato(c.id,'0000-01-01',today()).saldo;return '<button class="li" data-a="extratoCli" data-id="'+c.id+'"><span class="t"><b>'+esc(c.nome)+'</b><span>'+(sd<0?'Saldo a pagar':sd>0?'Crédito do cliente':'Em dia')+'</span></span><span class="row"><span class="mono val" style="color:'+(sd<0?'var(--urgent)':'inherit')+'">'+brlS(sd)+'</span><span aria-hidden="true">›</span></span></button>';}).join('')+'</div>':'<p class="empty">Nenhum cliente com pedidos ou pagamentos ainda.</p>');}
+  var c=cliente(cid),P=extPer(),X=extrato(cid,P.de,P.ate),e=ui.ext;
+  var chip=function(k,l){return '<button class="btn sm'+(e.modo===k?' pri':'')+'" data-a="extratoPer" data-v="'+k+'">'+l+'</button>';};
+  return head('Extrato · '+esc(c?c.nome:''))+
+    '<button class="linkbtn" data-a="extratoCli" data-id="" style="justify-self:start">‹ Outro cliente</button>'+
+    '<div class="row wrap" style="gap:6px">'+chip('mes','Este mês')+chip('ant','Mês passado')+chip('3m','Últimos 3 meses')+chip('per','Escolher datas')+'</div>'+
+    (e.modo==='per'?'<div class="row wrap" style="gap:8px"><label class="fld" style="flex:1;min-width:140px"><span>De</span><input type="date" id="ext-de" value="'+P.de+'"></label><label class="fld" style="flex:1;min-width:140px"><span>Até</span><input type="date" id="ext-ate" value="'+P.ate+'"></label></div>':'')+
+    '<p class="small muted">'+dmy(P.de)+' a '+dmy(P.ate)+'</p>'+
+    '<div class="list ext-l"><div class="li" style="cursor:default"><span class="t"><b>Saldo anterior</b></span><span class="mono">'+brlS(X.ant)+'</span></div>'+
+    (X.L.length?X.L.map(function(x){if(x.ped){var p=x.ped;return '<div class="li" style="cursor:default"><span class="t"><b>'+dmy(x.d).slice(0,5)+' · #'+p.num+(p.paciente?' · '+esc(p.paciente):'')+'</b><span>'+esc(extItens(p).join(' · '))+'</span></span><span class="row" style="flex-direction:column;align-items:flex-end;gap:0"><span class="mono" style="color:var(--urgent)">'+brlS(x.v)+'</span><small class="muted mono">'+brlS(x.saldo)+'</small></span></div>';}
+      var g=x.pg;return '<div class="li" style="cursor:default"><span class="t"><b>'+dmy(x.d).slice(0,5)+' · Pagamento recebido</b><span>'+esc(formaNome(g.forma))+(g.obs?' · '+esc(g.obs):'')+'</span></span><span class="row" style="flex-direction:column;align-items:flex-end;gap:0"><span class="mono" style="color:var(--ok)">+'+brl(x.v)+'</span><small class="muted mono">'+brlS(x.saldo)+'</small></span></div>';}).join(''):'<p class="empty">Nenhum movimento no período.</p>')+'</div>'+
+    '<div class="grid2"><div class="stat" style="cursor:default"><span class="lbl">Pagamentos (C)</span><span class="v" style="color:var(--ok)">'+brl(X.cred)+'</span></div><div class="stat" style="cursor:default"><span class="lbl">Pedidos (D)</span><span class="v">'+brlS(X.deb)+'</span></div></div>'+
+    '<div class="between cb-tot"><b>'+(X.saldo<0?'Saldo a pagar':X.saldo>0?'Crédito do cliente':'Saldo atual')+'</b><b class="mono val" style="color:'+(X.saldo<0?'var(--urgent)':'var(--ok)')+'">'+brlS(X.saldo)+'</b></div>'+
+    '<div class="row wrap" style="gap:8px"><button class="btn pri ld-wa" data-a="extratoEnvia" data-id="'+cid+'">Enviar no WhatsApp</button><button class="btn" data-a="extratoPdf" data-id="'+cid+'">Só o PDF</button></div>'+
+    '<p class="small muted">Entram os pedidos <b>finalizados</b> pela data de entrada e os <b>pagamentos registrados</b>. Saldo negativo é o que o cliente ainda deve.</p>';
+}
+async function geraPdfExtrato(cid,soGerar){
+  var c=cliente(cid),P=extPer(),X=extrato(cid,P.de,P.ate);
+  await carregaJsPDF();var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,M=14,y=0;
+  var roxo=[91,69,224],cinza=[98,94,117],tinta=[27,24,48],verm=[200,60,52],verde=[20,133,90];
+  var quem=pdfTxt(S.perfil.nome||'Cadista');
+  doc.setFillColor.apply(doc,roxo);doc.rect(0,0,W,30,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(19);doc.text('Extrato',M,14);
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text(pdfTxt(quem+(S.perfil.telefone?' · '+S.perfil.telefone:'')),M,22);
+  doc.setFont('helvetica','bold');doc.text(dmy(P.de)+' a '+dmy(P.ate),W-M,14,{align:'right'});doc.setFont('helvetica','normal');doc.text('Emitido em '+dmy(today()),W-M,22,{align:'right'});
+  y=40;doc.setTextColor.apply(doc,cinza);doc.setFontSize(8.5);doc.text('CLIENTE',M,y);
+  doc.setTextColor.apply(doc,tinta);doc.setFont('helvetica','bold');doc.setFontSize(13);doc.text(pdfTxt(c?c.nome:''),M,y+6);doc.setFont('helvetica','normal');
+  var sub=[c&&c.doc?(c.doc.length===11?'CPF ':'CNPJ ')+fmtDoc(c.doc):'',c&&c.cidade?c.cidade+(c.uf?'/'+c.uf:''):'',c&&c.telefone?c.telefone:''].filter(Boolean).join(' · ');
+  if(sub){doc.setFontSize(9.5);doc.setTextColor.apply(doc,cinza);doc.text(pdfTxt(sub),M,y+11.5);}
+  y+=20;
+  var X0={d:M,f:M+22,h:M+44,v:W-M-28,s:W-M};
+  function cab(){doc.setFillColor(238,235,253);doc.rect(M,y-5,W-2*M,8,'F');doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor.apply(doc,roxo);
+    doc.text('Data',X0.d+2,y);doc.text('Pedido',X0.f+2,y);doc.text('Histórico',X0.h+2,y);doc.text('Valor',X0.v-2,y,{align:'right'});doc.text('Saldo',X0.s-2,y,{align:'right'});y+=7;doc.setFont('helvetica','normal');doc.setTextColor.apply(doc,tinta);}
+  cab();
+  doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.text('Saldo anterior',X0.h+2,y);doc.text(brlS(X.ant),X0.s-2,y,{align:'right'});doc.setFont('helvetica','normal');y+=7;
+  var hw=X0.v-X0.h-30;
+  X.L.forEach(function(x,i){
+    var lin;if(x.ped){var p=x.ped;lin=['Paciente: '+(p.paciente||'-')].concat(extItens(p));}else{var g=x.pg;lin=['Pagamento recebido · '+formaNome(g.forma)].concat(g.obs?[g.obs]:[]);}
+    var wrapped=[];lin.forEach(function(t,k){doc.setFontSize(k?8.5:9.5);doc.splitTextToSize(pdfTxt(t),hw).forEach(function(s){wrapped.push([s,k]);});});
+    var h=wrapped.length*4.3+3;if(y+h>268){doc.addPage();y=18;cab();}
+    if(i%2){doc.setFillColor(248,247,252);doc.rect(M,y-4.3,W-2*M,h,'F');}
+    doc.setFontSize(9.5);doc.setTextColor.apply(doc,tinta);doc.text(dmy(x.d),X0.d+2,y);doc.text(x.ped?'#'+x.ped.num:'',X0.f+2,y);
+    wrapped.forEach(function(w,k){doc.setFontSize(w[1]?8.5:9.5);doc.setTextColor.apply(doc,w[1]?cinza:tinta);doc.setFont('helvetica',k===0&&!x.ped?'bold':'normal');doc.text(w[0],X0.h+2,y+k*4.3);});
+    doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor.apply(doc,x.v<0?verm:verde);doc.text((x.v>0?'+':'')+brlS(x.v),X0.v-2,y,{align:'right'});
+    doc.setTextColor.apply(doc,tinta);doc.setFont('helvetica','normal');doc.text(brlS(x.saldo),X0.s-2,y,{align:'right'});
+    y+=h;});
+  if(!X.L.length){doc.setTextColor.apply(doc,cinza);doc.text('Nenhum movimento no período.',X0.h+2,y);y+=7;}
+  if(y+44>285){doc.addPage();y=20;}
+  doc.setDrawColor(226,223,234);doc.line(M,y-1,W-M,y-1);y+=7;
+  var bx=W-M-86;
+  function tl(l,v,cor,b){doc.setFont('helvetica',b?'bold':'normal');doc.setFontSize(b?12:10);doc.setTextColor.apply(doc,cinza);doc.text(l,bx,y);doc.setTextColor.apply(doc,cor||tinta);doc.text(v,W-M-2,y,{align:'right'});y+=b?8:6;}
+  doc.setFontSize(9.5);doc.setTextColor.apply(doc,cinza);doc.text(X.L.filter(function(x){return x.ped;}).length+' pedido(s) · '+X.L.filter(function(x){return x.pg;}).length+' pagamento(s)',M,y);
+  tl('Saldo anterior',brlS(X.ant));tl('Total de pagamentos (C)','+'+brl(X.cred),verde);tl('Total de pedidos (D)',brlS(X.deb),verm);
+  doc.setDrawColor(226,223,234);doc.line(bx,y-3,W-M,y-3);y+=2;
+  tl(X.saldo<0?'Saldo a pagar':X.saldo>0?'Crédito do cliente':'Saldo atual',brlS(X.saldo),X.saldo<0?verm:verde,1);
+  if(X.saldo<0&&S.perfil.chave){y+=4;var vv=Math.abs(X.saldo),code=brcode(vv,'EXT'+Date.now().toString(36).toUpperCase()),qr=qrDataURL(code);
+    if(y+48>285){doc.addPage();y=20;}
+    doc.setDrawColor.apply(doc,roxo);doc.setLineWidth(.4);doc.roundedRect(M,y,W-2*M,44,3,3,'S');if(qr)doc.addImage(qr,'PNG',M+4,y+4,36,36);
+    var tx=M+46;doc.setTextColor.apply(doc,tinta);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Pague o saldo com Pix: '+brl(vv),tx,y+10);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor.apply(doc,cinza);doc.text(pdfTxt('Recebedor: '+norm(S.perfil.recebedor||S.perfil.nome,25)+' · Chave: '+pixKey()),tx,y+17);
+    doc.setFont('courier','normal');doc.setFontSize(7.5);doc.setTextColor.apply(doc,tinta);doc.text(doc.splitTextToSize(code,W-2*M-50),tx,y+24);doc.setFont('helvetica','normal');}
+  var n=doc.getNumberOfPages();for(var i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(160,156,180);doc.text('Extrato gerado pelo Ideali CAD · página '+i+' de '+n,W/2,292,{align:'center'});}
+  var nomeArq='extrato_'+norm(c?c.nome:'cliente',30).replace(/\s+/g,'_').toLowerCase()+'_'+P.de.slice(0,7)+'.pdf';
+  if(soGerar)return {blob:doc.output('blob'),nome:nomeArq,X:X,P:P};
+  if(await salvaPdf(doc,nomeArq,'Extrato','Segue o extrato de '+dmy(P.de)+' a '+dmy(P.ate)+'.'))toast('PDF do extrato baixado.');
+}
+function extMsg(cid,X,P){var c=cliente(cid),nm=c?String(nomeCurtoCli(c)||'').trim():'';
+  return 'Olá'+(nm?', '+nm:'')+'! Segue o seu extrato de '+dmy(P.de)+' a '+dmy(P.ate)+'.\n\nSaldo anterior: '+brlS(X.ant)+'\nPedidos no período: '+brlS(X.deb)+'\nPagamentos no período: '+brl(X.cred)+'\n'+(X.saldo<0?'Saldo a pagar: *'+brl(-X.saldo)+'*':X.saldo>0?'Crédito: *'+brl(X.saldo)+'*':'Tudo em dia ✅')+
+    (X.saldo<0&&S.perfil.chave?'\n\nPix: '+pixKey():'')+'\n\nO PDF com todos os pedidos e pagamentos vai junto. Qualquer dúvida, me chama! 😊';}
+async function enviaExtrato(cid){var c=cliente(cid),r=await geraPdfExtrato(cid,true);if(!r)return;var file=null;try{file=new File([r.blob],r.nome,{type:'application/pdf'});}catch(e){}
+  var cel=/Android|iPhone|iPad/i.test(navigator.userAgent),txt=extMsg(cid,r.X,r.P);
+  try{if(navigator.clipboard)await navigator.clipboard.writeText(txt);}catch(e){}
+  if(cel&&file&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:txt});toast('Escolha a conversa de '+(c?nomeCurtoCli(c):'cliente')+'. A mensagem também ficou copiada.');return;}catch(e){if(e&&e.name==='AbortError')return;}}
+  var u=URL.createObjectURL(r.blob),a=document.createElement('a');a.href=u;a.download=r.nome;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},60000);
+  var tel=c&&c.telefone?c.telefone:'';window.open(waLink(txt,tel),'_blank','noopener');
+  toast('Mensagem do extrato aberta no WhatsApp. O PDF foi baixado: arraste para a conversa.',7000);}
 /* Enviar cobrança: PDF + mensagem com Pix. No celular, vai junto pelo Compartilhar (PDF com a mensagem de legenda).
    No computador, baixa o PDF, copia a mensagem e abre a conversa do cliente no WhatsApp com o texto pronto. */
 async function enviaCobranca(cid){var c=cliente(cid);if(!cobPeds(cid).length){toast('Marque pelo menos um pedido.');return;}
@@ -7387,6 +7494,11 @@ tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l
     var m='Olá! Por este link você acompanha os seus casos comigo: a situação de cada pedido e os arquivos em 3D. '+urlLink(k.token);window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(m),'_blank','noopener');},
   cobranca:function(d,el,e){if(e)e.stopPropagation();ui.cobSel={};openSheet(fCobranca,d.id||null);},
   cobrancaCli:function(d){ui.cobSel={};ui.sheet.args=[d.id||null];renderSheet();},
+  extrato:function(d,el,e){if(e)e.stopPropagation();ui.ext=ui.ext||{modo:'mes'};openSheet(fExtrato,d.id||null);},
+  extratoCli:function(d){ui.sheet.args=[d.id||null];renderSheet();},
+  extratoPer:function(d,el){var e=ui.ext||(ui.ext={});if(el.dataset.v==='per'&&e.modo!=='per'){var P=extPer();e.de=P.de;e.ate=P.ate;}e.modo=el.dataset.v;renderSheet();},
+  extratoPdf:function(d,el){var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraPdfExtrato(d.id).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
+  extratoEnvia:function(d,el){var t=el.textContent;el.disabled=true;el.textContent='Preparando…';enviaExtrato(d.id).catch(function(x){toast((x&&x.message)||'Não foi possível enviar.');}).then(function(){el.disabled=false;el.textContent=t;});},
   cobrancaEnvia:function(d,el){var t=el.textContent;el.disabled=true;el.textContent='Preparando…';enviaCobranca(d.id).catch(function(x){toast((x&&x.message)||'Não foi possível preparar a cobrança.');}).then(function(){el.disabled=false;el.textContent=t;});},
   cobrancaPdf:function(d,el){var t=el.textContent;el.disabled=true;el.textContent='Gerando…';geraPdfCobranca(d.id).catch(function(x){toast((x&&x.message)||'Não foi possível gerar o PDF.');}).then(function(){el.disabled=false;el.textContent=t;});},
   cobrancaMsg:function(d){var c=cliente(d.id),ps=cobPeds(d.id),v=soma(ps);if(!ps.length){toast('Marque pelo menos um pedido.');return;}
