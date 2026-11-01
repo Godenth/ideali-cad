@@ -1556,6 +1556,44 @@ span.pd-it-t{cursor:default}
 @media (prefers-reduced-motion:reduce){.pisca-nv{animation:none;border-color:#1E8A5A}.upd-i,.upd-img{animation:none;opacity:1;transform:none}}
 .ldx-k8{grid-template-columns:repeat(4,minmax(0,1fr))!important}@media(min-width:1200px){.ldx-k8{grid-template-columns:repeat(8,minmax(0,1fr))!important}}
 .tm[data-v="cy2076"] .tm-pv{background:linear-gradient(180deg,transparent 40%,rgba(11,6,32,.7)),url(img/temas/cy2076-m.webp) center 30%/cover!important}
+/* ===== Tema Cyberpunk Street: beco neon animado (letreiros piscando, chuva, poças e fumaça) ===== */
+:root[data-tema="cystreet"]{color-scheme:dark;--bg:#0B0620;--surface:rgba(16,10,40,.78);--ink:#F3EEFF;--muted:#A99BD0;--line:rgba(160,120,255,.28);--accent:#FF2BD6;--accent-ink:#fff;--accent-soft:rgba(255,43,214,.18);--soft:rgba(40,24,90,.55);
+  --urgent:#FF3E6C;--ok:#3BF0C0;--warn:#FFD23F;--c-pac:#FF7AD1;--c-cli:#29E0FF;--c-val:#FFD23F;--p1:#FF2BD6;--p2:#FFD23F;--p3:#3BF0C0;--p4:#29E0FF;--p5:#9B6BFF;--p6:#FF7AD1}
+html[data-tema="cystreet"]{background:#0B0620}
+html[data-tema="cystreet"] body{background:transparent}
+html[data-tema="cystreet"] h1,html[data-tema="cystreet"] h2{letter-spacing:.02em;text-shadow:0 0 12px rgba(255,43,214,.55),0 0 26px rgba(41,224,255,.25)}
+html[data-tema="cystreet"] .btn.pri{background:linear-gradient(135deg,#FF2BD6,#9B6BFF 55%,#29E0FF);border-color:transparent;color:#fff;box-shadow:0 0 18px -4px rgba(255,43,214,.8)}
+html[data-tema="cystreet"] .btn.pri:hover{filter:brightness(1.12);box-shadow:0 0 24px -2px rgba(41,224,255,.8)}
+html[data-tema="cystreet"] .btn{border-color:rgba(160,120,255,.35);background:rgba(20,12,48,.6);color:var(--ink)}
+html[data-tema="cystreet"] .card,html[data-tema="cystreet"] .zap,html[data-tema="cystreet"] .stat{background:rgba(16,10,40,.72);border:1px solid rgba(160,120,255,.26);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 0 1px rgba(255,43,214,.06),0 18px 40px -22px #000}
+html[data-tema="cystreet"] .card:hover{border-color:rgba(255,43,214,.45)}
+html[data-tema="cystreet"] .top,html[data-tema="cystreet"] .side,html[data-tema="cystreet"] .bnav{background:rgba(11,6,32,.72);border-color:rgba(255,43,214,.25);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+html[data-tema="cystreet"] .tnav button.on,html[data-tema="cystreet"] .side .it.on{box-shadow:inset 0 -2px 0 #FF2BD6,0 6px 14px -8px #FF2BD6;color:#fff}
+html[data-tema="cystreet"] .sheet,html[data-tema="cystreet"] .modal{background:rgba(14,9,36,.94);backdrop-filter:blur(14px)}
+html[data-tema="cystreet"] input,html[data-tema="cystreet"] select,html[data-tema="cystreet"] textarea{background:rgba(10,6,28,.7);color:var(--ink);border-color:rgba(160,120,255,.35)}
+
+#cySt{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:#0B0620}
+#cySt .cs-w{position:absolute;left:50%;top:50%;width:max(100vw,177.7vh);height:max(56.28vw,100vh);transform:translate(-50%,-50%)}
+#cySt img{display:block;width:100%;height:100%}
+#cySt .cs-w i{position:absolute;display:block;mix-blend-mode:screen;border-radius:10px}
+#cySt .cs-k{left:44.2%;top:8.6%;width:5.4%;height:24.6%;background:radial-gradient(ellipse at center,rgba(255,70,230,.75),rgba(255,40,200,.25) 55%,transparent 72%);filter:blur(5px);animation:csPisca 5.5s steps(1) infinite}
+#cySt .cs-bar{left:65.6%;top:18.6%;width:6%;height:14.6%;background:radial-gradient(ellipse at center,rgba(60,220,255,.75),rgba(40,180,255,.25) 55%,transparent 72%);filter:blur(5px);animation:csPisca 7s steps(1) infinite 1.3s}
+#cySt .cs-far{left:52%;top:36%;width:13%;height:15%;background:radial-gradient(ellipse at center,rgba(255,80,220,.35),rgba(60,200,255,.18) 50%,transparent 72%);filter:blur(10px);animation:csRespira 3.4s ease-in-out infinite}
+#cySt .cs-door{left:76.5%;top:8%;width:10.5%;height:54%;background:radial-gradient(ellipse at 40% 45%,rgba(255,60,40,.55),rgba(255,40,40,.15) 55%,transparent 75%);filter:blur(12px);animation:csRespira 4.2s ease-in-out infinite .6s}
+#cySt .cs-poca{left:42%;top:70%;width:28%;height:30%;border-radius:50%;background:repeating-linear-gradient(90deg,transparent 0 10px,rgba(90,210,255,.22) 10px 12px,transparent 12px 26px,rgba(255,80,220,.18) 26px 27px,transparent 27px 40px);-webkit-mask:radial-gradient(ellipse at center,#000 30%,transparent 72%);mask:radial-gradient(ellipse at center,#000 30%,transparent 72%);animation:csOnda 2.8s ease-in-out infinite alternate}
+#cySt .cs-fumo{position:absolute;width:1.4%;height:6%;pointer-events:none}
+#cySt .cs-fumo b{position:absolute;left:0;bottom:0;width:100%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(220,210,255,.35),transparent 70%);filter:blur(2px);opacity:0;animation:csFumo 4.5s ease-out infinite}
+#cySt .cs-fumo b:nth-child(2){animation-delay:1.5s}#cySt .cs-fumo b:nth-child(3){animation-delay:3s}
+#cySt .cs-chuva{position:absolute;inset:-60% 0 0 0;opacity:.28;background:repeating-linear-gradient(100deg,transparent 0 18px,rgba(170,200,255,.45) 18px 19px,transparent 19px 53px);animation:cyChuva .9s linear infinite}
+#cySt .cs-esc{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,6,32,.2) 0%,rgba(11,6,32,.55) 40%,rgba(11,6,32,.86) 100%)}
+@keyframes csPisca{0%,30%,34%,70%,73%,100%{opacity:1}31%,33%,71%{opacity:.08}32%{opacity:.7}72%{opacity:.3}}
+@keyframes csRespira{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes csOnda{from{transform:translateX(-2%) scaleY(.96);opacity:.55}to{transform:translateX(2%) scaleY(1.04);opacity:1}}
+@keyframes csFumo{0%{transform:translate(0,0) scale(.6);opacity:0}15%{opacity:.9}100%{transform:translate(-60%,-260%) scale(2.4);opacity:0}}
+@keyframes cyChuva{to{transform:translate(-12px,50%)}}
+@media (prefers-reduced-motion:reduce){#cySt *{animation:none!important}#cySt .cs-chuva{display:none}}
+html[data-tema="cystreet"]{background:#0B0620}html[data-tema="cystreet"] body{background:transparent}
+.tm[data-v="cystreet"] .tm-pv{background:linear-gradient(180deg,transparent 40%,rgba(11,6,32,.7)),url(img/temas/cystreet-m.webp) center 40%/cover!important}
 </style>
 
 <div id="app"></div>
@@ -1876,7 +1914,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k]||x.k==='rede')return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='01/11 · 18h40';
+var VERSAO='01/11 · 19h00';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={caixa:'Caixa de entrada',painel:'Painel do dono',comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -2457,7 +2495,7 @@ function secPrevisao(){var tot=alive(S.pedidos).length,par=ui.prevPar||(ui.prevP
 /* ---------- Dashboard ---------- */
 /* ---------- Temas (cor do sistema por personalidade) + modo claro/escuro ----------
    Guardado em perfis.preferencias (tema, modo) e copiado no navegador para abrir já com o tema certo. */
-var TEMAS=[['ideali','Ideali','#5B45E0','#F6F5F8','#E2DFEA','Criativo'],['oceano','Oceano','#1F6FD1','#F4F7FB','#DCE5F0','Calmo'],['esmeralda','Esmeralda','#138A63','#F4F8F6','#DCE8E2','Equilibrado'],['brasa','Brasa','#D9531E','#FBF6F3','#F0E1D9','Energético'],['rose','Rosé','#C2367A','#FBF5F8','#F0DEE7','Acolhedor'],['dourado','Dourado','#9A7419','#F8F6F1','#E9E3D3','Elegante'],['grafite','Grafite','#2B2F36','#F5F5F6','#E2E3E6','Focado'],['neon','Neon','linear-gradient(135deg,#4FC8FF,#3D4BF2 45%,#B44DFF 75%,#E45CFF)','#0A0A24','#29285E','Vibrante'],['codigo','Código','#00FF66','#000400','#0F3D1F','Hacker'],['horizonte','Horizonte','#E8B66A','#04060B','#1E2434','Espacial'],['sakura','Sakura','#F0508C','#FFF6FA','#F6D9E6','Anime'],['cyber','Cyber','#FCEE0A','#07070B','#2A2638','Futurista'],['japao','Japão','#C8322A','#FFF4E6','#EBD7C6','Tradicional'],['sombria','Sombria','#E0B341','#07080C','#24252D','Noturno'],['bambu','Bambu','#2F8F4E','#EEF7EA','#D2E6CF','Natureza'],['abrigo','Abrigo','#F2C230','#0B1526','#2A4572','Retrô atômico'],['norte','Norte','#C9D6E3','#0A1018','#2B3A4A','Gélido'],['cy2076','Cyber Punk 2076','linear-gradient(135deg,#FF3EA5,#9B6BFF 55%,#3BE8FF)','#0B0620','#3A2766','Neon noturno']];
+var TEMAS=[['ideali','Ideali','#5B45E0','#F6F5F8','#E2DFEA','Criativo'],['oceano','Oceano','#1F6FD1','#F4F7FB','#DCE5F0','Calmo'],['esmeralda','Esmeralda','#138A63','#F4F8F6','#DCE8E2','Equilibrado'],['brasa','Brasa','#D9531E','#FBF6F3','#F0E1D9','Energético'],['rose','Rosé','#C2367A','#FBF5F8','#F0DEE7','Acolhedor'],['dourado','Dourado','#9A7419','#F8F6F1','#E9E3D3','Elegante'],['grafite','Grafite','#2B2F36','#F5F5F6','#E2E3E6','Focado'],['neon','Neon','linear-gradient(135deg,#4FC8FF,#3D4BF2 45%,#B44DFF 75%,#E45CFF)','#0A0A24','#29285E','Vibrante'],['codigo','Código','#00FF66','#000400','#0F3D1F','Hacker'],['horizonte','Horizonte','#E8B66A','#04060B','#1E2434','Espacial'],['sakura','Sakura','#F0508C','#FFF6FA','#F6D9E6','Anime'],['cyber','Cyber','#FCEE0A','#07070B','#2A2638','Futurista'],['japao','Japão','#C8322A','#FFF4E6','#EBD7C6','Tradicional'],['sombria','Sombria','#E0B341','#07080C','#24252D','Noturno'],['bambu','Bambu','#2F8F4E','#EEF7EA','#D2E6CF','Natureza'],['abrigo','Abrigo','#F2C230','#0B1526','#2A4572','Retrô atômico'],['norte','Norte','#C9D6E3','#0A1018','#2B3A4A','Gélido'],['cy2076','Cyber Punk 2076','linear-gradient(135deg,#FF3EA5,#9B6BFF 55%,#3BE8FF)','#0B0620','#3A2766','Neon noturno'],['cystreet','Cyberpunk Street','linear-gradient(135deg,#FF2BD6,#7B3BFF 55%,#29E0FF)','#0B0620','#3A2766','Beco neon animado']];
 /* Chuva de caracteres do tema Código (canvas leve, ~18 quadros por segundo, para quando a aba some) */
 var CHUVA={on:false};
 function chuvaLiga(){if(!document.body){document.addEventListener('DOMContentLoaded',chuvaLiga);return;}var r=document.documentElement;if(r.getAttribute('data-tema')==='horizonte'){espacoLiga();return;}if(r.getAttribute('data-tema')==='sakura'){sakuraLiga();return;}if(r.getAttribute('data-tema')==='cyber'){cyberLiga();return;}if(r.getAttribute('data-tema')==='japao'){japaoLiga();return;}if(r.getAttribute('data-tema')==='sombria'){sombriaLiga();return;}if(r.getAttribute('data-tema')==='bambu'){bambuLiga();return;}if(r.getAttribute('data-tema')==='abrigo'){abrigoLiga();return;}if(r.getAttribute('data-tema')==='norte'){norteLiga();return;}if(r.getAttribute('data-tema')!=='codigo'){CHUVA.on=false;return;}
@@ -2657,7 +2695,13 @@ function bambuLiga(){fundoLiga('bambu',function(s,W,H){s.b=[];var add=function(x
     x.fillStyle=pk;x.beginPath();x.ellipse(px+34,py-18+bob*.5,12,17,.3,0,6.29);x.fill();x.beginPath();x.ellipse(px-28,py-12,13,18,-.4,0,6.29);x.fill();},40);}
 function temaAtual(){return (S.prefs&&S.prefs.tema)||'ideali';}
 function modoAtual(){return (S.prefs&&S.prefs.modo)||'auto';}
-function aplicaTema(t,m){var r=document.documentElement;if(!t||t==='ideali')r.removeAttribute('data-tema');else r.setAttribute('data-tema',t);setTimeout(chuvaLiga,0);
+/* Cena animada do tema Cyberpunk Street (só existe enquanto o tema está ligado) */
+function streetCena(on){var e=document.getElementById('cySt');if(!on){if(e)e.remove();return;}if(e||!document.body){if(!document.body)document.addEventListener('DOMContentLoaded',function(){streetCena(document.documentElement.getAttribute('data-tema')==='cystreet');});return;}
+  var src='img/temas/cystreet'+(innerWidth<=820?'-m':'')+'.webp',fumo=function(l,t){return '<span class="cs-fumo" style="left:'+l+'%;top:'+t+'%"><b></b><b></b><b></b></span>';};
+  e=document.createElement('div');e.id='cySt';e.setAttribute('aria-hidden','true');
+  e.innerHTML='<div class="cs-w"><img src="'+src+'" alt=""><i class="cs-far"></i><i class="cs-door"></i><i class="cs-k"></i><i class="cs-bar"></i><i class="cs-poca"></i>'+fumo(35.4,12.5)+fumo(38.6,14.5)+fumo(72.2,23.5)+'</div><div class="cs-chuva"></div><div class="cs-esc"></div>';
+  document.body.insertBefore(e,document.body.firstChild);}
+function aplicaTema(t,m){var r=document.documentElement;if(!t||t==='ideali')r.removeAttribute('data-tema');else r.setAttribute('data-tema',t);streetCena(t==='cystreet');setTimeout(chuvaLiga,0);
   if(m==='claro')r.setAttribute('data-theme','light');else if(m==='escuro')r.setAttribute('data-theme','dark');else r.removeAttribute('data-theme');
   try{var mc=document.querySelector('meta[name=theme-color]');if(mc)mc.setAttribute('content',getComputedStyle(r).getPropertyValue('--accent').trim()||'#5B45E0');}catch(x){}
   try{localStorage.setItem('ideali_tema',JSON.stringify({t:t||'ideali',m:m||'auto'}));}catch(x){}}
