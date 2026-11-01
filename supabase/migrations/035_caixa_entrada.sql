@@ -26,7 +26,7 @@ create table if not exists public.caixa_entrada (
   remetente   text not null check (length(remetente) between 2 and 80),
   doutor      text check (doutor is null or length(doutor) <= 80),
   telefone    text check (telefone is null or telefone ~ '^[0-9]{10,13}$'),
-  paciente    text check (paciente is null or length(paciente) <= 40),
+  paciente    text check (paciente is null or length(paciente) <= 80),
   descricao   text not null check (length(descricao) between 3 and 2000),
   links       jsonb not null default '[]'::jsonb check (jsonb_typeof(links) = 'array' and jsonb_array_length(links) <= 5 and pg_column_size(links) <= 4000),
   status      text not null default 'novo' check (status in ('novo','lido','aprovado','recusado')),
@@ -75,7 +75,7 @@ begin
           left(trim(coalesce(d->>'remetente','')), 80),
           nullif(left(trim(coalesce(d->>'doutor','')), 80), ''),
           tel,
-          nullif(left(trim(coalesce(d->>'paciente','')), 40), ''),
+          nullif(left(trim(coalesce(d->>'paciente','')), 80), ''),
           left(trim(coalesce(d->>'descricao','')), 2000),
           lk);
   return 'ok';

@@ -64,7 +64,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid color-mix(in srgb,var(
       <label class="fld"><span id="lb-rem">Seu nome</span><input id="remetente" name="remetente" required maxlength="80" autocomplete="organization"></label>
       <label class="fld"><span>Doutor(a) responsável</span><input id="doutor" name="doutor" maxlength="80" placeholder="Ex.: Dra. Ana Lima"></label>
       <label class="fld"><span>WhatsApp <span class="hint">(opcional)</span></span><input id="telefone" name="telefone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999"></label>
-      <label class="fld"><span>Paciente</span><input id="paciente" name="paciente" maxlength="40" placeholder="Só as iniciais, ex.: M.A.S."><span class="hint">Por privacidade, use só as iniciais.</span></label>
+      <label class="fld"><span>Paciente</span><input id="paciente" name="paciente" maxlength="80" placeholder="Nome do paciente"></label>
     </div>
     <label class="fld"><span>Descrição do trabalho</span><textarea id="descricao" name="descricao" required maxlength="2000" placeholder="Ex.: Coroa sobre implante no 36, Neodent GM, cor A2. Prazo sexta."></textarea><span class="hint">Diga os dentes, o tipo de trabalho, material, cor e prazo, se souber.</span></label>
     <div class="sec">
@@ -97,7 +97,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid color-mix(in srgb,var(
     if(g('descricao').length<3)return erro('Escreva uma breve descrição do trabalho.','descricao');
     var tel=g('telefone').replace(/\D/g,'');if(tel&&(tel.length<10||tel.length>13))return erro('Confira o WhatsApp com DDD.','telefone');
     var mau=links.filter(function(l){return !/^https:\/\/\S{4,}$/i.test(l);})[0];if(mau)return erro('O link precisa começar com https://','link1');
-    if(/@|\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/.test(g('paciente')))return erro('No campo paciente, use só as iniciais.','paciente');
+    if(/@|\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/.test(g('paciente')))return erro('No campo paciente, coloque só o nome (sem CPF ou e-mail).','paciente');
     var tipo=(document.querySelector('input[name=tipo]:checked')||{}).value||'Dentista';
     $('enviar').disabled=true;$('enviar').textContent='Enviando…';
     sb.rpc('caixa_enviar',{tk:tk,d:{tipo:tipo,remetente:g('remetente'),doutor:g('doutor'),telefone:tel,paciente:g('paciente'),descricao:g('descricao'),links:links,site:g('site')}}).then(function(r){

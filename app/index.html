@@ -1833,7 +1833,7 @@ function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),
   LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='01/11 · 17h00';
+var VERSAO='01/11 · 17h10';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={caixa:'Caixa de entrada',painel:'Painel do dono',comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3663,7 +3663,7 @@ function cliStats(cid){var t=today(),c=cliente(cid),P=alive(S.pedidos).filter(fu
     v90:soma(p90),n90:p90.length,v180:soma(p180),n180:p180.length,el:elems(P),aj:ent.length?Math.round(ent.filter(function(p){return !(p.ajustes>0);}).length/ent.length*100):null,
     prazo:noPr.length?Math.round(noPr.filter(function(p){return p.entregue<=p.prazo;}).length/noPr.length*100):null,
     tipos:Object.keys(tipos).sort(function(a,b){return tipos[b]-tipos[a];}).slice(0,3).map(function(k){return k+' ('+tipos[k]+')';}),
-    ultimos:P.slice(-3).reverse().map(function(p){return (nomeTrab(p)||'Trabalho')+(p.paciente?' do paciente '+p.paciente:'')+' em '+dmy(p.recebido).slice(0,5)+(p.ajustes>0?' (teve '+p.ajustes+' ajuste)':'');}),
+    ultimos:P.slice(-3).reverse().map(function(p){return (nomeTrab(p)||'Trabalho')+(p.paciente?' do paciente '+pacIniciais(p.paciente):'')+' em '+dmy(p.recebido).slice(0,5)+(p.ajustes>0?' (teve '+p.ajustes+' ajuste)':'');}),
     ajN:P.filter(function(p){return p.ajustes>0;}).length,atrN:noPr.filter(function(p){return p.entregue>p.prazo;}).length,mesPico:(function(){var m=null;Object.keys(pm).forEach(function(k){if(!m||pm[k]>pm[m])m=k;});return m;})(),
     dev:soma(aReceber(cid)),total:soma(P),ticket:n?soma(P)/n:0,diasSem:diasSem};}
 function cliRisco(s){return s.padrao==='parou'||s.padrao==='caindo'||s.padrao==='umavez'||(s.diasSem!=null&&s.diasSem>30);}
@@ -5471,7 +5471,7 @@ function fImport(){var X=ui.imp;if(!X)return head('Importar');var pl=impPlano(X)
   var stN={arquivado:'Arquivado (entregue e pago)',finalizado:'Finalizado (a receber)',entrada:'Entrada (a fazer)'};
   var nomeC=function(r){var c=pl.cm[r];return c?(c.ex?c.ex.nome:(c.c.empresa||((c.c.titulo?c.c.titulo+' ':'')+c.c.pnome+' '+c.c.sobrenome))):r;};
   return head('Importar do '+esc(pl.fonte))+'<div class="stack">'+
-    '<p class="small muted" style="margin:0">Confira antes de gravar. Nada foi salvo ainda. Pacientes vêm só com as iniciais (LGPD).</p>'+
+    '<p class="small muted" style="margin:0">Confira antes de gravar. Nada foi salvo ainda.</p>'+
     '<div class="imp-res"><span><b>'+P.length+'</b> pedidos</span><span><b>'+novos+'</b> clientes novos</span><span><b>'+(Object.keys(pl.cm).length-novos)+'</b> já cadastrados</span><span><b>'+pl.G.length+'</b> pagamentos</span>'+(pl.novosT.length?'<span><b>'+pl.novosT.length+'</b> tipos novos</span>':'')+'</div>'+
     (pul?'<div class="banner">'+pul+' pedido(s) já foram importados antes e serão pulados.</div>':'')+
     '<h3 style="margin:6px 0 0">Clientes</h3><div class="imp-l">'+Object.keys(pl.cm).map(function(k){var c=pl.cm[k];return '<div><b>'+esc(nomeC(k))+'</b><span class="tag '+(c.ex?'':'a')+'">'+(c.ex?'já existe: usa o cadastro':'novo')+'</span></div>';}).join('')+'</div>'+
@@ -5729,7 +5729,7 @@ function cxMarca(id,st,pid){var x=CX.lista.filter(function(i){return i.id===id;}
 /* Ana: lê o envio e abre o pedido pré-preenchido */
 function cxPre(id){var x=CX.lista.filter(function(i){return i.id===id;})[0];if(!x)return;if(!guard())return;
   var r=pedDoTexto(x.descricao||'');var cli=null;try{cli=ppCliente([x.remetente,x.doutor,x.telefone].filter(Boolean).join(' '));}catch(e){}
-  r.cli=cli;if(x.paciente)r.pac=pacIniciais(x.paciente)||x.paciente;r.scan=false;
+  r.cli=cli;if(x.paciente)r.pac=nomeProprio(String(x.paciente).trim()).slice(0,80);r.scan=false;
   if(x.status==='novo')cxMarca(id,'lido');
   ui.caixaPend={id:id,links:(x.links||[]).slice(1)};
   ppAbrePedido(r);
@@ -5951,7 +5951,7 @@ function pedDoTexto(tx){var raw=String(tx||''),t=ppNorm(raw);
   var tp=ppTipo(t),c=ppCliente(raw);
   var pm=raw.match(/(?:paciente|pacient|pac\.?)\s*[:\-]?\s*([A-Za-zÀ-ú]+(?:\s+[A-Za-zÀ-ú]+){0,4})/i),pac='';
   if(pm){var PARA=/^(cor|coroa|coroas|dente|dentes|elemento|elementos|no|na|nos|nas|pra|para|com|faceta|facetas|placa|protocolo|implante|sobre|e|urgente|prazo|ate|até|segue|caso|zirconia|zircônia|o|a)$/i,ws=[];
-    pm[1].split(/\s+/).some(function(w){if(PARA.test(w)&&ws.length)return true;if(!PARA.test(w))ws.push(w);return ws.length>=3;});pac=pacIniciais(ws.join(' '));}
+    pm[1].split(/\s+/).some(function(w){if(PARA.test(w)&&ws.length)return true;if(!PARA.test(w))ws.push(w);return ws.length>=5;});pac=nomeProprio(ws.join(' '));}
   var cor=(raw.match(/\b(?:cor\s*)?((?:A|B|C|D)[1-4](?:[.,]5)?|BL\s?[1-4])\b/)||[])[1]||'';
   var mat=/zirconi/.test(t)?'Zircônia':/dissilicato|e\.?max/.test(t)?'Dissilicato de lítio':/pmma/.test(t)?'PMMA':/impress[a-z]*\s*3d|resina\s*3d/.test(t)?'Impressão 3D':'';
   var marca=(raw.match(/\b(Neodent|Straumann|Nobel|SIN|Conexão|Conexao|Implacil|Titanium Fix|Bionnovation|Dentoflex|Kopp|Osstem|Megagen|Eff\s*Dental|EFF|Systhex|Singular|Emfils|Biomet|Zimmer|Dentsply|Ankylos|Intraoss|Plenum)\b/i)||[])[1]||'';
@@ -6035,7 +6035,7 @@ function fPedido(id,preCli){
     '<div class="pdf"><div class="pdf-b1">'+
     '<label class="fld"><span>Cliente</span><select id="pd-cli" name="clienteId" required><option value="">Escolha…</option>'+(function(){var ld=p?[]:leadsDe().filter(function(l){return l.st==='seq'||l.st==='resp';}).sort(function(a,b){return String(a.nome).localeCompare(String(b.nome));}),op=function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';};
       return ld.length?'<optgroup label="Clientes">'+cs.map(op).join('')+'</optgroup><optgroup label="Leads (viram clientes ao salvar)">'+ld.map(function(l){var v='lead:'+l.id;return '<option value="'+v+'" '+(v===cid?'selected':'')+'>🌱 '+esc(l.nome||telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade):'')+'</option>';}).join('')+'</optgroup>':cs.map(op).join('');})()+'</select>'+(cs.length?'':'<small>Cadastre um cliente primeiro ou escolha um lead.</small>')+'</label>'+
-    '<label class="fld"><span>Paciente</span><input id="pd-pac" class="nome-p" name="paciente" required maxlength="40" placeholder="Iniciais, ex.: M.A.S." value="'+esc(p?p.paciente:(pre.pac||''))+'"><small>Guarde só as iniciais ou o primeiro nome (LGPD).</small></label>'+
+    '<label class="fld"><span>Paciente</span><input id="pd-pac" class="nome-p" name="paciente" required maxlength="80" placeholder="Nome do paciente" value="'+esc(p?p.paciente:(pre.pac||''))+'"></label>'+
     '</div><div class="pdf-a">'+
     '<div class="fld"><span>Elementos <b id="pd-qtd" class="mono"></b></span><div id="pd-odo" class="pd-odo"></div><small>Toque no dente e escolha o trabalho. Para unir dentes vizinhos (fixo / ponte), toque na bolinha entre eles.</small></div>'+
     '<div id="pd-ed"></div>'+
@@ -7752,9 +7752,6 @@ document.addEventListener('click',function(e){var zb=e.target.closest&&e.target.
   var f=A[el.dataset.a];if(f){if(REC_ACAO[el.dataset.a])rec(REC_ACAO[el.dataset.a]);else if(el.dataset.a==='iaCmd')rec('ag_'+(el.dataset.g||ui.secAg||''));if(el.tagName!=='A')e.preventDefault();f(el.dataset,el,e);}
 });
 document.addEventListener('click',function(e){if(!(e.target.closest&&e.target.closest('.tsel')))[].forEach.call(document.querySelectorAll('.tsel-l'),function(l){l.hidden=true;});});
-document.addEventListener('input',function(e){if(e.target.id==='pd-pac'){var v=e.target.value,av=document.getElementById('pac-lgpd');var nome=/[A-Za-zÀ-ÿ]{3,}/.test(v.replace(/\./g,' '));
-  if(nome&&!av){av=document.createElement('div');av.id='pac-lgpd';av.className='pac-lgpd';av.innerHTML='Use só as <b>iniciais</b> do paciente (LGPD). <button type="button" class="btn sm" data-a="pacIni">Trocar por '+'<span id="pac-ini"></span></button>';e.target.parentNode.appendChild(av);}
-  if(av){if(!nome)av.remove();else{var s=document.getElementById('pac-ini');if(s)s.textContent=pacIniciais(v);}}}});
 document.addEventListener('input',function(e){if(e.target.id==='ldx-busca'){ui.ldBusca=e.target.value;var cs=e.target.selectionStart;render();var nb=document.getElementById('ldx-busca');if(nb){nb.focus();try{nb.setSelectionRange(cs,cs);}catch(x){}}return;}if(e.target.id==='ldx-txt'&&ui.ldComp){ui.ldComp.txt=e.target.value;return;}if(e.target.classList&&e.target.classList.contains('ld-in')&&ui.leadImp&&ui.leadImp.lista){ui.leadImp.lista[+e.target.dataset.i][e.target.dataset.k]=e.target.value;return;}if(e.target.id==='fw-busca'){var q=e.target.value.trim().toLowerCase();[].forEach.call(document.querySelectorAll('.fw-it'),function(b){b.style.display=!q||b.dataset.n.indexOf(q)>=0?'':'none';});}});
 document.addEventListener('keydown',function(e){
   if(e.key==='Backspace'&&e.target.classList&&e.target.classList.contains('tel-num')&&!e.target.value){var d0=document.getElementById(e.target.dataset.pre+'-ddd');if(d0){e.preventDefault();d0.focus();}}
