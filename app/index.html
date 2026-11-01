@@ -1849,13 +1849,13 @@ var LIBS=[
   {k:'rede',g:'mkt',h:'animada',c:function(){try{var H=premiosDe().h,meta=Object.keys(H).some(function(k){return k.split(':').length===3&&H[k].g;});return meta&&alive(S.pedidos).filter(function(p){return pedComprovado(p);}).length>=30;}catch(e){return false;}},tit:'Você entrou para a Rede! 🌐',txt:'Você já pode publicar seu perfil na Rede. Laboratórios veem seus trabalhos e podem te chamar.',bts:[{a:'tab',v:'rede',l:'Ver a Rede',pri:1}]}];
 function libEstado(){S.prefs=S.prefs||{};var L=S.prefs.lib;if(!L||typeof L!=='object'){L=S.prefs.lib={ini:today()};if(alive(S.pedidos).length||alive(S.clientes).length)L.all=1;}return L;}
 function libIdade(){var L=libEstado();return L.ini?Math.round((new Date(today()+'T12:00:00')-new Date(L.ini+'T12:00:00'))/864e5):99;}
-function libOk(k){if(EM_DEMO||!S.sessao)return true;if(['metas','analises','ranking','rede','sala','passeio','painel','bia','leads'].indexOf(k)<0)return true;var L=libEstado();return !!(L.all||L[k]);}
+function libOk(k){if(k==='rede')return !!S.admin||!!EM_DEMO;if(EM_DEMO||!S.sessao)return true;if(['metas','analises','ranking','rede','sala','passeio','painel','bia','leads'].indexOf(k)<0)return true;var L=libEstado();return !!(L.all||L[k]);}
 function agOk(id){return id==='ven'?true:id==='ger'?libOk('metas'):id==='fin'?libOk('bia'):id==='mkt'?libOk('leads'):id==='dad'?libOk('analises'):true;}
 function libCheca(){if(EM_DEMO||!S.sessao||!ui.dadosOk)return;var L=libEstado(),mud=false;
-  LIBS.forEach(function(x){if(L[x.k])return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
+  LIBS.forEach(function(x){if(L[x.k]||x.k==='rede')return;var ok=false;try{ok=x.c();}catch(e){}if(!ok)return;L[x.k]=today();(x.tambem||[]).forEach(function(t){L[t]=today();});mud=true;
     if(!L.all)agenteCanto(x.g,x.h,x.tit,x.txt,x.bts,12000,!x.so);});
   if(mud){save();render();}}
-var VERSAO='01/11 · 17h30';
+var VERSAO='01/11 · 17h55';
 var CFG=['config','tabela','tipos','arquivos','lixeira'];
 function emCfg(){return CFG.indexOf(ui.tab)>=0;}
 var TITULOS={caixa:'Caixa de entrada',painel:'Painel do dono',comp:'Componentes',leads:'Leads',mais:'Mais',visu:'Visualizador 3D',secretarios:'Equipe de IA',lab:'Laboratório',metas:'Metas',analises:'Análises',rede:'Rede',admin:'Administração',dashboard:'Início',pedidos:'Produção',clientes:'Clientes',financeiro:'Financeiro',ranking:'Ranking de clientes',arquivos:'Configurações',tipos:'Tipos de trabalho',lixeira:'Configurações',tabela:'Configurações',config:'Configurações'};
@@ -3026,7 +3026,7 @@ var LIB_EXP={
   fin:{ag:'fin',h:'desconfiada',t:'Bia, do financeiro',x:'Eu aviso quem está devendo, quanto, e monto a cobrança com Pix.',falta:function(){var n=alive(S.pedidos).length;return 'Sou contratada com 3 pedidos. Você tem '+Math.min(n,3)+' de 3.';},n:function(){return [alive(S.pedidos).length,3];}},
   metas:{ag:'ger',h:'serio',t:'Metas e o Sr. Otávio',x:'Meta oficial do mês, medalhas 🥉🥈🥇 e presente quando você bate as faixas.',falta:function(){var n=alive(S.pedidos).length;return 'Libera com 10 pedidos. Você tem '+Math.min(n,10)+' de 10.';},n:function(){return [alive(S.pedidos).length,10];}},
   analises:{ag:'dad',h:'desconfiado',t:'Análises, Ranking e o Klose',x:'Saúde do negócio, clientes que sumiram, previsão e o ranking dos seus melhores clientes.',falta:function(){return 'Libera quando o seu primeiro mês com pedidos fechar. Aí já tenho o que comparar.';}},
-  rede:{ag:'mkt',h:'animada',t:'Rede de cadistas',x:'Seu perfil público para laboratórios e clínicas, e a troca de trabalhos com outros cadistas.',falta:function(){var n=alive(S.pedidos).filter(function(p){try{return pedComprovado(p);}catch(e){return false;}}).length;return 'Libera com 30 trabalhos finalizados e uma meta batida. Você tem '+Math.min(n,30)+' de 30.';},n:function(){return [alive(S.pedidos).filter(function(p){try{return pedComprovado(p);}catch(e){return false;}}).length,30];}}};
+  rede:{ag:'mkt',h:'animada',t:'Rede de cadistas',x:'Seu perfil público para laboratórios e clínicas, e a troca de trabalhos com outros cadistas.',falta:function(){return 'A Rede está em preparação e abre em breve para todos. Eu te aviso quando liberar! 🔒';}}};
 LIB_EXP.ranking=LIB_EXP.analises;LIB_EXP.mkt=LIB_EXP.leads;LIB_EXP.ger=LIB_EXP.metas;LIB_EXP.dad=LIB_EXP.analises;
 function tutCena(o){var g=SECS.filter(function(x){return x.id===o.ag;})[0];
   return '<div class="tut-intro" role="dialog" aria-label="'+esc(o.t)+'"><div class="tut-pers" style="--zc:'+g.cor+'"><img src="'+esc(corpoDe(g,o.h))+'" alt="'+esc(g.nome)+'"></div>'+
@@ -3039,7 +3039,7 @@ function tutDicaHtml(t){var d=(TUT_DICAS[t]||[]).filter(function(x){return x.id=
     bts:'<button class="btn sm" data-tut="intro">Explicação da tela</button><span class="spacer"></span>'+(resto?'<button class="btn sm" data-tut="dica">Outra dica ('+resto+')</button>':'')+'<button class="btn sm pri" data-tut="fecha">Entendi</button>'});}
 function tutLibHtml(k){var L=LIB_EXP[k];if(!L)return '';var nn=L.n?L.n():null,bar='';
   if(nn){var pc=Math.min(100,Math.round(nn[0]/nn[1]*100));bar='<div class="tut-bar" aria-label="'+pc+'%"><i style="width:'+pc+'%"></i></div>';}
-  return tutCena({ag:L.ag,h:L.h,t:L.t+' 🔒',rot:'chegando',f:[L.x,'Não é plano pago: libera sozinho conforme você vai usando o sistema.'],meio:'<p><b>'+esc(L.falta())+'</b></p>'+bar,
+  return tutCena({ag:L.ag,h:L.h,t:L.t+' 🔒',rot:'chegando',f:[L.x,k==='rede'?'Estamos preparando a Rede para abrir para todos de uma vez.':'Não é plano pago: libera sozinho conforme você vai usando o sistema.'],meio:'<p><b>'+esc(L.falta())+'</b></p>'+bar,
     bts:'<span class="spacer"></span><button class="btn sm pri" data-tut="fecha">Entendi</button>'});}
 /* ===== Som 🎧: mini player de Spotify ou YouTube. Fica fora do <main>, então continua tocando ao trocar de aba.
    Nada é carregado de Spotify/YouTube até a pessoa clicar em tocar. S.prefs.som={ult:[{u,n}] } guarda só os links. ===== */
