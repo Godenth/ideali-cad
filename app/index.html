@@ -3599,11 +3599,11 @@ function updCheca(forca){if(!forca&&(EM_DEMO||!S.sessao||!ui.dadosOk||precisaBoa
   if(!forca){dv[UPD.id]=today();save();}
   var g=SECS.filter(function(x){return x.id===UPD.quem;})[0],img=g?corpoDe(g,UPD.h):'';
   var d=document.createElement('div');d.id='upd';d.className='upd';
-  d.innerHTML='<div class="upd-c" role="dialog" aria-label="Novidades"><button class="upd-x" type="button" data-u="fecha" aria-label="Fechar">×</button>'+(img?'<img class="upd-img" src="'+esc(img)+'" alt="Bia">':'')+
+  d.innerHTML='<div class="upd-c" role="dialog" aria-label="Novidades">'+(img?'<img class="upd-img" src="'+esc(img)+'" alt="Bia">':'')+
    '<div class="upd-b"><div class="upd-k">Bia · Financeiro · '+esc(UPD.sub)+'</div><h2>'+esc(UPD.tit)+'</h2><div class="upd-l">'+UPD.itens.map(function(x,i){return '<div class="upd-i" style="--d:'+(0.6+i*0.35)+'s"><span>'+x[0]+'</span><div><b>'+esc(x[1])+'</b><p>'+esc(x[2])+'</p></div></div>';}).join('')+'</div>'+
-   '<div class="upd-bt"><button class="btn pri" data-u="extrato">Ver o extrato</button><button class="btn" data-u="logo">Colocar meu logo</button><button class="btn" data-u="fecha">Depois</button></div></div></div>';
+   '<div class="upd-bt"><button class="btn pri" data-u="extrato">Ver o extrato</button><button class="btn" data-u="logo">Colocar meu logo</button><button class="btn" data-u="fecha">OK, entendi</button></div></div></div>';
   document.body.appendChild(d);requestAnimationFrame(function(){d.classList.add('on');});setTimeout(function(){fogos(3000,d);},700);
-  d.addEventListener('click',function(e){var b=e.target.closest('[data-u]');if(!b&&e.target!==d)return;var u=b?b.dataset.u:'fecha';d.classList.remove('on');setTimeout(function(){d.remove();},350);
+  d.addEventListener('click',function(e){var b=e.target.closest('[data-u]');if(!b)return;var u=b.dataset.u;d.classList.remove('on');setTimeout(function(){d.remove();},350);
     if(u==='extrato'){closeSheet();ui.tab='financeiro';ui.sub=null;render();window.scrollTo(0,0);setTimeout(function(){var x=document.querySelector('[data-a="extrato"]');if(x)x.scrollIntoView({block:'center',behavior:'smooth'});},300);}
     if(u==='logo'){closeSheet();A.irConfig();setTimeout(function(){var x=document.querySelector('.logo-cfg');if(x)x.scrollIntoView({block:'center',behavior:'smooth'});},300);}});}
 function pisca(k){var dv=(S.prefs&&S.prefs.dicas)||{};return dv['vi_'+k]?'':' pisca-nv';}
