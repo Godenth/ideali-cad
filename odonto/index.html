@@ -646,6 +646,55 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .fz-av{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:800;font-size:.8rem}
 .fz-livre{color:#0f7a5a;font-weight:800}.fz-cv button{margin-top:2px;border:0;border-radius:999px;background:#5B45E0;color:#fff;font:700 .74rem var(--f-body);padding:6px}
 @media (max-width:860px){.fz-top{grid-template-columns:1fr}.fz-ph{display:none;width:100%;border-radius:22px;padding:10px}.fz.f1 .fz-ph{display:block}.fz.f2 .fz-ph{display:none}.fz-ph-h{display:none}.fz.f1 .fz-chips,.fz.f1 .fz-ana{display:none}.fz-push{margin-bottom:8px}.fz-in{font-size:.86rem;min-height:48px}.fz-cv{width:150px;padding:9px}.fz-tr.anda{transform:translateX(-330px)}.fz{gap:8px}.fz-b{padding:10px 12px;gap:7px}}
+
+/* A Ana completa o currículo */
+.ac{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;width:100%;max-width:900px;align-items:start}
+.ac-chat{max-width:none}.ac-b{padding:14px;display:grid;gap:10px;height:340px;overflow:hidden;align-content:start}
+.ac-m{opacity:0;transform:translateY(10px);transition:.45s;display:none}.ac-m.in{display:block;opacity:1;transform:none}
+.ac-m p{margin:0 0 6px;background:rgba(255,255,255,.08);border-radius:14px 14px 14px 4px;padding:8px 12px;display:inline-block;font-size:.92rem}
+.ac-ch{display:flex;flex-wrap:wrap;gap:6px}.ac-ch button,.ac-in button{border:1px solid rgba(255,255,255,.25);background:none;color:#fff;border-radius:999px;padding:6px 12px;font:700 .82rem var(--f-body);transition:.25s}
+.ac-ch button.on,.ac-in button.on{background:#7CF0C8;color:#0a0d24;border-color:#7CF0C8}
+.ac-in{display:flex;gap:6px;align-items:center}.ac-in span{flex:1;min-height:36px;border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:7px 10px;font-size:.9rem}
+.ac-cv{background:#F7F8FC;color:#1B2140;border-top:6px solid #5B45E0;border-radius:6px 6px 16px 16px;padding:16px;display:grid;gap:10px;box-shadow:0 20px 40px -16px rgba(0,0,0,.7);transition:box-shadow .5s}
+.ac-cv.ok{box-shadow:0 0 0 3px #7CF0C8,0 20px 40px -16px rgba(0,0,0,.7)}
+.ac-h{display:flex;gap:10px;align-items:center;padding-bottom:10px;border-bottom:2px solid #E1E5F2}.ac-h b{display:block}.ac-h small{color:#5d6486;font-weight:600}
+.ac-av,.vd-av,.ca-av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;background:#5B45E0;flex:none}
+.ac-s h4{margin:0 0 5px;font:600 .66rem var(--f-mono);letter-spacing:.08em;color:#7A82A3;text-transform:uppercase}.ac-s>div{display:flex;flex-wrap:wrap;gap:5px;min-height:26px}
+.ac-v{color:#A0A7C2;font-style:normal}
+.ac-t{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #D5DAEA;border-radius:8px;padding:3px 6px 3px 9px;font-weight:700;font-size:.8rem;opacity:0;transform:scale(.7);transition:.4s cubic-bezier(.2,1.6,.4,1)}.ac-t.in{opacity:1;transform:none}
+.ac-t b{font-size:.64rem;border-radius:999px;padding:1px 7px;background:#E1E5F2;color:#1B2140}.ac-t b.m{background:#5B8CFF;color:#fff}.ac-t b.a{background:#5BE3A4;color:#0a0d24}
+.ac-pr{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:.78rem;font-weight:700;color:#5d6486}.ac-pr i{height:8px;border-radius:9px;background:#E1E5F2;overflow:hidden}.ac-pr b{display:block;height:100%;background:linear-gradient(90deg,#5B45E0,#2BC7B8);transition:width .6s}.ac-pr em{font-style:normal;color:#1B2140}
+/* Você decide o que mostrar */
+.vd{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;width:100%;max-width:900px}
+.vd-l{max-width:none}.vd-b{padding:12px 16px;display:grid;gap:2px}
+.vd-r{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.vd-k{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;padding:5px 12px;font:800 .78rem var(--f-body);min-width:108px}
+.vd-k.on{background:rgba(124,240,200,.16);border-color:#7CF0C8;color:#7CF0C8}.vd-k.bt{animation:vdBt .5s}
+@keyframes vdBt{40%{transform:scale(1.15)}}
+.vd-n{margin:8px 0 0!important;font-size:.76rem!important;color:#9aa3d8!important}
+.vd-arr{font-size:1.8rem;color:var(--mint2)}
+.vd-c{background:#F7F8FC;color:#1B2140;border-top:6px solid #2BC7B8;border-radius:6px 6px 16px 16px;padding:16px;display:grid;gap:10px;box-shadow:0 20px 40px -16px rgba(0,0,0,.7)}
+.vd-k2{font:600 .64rem var(--f-mono);letter-spacing:.1em;color:#2BC7B8}
+.vd-h{display:flex;gap:10px;align-items:center}.vd-h b{display:block;font-size:1.05rem}.vd-h small{color:#5d6486;font-weight:600}
+.vd-av{background:#C9CEE0;font-size:1.3rem;transition:.4s}.vd-av.avc,.ca-av.avc{background:linear-gradient(135deg,#5B45E0,#2BC7B8);font-size:.95rem}
+.vd-i,.vd-t{display:flex;flex-wrap:wrap;gap:6px;font-size:.82rem}.vd-i span{color:#3A4163}.vd-t span{background:#fff;border:1px solid #D5DAEA;border-radius:8px;padding:3px 8px;font-weight:700}
+.vd-z{font-size:.78rem;background:#EEF0F8;border-radius:10px;padding:8px 10px;color:#3A4163}
+.flx{animation:flTx .6s}@keyframes flTx{0%{opacity:0;transform:translateY(-6px)}100%{opacity:1}}
+/* Contato aceito */
+.ca{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;width:100%;max-width:860px}
+.ca-ph{width:250px;height:auto;padding:12px 12px 16px}.ca-push{opacity:0;transform:translateY(-14px);transition:.5s}.ca-push.in{opacity:1;transform:none}
+.ca-bt{display:grid;gap:8px;opacity:0;transition:.4s}.ca-bt.in{opacity:1}
+.ca-bt button{border:0;border-radius:999px;padding:11px;font:800 .9rem var(--f-body)}.ca-ok{background:#7CF0C8;color:#0a0d24}.ca-no{background:rgba(255,255,255,.12);color:#fff}
+.ca-dn{display:none;text-align:center;background:#1DAE8A;color:#fff;border-radius:999px;padding:11px;font-weight:800}.ca-dn.in{display:block;animation:flTx .5s}
+.ca-w{max-width:none}.ca-c{display:flex;gap:12px;align-items:center}.ca-c b{display:block;font-size:1.1rem}.ca-c small{color:#625E75}
+.ca-av{width:58px;height:58px;font-size:1.5rem;background:#C9CEE0;transition:.4s}.ca-av.abre{animation:caOpen .6s}
+@keyframes caOpen{30%{transform:scale(1.3) rotate(-12deg)}}
+.ca-st{margin:14px 0 10px;font-weight:700;color:#8a6200;background:#FFF4DC;border-radius:10px;padding:9px 12px;font-size:.9rem}.ca-st.ok{color:#0f5a3a;background:#E3F7F0}
+.ca-lib{display:flex;flex-wrap:wrap;gap:6px;opacity:0;transform:translateY(6px);transition:.5s}.ca-lib.in{opacity:1;transform:none}.ca-lib span{background:#EEEBFD;color:#3D2FA8;border-radius:999px;padding:4px 11px;font-weight:700;font-size:.82rem}
+.ca-wa{margin-top:12px;border:0;border-radius:999px;background:#1E8A5A;color:#fff;font:800 .92rem var(--f-body);padding:11px 18px;opacity:0;transform:scale(.8);transition:.5s cubic-bezier(.2,1.6,.4,1)}.ca-wa.in{opacity:1;transform:none}
+@media (max-width:860px){.ac{grid-template-columns:1fr;gap:10px}.ac-b{height:190px;padding:10px}.ac-cv{padding:12px;gap:7px}.ac-cv .ac-h{padding-bottom:6px}
+ .vd{grid-template-columns:1fr;gap:8px}.vd-arr{display:none}.vd-b{padding:8px 12px}.vd-r{padding:4px 0;font-size:.85rem}.vd-k{padding:3px 10px;font-size:.72rem;min-width:94px}.vd-c{padding:12px;gap:7px}.vd-z{display:none}
+ .ca{grid-template-columns:1fr;gap:10px}.ca-ph{width:100%;border-radius:22px;padding:10px}.ca-ph .fz-ph-h{display:none}}
 </style>
 <body>
 <header class="top">
@@ -844,10 +893,51 @@ var CENAS=[
   go:function(){inn('.fx',100,200);[[0,1],[1,0],[1,2],[2,0],[2,1],[3,0]].forEach(function(q,i){at(1300+i*450,function(){var e=$('#q'+q[0]);if(e)e.children[q[1]].classList.add('on');});});
    falas([[0,'Para o estudante, a <b>mini entrevista</b> é sobre o futuro: fase do curso, áreas favoritas e o que procura.'],[5000,'Para quem já trabalha, eu pergunto softwares, técnicas e anos de experiência. <b>Sem formulário chato.</b>']]);}},
 
- {cap:'Currículo',pt:2,p:'determinada',d:10000,h:'<div class="sc"><div class="win dk"><div class="cv"><div class="foto fx"></div><div><h3 class="fx">L. M.</h3><div class="crg fx">Estudante de Odontologia · 8º período</div><div class="lk fx"><span>🔒 Profissão</span><span>🔒 Formação</span><span>📍 Campinas</span><span style="color:#7CF0C8">● Procurando estágio</span></div>'+
+ {cap:'Currículo',pt:2,p:'determinada',d:10000,h:'<div class="sc"><div class="win dk"><div class="cv"><div class="foto fx"></div><div><h3 class="fx">Larissa Martins</h3><div class="crg fx">Estudante de Odontologia · 8º período</div><div class="lk fx"><span>✓ Profissão conferida</span><span>✓ Formação conferida</span><span>📍 Campinas</span><span style="color:#7CF0C8">● Procurando estágio</span></div>'+
    '<div class="xp fx"><b>Clínica-escola da faculdade</b><small>Atendimentos supervisionados · 2 anos</small></div><div class="xp fx"><b>Curso de fluxo digital</b><small>Concluído</small></div>'+
    [['Prótese',.66],['Exocad',.33],['Atendimento',.66]].map(function(k){return '<div class="skb fx" style="--v:'+k[1]+'"><span style="width:96px">'+k[0]+'</span><i></i></div>';}).join('')+'</div></div></div></div>',
-  go:function(){inn('.fx',100,200);falas([[0,'Com as respostas, eu monto o <b>currículo</b>: foto, experiências, cursos e habilidades.'],[4400,'Profissão e formação ficam <b>travadas 🔒</b>. Quem contrata sabe que é verdade.']]);}},
+  go:function(){inn('.fx',100,200);falas([[0,'Com as respostas, eu monto o <b>currículo</b>: foto, experiências, cursos e habilidades.'],[4400,'Profissão e formação ficam <b>conferidas ✓</b> e não mudam. Quem contrata sabe que é verdade.']]);}},
+
+ {cap:'A Ana completa o currículo',pt:2,p:'feliz',d:15000,h:'<div class="sc"><div class="ac">'+
+   '<div class="win dk ac-chat fx"><div class="wbar">💬 Ana · completando seu currículo</div><div class="ac-b" id="acb">'+
+    '<div class="ac-m" id="am0"><p>Quais <b>sistemas</b> você usa?</p><div class="ac-ch"><button id="ab0">Exocad</button><button id="ab1">Clinicorp</button><button>Labfácil</button><button>Excel</button></div></div>'+
+    '<div class="ac-m" id="am1"><p>Qual o seu <b>nível</b> no Exocad?</p><div class="ac-ch"><button>Básico</button><button>Médio</button><button id="ab2">Avançado</button></div></div>'+
+    '<div class="ac-m" id="am2"><p>Tem <b>pós-graduação</b>?</p><div class="ac-ch"><button id="ab3">Prótese sobre implante</button><button>Estética</button><button>Ainda não</button></div></div>'+
+    '<div class="ac-m" id="am3"><p>E <b>cursos extras</b>?</p><div class="ac-in"><span id="act"></span><button id="ab4">Enviar</button></div></div>'+
+   '</div></div>'+
+   '<div class="ac-cv fx"><div class="ac-h"><span class="ac-av">LM</span><div><b>Larissa Martins</b><small>Técnica em Prótese Dentária</small></div></div>'+
+    '<div class="ac-s"><h4>Sistemas</h4><div id="acs"><em class="ac-v">—</em></div></div><div class="ac-s"><h4>Pós-graduação</h4><div id="acp"><em class="ac-v">—</em></div></div><div class="ac-s"><h4>Cursos</h4><div id="acc"><em class="ac-v">—</em></div></div>'+
+    '<div class="ac-pr"><span>Currículo</span><i><b id="acpr" style="width:40%"></b></i><em id="acpn">40%</em></div></div></div></div>',
+  go:function(){inn('.fx',100,250);var sh=function(id){var e=$('#'+id);if(e){e.classList.add('in');var b=$('#acb');if(b)b.scrollTop=b.scrollHeight;}},
+   pr=function(v){var b=$('#acpr'),n=$('#acpn');if(b)b.style.width=v+'%';if(n)n.textContent=v+'%';},
+   add=function(id,html){var e=$('#'+id);if(!e)return;var v=e.querySelector('.ac-v');if(v)v.remove();e.insertAdjacentHTML('beforeend',html);var l=e.lastElementChild;void l.offsetWidth;l.classList.add('in');},
+   on=function(id){var b=$('#'+id);if(b)b.classList.add('on');};
+   at(500,function(){sh('am0');});
+   clica('#ab0',1000,function(){on('ab0');add('acs','<span class="ac-t">Exocad<b class="lv">…</b></span>');pr(52);});
+   clica('#ab1',2300,function(){on('ab1');add('acs','<span class="ac-t">Clinicorp<b class="lv m">Médio</b></span>');pr(60);});
+   at(3700,function(){sh('am1');});
+   clica('#ab2',4100,function(){on('ab2');var l=$('#acs .lv');if(l){l.textContent='Avançado';l.classList.add('a');}pr(72);});
+   at(5600,function(){sh('am2');});
+   clica('#ab3',6000,function(){on('ab3');add('acp','<span class="ac-t">Prótese sobre implante</span>');pr(86);});
+   at(7500,function(){sh('am3');var tx='Fotografia odontológica',el=$('#act'),i=0;(function f(){if(!el||!el.isConnected)return;el.textContent=tx.slice(0,++i);if(i<tx.length)setTimeout(f,55);})();});
+   clica('#ab4',8600,function(){on('ab4');add('acc','<span class="ac-t">Fotografia odontológica</span>');pr(100);var c=$('.ac-cv');if(c)c.classList.add('ok');});
+   falas([[0,'Depois do cadastro, eu faço uma <b>entrevista rapidinha</b> no chat: quais sistemas você usa e em que nível.'],[5600,'Pós-graduação, cursos extras… Cada resposta já entra <b>direto no currículo</b>.'],[10200,'Pronto: currículo <b>100%</b>, sem preencher formulário chato. ✨']]);}},
+
+ {cap:'Você decide o que mostrar',pt:2,p:'determinada',d:14000,h:'<div class="sc"><div class="vd">'+
+   '<div class="win dk vd-l fx"><div class="wbar">🔐 Privacidade do seu perfil</div><div class="vd-b">'+
+    [['foto','Foto',0],['nome','Nome',0],['idade','Idade',0],['sexo','Sexo',0],['cidade','Cidade',1],['cursos','Cursos e experiência',1]].map(function(r){return '<div class="vd-r"><span>'+r[1]+'</span><button class="vd-k'+(r[2]?' on':'')+'" id="vk-'+r[0]+'">'+(r[2]?'🔓 visível':'🔒 oculto')+'</button></div>';}).join('')+
+    '<p class="vd-n">🔒 fechado = ninguém vê · 🔓 aberto = aparece na Rede</p></div></div>'+
+   '<div class="vd-arr fx">➜</div>'+
+   '<div class="vd-c fx"><small class="vd-k2">COMO A REDE TE VÊ</small><div class="vd-h"><span class="vd-av" id="vav">👤</span><div><b id="vnm">Profissional #0412</b><small>Técnica em Prótese · 5 anos</small></div></div>'+
+    '<div class="vd-i"><span id="vid">🎂 idade oculta</span><span>📍 Campinas / SP</span></div><div class="vd-t"><span>Exocad · Avançado</span><span>Prótese sobre implante</span></div>'+
+    '<div class="vd-z">📞 Telefone e e-mail <b>nunca</b> aparecem. Só quando você aceita o contato.</div></div></div></div>',
+  go:function(){inn('.fx',100,250);var tg=function(k,on,lb){var b=$('#vk-'+k);if(!b)return;b.classList.toggle('on',on);b.textContent=on?'🔓 visível':'🔒 oculto';b.classList.remove('bt');void b.offsetWidth;b.classList.add('bt');};
+   var muda=function(id,t){var e=$('#'+id);if(!e)return;e.classList.remove('flx');void e.offsetWidth;e.textContent=t;e.classList.add('flx');};
+   clica('#vk-foto',2400,function(){tg('foto',1);var a=$('#vav');if(a){a.textContent='LM';a.classList.add('avc');}});
+   clica('#vk-nome',4400,function(){tg('nome',1);muda('vnm','Larissa Martins');});
+   clica('#vk-idade',6400,function(){tg('idade',1);muda('vid','🎂 29 anos');});
+   clica('#vk-nome',9000,function(){tg('nome',0);muda('vnm','Profissional #0412');});
+   falas([[0,'Atenção: <b>todos os seus dados ficam em sigilo</b>. Nome, idade, foto, endereço… tudo fica oculto até você decidir mostrar.'],[6200,'É só tocar no <b>cadeado</b>: 🔓 aberto aparece na Rede, 🔒 fechado ninguém vê.'],[10600,'Quer ficar anônima? Pode. A empresa vê <b>a sua carreira</b>, e o resto só depois que você aceitar.']]);}},
 
  {cap:'Vagas perto de você',pt:2,p:'determinada',d:12000,rede:1,h:'<div class="tr" id="tr"></div><div class="sc"><div class="vg"><div><div class="flt fx"><span class="on" id="f0">Minha cidade</span><span id="f1">50 km</span><span id="f2">100 km</span><span id="f3">Brasil</span></div>'+
    [['🦷','#3a2a8a','Estágio em clínica','Clínica · Centro','3 km','Estágio'],['🔧','#1e5a4c','Projetista CAD júnior','Laboratório digital','12 km','CLT'],['🩺','#6a3a1e','ASB','Clínica confidencial','8 km','CLT'],['😁','#24507a','Dentista clínico geral','Clínica · Zona Sul','21 km','PJ']].map(function(v){return '<div class="vc fx"><div class="ic" style="background:'+v[1]+'">'+v[0]+'</div><div><b>'+v[2]+'</b><small>'+v[3]+' · '+v[5]+'</small></div><span class="km">'+v[4]+'</span></div>';}).join('')+
@@ -878,9 +968,20 @@ var CENAS=[
    falas([[0,'Agora o outro lado: a <b>clínica ou o laboratório</b>. Anunciar uma vaga leva <b>um minuto</b>.'],[5200,'Pode até anunciar como <b>confidencial</b>, sem expor o nome. E a vaga já chega para quem tem o perfil.']]);}},
 
  {cap:'Candidatos',pt:2,p:'feliz',d:11000,rede:1,h:'<div class="sc"><div class="win" style="max-width:720px"><div class="wbar"><span>👥 Candidatos · ASB</span><div class="tabs"><span>Nova vaga</span><span class="on">Candidatos</span></div></div><div class="wbody">'+
-   [['A. S.','ASB · 4 anos · cirurgia','5 km','#5B45E0',['Cirurgia','CRO ativo']],['R. P.','TSB · 2 anos','9 km','#1DAE8A',['Periodontia']],['J. C.','Estudante TSB · último semestre','3 km','#DD5A9E',['Estágio em cirurgia']]].map(function(c,i){return '<div class="cand fx" id="cd'+i+'"><span class="av" style="background:'+c[3]+'">'+c[0].replace(/[ .]/g,'')+'</span><div><b>'+c[0]+'</b><small>'+c[1]+'</small><div class="tgs">'+c[4].map(function(t){return '<em>'+t+'</em>';}).join('')+'</div></div><span class="km2">📍 '+c[2]+'</span><button class="chm" id="ch'+i+'">Chamar</button></div>';}).join('')+'</div></div></div>',
+   [['#0231','ASB · 4 anos · cirurgia','5 km','#5B45E0',['Cirurgia','CRO ativo']],['#0874','TSB · 2 anos','9 km','#1DAE8A',['Periodontia']],['#1190','Estudante TSB · último semestre','3 km','#DD5A9E',['Estágio em cirurgia']]].map(function(c,i){return '<div class="cand fx" id="cd'+i+'"><span class="av" style="background:'+c[3]+'">🔒</span><div><b>Profissional '+c[0]+'</b><small>'+c[1]+'</small><div class="tgs">'+c[4].map(function(t){return '<em>'+t+'</em>';}).join('')+'</div></div><span class="km2">📍 '+c[2]+'</span><button class="chm" id="ch'+i+'">Chamar</button></div>';}).join('')+'</div></div></div>',
   go:function(){inn('.fx',100,300);clica('#ch0',2600,function(){var b=$('#ch0');if(b){b.textContent='✓ Chamado';b.classList.add('ok');}});
-   falas([[0,'A clínica recebe os <b>candidatos</b> com o currículo completo, a distância e as habilidades.'],[4600,'Um clique em <b>"Chamar"</b> e o convite para a entrevista já vai.']]);}},
+   falas([[0,'A clínica recebe os <b>candidatos</b> com o currículo completo, a distância e as habilidades.'],[4600,'O nome fica <b>escondido</b> até a pessoa aceitar. Um clique em <b>"Chamar"</b> e o pedido de contato já vai.']]);}},
+
+ {cap:'Contato aceito',pt:2,p:'feliz',d:12000,rede:1,h:'<div class="sc"><div class="ca">'+
+   '<div class="phone ca-ph fx"><div class="fz-ph-h">10:12</div><div class="push ca-push" id="cap"><img src="../app/equipe/ana-av-feliz.webp" alt=""><div><b>Ana · Ideali</b><p>A <b>Clínica Sorriso Pleno</b> quer falar com você sobre a vaga de ASB.</p></div></div>'+
+    '<div class="ca-bt" id="cab"><button class="ca-ok" id="caok">Aceitar contato</button><button class="ca-no">Agora não</button></div><div class="ca-dn" id="cadn">✓ Contato liberado</div></div>'+
+   '<div class="win ca-w fx"><div class="wbar">👥 Candidato · ASB</div><div class="wbody"><div class="ca-c"><span class="ca-av" id="caav">🔒</span><div><b id="canm">Profissional #0231</b><small>ASB · 4 anos · cirurgia · 📍 5 km</small></div></div>'+
+    '<div class="ca-st" id="cast">⏳ Aguardando a pessoa aceitar o contato…</div><div class="ca-lib" id="calib"><span>📸 Foto</span><span>🪪 Nome completo</span><span>💬 WhatsApp</span></div><button class="ca-wa" id="cawa">💬 Chamar no WhatsApp</button></div></div></div></div>',
+  go:function(){inn('.fx',100,250);at(1300,function(){var p=$('#cap');if(p)p.classList.add('in');});at(2000,function(){var b=$('#cab');if(b)b.classList.add('in');});
+   clica('#caok',2600,function(){var b=$('#cab');if(b)b.style.display='none';var d=$('#cadn');if(d)d.classList.add('in');
+     at(700,function(){var a=$('#caav');if(a){a.classList.add('abre');a.textContent='🔓';}});
+     at(1500,function(){var a=$('#caav');if(a){a.textContent='AR';a.classList.add('avc');}var n=$('#canm');if(n){n.textContent='Amanda Silva Rocha';n.classList.add('flx');}var s2=$('#cast');if(s2){s2.textContent='✓ Contato aceito agora';s2.classList.add('ok');}var l=$('#calib');if(l)l.classList.add('in');var w=$('#cawa');if(w)w.classList.add('in');});});
+   falas([[0,'Quando a clínica chama, a decisão é <b>sua</b>: chega o pedido e você escolhe se aceita.'],[5200,'Aceitou? O cadeado <b>abre</b> e a clínica vê o seu nome, a foto e o WhatsApp. Antes disso, ninguém vê. 🔓']]);}},
 
  {cap:'Contratado!',pt:2,p:'feliz',d:8000,rede:1,h:'<div class="sc"><canvas id="cf"></canvas><div class="parab"><h2 class="pop" style="margin-top:18px">🎉 Parabéns, você foi contratado(a)!</h2><p class="fx">Da candidatura à contratação, tudo dentro da Ideali.</p></div></div>',
   go:function(){inn('.pop',200,200);inn('.fx',900);at(400,function(){confete(200);});at(2600,function(){confete(120);});
