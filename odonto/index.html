@@ -747,6 +747,57 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .qp-ok{background:rgba(124,240,200,.1);border:1px solid rgba(124,240,200,.4);border-radius:22px;padding:26px;display:grid;gap:8px;justify-items:start}.qp-ok b{font-size:1.4rem}.qp-ok p{margin:0;color:#C9D0FF}
 .qp-off{color:#C9D0FF}
 @media (max-width:760px){.qp{padding:52px 16px}.qp-c{grid-template-columns:1fr;gap:20px}#qpf{padding:16px}.qp-tp{grid-template-columns:1fr}}
+
+/* ===== Abertura ===== */
+#pl.intro .pl-main{grid-template-columns:1fr;grid-template-rows:1fr}#pl.intro .ana{display:none}
+.ab{position:absolute;inset:0;overflow:hidden;display:grid;place-items:center;color:#fff}
+.ab-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,#14183c,#05060f);transition:background 1.2s}
+.ab-bg.abdor{background:radial-gradient(ellipse at 50% 60%,#3a0d16,#0b0306 75%);animation:abPul 2s ease-in-out infinite}
+.ab-bg.abok{background:radial-gradient(ellipse at 50% 70%,#2d2190 0%,#101a4a 45%,#050a18 100%);animation:none}
+@keyframes abPul{50%{filter:brightness(1.25)}}
+.ab-q,.ab-b,.ab-fomo,.ab-fim{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none}
+.ab-q span{font:800 clamp(2rem,5.4vw,4.4rem)/1.05 var(--f-display);letter-spacing:-.02em;transform:scale(1.4);filter:blur(12px);transition:transform 1s cubic-bezier(.2,.9,.2,1),filter 1s}
+.ab-q.in{opacity:1}.ab-q.in span{transform:none;filter:none}.ab-q.out{opacity:0;transition:opacity .4s}
+.ab-b{gap:3vw;padding:0 4vw;transition:opacity .35s}.ab-b.in{opacity:1}.ab-b.out{opacity:0}
+.ab-b.ab-r{flex-direction:row-reverse}
+.ab-b img{height:min(88%,560px);width:auto;max-width:42%;object-fit:contain;filter:drop-shadow(0 30px 40px rgba(0,0,0,.6));transform:translateX(-120%);transition:transform .7s cubic-bezier(.2,1,.3,1)}
+.ab-b.ab-r img{transform:translateX(120%)}
+.ab-b.in img{transform:none}.ab-b.out img{transform:translateX(-140%);transition:transform .45s ease-in}.ab-b.ab-r.out img{transform:translateX(140%)}
+.ab-b.treme.in img{animation:abTr .12s 6 .7s}
+@keyframes abTr{50%{transform:translateX(6px) rotate(1deg)}}
+.ab-t{max-width:540px;display:grid;gap:10px;transform:translateY(30px);opacity:0;transition:.6s .25s}
+.ab-b.in .ab-t{transform:none;opacity:1}
+.ab-t small{font:600 .8rem var(--f-mono);letter-spacing:.2em;color:#FF7A7A}
+.ab-t p{margin:0;font:800 clamp(1.5rem,3.1vw,2.6rem)/1.15 var(--f-display);letter-spacing:-.01em}
+.ab-t p b{color:#FF6B6B;text-shadow:0 0 24px rgba(255,80,80,.6)}
+.ab-t em{font-style:normal;color:#C9A9B0;font-weight:700}
+.ab-fomo{padding:0 8vw;text-align:center;transition:opacity .5s}.ab-fomo.in{opacity:1}.ab-fomo.out{opacity:0}
+.ab-fomo p{margin:0;max-width:900px;font:800 clamp(1.5rem,3.4vw,2.8rem)/1.2 var(--f-display)}
+.ab-fomo b{color:#FFD166;animation:abZ 1.4s ease-out both .5s}
+@keyframes abZ{from{opacity:0;filter:blur(8px)}}
+.ab-fl{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}.ab-fl.in{animation:abFl .7s ease-out}
+@keyframes abFl{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.ab-fim{flex-direction:column;gap:2vh;transition:opacity .3s}.ab-fim.in{opacity:1}
+.ab-gang{display:flex;align-items:flex-end;justify-content:center;height:46%;max-height:360px}
+.ab-gang img{height:100%;width:auto;margin:0 -2.2vw;filter:drop-shadow(0 20px 30px rgba(0,0,0,.5));transform:translateY(60%) scale(.7);opacity:0}
+.ab-fim.in .ab-gang img{animation:abUp .8s cubic-bezier(.2,1.5,.4,1) both;animation-delay:calc(.25s + var(--i)*.18s)}
+@keyframes abUp{to{transform:none;opacity:1}}
+.ab-tx{text-align:center;display:grid;gap:10px;justify-items:center}
+.ab-logo{display:flex;align-items:center;gap:10px;font:800 clamp(1.8rem,4vw,3rem) var(--f-display);opacity:0;transform:scale(2.2)}
+.ab-logo i{width:1.3em;height:1.3em;border-radius:.3em;background:linear-gradient(135deg,#7B5CFF,#5B45E0);display:grid;place-items:center;font-style:normal;font-size:.8em}.ab-logo b{color:var(--mint2)}
+.ab-fim.in .ab-logo{animation:abSlam .5s cubic-bezier(.3,1.6,.5,1) 1.2s both}
+@keyframes abSlam{to{opacity:1;transform:none}}
+.ab-tx h2{margin:0;font:800 clamp(1.2rem,2.6vw,2rem)/1.2 var(--f-display);opacity:0}.ab-tx h2 span{color:var(--mint2)}
+.ab-fim.in .ab-tx h2{animation:abIn .6s ease-out 1.9s both}
+.ab-cta{margin:0;font:700 1rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:#FFD166;opacity:0}
+.ab-fim.in .ab-cta{animation:abIn .6s ease-out 2.8s both,abPisc 1.4s ease-in-out 3.4s infinite}
+@keyframes abIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes abPisc{50%{opacity:.45}}
+@media (max-width:860px){
+ .ab-b,.ab-b.ab-r{flex-direction:column;justify-content:flex-end;gap:10px;padding:0 18px 18px}
+ .ab-b img{height:auto;max-height:46%;max-width:72%}
+ .ab-t{text-align:center;justify-items:center}.ab-t p{font-size:1.35rem}
+ .ab-gang{height:38%}.ab-gang img{margin:0 -5vw}.ab-fomo p{font-size:1.4rem}}
 </style>
 <body>
 <header class="top">
@@ -885,6 +936,22 @@ var SETORES=[
 ];
 var CENAS=[
 /* ================= PARTE 1 · A IDEALI ================= */
+ {cap:'Abertura',pt:1,intro:1,d:30500,h:'<div class="ab"><div class="ab-bg" id="abbg"></div>'+
+   '<div class="ab-q" id="abq"><span>Você já sentiu isso?</span></div>'+
+   [['ana-preocupada','l','QUEM CONTRATA','Você posta a vaga em todo grupo de WhatsApp… e só aparece quem <b>não serve</b>.','Ana'],
+    ['mica-perdeu','r','QUEM PROCURA TRABALHO','Você manda currículo e ninguém responde. E a vaga perfeita estava <b>do lado da sua casa</b>.','Mika'],
+    ['otavio-bravo','l','O LABORATÓRIO','Prótese atrasada <b>de novo</b>. Paciente na cadeira… e o laboratório não atende.','Sr. Otávio'],
+    ['bia-brava','r','O SEU BOLSO','Cada atraso, cada retrabalho, cada vaga parada é <b>dinheiro saindo</b>. Todo santo mês.','Bia']].map(function(b,i){return '<div class="ab-b ab-'+b[1]+'" id="ab'+i+'"><img src="../app/equipe/'+b[0]+'.webp" alt=""><div class="ab-t"><small>'+b[2]+'</small><p>'+b[3]+'</p><em>— '+b[4]+'</em></div></div>';}).join('')+
+   '<div class="ab-fomo" id="abfo"><p>Enquanto você lê isso, alguém da sua cidade está <b>contratando o profissional que você queria</b>.</p></div>'+
+   '<div class="ab-fim" id="abfim"><div class="ab-gang">'+['ana-feliz','otavio-satisfeito','mica-animada','bia-contente'].map(function(n,i){return '<img src="../app/equipe/'+n+'.webp" alt="" style="--i:'+i+'">';}).join('')+'</div>'+
+   '<div class="ab-tx"><div class="ab-logo"><i>i</i>Ideali <b>Odonto</b></div><h2>Vagas, profissionais e laboratórios.<br><span>Tudo no mesmo lugar.</span></h2><p class="ab-cta">Isso acaba agora ▶</p></div></div>'+
+   '<div class="ab-fl" id="abfl"></div></div>',
+  go:function(){var on=function(id){var e=$('#'+id);if(e){e.classList.remove('out');e.classList.add('in');}},off=function(id){var e=$('#'+id);if(e){e.classList.add('out');}};
+   at(200,function(){on('abq');});at(2400,function(){off('abq');var b=$('#abbg');if(b)b.classList.add('abdor');});
+   [0,1,2,3].forEach(function(i){var t=2700+i*4000;at(t,function(){on('ab'+i);if(i===2){var b=$('#ab2');if(b)b.classList.add('treme');}});at(t+3600,function(){off('ab'+i);});});
+   at(18900,function(){on('abfo');});at(22500,function(){off('abfo');});
+   at(22900,function(){var f=$('#abfl');if(f)f.classList.add('in');var b=$('#abbg');if(b){b.classList.remove('abdor');b.classList.add('abok');}on('abfim');});}},
+
  {cap:'A Ideali',pt:1,p:'tranquila',d:9000,h:'<div class="sc"><div class="big"><div class="bigl pop"><i>i</i></div><div class="sl-k fx" style="margin-top:22px">Ideali Odonto</div><h2 class="fx">Onde a odontologia <span class="mt">contrata</span>, aprende e cresce.</h2><p class="fx">A rede profissional da odontologia brasileira, com uma assistente de IA que trabalha por você.</p></div></div>',
   go:function(){inn('.pop',100);inn('.fx',400,300);falas([[0,'Oi! Eu sou a <b>Ana</b> 💜 Antes de mostrar como funciona, deixa eu te apresentar a <b>Ideali</b>: o que ela é, por que existe e aonde a gente quer chegar.']]);}},
 
@@ -1281,7 +1348,7 @@ function vai(n){if(RG.pt&&n>RG.b){fimParte();return;}document.getElementById('pf
   Array.prototype.forEach.call(DOTS.children,function(d,i){d.className=i<n-RG.a?'ok':'';});
   var d=DOTS.children[n-RG.a];void d.offsetWidth;d.className='at';d.style.setProperty('--d',c.d+'ms');
   document.getElementById('pn').textContent=n===RG.b?(RG.pt?'Concluir ✓':'Fechar'):'Próximo ▶';
-  var po=c.p||'tranquila',qm=c.who==='ot'?'otavio':c.who==='mi'?'mica':c.who==='bi'?'bia':'ana';document.getElementById('anaimg').src='../app/equipe/'+qm+'-'+po+'.webp';document.getElementById('anaav').src='../app/equipe/'+qm+'-av-'+po+'.webp';document.getElementById('anm').innerHTML={ot:'Sr. Otávio<small>o gerente</small>',mi:'Mika<small>do marketing</small>',bi:'Bia<small>do financeiro</small>'}[c.who]||'Ana<small>sua assistente de IA</small>';PL.classList.toggle('lab',!!c.lab);PL.classList.toggle('mk',!!c.mk);ANA.classList.toggle('ot',c.who==='ot');ANA.classList.toggle('mi',c.who==='mi'||c.who==='bi');
+  var po=c.p||'tranquila',qm=c.who==='ot'?'otavio':c.who==='mi'?'mica':c.who==='bi'?'bia':'ana';document.getElementById('anaimg').src='../app/equipe/'+qm+'-'+po+'.webp';document.getElementById('anaav').src='../app/equipe/'+qm+'-av-'+po+'.webp';document.getElementById('anm').innerHTML={ot:'Sr. Otávio<small>o gerente</small>',mi:'Mika<small>do marketing</small>',bi:'Bia<small>do financeiro</small>'}[c.who]||'Ana<small>sua assistente de IA</small>';PL.classList.toggle('lab',!!c.lab);PL.classList.toggle('intro',!!c.intro);PL.classList.toggle('mk',!!c.mk);ANA.classList.toggle('ot',c.who==='ot');ANA.classList.toggle('mi',c.who==='mi'||c.who==='bi');
   FIMFALA=0;c.go();var dd=Math.max(c.d,FIMFALA);d.style.setProperty('--d',dd+'ms');restante=dd;iniT=Date.now();if(!pausado&&!c.fim)fimT=setTimeout(function(){vai(cur+1);},dd);}
 function telaCheia(on){try{var d=document,e=d.documentElement;if(on){if(innerWidth<=860&&!d.fullscreenElement&&e.requestFullscreen)e.requestFullscreen({navigationUI:'hide'}).catch(function(){});}else if(d.fullscreenElement&&d.exitFullscreen)d.exitFullscreen().catch(function(){});}catch(x){}}
 function abre(parte){telaCheia(1);PL.classList.add('on');document.body.style.overflow='hidden';setTimeout(function(){PL.classList.add('vis');},20);pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';var ini=0;if(typeof parte==='number'){RG=faixa(parte);ini=RG.a;}else RG={a:0,b:CENAS.length-1,pt:0};montaDots();vai(ini);}
