@@ -812,7 +812,7 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 <!-- PLAYER -->
 <div id="pl" role="dialog" aria-label="Apresentação Ideali Odonto">
   <div class="bg"></div>
-  <div class="pl-top"><span class="logo"><i>i</i>Ideali <small>Odonto</small></span><span class="pl-cap" id="cap"></span><span class="pl-r"><button class="pl-v" id="pvz" aria-pressed="false" title="Ouvir a voz da apresentação">🔇<span class="tx"> Voz</span></button><button class="pl-t" id="ptp" aria-label="Tópicos"><span class="hb">☰</span><span class="tx"> Tópicos</span></button><button class="pl-x" id="px" aria-label="Fechar">✕</button></span></div><div class="tpc" id="tpc"></div>
+  <div class="pl-top"><span class="logo"><i>i</i>Ideali <small>Odonto</small></span><span class="pl-cap" id="cap"></span><span class="pl-r"><button class="pl-t" id="ptp" aria-label="Tópicos"><span class="hb">☰</span><span class="tx"> Tópicos</span></button><button class="pl-x" id="px" aria-label="Fechar">✕</button></span></div><div class="tpc" id="tpc"></div>
   <div class="pl-main">
     <div class="ana" id="ana"><div class="anaf"><img id="anaimg" src="../app/equipe/ana-tranquila.webp" alt="Ana"></div><img class="anaav" id="anaav" src="../app/equipe/ana-av-tranquila.webp" alt="Ana"><div class="nm" id="anm">Ana<small>sua assistente de IA</small></div><div class="bal" id="bal"></div></div>
     <div class="stage" id="stg"></div>
@@ -834,7 +834,7 @@ function limpa(){T.forEach(clearTimeout);T=[];clearTimeout(fimT);calaVoz();}
 function $(q){return STG.querySelector(q);}
 function $$(q){return Array.prototype.slice.call(STG.querySelectorAll(q));}
 function inn(q,ms,passo){$$(q).forEach(function(el,i){at(ms+(passo||0)*i,function(){el.classList.add('in');});});}
-var VOZ=false,VZ=null;try{VOZ=localStorage.getItem('io_voz')==='1';}catch(e){}
+var VOZ=false,VZ=null;
 function vozPega(){if(VZ||!window.speechSynthesis)return VZ;var L=speechSynthesis.getVoices().filter(function(v){return /^pt(-|_)BR/i.test(v.lang);});VZ=L.filter(function(v){return /female|feminina|francisca|maria|luciana|google/i.test(v.name);})[0]||L[0]||null;return VZ;}
 function fala(txt){if(!VOZ||!window.speechSynthesis)return;try{speechSynthesis.cancel();var t=txt.replace(/<[^>]+>/g,'').replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF\uFE0F]/gu,'').replace(/\s+/g,' ').trim();if(!t)return;var u=new SpeechSynthesisUtterance(t);u.lang='pt-BR';var v=vozPega();if(v)u.voice=v;u.rate=1.05;u.pitch=1.1;speechSynthesis.speak(u);}catch(e){}}
 function calaVoz(){try{if(window.speechSynthesis)speechSynthesis.cancel();}catch(e){}}
@@ -1290,7 +1290,7 @@ function pausa(){var c=CENAS[cur];if(!pausado){pausado=true;PL.classList.add('pa
   else{pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';iniT=Date.now();try{speechSynthesis.resume();}catch(e){}if(!c.fim)fimT=setTimeout(function(){vai(cur+1);},Math.max(800,restante));}}
 Array.prototype.forEach.call(document.querySelectorAll('[data-play]'),function(b){b.onclick=function(){abre();};});
 if(!window.speechSynthesis){var pv0=document.getElementById('pvz');if(pv0)pv0.style.display='none';}else{try{speechSynthesis.onvoiceschanged=function(){VZ=null;};}catch(e){}}
-vozBt();document.getElementById('pvz').onclick=function(){VOZ=!VOZ;try{localStorage.setItem('io_voz',VOZ?'1':'0');}catch(e){}vozBt();if(!VOZ)calaVoz();else{var t=BAL.textContent;if(t)fala(t);}};
+if(document.getElementById('pvz'))document.getElementById('pvz').onclick=function(){VOZ=!VOZ;try{localStorage.setItem('io_voz',VOZ?'1':'0');}catch(e){}vozBt();if(!VOZ)calaVoz();else{var t=BAL.textContent;if(t)fala(t);}};
 montaTemas();document.getElementById('temas').addEventListener('click',function(e){var b=e.target.closest('[data-tema]');if(b)abre(+b.getAttribute('data-tema'));});
 document.getElementById('pfim').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
   if(b.hasAttribute('data-pt')||b.hasAttribute('data-pv')){var p=+(b.getAttribute('data-pt')||b.getAttribute('data-pv'));RG=faixa(p);montaDots();if(pausado)pausa();vai(RG.a);return;}
