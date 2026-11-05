@@ -936,21 +936,25 @@ var SETORES=[
 ];
 var CENAS=[
 /* ================= PARTE 1 · A IDEALI ================= */
- {cap:'Abertura',pt:1,intro:1,d:30500,h:'<div class="ab"><div class="ab-bg" id="abbg"></div>'+
+ {cap:'Abertura',pt:1,intro:1,d:41500,h:'<div class="ab"><div class="ab-bg" id="abbg"></div>'+
    '<div class="ab-q" id="abq"><span>Você já sentiu isso?</span></div>'+
-   [['ana-preocupada','l','QUEM CONTRATA','Você posta a vaga em todo grupo de WhatsApp… e só aparece quem <b>não serve</b>.','Ana'],
-    ['mica-perdeu','r','QUEM PROCURA TRABALHO','Você manda currículo e ninguém responde. E a vaga perfeita estava <b>do lado da sua casa</b>.','Mika'],
-    ['otavio-bravo','l','O LABORATÓRIO','Prótese atrasada <b>de novo</b>. Paciente na cadeira… e o laboratório não atende.','Sr. Otávio'],
-    ['bia-brava','r','O SEU BOLSO','Cada atraso, cada retrabalho, cada vaga parada é <b>dinheiro saindo</b>. Todo santo mês.','Bia']].map(function(b,i){return '<div class="ab-b ab-'+b[1]+'" id="ab'+i+'"><img src="../app/equipe/'+b[0]+'.webp" alt=""><div class="ab-t"><small>'+b[2]+'</small><p>'+b[3]+'</p><em>— '+b[4]+'</em></div></div>';}).join('')+
+   [['ana-preocupada','QUEM CONTRATA','Você posta a vaga em todo grupo de WhatsApp… e só aparece quem <b>não serve</b>.','Ana'],
+    ['ana-impaciente','A CLÍNICA, HOJE','A ASB faltou. Agenda lotada. E você não tem <b>pra quem ligar</b>.','Ana'],
+    ['mica-perdeu','QUEM PROCURA TRABALHO','Você manda currículo e ninguém responde. E a vaga perfeita estava <b>do lado da sua casa</b>.','Mika'],
+    ['bia-triste','O ESTUDANTE','Todo lugar pede experiência. Mas <b>quem te dá a primeira chance</b>?','Bia'],
+    ['mica-sumiu','O CADISTA E O FREELA','Você é bom no que faz… mas cliente novo só aparece <b>por indicação</b>.','Mika'],
+    ['otavio-bravo','O LABORATÓRIO','Prótese atrasada <b>de novo</b>. Paciente na cadeira… e o laboratório não atende.','Sr. Otávio'],
+    ['bia-desconfiada','A ESCOLA','Curso bom, professor bom… e a turma <b>não fecha</b>.','Bia'],
+    ['bia-brava','O SEU BOLSO','Cada atraso, cada retrabalho, cada vaga parada é <b>dinheiro saindo</b>. Todo santo mês.','Bia']].map(function(b,i){return '<div class="ab-b ab-'+(i%2?'r':'l')+'" id="ab'+i+'"><img src="../app/equipe/'+b[0]+'.webp" alt=""><div class="ab-t"><small>'+b[1]+'</small><p>'+b[2]+'</p><em>— '+b[3]+'</em></div></div>';}).join('')+
    '<div class="ab-fomo" id="abfo"><p>Enquanto você lê isso, alguém da sua cidade está <b>contratando o profissional que você queria</b>.</p></div>'+
    '<div class="ab-fim" id="abfim"><div class="ab-gang">'+['ana-feliz','otavio-satisfeito','mica-animada','bia-contente'].map(function(n,i){return '<img src="../app/equipe/'+n+'.webp" alt="" style="--i:'+i+'">';}).join('')+'</div>'+
-   '<div class="ab-tx"><div class="ab-logo"><i>i</i>Ideali <b>Odonto</b></div><h2>Vagas, profissionais e laboratórios.<br><span>Tudo no mesmo lugar.</span></h2><p class="ab-cta">Isso acaba agora ▶</p></div></div>'+
+   '<div class="ab-tx"><div class="ab-logo"><i>i</i>Ideali <b>Odonto</b></div><h2>Clínicas, profissionais, estudantes, laboratórios e escolas.<br><span>Tudo no mesmo lugar.</span></h2><p class="ab-cta">Isso acaba agora ▶</p></div></div>'+
    '<div class="ab-fl" id="abfl"></div></div>',
   go:function(){var on=function(id){var e=$('#'+id);if(e){e.classList.remove('out');e.classList.add('in');}},off=function(id){var e=$('#'+id);if(e){e.classList.add('out');}};
    at(200,function(){on('abq');});at(2400,function(){off('abq');var b=$('#abbg');if(b)b.classList.add('abdor');});
-   [0,1,2,3].forEach(function(i){var t=2700+i*4000;at(t,function(){on('ab'+i);if(i===2){var b=$('#ab2');if(b)b.classList.add('treme');}});at(t+3600,function(){off('ab'+i);});});
-   at(18900,function(){on('abfo');});at(22500,function(){off('abfo');});
-   at(22900,function(){var f=$('#abfl');if(f)f.classList.add('in');var b=$('#abbg');if(b){b.classList.remove('abdor');b.classList.add('abok');}on('abfim');});}},
+   [0,1,2,3,4,5,6,7].forEach(function(i){var t=2700+i*3400;at(t,function(){on('ab'+i);if(i===5){var b=$('#ab5');if(b)b.classList.add('treme');}});at(t+3050,function(){off('ab'+i);});});
+   at(30100,function(){on('abfo');});at(33800,function(){off('abfo');});
+   at(34200,function(){var f=$('#abfl');if(f)f.classList.add('in');var b=$('#abbg');if(b){b.classList.remove('abdor');b.classList.add('abok');}on('abfim');});}},
 
  {cap:'A Ideali',pt:1,p:'tranquila',d:9000,h:'<div class="sc"><div class="big"><div class="bigl pop"><i>i</i></div><div class="sl-k fx" style="margin-top:22px">Ideali Odonto</div><h2 class="fx">Onde a odontologia <span class="mt">contrata</span>, aprende e cresce.</h2><p class="fx">A rede profissional da odontologia brasileira, com uma assistente de IA que trabalha por você.</p></div></div>',
   go:function(){inn('.pop',100);inn('.fx',400,300);falas([[0,'Oi! Eu sou a <b>Ana</b> 💜 Antes de mostrar como funciona, deixa eu te apresentar a <b>Ideali</b>: o que ela é, por que existe e aonde a gente quer chegar.']]);}},
