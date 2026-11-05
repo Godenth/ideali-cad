@@ -609,6 +609,18 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .pfim-c small{font:600 .78rem var(--f-mono);letter-spacing:.1em;color:var(--mint2)}.pfim-c h2{font-size:1.7rem}.pfim-c p{margin:0;color:#C9D0FF}
 .pfim-b{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 @media (max-width:560px){.temas{grid-template-columns:1fr 1fr;gap:10px}.tema{padding:14px}.tema p{display:none}.tema-h img{width:38px;height:38px}.tema-c{display:none}}
+
+.mcmp{display:grid;gap:10px;margin-top:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px 16px}
+.mh,.mr{display:grid;grid-template-columns:150px 1fr 1fr 160px;gap:14px;align-items:center}
+.mh b{font:600 .7rem var(--f-mono);letter-spacing:.06em;color:#8E9AD8;text-transform:uppercase}
+.mr>span:first-child{font-weight:700;font-size:.92rem}
+.bx2{display:grid;grid-template-columns:1fr 46px;gap:8px;align-items:center}
+.bx2 i{height:10px;border-radius:9px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.bx2 i::after{content:"";position:absolute;inset:0;background:var(--c);transform-origin:left;transform:scaleX(0);transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.bx2 i.in::after{transform:scaleX(var(--v))}.bx2 em{font-style:normal;font-weight:800;text-align:right}
+.mtg{font-size:.76rem;font-weight:800;border-radius:999px;padding:4px 10px;text-align:center;white-space:nowrap}.mtg.mau{background:rgba(239,95,90,.16);color:#FF9A95}.mtg.bom{background:rgba(29,174,138,.18);color:#6FE3C0}
+.aviso{margin-top:12px;background:rgba(240,165,58,.14);border:1px solid rgba(240,165,58,.4);color:#FFE2B0;border-radius:14px;padding:12px 14px;font-size:.95rem;line-height:1.45}
+@media (max-width:860px){.mh{display:none}.mr{grid-template-columns:1fr 1fr;gap:4px 10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.08)}.mr>span:first-child{grid-column:1/-1;display:flex;justify-content:space-between}.mr .mtg{grid-column:1/-1;justify-self:start;font-size:.68rem;padding:2px 8px}.mcmp{gap:6px;padding:10px 12px}.aviso{font-size:.8rem;padding:9px 11px}}
 </style>
 <body>
 <header class="top">
@@ -916,10 +928,13 @@ var CENAS=[
    at(6200,function(){$('#r2').classList.add('on');$('#rp').classList.add('in');});at(9300,function(){$('#r3').classList.add('on');var e=$('#eta');if(e)e.innerHTML='✅ <b>Entregue!</b>';});
    falas([[0,'E sabe aquela pergunta "o motoboy já saiu?" Acabou. Aqui você <b>acompanha a entrega no mapa</b>, ao vivo. 🛵'],[5200,'Coletou, saiu, está chegando… e a Ana ainda avisa: <b>"está a 5 minutos"</b>.'],[9600,'Na chegada, a clínica confirma com um <b>código</b>. Entregue, registrado, sem discussão.']]);}},
 
- {cap:'Atrasos e refações',pt:3,who:'ot',p:'bravo',d:12000,lab:1,h:'<div class="sc"><div class="sl">'+L('Análise por laboratório · últimos 6 meses')+'<div class="cmp">'+[['Lab Arte Dental',4,3,96],['Lab Digital Centro',14,6,82],['Lab Cerâmica Fina',6,9,90]].map(function(l){return '<div class="cl fx"><b>'+l[0]+'</b><div class="bx"><span>Atrasos</span><i style="--v:'+l[1]*5+'%;--c:#EF5F5A"></i><em>'+l[1]+'%</em></div><div class="bx"><span>Refações</span><i style="--v:'+l[2]*5+'%;--c:#F0A53A"></i><em>'+l[2]+'%</em></div><div class="bx"><span>No prazo</span><i style="--v:'+l[3]+'%;--c:#1DAE8A"></i><em>'+l[3]+'%</em></div></div>';}).join('')+
-   '</div><div class="mot fx"><b>Por que voltou para ajuste?</b>'+[['Cor',38],['Adaptação',27],['Contato',21],['Outros',14]].map(function(m){return '<span>'+m[0]+' <em>'+m[1]+'%</em></span>';}).join('')+'</div><small class="src fx">Números de exemplo</small></div></div>',
-  go:function(){inn('.fx',100,250);at(700,function(){$$('.cmp i').forEach(function(e){e.classList.add('in');});});
-   falas([[0,'Agora a parte que me deixa <b>bravo</b>: atrasos e trabalhos errados. 😤 Aqui está tudo medido, laboratório por laboratório.'],[5600,'E o motivo de cada ajuste: cor, adaptação, contato. Com isso, você <b>conversa com o lab com dados</b>, não no achismo.']]);}},
+ {cap:'Atrasos e ajustes',pt:3,who:'ot',p:'bravo',d:13000,lab:1,h:'<div class="sc"><div class="sl">'+L('Seu laboratório × média dos outros labs · últimos 6 meses')+
+   '<div class="mcmp"><div class="mh"><span></span><b>Seu laboratório</b><b>Média dos outros</b><span></span></div>'+
+   [['Atrasos',14,'14%',6,'6%',20,0],['Retrabalho e ajuste',9,'9%',5,'5%',20,0],['Entregas no prazo',82,'82%',93,'93%',100,0],['Tempo de resposta',3,'3 h',4,'4 h',6,1]].map(function(r){return '<div class="mr fx"><span>'+r[0]+'</span><div class="bx2"><i style="--v:'+(r[1]/r[5])+';--c:'+(r[6]?'#1DAE8A':'#EF5F5A')+'"></i><em>'+r[2]+'</em></div><div class="bx2"><i style="--v:'+(r[3]/r[5])+';--c:#8E9AD8"></i><em>'+r[4]+'</em></div><span class="mtg '+(r[6]?'bom':'mau')+'">'+(r[6]?'✓ melhor que a média':'⚠️ abaixo da média')+'</span></div>';}).join('')+'</div>'+
+   '<div class="aviso fx">⚠️ <b>Aviso:</b> o seu laboratório está abaixo da média dos outros em <b>atrasos</b>, <b>retrabalho e ajuste</b> e <b>entregas no prazo</b>.</div>'+
+   '<div class="mot fx"><b>Por que voltou para ajuste?</b>'+[['Cor',38],['Adaptação',27],['Contato',21],['Outros',14]].map(function(m){return '<span>'+m[0]+' <em>'+m[1]+'%</em></span>';}).join('')+'</div><small class="src fx">Números de exemplo · nenhum laboratório é identificado</small></div></div>',
+  go:function(){inn('.fx',100,220);at(800,function(){$$('.mcmp i').forEach(function(e){e.classList.add('in');});});
+   falas([[0,'Agora a parte que me deixa <b>bravo</b>: atrasos e ajustes. 😤 O sistema compara o <b>meu laboratório</b> com a média dos outros, sem mostrar o nome de ninguém.'],[6000,'E me avisa onde estou abaixo da média e por quê: cor, adaptação, contato. Aí eu sei <b>o que melhorar</b>, com dados, não no achismo.']]);}},
 
  {cap:'Abaixo da média',pt:3,who:'ot',p:'serio',d:15000,lab:1,h:'<div class="sc"><div class="avl2">'+
    '<div class="ncard fx"><div class="nh" style="background:#5B45E0">🏥 Notificação para a clínica</div><div class="nb"><b>O seu laboratório de protocolos está abaixo da média da região.</b>'+
