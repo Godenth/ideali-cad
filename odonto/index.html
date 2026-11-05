@@ -730,6 +730,23 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
  .ec{grid-template-columns:1fr;gap:8px}.ec-ph{width:100%;border-radius:22px;padding:10px}.ec-ph .fz-ph-h{display:none}.ec-i{padding:6px 0;gap:8px}.ec-i b{font-size:.86rem}.ec-i small{display:none}.ec-i>span{font-size:1.2rem}.ec-i em{font-size:.68rem;padding:3px 8px}.ec-f{display:none}.ec-w .wbar{font-size:.82rem}.ec-ph .push{margin-bottom:6px}}
 /* voz da Ana */
 .pl-v{border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;height:42px;padding:0 14px;font:700 .9rem var(--f-body);cursor:pointer;margin-right:8px}.pl-v.on{background:rgba(124,240,200,.18);border-color:#7CF0C8;color:#7CF0C8}
+
+.qp [hidden]{display:none!important}
+.qp{padding:72px 20px;background:linear-gradient(180deg,#0E1230,#141a45)}
+.qp-c{max-width:980px;margin:0 auto;display:grid;grid-template-columns:1fr 1.1fr;gap:36px;align-items:center;color:#fff}
+.qp-k{font:600 .74rem var(--f-mono);letter-spacing:.14em;color:var(--mint2)}.qp-t h2{font:800 clamp(1.7rem,3.4vw,2.4rem)/1.1 var(--f-display);margin:8px 0 10px}.qp-t p{color:#C9D0FF;margin:0}
+#qpf{display:grid;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:22px}
+#qpf label>span,#qpf legend{display:block;font-size:.82rem;font-weight:700;color:#C9D0FF;margin-bottom:5px}
+#qpf input[name=nome],#qpf input[name=tel]{width:100%;background:rgba(0,0,0,.25);border:1.5px solid rgba(255,255,255,.16);border-radius:12px;color:#fff;font:inherit;font-size:1rem;padding:11px 12px}
+#qpf input:focus{outline:none;border-color:var(--mint2)}
+#qpf fieldset{border:0;margin:0;padding:0}.qp-tp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.qp-tp label{cursor:pointer}.qp-tp input{position:absolute;opacity:0;pointer-events:none}
+.qp-tp span{display:block;text-align:center;border:1.5px solid rgba(255,255,255,.16);border-radius:12px;padding:10px 4px;font-weight:700;font-size:.86rem;margin:0!important;color:#fff!important}.qp-tp input:checked+span{border-color:var(--mint2);background:rgba(124,240,200,.14)}.qp-tp input:focus-visible+span{box-shadow:0 0 0 3px rgba(124,240,200,.35)}
+.qp-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.qp-ac{display:flex;gap:8px;align-items:flex-start;font-size:.84rem;color:#C9D0FF}.qp-ac span{margin:0!important;font-weight:500!important}.qp-ac a{color:#7CF0C8}
+.qp-err{margin:0;color:#FFB4B4;font-weight:700}#qpb{justify-self:start;margin:0}
+.qp-ok{background:rgba(124,240,200,.1);border:1px solid rgba(124,240,200,.4);border-radius:22px;padding:26px;display:grid;gap:8px;justify-items:start}.qp-ok b{font-size:1.4rem}.qp-ok p{margin:0;color:#C9D0FF}
+.qp-off{color:#C9D0FF}
+@media (max-width:760px){.qp{padding:52px 16px}.qp-c{grid-template-columns:1fr;gap:20px}#qpf{padding:16px}.qp-tp{grid-template-columns:1fr}}
 </style>
 <body>
 <header class="top">
@@ -768,8 +785,27 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 </main>
 <section class="final">
   <h2>Quer ver tudo funcionando?</h2>
-  <p>Escolha um tema lá em cima ou assista a apresentação inteira com a Ana.</p>
+  <p>Escolha um tema lá em cima ou assista a apresentação inteira com a Ana. <a href="#participar" style="color:#7CF0C8;font-weight:700">Quero participar →</a></p>
   <button class="play" data-play style="margin-top:24px"><b>▶</b>Assistir tudo seguido</button><br><button class="btn" data-demo style="margin-top:14px;background:transparent;color:#fff;border-color:rgba(255,255,255,.3)">👆 Experimentar a plataforma</button>
+</section>
+<section class="qp" id="participar">
+  <div class="qp-c">
+    <div class="qp-t"><span class="qp-k">LISTA DE ESPERA</span><h2>Quero participar da Ideali Odonto</h2><p>Deixe o seu nome e WhatsApp. A equipe Ideali te chama quando abrir na sua região.</p></div>
+    <form id="qpf" novalidate>
+      <label><span>Seu nome</span><input name="nome" maxlength="60" autocomplete="name" required></label>
+      <label><span>WhatsApp com DDD</span><input name="tel" inputmode="numeric" autocomplete="tel" placeholder="(11) 99999-0000" required></label>
+      <fieldset><legend>Você é</legend><div class="qp-tp">
+        <label><input type="radio" name="tipo" value="dentista" checked><span>🦷 Dentista</span></label>
+        <label><input type="radio" name="tipo" value="protetico"><span>🧪 Protético / Lab.</span></label>
+        <label><input type="radio" name="tipo" value="outro"><span>✨ Outro</span></label></div></fieldset>
+      <input name="site" tabindex="-1" autocomplete="off" class="qp-hp" aria-hidden="true">
+      <label class="qp-ac"><input type="checkbox" name="aceite"> <span>Autorizo a Ideali a falar comigo pelo WhatsApp. <a href="../privacidade.html" target="_blank" rel="noopener">Privacidade</a></span></label>
+      <p class="qp-err" id="qperr" hidden></p>
+      <button class="play" id="qpb" type="submit"><b>🙋</b><span>Quero participar</span></button>
+    </form>
+    <div class="qp-ok" id="qpok" hidden><b>🎉 Recebido!</b><p>A equipe Ideali vai te chamar no WhatsApp.</p><a class="btn" id="qpwa" hidden target="_blank" rel="noopener">💬 Falar agora no WhatsApp</a></div>
+    <p class="qp-off" id="qpoff" hidden>A lista de espera abre em breve.</p>
+  </div>
 </section>
 <footer>Ideali Odonto · uma plataforma Ideali · <a href="../">idealisystems.com</a></footer>
 
@@ -1237,7 +1273,7 @@ function montaTemas(){var el=document.getElementById('temas');if(!el)return;var 
   var tm=document.getElementById('tudo-min');if(tm)tm.textContent='('+minTxt(tot)+')';}
 function montaDots(){DOTS.innerHTML=CENAS.slice(RG.a,RG.b+1).map(function(){return '<i></i>';}).join('');}
 function fimParte(){limpa();var p=RG.pt,V=vistos();V[p]=1;try{localStorage.setItem('io_temas',JSON.stringify(V));}catch(e){}montaTemas();var nx=p<4?p+1:0,todos=[1,2,3,4].every(function(k){return V[k];}),F=document.getElementById('pfim');
-  F.innerHTML='<div class="pfim-c"><small>FIM DA PARTE '+p+'</small><h2>'+TEMAS[p][0]+' ✓</h2><p>'+(nx?'Quer seguir para o próximo tema?':todos?'Você viu todos os temas. Que tal experimentar a plataforma?':'Fim da apresentação. Experimente a plataforma ou volte e escolha outro tema.')+'</p><div class="pfim-b">'+(nx?'<button class="btn pri" data-pt="'+nx+'">▶ Parte '+nx+' · '+TEMAS[nx][0]+'</button>':'<button class="btn pri" data-demo3>👆 Experimentar a plataforma</button>')+'<button class="btn" data-pv="'+p+'">↺ Ver de novo</button><button class="btn" data-ptemas>Voltar aos temas</button></div></div>';
+  F.innerHTML='<div class="pfim-c"><small>FIM DA PARTE '+p+'</small><h2>'+TEMAS[p][0]+' ✓</h2><p>'+(nx?'Quer seguir para o próximo tema?':todos?'Você viu todos os temas. Que tal experimentar a plataforma?':'Fim da apresentação. Experimente a plataforma ou volte e escolha outro tema.')+'</p><div class="pfim-b">'+(nx?'<button class="btn pri" data-pt="'+nx+'">▶ Parte '+nx+' · '+TEMAS[nx][0]+'</button>':'<button class="btn pri" data-demo3>👆 Experimentar a plataforma</button>')+'<button class="btn" data-pv="'+p+'">↺ Ver de novo</button><button class="btn" data-ptemas>Voltar aos temas</button><button class="btn" data-pqp>🙋 Quero participar</button></div></div>';
   F.classList.add('on');}
 function vai(n){if(RG.pt&&n>RG.b){fimParte();return;}document.getElementById('pfim').classList.remove('on');limpa();if(n<RG.a)n=RG.a;if(n>RG.b)n=RG.b;cur=n;var c=CENAS[n];
   PL.classList.toggle('rede',!!c.rede||n===CENAS.length-1&&false);
@@ -1259,6 +1295,7 @@ montaTemas();document.getElementById('temas').addEventListener('click',function(
 document.getElementById('pfim').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
   if(b.hasAttribute('data-pt')||b.hasAttribute('data-pv')){var p=+(b.getAttribute('data-pt')||b.getAttribute('data-pv'));RG=faixa(p);montaDots();if(pausado)pausa();vai(RG.a);return;}
   if(b.hasAttribute('data-demo3')){fecha();abreDemo();return;}
+  if(b.hasAttribute('data-pqp')){fecha();setTimeout(function(){var q=document.getElementById('participar');if(q)q.scrollIntoView({behavior:'smooth'});},520);return;}
   if(b.hasAttribute('data-ptemas')){fecha();setTimeout(function(){var t=document.getElementById('temas');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},520);}});
 document.getElementById('px').onclick=fecha;
 var PARTES={1:'Parte 1 · A Ideali',2:'Parte 2 · Como funciona',3:'Parte 3 · Laboratório',4:'Parte 4 · Gestão, marketing e comércio',9:'Encerramento'};
@@ -1514,6 +1551,22 @@ window.fechaDemo=function(){M.classList.remove('on');document.body.style.overflo
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&M.classList.contains('on')){var o=M.querySelector('.ov');if(o)o.remove();else fechaDemo();}});
 Array.prototype.forEach.call(document.querySelectorAll('[data-demo]'),function(b){b.onclick=abreDemo;});
 if(/[?&]demo/.test(location.search))abreDemo();
+})();
+
+/* Lista de espera: usa a página de captura do Ideali (o contato cai na Prospecção do admin) */
+var QP_SLUG='',QP_FN='https://qxspiaqaigjkmilxxfri.supabase.co/functions/v1/captura',QP_K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4c3BpYXFhaWdqa21pbHh4ZnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjYwMzMsImV4cCI6MjEwNzIwMjAzM30.TeIHiEvHx1PmvS5PQ3lzvByYP9ppYuq5GLZURtutXc0';
+(function(){var f=document.getElementById('qpf');if(!f)return;if(!QP_SLUG){f.hidden=true;document.getElementById('qpoff').hidden=false;return;}
+  f.tel.addEventListener('input',function(e){var d=e.target.value.replace(/\D/g,'').slice(0,11);e.target.value=d.length>10?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length>6?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d.length>2?'('+d.slice(0,2)+') '+d.slice(2):d;});
+  f.addEventListener('submit',function(e){e.preventDefault();var er=document.getElementById('qperr'),bt=document.getElementById('qpb');er.hidden=true;
+    var d={acao:'enviar',u:QP_SLUG,nome:f.nome.value.trim(),tipo:(f.querySelector('[name=tipo]:checked')||{}).value||'outro',tel:f.tel.value,cidade:'',site:f.site.value,aceite:f.aceite.checked,origem:'odonto'},dg=d.tel.replace(/\D/g,'');
+    if(d.nome.length<2){er.textContent='Digite o seu nome.';er.hidden=false;f.nome.focus();return;}
+    if(dg.length<10||dg.length>11){er.textContent='Digite o seu WhatsApp com DDD.';er.hidden=false;f.tel.focus();return;}
+    if(!d.aceite){er.textContent='Marque a autorização para o contato pelo WhatsApp.';er.hidden=false;return;}
+    bt.disabled=true;bt.querySelector('span').textContent='Enviando…';
+    fetch(QP_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':QP_K,'Authorization':'Bearer '+QP_K},body:JSON.stringify(d)}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.erro||'Não deu para enviar agora. Tente de novo.');return j;});}).then(function(j){
+      f.hidden=true;document.getElementById('qpok').hidden=false;
+      if(j.wa){var a=document.getElementById('qpwa');a.href='https://wa.me/'+j.wa+'?text='+encodeURIComponent('Olá! Sou '+d.nome+'. Vi a apresentação da Ideali Odonto e quero participar.');a.hidden=false;}
+    }).catch(function(x){er.textContent=x.message;er.hidden=false;bt.disabled=false;bt.querySelector('span').textContent='Quero participar';});});
 })();
 </script>
 
