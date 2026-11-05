@@ -593,11 +593,27 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
   .nums .nu:nth-child(n+7){display:none}
   .bm .bmc{display:none}
 }
+
+.temas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;max-width:1040px;margin:36px auto 0;text-align:left;position:relative;z-index:1}
+.tema{display:flex;flex-direction:column;gap:8px;padding:18px;border-radius:20px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.07);backdrop-filter:blur(8px);color:#fff;font:inherit;text-align:left;cursor:pointer;transition:transform .2s,border-color .2s,background .2s}
+.tema:hover,.tema:focus-visible{transform:translateY(-4px);border-color:var(--mint2);background:rgba(255,255,255,.12)}
+.tema-h{display:flex;align-items:center;gap:10px}.tema-h img{width:46px;height:46px;border-radius:50%;object-fit:cover;background:#fff2;border:2px solid rgba(255,255,255,.35)}
+.tema-n{font:600 .72rem var(--f-mono);letter-spacing:.08em;color:var(--mint2)}
+.tema b{font:800 1.12rem/1.2 var(--f-display)}.tema p{margin:0!important;font-size:.9rem!important;color:#C9D0FF!important;flex:1}
+.tema-f{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font:600 .74rem var(--f-mono);color:#8E9AD8}
+.tema-f i{font-style:normal;width:40px;height:40px;border-radius:50%;background:#fff;color:#5B45E0;display:grid;place-items:center;font-size:.95rem}
+.tema.ja{border-color:rgba(124,240,200,.45)}.tema.ja .tema-n::after{content:" · ✓ visto";color:#7CF0C8}
+.tudo{margin-top:18px;background:none;border:0;color:#C9D0FF;font:700 .95rem var(--f-body);cursor:pointer;text-decoration:underline;text-underline-offset:4px;position:relative;z-index:1}.tudo span{font:600 .78rem var(--f-mono);color:#8E9AD8}
+#pfim{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(10,13,36,.86);backdrop-filter:blur(6px)}
+#pfim.on{display:flex}.pfim-c{max-width:460px;text-align:center;display:grid;gap:14px;justify-items:center}
+.pfim-c small{font:600 .78rem var(--f-mono);letter-spacing:.1em;color:var(--mint2)}.pfim-c h2{font-size:1.7rem}.pfim-c p{margin:0;color:#C9D0FF}
+.pfim-b{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+@media (max-width:560px){.temas{grid-template-columns:1fr 1fr;gap:10px}.tema{padding:14px}.tema p{display:none}.tema-h img{width:38px;height:38px}.tema-c{display:none}}
 </style>
 <body>
 <header class="top">
   <a class="logo" href="./"><i>i</i>Ideali <small>Odonto</small></a>
-  <nav><button class="btn pri" data-play>▶ Conheça o projeto</button></nav>
+  <nav><a class="btn pri" href="#temas">▶ Conheça o projeto</a></nav>
 </header>
 
 <section class="hero">
@@ -606,8 +622,8 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
   <div class="eyebrow" style="margin-top:30px">Ideali Odonto · em breve</div>
   <h1>Onde a odontologia <em>contrata.</em></h1>
   <p>Vagas, estágios e contratação para dentistas, protéticos, ASB/TSB e estudantes. O seu primeiro emprego na odontologia começa aqui, com a Ana procurando por você.</p>
-  <button class="play" data-play><b>▶</b>Clique aqui e conheça o projeto</button>
-  <span class="dur">A ANA APRESENTA A IDEALI E MOSTRA TUDO FUNCIONANDO · CERCA DE 4 MINUTOS</span>
+  <div class="temas" id="temas" aria-label="Escolha um tema da apresentação"></div>
+  <button class="tudo" data-play>▶ Ou assista tudo seguido <span id="tudo-min"></span></button>
 </section>
 
 <main class="wrap">
@@ -631,8 +647,8 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 </main>
 <section class="final">
   <h2>Quer ver tudo funcionando?</h2>
-  <p>A Ana apresenta a Ideali e mostra tudo funcionando. Leva uns 4 minutos.</p>
-  <button class="play" data-play style="margin-top:24px"><b>▶</b>Conheça o projeto</button><br><button class="btn" data-demo style="margin-top:14px;background:transparent;color:#fff;border-color:rgba(255,255,255,.3)">👆 Experimentar a plataforma</button>
+  <p>Escolha um tema lá em cima ou assista a apresentação inteira com a Ana.</p>
+  <button class="play" data-play style="margin-top:24px"><b>▶</b>Assistir tudo seguido</button><br><button class="btn" data-demo style="margin-top:14px;background:transparent;color:#fff;border-color:rgba(255,255,255,.3)">👆 Experimentar a plataforma</button>
 </section>
 <footer>Ideali Odonto · uma plataforma Ideali · <a href="../">idealisystems.com</a></footer>
 
@@ -644,7 +660,7 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
     <div class="ana" id="ana"><div class="anaf"><img id="anaimg" src="../app/equipe/ana-tranquila.webp" alt="Ana"></div><img class="anaav" id="anaav" src="../app/equipe/ana-av-tranquila.webp" alt="Ana"><div class="nm" id="anm">Ana<small>sua assistente de IA</small></div><div class="bal" id="bal"></div></div>
     <div class="stage" id="stg"></div>
   </div>
-  <div class="pl-bot"><button class="cb" id="pv" aria-label="Voltar">◀</button><div class="dots" id="dots"></div><button class="cb" id="pp" aria-label="Pausar">❚❚</button><button class="cb pri" id="pn">Próximo ▶</button></div>
+  <div id="pfim"></div><div class="pl-bot"><button class="cb" id="pv" aria-label="Voltar">◀</button><div class="dots" id="dots"></div><button class="cb" id="pp" aria-label="Pausar">❚❚</button><button class="cb pri" id="pn">Próximo ▶</button></div>
 </div>
 
 <script>
@@ -973,21 +989,38 @@ var CENAS=[
 ];
 
 (function(){['megafone','ideia','animada','gravando','novo'].forEach(function(p){new Image().src='../app/equipe/mica-'+p+'.webp';new Image().src='../app/equipe/mica-av-'+p+'.webp';});new Image().src='../app/equipe/bia-dinheiro.webp';new Image().src='../app/equipe/bia-av-dinheiro.webp';['serio','satisfeito','bravo','presente'].forEach(function(p){new Image().src='../app/equipe/otavio-'+p+'.webp';new Image().src='../app/equipe/otavio-av-'+p+'.webp';});['tranquila','feliz','pensativa','determinada'].forEach(function(p){new Image().src='../app/equipe/ana-'+p+'.webp';new Image().src='../app/equipe/ana-av-'+p+'.webp';});})();
-function montaDots(){DOTS.innerHTML=CENAS.map(function(){return '<i></i>';}).join('');}
-function vai(n){limpa();if(n<0)n=0;if(n>=CENAS.length)n=CENAS.length-1;cur=n;var c=CENAS[n];
+var RG={a:0,b:0,pt:0},TEMAS={1:['A Ideali','O problema da odontologia, o tamanho do mercado e a solução.','ana-av-tranquila'],2:['Como funciona','Vagas, currículo com a Ana, estágios e freelas.','ana-av-feliz'],3:['Laboratório','Pedidos, foto na cadeira, entregas e atrasos, com o Sr. Otávio.','otavio-av-satisfeito'],4:['Gestão, marketing e comércio','Vagas, perfis e divulgação, com a Mika e a Bia.','mica-av-ideia']};
+function ptDe(c){return c.fim?4:c.pt;}
+function faixa(p){var a=-1,b=-1;CENAS.forEach(function(c,i){if(ptDe(c)===p){if(a<0)a=i;b=i;}});return {a:a,b:b,pt:p};}
+function minTxt(ms){var m=Math.max(1,Math.round(ms/60000*2)/2);return '≈ '+String(m).replace('.',',')+' min';}
+function vistos(){try{return JSON.parse(localStorage.getItem('io_temas')||'{}');}catch(e){return {};}}
+function montaTemas(){var el=document.getElementById('temas');if(!el)return;var V=vistos(),tot=0;
+  el.innerHTML=[1,2,3,4].map(function(p){var f=faixa(p),ms=0;for(var i=f.a;i<=f.b;i++)ms+=CENAS[i].d;tot+=ms;var t=TEMAS[p];
+    return '<button class="tema'+(V[p]?' ja':'')+'" data-tema="'+p+'"><span class="tema-h"><img src="../app/equipe/'+t[2]+'.webp" alt=""><span class="tema-n">PARTE '+p+'</span></span><b>'+t[0]+'</b><p>'+t[1]+'</p><span class="tema-f"><span><span class="tema-c">'+(f.b-f.a+1)+' cenas · </span>'+minTxt(ms)+'</span><i>▶</i></span></button>';}).join('');
+  var tm=document.getElementById('tudo-min');if(tm)tm.textContent='('+minTxt(tot)+')';}
+function montaDots(){DOTS.innerHTML=CENAS.slice(RG.a,RG.b+1).map(function(){return '<i></i>';}).join('');}
+function fimParte(){limpa();var p=RG.pt,V=vistos();V[p]=1;try{localStorage.setItem('io_temas',JSON.stringify(V));}catch(e){}montaTemas();var nx=p<4?p+1:0,todos=[1,2,3,4].every(function(k){return V[k];}),F=document.getElementById('pfim');
+  F.innerHTML='<div class="pfim-c"><small>FIM DA PARTE '+p+'</small><h2>'+TEMAS[p][0]+' ✓</h2><p>'+(nx?'Quer seguir para o próximo tema?':todos?'Você viu todos os temas. Que tal experimentar a plataforma?':'Fim da apresentação. Experimente a plataforma ou volte e escolha outro tema.')+'</p><div class="pfim-b">'+(nx?'<button class="btn pri" data-pt="'+nx+'">▶ Parte '+nx+' · '+TEMAS[nx][0]+'</button>':'<button class="btn pri" data-demo3>👆 Experimentar a plataforma</button>')+'<button class="btn" data-pv="'+p+'">↺ Ver de novo</button><button class="btn" data-ptemas>Voltar aos temas</button></div></div>';
+  F.classList.add('on');}
+function vai(n){if(RG.pt&&n>RG.b){fimParte();return;}document.getElementById('pfim').classList.remove('on');limpa();if(n<RG.a)n=RG.a;if(n>RG.b)n=RG.b;cur=n;var c=CENAS[n];
   PL.classList.toggle('rede',!!c.rede||n===CENAS.length-1&&false);
   STG.innerHTML=c.h;document.getElementById('cap').textContent=(c.fim?'Encerramento':c.pt===1?'Parte 1 · A Ideali':c.pt===3?'Parte 3 · Laboratório':c.pt===4?'Parte 4 · Gestão e comércio':'Parte 2 · Como funciona')+' · '+c.cap;
-  Array.prototype.forEach.call(DOTS.children,function(d,i){d.className=i<n?'ok':'';});
-  var d=DOTS.children[n];void d.offsetWidth;d.className='at';d.style.setProperty('--d',c.d+'ms');
-  document.getElementById('pn').textContent=n===CENAS.length-1?'Fechar':'Próximo ▶';
+  Array.prototype.forEach.call(DOTS.children,function(d,i){d.className=i<n-RG.a?'ok':'';});
+  var d=DOTS.children[n-RG.a];void d.offsetWidth;d.className='at';d.style.setProperty('--d',c.d+'ms');
+  document.getElementById('pn').textContent=n===RG.b?(RG.pt?'Concluir ✓':'Fechar'):'Próximo ▶';
   var po=c.p||'tranquila',qm=c.who==='ot'?'otavio':c.who==='mi'?'mica':c.who==='bi'?'bia':'ana';document.getElementById('anaimg').src='../app/equipe/'+qm+'-'+po+'.webp';document.getElementById('anaav').src='../app/equipe/'+qm+'-av-'+po+'.webp';document.getElementById('anm').innerHTML={ot:'Sr. Otávio<small>o gerente</small>',mi:'Mika<small>do marketing</small>',bi:'Bia<small>do financeiro</small>'}[c.who]||'Ana<small>sua assistente de IA</small>';PL.classList.toggle('lab',!!c.lab);PL.classList.toggle('mk',!!c.mk);ANA.classList.toggle('ot',c.who==='ot');ANA.classList.toggle('mi',c.who==='mi'||c.who==='bi');
   FIMFALA=0;c.go();var dd=Math.max(c.d,FIMFALA);d.style.setProperty('--d',dd+'ms');restante=dd;iniT=Date.now();if(!pausado&&!c.fim)fimT=setTimeout(function(){vai(cur+1);},dd);}
 function telaCheia(on){try{var d=document,e=d.documentElement;if(on){if(innerWidth<=860&&!d.fullscreenElement&&e.requestFullscreen)e.requestFullscreen({navigationUI:'hide'}).catch(function(){});}else if(d.fullscreenElement&&d.exitFullscreen)d.exitFullscreen().catch(function(){});}catch(x){}}
-function abre(){telaCheia(1);PL.classList.add('on');document.body.style.overflow='hidden';setTimeout(function(){PL.classList.add('vis');},20);pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';montaDots();vai(0);}
-function fecha(){telaCheia(0);limpa();PL.classList.remove('vis');setTimeout(function(){PL.classList.remove('on');STG.innerHTML='';},500);document.body.style.overflow='';}
+function abre(parte){telaCheia(1);PL.classList.add('on');document.body.style.overflow='hidden';setTimeout(function(){PL.classList.add('vis');},20);pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';var ini=0;if(typeof parte==='number'){RG=faixa(parte);ini=RG.a;}else RG={a:0,b:CENAS.length-1,pt:0};montaDots();vai(ini);}
+function fecha(){telaCheia(0);limpa();document.getElementById('pfim').classList.remove('on');PL.classList.remove('vis');setTimeout(function(){PL.classList.remove('on');STG.innerHTML='';},500);document.body.style.overflow='';}
 function pausa(){var c=CENAS[cur];if(!pausado){pausado=true;PL.classList.add('pause');clearTimeout(fimT);restante-=Date.now()-iniT;document.getElementById('pp').textContent='▶';}
   else{pausado=false;PL.classList.remove('pause');document.getElementById('pp').textContent='❚❚';iniT=Date.now();if(!c.fim)fimT=setTimeout(function(){vai(cur+1);},Math.max(800,restante));}}
-Array.prototype.forEach.call(document.querySelectorAll('[data-play]'),function(b){b.onclick=abre;});
+Array.prototype.forEach.call(document.querySelectorAll('[data-play]'),function(b){b.onclick=function(){abre();};});
+montaTemas();document.getElementById('temas').addEventListener('click',function(e){var b=e.target.closest('[data-tema]');if(b)abre(+b.getAttribute('data-tema'));});
+document.getElementById('pfim').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  if(b.hasAttribute('data-pt')||b.hasAttribute('data-pv')){var p=+(b.getAttribute('data-pt')||b.getAttribute('data-pv'));RG=faixa(p);montaDots();if(pausado)pausa();vai(RG.a);return;}
+  if(b.hasAttribute('data-demo3')){fecha();abreDemo();return;}
+  if(b.hasAttribute('data-ptemas')){fecha();setTimeout(function(){var t=document.getElementById('temas');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},520);}});
 document.getElementById('px').onclick=fecha;
 var PARTES={1:'Parte 1 · A Ideali',2:'Parte 2 · Como funciona',3:'Parte 3 · Laboratório',4:'Parte 4 · Gestão, marketing e comércio',9:'Encerramento'};
 function topicos(){var T2=document.getElementById('tpc');if(T2.classList.contains('on')){T2.classList.remove('on');return;}
@@ -997,12 +1030,12 @@ function topicos(){var T2=document.getElementById('tpc');if(T2.classList.contain
 document.getElementById('ptp').onclick=topicos;
 document.getElementById('tpc').addEventListener('click',function(e){var T2=this,b=e.target.closest('button');if(e.target===T2||(b&&b.id==='tpx')){T2.classList.remove('on');return;}if(!b)return;
   if(b.hasAttribute('data-sair')){T2.classList.remove('on');fecha();return;}
-  if(b.hasAttribute('data-demo2')){T2.classList.remove('on');abreDemo();return;}var i=+b.getAttribute('data-ti');T2.classList.remove('on');if(pausado)pausa();vai(i);});
+  if(b.hasAttribute('data-demo2')){T2.classList.remove('on');abreDemo();return;}var i=+b.getAttribute('data-ti');T2.classList.remove('on');if(pausado)pausa();if(RG.pt&&(i<RG.a||i>RG.b)){RG=faixa(ptDe(CENAS[i]));montaDots();}vai(i);});
 document.getElementById('pv').onclick=function(){vai(cur-1);};
-document.getElementById('pn').onclick=function(){if(cur===CENAS.length-1)fecha();else vai(cur+1);};
+document.getElementById('pn').onclick=function(){if(cur===RG.b&&!RG.pt)fecha();else vai(cur+1);};
 document.getElementById('pp').onclick=pausa;
 document.addEventListener('keydown',function(e){if(!PL.classList.contains('on'))return;if(e.key==='Escape')fecha();else if(e.key==='ArrowRight')vai(cur+1);else if(e.key==='ArrowLeft')vai(cur-1);else if(e.key===' '){e.preventDefault();pausa();}});
-if(/[?&]play/.test(location.search))abre();
+var mP=location.search.match(/[?&]parte=(\d)/);if(mP)abre(+mP[1]);else if(/[?&]play/.test(location.search))abre();
 </script>
 <!-- ===== DEMO INTERATIVA ===== -->
 <style>
