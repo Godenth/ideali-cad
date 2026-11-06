@@ -1658,7 +1658,7 @@ var MAP={
     to:function(x){var p=x.pendencia||{};return {numero:x.num,cliente_id:x.clienteId,paciente:x.paciente,elementos:x.elementos||[],tipo_trabalho_id:nn(x.tipoId),cor:nn(x.cor),observacoes:nn(x.obs),
       valor:+x.valor||0,urgente:!!x.urgente,status:x.status,pendencia_motivos:p.motivos||[],pendencia_obs:nn(p.obs),pendencia_desde:x.pendencia?nn(p.desde):null,aprovacao_desde:nn(x.aprovDesde),
       ajustes:x.ajustes||0,ajustes_motivos:(x.ajMotivos||[]).slice(-60),recebido_em:x.recebido,prazo:nn(x.prazo),enviado_em:nn(x.entregue),pago_em:nn(x.pago),pagamento_id:nn(x.pagamentoId),implante_marca:nn(x.impMarca),implante_tipo:nn(x.impTipo),scanbody_img:nn(x.sbImg),itens:x.itens||[],extras:x.extras||[],material:nn(x.material),fresadora:nn(x.fresadora),cancelado_em:ts(x.cancelado),cancelado_motivo:nn(x.cancMotivo),pausado_em:ts(x.pausado),deleted_at:ts(x.deleted)};},
-    from:function(r){return {portal:r.portal_user||null,id:r.id,num:r.numero,clienteId:r.cliente_id,paciente:nomeProprio(r.paciente),elementos:r.elementos||[],tipoId:r.tipo_trabalho_id,cor:r.cor||'',obs:r.observacoes||'',
+    from:function(r){return {id:r.id,num:r.numero,clienteId:r.cliente_id,paciente:nomeProprio(r.paciente),elementos:r.elementos||[],tipoId:r.tipo_trabalho_id,cor:r.cor||'',obs:r.observacoes||'',
       valor:+r.valor,urgente:r.urgente,status:r.status,pendencia:r.status==='pendente'?{motivos:r.pendencia_motivos||[],obs:r.pendencia_obs||'',desde:dia(r.pendencia_desde)}:null,
       aprovDesde:dia(r.aprovacao_desde),ajustes:r.ajustes,ajMotivos:r.ajustes_motivos||[],recebido:dia(r.recebido_em),prazo:dia(r.prazo),entregue:dia(r.enviado_em),pago:dia(r.pago_em),pagamentoId:r.pagamento_id,impMarca:r.implante_marca||'',sbImg:r.scanbody_img||'',impTipo:r.implante_tipo||'',itens:r.itens||[],extras:r.extras||[],material:r.material||'',fresadora:r.fresadora||'',cancelado:dia(r.cancelado_em),cancMotivo:r.cancelado_motivo||'',pausado:dia(r.pausado_em),deleted:dia(r.deleted_at)};}},
   arquivos:{t:'arquivos',
@@ -4596,7 +4596,7 @@ function rCliente(id){
     '<div class="stat" style="cursor:default"><span class="lbl">Este mês</span><span class="v">'+brl(mes)+'</span></div></div>'+
     (f?'<div class="banner"><span>Este cliente tem <b>'+f.pct+'% de desconto</b> nos pedidos deste mês pelo volume do mês passado.</span></div>':'')+
     '<div class="row wrap"><button class="btn pri" data-a="pix" data-id="'+id+'">Cobrar por Pix</button><button class="btn'+pisca('extrato')+'" data-a="extrato" data-id="'+id+'">Extrato</button><button class="btn" data-a="editCliente" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Editar</button><button class="btn" data-a="juntaAbre" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Juntar duplicado</button><button class="btn danger" data-a="delCliente" data-id="'+id+'" '+(canWrite()?'':'disabled')+'>Excluir</button></div>'+
-    secLinkCli(c)+secPortalCli(c)+
+    secLinkCli(c)+
     '<section class="card stack"><div><h2>Tabela de preços</h2><p class="small muted">Deixe em branco para usar o valor padrão do tipo de trabalho.</p></div>'+
     '<form data-form="precos" data-id="'+id+'" class="stack">'+alive(S.tipos).filter(function(t){return t.ativo;}).map(function(t){
       var pr=S.precos.filter(function(p){return p.clienteId===id&&p.tipoId===t.id&&!p.deleted;})[0];
@@ -6427,7 +6427,7 @@ function fPedidoDet(id){
     (p.status!=='arquivado'?(function(){var x=acoes(p);return (p.status!=='pendente'?x.extra:'')+(x.acts?'<div class="acts">'+x.acts+'</div>':'');})():'<div class="acts"><button class="btn sm" data-a="restaurarFin" data-id="'+p.id+'" '+(w?'':'disabled')+'>↩ Restaurar para Finalizado</button></div>')+
     '<label class="fld"><span>Mover para</span><select id="pd-mover" data-id="'+id+'" '+(w?'':'disabled')+'>'+STATUS.concat([['arquivado','Arquivado (enviado ao cliente)']]).map(function(s){return '<option value="'+s[0]+'" '+(p.status===s[0]?'selected':'')+'>'+s[1]+'</option>';}).join('')+'</select></label>'+
     '<section class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div class="between"><h3>Arquivos</h3><span class="small muted">'+bytes(usado())+' de '+bytes(S.assinatura.limite)+'</span></div>'+
-      slotsPedido(p,w)+secPortalPed(p)+
+      slotsPedido(p,w)+
       '<div id="up-st" '+(ui.up&&ui.up.pid===id?'':'hidden')+' class="stack" style="gap:6px"><div class="prog"><i id="up-bar" style="width:'+(ui.up&&ui.up.pid===id?ui.up.pct:0)+'%"></i></div><span class="small muted" id="up-txt">'+(ui.up&&ui.up.pid===id?esc(ui.up.txt):'')+'</span></div>'+
       '<form data-form="link" data-id="'+id+'" class="row wrap" style="gap:6px"><select name="cat" aria-label="Onde guardar o link" style="max-width:150px">'+SLOTS.slice(0,3).map(function(x){return '<option value="'+x[0]+'">'+x[1].replace(' do cliente','').replace(' do exocad','')+'</option>';}).join('')+'</select><input class="search" id="lk-url" name="url" type="url" placeholder="Ou cole o link do Drive / WeTransfer" required '+(w?'':'disabled')+' style="flex:1;min-width:160px"><button class="btn" type="submit" '+(w?'':'disabled')+'>Salvar</button></form>'+
     '</section>'+
@@ -6834,31 +6834,6 @@ function desenhaPix(){
   else box.innerHTML='<p class="small" style="color:#333;width:220px">Não foi possível carregar o gerador de QR Code. Use o código copia e cola.</p>';
 }
 
-/* ---------- Portal do cliente: convite para a clínica mandar trabalhos direto para a fila ---------- */
-var PT={conv:{},vinc:{},arq:{},ok:true,erro:''};
-function portalLink(tk){return location.origin+'/portal/?c='+tk;}
-function secPortalCli(c){if(!sb)return '';var k=PT.conv[c.id],v=PT.vinc[c.id];
-  if(k===undefined){k=PT.conv[c.id]=null;Promise.all([sb.from('portal_convites').select('token,criado_em').eq('cliente_id',c.id).eq('ativo',true).order('criado_em',{ascending:false}).limit(1),sb.from('portal_vinculos').select('cliente_user,criado_em').eq('cliente_id',c.id)]).then(function(r){
-    if(r[0].error){PT.conv[c.id]=false;PT.vinc[c.id]=[];PT.erro=r[0].error.message||'erro';}else{PT.erro='';PT.conv[c.id]=(r[0].data&&r[0].data[0])||false;PT.vinc[c.id]=r[1].data||[];}if(ui.tab==='clientes'&&ui.sub===c.id)render();});}
-  var tk=k&&k.token,vl=v||[];
-  return '<section class="card stack"><div><h2>📲 Portal do cliente</h2><p class="small muted">'+esc(c.nome)+' cria um login e manda os trabalhos <b>direto para a sua fila</b>: paciente, dentes, cor e os arquivos do escaneamento. Ela só vê os trabalhos que ela mesma enviou.</p></div>'+
-    (PT.erro&&k===false?'<p class="small muted">Falta rodar a atualização 041 no Supabase para ativar o portal.</p>':
-    k===null?'<p class="small muted">Carregando…</p>':
-    (vl.length?'<div class="banner"><span>✓ <b>'+vl.length+' login'+(vl.length>1?'s':'')+'</b> de '+esc(c.nome)+' já '+(vl.length>1?'estão ligados':'está ligado')+' ao portal.</span></div>':'')+
-    (tk?'<div class="stack" style="gap:8px"><input readonly value="'+esc(portalLink(tk))+'" onclick="this.select()" style="font-size:.85rem"><div class="row wrap"><a class="btn pri" href="'+waLink('Olá! Agora você pode mandar os trabalhos e escaneamentos direto para o meu laboratório pelo portal. É só abrir este link e criar o seu login: '+portalLink(tk),c.telefone)+'" target="_blank" rel="noopener">💬 Mandar convite por WhatsApp</a><button class="btn" data-a="ptCopia" data-id="'+c.id+'">Copiar link</button><button class="btn danger" data-a="ptCancela" data-id="'+c.id+'">Cancelar convite</button></div><p class="small muted">Cancelar o convite impede novos logins. Quem já entrou continua enviando'+(vl.length?' (<button class="linkbtn" data-a="ptDesliga" data-id="'+c.id+'">desligar todos</button>)':'')+'.</p></div>':
-      '<button class="btn pri" data-a="ptConvida" data-id="'+c.id+'" style="justify-self:start" '+(canWrite()?'':'disabled')+'>📲 Convidar '+esc(c.nome)+' para o portal</button>'))+'</section>';}
-function secPortalPed(p){if(!p.portal||!sb)return '';var L=PT.arq[p.id];
-  if(L===undefined){L=PT.arq[p.id]=null;sb.from('portal_arquivos').select('id,path,nome,tamanho,criado_em').eq('pedido_id',p.id).order('criado_em').then(function(r){PT.arq[p.id]=r.data||[];render();});}
-  return '<section class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div class="between"><h3>📲 Enviado pela clínica no portal</h3></div>'+
-    (L===null?'<p class="small muted">Carregando…</p>':!L.length?'<p class="small muted">A clínica não mandou arquivos neste pedido.</p>':
-    L.map(function(a){return '<div class="row wrap" style="gap:8px;border:1px solid var(--line);border-radius:12px;padding:8px 10px"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📦 '+esc(a.nome)+' <span class="small muted">· '+bytes(+a.tamanho||0)+'</span></span><button class="btn sm pri" data-a="ptBaixa" data-id="'+a.id+'" data-p="'+p.id+'">Baixar</button><button class="btn sm danger" data-a="ptApaga" data-id="'+a.id+'" data-p="'+p.id+'">Apagar</button></div>';}).join('')+'<p class="small muted">Baixe e apague depois para não ocupar espaço.</p>')+'</section>';}
-function ptNovos(){if(!sb||!S.sessao||!ui.dadosOk||!PT.ok||S.prospMembro)return;
-  sb.from('pedidos').select('*').not('portal_user','is',null).is('deleted_at',null).order('criado_em',{ascending:false}).limit(40).then(function(r){
-    if(r.error){if(/portal_user/.test(r.error.message||''))PT.ok=false;return;}
-    var tem={};S.pedidos.forEach(function(x){tem[x.id]=1;});var novos=(r.data||[]).filter(function(x){return !tem[x.id];});if(!novos.length)return;
-    novos.forEach(function(row){var x=MAP.pedidos.from(row);S.pedidos.push(x);SNAP.pedidos[x.id]=JSON.stringify(MAP.pedidos.to(x));S.seq=Math.max(S.seq||0,x.num||0);});
-    var c=cliente(novos[0].cliente_id);toast('📲 '+(novos.length>1?novos.length+' trabalhos novos':'Trabalho novo #'+novos[0].numero)+' pelo portal'+(c?' de '+c.nome:'')+'.',6000);render();});}
-setInterval(function(){if(!document.hidden)ptNovos();},60000);
 /* ---------- Arquivos do pedido em caixas (padrão do pedido e da Rede) ----------
    1) Escaneamento do cliente  2) HTML do exocad  3) STL para fresagem  4) Print do scanbody (Ctrl+V).
    Tocar no arquivo abre a visualização grande (3D para STL, moldura isolada para HTML). O print do scanbody
@@ -7199,12 +7174,6 @@ function excluirPagamento(g){softDel(g);g.pedidos.forEach(function(pid){var p=by
 function restaurarPagamento(g){delete g.deleted;g.pedidos.forEach(function(pid){var p=byId(S.pedidos,pid);if(p){p.pago=g.data;p.pagamentoId=g.id;}});}
 
 var A={
-  ptConvida:function(d){if(!guard())return;var id=d.id,tk=cxToken();sb.from('portal_convites').insert({lab_id:S.sessao.id,cliente_id:id,token:tk}).select('token,criado_em').single().then(function(r){if(r.error){toast(/portal_convites/.test(r.error.message||'')?'Falta rodar a atualização 041 no Supabase.':'Não consegui criar o convite: '+r.error.message);return;}PT.conv[id]=r.data;render();toast('Convite criado. Mande pelo WhatsApp.');});},
-  ptCopia:function(d){var k=PT.conv[d.id];if(!k)return;try{navigator.clipboard.writeText(portalLink(k.token)).then(function(){toast('Link copiado.');});}catch(e){}},
-  ptCancela:function(d){var id=d.id;if(!confirm('Cancelar este convite? Ninguém mais consegue entrar por ele.'))return;sb.from('portal_convites').update({ativo:false}).eq('cliente_id',id).then(function(){PT.conv[id]=false;render();toast('Convite cancelado.');});},
-  ptDesliga:function(d){var id=d.id;if(!confirm('Desligar todos os logins deste cliente do portal? Eles não vão mais conseguir enviar trabalhos.'))return;sb.from('portal_vinculos').delete().eq('cliente_id',id).then(function(){PT.vinc[id]=[];render();toast('Logins desligados.');});},
-  ptBaixa:function(d){var L=PT.arq[d.p]||[],a=L.filter(function(x){return x.id===d.id;})[0];if(!a)return;sb.storage.from('portal').createSignedUrl(a.path,600,{download:a.nome}).then(function(r){if(r.error||!r.data){toast('Não consegui baixar agora.');return;}location.href=r.data.signedUrl;});},
-  ptApaga:function(d){var pid=d.p,L=PT.arq[pid]||[],a=L.filter(function(x){return x.id===d.id;})[0];if(!a||!confirm('Apagar este arquivo? Baixe antes se ainda precisar.'))return;sb.storage.from('portal').remove([a.path]).then(function(){return sb.from('portal_arquivos').delete().eq('id',a.id);}).then(function(){PT.arq[pid]=L.filter(function(x){return x.id!==a.id;});render();toast('Arquivo apagado.');});},
   delTab:function(d,el){if(!guard())return;var t=tipo(d.id);if(!t)return;softDel(t);save();
     var li=el.closest('.tp-li'),lst=li&&li.parentNode;if(li)li.remove();if(lst&&!lst.querySelector('.tp-li'))lst.innerHTML='<p class="small muted" style="padding:6px 2px">Nenhum trabalho aqui.</p>';
     toast('“'+t.nome+'” foi para a lixeira. Dá para restaurar em Configurações › Lixeira.');},
