@@ -1184,6 +1184,21 @@ body.espelho [data-act=pfxAbre],body.espelho .pfx-ban{display:none!important}
 .jw-al.bravo{border-color:#D2433A}@media (prefers-reduced-motion:no-preference){.jw-al.bravo{animation:jwPop .35s cubic-bezier(.2,1.3,.4,1) both,jwTreme .5s .35s ease-in-out 2}}@keyframes jwTreme{0%,100%{margin-left:0}25%{margin-left:-6px}75%{margin-left:6px}}
 .jw-alimg{width:84px;height:115px;object-fit:cover;object-position:top;border-radius:14px;flex-shrink:0;background:#111}
 .jw-b{padding:6px 14px 6px 6px}
+
+/* linhas em atraso piscando: quanto mais atraso, mais forte e mais rápido */
+.ino-tr.atr1,.ino-tr.atr2,.ino-tr.atr3,.ino-tr.atr4{box-shadow:inset 4px 0 0 #D2433A}
+.ino-tr.atr1{--a1:.03;--a2:.10;--t:2.6s}.ino-tr.atr2{--a1:.05;--a2:.16;--t:1.9s}.ino-tr.atr3{--a1:.08;--a2:.24;--t:1.3s}.ino-tr.atr4{--a1:.12;--a2:.36;--t:.8s;box-shadow:inset 6px 0 0 #D2433A}
+.ino-tr[class*=atr]{background:rgba(210,67,58,var(--a2))}
+@media (prefers-reduced-motion:no-preference){.ino-tr[class*=atr]{animation:inoPisca var(--t) ease-in-out infinite}}
+@keyframes inoPisca{0%,100%{background:rgba(210,67,58,var(--a1))}50%{background:rgba(210,67,58,var(--a2))}}
+.ino-tr.atr4 .ino-cli{color:#FF6B5E}
+/* revisão do João ao entrar */
+.jw-rev{width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 80px);grid-template-rows:auto minmax(0,1fr) auto}
+.jw-revl{overflow:auto;display:grid;gap:2px;border:1px solid var(--line);border-radius:12px}
+.jw-revi{display:grid;grid-template-columns:minmax(0,1fr) auto 40px;gap:8px;align-items:center;padding:8px 10px;border-left:4px solid var(--k);border-bottom:1px solid var(--line)}.jw-revi span{display:grid;min-width:0}.jw-revi small{color:var(--muted)}.jw-revv{color:#D2433A}
+/* fala do João embaixo */
+.jw-fala{position:absolute;right:0;bottom:calc(100% + 10px);width:min(340px,calc(100vw - 36px));text-align:left;border:2px solid #D2433A;background:var(--surface);color:var(--ink);border-radius:16px 16px 4px 16px;padding:10px 12px;font:inherit;font-size:.88rem;line-height:1.35;cursor:pointer;box-shadow:0 14px 34px -12px rgba(0,0,0,.6)}
+@media (prefers-reduced-motion:no-preference){.jw-fala{animation:jwPop2 .3s ease-out both}}@keyframes jwPop2{from{opacity:0;transform:translateY(8px)}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3609,7 +3624,7 @@ function rInove(){if(!FIN.carregado)return '<div class="empty">Carregando…</di
   var L=finDoMes(),tot=0,pg=0,sal=0;L.forEach(function(m){tot+=+m.valor_mes;pg+=finPago(m);sal+=Math.max(0,finRest(m));});
   var com=L.filter(function(m){return +m.valor_mes>0;}),pagaram=com.filter(function(m){return finPago(m)>0.005||m.quitado;}).length,pc=tot?Math.round(pg/tot*100):0;
   var venc=finVenc(FIN.ano,FIN.mes),vi=isoD(venc),auto=!(EMP.row&&EMP.row.dados&&EMP.row.dados.venc&&EMP.row.dados.venc[FIN.ano+'-'+FIN.mes]),atr=inoAtrasados(L,vi);
-  var q=semAc(INO.q||''),V=L.filter(function(m){var s=finSt(m)[0];return (INO.f==='todos'||(INO.f==='quitado'&&s==='pago')||(INO.f==='parcial'&&s==='parcial')||(INO.f==='nada'&&(s==='aberto')))&&(!q||semAc(finCliNome(m)).indexOf(q)>=0);});var urg={};try{biaLista().forEach(function(b){urg[b.k]=b.dias;});}catch(e){}V.sort(function(a,b){var ra=Math.max(0,finRest(a))>0.005,rb=Math.max(0,finRest(b))>0.005;return (rb-ra)||((urg[finCliK(b)]||-99)-(urg[finCliK(a)]||-99))||(finRest(b)-finRest(a));});
+  var q=semAc(INO.q||''),V=L.filter(function(m){var s=finSt(m)[0];return (INO.f==='todos'||(INO.f==='quitado'&&s==='pago')||(INO.f==='parcial'&&s==='parcial')||(INO.f==='nada'&&(s==='aberto')))&&(!q||semAc(finCliNome(m)).indexOf(q)>=0);});var urg={};INO._urg={};try{biaLista().forEach(function(b){urg[b.k]=b.dias;if(b.dias>0&&!b.prom)INO._urg[b.k]=b.dias;});}catch(e){}V.sort(function(a,b){var ra=Math.max(0,finRest(a))>0.005,rb=Math.max(0,finRest(b))>0.005;return (rb-ra)||((urg[finCliK(b)]||-99)-(urg[finCliK(a)]||-99))||(finRest(b)-finRest(a));});
   var mesNome=MESES[FIN.mes-1].charAt(0).toUpperCase()+MESES[FIN.mes-1].slice(1);
   return '<div class="ino"><div class="ino-top"><div><small>Inove 3D Lab</small><h2>Conferência do mês</h2></div><span class="spacer"></span><div class="finnav"><button class="btn sm" data-act="finMesMuda" data-v="-1" aria-label="Mês anterior">‹</button><b>'+mesNome+' de '+FIN.ano+'</b><button class="btn sm" data-act="finMesMuda" data-v="1" aria-label="Próximo mês">›</button></div></div>'+
     '<div class="ino-kpis">'+[['Total do mês',fmtR(tot),''],['Total pago',fmtR(pg),''],['Saldo a receber',fmtR(sal),''],['% pago do mês',pc+'% pago','dest'],['Clientes que pagaram',pagaram+' de '+com.length+' clientes pagaram','']].map(function(k){return '<div class="ino-kpi '+k[2]+'"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>';}).join('')+'</div>'+
@@ -3621,8 +3636,9 @@ function rInove(){if(!FIN.carregado)return '<div class="empty">Carregando…</di
     '<div class="row wrap ino-fil">'+[['todos','Todos'],['quitado','Quitado'],['parcial','Parcial'],['nada','Nada Pago']].map(function(o){return '<button class="chip" aria-pressed="'+(INO.f===o[0])+'" data-act="inoFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
     '<label class="cli-q ino-q"><span aria-hidden="true">🔎</span><input id="ino-q" type="search" placeholder="Buscar cliente…" value="'+esc(INO.q||'')+'" autocomplete="off"></label>'+
     '<div class="ino-tab" role="table"><div class="ino-tr ino-th" role="row"><span>Cliente</span><span>Valor do mês</span><span>Valor pago</span><span>Restante</span><span>Status</span><span>Comprovantes</span><span>Observações</span></div>'+
-    (V.length?V.map(function(m){var s=inoStatus(m),k=finCliK(m);return '<div class="ino-tr" role="row"><span class="ino-cli">'+esc(finCliNome(m))+(cliWa(finCliObj(m))?' <a class="ino-wa" href="https://wa.me/'+cliWa(finCliObj(m))+'" target="_blank" rel="noopener" title="Falar no WhatsApp" aria-label="Falar no WhatsApp com '+esc(finCliNome(m))+'">💬</a>':'')+'</span><span data-l="Valor do mês">'+fmtR(m.valor_mes)+'</span><span data-l="Valor pago">'+fmtR(finPago(m))+'</span><span data-l="Restante" class="ino-rest'+(finRest(m)>0.005?' on':'')+'">'+fmtR(Math.max(0,finRest(m)))+'</span><span><i class="ino-st '+s[1]+'">'+s[0]+'</i></span>'+
+    (V.length?V.map(function(m){var s=inoStatus(m),k=finCliK(m);return '<div class="ino-tr'+inoAtrCl(m)+'" role="row"><span class="ino-cli">'+esc(finCliNome(m))+(cliWa(finCliObj(m))?' <a class="ino-wa" href="https://wa.me/'+cliWa(finCliObj(m))+'" target="_blank" rel="noopener" title="Falar no WhatsApp" aria-label="Falar no WhatsApp com '+esc(finCliNome(m))+'">💬</a>':'')+'</span><span data-l="Valor do mês">'+fmtR(m.valor_mes)+'</span><span data-l="Valor pago">'+fmtR(finPago(m))+'</span><span data-l="Restante" class="ino-rest'+(finRest(m)>0.005?' on':'')+'">'+fmtR(Math.max(0,finRest(m)))+'</span><span><i class="ino-st '+s[1]+'">'+s[0]+'</i></span>'+
       '<span class="ino-comp">'+(inoComps(m)||'<em>—</em>')+'<button class="ino-chip azul" data-act="inoHist" data-v="'+k+'">🕘 Histórico Geral</button>'+(m.extrato_path?'<button class="ino-chip ouro" data-act="finArqVer" data-v="'+esc(m.extrato_path)+'">📄 Extrato</button>':m.arquivo_legado?'<span class="ino-chip ouro off" title="Ainda no sistema antigo">📄 Extrato</span>':'')+'</span><span class="ino-obs">'+esc(m.obs||'—')+'</span></div>';}).join(''):'<div class="empty">Nenhum cliente'+(INO.q||INO.f!=='todos'?' com esse filtro':' neste mês')+'.</div>')+'</div></div>';}
+function inoAtrCl(m){var d=(INO._urg||{})[finCliK(m)];return !d?'':d<=7?' atr1':d<=15?' atr2':d<=30?' atr3':' atr4';}
 function rInoHist(k){var L=FIN.M.filter(function(m){return finCliK(m)===k;}).sort(function(a,b){return (b.ano*100+b.mes)-(a.ano*100+a.mes);}),nm=L.length?finCliNome(L[0]):'',tot=L.reduce(function(s,m){return s+(+m.valor_mes)-finPago(m);},0);
   return '<div class="ino"><div class="dtop"><div><h2>🕘 Histórico Geral · '+esc(nm)+'</h2><p class="small muted">'+(tot>0.005?'Em aberto no total: <b>'+fmtR(tot)+'</b>':tot<-0.005?'Crédito de '+fmtR(-tot):'Tudo em dia')+'</p></div><span class="spacer"></span><button class="btn" data-act="inoHistFecha">← Voltar</button></div>'+
     '<div class="ino-tab"><div class="ino-tr ino-th ino-h"><span>Mês</span><span>Valor do mês</span><span>Valor pago</span><span>Restante</span><span>Status</span><span>Comprovantes e extrato</span></div>'+
@@ -3809,16 +3825,21 @@ function rJoaoPainel(){var P=ESP.dono?joaoNovos():[],D=joaoDev(),tot=D.reduce(fu
 function joaoDesenha(){var el=document.getElementById('joao-w');if(!joaoVisivel()){if(el)el.remove();return;}
   if(!el){el=document.createElement('div');el.id='joao-w';document.body.appendChild(el);}
   var n=(ESP.dono?joaoNovos().length:0),d=joaoDev().length;
-  el.innerHTML=(JW.aberto?rJoaoPainel():'')+(JW.alerta?'<div class="jw-al'+(JW.bravo?' bravo':'')+'" role="alertdialog" aria-live="assertive"><div class="jw-alc"><img class="jw-alimg" src="'+(JW.bravo?'joao-bravo.webp':'joao.webp')+'" alt=""><div><b>João</b><p>'+JW.alerta+'</p></div></div><div class="row"><button class="btn" data-act="jwDepois">Depois</button><button class="btn pri" data-act="jwVer">Ver agora</button></div></div>':'')+
+  el.innerHTML=(JW.revisao?rJoaoRevisao():'')+(JW.fala&&!JW.aberto?'<button class="jw-fala" data-act="jwAbre" aria-live="polite">'+JW.fala+'</button>':'')+(JW.aberto?rJoaoPainel():'')+(JW.alerta&&!JW.revisao?'<div class="jw-al'+(JW.bravo?' bravo':'')+'" role="alertdialog" aria-live="assertive"><div class="jw-alc"><img class="jw-alimg" src="'+(JW.bravo?'joao-bravo.webp':'joao.webp')+'" alt=""><div><b>João</b><p>'+JW.alerta+'</p></div></div><div class="row"><button class="btn" data-act="jwDepois">Depois</button><button class="btn pri" data-act="jwVer">Ver agora</button></div></div>':'')+
     (JW.aberto?'':'<button class="jw-b" data-act="jwAbre" aria-label="Abrir o João"><img class="jw-bav" src="joao-av.webp" alt=""><span>João</span>'+(n+d?'<i>'+(n||d)+'</i>':'')+'</button>');}
-var _renderJ=render;render=function(){var r=_renderJ.apply(this,arguments);try{joaoDesenha();}catch(e){}return r;};
-function joaoAvisa(){if(!joaoVisivel()||JW.aberto||JW.alerta||document.hidden)return;var h=new Date().getHours();if(h<8||h>=20)return;var k='io_joao_'+dHoje(),c=+(espLS(k)||0);if(c>=12)return;
-  var P=ESP.dono?joaoNovos():[],D=joaoDev(),txt='';
-  JW.bravo=false;if(P.length)txt='Chegou <b>'+P.length+' pagamento'+(P.length>1?'s':'')+' novo'+(P.length>1?'s':'')+'</b>. Abra o comprovante e confirme que viu. 🎉';
-  else if(D.length){var b=D[JW.i++%D.length];JW.bravo=true;txt=(b.dias>30?'De novo! ':'')+'<b>'+esc(b.nome)+'</b> está há <b>'+b.dias+' dia'+(b.dias>1?'s':'')+'</b> em atraso, devendo <b>'+fmtR(b.tot)+'</b>.';}
-  if(!txt)return;espLS(k,String(c+1));JW.alerta=txt;joaoDesenha();}
-setTimeout(joaoAvisa,25000);setInterval(joaoAvisa,300000);
-Object.assign(ACT,{jwAbre:function(){JW.aberto=true;JW.alerta=null;joaoDesenha();},jwFecha:function(){JW.aberto=false;joaoDesenha();},jwDepois:function(){JW.alerta=null;joaoDesenha();},jwVer:function(){JW.alerta=null;JW.aberto=true;joaoDesenha();}});
+var _renderJ=render;render=function(){var r=_renderJ.apply(this,arguments);try{joaoDesenha();joaoRevisa();}catch(e){}return r;};
+function joaoRevisa(){if(!joaoVisivel()||JW.revisao)return;var k='io_joao_rev_'+(ESP.dono||'eu');try{if(sessionStorage.getItem(k))return;}catch(e){}var D=joaoDev();if(!D.length)return;try{sessionStorage.setItem(k,'1');}catch(e){}JW.revisao=true;joaoDesenha();}
+function rJoaoRevisao(){var D=joaoDev(),tot=D.reduce(function(s,b){return s+b.tot;},0);
+  return '<div class="jw-al bravo jw-rev" role="alertdialog" aria-live="assertive"><div class="jw-alc"><img class="jw-alimg" src="joao-bravo.webp" alt=""><div><b>João · revisão de quem não pagou</b><p><b>'+D.length+' cliente'+(D.length>1?'s':'')+'</b> em atraso, somando <b>'+fmtR(tot)+'</b>. Vamos resolver isso.</p></div></div>'+
+    '<div class="jw-revl">'+D.map(function(b){var w=cliWa(b.cli);return '<div class="jw-revi" style="--k:'+b.f[2]+'"><span><b>'+esc(b.nome)+'</b><small>'+b.dias+' dia'+(b.dias>1?'s':'')+' · '+b.f[1]+'</small></span><b class="jw-revv">'+fmtR(b.tot)+'</b>'+(w?'<a class="btn sm" href="https://wa.me/'+w+'" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a>':'<span></span>')+'</div>';}).join('')+'</div>'+
+    '<div class="row"><button class="btn pri" data-act="jwRevOk">Entendi</button></div></div>';}
+function joaoFala(){if(!joaoVisivel()||JW.aberto||JW.revisao||document.hidden)return;var h=new Date().getHours();if(h<8||h>=20)return;
+  var P=ESP.dono?joaoNovos():[],D=joaoDev();
+  if(P.length&&!JW.alerta){JW.bravo=false;JW.alerta='Chegou <b>'+P.length+' pagamento'+(P.length>1?'s':'')+' novo'+(P.length>1?'s':'')+'</b>. Abra o comprovante e confirme que viu. 🎉';joaoDesenha();return;}
+  if(!D.length)return;var top=D.slice(0,3).map(function(b){return '<b>'+esc(b.nome)+'</b> ('+b.dias+' dias, '+fmtR(b.tot)+')';}).join(', ');
+  JW.fala='😠 Atrasados: '+top+(D.length>3?' e mais '+(D.length-3)+'.':'.');joaoDesenha();clearTimeout(JW.falaT);JW.falaT=setTimeout(function(){JW.fala=null;joaoDesenha();},20000);}
+setInterval(joaoFala,300000);
+Object.assign(ACT,{jwAbre:function(){JW.aberto=true;JW.alerta=null;JW.fala=null;joaoDesenha();},jwFecha:function(){JW.aberto=false;joaoDesenha();},jwDepois:function(){JW.alerta=null;joaoDesenha();},jwVer:function(){JW.alerta=null;JW.aberto=true;joaoDesenha();},jwRevOk:function(){JW.revisao=false;joaoDesenha();}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
