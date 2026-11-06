@@ -798,6 +798,54 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
  .ab-b img{height:auto;max-height:46%;max-width:72%}
  .ab-t{text-align:center;justify-items:center}.ab-t p{font-size:1.35rem}
  .ab-gang{height:38%}.ab-gang img{margin:0 -5vw}.ab-fomo p{font-size:1.4rem}}
+
+/* Escaneamento conferido */
+.es{width:100%;max-width:820px}.es-w{max-width:none}.es-b{display:grid;grid-template-columns:240px 1fr;gap:20px;padding:18px;align-items:center}
+.es-arc{width:100%}.es-scan{opacity:0}.es-scan.go{opacity:.85;animation:esSc 1.6s ease-in-out}
+@keyframes esSc{0%{transform:translateY(0)}50%{transform:translateY(70px)}100%{transform:translateY(0)}}
+#es46{animation:esPul 1.4s ease-in-out infinite}@keyframes esPul{50%{fill:#F7DFA3}}
+.es-ck{display:grid;gap:8px}
+.es-i{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:#F7F4EE;color:#2a2418;font-weight:700;opacity:0;transform:translateX(14px);transition:.4s}.es-i.in{opacity:1;transform:none}
+.es-i i{width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;font-style:normal;font-size:.8rem;color:#fff}
+.es-i i.ok{background:#1DAE8A}.es-i i.ok::before{content:"✓"}.es-i i.av{background:#E8A33A}.es-i i.av::before{content:"!"}
+.es-i:has(i.av){background:#FFF3DC;color:#7a4d00}.es-i.fixo{animation:flTx .6s}
+.es-re{justify-self:start;border:0;border-radius:999px;background:#E8A33A;color:#fff;font:800 .88rem var(--f-body);padding:9px 16px;opacity:0;transition:.3s}.es-re.in{opacity:1}
+.es-ok{display:none;background:#1DAE8A;color:#fff;border-radius:12px;padding:10px 14px;font-weight:800}.es-ok.in{display:block;animation:flTx .5s}
+/* Agenda × prazo */
+.agz{width:100%;max-width:860px}.agz-w{max-width:none;position:relative}
+.agz-g{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px}
+.agz-d{min-height:200px;background:#F7F4EE;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px}.agz-d>b{font-size:.8rem;color:#8a7a5c;text-transform:uppercase;letter-spacing:.06em}
+.agz-x{font-size:.74rem;background:#ECE6DA;color:#6a5d45;border-radius:8px;padding:5px 7px}
+.agz-c{background:#5B45E0;color:#fff;border-radius:10px;padding:7px 8px;font-weight:800;font-size:.84rem;transition:background .4s}.agz-c small{display:block;opacity:.8;font-weight:700}.agz-c em{display:block;font-style:normal;font-weight:600;font-size:.72rem;opacity:.9}
+.agz-c.mal{background:#E0533A;animation:agTr .12s 6}.agz-c.ok{background:#1DAE8A;animation:flTx .6s}
+@keyframes agTr{50%{transform:translateX(3px)}}
+.agz-lab{margin-top:auto;background:#FFF3DC;color:#7a4d00;border:1.5px dashed #E8A33A;border-radius:10px;padding:6px 8px;font-size:.76rem;font-weight:800;opacity:0;transition:.4s}.agz-lab.in{opacity:1}
+.agz-al{position:absolute;left:50%;top:52%;transform:translate(-50%,-40%);width:min(420px,90%);background:#fff;border:2px solid #E0533A;border-radius:16px;padding:16px;display:grid;gap:6px;box-shadow:0 24px 50px -10px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:.4s}.agz-al.in{opacity:1;transform:translate(-50%,-50%)}
+.agz-al b{color:#B3261E}.agz-al span{color:#4a4235;font-size:.9rem}.agz-al button{margin-top:6px;border:0;border-radius:999px;background:#1DAE8A;color:#fff;font:800 .9rem var(--f-body);padding:10px}
+.agz-wa{margin:0 14px 14px;display:flex;gap:10px;align-items:center;background:#DCF8C6;color:#1f3a14;border-radius:14px;padding:10px 12px;font-size:.88rem;opacity:0;transform:translateY(10px);transition:.5s}.agz-wa.in{opacity:1;transform:none}.agz-wa em{margin-left:auto;font-style:normal;font-size:.72rem;color:#3a8a3a;white-space:nowrap}
+/* Certificado */
+.ce{display:grid;grid-template-columns:auto auto 1fr;gap:20px;align-items:center;width:100%;max-width:860px}
+.ce-cx{background:linear-gradient(160deg,#fff,#f0ebe0);border-radius:18px;padding:16px;display:grid;gap:8px;justify-items:center;color:#2a2418;box-shadow:0 20px 40px -12px rgba(0,0,0,.6);transform:rotate(-3deg)}
+.ce-tp{font-weight:800;font-size:.85rem}.ce-cx small{font-size:.72rem;color:#8a7a5c}
+.ce-qr{width:130px;height:130px;background:#fff;padding:6px;border-radius:8px;fill:#1a1a1a;shape-rendering:crispEdges;position:relative}
+.ce-qr.qrscan{animation:ceSc 1s ease-in-out 1;box-shadow:0 0 0 4px #2BC7B8}
+@keyframes ceSc{50%{box-shadow:0 0 0 10px rgba(43,199,184,.25)}}
+.ce-ar{font-size:1.8rem;color:#F0C46A}
+.ce-c{background:#FFFDF8;color:#2a2418;border:2px solid #E8D9B5;border-radius:18px;padding:16px 18px;display:grid;gap:6px;box-shadow:0 20px 40px -12px rgba(0,0,0,.6);opacity:0;transform:scale(.9);transition:.5s cubic-bezier(.2,1.4,.4,1)}.ce-c.in{opacity:1;transform:none}
+.ce-h{display:flex;gap:10px;align-items:center;padding-bottom:8px;border-bottom:1px solid #EFE4CC}.ce-h>span{font-size:2rem}.ce-h small{font:600 .66rem var(--f-mono);letter-spacing:.1em;color:#B08A3A}.ce-h b{display:block;font-size:1.15rem}
+.ce-r{display:grid;grid-template-columns:100px 1fr;gap:10px;font-size:.86rem;opacity:0;transition:.35s}.ce-r.in{opacity:1}.ce-r span{color:#8a7a5c;font-weight:700}
+.ce-f{margin-top:4px;font-size:.78rem;color:#1D8A6A;font-weight:800}
+/* Histórico */
+.hi{width:100%;max-width:720px}.hi-w{max-width:none}.hi-b{padding:16px;display:grid;gap:12px}
+.hi-l{display:grid;gap:10px;position:relative;padding-left:14px;border-left:3px solid #EADFCB}
+.hi-i{display:flex;align-items:center;gap:12px;background:#F7F4EE;border-radius:14px;padding:10px 12px;color:#2a2418;transition:.4s}.hi-i.sel{background:#E3F7F0;box-shadow:0 0 0 2px #1DAE8A}
+.hi-a{font:800 1rem var(--f-display);color:#B08A3A;min-width:46px}.hi-i div{flex:1}.hi-i small{display:block;color:#6a5d45}.hi-i em{font-style:normal;font-size:.74rem;color:#5B45E0;font-weight:700}
+.hi-i button{border:0;border-radius:999px;background:#5B45E0;color:#fff;font:800 .82rem var(--f-body);padding:8px 14px;white-space:nowrap}.hi-i button.on{background:#1DAE8A}
+.hi-ok{display:none;background:#1DAE8A;color:#fff;border-radius:12px;padding:10px 14px;font-weight:700}.hi-ok.in{display:block;animation:flTx .5s}
+@media (max-width:860px){.es-b{grid-template-columns:1fr;gap:8px;padding:10px}.es-arc{max-height:130px}.es-i{padding:6px 10px;font-size:.84rem}
+ .agz-g{grid-template-columns:repeat(5,1fr);gap:4px;padding:8px}.agz-d{min-height:150px;padding:5px;font-size:.7rem}.agz-x{display:none}.agz-c{font-size:.66rem;padding:5px}.agz-c em{display:none}.agz-lab{font-size:.62rem;padding:4px}.agz-wa{font-size:.78rem;margin:0 8px 8px}
+ .ce{grid-template-columns:1fr;gap:8px;justify-items:center}.ce-ar{display:none}.ce-cx{padding:10px}.ce-qr{width:80px;height:80px}.ce-c{padding:12px;width:100%}.ce-r{grid-template-columns:84px 1fr;font-size:.78rem}
+ .hi-i{flex-wrap:wrap;padding:8px 10px}.hi-i button{width:100%}}
 </style>
 <body>
 <header class="top">
@@ -1229,6 +1277,19 @@ var CENAS=[
    ['f1','f2','f3','f4'].forEach(function(id,i){at(3700+i*1000,function(){var e=$('#'+id);if(e)e.classList.add('on');});});
    falas([[0,'Olha que beleza: o dentista tira a <b>foto na cadeira, com o celular</b>, e ela vai direto para o pedido.'],[5400,'O laboratório recebe <b>na hora</b>, com a cor e as observações. Menos erro, menos retrabalho e ajuste, menos dinheiro jogado fora.']]);}},
 
+ {cap:'Escaneamento conferido',pt:3,who:'ot',p:'serio',d:14000,lab:1,h:'<div class="sc"><div class="es">'+
+   '<div class="win es-w fx"><div class="wbar">🦷 Escaneamento · Maria Souza · coroa no 46</div><div class="es-b">'+
+    '<svg class="es-arc" viewBox="0 0 220 190"><path d="M30 40 Q30 170 110 172 Q190 170 190 40" fill="none" stroke="#EADFCB" stroke-width="34" stroke-linecap="round"/>'+
+    [[36,52],[38,82],[44,110],[56,134],[74,152],[96,162],[124,162],[146,152],[164,134],[176,110],[182,82],[184,52]].map(function(t,i){return '<rect x="'+(t[0]-11)+'" y="'+(t[1]-11)+'" width="22" height="22" rx="7" fill="'+(i===10?'#F0C46A':'#fff')+'" stroke="#D7C9AE"'+(i===10?' id="es46"':'')+'/>';}).join('')+
+    '<rect class="es-scan" id="essc" x="150" y="40" width="54" height="5" rx="2" fill="#2BC7B8"/><text x="110" y="100" text-anchor="middle" font-size="13" fill="#9a8a6a" font-weight="700">arcada de baixo</text></svg>'+
+    '<div class="es-ck">'+[['c0','ok','Preparo do 46 completo'],['c1','ok','Antagonista (arcada de cima)'],['c2','av','Margem distal pouco nítida'],['c3','ok','Registro de mordida']].map(function(c){return '<div class="es-i" id="es'+c[0]+'"><i class="'+c[1]+'"></i><span>'+c[2]+'</span></div>';}).join('')+
+    '<button class="es-re" id="esre">🔁 Reescanear só essa área</button><div class="es-ok" id="esok">✓ Pronto para enviar ao laboratório</div></div></div></div></div></div>',
+  go:function(){inn('.fx',100,250);['c0','c1','c2','c3'].forEach(function(k,i){at(1200+i*900,function(){var e=$('#es'+k);if(e)e.classList.add('in');});});
+   at(4300,function(){var b=$('#esre');if(b)b.classList.add('in');});
+   clica('#esre',5000,function(){var b=$('#esre');if(b)b.classList.add('on');var sc=$('#essc');if(sc)sc.classList.add('go');
+     at(1800,function(){var c=$('#esc2');if(c){c.querySelector('i').className='ok';c.querySelector('span').textContent='Margem distal nítida';c.classList.add('fixo');}var b2=$('#esre');if(b2)b2.style.display='none';var o=$('#esok');if(o)o.classList.add('in');});});
+   falas([[0,'Antes, o pedido voltava dias depois: <b>"moldagem ruim, refaz"</b>. Com o paciente já em casa. 😤'],[5400,'Agora o sistema confere o escaneamento <b>na hora</b>: margem, antagonista, mordida. Faltou algo? Avisa com o paciente <b>ainda na cadeira</b>.']]);}},
+
  {cap:'Pedido para o laboratório',pt:3,who:'ot',p:'serio',d:15000,lab:1,h:'<div class="sc"><div class="pdw"><div class="cmdp fx" id="cp"><div class="cmdc"><div class="papel"><b>COMANDA · Lab Prótese Sul</b><span>Paciente: <i>C. M.</i></span><span>Trabalho: <i>Protocolo acril. sup.</i></span><span>Moldagem: <i>ok ✓</i></span><span>Dentes: <i>Delara A2</i></span><span>Prazo: <i>3 dias · URGENTE</i></span><span class="ass">Dr(a). A.</span></div><div class="scan" id="sc"></div><div class="flash" id="fl2"></div></div><div class="ialb" id="ia">✨ IA lendo a comanda…</div></div><div class="win pdf" id="pf"><div class="wbar"><span>🧪 Novo pedido para o laboratório</span><span class="aib" id="aib">✨ Preenchido pela IA</span></div><div class="wbody"><div class="frm">'+
    [['Paciente','C. M.'],['Trabalho','Protocolo acrilizado superior'],['Moldagem','✓ Feita hoje'],['Dentes','Delara · cor A2'],['Laboratório','Lab Prótese Sul'],['Prazo','3 dias · entrega 03/11']].map(function(f,i){return '<label>'+f[0]+'<span class="inp" id="pq'+i+'" data-t="'+f[1]+'"></span></label>';}).join('')+
    '<label style="grid-column:1/-1">Anexos<span class="anx"><span class="thumb" id="th"><svg viewBox="0 0 60 40"><rect width="60" height="40" fill="#f2c4a0"/><path d="M14 14 Q30 11 46 14 Q44 32 30 33 Q16 32 14 14 Z" fill="#7a1f2b"/><rect x="14" y="13" width="32" height="7" fill="#fbf7ec"/></svg></span><span id="an2" class="anf">📄 Escaneamento.stl</span></span></label>'+
@@ -1244,6 +1305,16 @@ var CENAS=[
  {cap:'IA vigiando as entregas',pt:3,who:'ot',p:'serio',d:11000,lab:1,h:'<div class="sc"><div class="alr">'+[['⚠️','#D2433A','Pedido #1043 vai atrasar 1 dia','O Lab Digital Centro ainda não iniciou a fresagem. Já avisei o lab e remarquei o paciente das 10h?'],['🕑','#B7791F','Prova da faceta chega hoje às 14h','Paciente C. M. confirmado às 15h. Está tudo encaixado.'],['✅','#1E8A5A','Coroa #1042 saiu para entrega','Previsão: amanhã cedo, dentro do prazo.'],['📈','#5B45E0','Lab Arte Dental: 3 entregas antecipadas este mês','Bom sinal. Ele está melhorando no prazo.']].map(function(a){return '<div class="al fx" style="--c:'+a[1]+'"><span>'+a[0]+'</span><div><b>'+a[2]+'</b><p>'+a[3]+'</p></div></div>';}).join('')+'</div></div>',
   go:function(){inn('.fx',200,700);falas([[0,'E tem uma <b>IA vigiando as entregas</b> 24 horas. Se um pedido vai atrasar, ela avisa <b>antes</b> do paciente chegar.'],[5400,'Prova chegando, trabalho saindo, lab melhorando ou piorando: <b>você fica sabendo de tudo.</b>']]);}},
 
+ {cap:'Agenda × prazo do lab',pt:3,who:'ot',p:'serio',d:14000,lab:1,h:'<div class="sc"><div class="agz">'+
+   '<div class="win agz-w fx"><div class="wbar">📅 Agenda da clínica · semana</div><div class="agz-g">'+
+    ['Seg','Ter','Qua','Qui','Sex'].map(function(d,i){return '<div class="agz-d" id="agd'+i+'"><b>'+d+'</b>'+(i===1?'<div class="agz-c" id="agc"><small>14h</small>Maria Souza<em>cimentação da coroa 46</em></div>':'')+(i===3?'<div class="agz-lab" id="aglab">🧪 Coroa 46 fica pronta</div>':'')+(i===0?'<div class="agz-x">9h · Avaliação</div>':'')+(i===2?'<div class="agz-x">10h · Limpeza</div>':'')+'</div>';}).join('')+'</div>'+
+    '<div class="agz-al" id="agal"><b>⚠️ A coroa da Maria Souza só chega na quinta.</b><span>O retorno dela está marcado para terça.</span><button id="agbt">Remarcar para sexta, 14h</button></div>'+
+    '<div class="agz-wa" id="agwa">💬 <span>"Oi, Maria! Podemos passar o seu retorno para <b>sexta às 14h</b>? Sua coroa fica pronta antes."</span><em>✓✓ enviada</em></div></div></div></div>',
+  go:function(){inn('.fx',100,250);at(1400,function(){var l=$('#aglab');if(l)l.classList.add('in');});
+   at(3000,function(){var a=$('#agal');if(a)a.classList.add('in');var c=$('#agc');if(c)c.classList.add('mal');});
+   clica('#agbt',5200,function(){var a=$('#agal');if(a)a.classList.remove('in');var c=$('#agc'),d=$('#agd4');if(c&&d){c.classList.remove('mal');c.classList.add('ok');d.appendChild(c);}at(900,function(){var w=$('#agwa');if(w)w.classList.add('in');});});
+   falas([[0,'Sabe o pior? <b>Paciente na cadeira</b> e a prótese ainda no laboratório. Vergonha. 😤'],[5600,'Agora a agenda conversa com o <b>prazo do lab</b>. Se não vai dar tempo, eu fico sabendo antes e remarco com um toque.']]);}},
+
  {cap:'Rastreio do motoboy',pt:3,who:'ot',p:'satisfeito',d:14000,lab:1,h:'<div class="sc"><div class="rst"><div class="rmap fx"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet"><g stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none"><path d="M0 80 H400"/><path d="M0 200 H400"/><path d="M90 0 V300"/><path d="M250 0 V300"/><path d="M0 140 Q200 120 400 150"/></g>'+
    '<path id="rota" d="M60 250 L90 250 L90 200 L250 200 L250 80 L340 80" stroke="#F0C46A" stroke-width="5" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>'+
    '<g><circle cx="60" cy="250" r="11" fill="#1DAE8A"/><text x="60" y="255" font-size="12" text-anchor="middle">🧪</text></g><g><circle cx="340" cy="80" r="13" fill="#5B45E0"/><text x="340" y="85" font-size="13" text-anchor="middle">🏥</text></g>'+
@@ -1257,13 +1328,30 @@ var CENAS=[
    at(6200,function(){$('#r2').classList.add('on');$('#rp').classList.add('in');});at(9300,function(){$('#r3').classList.add('on');var e=$('#eta');if(e)e.innerHTML='✅ <b>Entregue!</b>';});
    falas([[0,'E sabe aquela pergunta "o motoboy já saiu?" Acabou. Aqui você <b>acompanha a entrega no mapa</b>, ao vivo. 🛵'],[5200,'Coletou, saiu, está chegando… e a Ana ainda avisa: <b>"está a 5 minutos"</b>.'],[9600,'Na chegada, a clínica confirma com um <b>código</b>. Entregue, registrado, sem discussão.']]);}},
 
- {cap:'Atrasos e ajustes',pt:3,who:'ot',p:'bravo',d:13000,lab:1,h:'<div class="sc"><div class="sl">'+L('Seu laboratório × média dos outros labs · últimos 6 meses')+
-   '<div class="mcmp"><div class="mh"><span></span><b>Seu laboratório</b><b>Média dos outros</b><span></span></div>'+
+ {cap:'Certificado para o paciente',pt:3,who:'ot',p:'presente',d:13000,lab:1,h:'<div class="sc"><div class="ce">'+
+   '<div class="ce-cx fx"><div class="ce-tp">Coroa 46 · Maria Souza</div><svg class="ce-qr" viewBox="0 0 21 21">'+(function(){var r='',k=7;for(var y=0;y<21;y++)for(var x=0;x<21;x++){var f=(x<7&&y<7)||(x>13&&y<7)||(x<7&&y>13);var on=f?((x%14<7&&y%14<7)&&(x%14===0||x%14===6||y%14===0||y%14===6||(x%14>1&&x%14<5&&y%14>1&&y%14<5))):((x*31+y*17+x*y*7+(x^y)*3)%7<3);if(on)r+='<rect x="'+x+'" y="'+y+'" width="1.02" height="1.02" fill="#1a1a1a"/>';}return r;})()+'</svg><small>escaneie para ver o certificado</small></div>'+
+   '<div class="ce-ar fx">➜</div>'+
+   '<div class="ce-c" id="cec"><div class="ce-h"><span>🏅</span><div><small>CERTIFICADO DA SUA PRÓTESE</small><b>Maria Souza</b></div></div>'+
+    [['Peça','Coroa em zircônia · dente 46'],['Cor','A2'],['Material','Zircônia multicamada · lote ZR-0413'],['Laboratório','Laboratório Exemplo · técnico responsável'],['Clínica','Clínica Exemplo · Dr. Otávio'],['Garantia','até 11/2031']].map(function(r){return '<div class="ce-r"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>';}).join('')+
+    '<div class="ce-f">✓ Peça original e rastreada · dados de exemplo</div></div></div></div>',
+  go:function(){inn('.fx',100,250);at(2600,function(){var q=$('.ce-qr');if(q)q.classList.add('qrscan');});at(3600,function(){var c=$('#cec');if(c)c.classList.add('in');$$('.ce-r').forEach(function(r,i){at(400+i*260,function(){r.classList.add('in');});});});
+   falas([[0,'E na entrega, a peça vem com um <b>QR code</b>.'],[3800,'O paciente recebe o <b>certificado da prótese</b>: material, lote, cor e garantia. Ele enxerga o valor do tratamento… e <b>indica a clínica</b>. 😎']]);}},
+
+ {cap:'Histórico do paciente',pt:3,who:'ot',p:'satisfeito',d:13000,lab:1,h:'<div class="sc"><div class="hi">'+
+   '<div class="win hi-w fx"><div class="wbar">🗂️ Maria Souza · próteses</div><div class="hi-b"><div class="hi-l">'+
+    [['2019','Facetas 11 e 21','Dissilicato · cor BL2','Laboratório A',1],['2022','Coroa 36','Metalocerâmica · cor A3','Laboratório B',0],['2026','Coroa 46','Zircônia · cor A2','Laboratório Exemplo',0]].map(function(h,i){return '<div class="hi-i fx" id="hi'+i+'"><span class="hi-a">'+h[0]+'</span><div><b>'+h[1]+'</b><small>'+h[2]+' · '+h[3]+'</small><em>📁 arquivo 3D guardado</em></div>'+(h[4]?'<button id="hire">↺ Refazer igual</button>':'')+'</div>';}).join('')+
+    '</div><div class="hi-ok" id="hiok">✓ Pedido criado com os mesmos dados: <b>material, cor e arquivo 3D</b> de 2019</div></div></div></div></div>',
+  go:function(){inn('.fx',100,320);
+   clica('#hire',4200,function(){var b=$('#hire');if(b){b.textContent='✓ Pedido criado';b.classList.add('on');}var i=$('#hi0');if(i)i.classList.add('sel');var o=$('#hiok');if(o)o.classList.add('in');});
+   falas([[0,'A Maria quebrou a faceta que fez <b>em 2019</b>. Antes? Ninguém lembrava a cor, o material, nada.'],[4600,'Agora fica tudo no <b>histórico do paciente</b>. Um toque e o pedido sai <b>igualzinho</b>, até com o arquivo 3D.']]);}},
+
+ {cap:'Atrasos e ajustes',pt:3,who:'ot',p:'bravo',d:13000,lab:1,h:'<div class="sc"><div class="sl">'+L('O laboratório que você usa × média dos outros · últimos 6 meses')+
+   '<div class="mcmp"><div class="mh"><span></span><b>Seu laboratório</b><b>Média dos outros labs</b><span></span></div>'+
    [['Atrasos',14,'14%',6,'6%',20,0],['Retrabalho e ajuste',9,'9%',5,'5%',20,0],['Entregas no prazo',82,'82%',93,'93%',100,0],['Tempo de resposta',3,'3 h',4,'4 h',6,1]].map(function(r){return '<div class="mr fx"><span>'+r[0]+'</span><div class="bx2"><i style="--v:'+(r[1]/r[5])+';--c:'+(r[6]?'#1DAE8A':'#EF5F5A')+'"></i><em>'+r[2]+'</em></div><div class="bx2"><i style="--v:'+(r[3]/r[5])+';--c:#8E9AD8"></i><em>'+r[4]+'</em></div><span class="mtg '+(r[6]?'bom':'mau')+'">'+(r[6]?'✓ melhor que a média':'⚠️ abaixo da média')+'</span></div>';}).join('')+'</div>'+
-   '<div class="aviso fx">⚠️ <b>Aviso:</b> o seu laboratório está abaixo da média dos outros em <b>atrasos</b>, <b>retrabalho e ajuste</b> e <b>entregas no prazo</b>.</div>'+
+   '<div class="aviso fx">⚠️ <b>Aviso:</b> o laboratório que você usa está abaixo da média dos outros em <b>atrasos</b>, <b>retrabalho e ajuste</b> e <b>entregas no prazo</b>.</div>'+
    '<div class="mot fx"><b>Por que voltou para ajuste?</b>'+[['Cor',38],['Adaptação',27],['Contato',21],['Outros',14]].map(function(m){return '<span>'+m[0]+' <em>'+m[1]+'%</em></span>';}).join('')+'</div><small class="src fx">Números de exemplo · nenhum laboratório é identificado</small></div></div>',
   go:function(){inn('.fx',100,220);at(800,function(){$$('.mcmp i').forEach(function(e){e.classList.add('in');});});
-   falas([[0,'Agora a parte que me deixa <b>bravo</b>: atrasos e ajustes. 😤 O sistema compara o <b>meu laboratório</b> com a média dos outros, sem mostrar o nome de ninguém.'],[6000,'E me avisa onde estou abaixo da média e por quê: cor, adaptação, contato. Aí eu sei <b>o que melhorar</b>, com dados, não no achismo.']]);}},
+   falas([[0,'Agora a parte que me deixa <b>bravo</b>: atrasos e ajustes. 😤 O sistema compara o <b>laboratório que eu uso</b> com a média dos outros, sem mostrar o nome de ninguém.'],[6000,'E me avisa onde estou abaixo da média e por quê: cor, adaptação, contato. Aí eu sei <b>o que melhorar</b>, com dados, não no achismo.']]);}},
 
  {cap:'Abaixo da média',pt:3,who:'ot',p:'serio',d:15000,lab:1,h:'<div class="sc"><div class="avl2">'+
    '<div class="ncard fx"><div class="nh" style="background:#5B45E0">🏥 Notificação para a clínica</div><div class="nb"><b>O seu laboratório de protocolos está abaixo da média da região.</b>'+
