@@ -1965,7 +1965,7 @@ function pCard(f){var r=pRisco(f),k=f.st,nx={fila:['pCom','▶ Começar'],fazend
 function rPInicio(D){var ab=D.fila.filter(function(f){return f.st==='fila'||f.st==='fazendo';}).sort(function(a,b){return (b.urg-a.urg)||(a.prazo<b.prazo?-1:1);}),hj=ab.filter(function(f){return dDif(f.prazo)<=1;}),pr=D.fila.filter(function(f){return f.st==='pronto';}),
   mes=D.fila.filter(function(f){return f.st==='entregue';}).length+(D.feitos[D.feitos.length-1]||0),mx=Math.max.apply(null,D.feitos.concat([mes]));
   var meses=[];for(var i=D.feitos.length;i>=1;i--){var d=new Date();d.setMonth(d.getMonth()-i);meses.push(d.toLocaleDateString('pt-BR',{month:'short'}).replace('.',''));}meses.push('agora');
-  return '<section class="dhero '+ceuClasse()+'">'+ceuCamadas()+'<div class="dhero-t">'+climaChip()+'<h2>'+dSaud()+', '+esc(D.nome)+'!</h2><p>'+esc(D.funcao)+' no '+esc(D.lab)+'</p>'+
+  return '<section class="dhero '+ceuClasse()+'">'+ceuCamadas()+'<div class="dhero-t">'+climaChip()+'<h2>'+dSaud()+', '+esc(D.nome)+'!</h2><p>'+esc(D.funcao)+(D.lab?' no '+esc(D.lab):'')+'</p>'+
       '<div class="row wrap dhero-b"><button class="btn" data-act="dTab" data-v="producao">'+dIco('ped','di sm')+' Abrir minha fila</button><button class="btn" data-act="anaAbre">Falar com a Ana</button></div></div><img class="dhero-ana" src="'+ANA.feliz+'" alt=""></section>'+
     (D.exemplo?'<div class="dex"><span>👀 Deixamos <b>dados de exemplo</b> para você ver como funciona.</span><button class="btn sm" data-act="pLimpa">Começar do zero</button></div>':'')+
     '<div class="dkpis">'+[[D.fila.filter(function(f){return f.st==='fila';}).length,'a fazer','ped'],[D.fila.filter(function(f){return f.st==='fazendo';}).length,'fazendo agora','tar'],[hj.length,'vencem até amanhã','ag'],[pr.length,'prontos hoje','lab']].map(function(x,i){return '<button class="dkpi'+(i===2&&x[0]?' alerta':'')+(i===3&&x[0]?' bom':'')+'" data-act="dTab" data-v="producao" style="--d:'+(i*70)+'ms">'+dIco(x[2])+'<b>'+x[0]+'</b><span>'+x[1]+'</span></button>';}).join('')+'</div>'+
@@ -1974,7 +1974,7 @@ function rPInicio(D){var ab=D.fila.filter(function(f){return f.st==='fila'||f.st
       '<section class="card"><div class="row"><h2>Tarefas da Ana</h2><span class="spacer"></span><button class="btn sm" data-act="anaAbre">Falar com a Ana</button></div>'+(D.tar.filter(function(t){return !t.feito;}).slice(0,5).map(dTarItem).join('')||'<div class="empty">Nenhuma tarefa. Peça para a Ana anotar.</div>')+'</section>'+
       '<section class="card"><div class="row"><h2>Vagas para você</h2><span class="pill warn">teste</span><span class="spacer"></span><button class="btn sm" data-act="dAgente" data-v="vagas">Ver agente</button></div>'+PVAGAS.slice(0,3).map(function(v){return '<div class="vaga"><b>'+esc(v.cargo)+(v.novo?' <span class="pill info">nova</span>':'')+'</b><span class="small muted">'+esc(v.emp)+' · '+esc(v.lugar)+'</span></div>';}).join('')+'</section></div>';}
 function rPProducao(D){var f=D.fil||'todos',L=D.fila.filter(function(x){return f==='todos'?true:f==='urg'?x.urg:f==='hoje'?dDif(x.prazo)<=1&&x.st!=='entregue':true;});
-  return '<div class="dtop"><div><h2>Minha produção</h2><p class="small muted">Os trabalhos que o '+esc(D.lab)+' passou para você.</p></div></div>'+
+  return '<div class="dtop"><div><h2>Minha produção</h2><p class="small muted">'+(D.lab?'Os trabalhos que o '+esc(D.lab)+' passou para você.':'Os seus trabalhos em produção.')+'</p></div></div>'+
     '<div class="row wrap">'+[['todos','Todos'],['hoje','Vencem até amanhã'],['urg','Urgentes']].map(function(o){return '<button class="chip" aria-pressed="'+(f===o[0])+'" data-act="pFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
     '<div class="pkan">'+PST.map(function(s){var C=L.filter(function(x){return x.st===s[0];}).sort(function(a,b){return (b.urg-a.urg)||(a.prazo<b.prazo?-1:1);});
       return '<section class="pcol" style="--k:'+s[2]+'"><div class="pcol-h"><i></i><b>'+s[1]+'</b><span>'+C.length+'</span></div>'+(C.length?C.map(pCard).join(''):'<div class="pvazio">—</div>')+'</section>';}).join('')+'</div>';}
@@ -3093,7 +3093,7 @@ document.addEventListener('input',function(e){if(e.target.closest&&e.target.clos
 function rlBarra(){var b=document.getElementById('rl-bar');if(!RL.user){if(b)b.remove();document.body.classList.remove('rl-master','rl-in');return;}
   document.body.classList.add('rl-in');document.body.classList.toggle('rl-master',RL.admin);
   if(!b){b=document.createElement('div');b.id='rl-bar';document.body.appendChild(b);}
-  b.innerHTML=(RL.admin?'<span class="rl-mst">👑 Conta master</span>':'')+'<span class="rl-tst">🧪 Fase de teste: seu cadastro, currículo, empresa, clientes e tabela de preços são reais; as outras telas ainda usam dados de exemplo.</span><span class="spacer"></span><button data-rl="sair">Sair</button>';}
+  b.innerHTML=(RL.admin?'<span class="rl-mst">👑 Conta master</span>':'')+'<span class="rl-tst">🧪 Fase de teste: seu cadastro, currículo, empresa, clientes e tabela de preços são reais; o resto começa vazio e vai sendo preenchido nas próximas etapas.</span><span class="spacer"></span><button data-rl="sair">Sair</button>';}
 
 /* ===================== EMPRESA DE VERDADE (etapa 1): negócio, clientes e tabela de preços no banco ===================== */
 var EMP={row:null,cli:[],precSnap:{},carregado:false,erro:'',busy:false,ed:null,busca:'',filtro:'ativos',t:null};
@@ -3155,6 +3155,17 @@ Object.assign(ACT,{
     SB.from('odo_clientes').delete().eq('id',c.id).then(function(r){if(r.error){toast('Não consegui excluir.');return;}EMP.cli=EMP.cli.filter(function(x){return x.id!==c.id;});EMP.ed=null;render();toast('Cliente excluído.');});}});
 document.addEventListener('input',function(e){if(e.target.id==='cli-q'){EMP.busca=e.target.value;var q=semAc(EMP.busca),g=document.getElementById('cli-grid');if(g)g.innerHTML=cliCards(EMP.cli.filter(function(c){return (EMP.filtro==='todos'||(EMP.filtro==='ativos'?c.ativo:!c.ativo))&&(!q||semAc([c.nome,c.cidade,c.documento,c.telefone,c.reg].join(' ')).indexOf(q)>=0);}));}});
 
+
+/* conta real: nada de dados de exemplo no painel */
+function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
+  var z=function(D,f){if(!D||!D.exemplo)return;f(D);D.exemplo=false;D.conv=[{de:'ana',t:'Seu painel está pronto. Me peça para anotar o que precisar.'}];};
+  z(S.prot,function(D){D.fila=[];D.tar=[];D.feitos=[0,0,0,0,0];D.lab='';D.funcao=cg||'Protético';pSalva();});
+  z(S.dent,function(D){D.peds=[];D.ag=[];D.tar=[];D.labs=[];dSalva();});
+  z(S.asb,function(D){D.ag=[];D.peds=[];D.labs=[];D.tar=[];D.est=[];aSalva();});
+  z(S.stu,function(D){D.estudos=[];D.tar=[];sSalva();});
+  ['corp','ind'].forEach(function(k){z(S[k],function(D){if(D.L)Object.keys(D.L).forEach(function(x){D.L[x]=[];});D.ag=[];D.agDent=[];D.est=[];D.tar=[];D.equipe=[];if(k==='corp')cSalva();else iSalva();});});}
+function rlZera2(){if(typeof RL==='undefined'||!RL.user)return;[typeof PVAGAS!=='undefined'?PVAGAS:[],typeof AVAGAS!=='undefined'?AVAGAS:[],typeof EOPS!=='undefined'?EOPS:[]].forEach(function(L){L.forEach(function(v){v.novo=false;});});var b=document.querySelector('.vt-b');if(b)b.hidden=true;}
+var _render0=render;render=function(){try{rlZera();rlZera2();}catch(e){}return _render0.apply(this,arguments);};
 /* início */
 (function(){if(!SB){toast('Sem conexão com o servidor. Recarregue a página.');return;}
   SB.auth.onAuthStateChange(function(ev,ses){var u=ses&&ses.user;
