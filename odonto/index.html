@@ -953,6 +953,23 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .pzl-to{font-size:.78rem;font-weight:700;color:#6a5d45;background:#F7F4EE;border-radius:10px;padding:6px 10px}
 .pzl-r{display:none;background:#E3F7F0;color:#0f4a33;border-radius:12px;padding:9px 12px;font-size:.9rem}.pzl-r.in{display:block;animation:flTx .5s}.pzl-r small{display:block;font-size:.7rem;font-weight:800;opacity:.75}
 @media (max-width:860px){.pzl{grid-template-columns:1fr;gap:8px}.pzl-b{padding:8px;gap:6px}.pzl-o{padding:7px 9px}.pzl-o small{display:none}.pzl-h b{font-size:.82rem}.pzl-al{padding:10px}.pzl-al p{font-size:.8rem}.pzl-to{display:none}}
+
+/* Um ecossistema */
+.eco2{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:center;width:100%;max-width:980px}
+.ec2-hub{position:relative;aspect-ratio:1;max-width:420px;width:100%;margin:0 auto}
+.ec2-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:42%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#7B5CFF,#3a2aa8);display:grid;place-items:center;align-content:center;text-align:center;box-shadow:0 0 0 10px rgba(123,92,255,.15),0 0 60px rgba(123,92,255,.6);animation:ecPul 2.4s ease-in-out infinite}
+@keyframes ecPul{50%{box-shadow:0 0 0 18px rgba(123,92,255,.08),0 0 80px rgba(123,92,255,.75)}}
+.ec2-core i{font:800 2rem var(--f-display);font-style:normal}.ec2-core b{font:800 1.2rem var(--f-display)}.ec2-core small{font-size:.66rem;color:#d9d2ff;max-width:80%}
+.ec2-p{position:absolute;width:44%;display:grid;gap:2px;text-align:center;justify-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:10px 8px;opacity:0;transform:scale(.5);transition:.6s cubic-bezier(.2,1.5,.4,1)}
+.ec2-p.in{opacity:1;transform:none}
+.ec2-p span{font-size:1.5rem}.ec2-p b{font-size:.95rem}.ec2-p small{font-size:.7rem;color:#C9D0FF;line-height:1.3}
+.ec2-p[style*="--i:0"]{left:0;top:0}.ec2-p[style*="--i:1"]{right:0;top:0}.ec2-p[style*="--i:2"]{left:0;bottom:0}.ec2-p[style*="--i:3"]{right:0;bottom:0}
+.ec2-r{display:grid;gap:14px}
+.ec2-n{display:flex;align-items:center;gap:14px}.ec2-n b{font:800 3.4rem/1 var(--f-display);color:var(--mint2);text-shadow:0 0 30px rgba(124,240,200,.5)}.ec2-n span{font-weight:700;font-size:1.1rem;line-height:1.3}.ec2-n em{font-style:normal;color:#C9A9FF;font-size:.9rem}
+.ec2-t{display:flex;flex-wrap:wrap;gap:5px}
+.ec2-t span{font-size:.72rem;font-weight:700;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:3px 8px;opacity:0;transform:translateY(8px) scale(.9);transition:.35s}
+.ec2-t span.in{opacity:1;transform:none}.ec2-t span.ia{border-color:rgba(158,140,255,.6);background:rgba(123,92,255,.18)}
+@media (max-width:860px){.eco2{grid-template-columns:1fr;gap:10px}.ec2-hub{max-width:250px}.ec2-p{padding:6px 4px;border-radius:12px}.ec2-p small{display:none}.ec2-p span{font-size:1.1rem}.ec2-p b{font-size:.75rem}.ec2-core small{display:none}.ec2-n b{font-size:2.8rem}.ec2-n span{font-size:.9rem}.ec2-t span{font-size:.6rem;padding:2px 6px}.ec2-t{gap:3px}.ec2-hub{max-width:210px}.ec2-r{gap:6px}}
 </style>
 <body>
 <header class="top">
@@ -1114,6 +1131,16 @@ var CENAS=[
  {cap:'A Ideali',pt:1,p:'tranquila',d:9000,h:'<div class="sc"><div class="big"><div class="bigl pop"><i>i</i></div><div class="sl-k fx" style="margin-top:22px">Ideali Odonto</div><h2 class="fx">Onde a odontologia <span class="mt">contrata</span>, aprende e cresce.</h2><p class="fx">A rede profissional da odontologia brasileira, com uma assistente de IA que trabalha por você.</p></div></div>',
   go:function(){inn('.pop',100);inn('.fx',400,300);falas([[0,'Oi! Eu sou a <b>Ana</b> 💜 Antes de mostrar como funciona, deixa eu te apresentar a <b>Ideali</b>: o que ela é, por que existe e aonde a gente quer chegar.']]);}},
 
+ {cap:'Um ecossistema',pt:1,p:'feliz',d:19000,h:'<div class="sc"><div class="eco2">'+
+   '<div class="ec2-hub fx"><div class="ec2-core"><i>i</i><b>Ideali</b><small>o ecossistema da odontologia</small></div>'+
+    [['💼','Carreira','Currículo, vagas, freelas, estágios'],['🧪','Organização','Pedidos, laboratórios, prazos, pacientes'],['💰','Economia','Menos retrabalho, gastos sob controle'],['✨','Gestão com IA','Agentes que avisam, cobram e organizam']].map(function(x,i){return '<div class="ec2-p" style="--i:'+i+'" id="ecp'+i+'"><span>'+x[0]+'</span><b>'+x[1]+'</b><small>'+x[2]+'</small></div>';}).join('')+'</div>'+
+   '<div class="ec2-r"><div class="ec2-n fx"><b id="ecn">0</b><span>ferramentas num lugar só<br><em>muitas com inteligência artificial</em></span></div><div class="ec2-t" id="ect">'+
+    [['Currículo com a Ana',1],['Vagas por distância',0],['Freelas e plantões',0],['Carga imediata',0],['Estágios e cursos',0],['Perfis de empresas',0],['Pedidos para o laboratório',0],['Portal do cliente',0],['Prazo do laboratório',1],['Chat por paciente',1],['Foto na cadeira',0],['Escaneamento conferido',1],['Rastreio de entregas',1],['Histórico do paciente',0],['Certificado da prótese',0],['Tabela de preços',0],['Extrato e cobrança Pix',0],['Gastos com laboratório',1],['Agentes de IA',1],['Prospecção de clientes',1],['Agenda e tarefas',1],['Equipe e cargos',0],['Escolas',0],['Crie sua empresa',0]].map(function(t){return '<span class="'+(t[1]?'ia':'')+'">'+(t[1]?'✨ ':'')+t[0]+'</span>';}).join('')+
+   '</div></div></div></div>',
+  go:function(){inn('.fx',100,200);[0,1,2,3].forEach(function(i){at(900+i*600,function(){var e=$('#ecp'+i);if(e)e.classList.add('in');});});
+   at(3600,function(){var n=$('#ecn');if(n)cnt(n,24,0,'');$$('#ect span').forEach(function(e,i){at(i*130,function(){e.classList.add('in');});});});
+   falas([[0,'A Ideali não é só um site de vagas. É um <b>ecossistema da odontologia</b>: tudo o que o profissional e a clínica precisam, num lugar só.'],[6200,'<b>Carreira</b> com currículo e vagas, <b>organização</b> com laboratórios e pedidos, <b>economia</b> no dia a dia e <b>gestão com IA</b>.'],[12600,'São <b>24 ferramentas</b>, muitas com inteligência artificial trabalhando por você. 🚀']]);}},
+
  {cap:'O problema',pt:1,p:'pensativa',d:12000,h:'<div class="sc"><div class="sl">'+L('O problema')+'<h3 class="fx">Na odontologia, achar trabalho (e achar gente boa) ainda é na sorte.</h3><div class="g4">'+
    [['💬','Vagas perdidas','Circulam em grupos de WhatsApp, stories e indicação. Some em horas.'],['📄','Currículo que não diz nada','PDF genérico. Não mostra se a pessoa domina Exocad ou faz um protocolo.'],['🎓','Estudante sem porta','"Precisa de experiência para ter experiência." O primeiro emprego vira uma luta.'],['⏳','Clínica perdendo tempo','Dias filtrando currículo errado, longe ou sem o perfil da vaga.']].map(function(c){return '<div class="pb fx"><span>'+c[0]+'</span><b>'+c[1]+'</b><p>'+c[2]+'</p></div>';}).join('')+'</div></div></div>',
   go:function(){inn('.fx',100,250);falas([[0,'Hoje, vaga de odontologia fica espalhada em <b>grupo de WhatsApp, stories e indicação</b>. Quem não está no grupo certo, nem fica sabendo.'],[5600,'E do outro lado, a clínica e o laboratório perdem dias procurando o profissional certo. <b>Todo mundo perde.</b>']]);}},
@@ -1168,9 +1195,9 @@ var CENAS=[
    '</div><div class="quote fx">Quem entra estudante cresce junto com a Ideali: do estágio ao próprio consultório.</div></div></div>',
   go:function(){inn('.fx',100,220);falas([[0,'E aqui está a nossa aposta: os <b>estudantes</b>. São eles que vivem no celular, compartilham e trazem a turma toda.'],[5600,'Na Ideali, o estudante já sai da faculdade com <b>currículo, rede de contatos e vagas</b> na mão.']]);}},
 
- {cap:'Missão e visão',pt:1,p:'tranquila',d:11000,h:'<div class="sc"><div class="sl"><div class="mv"><div class="mvc fx"><div class="sl-k">Missão</div><p>Conectar quem faz a odontologia acontecer, do estudante ao dono da clínica, a oportunidades reais de trabalho e crescimento.</p></div>'+
-   '<div class="mvc fx"><div class="sl-k">Visão</div><p>Ser o lugar onde toda a odontologia brasileira contrata, é contratada e cresce.</p></div></div></div></div>',
-  go:function(){inn('.fx',200,600);falas([[0,'A nossa <b>missão</b>: conectar quem faz a odontologia acontecer a oportunidades de verdade.'],[5000,'E a <b>visão</b>: ser o lugar onde a odontologia do Brasil inteiro contrata e é contratada.']]);}},
+ {cap:'Missão e visão',pt:1,p:'tranquila',d:11000,h:'<div class="sc"><div class="sl"><div class="mv"><div class="mvc fx"><div class="sl-k">Missão</div><p>Conectar e organizar quem faz a odontologia acontecer, do estudante ao dono da clínica e do laboratório: mais oportunidades, menos retrabalho e mais tempo para o paciente.</p></div>'+
+   '<div class="mvc fx"><div class="sl-k">Visão</div><p>Ser o ecossistema da odontologia brasileira: onde ela contrata, trabalha em conjunto, se organiza e cresce.</p></div></div></div></div>',
+  go:function(){inn('.fx',200,600);falas([[0,'A nossa <b>missão</b>: conectar e organizar quem faz a odontologia acontecer. Mais oportunidade, menos retrabalho.'],[5000,'E a <b>visão</b>: ser o <b>ecossistema</b> da odontologia brasileira, onde ela contrata, trabalha junto e cresce.']]);}},
 
  {cap:'Valores',pt:1,p:'determinada',d:11000,h:'<div class="sc"><div class="sl">'+L('Nossos valores')+'<div class="vals">'+
    [['🤝','Pessoas primeiro','Por trás de cada vaga tem uma carreira e uma família.'],['✅','Verdade','Vagas reais e currículos com dados travados. Ninguém inventa profissão.'],['🌱','Oportunidade para quem começa','O estudante tem vez aqui.'],['🔒','Privacidade','Seus dados protegidos (LGPD). A clínica pode anunciar em sigilo.'],['⚡','Simplicidade','Candidatar e contratar em poucos toques.'],['💜','Comunidade','A odontologia cresce quando cresce junta.']].map(function(v){return '<div class="va fx"><span>'+v[0]+'</span><div><b>'+v[1]+'</b><p>'+v[2]+'</p></div></div>';}).join('')+'</div></div></div>',
