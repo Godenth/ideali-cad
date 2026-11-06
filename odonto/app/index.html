@@ -1138,6 +1138,16 @@ body.espelho [data-act=pedNovo],body.espelho [data-act=cliNovo],body.espelho [da
 .ino-chip.azul{color:#3A6BE0;border-color:color-mix(in srgb,#3A6BE0 40%,var(--line));background:color-mix(in srgb,#3A6BE0 8%,var(--surface))}.ino-chip.ouro{color:#9A6B00;border-color:color-mix(in srgb,#E8A33A 45%,var(--line));background:color-mix(in srgb,#E8A33A 10%,var(--surface))}
 @media (max-width:900px){.ino-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ino-th{display:none}.ino-tr,.ino-tr.ino-h{grid-template-columns:1fr 1fr 1fr}.ino-tr .ino-cli{grid-column:1/-1}.ino-tr [data-l]:before{content:attr(data-l);display:block;font-size:.66rem;text-transform:uppercase;color:var(--muted);font-weight:700}.ino-comp,.ino-obs{grid-column:1/-1}}
 body.espelho [data-act=inoVenc],body.espelho [data-act=inoVencAuto],body.espelho #ino-venc{display:none!important}
+
+/* Bia */
+.bia{display:grid;gap:6px;margin-bottom:12px;border-left:4px solid #9E8CFF}
+.bia-h{display:flex;gap:10px;align-items:center}.bia-h>div{display:grid}.bia-h small{color:var(--muted)}.bia-h em{color:#D2433A;font-style:normal;font-weight:700}
+.bia-av{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,#9E8CFF 20%,var(--surface));font-size:1.2rem}
+.bia-li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:8px 0 8px 10px;border-top:1px solid var(--line);border-left:3px solid var(--k)}
+.bia-t{display:grid;min-width:0}.bia-t small{color:var(--muted)}.bia-f{font-style:normal;font-weight:800;color:var(--k);text-transform:uppercase;font-size:.68rem;letter-spacing:.05em}
+.bia-pr{grid-column:1/-1;align-items:center;gap:6px}.bia-pr input{border:1px solid var(--line);border-radius:10px;padding:6px 8px;font:inherit;background:var(--surface);color:inherit}
+.bia-b{justify-content:flex-end}@media (max-width:620px){.bia-li{grid-template-columns:1fr}.bia-b{justify-content:flex-start}}
+.ino-wa{text-decoration:none;font-size:.95rem;margin-left:4px}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3573,7 +3583,7 @@ function rInove(){if(!FIN.carregado)return '<div class="empty">Carregando…</di
     '<div class="row wrap ino-fil">'+[['todos','Todos'],['quitado','Quitado'],['parcial','Parcial'],['nada','Nada Pago']].map(function(o){return '<button class="chip" aria-pressed="'+(INO.f===o[0])+'" data-act="inoFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div>'+
     '<label class="cli-q ino-q"><span aria-hidden="true">🔎</span><input id="ino-q" type="search" placeholder="Buscar cliente…" value="'+esc(INO.q||'')+'" autocomplete="off"></label>'+
     '<div class="ino-tab" role="table"><div class="ino-tr ino-th" role="row"><span>Cliente</span><span>Valor do mês</span><span>Valor pago</span><span>Restante</span><span>Status</span><span>Comprovantes</span><span>Observações</span></div>'+
-    (V.length?V.map(function(m){var s=inoStatus(m),k=finCliK(m);return '<div class="ino-tr" role="row"><span class="ino-cli">'+esc(finCliNome(m))+'</span><span data-l="Valor do mês">'+fmtR(m.valor_mes)+'</span><span data-l="Valor pago">'+fmtR(finPago(m))+'</span><span data-l="Restante">'+fmtR(Math.max(0,finRest(m)))+'</span><span><i class="ino-st '+s[1]+'">'+s[0]+'</i></span>'+
+    (V.length?V.map(function(m){var s=inoStatus(m),k=finCliK(m);return '<div class="ino-tr" role="row"><span class="ino-cli">'+esc(finCliNome(m))+(cliWa(finCliObj(m))?' <a class="ino-wa" href="https://wa.me/'+cliWa(finCliObj(m))+'" target="_blank" rel="noopener" title="Falar no WhatsApp" aria-label="Falar no WhatsApp com '+esc(finCliNome(m))+'">💬</a>':'')+'</span><span data-l="Valor do mês">'+fmtR(m.valor_mes)+'</span><span data-l="Valor pago">'+fmtR(finPago(m))+'</span><span data-l="Restante">'+fmtR(Math.max(0,finRest(m)))+'</span><span><i class="ino-st '+s[1]+'">'+s[0]+'</i></span>'+
       '<span class="ino-comp">'+(inoComps(m)||'<em>—</em>')+'<button class="ino-chip azul" data-act="inoHist" data-v="'+k+'">🕘 Histórico Geral</button>'+(m.extrato_path?'<button class="ino-chip ouro" data-act="finArqVer" data-v="'+esc(m.extrato_path)+'">📄 Extrato</button>':m.arquivo_legado?'<span class="ino-chip ouro off" title="Ainda no sistema antigo">📄 Extrato</span>':'')+'</span><span class="ino-obs">'+esc(m.obs||'—')+'</span></div>';}).join(''):'<div class="empty">Nenhum cliente'+(INO.q||INO.f!=='todos'?' com esse filtro':' neste mês')+'.</div>')+'</div></div>';}
 function rInoHist(k){var L=FIN.M.filter(function(m){return finCliK(m)===k;}).sort(function(a,b){return (b.ano*100+b.mes)-(a.ano*100+a.mes);}),nm=L.length?finCliNome(L[0]):'',tot=L.reduce(function(s,m){return s+(+m.valor_mes)-finPago(m);},0);
   return '<div class="ino"><div class="dtop"><div><h2>🕘 Histórico Geral · '+esc(nm)+'</h2><p class="small muted">'+(tot>0.005?'Em aberto no total: <b>'+fmtR(tot)+'</b>':tot<-0.005?'Crédito de '+fmtR(-tot):'Tudo em dia')+'</p></div><span class="spacer"></span><button class="btn" data-act="inoHistFecha">← Voltar</button></div>'+
@@ -3634,6 +3644,51 @@ Object.assign(ACT,{
   espVolta:function(v){var p=espAch(v);if(!p)return;SB.from('odo_parceiros').update({ativo:true}).eq('id',v).select('*').single().then(function(r){if(r.error){toast('Não consegui.');return;}Object.assign(p,r.data);render();toast('Acesso devolvido.');});},
   espApaga:function(v){var p=espAch(v);if(!p||!confirm('Apagar '+p.nome+'? Se estiver conectado, perde o acesso.'))return;SB.from('odo_parceiros').delete().eq('id',v).then(function(r){if(r.error){toast('Não consegui.');return;}ESPO.L=ESPO.L.filter(function(x){return x.id!==v;});render();});}});
 ESP_ESCRITA.slice(-4).forEach(function(k){var f=ACT[k];ACT[k]=function(){if(ESP.dono){toast('🪞 Conta espelho: só leitura.');return;}return f.apply(this,arguments);};});
+
+/* ===== Bia · agente de cobrança: urgência por faixa, promessa de pagamento, "cobrado em", WhatsApp ===== */
+var BIA={todos:false,prom:null};
+function empDados(){return (EMP.row&&EMP.row.dados)||{};}
+function empDadosGrava(ch,k,v,msg){if(!EMP.row||ESP.dono)return;var d=Object.assign({},EMP.row.dados||{}),o=Object.assign({},d[ch]||{});if(v==null)delete o[k];else o[k]=v;d[ch]=o;
+  SB.from('odo_empresas').update({dados:d}).eq('id',EMP.row.id).select('*').single().then(function(r){if(r.error){toast('Não consegui salvar.');return;}EMP.row=r.data;render();if(msg)toast(msg);});}
+function cliWa(c){var w=c&&String(c.whatsapp||c.telefone||'').replace(/\D/g,'');if(!w||w.length<10)return '';if(w.length<=11)w='55'+w;return w;}
+function biaFaixa(d){return d<0?['avencer','a vencer','#5B8CFF']:d<=7?['atrasado','atrasado','#E8A33A']:d<=30?['urgente','urgente','#E0662F']:['critico','crítico','#D2433A'];}
+function biaLista(){var hoje=dHoje(),P=empDados().prom||{},C=empDados().cob||{};
+  return finPend().filter(function(g){return g.tot>=1;}).map(function(g){var T=FIN.M.filter(function(m){return finCliK(m)===g.k&&!m.quitado;}).sort(function(a,b){return (b.ano*100+b.mes)-(a.ano*100+a.mes);}),acc=0,m0=g.meses[0][0];for(var i=0;i<T.length;i++){acc+=+T[i].valor_mes;m0=T[i];if(acc>=g.tot-0.005)break;}
+    var v=finVenc(m0.ano,m0.mes),vi=isoD(v),dias=Math.round((new Date(hoje+'T12:00:00')-new Date(vi+'T12:00:00'))/864e5),pr=P[g.k],cli=finCliObj(g.m0);
+    return {k:g.k,g:g,nome:finCliNome(g.m0),cli:cli,tot:g.tot,venc:vi,dias:dias,f:biaFaixa(dias),prom:pr&&pr.ate>=hoje?pr:null,cob:C[g.k]||null,ult:g.meses[g.meses.length-1][0]};})
+  .filter(function(b){return b.dias>=-5;}).sort(function(a,b){return (a.prom?1:0)-(b.prom?1:0)||b.dias-a.dias||b.tot-a.tot;});}
+function biaMsg(b){var pix=FIN.cfg&&FIN.cfg.chave_pix?'\n\nChave Pix: '+FIN.cfg.chave_pix:'',emp=(S.neg&&S.neg.nome)||'laboratório',det=b.g.meses.map(function(x){return '• '+finMesNome(x[0].ano,x[0].mes)+': '+fmtR(x[1]);}).join('\n'),vb=b.venc.split('-').reverse().join('/'),n=b.nome;
+  var T={avencer:'Olá, '+n+'! Tudo bem? Aqui é do '+emp+'. Passando para lembrar do fechamento:\n'+det+'\n\nTotal: '+fmtR(b.tot)+', com vencimento em '+vb+'.'+pix+'\n\nObrigado!',
+    atrasado:'Olá, '+n+'! Tudo bem? Aqui é do '+emp+'. Consta em aberto:\n'+det+'\n\nTotal: '+fmtR(b.tot)+' (venceu em '+vb+').'+pix+'\n\nSe já pagou, pode desconsiderar e nos mandar o comprovante. Obrigado!',
+    urgente:'Olá, '+n+'! Aqui é do '+emp+'. O pagamento abaixo está em atraso há '+b.dias+' dias:\n'+det+'\n\nTotal: '+fmtR(b.tot)+'.'+pix+'\n\nConseguimos regularizar esta semana? Assim mantemos a produção dos seus trabalhos em dia.',
+    critico:'Olá, '+n+'. Aqui é do '+emp+'. Temos valores em atraso há '+b.dias+' dias:\n'+det+'\n\nTotal: '+fmtR(b.tot)+'.'+pix+'\n\nPrecisamos regularizar com urgência. Se preferir, me diga uma data para combinarmos o pagamento.'};
+  return T[b.f[0]];}
+function rBia(ctx){if(!FIN.carregado||FIN.erro)return '';var L=biaLista(),dev=L.filter(function(b){return b.dias>=0;}),tot=dev.reduce(function(s,b){return s+b.tot;},0),cr=dev.filter(function(b){return b.f[0]==='critico';}).length,dono=!ESP.dono;
+  if(!L.length)return '<section class="card bia"><div class="bia-h"><span class="bia-av">🤖</span><div><b>Bia · cobrança</b><small>Ninguém devendo agora. 🎉</small></div></div></section>';
+  var n0=ctx==='inove'?3:6,V=BIA.todos?L:L.slice(0,n0);
+  return '<section class="card bia"><div class="bia-h"><span class="bia-av">🤖</span><div><b>Bia · cobrança</b><small>'+dev.length+' cliente'+(dev.length!==1?'s':'')+' devendo · '+fmtR(tot)+(cr?' · <em>'+cr+' crítico'+(cr>1?'s':'')+'</em>':'')+'</small></div></div>'+
+    V.map(function(b){var w=cliWa(b.cli);return '<div class="bia-li" style="--k:'+b.f[2]+'"><div class="bia-t"><b>'+esc(b.nome)+'</b><small><i class="bia-f">'+b.f[1]+'</i> '+(b.dias<0?'vence em '+(-b.dias)+' dia'+(b.dias<-1?'s':''):b.dias===0?'venceu hoje':'há '+b.dias+' dia'+(b.dias>1?'s':''))+' · '+fmtR(b.tot)+
+        (b.prom?' · 🤝 prometeu até '+b.prom.ate.split('-').reverse().join('/'):'')+(b.cob?' · ✉️ cobrado em '+b.cob.split('-').reverse().join('/'):'')+'</small></div><div class="row wrap bia-b">'+
+        (dono?'<button class="btn sm pri" data-act="biaCobra" data-v="'+b.k+'">Cobrar</button><button class="btn sm" data-act="biaProm" data-v="'+b.k+'">🤝 Promessa</button>':'')+
+        (w?'<a class="btn sm" href="https://wa.me/'+w+'" target="_blank" rel="noopener">💬 WhatsApp</a>':'')+'</div>'+
+        (BIA.prom===b.k?'<div class="row wrap bia-pr"><span class="small">Prometeu pagar até</span><input type="date" id="bia-pd" value="'+((b.prom&&b.prom.ate)||'')+'"><button class="btn sm pri" data-act="biaPromSalva" data-v="'+b.k+'">Salvar</button>'+(b.prom?'<button class="btn sm" data-act="biaPromTira" data-v="'+b.k+'">Tirar promessa</button>':'')+'</div>':'')+'</div>';}).join('')+
+    (L.length>n0?'<button class="btn sm" data-act="biaTodos">'+(BIA.todos?'Mostrar menos':'Ver todos os '+L.length)+'</button>':'')+'</section>';}
+Object.assign(ACT,{
+  biaTodos:function(){BIA.todos=!BIA.todos;render();},
+  biaProm:function(k){BIA.prom=BIA.prom===k?null:k;render();},
+  biaPromSalva:function(k){var i=document.getElementById('bia-pd');if(!i||!i.value){toast('Escolha a data.');return;}BIA.prom=null;empDadosGrava('prom',k,{ate:i.value,em:dHoje()},'Promessa anotada. A Bia fica quieta até essa data.');},
+  biaPromTira:function(k){BIA.prom=null;empDadosGrava('prom',k,null,'Promessa tirada.');},
+  biaCobra:function(k){var b=biaLista().filter(function(x){return x.k===k;})[0];if(!b)return;FIN.aba='mes';FIN.ed=b.ult.id;FIN.cob={k:k,txt:FIN.cfg.msg_cobranca?finMsg(k):biaMsg(b)};INO.hist=null;ACT.dTab('financeiro');window.scrollTo(0,0);}});
+/* depois de abrir o WhatsApp da cobrança: pergunta se enviou e anota */
+var _finCobWa=ACT.finCobWa;ACT.finCobWa=function(v,b){_finCobWa(v,b);var k=FIN.cob&&FIN.cob.k;if(!k||ESP.dono)return;setTimeout(function(){if(confirm('A mensagem foi enviada para o cliente?'))empDadosGrava('cob',k,dHoje(),'Anotado: cobrado hoje.');},800);};
+/* a mensagem padrão da cobrança segue o tom da Bia */
+var _finMsg=finMsg;finMsg=function(k){if(FIN.cfg&&FIN.cfg.msg_cobranca)return _finMsg(k);var b=biaLista().filter(function(x){return x.k===k;})[0];return b?biaMsg(b):_finMsg(k);};
+/* Bia aparece na aba Inove e nas Pendências */
+var _rInove=rInove;rInove=function(){var h=_rInove();if(INO.hist||!FIN.carregado||FIN.erro)return h;var i=h.indexOf('<div class="ino-pont">');return i<0?h:h.slice(0,i)+rBia('inove')+h.slice(i);};
+var _rFinPend=rFinPend;rFinPend=function(){return rBia('fin')+_rFinPend();};
+/* a Ana avisa da Bia no topo */
+var _pFrasesB=pFrases;pFrases=function(D){var L=_pFrasesB(D);try{if(pedAtivo()&&FIN.carregado&&!FIN.erro){var dev=biaLista().filter(function(b){return b.dias>0&&!b.prom;}),cr=dev.filter(function(b){return b.f[0]==='critico';}).length;
+  if(dev.length)L.splice(1,0,'A Bia avisa: '+dev.length+' cliente'+(dev.length>1?'s':'')+' com pagamento atrasado'+(cr?', '+cr+' em situação crítica':'')+'. Veja em Financeiro › Pendências.');}}catch(e){}return L;};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
