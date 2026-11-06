@@ -1103,6 +1103,13 @@ body:has(#neg-ov) .vt-b{display:none}
 .finhl b{text-transform:capitalize}.finhl small{grid-column:1/-1;color:var(--muted)}.finhl em{color:var(--bad);font-style:normal;font-weight:700}
 .finbar{display:block;height:12px;width:var(--w);min-width:6px;border-radius:8px;background:color-mix(in srgb,var(--bad) 25%,var(--surface));overflow:hidden}.finbar i{display:block;height:100%;width:var(--p);background:var(--ok)}
 @media (max-width:720px){.finli{grid-template-columns:1fr 1fr 1fr;row-gap:6px}.finli .finli-n{grid-column:1/-1}.finli .pill{grid-column:1/-1;justify-self:start}.finli.finpend{grid-template-columns:1fr auto}.finhl{grid-template-columns:110px 1fr}}
+
+/* conta espelho */
+.esp-li{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.esp-li>div:first-child{display:grid}.esp-li small{color:var(--muted)}
+#rl-bar .rl-esp{font-weight:600}
+#esp-nome{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;background:var(--surface);color:inherit}
+body.espelho #rl-bar{background:#4B2A99}
+body.espelho [data-act=pedNovo],body.espelho [data-act=cliNovo],body.espelho [data-act=finNovoAbre],body.espelho [data-act=pedCadistas],body.espelho .finpagnovo,body.espelho [data-act=finMesSalva],body.espelho [data-act=finMesApaga],body.espelho [data-act=pedSalva],body.espelho [data-act=pedApaga],body.espelho [data-act=cliSalva],body.espelho [data-act=cliApaga],body.espelho .pcard-f .btn,body.espelho [data-act=finComSaca],body.espelho [data-act=finCfgSalva],body.espelho [data-act=negTabCat],body.espelho .tbl-x,body.espelho .finextr label,body.espelho [data-act=finPagAnula],body.espelho [data-act=pUpgrade]{display:none!important}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -2997,11 +3004,11 @@ function negSwitch(){return '';}
 /* ===== Menu da conta (avatar) + Configurações ===== */
 function cfgMenuHtml(D){var em=(typeof RL!=='undefined'&&RL.user&&RL.user.email)||S.cad.email||'';
   return '<div class="cfg-m" role="menu"><div class="cfg-h"><b>'+esc(D.nome||S.cad.nome||'Você')+'</b><small>'+esc(em)+'</small></div>'+
-    [['conta','👤','Minha conta'],['perfil','📄','Meu currículo'],S.neg?['empresa',negT().ic,'Minha empresa']:null,S.neg&&negEhLab(S.neg)?['tabela','💲','Tabela de preços']:null,['armaz','💾','Armazenamento utilizado']].filter(Boolean).map(function(x){return '<button role="menuitem" data-act="cfgVai" data-v="'+x[0]+'"><span>'+x[1]+'</span>'+x[2]+'</button>';}).join('')+
+    [['conta','👤','Minha conta'],['perfil','📄','Meu currículo'],S.neg?['empresa',negT().ic,'Minha empresa']:null,S.neg&&negEhLab(S.neg)?['tabela','💲','Tabela de preços']:null,S.neg&&!ESP.dono?['espelho','🪞','Conta espelho']:null,['armaz','💾','Armazenamento utilizado']].filter(Boolean).map(function(x){return '<button role="menuitem" data-act="cfgVai" data-v="'+x[0]+'"><span>'+x[1]+'</span>'+x[2]+'</button>';}).join('')+
     (S.neg?'':'<button role="menuitem" data-act="pUpgrade"><span>🏢</span>Criar minha empresa</button>')+
     (typeof RL!=='undefined'&&RL.user?'<button role="menuitem" data-rl="sair" class="cfg-sair"><span>↩</span>Sair</button>':'')+'</div>';}
-function rConfig(){var a=S.cfgAba||'conta',N=S.neg,abas=[['conta','Minha conta'],N?['empresa','Minha empresa']:null,N&&negEhLab(N)?['tabela','Tabela de preços']:null,['armaz','Armazenamento']].filter(Boolean),corpo;
-  if(a==='tabela'&&N)corpo=rNegTabela(N);else if(a==='empresa'&&N)corpo=rCfgEmpresa(N);else if(a==='armaz')corpo=rCfgArmaz();else corpo=rCfgConta();
+function rConfig(){var a=S.cfgAba||'conta',N=S.neg,abas=[['conta','Minha conta'],N?['empresa','Minha empresa']:null,N&&negEhLab(N)?['tabela','Tabela de preços']:null,N&&!ESP.dono?['espelho','Conta espelho']:null,['armaz','Armazenamento']].filter(Boolean),corpo;
+  if(a==='tabela'&&N)corpo=rNegTabela(N);else if(a==='empresa'&&N)corpo=rCfgEmpresa(N);else if(a==='armaz')corpo=rCfgArmaz();else if(a==='espelho'&&N&&!ESP.dono)corpo=rCfgEspelho();else corpo=rCfgConta();
   return '<div class="dp2 cfg"><div class="cfg-top"><button class="btn sm" data-act="cfgSai">← Voltar ao painel</button><h1>Configurações</h1></div>'+
     '<nav class="dabas" role="tablist">'+abas.map(function(x){return '<button role="tab" aria-selected="'+(a===x[0])+'" data-act="cfgVai" data-v="'+x[0]+'"><span>'+x[1]+'</span></button>';}).join('')+'</nav><div class="dcont">'+corpo+'</div></div>';}
 function rCfgConta(){var R=typeof RL!=='undefined'?RL:{},p=R.perfil||{},c=S.cad,em=(R.user&&R.user.email)||c.email||'';
@@ -3150,14 +3157,14 @@ function rlBarra(){var b=document.getElementById('rl-bar');if(!RL.user){if(b)b.r
 /* ===================== EMPRESA DE VERDADE (etapa 1): negócio, clientes e tabela de preços no banco ===================== */
 var EMP={row:null,cli:[],precSnap:{},carregado:false,erro:'',busy:false,ed:null,busca:'',filtro:'ativos',t:null};
 function empCarrega(){if(!RL.user)return Promise.resolve();
-  return Promise.all([SB.from('odo_empresas').select('*').eq('user_id',RL.user.id).maybeSingle(),SB.from('odo_clientes').select('*').eq('user_id',RL.user.id).order('nome'),SB.from('odo_precos').select('*').eq('user_id',RL.user.id).order('ordem')]).then(function(r){
+  return Promise.all([SB.from('odo_empresas').select('*').eq('user_id',donoId()).maybeSingle(),SB.from('odo_clientes').select('*').eq('user_id',donoId()).order('nome'),SB.from('odo_precos').select('*').eq('user_id',donoId()).order('ordem')]).then(function(r){
     if(r[0].error){EMP.erro=/odo_empresas/.test(r[0].error.message||'')?'falta042':'erro';EMP.carregado=true;return;}
     EMP.erro='';EMP.carregado=true;EMP.row=r[0].data||null;EMP.cli=r[1].data||[];
     if(EMP.row){var d=EMP.row.dados||{};S.neg={tipo:EMP.row.tipo,nome:EMP.row.nome,uf:EMP.row.uf||'',cid:EMP.row.cidade||'',papel:EMP.row.papel||'faz',rt:EMP.row.rt||'',dono:RL.perfil&&RL.perfil.nome||'',
       servs:(r[2].data||[]).map(function(p){return [p.nome,p.valor==null?'':String(p.valor).replace('.',','),p.prazo==null?'':String(p.prazo)];}),eq:d.eq||[],vagas:d.vagas||[],criado:String(EMP.row.criado_em).slice(0,10),aba:(S.neg&&S.neg.aba)||'inicio'};
       EMP.precSnap={};(r[2].data||[]).forEach(function(p){EMP.precSnap[p.nome]=JSON.stringify([p.valor,p.prazo,p.grupo,p.ordem]);});
       try{localStorage.removeItem('io_neg_v1');}catch(e){}negRede();}
-    else if(S.neg){empCria();}});}
+    else if(S.neg&&!ESP.dono){empCria();}});}
 function num(v){var x=String(v==null?'':v).replace(/\./g,'').replace(',','.').trim();if(x==='')return null;var n=+x;return isFinite(n)&&n>=0?Math.round(n*100)/100:null;}
 function empCria(){var N=S.neg;if(!RL.user||!N)return;SB.from('odo_empresas').insert({user_id:RL.user.id,tipo:N.tipo,nome:N.nome,uf:N.uf||null,cidade:N.cid||null,papel:N.papel||null,rt:N.rt||null,dados:{eq:N.eq||[],vagas:N.vagas||[]}}).select('*').single().then(function(r){
   if(r.error){toast(/odo_empresas/.test(r.error.message||'')?'Falta rodar a atualização 042 para salvar a empresa no banco.':'Não consegui salvar a empresa agora.');return;}EMP.row=r.data;empSalvaPrecos();toast('Empresa salva na sua conta.');});}
@@ -3212,7 +3219,7 @@ var PEDST={orcamento:['Orçamento','#E8A33A'],desenho:['Desenho CAD a fazer','#7
 var PEDCOL=['desenho','producao','finalizado','entregue'];
 var PED={L:[],cad:[],carregado:false,erro:'',f:'todos',vista:'quadro',st:'ativos',busca:'',ed:null,busy:false,erroF:'',vcad:false,mais:100};
 function pedAtivo(){return typeof RL!=='undefined'&&!!RL.user&&!!S.neg&&negEhLab(S.neg);}
-function pedCarrega(){if(!RL.user)return Promise.resolve();var uid=RL.user.id,out=[];
+function pedCarrega(){if(!RL.user)return Promise.resolve();var uid=donoId(),out=[];
   function pg(i){return SB.from('odo_pedidos').select('*').eq('user_id',uid).eq('apagado',false).order('numero',{ascending:false}).range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data||[]);if((r.data||[]).length===1000)return pg(i+1000);});}
   return Promise.all([pg(0),SB.from('odo_cadistas').select('*').eq('user_id',uid).order('nome')]).then(function(r){if(r[1].error)throw r[1].error;PED.L=out;PED.cad=r[1].data||[];PED.erro='';PED.carregado=true;render();})
     .catch(function(e){PED.carregado=true;PED.erro=/odo_pedidos|odo_cadistas/.test((e&&e.message)||'')?'falta043':'erro';render();});}
@@ -3349,9 +3356,9 @@ var _pFrases=pFrases;pFrases=function(D){if(!pedAtivo()||!PED.carregado||PED.err
 var MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 var FIN={M:[],P:[],C:[],cfg:null,carregado:false,erro:'',ano:0,mes:0,aba:'mes',ed:null,busy:false,cob:null,novo:false};
 function fmtR(v){return 'R$ '+(Math.round((+v||0)*100)/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function finTodos(t,q){var out=[];function pg(i){return q(SB.from(t).select('*').eq('user_id',RL.user.id)).range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data||[]);if((r.data||[]).length===1000)return pg(i+1000);return out;});}return pg(0);}
+function finTodos(t,q){var out=[];function pg(i){return q(SB.from(t).select('*').eq('user_id',donoId())).range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data||[]);if((r.data||[]).length===1000)return pg(i+1000);return out;});}return pg(0);}
 function finCarrega(){if(!RL.user)return Promise.resolve();
-  return Promise.all([finTodos('odo_fin_meses',function(q){return q.order('ano').order('mes');}),finTodos('odo_fin_pagamentos',function(q){return q.order('criado_em');}),SB.from('odo_fin_config').select('*').eq('user_id',RL.user.id).maybeSingle(),SB.from('odo_fin_comissoes').select('*').eq('user_id',RL.user.id).order('data',{ascending:false})]).then(function(r){
+  return Promise.all([finTodos('odo_fin_meses',function(q){return q.order('ano').order('mes');}),finTodos('odo_fin_pagamentos',function(q){return q.order('criado_em');}),SB.from('odo_fin_config').select('*').eq('user_id',donoId()).maybeSingle(),SB.from('odo_fin_comissoes').select('*').eq('user_id',donoId()).order('data',{ascending:false})]).then(function(r){
     if(r[2].error)throw r[2].error;FIN.M=r[0];FIN.P=r[1];FIN.cfg=r[2].data||{chave_pix:'',email_resumo:RL.user.email,comissao_pct:10,msg_cobranca:''};FIN.C=r[3].data||[];FIN.erro='';FIN.carregado=true;
     if(!FIN.ano){var u=FIN.M.reduce(function(a,m){var k=m.ano*100+m.mes;return k>a?k:a;},0),d=new Date();FIN.ano=u?Math.floor(u/100):d.getFullYear();FIN.mes=u?u%100:d.getMonth()+1;}render();})
   .catch(function(e){FIN.carregado=true;FIN.erro=/odo_fin/.test((e&&e.message)||'')?'falta044':'erro';render();});}
@@ -3482,6 +3489,53 @@ document.addEventListener('change',function(e){var t=e.target;if(t.id==='fx-arq'
   finTrocaArq(f,'extratos/'+m.ano+'-'+String(m.mes).padStart(2,'0')).then(function(path){return SB.from('odo_fin_meses').update({extrato_path:path,extrato_recebido:true}).eq('id',m.id).select('*').single().then(function(r){if(r.error){SB.storage.from('odonto-fin').remove([path]);toast('Não consegui salvar o extrato.');return;}finAtual(r.data);if(velho)SB.storage.from('odonto-fin').remove([velho]);render();toast('Extrato anexado.');});}).catch(function(){});}});
 var _rPTrava=rPTrava;rPTrava=function(q){if(q==='financeiro'&&typeof pedAtivo==='function'&&pedAtivo())return rFin();return _rPTrava(q);};
 
+/* ===== Conta espelho: o parceiro (ex.: Inove) vê tudo da conta do dono, sem editar nada ===== */
+var ESP={dono:null,nome:'',lista:[],proprio:null};
+function donoId(){return ESP.dono||(RL.user&&RL.user.id);}
+function espLS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}return null;}
+(function(){var m=location.search.match(/[?&]espelho=([a-f0-9]{64})/);if(m){espLS('io_esp_token',m[1]);try{history.replaceState(null,'',location.pathname);}catch(e){}
+  setTimeout(function(){toast('Convite de conta espelho: entre ou crie o seu login para aceitar.');},600);}})();
+function espPrepara(){var u=RL.user;if(!u)return Promise.resolve();var tk=espLS('io_esp_token');
+  var p=tk?SB.rpc('odo_parceiro_aceita',{p_token:tk}).then(function(r){espLS('io_esp_token',null);if(r.error)toast(/inv[aá]lido|vencido|cancelado/i.test(r.error.message||'')?'Este convite não vale mais. Peça um novo.':'Não consegui aceitar o convite.');else{espLS('io_esp_dono',r.data);toast('Convite aceito! Você está vendo a conta espelho.');}}):Promise.resolve();
+  return p.then(function(){return SB.from('odo_parceiros').select('dono_id,nome,aceito_em').eq('parceiro_id',u.id).eq('ativo',true);}).then(function(r){
+    if(!r||r.error||!(r.data||[]).length){ESP.lista=[];ESP.dono=null;return;}ESP.lista=r.data;
+    return SB.from('odo_empresas').select('user_id,nome').in('user_id',r.data.map(function(x){return x.dono_id;})).then(function(e){(e.data||[]).forEach(function(x){ESP.lista.forEach(function(l){if(l.dono_id===x.user_id)l.emp=x.nome;});});
+      var esc0=espLS('io_esp_dono'),ok=ESP.lista.filter(function(l){return l.dono_id===esc0;})[0];if(!ok&&esc0==='eu')return;if(!ok&&RL.perfil)return;ok=ok||ESP.lista[0];
+      return SB.from('odo_perfis').select('*').eq('user_id',ok.dono_id).maybeSingle().then(function(pp){if(!pp.data){return;}ESP.dono=ok.dono_id;ESP.nome=ok.emp||'laboratório';ESP.proprio=RL.perfil;RL.perfil=pp.data;document.body.classList.add('espelho');});});});}
+var _rlBarra=rlBarra;rlBarra=function(){_rlBarra();var b=document.getElementById('rl-bar');if(!b||!RL.user)return;
+  if(ESP.dono){b.innerHTML='<span class="rl-esp">🪞 Conta espelho de <b>'+esc(ESP.nome)+'</b> · só leitura</span><span class="spacer"></span>'+(ESP.proprio?'<button data-act="espTroca" data-v="eu">Minha conta</button>':'')+'<button data-rl="sair">Sair</button>';}
+  else if(ESP.lista.length){var x=document.createElement('button');x.dataset.act='espTroca';x.dataset.v=ESP.lista[0].dono_id;x.textContent='🪞 Ver '+(ESP.lista[0].emp||'conta espelho');b.insertBefore(x,b.lastChild);}};
+/* nada se grava no modo espelho (o banco também recusa) */
+var ESP_ESCRITA=['cliNovo','cliSalva','cliApaga','pedNovo','pedSalva','pedApaga','pedAprova','pedDesFeito','pedInove','pedPronto','pedEntrega','pedCadNovo','pedCadAtivo','pedTipo','pedCalc',
+  'finNovoAbre','finNovoSalva','finMesSalva','finMesApaga','finCred','finPagNovo','finPagAnula','finCfgSalva','finComSaca','finResumoTeste','negTabCat','negServNovo','negServTira','negApaga','negIr','pUpgrade','cfgSenha','espNovo','espCorta','espVolta','espApaga'];
+ESP_ESCRITA.forEach(function(k){var f=ACT[k];if(typeof f!=='function')return;ACT[k]=function(){if(ESP.dono){toast('🪞 Conta espelho: aqui é só para acompanhar, sem editar.');return;}return f.apply(this,arguments);};});
+var _negSalvaE=negSalva;negSalva=function(){if(ESP.dono)return;return _negSalvaE.apply(this,arguments);};
+var _rlSalvaPfE=rlSalvaPf;rlSalvaPf=function(){if(ESP.dono)return;return _rlSalvaPfE.apply(this,arguments);};
+document.addEventListener('change',function(e){if(ESP.dono&&e.target&&e.target.type==='file'){e.stopImmediatePropagation();e.target.value='';toast('🪞 Conta espelho: só leitura.');}},true);
+/* dono: convidar e cortar o acesso */
+var ESPO={L:null,erro:''};
+function espLink(t){return location.origin+location.pathname.replace(/index\.html$/,'')+'?espelho='+t;}
+function espCarrega(){SB.from('odo_parceiros').select('*').eq('dono_id',RL.user.id).order('criado_em').then(function(r){if(r.error){ESPO.erro=/odo_parceiros/.test(r.error.message||'')?'falta046':'erro';ESPO.L=[];}else{ESPO.erro='';ESPO.L=r.data||[];}render();});}
+function rCfgEspelho(){if(!RL.user)return '';if(ESPO.L===null){ESPO.L=false;espCarrega();}
+  if(!ESPO.L)return '<div class="empty">Carregando…</div>';
+  if(ESPO.erro==='falta046')return '<section class="card"><h2>🪞 Conta espelho</h2><p>Falta rodar a atualização 046 no Supabase.</p></section>';
+  return '<section class="card cfg-c"><h2>🪞 Conta espelho</h2><p class="small muted">Um parceiro (por exemplo, a Inove) entra com o login dele e <b>vê tudo</b> da sua conta: clientes, pedidos, Ordens CAD, financeiro, comprovantes e comissão. <b>Ele não consegue editar nada</b>: o banco recusa. Você corta o acesso quando quiser.</p>'+
+    (ESPO.L.length?ESPO.L.map(function(p){var venc=!p.parceiro_id&&new Date(p.expira_em)<new Date(),st=!p.ativo?'⛔ acesso cortado':p.parceiro_id?'✅ conectado desde '+new Date(p.aceito_em).toLocaleDateString('pt-BR'):venc?'⌛ convite vencido':'⏳ esperando aceitar (vale até '+new Date(p.expira_em).toLocaleDateString('pt-BR')+')';
+      return '<div class="esp-li"><div><b>'+esc(p.nome)+'</b><small>'+st+'</small></div><div class="row wrap">'+(!p.parceiro_id&&p.ativo&&!venc?'<button class="btn sm" data-act="espCopia" data-v="'+p.id+'">Copiar link</button><a class="btn sm" href="https://wa.me/?text='+encodeURIComponent('Convite para acompanhar a conta do '+((S.neg&&S.neg.nome)||'laboratório')+' no Ideali Odonto (só leitura). Abra e entre ou crie o seu login: '+espLink(p.token))+'" target="_blank" rel="noopener">WhatsApp</a>':'')+
+        (p.ativo&&p.parceiro_id?'<button class="btn sm danger" data-act="espCorta" data-v="'+p.id+'">Cortar acesso</button>':'')+(!p.ativo&&p.parceiro_id?'<button class="btn sm" data-act="espVolta" data-v="'+p.id+'">Devolver acesso</button>':'')+'<button class="btn sm" data-act="espApaga" data-v="'+p.id+'" aria-label="Apagar">🗑</button></div></div>';}).join(''):'<p class="small muted">Nenhum parceiro ainda.</p>')+
+    '<div class="row wrap" style="margin-top:12px;gap:8px"><input id="esp-nome" maxlength="80" placeholder="Nome do parceiro (ex.: Inove)" style="flex:1 1 200px"><button class="btn pri" data-act="espNovo">+ Criar convite</button></div>'+
+    '<p class="small muted">O link vale por 7 dias e só pode ser usado por uma pessoa.</p></section>';}
+function espAch(v){return (ESPO.L||[]).filter(function(x){return x.id===v;})[0];}
+Object.assign(ACT,{
+  espTroca:function(v){espLS('io_esp_dono',v);location.reload();},
+  espNovo:function(){var i=document.getElementById('esp-nome'),n=i?i.value.trim():'';if(n.length<2){toast('Digite o nome do parceiro.');return;}
+    SB.from('odo_parceiros').insert({dono_id:RL.user.id,nome:n}).select('*').single().then(function(r){if(r.error){toast('Não consegui criar o convite.');return;}ESPO.L.push(r.data);render();ACT.espCopia(r.data.id);});},
+  espCopia:function(v){var p=espAch(v);if(!p)return;try{navigator.clipboard.writeText(espLink(p.token)).then(function(){toast('Link do convite copiado. Mande para o parceiro.');});}catch(e){prompt('Copie o link:',espLink(p.token));}},
+  espCorta:function(v){var p=espAch(v);if(!p||!confirm('Cortar o acesso de '+p.nome+'? Ele deixa de ver a sua conta na hora.'))return;SB.from('odo_parceiros').update({ativo:false}).eq('id',v).select('*').single().then(function(r){if(r.error){toast('Não consegui.');return;}Object.assign(p,r.data);render();toast('Acesso cortado.');});},
+  espVolta:function(v){var p=espAch(v);if(!p)return;SB.from('odo_parceiros').update({ativo:true}).eq('id',v).select('*').single().then(function(r){if(r.error){toast('Não consegui.');return;}Object.assign(p,r.data);render();toast('Acesso devolvido.');});},
+  espApaga:function(v){var p=espAch(v);if(!p||!confirm('Apagar '+p.nome+'? Se estiver conectado, perde o acesso.'))return;SB.from('odo_parceiros').delete().eq('id',v).then(function(r){if(r.error){toast('Não consegui.');return;}ESPO.L=ESPO.L.filter(function(x){return x.id!==v;});render();});}});
+ESP_ESCRITA.slice(-4).forEach(function(k){var f=ACT[k];ACT[k]=function(){if(ESP.dono){toast('🪞 Conta espelho: só leitura.');return;}return f.apply(this,arguments);};});
+
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
   var z=function(D,f){if(!D||!D.exemplo)return;f(D);D.exemplo=false;D.conv=[{de:'ana',t:'Seu painel está pronto. Me peça para anotar o que precisar.'}];};
@@ -3500,6 +3554,6 @@ var _render0=render;render=function(){try{rlZera();rlZera2();}catch(e){}return _
     Promise.all([SB.from('odo_perfis').select('*').eq('user_id',u.id).maybeSingle(),SB.rpc('sou_admin'),SB.from('perfis').select('nome,telefone').eq('user_id',u.id).maybeSingle()]).then(function(r){
       if(r[0].error)toast('O banco do Ideali Odonto precisa da atualização 040.');
       RL.perfil=r[0].data||null;RL.admin=!!r[1].data;var cp=r[2].data||{};RL.cadNome=cp.nome||'';RL.cadTel=cp.telefone||'';
-      rlBarra();empCarrega().then(function(){rlEntra();pedCarrega();finCarrega();});});});})();
+      espPrepara().catch(function(){}).then(function(){rlBarra();empCarrega().then(function(){rlEntra();pedCarrega();finCarrega();});});});});})();
 
 </script>
