@@ -2964,7 +2964,9 @@ function rNegVagas(N,T){var areas=N.tipo==='escola'?['Estágio','Corporativo']:[
 function rNegVazio(a,T){var V=NEG_VAZIO[a]||['🧩','Em breve',''],nm=(T.abas.filter(function(x){return x[0]===a;})[0]||[a,a])[1];
   return '<div class="dtop"><div><h2>'+esc(nm)+'</h2></div></div><section class="ptrava neg-vz"><div class="neg-vz-ic">'+V[0]+'</div><h2>'+esc(V[1])+'</h2><p>'+esc(V[2])+'</p><span class="pill warn">tela de exemplo no protótipo</span></section>';}
 
-Object.assign(ACT,NEG_ACT);S.neg=negCarrega();if(S.neg)negRede();
+Object.assign(ACT,NEG_ACT);S.neg=negCarrega();(function(){var N=S.neg;if(!negEhLab(N))return;var VELHOS=['Coroa em zircônia','Coroa metalocerâmica','Faceta em dissilicato','Prótese total','PPR','Protocolo sobre implante','Provisórios','Placa miorrelaxante','Modelos','Fresagem de zircônia','Fresagem de PMMA','Impressão de modelos','Impressão de guias cirúrgicos','Impressão de provisórios','Projeto CAD','Escaneamento de modelos'];
+  if(N.servs.some(function(x){return TAB_LAB.some(function(t){return t[1]===x[0];});}))return;
+  N.servs=N.servs.filter(function(x){return VELHOS.indexOf(x[0])<0||(x[1]!==''&&x[1]!=null);}).concat(TAB_LAB.map(function(t){return [t[1],'',''];}));negSalva();})();if(S.neg)negRede();
 document.addEventListener('change',function(e){var t=e.target;if(t.id==='ng-uf'&&S.negF){negLe();S.negF.r.uf=t.value;S.negF.r.cid='';negAbre();var c=$('ng-cid');if(c)c.focus();}});
 document.addEventListener('input',function(e){var t=e.target;if(t.classList&&S.neg){if(t.classList.contains('neg-preco')){S.neg.servs[+t.dataset.ns][1]=t.value;negSalva();}else if(t.classList.contains('neg-prazo')){S.neg.servs[+t.dataset.ns][2]=t.value;negSalva();}}});
 document.addEventListener('keydown',function(e){if(e.key!=='Enter')return;var id=e.target.id,m={'ng-outro':'negAdd','ng-eqn':'negEqAdd','ns-novo':'negServNovo','ne-n':'negEq','nv-cargo':'negVaga'}[id];if(m){e.preventDefault();ACT[m]();}else if((id==='ng-nome'||id==='ng-cid'||id==='ng-rt')&&S.negF){e.preventDefault();ACT.negOk();}});
