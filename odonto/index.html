@@ -892,6 +892,16 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .ddz-pix{display:none;font-size:.82rem;font-weight:700;color:#0f5a3a;line-height:1.5}.ddz-pix.in{display:block;animation:flTx .5s}
 @media (max-width:860px){.cim-b{padding:10px}.cim-c{padding:8px;gap:8px}.cim-av{width:38px;height:38px;font-size:.8rem}.cim-i{font-size:.72rem}.cim-i b{font-size:.86rem}.cim-i em{display:inline-block;white-space:nowrap}.cim-w .wbar{font-size:.8rem}.cim-t{font-size:.9rem}.cim-c button{padding:7px 10px;font-size:.74rem}.cim-k{font-size:.76rem;padding:5px 8px}.cim-f{display:none}
  .ddz-b{grid-template-columns:1fr;gap:8px;padding:10px}.ddz-e{grid-template-columns:14px 44px 1fr;gap:6px;padding:3px 6px}.ddz-e small{display:none}.ddz-e b{font-size:.8rem}.ddz-h{font-size:.72rem}.ddz-push{display:none}.ddz-av{padding:8px}.ddz-st{font-size:1.3rem}.ddz-pix{font-size:.72rem}}
+
+.cim-st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;position:relative}
+.cim-e{display:grid;justify-items:center;text-align:center;gap:3px;padding:10px 6px;border-radius:12px;background:#F7F4EE;color:#9a8a6a;transition:.4s}
+.cim-e i{width:26px;height:26px;border-radius:50%;border:3px solid #D7C9AE;background:#fff}
+.cim-e b{color:#7a6a4c}.cim-e small{font-size:.74rem}
+.cim-e.ok{background:#E3F7F0;color:#0f5a3a}.cim-e.ok i{background:#1DAE8A;border-color:#1DAE8A;animation:flTx .4s}.cim-e.ok i::before{content:"✓";color:#fff;font-style:normal;font-weight:800;display:grid;place-items:center;height:100%;font-size:.8rem}.cim-e.ok b{color:#0f5a3a}
+.cim-aval{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#FFF8E8;border:1.5px solid #E8C77A;border-radius:12px;padding:8px 12px;color:#2a2418;font-weight:700;opacity:0;transition:.4s}.cim-aval.in{opacity:1}
+.cim-sts{display:flex;gap:2px;font-size:1.5rem;color:#D7C9AE}.cim-sts b.on{color:#F0B429}
+.cim-aval em{font-style:normal;color:#0f5a3a;opacity:0;transition:.3s}.cim-aval em.in{opacity:1}
+@media (max-width:860px){.cim-e{padding:6px 4px}.cim-e small{display:none}.cim-e b{font-size:.78rem}.cim-sts{font-size:1.2rem}.cim-aval{font-size:.8rem;padding:6px 8px}}
 </style>
 <body>
 <header class="top">
@@ -1397,31 +1407,19 @@ var CENAS=[
    clica('#hire',4200,function(){var b=$('#hire');if(b){b.textContent='✓ Pedido criado';b.classList.add('on');}var i=$('#hi0');if(i)i.classList.add('sel');var o=$('#hiok');if(o)o.classList.add('in');});
    falas([[0,'A Maria quebrou a faceta que fez <b>em 2019</b>. Antes? Ninguém lembrava a cor, o material, nada.'],[4600,'Agora fica tudo no <b>histórico do paciente</b>. Um toque e o pedido sai <b>igualzinho</b>, até com o arquivo 3D.']]);}},
 
- {cap:'Carga imediata: quem chamar',pt:3,who:'ot',p:'serio',d:16500,lab:1,h:'<div class="sc"><div class="cim">'+
+ {cap:'Carga imediata: quem chamar',pt:3,who:'ot',p:'serio',d:16000,lab:1,h:'<div class="sc"><div class="cim">'+
    '<div class="win cim-w fx"><div class="wbar">🦷 Carga imediata · protocolo superior · José Almeida · sex 20, 8h</div><div class="cim-b">'+
     '<div class="cim-t">⭐ Protéticos indicados para a sua carga imediata</div><div class="cim-l" id="ciml">'+
     [['Carlos Mendes','CM','#B0762A','23 cargas imediatas pela Ideali','4,9 · 31 avaliações de clínicas','6 km','Mais indicado'],
      ['Renata Duarte','RD','#5B45E0','15 cargas imediatas pela Ideali','4,8 · 19 avaliações de clínicas','11 km',''],
      ['Lucas Prado','LP','#1DAE8A','4 cargas imediatas pela Ideali','5,0 · 4 avaliações de clínicas','3 km','🌱 Novo em carga imediata']].map(function(c,i){return '<div class="cim-c fx'+(i===0?' cim-top':'')+'" id="cimc'+i+'"><span class="cim-av" style="background:'+c[2]+'">'+c[1]+'</span><div class="cim-i"><b>'+c[0]+(c[6]?' <em>'+c[6]+'</em>':'')+'</b><span>⚡ '+c[3]+'</span><span>⭐ '+c[4]+'</span><span>📍 '+c[5]+' · ✓ livre sex 20</span></div><button'+(i===0?' id="cimbt"':'')+'>Convidar</button></div>';}).join('')+
-    '</div><div class="cim-ck" id="cimck"><div class="cim-ok">✓ <b>Carlos aceitou</b> · sex 20, 8h · valor por arcada combinado</div>'+
-     [['ok','Prova de dentes aprovada'],['ok','Sistema de implante informado'],['av','Faltam 2 cilindros provisórios → pedido à Dental Exemplo · chega quinta'],['ok','Kit do protético e bancada da clínica confirmados']].map(function(c,i){return '<div class="cim-k" id="cimk'+i+'"><i class="'+c[0]+'"></i>'+c[1]+'</div>';}).join('')+
-    '</div><small class="cim-f">Indicação pela experiência e pela avaliação de clínicas que contrataram · dados de exemplo</small></div></div></div></div>',
+    '</div><div class="cim-ck" id="cimck"><div class="cim-st">'+[['Solicitado','sex 20, 8h'],['Aceito','Carlos confirmou'],['Finalizado','prótese instalada']].map(function(e,i){return '<div class="cim-e" id="cime'+i+'"><i></i><b>'+e[0]+'</b><small>'+e[1]+'</small></div>';}).join('')+'</div>'+
+    '<div class="cim-aval" id="cimav"><span>Avaliar o Carlos:</span><span class="cim-sts"><b>★</b><b>★</b><b>★</b><b>★</b><b id="cim5">★</b></span><em id="cimpx">✓ Pix enviado</em></div></div><small class="cim-f">Indicação pela experiência e pela avaliação de clínicas que contrataram · dados de exemplo</small></div></div></div></div>',
   go:function(){inn('.fx',150,300);
    clica('#cimbt',4400,function(){var b=$('#cimbt');if(b){b.textContent='✓ Convidado';b.classList.add('on');}
-     at(900,function(){var l=$('#ciml');if(l)l.classList.add('min');var c=$('#cimck');if(c)c.classList.add('in');$$('.cim-k').forEach(function(k,i){at(500+i*700,function(){k.classList.add('in');});});var ms=$('.mouse');if(ms)ms.remove();});});
-   falas([[0,'Carga imediata é coisa séria: <b>poucos protéticos fazem bem</b>. E se der errado, é o paciente sem dente na cadeira.'],[4600,'Por isso o sistema <b>indica os melhores</b>: quem mais fez carga imediata e quem as clínicas avaliaram melhor. E sempre abre espaço para quem está começando. 🌱'],[10200,'Convidei, ele aceitou, e o sistema já confere <b>tudo o que precisa no dia</b>. Faltou componente? Já pede na dental.']]);}},
-
- {cap:'Carga imediata ao vivo',pt:3,who:'ot',p:'satisfeito',d:17000,lab:1,h:'<div class="sc"><div class="ddz">'+
-   '<div class="win ddz-w fx"><div class="wbar">🔴 Ao vivo · carga imediata do José Almeida <span class="ddz-rel" id="ddrel">08:00</span></div><div class="ddz-b"><div class="ddz-tl">'+
-    [['08:00','Cirurgia começou','Dr. Otávio'],['09:40','4 implantes instalados','marca, medida, lote e torque registrados'],['10:10','Escaneamento enviado','direto para o protético'],['10:15','Protético trabalhando','Carlos · previsão 14h30'],['13:50','Prova da prótese','✓ aprovada'],['14:30','Prótese instalada 🎉','tudo no histórico e no certificado']].map(function(e,i){return '<div class="ddz-e" id="dde'+i+'"><i></i><span class="ddz-h">'+e[0]+'</span><div><b>'+e[1]+'</b><small>'+e[2]+'</small>'+(i===3?'<div class="ddz-pb"><b id="ddpb"></b></div>':'')+'</div></div>';}).join('')+
-    '</div><div class="ddz-sd"><div class="push ddz-push" id="ddp"><img src="../app/equipe/ana-av-feliz.webp" alt=""><div><b>Para a família do José</b><p>O sorriso dele fica pronto por volta das <b>14h30</b>. 😊</p></div></div>'+
-    '<div class="ddz-av" id="ddav"><b>Como foi o trabalho do Carlos?</b><div class="ddz-st" id="ddst"><span>★</span><span>★</span><span>★</span><span>★</span><span id="dd5">★</span></div><div class="ddz-pix" id="ddpix">✓ Pix enviado ao Carlos<br>✓ Retornos marcados: ajuste em 7 dias e prótese definitiva em alguns meses</div></div></div></div></div></div></div>',
-  go:function(){inn('.fx',100,250);var hrs=['08:00','09:40','10:10','10:15','13:50','14:30'];
-   [0,1,2,3,4,5].forEach(function(i){at(700+i*1500,function(){$$('.ddz-e').forEach(function(e,k){e.classList.toggle('at',k===i);if(k<i)e.classList.add('ok');});var e=$('#dde'+i);if(e)e.classList.add('in');var r=$('#ddrel');if(r)r.textContent=hrs[i];if(i===3){var pb=$('#ddpb');if(pb)pb.classList.add('go');}if(i===5){var e5=$('#dde5');if(e5){e5.classList.add('ok');e5.classList.remove('at');}}});});
-   at(4200,function(){var p=$('#ddp');if(p)p.classList.add('in');});
-   at(9400,function(){var a=$('#ddav');if(a)a.classList.add('in');});
-   clica('#dd5',9900,function(){$$('#ddst span').forEach(function(x){x.classList.add('on');});at(500,function(){var x=$('#ddpix');if(x)x.classList.add('in');});});
-   falas([[0,'E no dia, eu acompanho <b>tudo ao vivo</b>: cirurgia, implantes, escaneamento, o protético trabalhando…'],[5800,'A família na recepção sabe a hora certinha. E cada implante fica registrado: <b>marca, medida, lote e torque</b>.'],[10600,'Instalou? Eu avalio o protético, o <b>Pix sai</b> e os retornos já ficam marcados. Carga imediata sem susto. 💪']]);}},
+     at(900,function(){var l=$('#ciml');if(l)l.classList.add('min');var c=$('#cimck');if(c)c.classList.add('in');[0,1,2].forEach(function(k){at(300+k*1300,function(){var e=$('#cime'+k);if(e)e.classList.add('ok');});});at(4300,function(){var a=$('#cimav');if(a)a.classList.add('in');});});
+     clica('#cim5',4800,function(){$$('.cim-sts b').forEach(function(x){x.classList.add('on');});at(400,function(){var x=$('#cimpx');if(x)x.classList.add('in');});});});
+   falas([[0,'Carga imediata é coisa séria: <b>poucos protéticos fazem bem</b>. E se der errado, é o paciente sem dente na cadeira.'],[4600,'Por isso o sistema <b>indica os melhores</b>: quem mais fez carga imediata e quem as clínicas avaliaram melhor. E sempre abre espaço para quem está começando. 🌱'],[10200,'Convidei, ele aceitou. <b>Solicitado, aceito, finalizado.</b> Avaliei e o Pix já foi. Simples assim. 😎']]);}},
 
  {cap:'Atrasos e ajustes',pt:3,who:'ot',p:'bravo',d:13000,lab:1,h:'<div class="sc"><div class="sl">'+L('O laboratório que você usa × média dos outros · últimos 6 meses')+
    '<div class="mcmp"><div class="mh"><span></span><b>Seu laboratório</b><b>Média dos outros labs</b><span></span></div>'+
