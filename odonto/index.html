@@ -932,6 +932,27 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .agz-sl.ok{border-color:#1DAE8A;color:#0f7a5a;background:#E8F8F2}
 .agz-sl.try{border-color:#E0533A;color:#B3261E;background:#FFECE8;animation:agTr .12s 6}
 .agz-d.nao{box-shadow:inset 0 0 0 2px #E0533A}
+
+/* Prazo do laboratório */
+.pzl{width:100%;max-width:880px;display:grid;grid-template-columns:1.25fr 1fr;gap:16px;align-items:center}.pzl-w{max-width:none}
+.pzl-b{padding:10px 12px;display:grid;gap:7px}
+.pzl-o{background:#F7F4EE;border-radius:14px;padding:8px 12px;color:#2a2418;display:grid;gap:4px;border:2px solid transparent;transition:.4s}
+.pzl-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.pzl-o small{color:#7a6a4c;font-size:.76rem}
+.pzl-tg{font-size:.72rem;font-weight:800;border-radius:999px;padding:2px 9px;background:#E3F7F0;color:#0f7a5a;white-space:nowrap}
+.pzl-bar{position:relative;height:12px;border-radius:9px;background:#E8DFCC;overflow:hidden;margin-top:3px}
+.pzl-bar i{position:absolute;inset:0;background:#1DAE8A;transform-origin:left;transform:scaleX(0);transition:transform 1.4s cubic-bezier(.2,.8,.2,1),background .4s}.pzl-bar i.in{transform:scaleX(var(--v))}
+.pzl-bar s{position:absolute;top:0;bottom:0;width:2px;background:#F7F4EE;text-decoration:none}
+.pzl-d{font-style:normal;font-size:.74rem;font-weight:800;color:#7a6a4c;justify-self:end}
+.pzl-o.risco{border-color:#E0533A;background:#FFF1EE;animation:pzP 1s ease-in-out infinite}.pzl-o.risco .pzl-bar i{background:#E0533A}.pzl-o.risco .pzl-tg{background:#E0533A;color:#fff}.pzl-o.risco .pzl-d{color:#B3261E}
+@keyframes pzP{50%{box-shadow:0 0 0 6px rgba(224,83,58,.15)}}
+.pzl-o.garant{border-color:#1DAE8A}.pzl-o.garant .pzl-bar i{background:#1DAE8A}.pzl-o.garant .pzl-tg{background:#1DAE8A;color:#fff}
+.pzl-al{background:#fff;color:#2a2418;border:2px solid #E0533A;border-radius:18px;padding:14px;display:grid;gap:6px;box-shadow:0 24px 50px -10px rgba(0,0,0,.55);opacity:0;transform:translateX(30px) scale(.95);transition:.5s cubic-bezier(.2,1.4,.4,1)}.pzl-al.in{opacity:1;transform:none}
+.pzl-ah{justify-self:start;background:#E0533A;color:#fff;font:800 .78rem var(--f-mono);letter-spacing:.12em;border-radius:8px;padding:4px 10px;animation:pzA 1s steps(1) infinite}
+@keyframes pzA{50%{background:#B3261E}}
+.pzl-al p{margin:0;font-size:.9rem;line-height:1.45}.pzl-al p b{color:#B3261E}
+.pzl-to{font-size:.78rem;font-weight:700;color:#6a5d45;background:#F7F4EE;border-radius:10px;padding:6px 10px}
+.pzl-r{display:none;background:#E3F7F0;color:#0f4a33;border-radius:12px;padding:9px 12px;font-size:.9rem}.pzl-r.in{display:block;animation:flTx .5s}.pzl-r small{display:block;font-size:.7rem;font-weight:800;opacity:.75}
+@media (max-width:860px){.pzl{grid-template-columns:1fr;gap:8px}.pzl-b{padding:8px;gap:6px}.pzl-o{padding:7px 9px}.pzl-o small{display:none}.pzl-h b{font-size:.82rem}.pzl-al{padding:10px}.pzl-al p{font-size:.8rem}.pzl-to{display:none}}
 </style>
 <body>
 <header class="top">
@@ -1403,22 +1424,17 @@ var CENAS=[
  {cap:'IA vigiando as entregas',pt:3,who:'ot',p:'serio',d:11000,lab:1,h:'<div class="sc"><div class="alr">'+[['⚠️','#D2433A','Pedido #1043 vai atrasar 1 dia','O Lab Digital Centro ainda não iniciou a fresagem. Já avisei o lab e remarquei o paciente das 10h?'],['🕑','#B7791F','Prova da faceta chega hoje às 14h','Paciente C. M. confirmado às 15h. Está tudo encaixado.'],['✅','#1E8A5A','Coroa #1042 saiu para entrega','Previsão: amanhã cedo, dentro do prazo.'],['📈','#5B45E0','Lab Arte Dental: 3 entregas antecipadas este mês','Bom sinal. Ele está melhorando no prazo.']].map(function(a){return '<div class="al fx" style="--c:'+a[1]+'"><span>'+a[0]+'</span><div><b>'+a[2]+'</b><p>'+a[3]+'</p></div></div>';}).join('')+'</div></div>',
   go:function(){inn('.fx',200,700);falas([[0,'E tem uma <b>IA vigiando as entregas</b> 24 horas. Se um pedido vai atrasar, ela avisa <b>antes</b> do paciente chegar.'],[5400,'Prova chegando, trabalho saindo, lab melhorando ou piorando: <b>você fica sabendo de tudo.</b>']]);}},
 
- {cap:'Agenda × prazo do lab',pt:3,who:'ot',p:'serio',d:19000,lab:1,h:'<div class="sc"><div class="agz">'+
-   '<div class="win agz-w fx"><div class="wbar">📅 Agenda da clínica · marcar retorno da Maria Souza (coroa 46)</div><div class="agz-g">'+
-    ['Seg','Ter','Qua','Qui','Sex'].map(function(d,i){return '<div class="agz-d'+(i<3?' agz-bl':'')+'" id="agd'+i+'"><b>'+d+'</b>'+(i<3?'<div class="agz-lk">🔒 coroa ainda no lab</div>':'')+(i===1?'<div class="agz-sl" id="agsl">14h · livre</div>':'')+(i===3?'<div class="agz-lab in" id="aglab">🧪 Coroa 46 fica pronta</div><div class="agz-sl ok">a partir de 14h</div>':'')+(i===4?'<div class="agz-sl ok">✓ livre</div>':'')+'</div>';}).join('')+'</div>'+
-    '<div class="agz-al" id="agal"><b>⛔ Não dá para marcar na terça.</b><span>A coroa da Maria só fica pronta <b>quinta</b>. O sistema não deixa o paciente vir antes da prótese.</span><button id="agbt">⚡ Pedir ao laboratório para adiantar</button><button class="agz-2">Marcar quinta, 14h</button>'+
-     '<div class="agz-ch" id="agch"><div class="agz-m ia" id="agm0"><small>🤖 IA da clínica → Laboratório Exemplo</small>A coroa 46 da Maria Souza consegue ficar pronta até <b>terça, 11h</b>? A paciente pode vir às 14h.</div>'+
-     '<div class="agz-m dig" id="agdg"><i></i><i></i><i></i></div>'+
-     '<div class="agz-m lab" id="agm1"><small>🧪 Laboratório · resposta automática</small>✓ <b>Sim!</b> A bancada tem espaço. Entrego <b>terça, 11h</b>.</div></div></div>'+
-    '<div class="agz-wa" id="agwa">🛡️ <span><b>Retorno marcado: terça, 14h.</b> Se o laboratório atrasar, eu aviso <b>2 dias antes</b> e já sugiro um novo horário. Paciente nunca chega antes da prótese.</span></div></div></div></div>',
-  go:function(){inn('.fx',100,250);
-   clica('#agsl',2000,function(){var sl=$('#agsl');if(sl)sl.classList.add('try');var a=$('#agal');if(a)a.classList.add('in');var d=$('#agd1');if(d)d.classList.add('nao');});
-   clica('#agbt',6200,function(){var a=$('#agal');if(a)a.classList.add('chat');var ch=$('#agch');if(ch)ch.classList.add('in');
-     at(300,function(){var m=$('#agm0');if(m)m.classList.add('in');var ms=$('.mouse');if(ms)ms.remove();});at(1300,function(){var d=$('#agdg');if(d)d.classList.add('in');});
-     at(3100,function(){var d=$('#agdg');if(d)d.classList.remove('in');var m=$('#agm1');if(m)m.classList.add('in');});
-     at(5000,function(){var a2=$('#agal');if(a2)a2.classList.remove('in');var d1=$('#agd1'),l=$('#aglab'),sl=$('#agsl');[0,1,2].forEach(function(k){var x=$('#agd'+k);if(x){x.classList.remove('agz-bl','nao');var q=x.querySelector('.agz-lk');if(q)q.remove();}});var t3=$('#agd3 .agz-sl');if(t3)t3.textContent='✓ livre';
-       if(l&&d1){l.innerHTML='🧪 Coroa 46 pronta · 11h';l.classList.add('ok');d1.insertBefore(l,sl);}if(sl){sl.className='agz-c ok';sl.innerHTML='<small>14h</small>Maria Souza<em>cimentação da coroa 46</em>';}at(700,function(){var w=$('#agwa');if(w)w.classList.add('in');});});});
-   falas([[0,'Paciente na cadeira e a prótese ainda no laboratório? <b>Aqui isso não acontece.</b> 😤'],[2800,'A recepção tenta marcar a Maria na <b>terça</b>… e o sistema <b>trava</b>: a coroa só fica pronta quinta.'],[7600,'Quer na terça mesmo? A IA pergunta ao laboratório se dá para <b>adiantar</b>, e ele responde <b>na hora, automático</b>.'],[12800,'E se o lab atrasar depois, eu fico sabendo <b>2 dias antes</b>. Paciente nunca mais chega antes da prótese. 🛡️']]);}},
+ {cap:'Prazo do laboratório',pt:3,who:'ot',p:'serio',d:17500,lab:1,h:'<div class="sc"><div class="pzl">'+
+   '<div class="win pzl-w fx"><div class="wbar">⏱️ Prazos combinados com os laboratórios</div><div class="pzl-b">'+
+    [['Coroa 46 · Maria Souza','Laboratório Exemplo',7,6,'Cerâmica'],['Faceta 11 · Ana Lima','Laboratório Arte',5,3,'Prova'],['Protocolo · José Almeida','Laboratório Sul',10,2,'Montagem']].map(function(o,i){return '<div class="pzl-o" id="pzo'+i+'"><div class="pzl-h"><b>'+o[0]+'</b><span class="pzl-tg" id="pzt'+i+'">✓ no prazo</span></div><small>'+o[1]+' · prazo combinado: <b>'+o[2]+' dias úteis</b> · etapa: '+o[4]+'</small><div class="pzl-bar"><i style="--v:'+(o[3]/o[2])+'" id="pzb'+i+'"></i>'+Array.from({length:o[2]-1}).map(function(_,k){return '<s style="left:'+((k+1)/o[2]*100)+'%"></s>';}).join('')+'</div><em class="pzl-d" id="pzd'+i+'">dia '+o[3]+' de '+o[2]+'</em></div>';}).join('')+
+   '</div></div>'+
+   '<div class="pzl-al" id="pzal"><div class="pzl-ah">🚨 URGENTE</div><b>Coroa 46 · Maria Souza</b><p>O prazo de 7 dias úteis <b>termina amanhã</b> e o trabalho ainda está na <b>cerâmica</b>. Risco da paciente <b>não receber em dia</b>.</p><div class="pzl-to">Avisado: 🏥 clínica · 🧪 Laboratório Exemplo</div>'+
+    '<div class="pzl-r" id="pzr"><small>🧪 Laboratório respondeu em 12 min</small>✓ Garantido: <b>sai amanhã às 10h</b>, dentro do prazo.</div></div></div></div>',
+  go:function(){inn('.fx',100,250);at(700,function(){$$('.pzl-bar i').forEach(function(b){b.classList.add('in');});});
+   at(3200,function(){var o=$('#pzo0'),t=$('#pzt0');if(o)o.classList.add('risco');if(t)t.textContent='⚠️ risco de atraso';});
+   at(4600,function(){var a=$('#pzal');if(a)a.classList.add('in');});
+   at(10200,function(){var r=$('#pzr');if(r)r.classList.add('in');var o=$('#pzo0'),t=$('#pzt0');if(o){o.classList.remove('risco');o.classList.add('garant');}if(t)t.textContent='✓ confirmado pelo lab';});
+   falas([[0,'O que importa é o <b>prazo que o laboratório prometeu</b>. Falou 7 dias úteis? É 7 dias úteis. O sistema conta cada dia.'],[4800,'Chegou perto do fim e o trabalho parado? Alerta <b>URGENTE</b> para mim e para o lab: <b>risco do paciente não receber em dia</b>.'],[10600,'E o lab é obrigado a responder: <b>"vai dar"</b> ou <b>"vai atrasar"</b>. Ninguém mais descobre o atraso com o paciente na cadeira. 🛡️']]);}},
 
  {cap:'Rastreio do motoboy',pt:3,who:'ot',p:'satisfeito',d:14000,lab:1,h:'<div class="sc"><div class="rst"><div class="rmap fx"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet"><g stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none"><path d="M0 80 H400"/><path d="M0 200 H400"/><path d="M90 0 V300"/><path d="M250 0 V300"/><path d="M0 140 Q200 120 400 150"/></g>'+
    '<path id="rota" d="M60 250 L90 250 L90 200 L250 200 L250 80 L340 80" stroke="#F0C46A" stroke-width="5" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>'+
