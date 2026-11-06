@@ -58,6 +58,25 @@ body:not(.rl-master) .vt-b,body:not(.rl-master) .roles,body:not(.rl-master) .pro
 .cfg-c{display:grid;gap:4px}.cfg-c h2{margin:0 0 8px}
 .cfg-l{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.92rem}.cfg-l span{color:var(--muted)}.cfg-l b{text-align:right}
 .cfg-bar{height:10px;border-radius:9px;background:var(--soft);overflow:hidden;margin:4px 0 8px}.cfg-bar i{display:block;height:100%;background:var(--accent)}
+
+/* pedidos e produção */
+.pedc{cursor:pointer;text-align:left}.pedc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pedc.pc-cad.st-desenho{border-left:4px solid #7B3FE4;background:color-mix(in srgb,#7B3FE4 7%,var(--surface))}
+.pedc.urg{border-left-color:var(--bad)}
+.pedn{color:var(--muted);font-weight:700;font-size:.85em}
+.pchips .pedtp{font-weight:700}.pedc.pc-cad .pedtp{background:color-mix(in srgb,#7B3FE4 16%,var(--surface));color:#6A2FD0}.pedc.pc-ana .pedtp{background:color-mix(in srgb,#1DAE8A 16%,var(--surface));color:#0F7A5F}
+.btn.pedbtn{background:#7B3FE4;color:#fff;border-color:#7B3FE4}.pedok{color:#6A2FD0;font-weight:700}
+.pedfil{margin:4px 0 12px}.pedorc{border-color:color-mix(in srgb,#E8A33A 55%,var(--line));background:color-mix(in srgb,#E8A33A 10%,var(--surface))}
+.pedlista{display:grid;gap:6px}
+.pedli{display:grid;grid-template-columns:56px 1fr auto 70px 100px;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;font:inherit;color:inherit;cursor:pointer}
+.pedli:hover{background:var(--soft)}.pedli.pc-cad{border-left:4px solid #7B3FE4}
+.pedli-t{min-width:0}.pedli-t b,.pedli-t small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pedli-t small{color:var(--muted)}
+.pedli .pill{background:color-mix(in srgb,var(--k) 14%,var(--surface));color:var(--k);font-weight:700;white-space:nowrap}.pedv{text-align:right;font-weight:700;font-size:.88rem}
+.pedregra{background:color-mix(in srgb,var(--warn) 10%,var(--surface))}
+.pedseg button{flex:1}
+.pedcadnovo{flex-wrap:wrap}.pedcadnovo input{flex:1 1 140px}
+.dkpi.roxo{border-color:color-mix(in srgb,#7B3FE4 45%,var(--line));background:color-mix(in srgb,#7B3FE4 8%,var(--surface))}.dkpi.roxo .di{color:#7B3FE4}
+@media (max-width:620px){.pedli{grid-template-columns:44px 1fr auto;row-gap:4px}.pedli>.small{grid-column:2}.pedv{grid-column:3}}
 </style>
 
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1051,6 +1070,12 @@ body:has(#neg-ov) .vt-b{display:none}
 .ns-c{display:none}@media (max-width:640px){.ns-l{display:none}.ns-c{display:inline}}
 .cvneg{display:flex;align-items:center;gap:10px;text-align:left;margin-top:10px;padding:10px 12px;border-radius:14px;background:rgba(124,240,200,.08);border:1px dashed rgba(124,240,200,.4)}.cvneg>span{font-size:1.5rem}.cvneg div{flex:1;min-width:0}.cvneg b{display:block;font-size:.9rem}.cvneg small{font-size:.75rem;opacity:.75}
 @media (max-width:560px){.neg-cab{gap:10px;padding:14px}.neg-cab-ic{width:48px;height:48px;font-size:1.5rem}.neg-cab>div{flex:1;min-width:0}.neg-cab .spacer{display:none}.neg-tipos{grid-template-columns:1fr}.neg-li{flex-wrap:wrap}.neg-preco{width:100%}.neg-sw button{font-size:.8rem;padding:9px 10px}}
+
+/* cartões da produção: protege contra a regra .pcard de outra tela */
+.pkan .pcard,.dgrid .pcard{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;align-items:stretch;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}
+.pkan .pcard.urg,.dgrid .pcard.urg{border-left:4px solid var(--bad)}
+.pkan .pedc.pc-cad.st-desenho,.dgrid .pedc.pc-cad.st-desenho{border-left:4px solid #7B3FE4;background:color-mix(in srgb,#7B3FE4 7%,var(--surface))}
+.pkan .pedc.pc-cad.st-desenho.urg,.dgrid .pedc.pc-cad.st-desenho.urg{border-left-color:var(--bad)}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -1989,10 +2014,10 @@ function rPPerfil(D){var c=S.cad,pf=PROFS[1];var res=(c.prof===pf||(c.outras||[]
     '<div class="ent-res">'+res.map(function(x){return '<span class="pill">'+esc(x)+'</span>';}).join('')+'</div>'+
     '<label class="switch"><input type="checkbox" disabled><span><b>Estou aberto a oportunidades</b><br><span class="small muted">Começa desligado. Seu patrão atual não vê seu perfil.</span></span></label></section>';}
 function rProt(){var D=S.prot;if(!D){D=S.prot=pCarrega()||pSeed((S.cad.nome||'').split(' ')[0]);}var t=S.tab.prot||'inicio';
-  var corpo=t==='equipe'&&S.neg?rNegEquipe(S.neg,negT()):t==='vagas'&&S.neg?rNegVagas(S.neg,negT()):t==='producao'?rPProducao(D):t==='clientes'||t==='financeiro'?rPTrava(t):t==='agentes'?rDAgentes(D):t==='rede'?rDRede(D):t==='perfil'?rPPerfil(D):rPInicio(D);
-  var ab=D.fila.filter(function(f){return (f.st==='fila'||f.st==='fazendo')&&dDif(f.prazo)<=1;}).length,nv=PVAGAS.filter(function(v){return v.novo;}).length,badge={producao:ab,agentes:nv};
+  var corpo=t==='equipe'&&S.neg?rNegEquipe(S.neg,negT()):t==='vagas'&&S.neg?rNegVagas(S.neg,negT()):t==='producao'?(pedAtivo()?rPedidos():rPProducao(D)):t==='clientes'||t==='financeiro'?rPTrava(t):t==='agentes'?rDAgentes(D):t==='rede'?rDRede(D):t==='perfil'?rPPerfil(D):rPInicio(D);
+  var ab=D.fila.filter(function(f){return (f.st==='fila'||f.st==='fazendo')&&dDif(f.prazo)<=1;}).length,nv=PVAGAS.filter(function(v){return v.novo;}).length,badge={producao:(typeof pedAtivo==='function'&&pedAtivo())?pedBadge():ab,agentes:nv};
   return rFestaDecor()+'<div class="dp2 pp">'+rAnaTopo(D)+
-    '<nav class="dabas" role="tablist" aria-label="Painel do protético">'+(S.neg?PMENU.slice(0,4).concat([['equipe','Equipe','eu'],['vagas','Vagas','rede']],PMENU.slice(4)):PMENU).map(function(x){var tr=!S.neg&&(x[0]==='clientes'||x[0]==='financeiro');return '<button role="tab" aria-selected="'+(t===x[0])+'" data-act="dTab" data-v="'+x[0]+'"'+(tr?' class="trava"':'')+'>'+dIco(tr?'cad':x[2],'di sm')+'<span>'+x[1]+'</span>'+(badge[x[0]]?'<i>'+badge[x[0]]+'</i>':'')+'</button>';}).join('')+'</nav>'+
+    '<nav class="dabas" role="tablist" aria-label="Painel do protético">'+(S.neg?PMENU.slice(0,4).concat([['equipe','Equipe','eu'],['vagas','Vagas','rede']],PMENU.slice(4)):PMENU).map(function(x){var tr=!S.neg&&(x[0]==='clientes'||x[0]==='financeiro');return '<button role="tab" aria-selected="'+(t===x[0])+'" data-act="dTab" data-v="'+x[0]+'"'+(tr?' class="trava"':'')+'>'+dIco(tr?'cad':x[2],'di sm')+'<span>'+(x[0]==='producao'&&typeof pedAtivo==='function'&&pedAtivo()?'Pedidos':x[1])+'</span>'+(badge[x[0]]?'<i>'+badge[x[0]]+'</i>':'')+'</button>';}).join('')+'</nav>'+
     '<div class="dcont" data-tab="'+t+'">'+corpo+'</div></div>';}
 
 /* ===================== PAINEL DO ASB / TSB ===================== */
@@ -3093,7 +3118,7 @@ document.addEventListener('input',function(e){if(e.target.closest&&e.target.clos
 function rlBarra(){var b=document.getElementById('rl-bar');if(!RL.user){if(b)b.remove();document.body.classList.remove('rl-master','rl-in');return;}
   document.body.classList.add('rl-in');document.body.classList.toggle('rl-master',RL.admin);
   if(!b){b=document.createElement('div');b.id='rl-bar';document.body.appendChild(b);}
-  b.innerHTML=(RL.admin?'<span class="rl-mst">👑 Conta master</span>':'')+'<span class="rl-tst">🧪 Fase de teste: seu cadastro, currículo, empresa, clientes e tabela de preços são reais; o resto começa vazio e vai sendo preenchido nas próximas etapas.</span><span class="spacer"></span><button data-rl="sair">Sair</button>';}
+  b.innerHTML=(RL.admin?'<span class="rl-mst">👑 Conta master</span>':'')+'<span class="rl-tst">🧪 Fase de teste: seu cadastro, currículo, empresa, clientes, tabela de preços e pedidos são reais; o resto começa vazio e vai sendo preenchido nas próximas etapas.</span><span class="spacer"></span><button data-rl="sair">Sair</button>';}
 
 /* ===================== EMPRESA DE VERDADE (etapa 1): negócio, clientes e tabela de preços no banco ===================== */
 var EMP={row:null,cli:[],precSnap:{},carregado:false,erro:'',busy:false,ed:null,busca:'',filtro:'ativos',t:null};
@@ -3155,6 +3180,143 @@ Object.assign(ACT,{
     SB.from('odo_clientes').delete().eq('id',c.id).then(function(r){if(r.error){toast('Não consegui excluir.');return;}EMP.cli=EMP.cli.filter(function(x){return x.id!==c.id;});EMP.ed=null;render();toast('Cliente excluído.');});}});
 document.addEventListener('input',function(e){if(e.target.id==='cli-q'){EMP.busca=e.target.value;var q=semAc(EMP.busca),g=document.getElementById('cli-grid');if(g)g.innerHTML=cliCards(EMP.cli.filter(function(c){return (EMP.filtro==='todos'||(EMP.filtro==='ativos'?c.ativo:!c.ativo))&&(!q||semAc([c.nome,c.cidade,c.documento,c.telefone,c.reg].join(' ')).indexOf(q)>=0);}));}});
 
+/* ===== Pedidos e produção (etapa 2). As antigas Ordens CAM agora são pedidos do tipo CAD. ===== */
+var PEDST={orcamento:['Orçamento','#E8A33A'],desenho:['Desenho CAD a fazer','#7B3FE4'],producao:['Em produção','#3A7BD5'],finalizado:['Pronto','#13875F'],entregue:['Entregue','#8A8FA3'],cancelado:['Cancelado','#B4413A']};
+var PEDCOL=['desenho','producao','finalizado','entregue'];
+var PED={L:[],cad:[],carregado:false,erro:'',f:'todos',vista:'quadro',st:'ativos',busca:'',ed:null,busy:false,erroF:'',vcad:false,mais:100};
+function pedAtivo(){return typeof RL!=='undefined'&&!!RL.user&&!!S.neg&&negEhLab(S.neg);}
+function pedCarrega(){if(!RL.user)return Promise.resolve();var uid=RL.user.id,out=[];
+  function pg(i){return SB.from('odo_pedidos').select('*').eq('user_id',uid).eq('apagado',false).order('numero',{ascending:false}).range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data||[]);if((r.data||[]).length===1000)return pg(i+1000);});}
+  return Promise.all([pg(0),SB.from('odo_cadistas').select('*').eq('user_id',uid).order('nome')]).then(function(r){if(r[1].error)throw r[1].error;PED.L=out;PED.cad=r[1].data||[];PED.erro='';PED.carregado=true;render();})
+    .catch(function(e){PED.carregado=true;PED.erro=/odo_pedidos|odo_cadistas/.test((e&&e.message)||'')?'falta043':'erro';render();});}
+function pedCli(p){var c=p.cliente_id&&EMP.cli.filter(function(x){return x.id===p.cliente_id;})[0];return c?c.nome:(p.cliente_nome||(p.cliente_reg?'Cliente nº '+p.cliente_reg:'Sem cliente'));}
+function pedAtivos(){return PED.L.filter(function(p){return !p.arquivado&&p.status!=='cancelado';});}
+function pedBadge(){return pedAtivo()?pedAtivos().filter(function(p){return p.status==='desenho';}).length:0;}
+function pedRisco(p){if(!p.prazo||p.status==='finalizado'||p.status==='entregue'||p.status==='cancelado')return '';var n=dDif(p.prazo);return n<0?'atrasado':n===0?'hoje':n===1?'amanha':'';}
+function pedFiltra(L){var f=PED.f,q=semAc(PED.busca||'');return L.filter(function(p){return (f==='todos'||(f==='urg'?p.urgente:p.tipo===f))&&(!q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(q)>=0);});}
+function pedDentes(p){return p.dentes&&p.dentes.length?(p.dentes.length>1?'dentes ':'dente ')+p.dentes.join(', '):'';}
+function pedNx(p){if(p.status==='orcamento')return ['pedAprova','✓ Aprovar'];if(p.status==='desenho')return p.desenho_feito?['pedInove','📤 Enviado à Inove']:['pedDesFeito','✓ Desenho feito'];
+  return {producao:['pedPronto','✓ Pronto'],finalizado:['pedEntrega','Entregue']}[p.status]||null;}
+function pedCard(p){var r=pedRisco(p),nx=pedNx(p),cad=p.tipo==='cad';
+  return '<article class="pcard pedc'+(cad?' pc-cad':' pc-ana')+' st-'+p.status+(r?' '+r:'')+(p.urgente?' urg':'')+'" data-act="pedAbre" data-v="'+p.id+'" tabindex="0">'+
+    '<div class="pcard-h"><b>'+(p.numero?'<span class="pedn">#'+p.numero+'</span> ':'')+esc(p.paciente||'Sem paciente')+'</b>'+(p.urgente?'<span class="pill bad">Urgente</span>':'')+'</div>'+
+    '<span class="small muted">'+esc(pedCli(p))+'</span>'+
+    '<div class="pchips"><span class="pedtp">'+(cad?'🟣 CAD':'🧪 Analógico')+'</span>'+(p.trabalho?'<span>'+esc(p.trabalho.length>50?p.trabalho.slice(0,48)+'…':p.trabalho)+'</span>':'')+(pedDentes(p)?'<span>'+esc(pedDentes(p))+'</span>':'')+(p.cor?'<span>Cor '+esc(p.cor)+'</span>':'')+(p.cadista_nome?'<span>✏️ '+esc(p.cadista_nome)+'</span>':'')+'</div>'+
+    (p.status==='desenho'&&p.desenho_feito?'<span class="small pedok">✓ Desenho pronto · falta enviar à Inove</span>':'')+
+    '<div class="pcard-f"><span class="pprz'+(r?' '+r:'')+'">'+(p.prazo?(r==='atrasado'?'Atrasado · ':'')+'Prazo '+esc(dFmt(p.prazo)):'Sem prazo')+'</span>'+(nx?'<button class="btn sm'+(p.status==='desenho'?' pedbtn':'')+'" data-act="'+nx[0]+'" data-v="'+p.id+'">'+nx[1]+'</button>':'')+'</div></article>';}
+function pedOrdem(a,b){return ((b.urgente?1:0)-(a.urgente?1:0))||((a.prazo||'9999')<(b.prazo||'9999')?-1:(a.prazo||'9999')>(b.prazo||'9999')?1:0)||((b.numero||0)-(a.numero||0));}
+function rPedidos(){if(!PED.carregado)return '<div class="empty">Carregando os pedidos…</div>';
+  if(PED.erro==='falta043')return '<section class="ptrava neg-vz"><div class="neg-vz-ic">🛠️</div><h2>Falta a atualização 043</h2><p>Rode a atualização 043 no Supabase para ativar os pedidos.</p></section>';
+  if(PED.erro)return '<section class="ptrava neg-vz"><div class="neg-vz-ic">⚠️</div><h2>Não consegui carregar os pedidos</h2><button class="btn pri" data-act="pedRecarrega">Tentar de novo</button></section>';
+  if(PED.ed)return rPedForm(PED.ed);if(PED.vcad)return rPedCadistas();
+  var A=pedAtivos(),nOrc=A.filter(function(p){return p.status==='orcamento';}).length,nCad=A.filter(function(p){return p.tipo==='cad';}).length,nAna=A.length-nCad;
+  var topo='<div class="dtop"><div><h2>Pedidos</h2><p class="small muted">'+A.filter(function(p){return p.status==='desenho';}).length+' desenhos CAD a fazer · '+A.filter(function(p){return p.status==='producao';}).length+' em produção</p></div><span class="spacer"></span><button class="btn" data-act="pedCadistas">✏️ Cadistas</button><button class="btn pri" data-act="pedNovo">+ Novo pedido</button></div>'+
+    '<div class="cli-bar"><label class="cli-q"><span aria-hidden="true">🔎</span><input id="ped-q" type="search" placeholder="Buscar paciente, cliente, nº ou dente" value="'+esc(PED.busca||'')+'" autocomplete="off"></label>'+
+    '<div class="seg">'+[['quadro','Quadro'],['lista','Lista']].map(function(o){return '<button aria-pressed="'+(PED.vista===o[0])+'" data-act="pedVista" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
+    '<div class="row wrap pedfil">'+[['todos','Todos'],['cad','🟣 Ordens CAD ('+nCad+')'],['analogico','🧪 Analógico ('+nAna+')'],['urg','Urgentes']].map(function(o){return '<button class="chip" aria-pressed="'+(PED.f===o[0])+'" data-act="pedFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+
+    (nOrc?'<button class="chip pedorc" data-act="pedVerSt" data-v="orcamento">💬 '+nOrc+' orçamento'+(nOrc>1?'s':'')+' esperando</button>':'')+'</div>';
+  return topo+'<div id="ped-corpo">'+(PED.vista==='lista'?rPedLista():rPedQuadro())+'</div>';}
+function rPedQuadro(){var L=pedFiltra(pedAtivos());
+  return '<div class="pkan">'+PEDCOL.map(function(s){var C=L.filter(function(p){return p.status===s;}),cap=s==='entregue'?15:40;
+    C.sort(s==='entregue'?function(a,b){return (b.entregue_em||b.criado_em)<(a.entregue_em||a.criado_em)?-1:1;}:pedOrdem);
+    return '<section class="pcol" style="--k:'+PEDST[s][1]+'"><div class="pcol-h"><i></i><b>'+PEDST[s][0]+'</b><span>'+C.length+'</span></div>'+(C.length?C.slice(0,cap).map(pedCard).join('')+(C.length>cap?'<button class="btn sm" data-act="pedVerSt" data-v="'+s+'">Ver todos os '+C.length+' na lista</button>':''):'<div class="pvazio">—</div>')+'</section>';}).join('')+'</div>';}
+function rPedLista(){var st=PED.st,L=PED.L.filter(function(p){return st==='ativos'?(!p.arquivado&&p.status!=='cancelado'):st==='arquivados'?p.arquivado:(p.status===st&&!p.arquivado);});L=pedFiltra(L);
+  return '<div class="row wrap" style="margin:6px 0"><label class="small muted">Mostrar <select id="ped-st">'+[['ativos','Todos ativos']].concat(Object.keys(PEDST).map(function(k){return [k,PEDST[k][0]];})).concat([['arquivados','Arquivados']]).map(function(o){return '<option value="'+o[0]+'"'+(st===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label><span class="small muted">'+L.length+' pedido'+(L.length!==1?'s':'')+'</span></div>'+
+    (L.length?'<div class="pedlista">'+L.slice(0,PED.mais).map(function(p){var r=pedRisco(p);return '<button class="pedli'+(p.tipo==='cad'?' pc-cad':'')+'" data-act="pedAbre" data-v="'+p.id+'"><span class="pedn">#'+(p.numero||'—')+'</span><span class="pedli-t"><b>'+esc(p.paciente||'Sem paciente')+'</b><small>'+esc(pedCli(p))+(p.trabalho?' · '+esc(p.trabalho):'')+'</small></span><span class="pill" style="--k:'+PEDST[p.status][1]+'">'+PEDST[p.status][0]+'</span><span class="small'+(r?' pprz '+r:' muted')+'">'+(p.prazo?dFmt(p.prazo):String(p.criado_em||'').slice(0,10).split('-').reverse().join('/'))+'</span><span class="pedv">'+(p.valor!=null?'R$ '+Number(p.valor).toLocaleString('pt-BR',{minimumFractionDigits:2}):'')+'</span></button>';}).join('')+'</div>'+
+      (L.length>PED.mais?'<button class="btn" data-act="pedMais" style="margin-top:10px">Mostrar mais</button>':''):'<div class="empty">Nenhum pedido aqui.</div>');}
+/* formulário */
+function pedServ(nome){var N=S.neg;if(!N||!nome)return null;var s=N.servs.filter(function(x){return semAc(x[0])===semAc(nome);})[0];return s?{valor:num(s[1]),prazo:s[2]===''||s[2]==null?null:parseInt(s[2],10)}:null;}
+function pedUteis(n){var d=new Date(dHoje()+'T12:00:00'),k=0;while(k<n){d.setDate(d.getDate()+1);var w=d.getDay();if(w!==0&&w!==6)k++;}return d.toISOString().slice(0,10);}
+function pedDentesLe(t){var L=[];String(t||'').split(/[^0-9]+/).forEach(function(x){var v=parseInt(x,10);if(v>=11&&v<=85&&v%10>=1&&v%10<=8&&L.indexOf(v)<0)L.push(v);});return L.slice(0,32);}
+function rPedForm(p){var cli=p.cliente_id&&EMP.cli.filter(function(x){return x.id===p.cliente_id;})[0],cliL=EMP.cli.filter(function(c){return c.ativo||c.id===p.cliente_id;}),N=S.neg;
+  var sel=function(k,ops,v){return '<select data-pf="'+k+'">'+ops.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(v==null?'':v)===String(o[0])?' selected':'')+'>'+esc(o[1])+'</option>';}).join('')+'</select>';};
+  var fld=function(k,lab,v,extra){return '<label class="fld ped-'+k+'"><span>'+lab+'</span><input data-pf="'+k+'" value="'+esc(v==null?'':v)+'"'+(extra||'')+'></label>';};
+  return '<div class="dtop"><div><h2>'+(p.id?'Pedido #'+(p.numero||'—'):'Novo pedido')+'</h2>'+(p.legado?'<p class="small muted">Veio do sistema antigo'+(p.legado.indexOf('o:')===0?' (Ordens CAM)':'')+'.</p>':'')+'</div></div>'+
+    '<section class="card cli-form pedform">'+
+    '<div class="fld cli-full"><span>Tipo</span><div class="seg pedseg">'+[['cad','🟣 CAD (desenho a fazer)'],['analogico','🧪 Analógico (laboratório)']].map(function(o){return '<button type="button" aria-pressed="'+(p.tipo===o[0])+'" data-act="pedTipo" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
+    '<label class="fld cli-full"><span>Cliente</span>'+sel('cliente_id',[['','— escolha —']].concat(cliL.map(function(c){return [c.id,c.nome+(c.reg?' (nº '+c.reg+')':'')];})),p.cliente_id)+'</label>'+
+    (cli&&cli.regra?'<div class="banner cli-full pedregra">📌 <b>Regra do cliente:</b> '+esc(cli.regra)+'</div>':'')+
+    fld('paciente','Paciente',p.paciente,' maxlength="120"')+
+    '<label class="fld ped-trabalho"><span>Trabalho</span><input data-pf="trabalho" list="ped-servs" maxlength="120" value="'+esc(p.trabalho||'')+'"><datalist id="ped-servs">'+(N?N.servs.map(function(s){return '<option value="'+esc(s[0])+'">';}).join(''):'')+'</datalist></label>'+
+    fld('dentes','Dentes (ex.: 11, 21)',(p.dentes||[]).join(', '),' inputmode="numeric"')+fld('qtd','Qtd. de elementos',p.qtd,' type="number" min="0" max="99"')+
+    fld('cor','Cor',p.cor,' maxlength="20"')+fld('material','Material',p.material,' maxlength="60"')+fld('componente','Componente',p.componente,' maxlength="120"')+
+    '<label class="check"><input type="checkbox" data-pf="sobre_implante"'+(p.sobre_implante?' checked':'')+'> Sobre implante</label>'+
+    '<label class="fld"><span>Valor (R$)</span><input data-pf="valor" inputmode="decimal" placeholder="0,00" value="'+esc(p.valor==null?'':String(p.valor).replace('.',','))+'"></label>'+
+    fld('prazo','Prazo',p.prazo,' type="date"')+
+    '<div class="fld"><span>&nbsp;</span><button type="button" class="btn sm" data-act="pedCalc">💲 Preço e prazo pela tabela</button></div>'+
+    '<label class="check"><input type="checkbox" data-pf="urgente"'+(p.urgente?' checked':'')+'> Urgente</label>'+
+    '<label class="fld"><span>Cadista</span>'+sel('cadista_id',[['','— ninguém —']].concat(PED.cad.filter(function(c){return c.ativo||c.id===p.cadista_id;}).map(function(c){return [c.id,c.nome];})),p.cadista_id)+'</label>'+
+    '<label class="fld"><span>Situação</span>'+sel('status',Object.keys(PEDST).filter(function(k){return k!=='desenho'||p.tipo==='cad';}).map(function(k){return [k,PEDST[k][0]];}),p.status)+'</label>'+
+    '<label class="fld"><span>Chegou por</span>'+sel('origem',[['manual','Manual'],['whatsapp','WhatsApp'],['email','E-mail'],['portal','Portal']],p.origem||'manual')+'</label>'+
+    (p.tipo==='cad'?'<label class="check"><input type="checkbox" data-pf="desenho_feito"'+(p.desenho_feito?' checked':'')+'> Desenho feito</label><label class="check"><input type="checkbox" data-pf="enviado_inove"'+(p.enviado_inove?' checked':'')+'> Enviado à Inove</label>':'')+
+    '<label class="fld cli-full"><span>Descrição</span><textarea data-pf="descricao" maxlength="4000" rows="4">'+esc(p.descricao||'')+'</textarea></label>'+
+    '<label class="fld cli-full"><span>Observações</span><textarea data-pf="obs" maxlength="1000" rows="2">'+esc(p.obs||'')+'</textarea></label>'+
+    (p.id?'<label class="check cli-full"><input type="checkbox" data-pf="arquivado"'+(p.arquivado?' checked':'')+'> Arquivado (sai do quadro)</label>':'')+
+    (PED.erroF?'<p class="err cli-full">'+esc(PED.erroF)+'</p>':'')+
+    '<div class="row cli-full"><button class="btn" data-act="pedVolta">← Voltar</button><span class="spacer"></span>'+(p.id?'<button class="btn danger" data-act="pedApaga">Excluir</button>':'')+'<button class="btn pri" data-act="pedSalva"'+(PED.busy?' disabled':'')+'>'+(PED.busy?'Salvando…':'Salvar')+'</button></div></section>';}
+function pedLe(){var p=PED.ed;[].forEach.call(document.querySelectorAll('[data-pf]'),function(el){var k=el.dataset.pf;p[k]=el.type==='checkbox'?el.checked:el.value.trim();});
+  p.dentes=pedDentesLe(p.dentes);p.qtd=p.qtd===''||p.qtd==null?(p.dentes.length||null):Math.max(0,Math.min(99,parseInt(p.qtd,10)||0));p.valor=num(p.valor);if(p.cor)p.cor=p.cor.toUpperCase();}
+var PED_COLS=['cliente_id','paciente','tipo','trabalho','descricao','dentes','qtd','cor','material','sobre_implante','componente','valor','prazo','urgente','status','desenho_feito','enviado_inove','cadista_id','origem','obs','arquivado'];
+function pedRow(p){var r={};PED_COLS.forEach(function(k){var v=p[k];r[k]=v===''||v===undefined?null:v;});
+  ['sobre_implante','urgente','desenho_feito','enviado_inove','arquivado'].forEach(function(k){r[k]=!!p[k];});if(!r.dentes||!r.dentes.length)r.dentes=null;
+  var c=r.cliente_id&&EMP.cli.filter(function(x){return x.id===r.cliente_id;})[0];r.cliente_nome=c?c.nome:(p.cliente_nome||null);r.cliente_reg=c?c.reg:(p.cliente_reg||null);
+  var k=r.cadista_id&&PED.cad.filter(function(x){return x.id===r.cadista_id;})[0];r.cadista_nome=k?k.nome:(r.cadista_id?p.cadista_nome:null);if(!r.cadista_id&&p.cadista_nome&&!p._mudouCad)r.cadista_nome=p.cadista_nome;
+  if(r.tipo!=='cad'&&r.status==='desenho')r.status='producao';
+  if(r.status==='finalizado'&&!p.finalizado_em)r.finalizado_em=new Date().toISOString();if(r.status==='entregue'&&!p.entregue_em)r.entregue_em=new Date().toISOString();return r;}
+function pedGuarda(row){var i=PED.L.map(function(x){return x.id;}).indexOf(row.id);if(i>=0)PED.L[i]=row;else PED.L.unshift(row);}
+function pedMuda(id,patch,msg){var p=PED.L.filter(function(x){return x.id===id;})[0];if(!p)return;var antes=Object.assign({},p);Object.assign(p,patch);render();
+  SB.from('odo_pedidos').update(patch).eq('id',id).select('*').single().then(function(r){if(r.error){Object.assign(p,antes);render();toast('Não consegui salvar agora.');return;}pedGuarda(r.data);render();if(msg)toast(msg);});}
+function rPedCadistas(){return '<div class="dtop"><div><h2>✏️ Cadistas</h2><p class="small muted">Quem desenha as ordens CAD. Aparece para escolher em cada pedido.</p></div><span class="spacer"></span><button class="btn" data-act="pedCadVolta">← Voltar aos pedidos</button></div>'+
+  '<section class="card">'+(PED.cad.length?PED.cad.map(function(c){var n=PED.L.filter(function(p){return p.cadista_id===c.id;}).length;return '<div class="neg-li"><b>'+esc(c.nome)+(c.ativo?'':' <span class="pill">inativo</span>')+'</b><span class="small muted">'+esc([c.email,c.tel].filter(Boolean).join(' · '))+(n?' · '+n+' pedido'+(n>1?'s':''):'')+'</span><button class="btn sm" data-act="pedCadAtivo" data-v="'+c.id+'">'+(c.ativo?'Desativar':'Ativar')+'</button></div>';}).join(''):'<div class="empty">Nenhum cadista ainda.</div>')+
+  '<div class="neg-li neg-add pedcadnovo"><input id="pc-nome" placeholder="Nome" maxlength="80"><input id="pc-email" placeholder="E-mail (opcional)" maxlength="120"><input id="pc-tel" placeholder="Telefone (opcional)" maxlength="30"><button class="btn sm pri" data-act="pedCadNovo">+ Adicionar</button></div></section>';}
+Object.assign(ACT,{
+  pedRecarrega:function(){PED.carregado=false;render();pedCarrega();},
+  pedFil:function(v){PED.f=v;render();},
+  pedVista:function(v){PED.vista=v;PED.mais=100;render();},
+  pedVerSt:function(v){PED.vista='lista';PED.st=v;PED.mais=100;render();window.scrollTo(0,0);},
+  pedMais:function(){PED.mais+=100;render();},
+  pedNovo:function(){PED.ed={tipo:'cad',status:'desenho',origem:'manual'};PED.erroF='';render();window.scrollTo(0,0);},
+  pedAbre:function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;PED.ed=Object.assign({},p);PED.erroF='';render();window.scrollTo(0,0);},
+  pedVolta:function(){PED.ed=null;render();},
+  pedTipo:function(v){pedLe();var p=PED.ed;p.tipo=v;if(v==='cad'&&(p.status==='producao'&&!p.id))p.status='desenho';if(v!=='cad'&&p.status==='desenho')p.status='producao';render();},
+  pedCalc:function(){pedLe();var p=PED.ed,s=pedServ(p.trabalho);if(!s){toast('Escolha um trabalho da sua tabela de preços.');return;}
+    var q=p.qtd||1;if(s.valor!=null)p.valor=Math.round(s.valor*q*100)/100;if(s.prazo!=null)p.prazo=pedUteis(s.prazo);render();toast('Preço'+(s.prazo!=null?' e prazo':'')+' pela tabela'+(q>1?' (× '+q+')':'')+'.');},
+  pedSalva:function(){pedLe();var p=PED.ed;if(!p.paciente&&!p.cliente_id&&!p.trabalho){PED.erroF='Preencha pelo menos o cliente, o paciente ou o trabalho.';render();return;}
+    if(!p.id){var s=pedServ(p.trabalho);if(s){if(p.valor==null&&s.valor!=null)p.valor=Math.round(s.valor*(p.qtd||1)*100)/100;if(!p.prazo&&s.prazo!=null)p.prazo=pedUteis(s.prazo);}}
+    var row=pedRow(p);PED.busy=true;render();
+    var q=p.id?SB.from('odo_pedidos').update(row).eq('id',p.id).select('*').single():SB.from('odo_pedidos').insert(Object.assign({user_id:RL.user.id,numero:PED.L.reduce(function(m,x){return Math.max(m,x.numero||0);},0)+1},row)).select('*').single();
+    q.then(function(r){PED.busy=false;if(r.error){PED.erroF='Não consegui salvar agora.';render();return;}pedGuarda(r.data);PED.ed=null;render();toast('Pedido #'+r.data.numero+' salvo.');});},
+  pedApaga:function(){var p=PED.ed;if(!p||!p.id||!confirm('Excluir o pedido #'+p.numero+'? Se ele só terminou, prefira marcar "Arquivado".'))return;
+    SB.from('odo_pedidos').update({apagado:true}).eq('id',p.id).then(function(r){if(r.error){toast('Não consegui excluir.');return;}PED.L=PED.L.filter(function(x){return x.id!==p.id;});PED.ed=null;render();toast('Pedido excluído.');});},
+  pedAprova:function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(p)pedMuda(v,{status:p.tipo==='cad'?'desenho':'producao'},'Orçamento aprovado.');},
+  pedDesFeito:function(v){pedMuda(v,{desenho_feito:true},'Desenho feito. Agora é só enviar à Inove.');},
+  pedInove:function(v){pedMuda(v,{desenho_feito:true,enviado_inove:true,status:'producao'},'Enviado à Inove: foi para Em produção.');},
+  pedPronto:function(v){pedMuda(v,{status:'finalizado',finalizado_em:new Date().toISOString()},'Marcado como pronto.');},
+  pedEntrega:function(v){pedMuda(v,{status:'entregue',entregue_em:new Date().toISOString()},'Entregue.');},
+  pedCadistas:function(){PED.vcad=true;render();window.scrollTo(0,0);},
+  pedCadVolta:function(){PED.vcad=false;render();},
+  pedCadNovo:function(){var g=function(i){var e=document.getElementById(i);return e?e.value.trim():'';},nm=g('pc-nome');if(nm.length<2){toast('Digite o nome do cadista.');return;}
+    SB.from('odo_cadistas').insert({user_id:RL.user.id,nome:nm,email:g('pc-email')||null,tel:g('pc-tel')||null}).select('*').single().then(function(r){if(r.error){toast('Não consegui salvar.');return;}PED.cad.push(r.data);PED.cad.sort(function(a,b){return a.nome.localeCompare(b.nome,'pt');});render();toast('Cadista adicionado.');});},
+  pedCadAtivo:function(v){var c=PED.cad.filter(function(x){return x.id===v;})[0];if(!c)return;SB.from('odo_cadistas').update({ativo:!c.ativo}).eq('id',v).then(function(r){if(r.error){toast('Não consegui salvar.');return;}c.ativo=!c.ativo;render();});}});
+document.addEventListener('input',function(e){if(e.target.id==='ped-q'){PED.busca=e.target.value;var b=document.getElementById('ped-corpo');if(b)b.innerHTML=PED.vista==='lista'?rPedLista():rPedQuadro();}});
+document.addEventListener('change',function(e){var t=e.target;if(t.id==='ped-st'){PED.st=t.value;PED.mais=100;render();}else if(PED.ed&&t.dataset&&(t.dataset.pf==='cliente_id'||t.dataset.pf==='cadista_id')){if(t.dataset.pf==='cadista_id')PED.ed._mudouCad=true;pedLe();render();}});
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('pedc')){ACT.pedAbre(e.target.dataset.v);}});
+/* início do protético com os pedidos de verdade */
+var _rPInicio=rPInicio;rPInicio=function(D){if(!pedAtivo()||!PED.carregado||PED.erro)return _rPInicio(D);
+  var A=pedAtivos(),des=A.filter(function(p){return p.status==='desenho';}),pro=A.filter(function(p){return p.status==='producao';}),ab=des.concat(pro).sort(pedOrdem),hj=ab.filter(function(p){return p.prazo&&dDif(p.prazo)<=1;}),pr=A.filter(function(p){return p.status==='finalizado';});
+  var meses=[],cont=[];for(var i=5;i>=0;i--){var d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);var k=d.toISOString().slice(0,7);meses.push(i?d.toLocaleDateString('pt-BR',{month:'short'}).replace('.',''):'agora');cont.push(PED.L.filter(function(p){return p.status==='entregue'&&String(p.entregue_em||p.criado_em).slice(0,7)===k;}).length);}
+  var mx=Math.max.apply(null,cont.concat([1]));
+  return '<section class="dhero '+ceuClasse()+'">'+ceuCamadas()+'<div class="dhero-t">'+climaChip()+'<h2>'+dSaud()+', '+esc(D.nome)+'!</h2><p>'+esc(D.funcao)+' · '+esc(S.neg.nome)+'</p>'+
+      '<div class="row wrap dhero-b"><button class="btn" data-act="dTab" data-v="producao">'+dIco('ped','di sm')+' Abrir pedidos</button><button class="btn" data-act="anaAbre">Falar com a Ana</button></div></div><img class="dhero-ana" src="'+ANA.feliz+'" alt=""></section>'+
+    '<div class="dkpis">'+[[des.length,'desenhos CAD a fazer','ped'],[pro.length,'em produção','tar'],[hj.length,'vencem até amanhã','ag'],[pr.length,'prontos p/ entregar','lab']].map(function(x,i){return '<button class="dkpi'+(i===0&&x[0]?' roxo':'')+(i===2&&x[0]?' alerta':'')+(i===3&&x[0]?' bom':'')+'" data-act="dTab" data-v="producao" style="--d:'+(i*70)+'ms">'+dIco(x[2])+'<b>'+x[0]+'</b><span>'+x[1]+'</span></button>';}).join('')+'</div>'+
+    '<div class="dgrid"><section class="card"><div class="row"><h2>Próximos prazos</h2><span class="spacer"></span><button class="btn sm" data-act="dTab" data-v="producao">Ver pedidos</button></div>'+(ab.length?ab.slice(0,4).map(pedCard).join(''):'<div class="empty">Nada na fila. 🎉</div>')+'</section>'+
+      '<section class="card"><h2>Entregas</h2><p class="small muted" style="margin:0">Pedidos entregues por mês</p><div class="pbar">'+cont.map(function(n,i){return '<span style="--h:'+Math.round(n/mx*100)+'%"'+(i===5?' class="ag"':'')+'><b>'+n+'</b><i></i><small>'+meses[i]+'</small></span>';}).join('')+'</div></section>'+
+      '<section class="card"><div class="row"><h2>Tarefas da Ana</h2><span class="spacer"></span><button class="btn sm" data-act="anaAbre">Falar com a Ana</button></div>'+(D.tar.filter(function(t){return !t.feito;}).slice(0,5).map(dTarItem).join('')||'<div class="empty">Nenhuma tarefa. Peça para a Ana anotar.</div>')+'</section></div>';};
+var _pFrases=pFrases;pFrases=function(D){if(!pedAtivo()||!PED.carregado||PED.erro)return _pFrases(D);var A=pedAtivos(),des=A.filter(function(p){return p.status==='desenho';}).length,pro=A.filter(function(p){return p.status==='producao';}).length,
+  hj=A.filter(function(p){return (p.status==='desenho'||p.status==='producao')&&p.prazo&&dDif(p.prazo)<=0;}),ta=D.tar.filter(function(t){return !t.feito;}),L=[];
+  L.push(dSaud()+', '+D.nome+'! Você tem '+des+' desenho'+(des!==1?'s':'')+' CAD a fazer e '+pro+' trabalho'+(pro!==1?'s':'')+' em produção.');
+  if(hj.length)L.push(hj.length+' pedido'+(hj.length>1?'s vencem':' vence')+' hoje ou já passou do prazo.');
+  if(ta.length)L.push('Você tem '+ta.length+' tarefa'+(ta.length>1?'s':'')+' anotada'+(ta.length>1?'s':'')+'. Toque aqui para ver.');return L;};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
@@ -3174,6 +3336,6 @@ var _render0=render;render=function(){try{rlZera();rlZera2();}catch(e){}return _
     Promise.all([SB.from('odo_perfis').select('*').eq('user_id',u.id).maybeSingle(),SB.rpc('sou_admin'),SB.from('perfis').select('nome,telefone').eq('user_id',u.id).maybeSingle()]).then(function(r){
       if(r[0].error)toast('O banco do Ideali Odonto precisa da atualização 040.');
       RL.perfil=r[0].data||null;RL.admin=!!r[1].data;var cp=r[2].data||{};RL.cadNome=cp.nome||'';RL.cadTel=cp.telefone||'';
-      rlBarra();empCarrega().then(function(){rlEntra();});});});})();
+      rlBarra();empCarrega().then(function(){rlEntra();pedCarrega();});});});})();
 
 </script>
