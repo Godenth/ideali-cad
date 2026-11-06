@@ -846,6 +846,19 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
  .agz-g{grid-template-columns:repeat(5,1fr);gap:4px;padding:8px}.agz-d{min-height:150px;padding:5px;font-size:.7rem}.agz-x{display:none}.agz-c{font-size:.66rem;padding:5px}.agz-c em{display:none}.agz-lab{font-size:.62rem;padding:4px}.agz-wa{font-size:.78rem;margin:0 8px 8px}
  .ce{grid-template-columns:1fr;gap:8px;justify-items:center}.ce-ar{display:none}.ce-cx{padding:10px}.ce-qr{width:80px;height:80px}.ce-c{padding:12px;width:100%}.ce-r{grid-template-columns:84px 1fr;font-size:.78rem}
  .hi-i{flex-wrap:wrap;padding:8px 10px}.hi-i button{width:100%}}
+
+.agz-2{background:none!important;color:#6a5d45!important;border:1.5px solid #D7C9AE!important;padding:8px!important}
+.agz-al.chat{width:min(470px,94%)}.agz-al.chat>b,.agz-al.chat>span,.agz-al.chat>button{display:none}
+.agz-ch{display:none;gap:8px}.agz-ch.in{display:grid}
+.agz-m{border-radius:14px;padding:9px 12px;font-size:.88rem;line-height:1.4;opacity:0;transform:translateY(8px);transition:.4s;display:none}.agz-m.in{display:block;opacity:1;transform:none}
+.agz-m small{display:block;font-size:.7rem;font-weight:800;opacity:.75;margin-bottom:2px}
+.agz-m.ia{background:#EEEBFD;color:#2a2160;justify-self:end;max-width:88%;border-bottom-right-radius:4px}
+.agz-m.lab{background:#E3F7F0;color:#0f4a33;justify-self:start;max-width:88%;border-bottom-left-radius:4px}
+.agz-m.dig{background:#F2EEE6;justify-self:start;padding:12px 14px}.agz-m.dig.in{display:flex;gap:5px}
+.agz-m.dig i{width:7px;height:7px;border-radius:50%;background:#B8A88A;animation:agDg 1s infinite}.agz-m.dig i:nth-child(2){animation-delay:.15s}.agz-m.dig i:nth-child(3){animation-delay:.3s}
+@keyframes agDg{50%{transform:translateY(-4px);opacity:.5}}
+.agz-lab.ok{background:#E3F7F0;color:#0f5a3a;border:1.5px solid #1DAE8A;margin-top:0;animation:flTx .6s}
+.agz-wa{background:#E3F7F0!important;color:#0f4a33!important}
 </style>
 <body>
 <header class="top">
@@ -1305,15 +1318,21 @@ var CENAS=[
  {cap:'IA vigiando as entregas',pt:3,who:'ot',p:'serio',d:11000,lab:1,h:'<div class="sc"><div class="alr">'+[['⚠️','#D2433A','Pedido #1043 vai atrasar 1 dia','O Lab Digital Centro ainda não iniciou a fresagem. Já avisei o lab e remarquei o paciente das 10h?'],['🕑','#B7791F','Prova da faceta chega hoje às 14h','Paciente C. M. confirmado às 15h. Está tudo encaixado.'],['✅','#1E8A5A','Coroa #1042 saiu para entrega','Previsão: amanhã cedo, dentro do prazo.'],['📈','#5B45E0','Lab Arte Dental: 3 entregas antecipadas este mês','Bom sinal. Ele está melhorando no prazo.']].map(function(a){return '<div class="al fx" style="--c:'+a[1]+'"><span>'+a[0]+'</span><div><b>'+a[2]+'</b><p>'+a[3]+'</p></div></div>';}).join('')+'</div></div>',
   go:function(){inn('.fx',200,700);falas([[0,'E tem uma <b>IA vigiando as entregas</b> 24 horas. Se um pedido vai atrasar, ela avisa <b>antes</b> do paciente chegar.'],[5400,'Prova chegando, trabalho saindo, lab melhorando ou piorando: <b>você fica sabendo de tudo.</b>']]);}},
 
- {cap:'Agenda × prazo do lab',pt:3,who:'ot',p:'serio',d:14000,lab:1,h:'<div class="sc"><div class="agz">'+
+ {cap:'Agenda × prazo do lab',pt:3,who:'ot',p:'serio',d:16500,lab:1,h:'<div class="sc"><div class="agz">'+
    '<div class="win agz-w fx"><div class="wbar">📅 Agenda da clínica · semana</div><div class="agz-g">'+
     ['Seg','Ter','Qua','Qui','Sex'].map(function(d,i){return '<div class="agz-d" id="agd'+i+'"><b>'+d+'</b>'+(i===1?'<div class="agz-c" id="agc"><small>14h</small>Maria Souza<em>cimentação da coroa 46</em></div>':'')+(i===3?'<div class="agz-lab" id="aglab">🧪 Coroa 46 fica pronta</div>':'')+(i===0?'<div class="agz-x">9h · Avaliação</div>':'')+(i===2?'<div class="agz-x">10h · Limpeza</div>':'')+'</div>';}).join('')+'</div>'+
-    '<div class="agz-al" id="agal"><b>⚠️ A coroa da Maria Souza só chega na quinta.</b><span>O retorno dela está marcado para terça.</span><button id="agbt">Remarcar para sexta, 14h</button></div>'+
-    '<div class="agz-wa" id="agwa">💬 <span>"Oi, Maria! Podemos passar o seu retorno para <b>sexta às 14h</b>? Sua coroa fica pronta antes."</span><em>✓✓ enviada</em></div></div></div></div>',
+    '<div class="agz-al" id="agal"><b>⚠️ A coroa da Maria Souza só chega na quinta.</b><span>O retorno dela está marcado para terça, 14h.</span><button id="agbt">⚡ Pedir urgência ao laboratório</button><button class="agz-2">Remarcar a paciente</button>'+
+     '<div class="agz-ch" id="agch"><div class="agz-m ia" id="agm0"><small>🤖 IA da clínica → Laboratório Exemplo</small>A coroa 46 da Maria Souza consegue ficar pronta até <b>terça, 11h</b>? A paciente volta às 14h.</div>'+
+     '<div class="agz-m dig" id="agdg"><i></i><i></i><i></i></div>'+
+     '<div class="agz-m lab" id="agm1"><small>🧪 Laboratório · resposta automática</small>✓ <b>Sim!</b> A bancada tem espaço. Entrego <b>terça, 11h</b> como urgência.</div></div></div>'+
+    '<div class="agz-wa" id="agwa">✓ <span>Prazo do laboratório atualizado: <b>terça, 11h</b>. O retorno da Maria às 14h está garantido.</span></div></div></div></div>',
   go:function(){inn('.fx',100,250);at(1400,function(){var l=$('#aglab');if(l)l.classList.add('in');});
    at(3000,function(){var a=$('#agal');if(a)a.classList.add('in');var c=$('#agc');if(c)c.classList.add('mal');});
-   clica('#agbt',5200,function(){var a=$('#agal');if(a)a.classList.remove('in');var c=$('#agc'),d=$('#agd4');if(c&&d){c.classList.remove('mal');c.classList.add('ok');d.appendChild(c);}at(900,function(){var w=$('#agwa');if(w)w.classList.add('in');});});
-   falas([[0,'Sabe o pior? <b>Paciente na cadeira</b> e a prótese ainda no laboratório. Vergonha. 😤'],[5600,'Agora a agenda conversa com o <b>prazo do lab</b>. Se não vai dar tempo, eu fico sabendo antes e remarco com um toque.']]);}},
+   clica('#agbt',4700,function(){var a=$('#agal');if(a)a.classList.add('chat');var ch=$('#agch');if(ch)ch.classList.add('in');
+     at(300,function(){var m=$('#agm0');if(m)m.classList.add('in');var ms=$('.mouse');if(ms)ms.remove();});at(1300,function(){var d=$('#agdg');if(d)d.classList.add('in');});
+     at(3100,function(){var d=$('#agdg');if(d)d.classList.remove('in');var m=$('#agm1');if(m)m.classList.add('in');});
+     at(5000,function(){var a2=$('#agal');if(a2)a2.classList.remove('in');var l=$('#aglab'),t=$('#agd1'),c=$('#agc');if(c){c.classList.remove('mal');c.classList.add('ok');}if(l&&t){l.innerHTML='🧪 Coroa 46 pronta · 11h';l.classList.add('ok');t.insertBefore(l,c);}at(700,function(){var w=$('#agwa');if(w)w.classList.add('in');});});});
+   falas([[0,'Sabe o pior? <b>Paciente na cadeira</b> e a prótese ainda no laboratório. Vergonha. 😤'],[4600,'Agora a agenda conversa com o <b>prazo do lab</b>. Não vai dar tempo? A IA já pergunta ao laboratório se dá para <b>adiantar</b>…'],[8700,'…e o laboratório responde <b>na hora, automático</b>, olhando a bancada dele. Paciente garantida, sem eu ligar para ninguém. 😎']]);}},
 
  {cap:'Rastreio do motoboy',pt:3,who:'ot',p:'satisfeito',d:14000,lab:1,h:'<div class="sc"><div class="rst"><div class="rmap fx"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet"><g stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none"><path d="M0 80 H400"/><path d="M0 200 H400"/><path d="M90 0 V300"/><path d="M250 0 V300"/><path d="M0 140 Q200 120 400 150"/></g>'+
    '<path id="rota" d="M60 250 L90 250 L90 200 L250 200 L250 80 L340 80" stroke="#F0C46A" stroke-width="5" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>'+
