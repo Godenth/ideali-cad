@@ -114,7 +114,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .pg-ops{display:flex;flex-wrap:wrap;gap:6px}.pg-ck{padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);white-space:nowrap}.pg-ck:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
 .tp-extra{display:grid;gap:16px;align-items:start}
 
-.tp-li{display:grid;grid-template-columns:170px 90px 160px auto minmax(0,1fr) 36px;position:relative;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.tp-li{display:grid;grid-template-columns:minmax(0,1fr) 170px 160px auto 36px;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
 .tp-li.off{opacity:.6}
 .tp-li input,.tp-li select{min-width:0;width:100%}
 .tp-val{display:flex;align-items:center;gap:6px}
@@ -124,7 +124,7 @@ body.sem-anim *{transition:none!important;animation:none!important}
 .tp-x{width:36px;height:36px;border-radius:10px;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;font-size:1rem;display:grid;place-items:center}
 .tp-x:hover{color:var(--urgent);background:color-mix(in srgb,var(--urgent) 10%,transparent);border-color:color-mix(in srgb,var(--urgent) 25%,transparent)}
 .tp-x:disabled{opacity:.4;cursor:default}
-@media (max-width:699px){.tp-li>select{grid-column:1/-1}.tp-li>.tp-nome{font-size:.88rem}.tp-li{grid-template-columns:86px minmax(0,1fr) auto;gap:6px;position:relative;padding-top:8px}.tp-li input.tp-nome:not([type=checkbox]){width:calc(100% - 42px)}.tp-li .tp-x{position:absolute;top:10px;right:8px}.tp-li select{padding-left:.5em;padding-right:.1em;font-size:.9rem}.tp-at{font-size:.78rem;gap:4px}.tp-li .tp-val input{padding-inline:.5em}.tp-nome{grid-column:1/-1}.tp-nome[readonly]{cursor:not-allowed;opacity:.85}.tp-val span{display:none}}
+@media (max-width:699px){.tp-li{grid-template-columns:minmax(0,1fr) 86px auto;gap:6px;position:relative;padding-top:8px}.tp-li input.tp-nome:not([type=checkbox]){width:calc(100% - 42px)}.tp-li .tp-x{position:absolute;top:10px;right:8px}.tp-li select{padding-left:.5em;padding-right:.1em;font-size:.9rem}.tp-at{font-size:.78rem;gap:4px}.tp-li .tp-val input{padding-inline:.5em}.tp-nome{grid-column:1/-1}.tp-nome[readonly]{cursor:not-allowed;opacity:.85}.tp-val span{display:none}}
 .msg-cta{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;border:1px solid var(--line);font:inherit;color:inherit;background:linear-gradient(100deg,color-mix(in srgb,var(--p3) 10%,var(--surface)),var(--surface) 60%)}
 .msg-cta:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
 .msg-cta .t{display:grid;gap:2px;flex:1;min-width:0}.msg-cta .t span{color:var(--muted);font-size:.85rem}
@@ -1594,9 +1594,6 @@ html[data-tema="cystreet"] input,html[data-tema="cystreet"] select,html[data-tem
 @media (prefers-reduced-motion:reduce){#cySt *{animation:none!important}#cySt .cs-chuva{display:none}}
 html[data-tema="cystreet"]{background:#0B0620}html[data-tema="cystreet"] body{background:transparent}
 .tm[data-v="cystreet"] .tm-pv{background:linear-gradient(180deg,transparent 40%,rgba(11,6,32,.7)),url(img/temas/cystreet-m.webp) center 40%/cover!important}
-.tp-gr{display:flex;align-items:center;gap:8px;margin:10px 2px 0;font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.tp-gr span{font-size:1.05rem}.tp-gr em{font-style:normal;margin-left:auto;font-size:.72rem;background:var(--soft);border-radius:999px;padding:1px 8px;letter-spacing:0}
-.tp-li>.tp-nome{grid-column:1/-1}.tp-li:has(.tp-ica)>.tp-nome{padding-left:52px!important}.tp-ica{position:absolute!important;left:14px;top:12px;width:34px!important;height:34px!important;border-radius:9px!important;z-index:1}.tp-ica svg{width:23px!important;height:23px!important}.tp-li>.tp-x,.tp-li>button:last-child{grid-column:-2/-1;justify-self:end}
-.tp-pz{display:flex;align-items:center;gap:4px}.tp-pz span{font-size:.95rem}.tp-pz input{text-align:center}
 </style>
 
 <div id="app"></div>
@@ -1743,42 +1740,6 @@ setInterval(function(){if(S&&S.sessao&&ui.dadosOk&&!document.hidden&&CX.ok)cxCar
 var TRAB_REF=[['Elemento sobre dente','elemento'],['Elemento sobre implante','elemento'],['Faceta','elemento'],['Inlay / Onlay','elemento'],['Pôntico','elemento'],
   ['Provisório com aleta','elemento'],['Placa de bruxismo','elemento'],['Enceramento digital (planejamento)','elemento'],
   ['Protocolo (superior ou inferior)','trabalho'],['Protocolo completo (superior + inferior)','trabalho'],['Modelo 3D','trabalho'],['Gengiva','elemento']];
-/* ---------- Catálogo de laboratório (tabela pré-cadastrada) + ícones ---------- */
-var GENG=[' · c/ gengiva separada',' · s/ gengiva separada'];
-var CAT_LAB=(function(){var L=[],add=function(g,c,itens,forma){itens.forEach(function(i){L.push({g:g,c:c,nome:(c+' · '+i).slice(0,60),forma:forma||'elemento'});});};
-  var FX=['Elemento sobre dente','Elemento sobre implante','Faceta','Inlay / Onlay'];
-  add('Fixas fresadas','Zircônia fresada',FX.concat(['Copping','Gengiva']));
-  add('Fixas fresadas','Dissilicato de lítio',FX);
-  add('Fixas fresadas','PMMA monocolor',FX.concat(['Gengiva']));
-  add('Fixas fresadas','PMMA multilayer',FX.concat(['Gengiva']));
-  add('Fixas fresadas','PMMA carga cerâmica',FX.concat(['Gengiva']));
-  add('Fixas impressas','Impresso',['Provisório maquiado','Faceta maquiada']);
-  add('Placas de bruxismo','Placa de bruxismo',['Acrilizada em resina','Impressa','Fresada'],'trabalho');
-  ['Metalocerâmica','Metaloplástico','Convencional impresso','PMMA','PMMA carga cerâmica fresado','PMMA carga cerâmica impresso','Zircônia maquiada fresado'].forEach(function(m){add('Protocolos','Protocolo '+m,GENG.map(function(x){return x.slice(3);}),'trabalho');});
-  add('Protocolos','Protocolo acrilizado',['com STG · com dentes','com STG · sem dentes','sem STG · com dentes','sem STG · sem dentes'],'trabalho');
-  add('Gesso','Gesso',['Modelo arcada total','Modelo arcada total com gengiva','Modelo arcada parcial','Modelo arcada parcial com gengiva'],'trabalho');
-  add('Gesso','Gesso',['Troquel']);
-  add('Impressões','Impressão 3D',['Modelo arcada total','Modelo arcada parcial','Prova de protocolo','Mockup de arcada'],'trabalho');
-  add('Impressões','Impressão 3D',['Prova por elemento unitário']);
-  add('Modelagem 3D','Modelagem 3D',['Elemento sobre dente','Elemento sobre dente com gengiva','Elemento sobre implante','Elemento sobre implante com gengiva','Faceta','Inlay / Onlay','Copping']);
-  add('Modelagem 3D','Modelagem 3D',['Modelo','Placa de bruxismo','Barra metálica','Prótese flexível'],'trabalho');
-  return L;})();
-var GRUPO_IC={'Fixas fresadas':'⚙️','Fixas impressas':'🖨️','Placas de bruxismo':'🌙','Protocolos':'🦷','Gesso':'🧱','Impressões':'🖨️','Modelagem 3D':'💻','Outros':'📋'};
-function catFaltando(){var tem={};S.tipos.forEach(function(t){if(!t.deleted)tem[semAcento(t.nome)]=1;});return CAT_LAB.filter(function(r){return !tem[semAcento(r.nome)];});}
-function grupoDe(nome){var k=semAcento(nome);for(var i=0;i<CAT_LAB.length;i++)if(semAcento(CAT_LAB[i].nome)===k)return CAT_LAB[i].g;
-  if(/protocolo/.test(k))return 'Protocolos';if(/bruxismo/.test(k))return 'Placas de bruxismo';if(/gesso|troquel/.test(k))return 'Gesso';if(/modelagem|enceramento/.test(k))return 'Modelagem 3D';if(/impress|modelo 3d|mockup/.test(k))return 'Impressões';return 'Outros';}
-var ICO_EXTRA={ino:['Inlay / Onlay','#7B5CF2','<path d="M5 9c0-3 3-5.5 7-5.5S19 6 19 9v2H5z"/><path d="M9 7.5h6v3.5H9z"/><path d="M6 11c.4 4.2 1.5 8 3 9.5.7.7 1.6.3 1.8-.7l.6-3.3h1.2l.6 3.3c.2 1 1.1 1.4 1.8.7 1.5-1.5 2.6-5.3 3-9.5"/>'],
-  cop:['Copping','#5B8CFF','<path d="M6 13C6 7.5 8.7 4 12 4s6 3.5 6 9"/><path d="M8.5 13c0-4 1.5-6.5 3.5-6.5s3.5 2.5 3.5 6.5"/><path d="M5 13h14v2H5z"/>'],
-  gen:['Gengiva','#E86A8F','<path d="M3 9c2.5 2 4.5 3 9 3s6.5-1 9-3"/><path d="M3 9c0 5 4 9 9 9s9-4 9-9"/><path d="M7 13.5c1 .8 2.6 1.3 5 1.3s4-.5 5-1.3"/>'],
-  tro:['Troquel / gesso','#B7791F','<path d="M8 3.5h8l1 5H7z"/><path d="M7 8.5h10v4H7z"/><path d="M9 12.5l1 8h4l1-8"/>'],
-  bar:['Barra','#6B7591','<path d="M3 11h18v3H3z"/><path d="M6 14v4M12 14v5M18 14v4"/><path d="M5 18h2M11 19h2M17 18h2"/>'],
-  flx:['Prótese flexível','#D45BB0','<path d="M4 8c3 5 13 5 16 0"/><path d="M4 8c0 6 3.5 10 8 10s8-4 8-10"/><path d="M8 12.5v2M12 13.5v2.5M16 12.5v2"/>'],
-  prv:['Prova / mockup','#1DAE8A','<path d="M4 10c2 4 14 4 16 0"/><path d="M4 10c1 5 4 8 8 8s7-3 8-8"/><path d="M8 11.8v2.5M12 12.4v3M16 11.8v2.5"/><path d="M12 3v3M8.5 4.5l1 2M15.5 4.5l-1 2"/>']};
-function icoTab(nome){var k=semAcento(String(nome||'')).toLowerCase(),
-  c=/inlay|onlay/.test(k)?'ino':/copping|copin/.test(k)?'cop':/troquel|gesso/.test(k)?'tro':/barra/.test(k)?'bar':/flexivel/.test(k)?'flx':/mockup|prova/.test(k)?'prv':/protocolo/.test(k)?'pro':/bruxismo|placa/.test(k)?'pla':/gengiva/.test(k)?'gen':/implante/.test(k)?'imp':/faceta/.test(k)?'fac':/provis/.test(k)?'prov':/modelo/.test(k)?'mod':/modelagem|encer/.test(k)?'enc':/elemento|dente|coroa/.test(k)?'prep':'out',
-  d=ICO_EXTRA[c]||ICO_TRAB[c];
-  return '<span class="ico-trab tp-ica" style="--ic:'+d[1]+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+d[2]+'</svg></span>';}
-function prazoTipo(id){var tb=(S.prefs&&S.prefs.tab)||{},p=tb.prazos||{};return p[id]||'';}
 function refFaltando(){var tem={};S.tipos.forEach(function(t){tem[semAcento(t.nome)]=1;});return TRAB_REF.filter(function(r){return !tem[semAcento(r[0])];});}
 function toast(t,ms){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(function(){el.hidden=true;},ms||2800);}
 function save(){if(S.prospMembro){prSyncLogo();return;}agendaSync();if(PR.ok)prSyncLogo();}
@@ -3290,7 +3251,6 @@ function bolha(m){var ok=secOkHoje(m.k),hr=m.k?recHora(m.k):'';
 function iaContexto(id,q){var t=today(),L=[],P=alive(S.pedidos),ab=P.filter(aberto),F={ger:msgsGer,ven:msgsVen,fin:msgsFin,mkt:msgsMkt,dad:msgsDad},ms=[];
   try{ms=F[id]();}catch(e){}
   L.push('Hoje: '+DIAS[new Date(t+'T12:00:00').getDay()]+', '+dmy(t)+'. Cadista: '+((S.perfil.nome||'').trim()||'sem nome')+'.');
-  try{var tpL=alive(S.tipos).filter(function(x){return x.ativo;});if(tpL.length)L.push('Tabela de preços e prazos: '+tpL.map(function(x){var pz=prazoTipo(x.id);return x.nome+' = '+brl(+x.valor)+(x.forma==='elemento'?' por elemento':' por trabalho')+(pz?', prazo '+pz+' dias úteis':'');}).join('; ')+'.');}catch(e){}
   var mes=monthOf(t),fat=P.filter(function(p){return p.recebido&&monthOf(p.recebido)===mes;}).reduce(function(s,p){return s+(+p.valor||0);},0),meta=null;try{meta=metaDe(mes);}catch(e){}
   L.push('Faturamento do mês até agora: '+brl(fat)+(meta&&meta.fat?' (meta '+brl(meta.fat)+')':' (sem meta cadastrada)')+'. Pedidos em produção: '+ab.length+'. Atrasados: '+ab.filter(function(p){return atrasado(p,t);}).length+'.');
   try{var hm=[],m0=mes;for(var q=0;q<12;q++){var pp=P.filter(function(x){return x.recebido&&monthOf(x.recebido)===m0;});if(pp.length||q<3)hm.push(capMes(m0)+': '+brl(soma(pp))+' ('+plural(pp.length,'pedido','pedidos')+', '+plural(elems(pp),'elemento','elementos')+')');m0=prevMonth(m0);}
@@ -5564,13 +5524,10 @@ function rdParceiros(R){
 /* ---------- Tabela de preços (Configurações) ---------- */
 function rTabela(){
   var w=canWrite(),dis=w?'':'disabled',ts=alive(S.tipos),falta=refFaltando(),tb=(S.prefs&&S.prefs.tab)||{};
-  var gr={},ord=['Fixas fresadas','Fixas impressas','Placas de bruxismo','Protocolos','Gesso','Impressões','Modelagem 3D','Outros'];ts.forEach(function(t){var g=grupoDe(t.nome);(gr[g]=gr[g]||[]).push(t);});
-  var cf=catFaltando();
-  var lista=ts.length?ord.filter(function(g){return gr[g];}).map(function(g){return '<div class="tp-gr"><span>'+GRUPO_IC[g]+'</span>'+esc(g)+'<em>'+gr[g].length+'</em></div>'+gr[g].map(function(t){return linhaTabela(t,dis);}).join('');}).join(''):'<p class="small muted tp-vazio" style="padding:6px 2px">Nenhum item. Use “+ Adicionar item”.</p>';
+  var lista=ts.length?ts.map(function(t){return linhaTabela(t,dis);}).join(''):'<p class="small muted tp-vazio" style="padding:6px 2px">Nenhum item. Use “+ Adicionar item”.</p>';
   return '<form class="stack" data-form="tabela">'+
     '<div class="banner"><span>Este é o seu <b>preço padrão</b> para cada trabalho. Os valores começam em R$ 0,00: preencha como quiser. Preço diferente para um cliente específico fica na ficha do cliente.</span></div>'+
-    (falta.length&&cf.length===CAT_LAB.length?'<div class="banner"><span>Faltam '+falta.length+' trabalho(s) da lista de referência: '+falta.map(function(r){return esc(r[0]);}).join(', ')+'.</span><button type="button" class="btn sm" data-a="addRef" '+dis+'>Adicionar com R$ 0,00</button></div>':'')+
-    (cf.length?'<div class="banner"><span>📚 <b>Catálogo de laboratório</b>: '+cf.length+' item(ns) prontos (zircônia, dissilicato, PMMA, protocolos, placas, gesso, impressões e modelagem 3D).</span><button type="button" class="btn sm pri" data-a="addCatLab" '+dis+'>Adicionar com R$ 0,00</button></div>':'')+
+    (falta.length?'<div class="banner"><span>Faltam '+falta.length+' trabalho(s) da lista de referência: '+falta.map(function(r){return esc(r[0]);}).join(', ')+'.</span><button type="button" class="btn sm" data-a="addRef" '+dis+'>Adicionar com R$ 0,00</button></div>':'')+
     '<div class="tp-grid">'+
       '<section class="card stack"><div><h2>Trabalhos e preços</h2><p class="small muted">“Por elemento” multiplica pelos dentes marcados no pedido; “por trabalho” é valor fechado.</p></div><div class="tp-list" id="tp-list">'+lista+'</div>'+
         '<div><button type="button" class="btn" data-a="addItem" '+dis+'>+ Adicionar item</button></div></section>'+
@@ -5588,10 +5545,9 @@ function rTabela(){
     '<div class="row wrap"><button class="btn pri" type="submit" '+dis+'>Salvar tabela</button></div></form>';
 }
 function linhaTabela(t,dis){var novo=!t.id,id=t.id||('novo'+uid().replace(/-/g,''));
-  return '<div class="tp-li'+(t.ativo===false?' off':'')+'">'+(novo?'':icoTab(t.nome))+
+  return '<div class="tp-li'+(t.ativo===false?' off':'')+'">'+
     '<input class="tp-nome" name="n_'+id+'" maxlength="60" required value="'+esc(t.nome||'')+'" placeholder="Nome do item" aria-label="Nome do trabalho" '+(novo?'':'readonly title="O nome fica travado depois de salvo. Para outro nome, adicione um item novo." ')+dis+'>'+
     '<select name="f_'+id+'" aria-label="Forma de cobrança" '+dis+'><option value="elemento" '+(t.forma!=='trabalho'?'selected':'')+'>'+formaTxt({nome:t.nome,forma:'elemento'})+'</option><option value="trabalho" '+(t.forma==='trabalho'?'selected':'')+'>'+formaTxt({nome:t.nome,forma:'trabalho'})+'</option></select>'+
-    '<label class="tp-pz" title="Prazo em dias úteis"><span>⏱</span><input name="p_'+id+'" type="number" min="0" max="60" inputmode="numeric" placeholder="dias" value="'+esc(t.id?prazoTipo(t.id):'')+'" aria-label="Prazo em dias úteis" '+dis+'></label>'+
     '<label class="tp-val"><span>R$</span><input name="v_'+id+'" type="number" step="0.01" min="0" inputmode="decimal" value="'+(+t.valor||0).toFixed(2)+'" aria-label="Valor" '+dis+'></label>'+
     '<label class="check tp-at" title="Desmarque para não aparecer no novo pedido"><input type="checkbox" name="a_'+id+'" '+(t.ativo===false?'':'checked')+' '+dis+'> Ativo</label>'+
     '<button type="button" class="tp-x" data-a="'+(novo?'delNovo':'delTab')+'" data-id="'+id+'" aria-label="Excluir" title="Excluir" '+dis+'>✕</button></div>';
@@ -7531,7 +7487,6 @@ impGrava:function(){impGrava();},
     l.insertAdjacentHTML('beforeend',linhaTabela({nome:'',forma:'elemento',valor:0,ativo:true},''));var n=l.lastElementChild.querySelector('.tp-nome');n.focus();n.scrollIntoView({block:'center',behavior:'smooth'});},
   delNovo:function(d,el){var li=el.closest('.tp-li');if(li)li.remove();},
   instalarApp:function(){var e=window._instalar;if(!e)return;e.prompt();e.userChoice.then(function(r){window._instalar=null;render();toast(r.outcome==='accepted'?'Pronto! O Ideali CAD está na sua tela inicial.':'Tudo bem, dá para instalar depois.');});},
-  addCatLab:function(){if(!guard())return;var f=catFaltando();f.forEach(function(r){S.tipos.push({id:uid(),nome:r.nome,forma:r.forma,valor:0,ativo:true});});save();render();toast(f.length+' item(ns) do catálogo adicionados. Agora preencha os preços e prazos.');},
   addRef:function(){if(!guard())return;var f=refFaltando();f.forEach(function(r){S.tipos.push({id:uid(),nome:r[0],forma:r[1],valor:0,ativo:true});});save();render();toast(f.length+' trabalho(s) adicionado(s) com R$ 0,00.');},
   contaIr:function(d){ui.ddOpen=null;A.tab(d);},
   compLin:function(d){ui.compLin=d.v||'';ui.compMais=false;render();},
@@ -7862,9 +7817,8 @@ var F={
     var nomes={};alive(S.tipos).forEach(function(t){nomes[semAcento(t.nome)]=1;});
     for(var i=0;i<novos.length;i++){var kk=semAcento(novos[i].nome);if(nomes[kk]){toast('Já existe um item chamado “'+novos[i].nome+'”.');return;}nomes[kk]=1;}
     novos.forEach(function(t){S.tipos.push(t);n++;});
-    var pzs={};alive(S.tipos).forEach(function(t){var x=parseInt(fd.get('p_'+t.id),10);if(x>0&&x<=60)pzs[t.id]=x;});
-    var tb={prazos:pzs,modelos:(S.prefs&&S.prefs.tab&&S.prefs.tab.modelos!=null)?S.prefs.tab.modelos:null,prazo:(fd.get('prazo')||'').trim(),pagamento:fd.getAll('pg').concat(String(fd.get('pgOutro')||'').trim()?[String(fd.get('pgOutro')).trim()]:[]).join(', '),info:(fd.get('info')||'').trim()};
-    S.prefs=S.prefs||{};var pv=S.prefs.tab||{};if(JSON.stringify(tb)!==JSON.stringify({prazos:pv.prazos||{},modelos:pv.modelos==null?null:pv.modelos,prazo:pv.prazo||'',pagamento:pv.pagamento||'',info:pv.info||''})){S.prefs.tab=tb;n++;}
+    var tb={modelos:(S.prefs&&S.prefs.tab&&S.prefs.tab.modelos!=null)?S.prefs.tab.modelos:null,prazo:(fd.get('prazo')||'').trim(),pagamento:fd.getAll('pg').concat(String(fd.get('pgOutro')||'').trim()?[String(fd.get('pgOutro')).trim()]:[]).join(', '),info:(fd.get('info')||'').trim()};
+    S.prefs=S.prefs||{};var pv=S.prefs.tab||{};if(JSON.stringify(tb)!==JSON.stringify({modelos:pv.modelos==null?null:pv.modelos,prazo:pv.prazo||'',pagamento:pv.pagamento||'',info:pv.info||''})){S.prefs.tab=tb;n++;}
     save();render();toast(n?'Tabela salva ('+n+' alteração(ões)).':'Nada mudou na tabela.');
   },
   perfilRede:function(fd){var v=String(fd.get('video')||'').trim(),ufv=String(fd.get('uf')||''),cv=String(fd.get('cidade')||'').trim();
