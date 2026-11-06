@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ideali Odonto</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Figtree:wght@400;500;600;700;800&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#0B1030;--bg2:#121A45;--card:#161F52;--ink:#EEF2FF;--mut:#A9B3E0;--line:rgba(255,255,255,.12);--mint:#7CF0C8;--teal:#2BC7B8;--roxo:#5B45E0;--erro:#FF9A95;
+  --f-d:"Plus Jakarta Sans",system-ui,sans-serif;--f-b:"Figtree",system-ui,sans-serif}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:radial-gradient(ellipse at 50% -10%,#24307a 0%,var(--bg) 55%) fixed,var(--bg);color:var(--ink);font:16px/1.5 var(--f-b);min-height:100vh;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--mint)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+.logo{display:inline-flex;align-items:center;gap:9px;font:800 1.1rem var(--f-d);text-decoration:none;color:var(--ink)}
+.logo i{width:30px;height:30px;border-radius:9px;background:var(--roxo);display:grid;place-items:center;font-style:normal}
+.logo small{font:700 .7rem var(--f-b);letter-spacing:.14em;color:var(--mint)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);border-radius:999px;padding:11px 20px;font-weight:700;text-decoration:none}
+.btn.pri{background:var(--teal);border-color:var(--teal);color:#06201d}
+.btn.sm{padding:7px 14px;font-size:.88rem}
+.btn:disabled{opacity:.55;cursor:wait}
+.lin{display:flex;flex-direction:column;gap:5px;font-size:.85rem;color:var(--mut);font-weight:700}
+.lin input,.lin select,.lin textarea{background:rgba(0,0,0,.25);border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;color:var(--ink);font-weight:500;font-size:1rem;width:100%}
+.lin input:focus,.lin select:focus,.lin textarea:focus{outline:none;border-color:var(--mint)}
+.lin select option{color:#111}
+.lin input:disabled{opacity:.5}
+.erro{color:var(--erro);font-weight:700;margin:0}
+.ok{color:var(--mint);font-weight:700;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1.5px solid var(--line);background:rgba(255,255,255,.05);border-radius:999px;padding:7px 13px;font-weight:700;font-size:.9rem;color:var(--ink)}
+.chip.on{border-color:var(--mint);background:rgba(124,240,200,.14)}
+/* login */
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px}
+.auth-c{width:min(420px,100%);display:grid;gap:14px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:24px;padding:26px;backdrop-filter:blur(8px)}
+.auth-c h1{margin:0;font:800 1.6rem/1.15 var(--f-d)}.auth-c p{margin:0;color:var(--mut)}
+.auth-ana{display:flex;gap:12px;align-items:center}.auth-ana img{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#fff2}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:rgba(0,0,0,.25);border-radius:14px;padding:4px}
+.seg button{border:0;background:none;border-radius:10px;padding:9px;font-weight:800;color:var(--mut)}.seg button.on{background:var(--teal);color:#06201d}
+.link{background:none;border:0;color:var(--mint);font-weight:700;padding:0;text-decoration:underline;text-underline-offset:3px}
+/* cadastro (folha) */
+.folha{max-width:760px;margin:20px auto;background:#F7F8FC;color:#1B2140;border-top:8px solid var(--teal);border-radius:8px 8px 22px 22px;padding:clamp(18px,4vw,34px);box-shadow:0 30px 70px -20px rgba(0,0,0,.6);display:grid;gap:18px}
+.folha h1{margin:0;font:800 1.6rem var(--f-d)}.folha>p{margin:0;color:#4A5275}
+.folha .lin{color:#4A5275}.folha .lin input,.folha .lin select,.folha .lin textarea{background:#fff;border-color:#D5DAEA;color:#1B2140}
+.folha .lin input:focus,.folha .lin select:focus{border-color:var(--teal)}
+.folha .chip{color:#1B2140;border-color:#D5DAEA;background:#fff}.folha .chip.on{background:#E3F7F0;border-color:var(--teal)}
+.fs{display:grid;gap:10px;padding-top:14px;border-top:2px solid #E1E5F2}.fs h3{margin:0;font:800 .78rem var(--f-b);letter-spacing:.1em;text-transform:uppercase;color:#7A82A3;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fs h3 span{text-transform:none;letter-spacing:0;font-weight:700;color:#1D8A6A}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g3{display:grid;grid-template-columns:140px 1fr;gap:12px}
+.folha .erro{color:#C0392B}
+.priv{background:#EEF8F4;border:1px solid #BFE8D8;border-radius:14px;padding:12px 14px;font-size:.92rem;color:#1B4A3A}
+/* topo do app */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;max-width:980px;margin:0 auto}
+.spacer{flex:1}
+.master{background:linear-gradient(135deg,#FFD166,#F0A53A);color:#3a2400;border-radius:999px;padding:4px 12px;font-weight:800;font-size:.8rem}
+.abas{display:flex;gap:4px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:5px;max-width:980px;margin:0 auto 4px}
+.abas button{flex:1;border:0;background:none;border-radius:10px;padding:10px;font-weight:800;color:var(--mut)}.abas button.on{background:var(--teal);color:#06201d}
+/* currículo */
+.cv{display:grid;grid-template-columns:270px 1fr;gap:18px;align-items:start}
+.cv-l,.cv-r{display:grid;gap:14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:10px}
+.box h3{margin:0;font:800 .78rem var(--f-b);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:8px}
+.box h3 .spacer{flex:1}
+.ft{width:120px;height:120px;border-radius:50%;margin:0 auto;display:grid;place-items:center;background:#2a3576;overflow:hidden;font:800 2.2rem var(--f-d);position:relative;border:3px solid rgba(255,255,255,.15)}
+.ft img{width:100%;height:100%;object-fit:cover}
+.ft-b{position:absolute;inset:auto 0 0 0;background:rgba(0,0,0,.55);font:700 .7rem var(--f-b);padding:5px;text-align:center}
+.cv-id{text-align:center;display:grid;gap:2px}.cv-id b{font:800 1.2rem var(--f-d)}.cv-id span{color:var(--mut);font-size:.9rem}
+.cads{display:grid;gap:6px}
+.cad{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.9rem;font-weight:700}
+.cad button{border:1.5px solid var(--line);background:rgba(255,255,255,.05);border-radius:999px;padding:4px 11px;font-weight:800;font-size:.8rem;min-width:104px;color:var(--ink)}
+.cad button.on{border-color:var(--mint);color:var(--mint);background:rgba(124,240,200,.12)}
+.nota{font-size:.8rem;color:var(--mut);margin:0}
+.sw{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.9rem}
+.sw i{width:44px;height:26px;border-radius:99px;background:#39427a;position:relative;flex:none;transition:.25s}.sw i::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.25s}
+.sw.on i{background:var(--teal)}.sw.on i::after{left:21px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:5px 6px 5px 10px;font-weight:700;font-size:.86rem}
+.tag b{font-size:.68rem;border-radius:999px;padding:1px 7px;color:#0a0d24}.nv-b{background:#9AA6C8}.nv-m{background:#7FA4FF}.nv-a{background:#5BE3A4}
+.tag button{border:0;background:none;color:var(--mut);font-weight:800;padding:0 4px}
+.addl{display:flex;gap:6px}.addl input{flex:1;background:rgba(0,0,0,.25);border:1.5px solid var(--line);border-radius:12px;padding:9px 11px;color:var(--ink)}
+.xp{display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:8px 0}.xp div{flex:1}.xp small{display:block;color:var(--mut)}
+.xp button{border:0;background:none;color:var(--mut);font-weight:800}
+.xpf{display:grid;grid-template-columns:1fr 1fr 80px auto;gap:6px}.xpf input{background:rgba(0,0,0,.25);border:1.5px solid var(--line);border-radius:12px;padding:9px 10px;color:var(--ink);min-width:0}
+textarea.res{width:100%;min-height:90px;background:rgba(0,0,0,.25);border:1.5px solid var(--line);border-radius:12px;padding:10px;color:var(--ink);resize:vertical}
+.salvo{font-size:.75rem;color:var(--mint);font-weight:700}
+/* como a Rede te vê */
+.rv{background:#F7F8FC;color:#1B2140;border-top:6px solid var(--teal);border-radius:6px 6px 16px 16px;padding:14px;display:grid;gap:8px}
+.rv small.k{font:800 .66rem var(--f-b);letter-spacing:.12em;color:#1D8A6A}
+.rv-h{display:flex;gap:10px;align-items:center}.rv-h b{display:block}.rv-h span{color:#5d6486;font-size:.85rem;font-weight:600}
+.rv-av{width:46px;height:46px;border-radius:50%;background:#C9CEE0;display:grid;place-items:center;font-weight:800;color:#fff;overflow:hidden;flex:none}.rv-av img{width:100%;height:100%;object-fit:cover}
+.rv-i{display:flex;flex-wrap:wrap;gap:6px;font-size:.82rem;color:#3A4163}
+.rv-t{display:flex;flex-wrap:wrap;gap:5px}.rv-t span{background:#fff;border:1px solid #D5DAEA;border-radius:8px;padding:2px 8px;font-size:.78rem;font-weight:700}
+/* overlay: tutorial e Ana */
+.ov{position:fixed;inset:0;z-index:50;background:rgba(3,6,20,.78);display:flex;align-items:center;justify-content:center;padding:16px}
+.ovc{width:min(520px,100%);max-height:92vh;background:#10184A;border:1px solid var(--line);border-top:5px solid var(--mint);border-radius:22px;padding:22px;display:grid;gap:12px}
+.tut{text-align:center}.tut .ic{font-size:2.6rem}.tut h2{margin:0;font:800 1.4rem var(--f-d)}.tut p{margin:0;color:var(--mut)}
+.dots{display:flex;justify-content:center;gap:6px}.dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}.dots i.on{width:22px;border-radius:5px;background:var(--mint)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.perg{display:flex;gap:14px;align-items:flex-start}.perg img{width:72px;height:72px;border-radius:50%;object-fit:cover;flex:none}
+.chat{padding:0;overflow:hidden;display:flex;flex-direction:column;height:min(660px,92vh)}
+.ch-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}.ch-h img{width:40px;height:40px;border-radius:50%;object-fit:cover}.ch-h small{display:block;color:var(--mut);font-size:.75rem}
+.ch-b{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.m{max-width:85%;padding:9px 13px;border-radius:14px;line-height:1.4}.m.an{background:rgba(255,255,255,.08);align-self:flex-start;border-bottom-left-radius:4px}.m.eu{background:var(--teal);color:#06201d;align-self:flex-end;border-bottom-right-radius:4px;font-weight:600}
+.ch-r{padding:12px 16px;border-top:1px solid var(--line);display:grid;gap:10px;max-height:48%;overflow-y:auto}
+.nvr{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.nvr b{min-width:120px}
+.load{min-height:100vh;display:grid;place-items:center;color:var(--mut)}
+.em-breve{text-align:center;padding:40px 16px;display:grid;gap:10px;justify-items:center}.em-breve .ic{font-size:2.6rem}.em-breve h2{margin:0;font:800 1.4rem var(--f-d)}.em-breve p{margin:0;color:var(--mut);max-width:460px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#fff;color:#1B2140;border-radius:999px;padding:10px 18px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:80;max-width:92vw;text-align:center}
+@media (max-width:760px){.cv{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr}.xpf{grid-template-columns:1fr 1fr}.perg{flex-direction:column;align-items:center;text-align:center}}
+</style>
+</head>
+<body>
+<div id="app"><div class="load">Carregando…</div></div>
+<div id="toast" hidden></div>
+<script>
+'use strict';
+var SUPA_URL='https://qxspiaqaigjkmilxxfri.supabase.co';
+var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4c3BpYXFhaWdqa21pbHh4ZnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjYwMzMsImV4cCI6MjEwNzIwMjAzM30.TeIHiEvHx1PmvS5PQ3lzvByYP9ppYuq5GLZURtutXc0';
+var sb=window.supabase?window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+var EQ='../../app/equipe/';
+var PROFS=['Dentista','Protético','ASB / TSB','Corporativo','Indústria e comércio','Estudante'];
+var UFS=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+var NIV={b:'Básico',m:'Médio',a:'Avançado'};
+var SISTEMAS={'Dentista':['Clinicorp','Simples Dental','Dental Office','3Shape','Medit Link','Excel'],
+  'Protético':['Exocad','3Shape','Medit Link','DentalCNC','ChituBox','Blender for Dental','Labfácil','Ideali CAD','Excel'],
+  'ASB / TSB':['Clinicorp','Simples Dental','Dental Office','Excel'],
+  'Corporativo':['Clinicorp','Simples Dental','Dental Office','Excel','Canva','WhatsApp Business'],
+  'Indústria e comércio':['Excel','CRM de vendas','ERP','WhatsApp Business','Canva'],
+  'Estudante':['Exocad','Blender for Dental','Medit Link','Excel','Canva']};
+var POSG={'Dentista':['Implantodontia','Ortodontia','Endodontia','Periodontia','Prótese Dentária','Dentística','Odontopediatria','Cirurgia Bucomaxilofacial','Harmonização Orofacial'],
+  'Protético':['Especialização em CAD/CAM','Cerâmica avançada','Prótese sobre implante','Gestão de laboratório'],
+  'ASB / TSB':['Técnico em Saúde Bucal (TSB)','Instrumentação cirúrgica','Radiologia odontológica'],
+  'Corporativo':['MBA em Gestão','Gestão de clínicas','Marketing digital'],
+  'Indústria e comércio':['MBA em Vendas','Gestão comercial','Marketing'],
+  'Estudante':['Iniciação científica','Liga acadêmica']};
+var CURSOS={'Dentista':['Lentes de contato dental','Clareamento','Fotografia odontológica','Escaneamento intraoral','Cirurgia guiada'],
+  'Protético':['Exocad básico','Exocad avançado','Estratificação em cerâmica','Fresagem','Impressão 3D','Protocolo sobre implante'],
+  'ASB / TSB':['Biossegurança','Radiologia','Instrumentação cirúrgica','Atendimento ao paciente'],
+  'Corporativo':['Atendimento ao paciente','Vendas de tratamentos','Gestão financeira','Marketing para clínicas'],
+  'Indústria e comércio':['Implantes e componentes','Técnicas de negociação','Atendimento a clínicas'],
+  'Estudante':['Fotografia odontológica','Fluxo digital','Exocad básico','Biossegurança']};
+var TUT=[['👋','Bem-vindo à Ideali Odonto','Aqui fica a sua carreira na odontologia: currículo, vagas, contatos e cursos.'],
+  ['🔒','Você decide o que mostrar','Nome, idade, foto e contatos ficam ocultos até você abrir o cadeado. Telefone e e-mail nunca aparecem na Rede.'],
+  ['🌐','A Rede vem aí','Vagas perto de você, profissionais, clínicas e laboratórios. Estamos abrindo aos poucos.'],
+  ['💜','A Ana te ajuda','Ela monta o seu currículo numa conversa rápida e depois te avisa das vagas com o seu perfil.']];
+var VIS0={foto:false,nome:false,idade:false,sexo:false,cidade:true,empresas:true,cursos:true};
+var S={tela:'load',user:null,p:null,admin:false,aba:'cv',auth:{modo:'entrar',email:'',msg:'',erro:'',busy:false},
+  cad:{nome:'',whats:'',prof:'',cargo:'',idade:'',sexo:'',uf:'',cidade:'',formacao:'',situacao:'',instituicao:'',erro:'',busy:false},
+  pos:null,fotoUrl:'',salvo:''};
+var MUN_UF=null;
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function semAc(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();}
+function toast(t){var e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){e.hidden=true;},3000);}
+function telFmt(d){d=String(d||'').replace(/\D/g,'').slice(0,11);return d.length>10?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length>6?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d.length>2?'('+d.slice(0,2)+') '+d.slice(2):d;}
+function msgAuth(e){var m=(e&&e.message)||'';
+  if(/Invalid login credentials/i.test(m))return 'E-mail ou senha incorretos.';
+  if(/Email not confirmed/i.test(m))return 'Confirme seu e-mail antes de entrar. Procure a mensagem na caixa de entrada e no spam.';
+  if(/already registered|already been registered/i.test(m))return 'Já existe uma conta com esse e-mail. Use "Entrar". (Se você usa o Ideali CAD, é a mesma conta.)';
+  if(/Password should be|weak/i.test(m))return 'Senha fraca. Use pelo menos 8 caracteres, misturando letras e números.';
+  if(/rate limit|too many/i.test(m))return 'Muitas tentativas. Aguarde alguns minutos e tente de novo.';
+  if(/fetch|network/i.test(m))return 'Sem conexão com a internet.';
+  return 'Não deu certo agora. Tente de novo.';}
+
+/* ---------- municípios (mesma lista do Ideali CAD) ---------- */
+function carregaMun(){if(MUN_UF)return Promise.resolve();return fetch('../../app/municipios.json').then(function(r){return r.json();}).then(function(L){var m={};L.forEach(function(x){(m[x[1]]=m[x[1]]||[]).push(x[0]);});Object.keys(m).forEach(function(u){m[u].sort(function(a,b){return a.localeCompare(b,'pt');});});MUN_UF=m;}).catch(function(){MUN_UF={};});}
+function munNome(uf,c){var L=(MUN_UF&&MUN_UF[uf])||[],k=semAc(c);for(var i=0;i<L.length;i++)if(semAc(L[i])===k)return L[i];return '';}
+function munDl(id,uf){return '<datalist id="'+id+'">'+((MUN_UF&&MUN_UF[uf])||[]).map(function(n){return '<option value="'+esc(n)+'">';}).join('')+'</datalist>';}
+function ufOpts(sel){return '<option value="">Escolha</option>'+UFS.map(function(u){return '<option'+(u===sel?' selected':'')+'>'+u+'</option>';}).join('');}
+
+/* ---------- sessão ---------- */
+function iniciar(){if(!sb){$('app').innerHTML='<div class="load">Não foi possível carregar. Verifique a internet e recarregue a página.</div>';return;}
+  carregaMun();
+  sb.auth.onAuthStateChange(function(ev,ses){var u=ses&&ses.user;if(ev==='PASSWORD_RECOVERY'){S.tela='novasenha';render();return;}
+    if(!u){S.user=null;S.p=null;S.admin=false;S.tela='login';render();return;}
+    if(S.user&&S.user.id===u.id&&S.p)return;S.user=u;S.tela='load';render();carregaPerfil();});}
+function carregaPerfil(){Promise.all([sb.from('odo_perfis').select('*').eq('user_id',S.user.id).maybeSingle(),sb.rpc('sou_admin'),sb.from('perfis').select('nome,telefone').eq('user_id',S.user.id).maybeSingle()]).then(function(r){
+  if(r[0].error){S.tela='erro';S.erroMsg=/odo_perfis/.test(r[0].error.message||'')?'O banco do Ideali Odonto ainda não foi preparado (atualização 039).':'Não consegui carregar seus dados.';render();return;}
+  S.admin=!!r[1].data;S.p=r[0].data;
+  if(!S.p){var cp=r[2].data||{};if(cp.nome&&!S.cad.nome)S.cad.nome=cp.nome;if(cp.telefone&&!S.cad.whats)S.cad.whats=String(cp.telefone).replace(/\D/g,'');S.tela='cadastro';render();return;}
+  S.p.vis=Object.assign({},VIS0,S.p.vis||{});S.tela='app';render();fotoUrl();});}
+function fotoUrl(){S.fotoUrl='';if(!S.p||!S.p.foto)return;sb.storage.from('odonto-fotos').createSignedUrl(S.p.foto,3600).then(function(r){if(r.data&&r.data.signedUrl){S.fotoUrl=r.data.signedUrl;render();}});}
+
+/* ---------- telas ---------- */
+function render(){var h='';
+  if(S.tela==='load')h='<div class="load">Carregando…</div>';
+  else if(S.tela==='erro')h='<div class="load"><div class="em-breve"><div class="ic">🛠️</div><h2>Quase lá</h2><p>'+esc(S.erroMsg||'')+'</p><button class="btn" data-a="sair">Sair</button></div></div>';
+  else if(S.tela==='login')h=rLogin();
+  else if(S.tela==='novasenha')h=rNovaSenha();
+  else if(S.tela==='cadastro')h=rCadastro();
+  else h=rApp();
+  var foco=document.activeElement&&document.activeElement.id,pos=foco&&document.activeElement.selectionStart;
+  $('app').innerHTML=h;if(foco&&$(foco)){var f=$(foco);f.focus();try{if(pos!=null)f.setSelectionRange(pos,pos);}catch(e){}}
+  ovRender();}
+function rLogin(){var A=S.auth,cr=A.modo==='criar';
+  return '<div class="auth"><form class="auth-c" id="fauth" novalidate><a class="logo" href="../"><i>i</i>Ideali <small>ODONTO</small></a>'+
+    '<div class="auth-ana"><img src="'+EQ+'ana-av-feliz.webp" alt=""><p>'+(cr?'Vamos criar a sua conta. Depois eu monto o seu currículo com você. 💜':'Que bom te ver! Entre com o seu e-mail e senha.')+'</p></div>'+
+    '<div class="seg"><button type="button" class="'+(!cr?'on':'')+'" data-a="modo" data-v="entrar">Entrar</button><button type="button" class="'+(cr?'on':'')+'" data-a="modo" data-v="criar">Criar conta</button></div>'+
+    '<label class="lin">E-mail<input id="au-email" type="email" autocomplete="email" value="'+esc(A.email)+'" required></label>'+
+    '<label class="lin">Senha<input id="au-senha" type="password" autocomplete="'+(cr?'new-password':'current-password')+'" minlength="8" required></label>'+
+    (cr?'<p class="nota">Já usa o Ideali CAD? É a mesma conta: é só entrar.</p>':'')+
+    (A.erro?'<p class="erro">'+esc(A.erro)+'</p>':'')+(A.msg?'<p class="ok">'+esc(A.msg)+'</p>':'')+
+    '<button class="btn pri" type="submit"'+(A.busy?' disabled':'')+'>'+(A.busy?'Aguarde…':cr?'Criar conta':'Entrar')+'</button>'+
+    (!cr?'<button type="button" class="link" data-a="esqueci">Esqueci a senha</button>':'')+'</form></div>';}
+function rNovaSenha(){return '<div class="auth"><form class="auth-c" id="fnova"><h1>Nova senha</h1><label class="lin">Nova senha<input id="ns-s" type="password" minlength="8" autocomplete="new-password"></label>'+(S.auth.erro?'<p class="erro">'+esc(S.auth.erro)+'</p>':'')+'<button class="btn pri">Salvar senha</button></form></div>';}
+function rCadastro(){var c=S.cad;
+  return '<form class="folha" id="fcad" novalidate><div class="row"><a class="logo" style="color:#1B2140" href="../"><i style="color:#fff">i</i>Ideali <small>ODONTO</small></a><span class="spacer"></span><button type="button" class="link" style="color:#1D8A6A" data-a="sair">Sair</button></div>'+
+    '<div><h1>Seu cadastro</h1><p style="margin:4px 0 0;color:#4A5275">Leva 1 minuto. Depois a Ana completa o seu currículo com você.</p></div>'+
+    '<div class="priv">🔒 <b>Atenção: todos os seus dados ficam em sigilo.</b> Nome, idade, foto e contatos ficam ocultos na Rede até você decidir mostrar.</div>'+
+    '<div class="fs"><h3>Você</h3><label class="lin">Nome completo<input id="cd-nome" data-c="nome" maxlength="80" autocomplete="name" value="'+esc(c.nome)+'"></label>'+
+      '<div class="g2"><label class="lin">WhatsApp com DDD<input id="cd-whats" data-c="whats" inputmode="numeric" autocomplete="tel" value="'+esc(telFmt(c.whats))+'"></label>'+
+      '<div class="g2"><label class="lin">Idade<input id="cd-idade" data-c="idade" type="number" min="14" max="90" inputmode="numeric" value="'+esc(c.idade)+'"></label>'+
+      '<label class="lin">Sexo<select id="cd-sexo" data-c="sexo"><option value="">Escolha</option>'+['Feminino','Masculino','Prefiro não informar'].map(function(x){return '<option'+(x===c.sexo?' selected':'')+'>'+x+'</option>';}).join('')+'</select></label></div></div></div>'+
+    '<div class="fs"><h3>Sua profissão</h3><div class="chips">'+PROFS.map(function(p){return '<button type="button" class="chip'+(c.prof===p?' on':'')+'" data-a="prof" data-v="'+esc(p)+'">'+esc(p)+'</button>';}).join('')+'</div>'+
+      '<label class="lin">Cargo ou função (opcional)<input id="cd-cargo" data-c="cargo" maxlength="80" placeholder="Ex.: Cadista, Ceramista, ASB de cirurgia, Dono de laboratório" value="'+esc(c.cargo)+'"></label></div>'+
+    '<div class="fs"><h3>Onde você está</h3><div class="g3"><label class="lin">Estado<select id="cd-uf" data-c="uf">'+ufOpts(c.uf)+'</select></label>'+
+      '<label class="lin">Município<input id="cd-cid" data-c="cidade" list="cd-dl" autocomplete="off" placeholder="'+(c.uf?'Digite e escolha da lista':'Escolha o estado primeiro')+'" value="'+esc(c.cidade)+'"'+(c.uf?'':' disabled')+'>'+munDl('cd-dl',c.uf)+'</label></div></div>'+
+    '<div class="fs"><h3>Formação</h3><label class="lin">Curso<input id="cd-form" data-c="formacao" maxlength="120" placeholder="Ex.: Técnico em Prótese Dentária, Odontologia" value="'+esc(c.formacao)+'"></label>'+
+      '<div class="g2"><label class="lin">Situação<select id="cd-sit" data-c="situacao"><option value="">Escolha</option>'+['Cursando','Concluído','Trancado'].map(function(x){return '<option'+(x===c.situacao?' selected':'')+'>'+x+'</option>';}).join('')+'</select></label>'+
+      '<label class="lin">Instituição<input id="cd-inst" data-c="instituicao" maxlength="120" value="'+esc(c.instituicao)+'"></label></div></div>'+
+    (c.erro?'<p class="erro">'+esc(c.erro)+'</p>':'')+
+    '<button class="btn pri" type="submit"'+(c.busy?' disabled':'')+'>'+(c.busy?'Salvando…':'Criar meu perfil')+'</button></form>';}
+function cadValida(){var c=S.cad;
+  if(c.nome.trim().split(/\s+/).length<2)return 'Digite nome e sobrenome.';
+  var w=c.whats.replace(/\D/g,'');if(w&&(w.length<10||w.length>11))return 'Confira o WhatsApp com DDD.';
+  if(!(+c.idade>=14&&+c.idade<=90))return 'Digite a sua idade.';
+  if(!c.sexo)return 'Escolha uma opção em Sexo.';
+  if(!c.prof)return 'Toque na sua profissão.';
+  if(!c.uf)return 'Escolha o seu estado.';
+  var m=munNome(c.uf,c.cidade);if(!m)return 'Escolha o município na lista de '+c.uf+'.';c.cidade=m;
+  return '';}
+function rApp(){var p=S.p;
+  return '<header class="top"><a class="logo" href="../"><i>i</i>Ideali <small>ODONTO</small></a>'+(S.admin?'<span class="master" title="Conta master: tudo liberado">👑 Conta master</span>':'')+'<span class="spacer"></span><button class="btn sm" data-a="sair">Sair</button></header>'+
+    '<div class="wrap" style="padding-top:0"><nav class="abas"><button class="'+(S.aba==='cv'?'on':'')+'" data-a="aba" data-v="cv">👤 Meu currículo</button><button class="'+(S.aba==='rede'?'on':'')+'" data-a="aba" data-v="rede">🌐 Rede</button></nav>'+
+    (S.aba==='rede'?rRede():rCv(p))+'</div>';}
+function rRede(){return '<div class="em-breve"><div class="ic">🌐</div><h2>A Rede abre em breve</h2><p>Vagas perto de você, profissionais, clínicas e laboratórios. Enquanto isso, deixe o seu currículo completo: quando abrir, você já aparece.</p><button class="btn pri" data-a="aba" data-v="cv">Ver meu currículo</button></div>';}
+function cadBt(k,rot){var on=!!S.p.vis[k];return '<div class="cad"><span>'+rot+'</span><button data-a="vis" data-v="'+k+'" aria-pressed="'+on+'" class="'+(on?'on':'')+'">'+(on?'🔓 visível':'🔒 oculto')+'</button></div>';}
+function nvTag(x,i){return '<span class="tag">'+esc(x[0])+'<b class="nv-'+x[1]+'">'+NIV[x[1]]+'</b><button data-a="softTira" data-v="'+i+'" aria-label="Tirar">✕</button></span>';}
+function rCv(p){var ini=p.nome.split(/\s+/).map(function(x){return x[0];}).slice(0,2).join('').toUpperCase();
+  return '<div class="cv"><div class="cv-l">'+
+    '<div class="box"><label class="ft" title="Trocar foto">'+(S.fotoUrl?'<img src="'+esc(S.fotoUrl)+'" alt="Sua foto">':esc(ini))+'<span class="ft-b">📷 '+(p.foto?'Trocar':'Pôr')+' foto</span><input id="ft-in" type="file" accept="image/*" class="sr"></label>'+
+      '<div class="cv-id"><b>'+esc(p.nome)+'</b><span>'+esc(p.prof)+(p.cargo?' · '+esc(p.cargo):'')+'</span><span>📍 '+esc(p.cidade)+' / '+esc(p.uf)+' · 🎂 '+esc(p.idade)+' anos · '+esc(p.sexo)+'</span></div></div>'+
+    '<div class="box"><h3>Na Rede</h3><div class="cads">'+cadBt('foto','Foto')+cadBt('nome','Nome')+cadBt('idade','Idade')+cadBt('sexo','Sexo')+cadBt('cidade','Cidade')+cadBt('empresas','Onde trabalhei')+cadBt('cursos','Cursos')+'</div>'+
+      '<p class="nota">🔒 oculto = ninguém vê · 🔓 visível = aparece na Rede. Telefone e e-mail nunca aparecem: só quando você aceita o contato de uma empresa.</p>'+
+      '<button class="sw'+(p.aberto?' on':'')+'" data-a="aberto" style="background:none;border:0;padding:0;color:inherit;text-align:left"><i></i><span>'+(p.aberto?'Aparecendo na Rede':'Escondido da Rede')+'</span></button></div>'+
+    rVe(p)+'</div>'+
+    '<div class="cv-r">'+
+    '<div class="box"><h3>Sobre você<span class="spacer"></span><span class="salvo">'+esc(S.salvo)+'</span></h3><textarea class="res" id="cv-res" maxlength="600" placeholder="Conte em poucas linhas o que você faz de melhor.">'+esc(p.resumo||'')+'</textarea></div>'+
+    '<div class="box"><h3>Sistemas e softwares<span class="spacer"></span><button class="btn sm pri" data-a="ana">✨ Completar com a Ana</button></h3><div class="tags">'+((p.softs||[]).length?p.softs.map(nvTag).join(''):'<span class="nota">Nenhum ainda.</span>')+'</div></div>'+
+    '<div class="box"><h3>Pós-graduação e especialização</h3><div class="tags">'+lista('pos')+'</div><div class="addl"><input id="add-pos" maxlength="80" placeholder="Adicionar"><button class="btn sm" data-a="add" data-v="pos">+</button></div></div>'+
+    '<div class="box"><h3>Cursos</h3><div class="tags">'+lista('cursos')+'</div><div class="addl"><input id="add-cursos" maxlength="80" placeholder="Adicionar curso"><button class="btn sm" data-a="add" data-v="cursos">+</button></div></div>'+
+    '<div class="box"><h3>Experiência</h3>'+((p.exp||[]).length?p.exp.map(function(x,i){return '<div class="xp"><div><b>'+esc(x.cargo)+'</b><small>'+esc(x.empresa||'')+(x.anos?' · '+esc(x.anos)+(+x.anos===1?' ano':' anos'):'')+'</small></div><button data-a="xpTira" data-v="'+i+'" aria-label="Tirar">✕</button></div>';}).join(''):'<span class="nota">Nenhuma ainda.</span>')+
+      '<div class="xpf"><input id="xp-c" maxlength="60" placeholder="Cargo"><input id="xp-e" maxlength="60" placeholder="Onde"><input id="xp-a" type="number" min="0" max="60" placeholder="Anos"><button class="btn sm" data-a="xpAdd">+</button></div></div>'+
+    '<div class="box"><h3>Formação ✓ do cadastro</h3><p style="margin:0">'+esc(p.formacao||'—')+(p.situacao?' · '+esc(p.situacao):'')+(p.instituicao?'<br><span class="nota">'+esc(p.instituicao)+'</span>':'')+'</p></div>'+
+    '</div></div>';}
+function lista(k){var L=S.p[k]||[];return L.length?L.map(function(x,i){return '<span class="tag">'+esc(x)+'<button data-a="tira" data-k="'+k+'" data-v="'+i+'" aria-label="Tirar">✕</button></span>';}).join(''):'<span class="nota">Nenhum ainda.</span>';}
+function rVe(p){var v=p.vis,nome=v.nome?p.nome:'Profissional #'+(Math.abs(hash(p.user_id))%10000+'').padStart(4,'0'),ini=p.nome.split(/\s+/).map(function(x){return x[0];}).slice(0,2).join('').toUpperCase();
+  return '<div class="rv"><small class="k">COMO A REDE TE VÊ</small><div class="rv-h"><span class="rv-av">'+(v.foto&&S.fotoUrl?'<img src="'+esc(S.fotoUrl)+'" alt="">':v.foto?esc(ini):'👤')+'</span><div><b>'+esc(nome)+(v.nome?'':' 🔒')+'</b><span>'+esc(p.prof)+(p.cargo?' · '+esc(p.cargo):'')+'</span></div></div>'+
+    '<div class="rv-i">'+(v.idade?'<span>🎂 '+esc(p.idade)+' anos</span>':'')+(v.sexo?'<span>'+esc(p.sexo)+'</span>':'')+'<span>📍 '+(v.cidade?esc(p.cidade)+' / ':'')+esc(p.uf)+'</span></div>'+
+    '<div class="rv-t">'+(p.softs||[]).slice(0,4).map(function(x){return '<span>'+esc(x[0])+' · '+NIV[x[1]]+'</span>';}).join('')+'</div>'+(p.aberto?'':'<span class="nota" style="color:#B3261E">Escondido: ninguém te encontra na Rede.</span>')+'</div>';}
+function hash(s){var h=0;s=String(s||'');for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return h;}
+
+/* ---------- salvar ---------- */
+var salvaT=null,pend={};
+function salva(patch,ja){Object.assign(S.p,patch);Object.assign(pend,patch);clearTimeout(salvaT);S.salvo='Salvando…';
+  var go=function(){var P=pend;pend={};sb.from('odo_perfis').update(P).eq('user_id',S.user.id).then(function(r){S.salvo=r.error?'Não salvou. Tente de novo.':'✓ Salvo';if(r.error)toast('Não consegui salvar agora. Verifique a internet.');var e=document.querySelector('.salvo');if(e)e.textContent=S.salvo;});};
+  if(ja)go();else salvaT=setTimeout(go,700);}
+
+/* ---------- foto (bucket privado) ---------- */
+function mandaFoto(file){if(!file||!/^image\//.test(file.type)){toast('Escolha uma imagem.');return;}
+  var img=new Image(),url=URL.createObjectURL(file);img.onload=function(){var s=480,c=document.createElement('canvas'),k=Math.min(1,s/Math.max(img.width,img.height));c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);
+    c.toBlob(function(b){if(!b){toast('Não consegui ler a imagem.');return;}var path=S.user.id+'/foto.webp';toast('Enviando foto…');
+      sb.storage.from('odonto-fotos').upload(path,b,{upsert:true,contentType:'image/webp',cacheControl:'60'}).then(function(r){if(r.error){toast('Não consegui enviar a foto.');return;}salva({foto:path},true);fotoUrl();toast('Foto salva. Ela só aparece na Rede se você abrir o cadeado.');});},'image/webp',.85);};
+  img.onerror=function(){toast('Não consegui ler a imagem.');};img.src=url;}
+
+/* ---------- tutorial + Ana ---------- */
+function ovRender(){var o=$('ov');if(!S.pos){if(o)o.remove();return;}if(!o){o=document.createElement('div');o.id='ov';o.className='ov';document.body.appendChild(o);}
+  o.innerHTML=posHtml();var b=o.querySelector('.ch-b');if(b)b.scrollTop=b.scrollHeight;}
+function posHtml(){var P=S.pos,pr=S.p.prof;
+  if(P.st==='tut'){var t=TUT[P.i];return '<div class="ovc tut"><div class="ic">'+t[0]+'</div><h2>'+t[1]+'</h2><p>'+t[2]+'</p><div class="dots">'+TUT.map(function(x,i){return '<i class="'+(i===P.i?'on':'')+'"></i>';}).join('')+'</div><div class="row"><button class="btn" data-a="tutPula">Pular</button><span class="spacer"></span><button class="btn pri" data-a="tutProx">'+(P.i<TUT.length-1?'Próximo':'Entendi')+'</button></div></div>';}
+  if(P.st==='perg')return '<div class="ovc"><div class="perg"><img src="'+EQ+'ana-feliz.webp" alt="Ana"><div><h2 style="margin:0 0 6px;font:800 1.25rem var(--f-d)">Agora vamos completar seu currículo?</h2><p style="margin:0;color:var(--mut)">Leva uns 2 minutos. Eu pergunto, você toca nas respostas.</p><div class="row" style="margin-top:12px"><button class="btn pri" data-a="anaSim">Sim, vamos!</button><button class="btn" data-a="anaDepois">Mais tarde</button></div></div></div></div>';
+  var R=P.r,ch=function(L,sel,a){return '<div class="chips">'+L.map(function(n){var on=sel.indexOf(n)>=0;return '<button class="chip'+(on?' on':'')+'" data-a="'+a+'" data-v="'+esc(n)+'">'+(on?'✓ ':'')+esc(n)+'</button>';}).join('')+'</div>';},
+    msgs='<div class="m an">Vamos deixar seu currículo no ponto. 😊</div><div class="m an">Quais <b>sistemas e softwares</b> você usa no dia a dia?</div>',resp='';
+  var Ls=(SISTEMAS[pr]||[]).concat(R.sis.filter(function(x){return (SISTEMAS[pr]||[]).indexOf(x)<0;})),Lp=(POSG[pr]||[]).concat(R.pos.filter(function(x){return (POSG[pr]||[]).indexOf(x)<0;})),Lc=(CURSOS[pr]||[]).concat(R.cur.filter(function(x){return (CURSOS[pr]||[]).indexOf(x)<0;}));
+  if(P.k>0){msgs+='<div class="m eu">'+esc(R.sis.join(', ')||'Nenhum por enquanto')+'</div>';if(R.sis.length)msgs+='<div class="m an">E qual o seu <b>nível</b> em cada um?</div>';}
+  if(P.k>1){if(R.sis.length)msgs+='<div class="m eu">'+esc(R.sis.map(function(n){return n+': '+NIV[R.nv[n]||'b'];}).join(' · '))+'</div>';msgs+='<div class="m an">Tem <b>pós-graduação ou especialização</b>?</div>';}
+  if(P.k>2){msgs+='<div class="m eu">'+esc(R.pos.join(', ')||'Ainda não')+'</div><div class="m an">E <b>cursos extras</b>? Toque nos que fez ou escreva.</div>';}
+  if(P.k>3){msgs+='<div class="m eu">'+esc(R.cur.join(', ')||'Nenhum')+'</div><div class="m an">Prontinho! Já salvei tudo no seu currículo. ✨</div>';}
+  if(P.k===0)resp=ch(Ls,R.sis,'anaSis')+addIn('sis','Outro sistema')+'<button class="btn pri" data-a="anaOk">Continuar</button>';
+  else if(P.k===1)resp=R.sis.map(function(n){return '<div class="nvr"><b>'+esc(n)+'</b>'+['b','m','a'].map(function(l){return '<button class="chip'+((R.nv[n]||'b')===l?' on':'')+'" data-a="anaNv" data-v="'+esc(n)+'|'+l+'">'+NIV[l]+'</button>';}).join('')+'</div>';}).join('')+'<button class="btn pri" data-a="anaOk">Continuar</button>';
+  else if(P.k===2)resp=ch(Lp,R.pos,'anaPos')+addIn('pos','Outra especialização')+'<button class="btn pri" data-a="anaOk">'+(R.pos.length?'Continuar':'Ainda não tenho')+'</button>';
+  else if(P.k===3)resp=ch(Lc,R.cur,'anaCur')+addIn('cur','Nome do curso')+'<button class="btn pri" data-a="anaOk">Concluir ✓</button>';
+  else resp='<button class="btn pri" data-a="anaFim">Ver meu currículo</button>';
+  return '<div class="ovc chat"><div class="ch-h"><img src="'+EQ+'ana-av-feliz.webp" alt=""><div><b>Ana</b><small>completando seu currículo</small></div><span class="spacer"></span><button class="btn sm" data-a="anaDepois">Terminar depois</button></div><div class="ch-b">'+msgs+'</div><div class="ch-r">'+resp+'</div></div>';}
+function addIn(k,ph){return '<div class="addl"><input id="ana-add" data-k="'+k+'" maxlength="60" placeholder="'+ph+' (Enter para adicionar)"><button class="btn sm" data-a="anaAdd">+</button></div>';}
+function anaAbre(){var p=S.p,nv={};(p.softs||[]).forEach(function(x){nv[x[0]]=x[1];});S.pos={st:'chat',k:0,r:{sis:(p.softs||[]).map(function(x){return x[0];}),nv:nv,pos:(p.pos||[]).slice(),cur:(p.cursos||[]).slice()}};ovRender();}
+function anaSalva(){var R=S.pos.r;salva({softs:R.sis.map(function(n){return [n,R.nv[n]||'b'];}),pos:R.pos.slice(),cursos:R.cur.slice()},true);}
+function tog(L,v){var i=L.indexOf(v);if(i>=0)L.splice(i,1);else L.push(v);}
+
+/* ---------- ações ---------- */
+var A={
+  modo:function(v){S.auth.modo=v;S.auth.erro='';S.auth.msg='';render();},
+  esqueci:function(){var e=($('au-email')||{}).value||'';e=e.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){S.auth.erro='Digite o seu e-mail acima e toque de novo em "Esqueci a senha".';render();return;}
+    sb.auth.resetPasswordForEmail(e,{redirectTo:location.href.split('#')[0].split('?')[0]}).then(function(r){S.auth.email=e;S.auth.erro=r.error?msgAuth(r.error):'';S.auth.msg=r.error?'':'Enviamos um link para criar uma nova senha. Veja o seu e-mail.';render();});},
+  sair:function(){sb.auth.signOut();},
+  prof:function(v){S.cad.prof=v;S.cad.erro='';render();},
+  aba:function(v){S.aba=v;render();window.scrollTo(0,0);},
+  vis:function(v){var o=Object.assign({},S.p.vis);o[v]=!o[v];salva({vis:o},true);render();},
+  aberto:function(){salva({aberto:!S.p.aberto},true);render();},
+  softTira:function(v){var L=S.p.softs.slice();L.splice(+v,1);salva({softs:L},true);render();},
+  tira:function(v,b){var k=b.dataset.k,L=S.p[k].slice();L.splice(+v,1);var o={};o[k]=L;salva(o,true);render();},
+  add:function(k){var i=$('add-'+k),t=(i&&i.value||'').trim();if(!t)return;var L=(S.p[k]||[]).slice();if(L.indexOf(t)<0)L.push(t);var o={};o[k]=L;salva(o,true);render();var j=$('add-'+k);if(j)j.focus();},
+  xpAdd:function(){var c=($('xp-c').value||'').trim(),e=($('xp-e').value||'').trim(),a=$('xp-a').value;if(c.length<2){toast('Digite o cargo.');return;}var L=(S.p.exp||[]).slice();L.unshift({cargo:c,empresa:e,anos:a?+a:null});salva({exp:L},true);render();},
+  xpTira:function(v){var L=S.p.exp.slice();L.splice(+v,1);salva({exp:L},true);render();},
+  ana:function(){anaAbre();},
+  tutProx:function(){var P=S.pos;if(P.i<TUT.length-1){P.i++;ovRender();}else{S.pos={st:'perg'};ovRender();}},
+  tutPula:function(){S.pos={st:'perg'};ovRender();},
+  anaSim:function(){anaAbre();},
+  anaDepois:function(){if(S.pos&&S.pos.st==='chat')anaSalva();S.pos=null;ovRender();render();toast('Quando quiser, toque em "✨ Completar com a Ana".');},
+  anaSis:function(v){tog(S.pos.r.sis,v);ovRender();},anaPos:function(v){tog(S.pos.r.pos,v);ovRender();},anaCur:function(v){tog(S.pos.r.cur,v);ovRender();},
+  anaNv:function(v){var x=v.split('|');S.pos.r.nv[x[0]]=x[1];ovRender();},
+  anaAdd:function(){var i=$('ana-add'),t=(i&&i.value||'').trim();if(!t)return;var R=S.pos.r,L=i.dataset.k==='sis'?R.sis:i.dataset.k==='pos'?R.pos:R.cur;if(L.indexOf(t)<0)L.push(t);ovRender();var j=$('ana-add');if(j)j.focus();},
+  anaOk:function(){var P=S.pos;P.k++;if(P.k===1&&!P.r.sis.length)P.k=2;if(P.k>=4){P.k=4;anaSalva();}ovRender();},
+  anaFim:function(){S.pos=null;ovRender();S.aba='cv';render();window.scrollTo(0,0);}
+};
+document.addEventListener('click',function(e){var b=e.target.closest('[data-a]');if(!b)return;var f=A[b.dataset.a];if(f){e.preventDefault();f(b.dataset.v,b);}});
+document.addEventListener('input',function(e){var t=e.target;
+  if(t.dataset.c){var k=t.dataset.c,v=t.value;if(k==='whats'){var d=v.replace(/\D/g,'').slice(0,11);S.cad.whats=d;t.value=telFmt(d);return;}S.cad[k]=v;return;}
+  if(t.id==='cv-res')salva({resumo:t.value});});
+document.addEventListener('change',function(e){var t=e.target;
+  if(t.id==='cd-uf'){S.cad.uf=t.value;S.cad.cidade='';render();var c=$('cd-cid');if(c)c.focus();return;}
+  if(t.id==='cd-sexo'||t.id==='cd-sit'){S.cad[t.dataset.c]=t.value;return;}
+  if(t.id==='ft-in'&&t.files&&t.files[0])mandaFoto(t.files[0]);});
+document.addEventListener('keydown',function(e){if(e.key!=='Enter')return;var id=e.target.id;
+  if(id==='ana-add'){e.preventDefault();A.anaAdd();}else if(id==='add-pos'||id==='add-cursos'){e.preventDefault();A.add(id.slice(4));}else if(id==='xp-a'||id==='xp-e'){e.preventDefault();A.xpAdd();}});
+document.addEventListener('submit',function(e){var f=e.target;e.preventDefault();
+  if(f.id==='fauth'){var em=$('au-email').value.trim(),se=$('au-senha').value,cr=S.auth.modo==='criar';S.auth.email=em;S.auth.erro='';S.auth.msg='';
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){S.auth.erro='Digite um e-mail válido.';render();return;}
+    if(se.length<8){S.auth.erro='A senha precisa ter pelo menos 8 caracteres.';render();return;}
+    S.auth.busy=true;render();
+    var fim=function(m){S.auth.busy=false;S.auth.erro=m||'';render();};
+    if(cr)sb.auth.signUp({email:em,password:se,options:{emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){if(r.error)return fim(msgAuth(r.error));S.auth.busy=false;if(!r.data.session){S.auth.modo='entrar';S.auth.msg='Conta criada! Confirme pelo link que enviamos no seu e-mail e depois entre.';render();}});
+    else sb.auth.signInWithPassword({email:em,password:se}).then(function(r){if(r.error)return fim(msgAuth(r.error));S.auth.busy=false;});
+    return;}
+  if(f.id==='fnova'){var ns=$('ns-s').value;if(ns.length<8){S.auth.erro='Use pelo menos 8 caracteres.';render();return;}sb.auth.updateUser({password:ns}).then(function(r){if(r.error){S.auth.erro=msgAuth(r.error);render();return;}toast('Senha alterada.');S.tela='load';render();carregaPerfil();});return;}
+  if(f.id==='fcad'){var c=S.cad,er=cadValida();c.erro=er;if(er){render();return;}c.busy=true;render();
+    var row={user_id:S.user.id,nome:c.nome.trim(),whats:c.whats||null,prof:c.prof,cargo:c.cargo.trim()||null,idade:+c.idade,sexo:c.sexo,uf:c.uf,cidade:c.cidade,formacao:c.formacao.trim()||null,situacao:c.situacao||null,instituicao:c.instituicao.trim()||null};
+    sb.from('odo_perfis').insert(row).select('*').single().then(function(r){c.busy=false;if(r.error){c.erro='Não consegui salvar agora. Tente de novo.';render();return;}S.p=r.data;S.p.vis=Object.assign({},VIS0,S.p.vis||{});S.tela='app';S.pos={st:'tut',i:0};render();});}});
+iniciar();
+</script>
+</body>
+</html>
