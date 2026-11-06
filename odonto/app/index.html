@@ -116,7 +116,7 @@ textarea{min-height:76px;resize:vertical}
 .emp dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;margin:6px 0 0;font-size:.86rem}
 .emp dt{color:var(--muted)}.emp dd{margin:0}
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:.86rem;font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.cg-ch .chip{cursor:pointer;color:var(--ink)}.cg-ch .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:.86rem;font-weight:500}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}.opt{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:12px;text-align:left;display:grid;gap:2px}
 .opt span{font-size:.82rem;color:var(--muted)}.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
@@ -1335,6 +1335,13 @@ function sitCampo(w,o){return '<div class="sit" role="radiogroup" aria-label="Si
 function precisaInst(o){return o.escola&&o.escola!=='Ensino médio';}
 var UFS=['SP','RJ','MG','PR','SC','RS','GO','BA','PE','DF'];
 function uid(){return Math.random().toString(36).slice(2,9);}
+var CARGOS_PROF={'Dentista':['Clínico geral','Implantodontista','Ortodontista','Endodontista','Periodontista','Protesista','Odontopediatra','Cirurgião bucomaxilofacial','Harmonização orofacial','Dono de clínica'],
+  'Protético':['Cadista','Ceramista','Técnico em prótese total','Técnico em PPR','Protético de carga imediata','Operador de fresadora','Operador de impressora 3D','Auxiliar de bancada','Dono de laboratório'],
+  'ASB / TSB':['ASB','TSB','ASB de cirurgia','Instrumentador(a)','Auxiliar de esterilização'],
+  'Corporativo':['Recepcionista','Gerente de clínica','Financeiro','Consultor(a) de orçamentos','Comprador(a)','Marketing / social media','RH'],
+  'Indústria e comércio':['Vendedor(a)','Representante comercial','Consultor(a) técnico','Técnico de equipamentos','Gerente regional'],
+  'Estudante':['Estágio em clínica','Estágio em laboratório','Monitoria','Primeiro emprego']};
+function cargosDe(c){var L=(CARGOS_PROF[c.prof]||[]).slice();(c.outras||[]).forEach(function(o){(CARGOS_PROF[o]||[]).forEach(function(x){if(L.indexOf(x)<0)L.push(x);});});if(c.digital==='so'){L=L.filter(function(x){return x!=='Técnico em prótese total'&&x!=='Técnico em PPR';});}L.push('Não estou procurando agora');return L;}
 var S={
   role:'site',tab:{prof:'cv',emp:'feed',dono:'aprovar'},empAtual:'e1',diaLimite:10,
   eu:{id:'p0',nome:'Rafael Souza',whats:'(19) 99999-0101',email:'rafael.exemplo@email.com',prof:'Protético',cargo:'Ceramista',cidade:'Campinas',uf:'SP',soRegiao:false,
@@ -1565,7 +1572,7 @@ function rCadastro(){var c=S.cad,P=c.passo,tot=5;
     h='<section class="esc entra"><div class="esc-hero"><h2>Sua outra profissão <span>soma ao seu perfil.</span></h2>'+
       '<div class="sec-ana"><img src="'+ANA.av+'" alt="Ana"><p><b>Ana</b>Pode marcar mais de uma! A principal (<b style="display:inline">'+esc(mp.t)+'</b>) continua definindo o seu painel.</p></div>'+barra+'</div>'+
     '<div class="esc-grid sec">'+SEC.map(function(x,i){var mm=PCARD[x],on=c.outras.indexOf(x)>=0;return '<button type="button" class="esc-c'+(on?' on':'')+'" aria-pressed="'+on+'" style="--c1:'+mm.c1+';--c2:'+mm.c2+';--d:'+(i*90)+'ms" data-act="cadSec" data-v="'+esc(x)+'">'+(on?'<span class="ok" aria-hidden="true">✓</span>':'')+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+mm.ic+'</svg><b>'+esc(mm.t)+'</b><span>'+esc(mm.s)+'</span></button>';}).join('')+'</div>'+
-    (c.erro?'<p class="err">'+esc(c.erro)+'</p>':'')+'<div class="row"><button class="btn" data-act="cadIr" data-v="2">← Voltar</button><span class="spacer"></span><button class="btn pri" data-act="cadIr" data-v="3">'+(c.outras.length?'Continuar com '+c.outras.length+' a mais →':'Pular →')+'</button></div></section>';}
+    (c.erro?'<p class="err">'+esc(c.erro)+'</p>':'')+'<div class="row"><button class="btn" data-act="cadIr" data-v="2">← Voltar</button><span class="spacer"></span><button class="btn" data-act="cadSemOutra">Ops, na verdade não tenho outra</button><button class="btn pri" data-act="cadIr" data-v="3">'+(c.outras.length?'Continuar com '+c.outras.length+' a mais →':'Pular →')+'</button></div></section>';}
   else if(P===1){var sel=c.ver;
     h='<section class="esc"><div class="esc-hero"><h2>A odontologia <span>se conecta aqui.</span></h2><p>Escolha a sua profissão principal. Depois você pode somar outras.</p>'+barra+'</div>'+
     '<div class="esc-grid">'+PROFS.map(function(x,i){var m=PCARD[x];return '<button type="button" class="esc-c'+(c.prof===x?' on':'')+'" style="--c1:'+m.c1+';--c2:'+m.c2+';--d:'+(i*90)+'ms" data-act="cadVer" data-v="'+esc(x)+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+m.ic+'</svg><b>'+esc(m.t)+'</b><span>'+esc(m.s)+'</span></button>';}).join('')+'</div>'+
@@ -1585,7 +1592,8 @@ function rCadastro(){var c=S.cad,P=c.passo,tot=5;
   else if(P===4)h='<section class="card cad entra">'+barra+'<h2>Como você trabalha hoje?</h2><p class="small muted">Isso define as ferramentas do seu painel.</p>'+opcoes('cad','modo',MODOS,c.modo)+
     '<div class="fld"><span>Onde você topa trabalhar?</span>'+opcoes('cad','local',c.digital==='so'?LOCAIS:LOCAIS,c.local)+(c.digital==='so'?'<span class="hint">Cadista só digital costuma aceitar home office.</span>':'')+'</div>'+nav()+'</section>';
   else if(P===5)h='<section class="card cad entra">'+barra+'<h2>Seu currículo rápido</h2><p class="small muted">Só o essencial agora. Formação, cursos e experiências detalhadas você coloca depois.</p>'+
-    '<div class="grid2"><label class="fld"><span>Cargo que você procura</span><input type="text" id="cd-cargo" data-c="cargo" placeholder="'+esc(c.digital==='so'?'Ex.: Cadista Exocad':c.prof==='Dentista'?'Ex.: Clínico geral':'Ex.: Ceramista')+'" value="'+esc(c.cargo)+'"></label>'+
+    '<div class="fld"><span>Seu cargo ou o que você procura</span><div class="chips cg-ch">'+cargosDe(c).map(function(x){return '<button type="button" class="chip'+(c.cargo===x?' on':'')+'" data-act="cadCargo" data-v="'+esc(x)+'">'+(c.cargo===x?'✓ ':'')+esc(x)+'</button>';}).join('')+'<button type="button" class="chip'+(c.cargoOutro?' on':'')+'" data-act="cadCargoOutro">Outro…</button></div>'+(c.cargoOutro?'<input type="text" id="cd-cargo" data-c="cargo" maxlength="60" placeholder="Escreva o cargo" value="'+esc(c.cargo)+'" style="margin-top:8px">':'')+'</div>'+
+    '<div class="grid2">'+
     (c.entOk&&profList(c).length&&entDe(c,profList(c)[0]).exp?'<div class="fld"><span>Experiência</span><span class="pill info" style="justify-self:start">'+esc(ENT.exp.filter(function(o){return o[0]===entDe(c,profList(c)[0]).exp;})[0][1])+' · da entrevista</span></div>':'<label class="fld"><span>Anos de experiência</span><input type="number" min="0" max="60" id="cd-anos" data-c="anos" value="'+esc(c.anos)+'"></label>')+
     '</div>'+
     '<p class="hint">Você começa <b>invisível</b> para as empresas. Quando quiser aparecer, ligue "Estou aberto a oportunidades" no seu perfil.</p>'+nav('Criar minha conta')+'</section>';
@@ -2602,6 +2610,8 @@ var ACT={
     c.passo=c.outras.length?2.5:2;render();window.scrollTo(0,0);},
   entRefaz:function(v){var c=S.cad;c.entOk=false;c.entP=+v||0;c.entQ=0;c.entIntro=false;c.entSo=true;c.entAnim=true;render();window.scrollTo(0,0);},
   anaOk:function(){S.cad.anaOi=true;render();var n=$('cd-nome');if(n)n.focus();},
+  cadSemOutra:function(){var c=S.cad;c.outras=[];c.entOk=false;c.entP=0;c.entQ=0;c.entIntro=false;c.entSo=false;var ok=areasDe(c);c.areas=c.areas.filter(function(a){return ok.indexOf(a)>=0;});if(c.prof!=='Protético')c.digital='';c.maisVisto=true;c.erro='';c.passo=3;render();window.scrollTo(0,0);},
+  cadCargo:function(v){S.cad.cargo=v;S.cad.cargoOutro=false;S.cad.erro='';render();},cadCargoOutro:function(){S.cad.cargoOutro=true;if(cargosDe(S.cad).indexOf(S.cad.cargo)>=0)S.cad.cargo='';render();var i=$('cd-cargo');if(i)i.focus();},
   cadMais:function(v){var c=S.cad;c.mais=false;c.maisVisto=true;c.passo=v==='sim'?2.5:3;render();window.scrollTo(0,0);},
   cadSec:function(v){var c=S.cad,i=c.outras.indexOf(v);c.entOk=false;c.entP=0;c.entQ=0;c.entIntro=false;c.entSo=false;if(i>=0)c.outras.splice(i,1);else c.outras.push(v);var ok=areasDe(c);c.areas=c.areas.filter(function(a){return ok.indexOf(a)>=0;});if([c.prof].concat(c.outras).indexOf('Protético')<0)c.digital='';c.erro='';render();},
   sit:function(v,b){var w=b.dataset.w;if(w==='cv')lerCv();alvo(w).sit=v;S.cad.erro='';render();},
