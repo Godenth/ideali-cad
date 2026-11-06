@@ -20,6 +20,20 @@
 body.rl-in{padding-bottom:64px}body.rl-in .rl-sen{display:none}.inst-lista{position:relative!important;top:auto!important;margin-top:6px;max-height:260px!important}body.rl-in .vt-b{bottom:52px!important}
 body:not(.rl-master) .vt-b,body:not(.rl-master) .roles,body:not(.rl-master) .proto,body.rl-in:not(.rl-master) .voltar-site{display:none!important}
 @media (max-width:600px){.rl-tst{display:none}}
+
+/* tabela de preços do laboratório */
+.tbl-res{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-4px 0 4px;font-size:.9rem;color:var(--muted)}
+.tbl-g{display:grid;gap:2px;padding:12px 14px;border-left:4px solid var(--gc)}
+.tbl-gh{display:flex;align-items:center;gap:10px;padding:2px 0 8px}.tbl-gh b{font-size:1.02rem}.tbl-gh em{font-style:normal;font-size:.75rem;font-weight:800;background:var(--soft);border-radius:999px;padding:1px 9px;color:var(--muted)}
+.tbl-gi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:1.15rem;background:color-mix(in srgb,var(--gc) 18%,transparent)}
+.tbl-li{display:grid;grid-template-columns:30px 1fr 130px 92px 30px;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.tbl-ic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:.9rem;background:color-mix(in srgb,var(--gc) 12%,transparent)}
+.tbl-n{font-weight:600;font-size:.92rem;line-height:1.25}.tbl-n small{display:block;font-size:.72rem;color:var(--muted);font-weight:700}
+.tbl-v,.tbl-p{display:flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:10px;padding:0 8px;background:var(--surface)}
+.tbl-v span,.tbl-p span{font-size:.8rem;color:var(--muted);font-weight:700}
+.tbl-v input,.tbl-p input{border:0!important;background:none!important;box-shadow:none!important;width:100%;padding:8px 0!important;font:inherit;color:inherit;outline:none;min-width:0;border-radius:0!important}.tbl-p input::-webkit-inner-spin-button{display:none}
+.tbl-x{border:0;background:none;color:var(--muted);font-weight:800;cursor:pointer}
+@media (max-width:620px){.tbl-li{grid-template-columns:26px 1fr 84px 26px;row-gap:6px}.tbl-n{grid-column:2/4}.tbl-v{grid-column:2}.tbl-p{grid-column:3}.tbl-x{grid-row:1;grid-column:4}}
 </style>
 
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -2784,11 +2798,11 @@ var NEG_TIPOS={
     funcs:['Dentista','ASB','TSB','Recepção','Gerente','Financeiro'],
     abas:[['inicio','Início'],['servicos','Serviços e preços'],['pedidos','Pedidos aos labs'],['parceiros','Labs parceiros'],['equipe','Equipe'],['financeiro','Financeiro'],['vagas','Vagas']]},
   lab:{t:'Laboratório de prótese',ic:'🧪',rede:'labs',rt:'Nome do técnico em prótese responsável (TPD)',
-    servs:['Coroa em zircônia','Coroa metalocerâmica','Faceta em dissilicato','Prótese total','PPR','Protocolo sobre implante','Provisórios','Placa miorrelaxante','Modelos'],
+    servs:['Fixas fresadas','Fixas impressas','Placas de bruxismo','Protocolos','Gesso','Impressões','Modelagem 3D'],
     funcs:['Protético','Ceramista','Cadista','Auxiliar de bancada','Motoboy','Recepção','Financeiro'],
     abas:[['inicio','Início'],['pedidos','Pedidos recebidos'],['clientes','Clientes'],['servicos','Tabela de preços'],['equipe','Equipe'],['financeiro','Financeiro'],['vagas','Vagas']]},
   centro:{t:'Centro digital (fresagem e impressão 3D)',ic:'🖨️',rede:'labs',rt:'Nome do técnico responsável',
-    servs:['Fresagem de zircônia','Fresagem de PMMA','Impressão de modelos','Impressão de guias cirúrgicos','Impressão de provisórios','Projeto CAD','Escaneamento de modelos'],
+    servs:['Fixas fresadas','Fixas impressas','Placas de bruxismo','Protocolos','Impressões','Modelagem 3D'],
     funcs:['Cadista','Operador de fresadora','Operador de impressora 3D','Atendimento','Motoboy','Financeiro'],
     abas:[['inicio','Início'],['pedidos','Pedidos recebidos'],['clientes','Clientes'],['servicos','Tabela de preços'],['equipe','Equipe'],['financeiro','Financeiro'],['vagas','Vagas']]},
   auto:{t:'Autônomo (freela)',ic:'🧑‍💻',rede:'',rt:'',
@@ -2802,6 +2816,26 @@ var NEG_TIPOS={
     servs:['Curso técnico em Prótese Dentária','Curso de ASB','Curso de TSB','Pós-graduação','Curso livre de Exocad','Curso de cerâmica','Workshop prático','Curso online'],
     funcs:['Professor','Coordenador','Secretaria','Monitor','Financeiro','Marketing'],
     abas:[['inicio','Início'],['servicos','Cursos e turmas'],['alunos','Alunos e inscrições'],['eventos','Eventos'],['equipe','Equipe'],['vagas','Vagas de estágio']]}};
+/* ===== Tabela de preços do laboratório (catálogo pré-cadastrado: usado também pelos agentes para prazo e preço) ===== */
+var TAB_GR=[['Fixas fresadas','⚙️','#5B8CFF'],['Fixas impressas','🖨️','#2BC7B8'],['Placas de bruxismo','🌙','#9E8CFF'],['Protocolos','🦷','#E8A33A'],['Gesso','🧱','#B7791F'],['Impressões','🧩','#1DAE8A'],['Modelagem 3D','💻','#E86AA6']];
+var TAB_LAB=(function(){var L=[],add=function(g,c,its){its.forEach(function(i){L.push([g,c?c+' · '+i:i]);});},FX=['Elemento sobre dente','Elemento sobre implante','Faceta','Inlay / Onlay'],GS=['com gengiva separada','sem gengiva separada'];
+  add('Fixas fresadas','Zircônia fresada',FX.concat(['Copping','Gengiva']));
+  add('Fixas fresadas','Dissilicato de lítio (fresado ou injetado)',FX);
+  add('Fixas fresadas','PMMA fresado monocolor',FX.concat(['Gengiva']));
+  add('Fixas fresadas','PMMA fresado multilayer',FX.concat(['Gengiva']));
+  add('Fixas fresadas','PMMA fresado com carga cerâmica',FX.concat(['Gengiva']));
+  add('Fixas impressas','',['Provisório impresso maquiado','Facetas impressas maquiadas']);
+  add('Placas de bruxismo','Placa de bruxismo',['Acrilizada em resina','Impressa','Fresada']);
+  ['Metalocerâmica','Metaloplástico','Convencional impresso','Em PMMA','Em PMMA carga cerâmica fresado','Em PMMA carga cerâmica impresso','Em zircônia maquiada fresado'].forEach(function(m){add('Protocolos','Protocolo '+m.charAt(0).toLowerCase()+m.slice(1),GS);});
+  add('Protocolos','Protocolo acrilizado',['com STG e com dentes','com STG e sem dentes','sem STG e com dentes','sem STG e sem dentes']);
+  add('Gesso','Modelo de gesso',['Arcada total','Arcada total com gengiva','Arcada parcial','Arcada parcial com gengiva']);
+  add('Gesso','',['Troquel']);
+  add('Impressões','Impressão 3D',['Modelo arcada total','Modelo arcada parcial','Prova por elemento unitário','Prova de protocolo','Mockup de arcada']);
+  add('Modelagem 3D','Modelagem 3D',['Elemento sobre dente','Elemento sobre dente com gengiva','Elemento sobre implante','Elemento sobre implante com gengiva','Faceta','Inlay / Onlay','Copping','Modelo','Placa de bruxismo','Barra metálica','Prótese flexível']);
+  return L;})();
+function tabGrupo(nome){for(var i=0;i<TAB_LAB.length;i++)if(TAB_LAB[i][1]===nome)return TAB_LAB[i][0];return 'Outros';}
+function tabIc(g){var x=TAB_GR.filter(function(t){return t[0]===g;})[0];return x||['Outros','📋','#8E9AD8'];}
+function negEhLab(N){return N&&(N.tipo==='lab'||N.tipo==='centro');}
 var NEG_VAZIO={
   pedidos:['📦','Seus pedidos vão aparecer aqui','Cada pedido com paciente, etapa, prazo e status, do jeito do Ideali CAD.'],
   clientes:['👥','Nenhum cliente ainda','Aqui você cadastra dentistas, clínicas e labs que compram de você, cada um com a sua tabela de preços.'],
@@ -2864,12 +2898,13 @@ var NEG_ACT={
     else if(F.k===3){if(!R.servs.length)F.erro='Escolha pelo menos um.';else F.k=T.funcs.length?4:5;}
     else if(F.k===4)F.k=5;
     negAbre();},
-  negFim:function(){var R=S.negF.r;S.neg={tipo:R.tipo,nome:R.nome,uf:R.uf,cid:R.cid,papel:R.tipo==='auto'?'faz':R.papel,rt:R.papel==='gestao'?R.rt:'',dono:(PN()&&PN().nome)||S.cad.nome||'',servs:R.servs.map(function(s){return [s,''];}),eq:R.eq.map(function(x){return {n:x[0],f:x[1],st:'convite enviado'};}),vagas:[],criado:new Date().toISOString().slice(0,10),aba:'inicio'};
+  negFim:function(){var R=S.negF.r;if(R.tipo==='lab'||R.tipo==='centro'){var gs=R.servs.filter(function(x){return TAB_GR.some(function(g){return g[0]===x;});}),out=R.servs.filter(function(x){return !TAB_GR.some(function(g){return g[0]===x;});});R.servs=TAB_LAB.filter(function(t){return gs.indexOf(t[0])>=0;}).map(function(t){return t[1];}).concat(out);}S.neg={tipo:R.tipo,nome:R.nome,uf:R.uf,cid:R.cid,papel:R.tipo==='auto'?'faz':R.papel,rt:R.papel==='gestao'?R.rt:'',dono:(PN()&&PN().nome)||S.cad.nome||'',servs:R.servs.map(function(s){return [s,''];}),eq:R.eq.map(function(x){return {n:x[0],f:x[1],st:'convite enviado'};}),vagas:[],criado:new Date().toISOString().slice(0,10),aba:'inicio'};
     negSalva();negRede();S.negF.k='fim';negAbre();},
   negIr:function(){S.negF=null;negAbre();S.negOn=true;S.redeOn=false;render();window.scrollTo(0,0);},
   negModo:function(v){S.negOn=v==='neg';render();window.scrollTo(0,0);},
   negTab:function(v){S.neg.aba=v;negSalva();render();window.scrollTo(0,0);},
   negPreco:function(){},
+  negTabCat:function(){var tem={};S.neg.servs.forEach(function(x){tem[x[0]]=1;});TAB_LAB.forEach(function(t){if(!tem[t[1]])S.neg.servs.push([t[1],'','']);});negSalva();render();toast('Catálogo completo adicionado. Agora é só preencher preço e prazo.');},
   negServNovo:function(){var i=$('ns-novo'),t=(i&&i.value||'').trim();if(!t)return;S.neg.servs.push([t,'']);negSalva();render();var j=$('ns-novo');if(j)j.focus();},
   negServTira:function(v){S.neg.servs.splice(+v,1);negSalva();render();},
   negEq:function(){var n=$('ne-n'),f=$('ne-f'),t=(n&&n.value||'').trim();if(t.split(/\s+/).length<2){toast('Digite nome e sobrenome.');return;}S.neg.eq.push({n:t,f:f.value,st:'convite enviado'});negSalva();render();toast('Convite enviado para '+t.split(' ')[0]+' (exemplo).');},
@@ -2899,10 +2934,21 @@ function rNegInicio(N,T){var tem=function(k){return T.abas.some(function(x){retu
   return '<section class="card"><div class="row"><h2>Primeiros passos</h2><span class="spacer"></span><b class="neg-prog">'+feitos+' de '+passos.length+'</b></div><div class="neg-barra"><i style="width:'+Math.round(feitos/passos.length*100)+'%"></i></div>'+
     passos.map(function(p){var ir=p[3]?(p[3].indexOf('rede:')===0?'data-act="negVerRede" data-v="'+p[3].slice(5)+'"':'data-act="negTab" data-v="'+p[3]+'"'):'';return '<button class="neg-passo'+(p[0]?' ok':'')+'" '+(ir||'disabled')+'><span class="neg-ck">'+(p[0]?'✓':'')+'</span><span><b>'+esc(p[1])+'</b><small>'+esc(p[2])+'</small></span>'+(ir&&!p[0]?'<span class="neg-vai">→</span>':'')+'</button>';}).join('')+'</section>'+
     '<section class="card"><h2>O que vem por aí</h2><p class="small muted" style="margin:0">Neste protótipo, '+T.abas.filter(function(x){return NEG_VAZIO[x[0]];}).map(function(x){return x[1];}).join(', ')+' ainda estão como tela de exemplo.</p><div class="row" style="margin-top:10px"><button class="btn sm" data-act="negApaga">Apagar negócio de teste</button></div></section>';}
-function rNegServ(N,T){var esc2=N.tipo==='escola'?'Valor do curso':N.tipo==='dental'?'Observação (marcas, prazo)':'Preço (R$)';
+function rNegServ(N,T){if(negEhLab(N))return rNegTabela(N);var esc2=N.tipo==='escola'?'Valor do curso':N.tipo==='dental'?'Observação (marcas, prazo)':'Preço (R$)';
   return '<div class="dtop"><div><h2>'+esc(T.abas.filter(function(x){return x[0]==='servicos';})[0][1])+'</h2><p class="small muted">'+(N.tipo==='dental'?'As categorias que você vende. Produtos com foto e preço entram depois.':'Preço base. Depois dá para ter preço diferente por cliente.')+'</p></div></div>'+
     '<section class="card neg-tab">'+N.servs.map(function(s,i){return '<div class="neg-li"><b>'+esc(s[0])+'</b><input class="neg-preco" data-ns="'+i+'" value="'+esc(s[1])+'" placeholder="'+esc2+'"'+(N.tipo==='dental'?'':' inputmode="decimal"')+'><button class="btn sm" data-act="negServTira" data-v="'+i+'" aria-label="Tirar">✕</button></div>';}).join('')+
     '<div class="neg-li neg-add"><input id="ns-novo" placeholder="Adicionar outro" maxlength="50"><button class="btn sm pri" data-act="negServNovo">+ Adicionar</button></div></section>';}
+function rNegTabela(N){var tem={},gr={},ordem=TAB_GR.map(function(g){return g[0];}).concat(['Outros']);
+  N.servs.forEach(function(s,i){tem[s[0]]=1;var g=tabGrupo(s[0]);(gr[g]=gr[g]||[]).push([s,i]);});
+  var falta=TAB_LAB.filter(function(t){return !tem[t[1]];}).length,feitos=N.servs.filter(function(s){return s[1]!==''&&s[1]!=null;}).length;
+  return '<div class="dtop"><div><h2>Tabela de preços</h2><p class="small muted">Preço e prazo de cada trabalho. Os agentes de IA usam esta tabela para responder clientes sobre <b>preço e prazo</b>.</p></div></div>'+
+    '<div class="tbl-res"><span>✓ <b>'+feitos+'</b> de '+N.servs.length+' com preço</span>'+(falta?'<button class="btn sm" data-act="negTabCat">📚 Adicionar os '+falta+' itens que faltam do catálogo</button>':'')+'</div>'+
+    ordem.filter(function(g){return gr[g];}).map(function(g){var ic=tabIc(g);return '<section class="card tbl-g" style="--gc:'+ic[2]+'"><div class="tbl-gh"><span class="tbl-gi">'+ic[1]+'</span><b>'+esc(g)+'</b><em>'+gr[g].length+'</em></div>'+
+      gr[g].map(function(x){var s=x[0],i=x[1],nm=String(s[0]),k=nm.indexOf(' · ');return '<div class="tbl-li"><span class="tbl-ic">'+ic[1]+'</span><span class="tbl-n">'+(k>0?'<small>'+esc(nm.slice(0,k))+'</small>'+esc(nm.slice(k+3)):esc(nm))+'</span>'+
+        '<label class="tbl-v"><span>R$</span><input class="neg-preco" data-ns="'+i+'" inputmode="decimal" placeholder="0,00" value="'+esc(s[1]||'')+'"></label>'+
+        '<label class="tbl-p" title="Prazo em dias úteis"><span>⏱</span><input class="neg-prazo" data-ns="'+i+'" type="number" min="0" max="90" inputmode="numeric" placeholder="dias" value="'+esc(s[2]||'')+'"></label>'+
+        '<button class="tbl-x" data-act="negServTira" data-v="'+i+'" aria-label="Tirar" title="Tirar da tabela">✕</button></div>';}).join('')+'</section>';}).join('')+
+    '<section class="card"><div class="neg-li neg-add"><input id="ns-novo" placeholder="Adicionar outro trabalho" maxlength="60"><button class="btn sm pri" data-act="negServNovo">+ Adicionar</button></div></section>';}
 function rNegEquipe(N,T){return '<div class="dtop"><div><h2>Equipe</h2><p class="small muted">Cada pessoa entra com login próprio. Ela continua com o currículo dela na Rede.</p></div></div>'+
   '<section class="card">'+(N.eq.length?N.eq.map(function(p,i){return '<div class="neg-li"><span class="dlab-av" style="width:38px;height:38px;background:linear-gradient(135deg,#1F4E8C,#122C55)">'+esc(p.n[0])+'</span><span style="flex:1"><b>'+esc(p.n)+'</b><small class="muted" style="display:block">'+esc(p.f)+'</small></span><span class="pill warn">'+esc(p.st)+'</span><button class="btn sm" data-act="negEqTira" data-v="'+i+'" aria-label="Tirar">✕</button></div>';}).join(''):'<div class="empty">Ninguém na equipe ainda.</div>')+
   '<div class="neg-li neg-add"><input id="ne-n" placeholder="Nome e sobrenome" maxlength="50"><select id="ne-f">'+T.funcs.map(function(x){return '<option>'+esc(x)+'</option>';}).join('')+'</select><button class="btn sm pri" data-act="negEq">Convidar</button></div></section>';}
@@ -2920,7 +2966,7 @@ function rNegVazio(a,T){var V=NEG_VAZIO[a]||['🧩','Em breve',''],nm=(T.abas.fi
 
 Object.assign(ACT,NEG_ACT);S.neg=negCarrega();if(S.neg)negRede();
 document.addEventListener('change',function(e){var t=e.target;if(t.id==='ng-uf'&&S.negF){negLe();S.negF.r.uf=t.value;S.negF.r.cid='';negAbre();var c=$('ng-cid');if(c)c.focus();}});
-document.addEventListener('input',function(e){var t=e.target;if(t.classList&&t.classList.contains('neg-preco')&&S.neg){S.neg.servs[+t.dataset.ns][1]=t.value;negSalva();}});
+document.addEventListener('input',function(e){var t=e.target;if(t.classList&&S.neg){if(t.classList.contains('neg-preco')){S.neg.servs[+t.dataset.ns][1]=t.value;negSalva();}else if(t.classList.contains('neg-prazo')){S.neg.servs[+t.dataset.ns][2]=t.value;negSalva();}}});
 document.addEventListener('keydown',function(e){if(e.key!=='Enter')return;var id=e.target.id,m={'ng-outro':'negAdd','ng-eqn':'negEqAdd','ns-novo':'negServNovo','ne-n':'negEq','nv-cargo':'negVaga'}[id];if(m){e.preventDefault();ACT[m]();}else if((id==='ng-nome'||id==='ng-cid'||id==='ng-rt')&&S.negF){e.preventDefault();ACT.negOk();}});
 Object.assign(ACT,POS_ACT,{
   filAbre:function(){S.rede.fOpen=true;render();},filFecha:function(){S.rede.fOpen=false;render();},
