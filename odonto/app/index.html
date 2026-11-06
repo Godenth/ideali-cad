@@ -34,6 +34,18 @@ body:not(.rl-master) .vt-b,body:not(.rl-master) .roles,body:not(.rl-master) .pro
 .tbl-v input,.tbl-p input{border:0!important;background:none!important;box-shadow:none!important;width:100%;padding:8px 0!important;font:inherit;color:inherit;outline:none;min-width:0;border-radius:0!important}.tbl-p input::-webkit-inner-spin-button{display:none}
 .tbl-x{border:0;background:none;color:var(--muted);font-weight:800;cursor:pointer}
 @media (max-width:620px){.tbl-li{grid-template-columns:26px 1fr 84px 26px;row-gap:6px}.tbl-n{grid-column:2/4}.tbl-v{grid-column:2}.tbl-p{grid-column:3}.tbl-x{grid-row:1;grid-column:4}}
+
+/* clientes da empresa */
+.cli-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:4px}
+.cli-q{flex:1 1 260px;min-width:0;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:0 12px}.cli-q input{flex:1;border:0!important;background:none!important;padding:11px 0!important;outline:none;font:inherit;color:inherit;box-shadow:none!important}
+.cli-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:10px}
+.cli-card{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;color:inherit;font:inherit;cursor:pointer;transition:.2s}
+.cli-card:hover{border-color:var(--accent);transform:translateY(-2px)}.cli-card.off{opacity:.6}
+.cli-av{width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:800;font-size:.9rem}
+.cli-tx{flex:1;min-width:0;display:grid;gap:1px}.cli-tx b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cli-tx small{color:var(--muted);font-size:.8rem}.cli-tx em{font-style:normal;font-size:.75rem;font-weight:700;color:#B7791F}
+.cli-form{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.cli-form .fld{display:flex;flex-direction:column;gap:5px;font-size:.85rem;font-weight:700}.cli-form input:not([type=checkbox]),.cli-form textarea{border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:var(--surface);font:inherit;font-weight:500;color:inherit;width:100%;box-sizing:border-box}.cli-form input:focus,.cli-form textarea:focus{outline:none;border-color:var(--accent)}
+.cli-form .cli-nome,.cli-form .cli-endereco,.cli-form .cli-email{grid-column:span 2}.cli-form .cli-full{grid-column:1/-1}.cli-form .cli-uf{max-width:none}
+@media (max-width:700px){.cli-form{grid-template-columns:1fr 1fr}.cli-form .cli-nome,.cli-form .cli-endereco,.cli-form .cli-email{grid-column:1/-1}}
 </style>
 
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -2921,7 +2933,7 @@ function negSwitch(){if(!S.neg)return '';var D=PN(),onde=S.role==='prot'&&D&&D.l
 
 /* ---- painel do negócio ---- */
 function rNegocio(){var N=S.neg,T=negT(),a=N.aba||'inicio';if(!T.abas.some(function(x){return x[0]===a;}))a='inicio';
-  var corpo=a==='inicio'?rNegInicio(N,T):a==='servicos'?rNegServ(N,T):a==='equipe'?rNegEquipe(N,T):a==='vagas'?rNegVagas(N,T):rNegVazio(a,T);
+  var corpo=a==='inicio'?rNegInicio(N,T):a==='servicos'?rNegServ(N,T):a==='equipe'?rNegEquipe(N,T):a==='vagas'?rNegVagas(N,T):a==='clientes'&&typeof rNegClientes==='function'?rNegClientes(N):rNegVazio(a,T);
   return '<div class="dp2 neg">'+
     '<section class="neg-cab"><span class="neg-cab-ic">'+T.ic+'</span><div><small>'+esc(T.t)+'</small><h1>'+esc(N.nome)+'</h1><span class="small muted">📍 '+esc(N.cid+' / '+N.uf)+' · '+(N.tipo==='auto'?'Você atende por conta':N.papel==='faz'?(N.tipo==='escola'?'Você é dono e responsável pedagógico':N.tipo==='dental'?'Você é dono e trabalha nele':'Você é dono e responsável técnico'):'Você cuida da gestão'+(N.rt?' · Responsável: '+esc(N.rt):''))+'</span></div><span class="spacer"></span><span class="pill warn" title="A equipe Ideali confere os dados antes de mostrar o selo">em conferência</span></section>'+
     '<nav class="dabas" role="tablist" aria-label="Meu negócio">'+T.abas.map(function(x){return '<button role="tab" aria-selected="'+(a===x[0])+'" data-act="negTab" data-v="'+x[0]+'"><span>'+esc(x[1])+'</span>'+(x[0]==='vagas'&&N.vagas.length?'<i>'+N.vagas.length+'</i>':'')+'</button>';}).join('')+'</nav>'+
@@ -3045,7 +3057,67 @@ document.addEventListener('input',function(e){if(e.target.closest&&e.target.clos
 function rlBarra(){var b=document.getElementById('rl-bar');if(!RL.user){if(b)b.remove();document.body.classList.remove('rl-master','rl-in');return;}
   document.body.classList.add('rl-in');document.body.classList.toggle('rl-master',RL.admin);
   if(!b){b=document.createElement('div');b.id='rl-bar';document.body.appendChild(b);}
-  b.innerHTML=(RL.admin?'<span class="rl-mst">👑 Conta master</span>':'')+'<span class="rl-tst">🧪 Fase de teste: seu cadastro e currículo são reais; as outras telas ainda usam dados de exemplo.</span><span class="spacer"></span><button data-rl="sair">Sair</button>';}
+  b.innerHTML=(RL.admin?'<span class="rl-mst">👑 Conta master</span>':'')+'<span class="rl-tst">🧪 Fase de teste: seu cadastro, currículo, empresa, clientes e tabela de preços são reais; as outras telas ainda usam dados de exemplo.</span><span class="spacer"></span><button data-rl="sair">Sair</button>';}
+
+/* ===================== EMPRESA DE VERDADE (etapa 1): negócio, clientes e tabela de preços no banco ===================== */
+var EMP={row:null,cli:[],precSnap:{},carregado:false,erro:'',busy:false,ed:null,busca:'',filtro:'ativos',t:null};
+function empCarrega(){if(!RL.user)return Promise.resolve();
+  return Promise.all([SB.from('odo_empresas').select('*').eq('user_id',RL.user.id).maybeSingle(),SB.from('odo_clientes').select('*').eq('user_id',RL.user.id).order('nome'),SB.from('odo_precos').select('*').eq('user_id',RL.user.id).order('ordem')]).then(function(r){
+    if(r[0].error){EMP.erro=/odo_empresas/.test(r[0].error.message||'')?'falta042':'erro';EMP.carregado=true;return;}
+    EMP.erro='';EMP.carregado=true;EMP.row=r[0].data||null;EMP.cli=r[1].data||[];
+    if(EMP.row){var d=EMP.row.dados||{};S.neg={tipo:EMP.row.tipo,nome:EMP.row.nome,uf:EMP.row.uf||'',cid:EMP.row.cidade||'',papel:EMP.row.papel||'faz',rt:EMP.row.rt||'',dono:RL.perfil&&RL.perfil.nome||'',
+      servs:(r[2].data||[]).map(function(p){return [p.nome,p.valor==null?'':String(p.valor).replace('.',','),p.prazo==null?'':String(p.prazo)];}),eq:d.eq||[],vagas:d.vagas||[],criado:String(EMP.row.criado_em).slice(0,10),aba:(S.neg&&S.neg.aba)||'inicio'};
+      EMP.precSnap={};(r[2].data||[]).forEach(function(p){EMP.precSnap[p.nome]=JSON.stringify([p.valor,p.prazo,p.grupo,p.ordem]);});
+      try{localStorage.removeItem('io_neg_v1');}catch(e){}negRede();}
+    else if(S.neg){empCria();}});}
+function num(v){var x=String(v==null?'':v).replace(/\./g,'').replace(',','.').trim();if(x==='')return null;var n=+x;return isFinite(n)&&n>=0?Math.round(n*100)/100:null;}
+function empCria(){var N=S.neg;if(!RL.user||!N)return;SB.from('odo_empresas').insert({user_id:RL.user.id,tipo:N.tipo,nome:N.nome,uf:N.uf||null,cidade:N.cid||null,papel:N.papel||null,rt:N.rt||null,dados:{eq:N.eq||[],vagas:N.vagas||[]}}).select('*').single().then(function(r){
+  if(r.error){toast(/odo_empresas/.test(r.error.message||'')?'Falta rodar a atualização 042 para salvar a empresa no banco.':'Não consegui salvar a empresa agora.');return;}EMP.row=r.data;empSalvaPrecos();toast('Empresa salva na sua conta.');});}
+function empSalvaPrecos(){if(!RL.user||!EMP.row||!S.neg)return;var N=S.neg,agora={},rows=[];
+  N.servs.forEach(function(s,i){var g=tabGrupo(s[0]),v=num(s[1]),pz=s[2]===''||s[2]==null?null:Math.max(0,Math.min(90,parseInt(s[2],10)||0)),js=JSON.stringify([v,pz,g,i]);agora[s[0]]=js;if(EMP.precSnap[s[0]]!==js)rows.push({user_id:RL.user.id,nome:String(s[0]).slice(0,120),grupo:g,valor:v,prazo:pz,ordem:i});});
+  var tira=Object.keys(EMP.precSnap).filter(function(n){return !(n in agora);});
+  var p=rows.length?SB.from('odo_precos').upsert(rows,{onConflict:'user_id,nome'}):Promise.resolve({});
+  p.then(function(r){if(r&&r.error){toast('Não consegui salvar a tabela agora.');return;}rows.forEach(function(x){EMP.precSnap[x.nome]=agora[x.nome];});
+    if(tira.length)SB.from('odo_precos').delete().eq('user_id',RL.user.id).in('nome',tira).then(function(){tira.forEach(function(n){delete EMP.precSnap[n];});});});}
+function empSalvaDados(){if(!RL.user||!EMP.row||!S.neg)return;var N=S.neg;SB.from('odo_empresas').update({nome:N.nome,uf:N.uf||null,cidade:N.cid||null,papel:N.papel||null,rt:N.rt||null,dados:{eq:N.eq||[],vagas:N.vagas||[]}}).eq('id',EMP.row.id).then(function(){});}
+var _negSalva=negSalva;
+negSalva=function(){_negSalva();if(!RL.user)return;if(!S.neg){if(EMP.row){SB.from('odo_empresas').delete().eq('id',EMP.row.id).then(function(){});SB.from('odo_precos').delete().eq('user_id',RL.user.id).then(function(){});EMP.row=null;EMP.precSnap={};}return;}
+  if(!EMP.row){empCria();return;}clearTimeout(EMP.t);EMP.t=setTimeout(function(){empSalvaPrecos();empSalvaDados();},700);};
+
+/* ---- Clientes da empresa ---- */
+function cliDoc(d){d=String(d||'').replace(/\D/g,'');return d.length===11?d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'):d.length===14?d.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,'$1.$2.$3/$4-$5'):d;}
+function cliIni(n){return String(n||'?').trim().split(/\s+/).filter(function(x){return !/^(dr|dra|clinica|clínica|de|da|do|dos|das)\.?$/i.test(x);}).map(function(x){return x[0];}).slice(0,2).join('').toUpperCase()||'?';}
+function cliCor(id){var C=['#2BC7B8','#5B8CFF','#9E8CFF','#E86AA6','#E8A33A','#1DAE8A','#5B45E0','#D2433A'],h=0;String(id).split('').forEach(function(c){h=(h*31+c.charCodeAt(0))|0;});return C[Math.abs(h)%C.length];}
+function rNegClientes(N){if(!RL.user)return '<section class="ptrava neg-vz"><div class="neg-vz-ic">👥</div><h2>Entre na sua conta</h2><p>Os clientes ficam guardados na sua conta.</p></section>';
+  if(!EMP.carregado)return '<div class="empty">Carregando…</div>';
+  if(EMP.erro==='falta042')return '<section class="ptrava neg-vz"><div class="neg-vz-ic">🛠️</div><h2>Falta a atualização 042</h2><p>Rode a atualização 042 no Supabase para guardar os clientes na sua conta.</p></section>';
+  if(EMP.ed)return rCliForm(EMP.ed);
+  var q=semAc(EMP.busca||''),L=EMP.cli.filter(function(c){return (EMP.filtro==='todos'||(EMP.filtro==='ativos'?c.ativo:!c.ativo))&&(!q||semAc([c.nome,c.cidade,c.documento,c.telefone,c.reg].join(' ')).indexOf(q)>=0);}),na=EMP.cli.filter(function(c){return c.ativo;}).length;
+  return '<div class="dtop"><div><h2>Clientes</h2><p class="small muted">'+na+' ativos'+(EMP.cli.length>na?' · '+(EMP.cli.length-na)+' inativos':'')+'. Ficam só na sua conta.</p></div><span class="spacer"></span><button class="btn pri" data-act="cliNovo">+ Novo cliente</button></div>'+
+    '<div class="cli-bar"><label class="cli-q"><span aria-hidden="true">🔎</span><input id="cli-q" type="search" placeholder="Buscar por nome, cidade, CPF ou telefone" value="'+esc(EMP.busca||'')+'" autocomplete="off"></label><div class="seg">'+[['ativos','Ativos'],['inativos','Inativos'],['todos','Todos']].map(function(o){return '<button aria-pressed="'+(EMP.filtro===o[0])+'" data-act="cliFiltro" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
+    '<div class="cli-grid" id="cli-grid">'+cliCards(L)+'</div>';}
+function cliCards(L){return L.length?L.map(function(c){return '<button class="cli-card'+(c.ativo?'':' off')+'" data-act="cliAbre" data-v="'+c.id+'"><span class="cli-av" style="background:'+cliCor(c.id)+'">'+esc(cliIni(c.nome))+'</span><span class="cli-tx"><b>'+esc(c.nome)+'</b><small>'+esc([c.cidade,c.uf].filter(Boolean).join(' / ')||'Sem cidade')+(c.reg?' · nº '+c.reg:'')+'</small>'+(c.whatsapp||c.telefone?'<small>📱 '+esc(c.whatsapp||c.telefone)+'</small>':'')+(c.regra?'<em>📌 tem regra própria</em>':'')+'</span>'+(c.ativo?'':'<span class="pill">inativo</span>')+'</button>';}).join(''):'<div class="empty">Nenhum cliente'+(EMP.busca?' com essa busca':'')+'.</div>';}
+var CLI_F=[['nome','Nome do cliente (dentista ou clínica)',120],['documento','CPF ou CNPJ',20],['cro','CRO',30],['whatsapp','WhatsApp',30],['telefone','Telefone',30],['email','E-mail',120],['endereco','Endereço',160],['bairro','Bairro',80],['cidade','Cidade',80],['uf','UF',2],['cep','CEP',10]];
+function rCliForm(c){return '<div class="dtop"><div><h2>'+(c.id?'Editar cliente':'Novo cliente')+'</h2>'+(c.reg?'<p class="small muted">Nº '+c.reg+' (do sistema antigo)</p>':'')+'</div></div>'+
+  '<section class="card cli-form">'+CLI_F.map(function(f){return '<label class="fld cli-'+f[0]+'"><span>'+f[1]+'</span><input data-cf="'+f[0]+'" maxlength="'+f[2]+'" value="'+esc(f[0]==='documento'?cliDoc(c[f[0]]):c[f[0]]||'')+'"></label>';}).join('')+
+  '<label class="fld cli-full"><span>📌 Regra padrão do cliente</span><textarea data-cf="regra" maxlength="1000" rows="2" placeholder="Ex.: não cimentar componente; casos unitários usar Icmut">'+esc(c.regra||'')+'</textarea></label>'+
+  '<label class="fld cli-full"><span>Observações</span><textarea data-cf="obs" maxlength="1000" rows="2">'+esc(c.obs||'')+'</textarea></label>'+
+  '<label class="check cli-full"><input type="checkbox" data-cf="ativo" '+(c.ativo!==false?'checked':'')+'> Cliente ativo</label>'+
+  (EMP.erroF?'<p class="err cli-full">'+esc(EMP.erroF)+'</p>':'')+
+  '<div class="row cli-full"><button class="btn" data-act="cliVolta">← Voltar</button><span class="spacer"></span>'+(c.id?'<button class="btn danger" data-act="cliApaga">Excluir</button>':'')+'<button class="btn pri" data-act="cliSalva"'+(EMP.busy?' disabled':'')+'>'+(EMP.busy?'Salvando…':'Salvar')+'</button></div></section>';}
+function cliLe(){var c=EMP.ed;[].forEach.call(document.querySelectorAll('[data-cf]'),function(el){var k=el.dataset.cf;c[k]=el.type==='checkbox'?el.checked:el.value.trim();});if(c.documento)c.documento=c.documento.replace(/\D/g,'');if(c.uf)c.uf=c.uf.toUpperCase();}
+Object.assign(ACT,{
+  cliNovo:function(){EMP.ed={ativo:true};EMP.erroF='';render();var i=document.querySelector('[data-cf=nome]');if(i)i.focus();},
+  cliAbre:function(v){var c=EMP.cli.filter(function(x){return x.id===v;})[0];if(!c)return;EMP.ed=Object.assign({},c);EMP.erroF='';render();window.scrollTo(0,0);},
+  cliVolta:function(){EMP.ed=null;render();},
+  cliFiltro:function(v){EMP.filtro=v;render();},
+  cliSalva:function(){cliLe();var c=EMP.ed;if(!c.nome||c.nome.length<2){EMP.erroF='Digite o nome do cliente.';render();return;}
+    var row={};['nome','documento','cro','whatsapp','telefone','email','endereco','bairro','cidade','uf','cep','regra','obs'].forEach(function(k){row[k]=c[k]?String(c[k]):null;});row.ativo=c.ativo!==false;
+    EMP.busy=true;render();var q=c.id?SB.from('odo_clientes').update(row).eq('id',c.id).select('*').single():SB.from('odo_clientes').insert(Object.assign({user_id:RL.user.id},row)).select('*').single();
+    q.then(function(r){EMP.busy=false;if(r.error){EMP.erroF='Não consegui salvar agora.';render();return;}var i=EMP.cli.map(function(x){return x.id;}).indexOf(r.data.id);if(i>=0)EMP.cli[i]=r.data;else EMP.cli.push(r.data);EMP.cli.sort(function(a,b){return a.nome.localeCompare(b.nome,'pt');});EMP.ed=null;render();toast('Cliente salvo.');});},
+  cliApaga:function(){var c=EMP.ed;if(!c||!c.id||!confirm('Excluir '+c.nome+'? Isso não pode ser desfeito. Se só parou de mandar trabalho, prefira desmarcar "Cliente ativo".'))return;
+    SB.from('odo_clientes').delete().eq('id',c.id).then(function(r){if(r.error){toast('Não consegui excluir.');return;}EMP.cli=EMP.cli.filter(function(x){return x.id!==c.id;});EMP.ed=null;render();toast('Cliente excluído.');});}});
+document.addEventListener('input',function(e){if(e.target.id==='cli-q'){EMP.busca=e.target.value;var q=semAc(EMP.busca),g=document.getElementById('cli-grid');if(g)g.innerHTML=cliCards(EMP.cli.filter(function(c){return (EMP.filtro==='todos'||(EMP.filtro==='ativos'?c.ativo:!c.ativo))&&(!q||semAc([c.nome,c.cidade,c.documento,c.telefone,c.reg].join(' ')).indexOf(q)>=0);}));}});
 
 /* início */
 (function(){if(!SB){toast('Sem conexão com o servidor. Recarregue a página.');return;}
@@ -3055,6 +3127,6 @@ function rlBarra(){var b=document.getElementById('rl-bar');if(!RL.user){if(b)b.r
     Promise.all([SB.from('odo_perfis').select('*').eq('user_id',u.id).maybeSingle(),SB.rpc('sou_admin'),SB.from('perfis').select('nome,telefone').eq('user_id',u.id).maybeSingle()]).then(function(r){
       if(r[0].error)toast('O banco do Ideali Odonto precisa da atualização 040.');
       RL.perfil=r[0].data||null;RL.admin=!!r[1].data;var cp=r[2].data||{};RL.cadNome=cp.nome||'';RL.cadTel=cp.telefone||'';
-      rlBarra();rlEntra();});});})();
+      rlBarra();empCarrega().then(function(){rlEntra();});});});})();
 
 </script>
