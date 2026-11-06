@@ -1076,6 +1076,33 @@ body:has(#neg-ov) .vt-b{display:none}
 .pkan .pcard.urg,.dgrid .pcard.urg{border-left:4px solid var(--bad)}
 .pkan .pedc.pc-cad.st-desenho,.dgrid .pedc.pc-cad.st-desenho{border-left:4px solid #7B3FE4;background:color-mix(in srgb,#7B3FE4 7%,var(--surface))}
 .pkan .pedc.pc-cad.st-desenho.urg,.dgrid .pedc.pc-cad.st-desenho.urg{border-left-color:var(--bad)}
+
+/* financeiro */
+.finabas{margin:4px 0 14px;flex-wrap:wrap}
+.finnav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.finnav b{font-size:1.1rem;min-width:170px;text-align:center}
+.finkpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.finkpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:2px}.finkpi b{font-size:1.25rem}.finkpi span{color:var(--muted);font-size:.82rem}
+.finkpi.ok b{color:var(--ok)}.finkpi.bad b{color:var(--bad)}.finkpi.roxo b{color:#6A2FD0}
+.fincom{background:color-mix(in srgb,#7B3FE4 8%,var(--surface));display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin-bottom:12px}
+.finaviso{background:color-mix(in srgb,var(--warn) 10%,var(--surface));margin-bottom:10px}.fincred{background:color-mix(in srgb,var(--ok) 9%,var(--surface));display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+.finlista{display:grid;gap:6px}
+.finli{display:grid;grid-template-columns:1fr 110px 110px 110px 92px;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);border-left:4px solid var(--k,var(--line));background:var(--surface);border-radius:12px;padding:10px 12px;font:inherit;color:inherit;cursor:pointer}
+.finli:hover{background:var(--soft)}.finli.finpend{grid-template-columns:1fr 130px auto;cursor:default;border-left-color:var(--bad)}
+.finli-n{min-width:0;display:grid;gap:2px}.finli-n small{color:var(--muted);font-size:.78rem}.finatr{color:var(--bad)!important;font-weight:700}
+.finv{display:grid;text-align:right;font-weight:700;font-size:.9rem}.finv small{color:var(--muted);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
+.finli .pill,.dtop .pill{background:color-mix(in srgb,var(--k) 14%,var(--surface));color:var(--k);font-weight:700;text-align:center}
+.finnovo{margin-bottom:12px}.finnovo select,.finnovo input{flex:1 1 180px}
+.finform h3,.fincob h3{margin:0 0 6px}
+.finextr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
+.finpag{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid var(--line)}.finpag>span:first-child{flex:1;min-width:140px;display:grid}.finpag small{color:var(--muted)}
+.finpag.anulado b{text-decoration:line-through;color:var(--muted)}
+.finpagnovo{display:grid;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}.finpagnovo input{min-width:0;flex:1 1 140px}
+.finpagnovo input:not([type=file]),.finnovo input,.finnovo select{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;background:var(--surface);color:inherit}
+.fincobm{display:grid;gap:8px;margin-top:10px}.fincobm textarea{width:100%;font:inherit;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface);color:inherit}
+.finhist{display:grid;gap:6px}.finhl{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;align-items:center;text-align:left;border:0;background:none;border-bottom:1px solid var(--line);padding:10px 0;font:inherit;color:inherit;cursor:pointer}
+.finhl b{text-transform:capitalize}.finhl small{grid-column:1/-1;color:var(--muted)}.finhl em{color:var(--bad);font-style:normal;font-weight:700}
+.finbar{display:block;height:12px;width:var(--w);min-width:6px;border-radius:8px;background:color-mix(in srgb,var(--bad) 25%,var(--surface));overflow:hidden}.finbar i{display:block;height:100%;width:var(--p);background:var(--ok)}
+@media (max-width:720px){.finli{grid-template-columns:1fr 1fr 1fr;row-gap:6px}.finli .finli-n{grid-column:1/-1}.finli .pill{grid-column:1/-1;justify-self:start}.finli.finpend{grid-template-columns:1fr auto}.finhl{grid-template-columns:110px 1fr}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3118,7 +3145,7 @@ document.addEventListener('input',function(e){if(e.target.closest&&e.target.clos
 function rlBarra(){var b=document.getElementById('rl-bar');if(!RL.user){if(b)b.remove();document.body.classList.remove('rl-master','rl-in');return;}
   document.body.classList.add('rl-in');document.body.classList.toggle('rl-master',RL.admin);
   if(!b){b=document.createElement('div');b.id='rl-bar';document.body.appendChild(b);}
-  b.innerHTML=(RL.admin?'<span class="rl-mst">👑 Conta master</span>':'')+'<span class="rl-tst">🧪 Fase de teste: seu cadastro, currículo, empresa, clientes, tabela de preços e pedidos são reais; o resto começa vazio e vai sendo preenchido nas próximas etapas.</span><span class="spacer"></span><button data-rl="sair">Sair</button>';}
+  b.innerHTML=(RL.admin?'<span class="rl-mst">👑 Conta master</span>':'')+'<span class="rl-tst">🧪 Fase de teste: seu cadastro, currículo, empresa, clientes, tabela de preços, pedidos e financeiro são reais; o resto começa vazio e vai sendo preenchido nas próximas etapas.</span><span class="spacer"></span><button data-rl="sair">Sair</button>';}
 
 /* ===================== EMPRESA DE VERDADE (etapa 1): negócio, clientes e tabela de preços no banco ===================== */
 var EMP={row:null,cli:[],precSnap:{},carregado:false,erro:'',busy:false,ed:null,busca:'',filtro:'ativos',t:null};
@@ -3318,6 +3345,141 @@ var _pFrases=pFrases;pFrases=function(D){if(!pedAtivo()||!PED.carregado||PED.err
   if(hj.length)L.push(hj.length+' pedido'+(hj.length>1?'s vencem':' vence')+' hoje ou já passou do prazo.');
   if(ta.length)L.push('Você tem '+ta.length+' tarefa'+(ta.length>1?'s':'')+' anotada'+(ta.length>1?'s':'')+'. Toque aqui para ver.');return L;};
 
+/* ===== Financeiro (etapa 3): controle por cliente e mês, pagamentos com comprovante, cobrança da Bia, comissão ===== */
+var MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+var FIN={M:[],P:[],C:[],cfg:null,carregado:false,erro:'',ano:0,mes:0,aba:'mes',ed:null,busy:false,cob:null,novo:false};
+function fmtR(v){return 'R$ '+(Math.round((+v||0)*100)/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function finTodos(t,q){var out=[];function pg(i){return q(SB.from(t).select('*').eq('user_id',RL.user.id)).range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data||[]);if((r.data||[]).length===1000)return pg(i+1000);return out;});}return pg(0);}
+function finCarrega(){if(!RL.user)return Promise.resolve();
+  return Promise.all([finTodos('odo_fin_meses',function(q){return q.order('ano').order('mes');}),finTodos('odo_fin_pagamentos',function(q){return q.order('criado_em');}),SB.from('odo_fin_config').select('*').eq('user_id',RL.user.id).maybeSingle(),SB.from('odo_fin_comissoes').select('*').eq('user_id',RL.user.id).order('data',{ascending:false})]).then(function(r){
+    if(r[2].error)throw r[2].error;FIN.M=r[0];FIN.P=r[1];FIN.cfg=r[2].data||{chave_pix:'',email_resumo:RL.user.email,comissao_pct:10,msg_cobranca:''};FIN.C=r[3].data||[];FIN.erro='';FIN.carregado=true;
+    if(!FIN.ano){var u=FIN.M.reduce(function(a,m){var k=m.ano*100+m.mes;return k>a?k:a;},0),d=new Date();FIN.ano=u?Math.floor(u/100):d.getFullYear();FIN.mes=u?u%100:d.getMonth()+1;}render();})
+  .catch(function(e){FIN.carregado=true;FIN.erro=/odo_fin/.test((e&&e.message)||'')?'falta044':'erro';render();});}
+function finCliK(m){return m.cliente_id||('r'+m.cliente_reg);}
+function finCliNome(m){var c=m.cliente_id&&EMP.cli.filter(function(x){return x.id===m.cliente_id;})[0];return c?c.nome:(m.cliente_reg?'Cliente nº '+m.cliente_reg:'Sem cliente');}
+function finCliObj(m){return (m.cliente_id&&EMP.cli.filter(function(x){return x.id===m.cliente_id;})[0])||null;}
+function finPags(m){return FIN.P.filter(function(p){return p.mes_id===m.id;});}
+function finPago(m){return finPags(m).reduce(function(s,p){return s+(p.anulado_em?0:+p.valor);},0);}
+function finAnt(m){var a=m.mes===1?m.ano-1:m.ano,ms=m.mes===1?12:m.mes-1,k=finCliK(m),p=FIN.M.filter(function(x){return x.ano===a&&x.mes===ms&&finCliK(x)===k;})[0];if(!p)return 0;var d=finPago(p)-(+p.valor_mes);return Math.abs(d)<0.005?0:d;}
+function finRest(m){var r=(+m.valor_mes)-finPago(m),a=finAnt(m);if(a>0&&m.abater_credito===true)r-=a;return Math.round(r*100)/100;}
+function finSt(m){var r=finRest(m),pg=finPago(m);if(m.quitado||(+m.valor_mes>0&&r<=0.005))return ['pago','Pago','#13875F'];if(+m.valor_mes===0&&!pg)return ['zero','Sem valor','#8A8FA3'];if(pg>0)return ['parcial','Parcial','#E8A33A'];return ['aberto','Em aberto','#D2433A'];}
+function finDoMes(){return FIN.M.filter(function(m){return m.ano===FIN.ano&&m.mes===FIN.mes;});}
+function finComPend(){var pct=(+(FIN.cfg&&FIN.cfg.comissao_pct)||0)/100;return FIN.M.reduce(function(s,m){return s+Math.max(0,finPago(m)-(+m.comissionado||0))*pct;},0);}
+function finPend(){var G={};FIN.M.forEach(function(m){var r=(+m.valor_mes)-finPago(m);if(m.quitado)r=0;var k=finCliK(m);if(!G[k])G[k]={k:k,m0:m,tot:0,meses:[]};G[k].tot+=r;if(r>0.005)G[k].meses.push([m,r]);});
+  return Object.keys(G).map(function(k){var g=G[k];g.tot=Math.round(g.tot*100)/100;return g;}).filter(function(g){return g.tot>0.005;}).sort(function(a,b){return b.tot-a.tot;});}
+function finUtil5(ano,mes){var d=new Date(ano,mes,1,12),k=0;while(true){var w=d.getDay();if(w!==0&&w!==6){k++;if(k===5)break;}d.setDate(d.getDate()+1);}return d;}
+function finMesNome(a,m){return MESES[m-1]+'/'+a;}
+/* telas */
+function rFin(){if(!FIN.carregado)return '<div class="empty">Carregando o financeiro…</div>';
+  if(FIN.erro==='falta044')return '<section class="ptrava neg-vz"><div class="neg-vz-ic">🛠️</div><h2>Falta a atualização 044</h2><p>Rode a atualização 044 no Supabase para ativar o financeiro.</p></section>';
+  if(FIN.erro)return '<section class="ptrava neg-vz"><div class="neg-vz-ic">⚠️</div><h2>Não consegui carregar o financeiro</h2><button class="btn pri" data-act="finRecarrega">Tentar de novo</button></section>';
+  if(FIN.ed)return rFinDet(FIN.M.filter(function(m){return m.id===FIN.ed;})[0]);
+  var abas=[['mes','Mês'],['pend','Pendências'],['hist','Histórico'],['cfg','⚙️ Ajustes']];
+  return '<div class="dtop"><div><h2>Financeiro</h2><p class="small muted">Quanto cada cliente deve, o que já pagou e os comprovantes. Só você vê.</p></div></div>'+
+    '<div class="seg finabas">'+abas.map(function(a){return '<button aria-pressed="'+(FIN.aba===a[0])+'" data-act="finAba" data-v="'+a[0]+'">'+a[1]+'</button>';}).join('')+'</div>'+
+    (FIN.aba==='pend'?rFinPend():FIN.aba==='hist'?rFinHist():FIN.aba==='cfg'?rFinCfg():rFinMes());}
+function rFinMes(){var L=finDoMes(),fat=0,rec=0,fal=0;L.forEach(function(m){fat+=+m.valor_mes;rec+=finPago(m);fal+=Math.max(0,finRest(m));});
+  var ordem={aberto:0,parcial:1,zero:2,pago:3};L.sort(function(a,b){return (ordem[finSt(a)[0]]-ordem[finSt(b)[0]])||finCliNome(a).localeCompare(finCliNome(b),'pt');});
+  var com=finComPend(),pct=+(FIN.cfg.comissao_pct||0);
+  return '<div class="finnav"><button class="btn sm" data-act="finMesMuda" data-v="-1" aria-label="Mês anterior">‹</button><b>'+MESES[FIN.mes-1].charAt(0).toUpperCase()+MESES[FIN.mes-1].slice(1)+' de '+FIN.ano+'</b><button class="btn sm" data-act="finMesMuda" data-v="1" aria-label="Próximo mês">›</button><span class="spacer"></span><button class="btn pri" data-act="finNovoAbre">+ Lançar cliente no mês</button></div>'+
+    '<div class="finkpis">'+[[fmtR(fat),'faturado no mês',''],[fmtR(rec),'recebido','ok'],[fmtR(fal),'falta receber',fal>0.005?'bad':''],[fmtR(com),'comissão a receber ('+pct+'%)','roxo']].map(function(k){return '<div class="finkpi '+k[2]+'"><b>'+k[0]+'</b><span>'+k[1]+'</span></div>';}).join('')+'</div>'+
+    (com>0.005?'<div class="banner fincom"><span>💜 Comissão de <b>'+fmtR(com)+'</b> sobre o que os clientes já pagaram.</span><button class="btn sm" data-act="finComSaca">Registrar que recebi</button></div>':'')+
+    (FIN.novo?rFinNovo():'')+
+    (L.length?'<div class="finlista">'+L.map(function(m){var s=finSt(m),pg=finPago(m),r=finRest(m),a=finAnt(m);return '<button class="finli" data-act="finAbre" data-v="'+m.id+'" style="--k:'+s[2]+'"><span class="finli-n"><b>'+esc(finCliNome(m))+'</b><small>'+(m.extrato_path||m.arquivo_legado?'📄 extrato · ':'')+(m.enviado?'✉️ enviado':'não enviado')+(a<-0.005?' · ⚠️ devia '+fmtR(-a)+' do mês anterior':'')+(a>0.005?' · crédito de '+fmtR(a):'')+'</small></span><span class="finv"><small>mês</small>'+fmtR(m.valor_mes)+'</span><span class="finv"><small>pago</small>'+fmtR(pg)+'</span><span class="finv"><small>falta</small>'+fmtR(Math.max(0,r))+'</span><span class="pill">'+s[1]+'</span></button>';}).join('')+'</div>':'<div class="empty">Nenhum cliente lançado em '+MESES[FIN.mes-1]+'. Use “+ Lançar cliente no mês”.</div>');}
+function rFinNovo(){var tem={};finDoMes().forEach(function(m){tem[finCliK(m)]=1;});var L=EMP.cli.filter(function(c){return c.ativo&&!tem[c.id];});
+  return '<section class="card finnovo"><h3>Lançar cliente em '+MESES[FIN.mes-1]+'</h3><div class="row wrap"><select id="fn-cli"><option value="">— cliente —</option>'+L.map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+'</option>';}).join('')+'</select><input id="fn-valor" inputmode="decimal" placeholder="Valor do mês (R$)"><button class="btn pri" data-act="finNovoSalva"'+(FIN.busy?' disabled':'')+'>Lançar</button><button class="btn" data-act="finNovoFecha">Cancelar</button></div></section>';}
+function rFinDet(m){if(!m){FIN.ed=null;return rFin();}var c=finCliObj(m),pg=finPago(m),r=finRest(m),a=finAnt(m),s=finSt(m),P=finPags(m);
+  var peds=PED.L.filter(function(p){var d=String(p.criado_em||'');return (c?p.cliente_id===c.id:p.cliente_reg===m.cliente_reg)&&d.slice(0,7)===m.ano+'-'+String(m.mes).padStart(2,'0');}),vp=peds.reduce(function(x,p){return x+(+p.valor||0);},0);
+  return '<div class="dtop"><div><h2>'+esc(finCliNome(m))+'</h2><p class="small muted">'+MESES[m.mes-1]+' de '+m.ano+' · <span class="pill" style="--k:'+s[2]+'">'+s[1]+'</span></p></div><span class="spacer"></span><button class="btn" data-act="finVolta">← Voltar</button></div>'+
+    '<div class="finkpis">'+[[fmtR(m.valor_mes),'valor do mês',''],[fmtR(pg),'pago','ok'],[fmtR(Math.max(0,r)),'falta',r>0.005?'bad':'']].map(function(k){return '<div class="finkpi '+k[2]+'"><b>'+k[0]+'</b><span>'+k[1]+'</span></div>';}).join('')+'</div>'+
+    (a<-0.005?'<div class="banner finaviso">⚠️ No mês anterior ficou faltando <b>'+fmtR(-a)+'</b>.</div>':'')+
+    (a>0.005?'<div class="banner fincred"><span>💚 No mês anterior pagou <b>'+fmtR(a)+'</b> a mais. '+(m.abater_credito===true?'Está sendo abatido deste mês.':m.abater_credito===false?'Você decidiu não abater.':'Abater deste mês?')+'</span><div class="row"><button class="btn sm" data-act="finCred" data-v="1">Abater</button><button class="btn sm" data-act="finCred" data-v="0">Não abater</button></div></div>':'')+
+    '<div class="dgrid"><section class="card cli-form finform"><h3 class="cli-full">Valores do mês</h3>'+
+      '<label class="fld"><span>Valor do mês (R$)</span><input data-fm="valor_mes" inputmode="decimal" value="'+esc(String(m.valor_mes).replace('.',','))+'"></label>'+
+      '<label class="fld"><span>Componentes (R$)</span><input data-fm="valor_componente" inputmode="decimal" value="'+esc(String(m.valor_componente||0).replace('.',','))+'"></label>'+
+      '<label class="check"><input type="checkbox" data-fm="extrato_recebido"'+(m.extrato_recebido?' checked':'')+'> Extrato recebido</label>'+
+      '<label class="check"><input type="checkbox" data-fm="enviado"'+(m.enviado?' checked':'')+'> Enviado ao cliente</label>'+
+      '<label class="check cli-full"><input type="checkbox" data-fm="quitado"'+(m.quitado?' checked':'')+'> Quitado (considerar pago mesmo com diferença)</label>'+
+      '<label class="fld cli-full"><span>Observação</span><textarea data-fm="obs" maxlength="1000" rows="2">'+esc(m.obs||'')+'</textarea></label>'+
+      (peds.length?'<p class="small muted cli-full">📋 '+peds.length+' pedido'+(peds.length>1?'s':'')+' deste cliente criados no mês'+(vp?', somando '+fmtR(vp):'')+'.</p>':'')+
+      '<div class="row cli-full"><button class="btn danger sm" data-act="finMesApaga">Apagar lançamento</button><span class="spacer"></span><button class="btn pri" data-act="finMesSalva"'+(FIN.busy?' disabled':'')+'>Salvar</button></div>'+
+      '<div class="cli-full finextr"><b>📄 Extrato do mês</b> '+(m.extrato_path?'<button class="btn sm" data-act="finArqVer" data-v="'+esc(m.extrato_path)+'">Abrir</button>':m.arquivo_legado?'<span class="small muted">está no sistema antigo (ainda não copiado)</span>':'<span class="small muted">nenhum</span>')+
+        '<label class="btn sm">'+(m.extrato_path?'Trocar':'Anexar')+' PDF<input type="file" id="fx-arq" accept="application/pdf,image/*" hidden></label></div></section>'+
+    '<section class="card"><h3>Pagamentos</h3>'+(P.length?P.map(function(p){return '<div class="finpag'+(p.anulado_em?' anulado':'')+'"><span><b>'+fmtR(p.valor)+'</b><small>'+(p.data?String(p.data).split('-').reverse().join('/'):'sem data')+(p.obs?' · '+esc(p.obs):'')+(p.anulado_em?' · anulado'+(p.anulado_motivo?': '+esc(p.anulado_motivo):''):'')+'</small></span>'+
+        (p.comprovante_path?'<button class="btn sm" data-act="finArqVer" data-v="'+esc(p.comprovante_path)+'">📎 Comprovante</button>':p.arquivo_legado?'<span class="small muted" title="Ainda no sistema antigo">📎 antigo</span>':'')+(p.conferencia==='ok'?'<span class="pill ok" title="Valor do comprovante confere">confere</span>':p.conferencia==='diverge'?'<span class="pill bad">diverge</span>':'')+
+        (p.anulado_em?'':'<button class="btn sm" data-act="finPagAnula" data-v="'+p.id+'" aria-label="Anular pagamento">Anular</button>')+'</div>';}).join(''):'<div class="empty">Nenhum pagamento ainda.</div>')+
+      '<div class="finpagnovo"><b>Lançar pagamento</b><div class="row wrap"><input id="fp-valor" inputmode="decimal" placeholder="Valor (R$)" value="'+(r>0.005?String(r.toFixed(2)).replace('.',','):'')+'"><input id="fp-data" type="date" value="'+dHoje()+'"></div>'+
+        '<input id="fp-obs" maxlength="500" placeholder="Observação (opcional)"><label class="small">📎 Comprovante (PDF ou foto, até 10 MB) <input type="file" id="fp-arq" accept="application/pdf,image/*"></label>'+
+        '<button class="btn pri" data-act="finPagNovo"'+(FIN.busy?' disabled':'')+'>'+(FIN.busy?'Salvando…':'Lançar pagamento')+'</button></div></section>'+
+    '<section class="card fincob"><h3>💬 Cobrança da Bia</h3><p class="small muted">A Bia monta a mensagem com tudo o que este cliente tem em aberto'+(FIN.cfg.chave_pix?' e a sua chave Pix':'. Cadastre a chave Pix em Ajustes')+'.</p><button class="btn" data-act="finCob" data-v="'+finCliK(m)+'">Montar mensagem</button>'+(FIN.cob&&FIN.cob.k===finCliK(m)?rFinCob():'')+'</section></div>';}
+function finMsg(k){var g=finPend().filter(function(x){return x.k===k;})[0],m0=g?g.m0:FIN.M.filter(function(x){return finCliK(x)===k;})[0],c=m0&&finCliObj(m0),nome=c?c.nome:(m0?finCliNome(m0):'');
+  if(!g)return 'Olá, '+nome+'! Passando para avisar que está tudo em dia por aqui. Obrigado!';
+  var det=g.meses.map(function(x){return '• '+finMesNome(x[0].ano,x[0].mes)+': '+fmtR(x[1]);}).join('\n'),pix=FIN.cfg.chave_pix?'\n\nChave Pix: '+FIN.cfg.chave_pix:'';
+  var t=FIN.cfg.msg_cobranca||'Olá, {cliente}! Tudo bem? Aqui é do {empresa}. Segue o que está em aberto:\n{detalhe}\n\nTotal: {total}{pix}\n\nQualquer dúvida, estou à disposição.';
+  return t.replace(/\{cliente\}/g,nome).replace(/\{empresa\}/g,(S.neg&&S.neg.nome)||'laboratório').replace(/\{detalhe\}/g,det).replace(/\{total\}/g,fmtR(g.tot)).replace(/\{pix\}/g,pix);}
+function rFinCob(){var c=FIN.cob,cli=EMP.cli.filter(function(x){return x.id===c.k;})[0],w=cli&&String(cli.whatsapp||cli.telefone||'').replace(/\D/g,'');if(w&&w.length<=11)w='55'+w;
+  return '<div class="fincobm"><textarea id="fc-txt" rows="8">'+esc(c.txt)+'</textarea><div class="row wrap"><button class="btn" data-act="finCobCopia">Copiar</button>'+(w?'<a class="btn pri" href="https://wa.me/'+w+'?text='+encodeURIComponent(c.txt)+'" target="_blank" rel="noopener" data-act="finCobWa">Abrir no WhatsApp</a>':'<span class="small muted">Cliente sem WhatsApp cadastrado.</span>')+'</div></div>';}
+function rFinPend(){var G=finPend(),tot=G.reduce(function(s,g){return s+g.tot;},0);
+  return '<div class="finkpis">'+[[fmtR(tot),'total a receber','bad'],[String(G.length),'clientes devendo',''],[fmtR(finComPend()),'comissão a receber','roxo']].map(function(k){return '<div class="finkpi '+k[2]+'"><b>'+k[0]+'</b><span>'+k[1]+'</span></div>';}).join('')+'</div>'+
+    (G.length?'<div class="finlista">'+G.map(function(g){var v=g.meses.length?finUtil5(g.meses[0][0].ano,g.meses[0][0].mes):null,atr=v&&v<new Date();return '<div class="finli finpend"><span class="finli-n"><b>'+esc(finCliNome(g.m0))+'</b><small>'+g.meses.map(function(x){return finMesNome(x[0].ano,x[0].mes)+' '+fmtR(x[1]);}).join(' · ')+'</small>'+(v?'<small class="'+(atr?'finatr':'')+'">'+(atr?'⚠️ vencido desde ':'vence em ')+v.toLocaleDateString('pt-BR')+'</small>':'')+'</span><span class="finv"><small>em aberto</small>'+fmtR(g.tot)+'</span><button class="btn sm" data-act="finPendAbre" data-v="'+g.meses[g.meses.length-1][0].id+'">Abrir e cobrar</button></div>';}).join('')+'</div>':'<div class="empty">Ninguém devendo. 🎉</div>');}
+function rFinHist(){var G={};FIN.M.forEach(function(m){var k=m.ano*100+m.mes;if(!G[k])G[k]={a:m.ano,m:m.mes,n:0,f:0,r:0};G[k].n++;G[k].f+=+m.valor_mes;G[k].r+=finPago(m);});
+  var L=Object.keys(G).sort().reverse().map(function(k){return G[k];}),mx=Math.max.apply(null,L.map(function(x){return x.f;}).concat([1]));
+  return '<section class="card"><h3>Mês a mês</h3>'+(L.length?'<div class="finhist">'+L.map(function(x){var ab=Math.max(0,x.f-x.r),pc=x.f?Math.min(100,Math.round(x.r/x.f*100)):100;return '<button class="finhl" data-act="finVaiMes" data-v="'+x.a+'-'+x.m+'"><b>'+finMesNome(x.a,x.m)+'</b><span class="finbar" style="--w:'+Math.round(x.f/mx*100)+'%;--p:'+pc+'%"><i></i></span><small>'+x.n+' clientes · faturado '+fmtR(x.f)+' · recebido '+fmtR(x.r)+(ab>0.005?' · <em>falta '+fmtR(ab)+'</em>':' · ✓')+'</small></button>';}).join('')+'</div>':'<div class="empty">Sem meses lançados.</div>')+'</section>'+
+    '<section class="card"><h3>Comissões recebidas</h3>'+(FIN.C.length?FIN.C.map(function(c){return '<div class="finpag"><span><b>'+fmtR(c.valor_total)+'</b><small>'+(c.mes?'referente a '+finMesNome(c.ano,c.mes)+' · ':'')+'registrada em '+new Date(c.data).toLocaleDateString('pt-BR')+'</small></span></div>';}).join(''):'<div class="empty">Nenhuma ainda.</div>')+'</section>';}
+function rFinCfg(){var c=FIN.cfg;return '<section class="card cli-form finform"><h3 class="cli-full">Ajustes do financeiro</h3>'+
+  '<label class="fld cli-full"><span>Chave Pix (aparece nas cobranças)</span><input data-fc="chave_pix" maxlength="140" value="'+esc(c.chave_pix||'')+'" placeholder="CNPJ, e-mail, telefone ou chave aleatória"></label>'+
+  '<label class="fld"><span>E-mail do resumo diário</span><input data-fc="email_resumo" type="email" maxlength="120" value="'+esc(c.email_resumo||'')+'"></label>'+
+  '<label class="fld"><span>Comissão (%)</span><input data-fc="comissao_pct" inputmode="decimal" value="'+esc(String(c.comissao_pct==null?10:c.comissao_pct).replace('.',','))+'"></label>'+
+  '<label class="check cli-full"><input type="checkbox" data-fc="resumo_ativo"'+(c.resumo_ativo?' checked':'')+'> Receber o resumo diário por e-mail <span class="small muted">(começa a chegar quando o envio pelo Resend estiver ligado)</span></label>'+
+  '<label class="fld cli-full"><span>Modelo da mensagem de cobrança</span><textarea data-fc="msg_cobranca" rows="6" maxlength="1500" placeholder="Deixe vazio para usar o modelo da Bia">'+esc(c.msg_cobranca||'')+'</textarea><small class="muted">Use {cliente}, {empresa}, {detalhe}, {total} e {pix}.</small></label>'+
+  '<div class="row cli-full"><span class="spacer"></span><button class="btn pri" data-act="finCfgSalva"'+(FIN.busy?' disabled':'')+'>Salvar</button></div></section>';}
+/* ações */
+function finTrocaArq(f,pasta){if(!f)return Promise.resolve(null);if(f.size>10485760){toast('Arquivo maior que 10 MB.');return Promise.reject('grande');}
+  if(!/^(application\/pdf|image\/(jpeg|png|webp))$/.test(f.type)){toast('Use PDF, JPG, PNG ou WEBP.');return Promise.reject('tipo');}
+  var ext={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[f.type],path=RL.user.id+'/'+pasta+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
+  return SB.storage.from('odonto-fin').upload(path,f,{contentType:f.type,upsert:false}).then(function(r){if(r.error){toast('Não consegui enviar o arquivo.');throw r.error;}return path;});}
+function finAtual(row){var i=FIN.M.map(function(x){return x.id;}).indexOf(row.id);if(i>=0)FIN.M[i]=row;else FIN.M.push(row);}
+Object.assign(ACT,{
+  finRecarrega:function(){FIN.carregado=false;render();finCarrega();},
+  finAba:function(v){FIN.aba=v;FIN.ed=null;render();},
+  finMesMuda:function(v){var m=FIN.mes+(+v),a=FIN.ano;if(m<1){m=12;a--;}if(m>12){m=1;a++;}FIN.mes=m;FIN.ano=a;FIN.novo=false;render();},
+  finVaiMes:function(v){var p=v.split('-');FIN.ano=+p[0];FIN.mes=+p[1];FIN.aba='mes';render();window.scrollTo(0,0);},
+  finNovoAbre:function(){FIN.novo=true;render();},finNovoFecha:function(){FIN.novo=false;render();},
+  finNovoSalva:function(){var id=(document.getElementById('fn-cli')||{}).value,v=num((document.getElementById('fn-valor')||{}).value);if(!id){toast('Escolha o cliente.');return;}var c=EMP.cli.filter(function(x){return x.id===id;})[0];
+    FIN.busy=true;render();SB.from('odo_fin_meses').insert({user_id:RL.user.id,cliente_id:id,cliente_reg:c&&c.reg||null,ano:FIN.ano,mes:FIN.mes,valor_mes:v||0}).select('*').single().then(function(r){FIN.busy=false;if(r.error){toast(/duplicate|unique/.test(r.error.message||'')?'Este cliente já está neste mês.':'Não consegui lançar.');render();return;}finAtual(r.data);FIN.novo=false;FIN.ed=r.data.id;render();});},
+  finAbre:function(v){FIN.ed=v;FIN.cob=null;render();window.scrollTo(0,0);},
+  finPendAbre:function(v){FIN.ed=v;FIN.cob=null;var m=FIN.M.filter(function(x){return x.id===v;})[0];if(m){FIN.cob={k:finCliK(m),txt:finMsg(finCliK(m))};}render();window.scrollTo(0,0);},
+  finVolta:function(){FIN.ed=null;FIN.cob=null;render();},
+  finMesSalva:function(){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0];if(!m)return;var p={};[].forEach.call(document.querySelectorAll('[data-fm]'),function(el){var k=el.dataset.fm;p[k]=el.type==='checkbox'?el.checked:el.value.trim();});
+    p.valor_mes=num(p.valor_mes)||0;p.valor_componente=num(p.valor_componente)||0;p.obs=p.obs||null;
+    if(p.valor_mes<+m.valor_mes&&!confirm('Diminuir o valor do mês de '+fmtR(m.valor_mes)+' para '+fmtR(p.valor_mes)+'?'))return;
+    FIN.busy=true;render();SB.from('odo_fin_meses').update(p).eq('id',m.id).select('*').single().then(function(r){FIN.busy=false;if(r.error){toast('Não consegui salvar.');render();return;}finAtual(r.data);render();toast('Salvo.');});},
+  finMesApaga:function(){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0];if(!m)return;if(finPags(m).length){toast('Este mês tem pagamentos. Anule-os ou mantenha o lançamento.');return;}if(!confirm('Apagar o lançamento de '+finCliNome(m)+' em '+MESES[m.mes-1]+'?'))return;
+    SB.from('odo_fin_meses').delete().eq('id',m.id).then(function(r){if(r.error){toast('Não consegui apagar.');return;}if(m.extrato_path)SB.storage.from('odonto-fin').remove([m.extrato_path]);FIN.M=FIN.M.filter(function(x){return x.id!==m.id;});FIN.ed=null;render();});},
+  finCred:function(v){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0];if(!m)return;SB.from('odo_fin_meses').update({abater_credito:v==='1'}).eq('id',m.id).select('*').single().then(function(r){if(r.error){toast('Não consegui salvar.');return;}finAtual(r.data);render();});},
+  finPagNovo:function(){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0];if(!m)return;var v=num(document.getElementById('fp-valor').value),dt=document.getElementById('fp-data').value||null,ob=document.getElementById('fp-obs').value.trim()||null,f=(document.getElementById('fp-arq').files||[])[0];
+    if(!v||v<=0){toast('Digite o valor pago.');return;}FIN.busy=true;render();
+    finTrocaArq(f,'comprovantes/'+m.ano+'-'+String(m.mes).padStart(2,'0')).then(function(path){return SB.from('odo_fin_pagamentos').insert({user_id:RL.user.id,mes_id:m.id,valor:v,data:dt,obs:ob,comprovante_path:path}).select('*').single().then(function(r){if(r.error){if(path)SB.storage.from('odonto-fin').remove([path]);throw r.error;}FIN.P.push(r.data);
+      FIN.busy=false;render();toast('Pagamento de '+fmtR(v)+' lançado.');});}).catch(function(){FIN.busy=false;render();});},
+  finPagAnula:function(v){var p=FIN.P.filter(function(x){return x.id===v;})[0];if(!p)return;var mo=prompt('Anular o pagamento de '+fmtR(p.valor)+'? Diga o motivo:');if(mo===null)return;
+    SB.from('odo_fin_pagamentos').update({anulado_em:new Date().toISOString(),anulado_motivo:mo.slice(0,300)||null}).eq('id',v).select('*').single().then(function(r){if(r.error){toast('Não consegui anular.');return;}Object.assign(p,r.data);render();toast('Pagamento anulado.');});},
+  finArqVer:function(v){var w=window.open('','_blank');SB.storage.from('odonto-fin').createSignedUrl(v,300).then(function(r){if(r.error||!r.data){if(w)w.close();toast('Não consegui abrir o arquivo.');return;}if(w)w.location=r.data.signedUrl;else location.href=r.data.signedUrl;});},
+  finCob:function(k){FIN.cob={k:k,txt:finMsg(k)};render();},
+  finCobCopia:function(){var t=document.getElementById('fc-txt');if(!t)return;try{navigator.clipboard.writeText(t.value).then(function(){toast('Mensagem copiada.');});}catch(e){t.select();}},
+  finCobWa:function(v,b){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0],t=document.getElementById('fc-txt');if(t)b.href=b.href.split('?')[0]+'?text='+encodeURIComponent(t.value);window.open(b.href,'_blank','noopener');
+    if(m&&!m.enviado)SB.from('odo_fin_meses').update({enviado:true}).eq('id',m.id).select('*').single().then(function(r){if(!r.error){finAtual(r.data);render();}});},
+  finCfgSalva:function(){var c={};[].forEach.call(document.querySelectorAll('[data-fc]'),function(el){var k=el.dataset.fc;c[k]=el.type==='checkbox'?el.checked:el.value.trim();});
+    c.comissao_pct=Math.max(0,Math.min(100,num(c.comissao_pct)||0));['chave_pix','email_resumo','msg_cobranca'].forEach(function(k){c[k]=c[k]||null;});
+    FIN.busy=true;render();SB.from('odo_fin_config').upsert(Object.assign({user_id:RL.user.id},c),{onConflict:'user_id'}).select('*').single().then(function(r){FIN.busy=false;if(r.error){toast('Não consegui salvar.');render();return;}FIN.cfg=r.data;render();toast('Ajustes salvos.');});},
+  finComSaca:function(){var pct=(+FIN.cfg.comissao_pct||0)/100,L=FIN.M.filter(function(m){return finPago(m)-(+m.comissionado||0)>0.005;});if(!L.length)return;
+    var det=L.map(function(m){var base=finPago(m)-(+m.comissionado||0);return {cliente_reg:m.cliente_reg,ano:m.ano,mes:m.mes,valor_pago:Math.round(finPago(m)*100)/100,valor_base_comissao:Math.round(base*100)/100,comissao:Math.round(base*pct*100)/100};}),tot=Math.round(det.reduce(function(s,x){return s+x.comissao;},0)*100)/100;
+    if(!confirm('Registrar que você recebeu '+fmtR(tot)+' de comissão?'))return;
+    SB.from('odo_fin_comissoes').insert({user_id:RL.user.id,valor_total:tot,valor_calculado:tot,detalhes:det}).select('*').single().then(function(r){if(r.error){toast('Não consegui registrar.');return;}FIN.C.unshift(r.data);
+      return Promise.all(L.map(function(m){var v=Math.round(finPago(m)*100)/100;return SB.from('odo_fin_meses').update({comissionado:v}).eq('id',m.id).then(function(x){if(!x.error)m.comissionado=v;});}));}).then(function(){render();toast('Comissão registrada.');});}});
+document.addEventListener('change',function(e){var t=e.target;if(t.id==='fx-arq'){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0],f=(t.files||[])[0];if(!m||!f)return;var velho=m.extrato_path;
+  finTrocaArq(f,'extratos/'+m.ano+'-'+String(m.mes).padStart(2,'0')).then(function(path){return SB.from('odo_fin_meses').update({extrato_path:path,extrato_recebido:true}).eq('id',m.id).select('*').single().then(function(r){if(r.error){SB.storage.from('odonto-fin').remove([path]);toast('Não consegui salvar o extrato.');return;}finAtual(r.data);if(velho)SB.storage.from('odonto-fin').remove([velho]);render();toast('Extrato anexado.');});}).catch(function(){});}});
+var _rPTrava=rPTrava;rPTrava=function(q){if(q==='financeiro'&&typeof pedAtivo==='function'&&pedAtivo())return rFin();return _rPTrava(q);};
+
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
   var z=function(D,f){if(!D||!D.exemplo)return;f(D);D.exemplo=false;D.conv=[{de:'ana',t:'Seu painel está pronto. Me peça para anotar o que precisar.'}];};
@@ -3336,6 +3498,6 @@ var _render0=render;render=function(){try{rlZera();rlZera2();}catch(e){}return _
     Promise.all([SB.from('odo_perfis').select('*').eq('user_id',u.id).maybeSingle(),SB.rpc('sou_admin'),SB.from('perfis').select('nome,telefone').eq('user_id',u.id).maybeSingle()]).then(function(r){
       if(r[0].error)toast('O banco do Ideali Odonto precisa da atualização 040.');
       RL.perfil=r[0].data||null;RL.admin=!!r[1].data;var cp=r[2].data||{};RL.cadNome=cp.nome||'';RL.cadTel=cp.telefone||'';
-      rlBarra();empCarrega().then(function(){rlEntra();pedCarrega();});});});})();
+      rlBarra();empCarrega().then(function(){rlEntra();pedCarrega();finCarrega();});});});})();
 
 </script>
