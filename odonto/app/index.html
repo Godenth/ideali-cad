@@ -1157,6 +1157,12 @@ body.espelho [data-act=inoVenc],body.espelho [data-act=inoVencAuto],body.espelho
 @media (max-width:620px){.joao-li{grid-template-columns:1fr auto}.joao-li .row{grid-column:1/-1}}
 .leit-st{font-size:.82rem;font-weight:700;color:var(--muted)}.leit-st.meio{color:#B7791F}.leit-st.ok{color:#13875F}
 .ino-rest.on{color:#D2433A;font-weight:800}
+
+.pfx-l{display:grid;max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:8px}
+.pfx-i{display:grid;grid-template-columns:24px 56px 1fr;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer}.pfx-i>span:last-child{display:grid;min-width:0}.pfx-i small{color:var(--muted)}
+.pfx select,.pfx input{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;background:var(--surface);color:inherit}
+.pfx-ban{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+body.espelho [data-act=pfxAbre],body.espelho .pfx-ban{display:none!important}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3728,6 +3734,47 @@ Object.assign(ACT,{
 setInterval(function(){try{var n=joaoNovos().length,h=new Date().getHours();if(!n||h<8||h>=20||document.hidden)return;var k='io_joao_'+dHoje(),c=+(espLS(k)||0);if(c>=12)return;espLS(k,String(c+1));
   toast('🧑‍🔧 João: '+n+' pagamento'+(n>1?'s':'')+' esperando a sua verificação na aba Inove.');}catch(e){}},300000);
 var _rInoveJ=rInove;rInove=function(){var h=_rInoveJ();if(!ESP.dono||INO.hist)return h;var i=h.indexOf('<div class="ino-kpis">');return i<0?h:h.slice(0,i)+rJoao()+h.slice(i);};
+
+/* ===== Fechar pedidos antigos em lote (com histórico e desfazer) ===== */
+var PFX={on:false,st:'finalizado',ate:'',acao:'entregue',sel:null,busy:false};
+function pfxAte(){if(!PFX.ate){var d=new Date();d.setDate(d.getDate()-30);PFX.ate=isoD(d);}return PFX.ate;}
+function pfxLista(){var ate=pfxAte();return PED.L.filter(function(p){return !p.arquivado&&p.status===PFX.st&&String(p.criado_em).slice(0,10)<=ate;}).sort(function(a,b){return (a.numero||0)-(b.numero||0);});}
+function pfxLotes(){return (empDados().lotes)||[];}
+function rPedFecha(){var L=pfxLista();if(PFX.sel===null||PFX.selK!==PFX.st+PFX.ate){PFX.sel={};L.forEach(function(p){PFX.sel[p.id]=1;});PFX.selK=PFX.st+PFX.ate;}
+  var n=L.filter(function(p){return PFX.sel[p.id];}).length,ac={entregue:'Marcar como entregue e arquivar',arquivar:'Só arquivar (sai do quadro)',cancelado:'Marcar como cancelado e arquivar'};
+  return '<div class="dtop"><div><h2>🧹 Fechar pedidos antigos</h2><p class="small muted">Tira do quadro os pedidos velhos de uma vez. Fica guardado o que era antes, e dá para desfazer.</p></div><span class="spacer"></span><button class="btn" data-act="pfxSai">← Voltar aos pedidos</button></div>'+
+    '<section class="card cli-form pfx"><label class="fld"><span>Situação</span><select id="pfx-st">'+[['finalizado','Pronto'],['producao','Em produção'],['desenho','Desenho CAD a fazer'],['aguardando','Aguardando informação'],['orcamento','Orçamento']].map(function(o){return '<option value="'+o[0]+'"'+(PFX.st===o[0]?' selected':'')+'>'+o[1]+' ('+PED.L.filter(function(p){return !p.arquivado&&p.status===o[0];}).length+')</option>';}).join('')+'</select></label>'+
+      '<label class="fld"><span>Criados até</span><input type="date" id="pfx-ate" value="'+pfxAte()+'"></label>'+
+      '<label class="fld cli-full"><span>O que fazer</span><select id="pfx-ac">'+Object.keys(ac).map(function(k){return '<option value="'+k+'"'+(PFX.acao===k?' selected':'')+'>'+ac[k]+'</option>';}).join('')+'</select></label></section>'+
+    '<section class="card"><div class="row wrap"><b>'+n+' de '+L.length+' selecionados</b><span class="spacer"></span><button class="btn sm" data-act="pfxTodos" data-v="1">Marcar todos</button><button class="btn sm" data-act="pfxTodos" data-v="0">Desmarcar todos</button></div>'+
+      (L.length?'<div class="pfx-l">'+L.map(function(p){return '<label class="pfx-i"><input type="checkbox" data-pfx="'+p.id+'"'+(PFX.sel[p.id]?' checked':'')+'><span class="pedn">#'+(p.numero||'—')+'</span><span><b>'+esc(p.paciente||'Sem paciente')+'</b><small>'+esc(pedCli(p))+(p.trabalho?' · '+esc(p.trabalho):'')+' · criado em '+String(p.criado_em).slice(0,10).split('-').reverse().join('/')+'</small></span></label>';}).join('')+'</div>':'<div class="empty">Nenhum pedido nessa situação até essa data.</div>')+
+      '<div class="row" style="margin-top:12px"><span class="spacer"></span><button class="btn pri" data-act="pfxVai"'+(!n||PFX.busy||n>400?' disabled':'')+'>'+(PFX.busy?'Fechando…':n>400?'Máximo 400 por vez':'Fechar '+n+' pedido'+(n!==1?'s':''))+'</button></div></section>';}
+function pfxAplica(ids,patch){var chunks=[];for(var i=0;i<ids.length;i+=100)chunks.push(ids.slice(i,i+100));
+  return chunks.reduce(function(pr,c){return pr.then(function(){return SB.from('odo_pedidos').update(patch).in('id',c).then(function(r){if(r.error)throw r.error;});});},Promise.resolve());}
+function rPedLoteBanner(){var L=pfxLotes();if(!L.length||ESP.dono)return '';var u=L[L.length-1];
+  return '<div class="banner pfx-ban"><span>🧹 Último lote: <b>'+u.n+' pedido'+(u.n!==1?'s':'')+'</b> '+u.desc+' em '+new Date(u.em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'.</span><button class="btn sm" data-act="pfxDesfaz">Desfazer</button></div>';}
+Object.assign(ACT,{
+  pfxAbre:function(){PFX.on=true;PFX.sel=null;render();window.scrollTo(0,0);},pfxSai:function(){PFX.on=false;render();},
+  pfxTodos:function(v){pfxLista().forEach(function(p){if(v==='1')PFX.sel[p.id]=1;else delete PFX.sel[p.id];});render();},
+  pfxVai:function(){var L=pfxLista().filter(function(p){return PFX.sel[p.id];});if(!L.length||L.length>400)return;
+    var ac=PFX.acao,agora=new Date().toISOString(),patch=ac==='entregue'?{status:'entregue',arquivado:true}:ac==='cancelado'?{status:'cancelado',arquivado:true}:{arquivado:true};
+    var desc=ac==='entregue'?'marcados como entregues':ac==='cancelado'?'cancelados':'arquivados';
+    if(!confirm('Fechar '+L.length+' pedido'+(L.length!==1?'s':'')+' ('+desc+')? Dá para desfazer depois.'))return;
+    var antes={};L.forEach(function(p){var k=p.status+'|'+(p.arquivado?1:0)+'|'+(p.entregue_em||'');(antes[k]=antes[k]||[]).push(p.id);});
+    PFX.busy=true;render();
+    pfxAplica(L.map(function(p){return p.id;}),patch).then(function(){L.forEach(function(p){Object.assign(p,patch);});
+      var lotes=pfxLotes().concat([{em:agora,n:L.length,desc:desc,antes:antes}]).slice(-3),d=Object.assign({},EMP.row.dados||{});d.lotes=lotes;
+      return SB.from('odo_empresas').update({dados:d}).eq('id',EMP.row.id).select('*').single().then(function(r){if(!r.error)EMP.row=r.data;});})
+    .then(function(){PFX.busy=false;PFX.on=false;render();toast(L.length+' pedido'+(L.length!==1?'s':'')+' fechado'+(L.length!==1?'s':'')+'. Se precisar, use "Desfazer".');})
+    .catch(function(){PFX.busy=false;render();toast('Não consegui fechar todos. Recarregue a página e confira.');});},
+  pfxDesfaz:function(){var L=pfxLotes();if(!L.length)return;var u=L[L.length-1];if(!confirm('Desfazer o último lote ('+u.n+' pedidos)? Eles voltam para a situação de antes.'))return;
+    var ks=Object.keys(u.antes);ks.reduce(function(pr,k){var a=k.split('|'),patch={status:a[0],arquivado:a[1]==='1',entregue_em:a[2]||null};return pr.then(function(){return pfxAplica(u.antes[k],patch).then(function(){u.antes[k].forEach(function(id){var p=PED.L.filter(function(x){return x.id===id;})[0];if(p)Object.assign(p,patch);});});});},Promise.resolve())
+    .then(function(){var d=Object.assign({},EMP.row.dados||{});d.lotes=L.slice(0,-1);return SB.from('odo_empresas').update({dados:d}).eq('id',EMP.row.id).select('*').single().then(function(r){if(!r.error)EMP.row=r.data;});})
+    .then(function(){render();toast('Lote desfeito. Os pedidos voltaram como estavam.');}).catch(function(){toast('Não consegui desfazer tudo. Recarregue e confira.');});}});
+document.addEventListener('change',function(e){var t=e.target;if(!PFX.on)return;if(t.id==='pfx-st'){PFX.st=t.value;PFX.sel=null;render();}else if(t.id==='pfx-ate'){PFX.ate=t.value;PFX.sel=null;render();}else if(t.id==='pfx-ac'){PFX.acao=t.value;}
+  else if(t.dataset&&t.dataset.pfx){if(t.checked)PFX.sel[t.dataset.pfx]=1;else delete PFX.sel[t.dataset.pfx];render();}});
+var _rPedidosF=rPedidos;rPedidos=function(){if(PFX.on&&!ESP.dono&&PED.carregado&&!PED.erro)return rPedFecha();var h=_rPedidosF();if(!PED.carregado||PED.erro||PED.ed||PED.vcad)return h;
+  h=h.replace('<button class="btn" data-act="pedCadistas">','<button class="btn" data-act="pfxAbre">🧹 Fechar antigos</button><button class="btn" data-act="pedCadistas">');var i=h.indexOf('<div class="cli-bar">');return i<0?h:h.slice(0,i)+rPedLoteBanner()+h.slice(i);};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
