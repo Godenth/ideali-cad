@@ -1098,6 +1098,7 @@ body:has(#neg-ov) .vt-b{display:none}
 .finpag.anulado b{text-decoration:line-through;color:var(--muted)}
 .finpagnovo{display:grid;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}.finpagnovo input{min-width:0;flex:1 1 140px}
 .finpagnovo input:not([type=file]),.finnovo input,.finnovo select{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;background:var(--surface);color:inherit}
+.finmig{margin-bottom:12px;display:grid;gap:8px}.finmig input{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;background:var(--surface);color:inherit}
 .fincobm{display:grid;gap:8px;margin-top:10px}.fincobm textarea{width:100%;font:inherit;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface);color:inherit}
 .finhist{display:grid;gap:6px}.finhl{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;align-items:center;text-align:left;border:0;background:none;border-bottom:1px solid var(--line);padding:10px 0;font:inherit;color:inherit;cursor:pointer}
 .finhl b{text-transform:capitalize}.finhl small{grid-column:1/-1;color:var(--muted)}.finhl em{color:var(--bad);font-style:normal;font-weight:700}
@@ -3433,7 +3434,7 @@ function rFinHist(){var G={};FIN.M.forEach(function(m){var k=m.ano*100+m.mes;if(
   var L=Object.keys(G).sort().reverse().map(function(k){return G[k];}),mx=Math.max.apply(null,L.map(function(x){return x.f;}).concat([1]));
   return '<section class="card"><h3>Mês a mês</h3>'+(L.length?'<div class="finhist">'+L.map(function(x){var ab=Math.max(0,x.f-x.r),pc=x.f?Math.min(100,Math.round(x.r/x.f*100)):100;return '<button class="finhl" data-act="finVaiMes" data-v="'+x.a+'-'+x.m+'"><b>'+finMesNome(x.a,x.m)+'</b><span class="finbar" style="--w:'+Math.round(x.f/mx*100)+'%;--p:'+pc+'%"><i></i></span><small>'+x.n+' clientes · faturado '+fmtR(x.f)+' · recebido '+fmtR(x.r)+(ab>0.005?' · <em>falta '+fmtR(ab)+'</em>':' · ✓')+'</small></button>';}).join('')+'</div>':'<div class="empty">Sem meses lançados.</div>')+'</section>'+
     '<section class="card"><h3>Comissões recebidas</h3>'+(FIN.C.length?FIN.C.map(function(c){return '<div class="finpag"><span><b>'+fmtR(c.valor_total)+'</b><small>'+(c.mes?'referente a '+finMesNome(c.ano,c.mes)+' · ':'')+'registrada em '+new Date(c.data).toLocaleDateString('pt-BR')+'</small></span></div>';}).join(''):'<div class="empty">Nenhuma ainda.</div>')+'</section>';}
-function rFinCfg(){var c=FIN.cfg;return '<section class="card cli-form finform"><h3 class="cli-full">Ajustes do financeiro</h3>'+
+function rFinCfg(){var c=FIN.cfg;return (ESP.dono?'':rFinMig())+'<section class="card cli-form finform"><h3 class="cli-full">Ajustes do financeiro</h3>'+
   '<label class="fld cli-full"><span>Chave Pix (aparece nas cobranças)</span><input data-fc="chave_pix" maxlength="140" value="'+esc(c.chave_pix||'')+'" placeholder="CNPJ, e-mail, telefone ou chave aleatória"></label>'+
   '<div class="fld"><span>Resumo diário vai para</span><b>'+esc(RL.user.email)+'</b><small class="muted">o e-mail de login da sua conta</small></div>'+
   '<label class="fld"><span>Comissão (%)</span><input data-fc="comissao_pct" inputmode="decimal" value="'+esc(String(c.comissao_pct==null?10:c.comissao_pct).replace('.',','))+'"></label>'+
@@ -3487,6 +3488,32 @@ Object.assign(ACT,{
       return Promise.all(L.map(function(m){var v=Math.round(finPago(m)*100)/100;return SB.from('odo_fin_meses').update({comissionado:v}).eq('id',m.id).then(function(x){if(!x.error)m.comissionado=v;});}));}).then(function(){render();toast('Comissão registrada.');});}});
 document.addEventListener('change',function(e){var t=e.target;if(t.id==='fx-arq'){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0],f=(t.files||[])[0];if(!m||!f)return;var velho=m.extrato_path;
   finTrocaArq(f,'extratos/'+m.ano+'-'+String(m.mes).padStart(2,'0')).then(function(path){return SB.from('odo_fin_meses').update({extrato_path:path,extrato_recebido:true}).eq('id',m.id).select('*').single().then(function(r){if(r.error){SB.storage.from('odonto-fin').remove([path]);toast('Não consegui salvar o extrato.');return;}finAtual(r.data);if(velho)SB.storage.from('odonto-fin').remove([velho]);render();toast('Extrato anexado.');});}).catch(function(){});}});
+
+/* trazer comprovantes e extratos do sistema antigo (o navegador copia; a senha antiga não é guardada) */
+var ANT_URL='https://alqhhgysvehtgkwsxeok.supabase.co',ANT_KEY='sb_publishable_oq7JWHoMvMqvjeaTDGHoqA_din8-sjJ';
+function finMigPend(){return {pag:FIN.P.filter(function(p){return p.arquivo_legado&&!p.comprovante_path;}),mes:FIN.M.filter(function(m){return m.arquivo_legado&&!m.extrato_path;})};}
+function rFinMig(){var P=finMigPend(),n=P.pag.length+P.mes.length,G=FIN.mig;if(!n&&!G)return '';
+  if(G)return '<section class="card finmig"><h3>📦 Arquivos do sistema antigo</h3><div class="finbar" style="--w:100%;--p:'+Math.round((G.ok+G.err)/Math.max(1,G.tot)*100)+'%"><i></i></div><p class="small">'+(G.rodando?'Copiando… ':'Pronto: ')+G.ok+' de '+G.tot+' copiados'+(G.err?' · '+G.err+' com erro':'')+'.</p>'+(!G.rodando&&G.err?'<button class="btn sm" data-act="finMigDeNovo">Tentar os que deram erro</button>':'')+'</section>';
+  return '<section class="card finmig cli-form"><h3 class="cli-full">📦 Trazer arquivos do sistema antigo</h3><p class="small muted cli-full">Faltam <b>'+P.pag.length+' comprovantes</b> e <b>'+P.mes.length+' extratos</b>. Entre com o login do sistema antigo: o seu navegador copia cada arquivo para a sua pasta privada nova. A senha não fica guardada. Escaneamentos e STL não vêm.</p>'+
+    '<label class="fld"><span>E-mail do sistema antigo</span><input id="mg-email" type="email" autocomplete="off" value="'+esc(RL.user.email)+'"></label><label class="fld"><span>Senha do sistema antigo</span><input id="mg-senha" type="password" autocomplete="off"></label>'+
+    '<div class="row cli-full"><span class="spacer"></span><button class="btn pri" data-act="finMigra">Trazer arquivos</button></div></section>';}
+function finMigCopia(ant,it){var ext=(String(it.path).match(/\.([a-z0-9]+)$/i)||[])[1]||'',e=ext.toLowerCase(),tipo={pdf:'application/pdf',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'}[e];
+  if(!tipo)return Promise.reject('tipo');
+  return ant.storage.from(it.bucket).download(it.path).then(function(r){if(r.error||!r.data)throw r.error||'baixar';
+    var novo=RL.user.id+'/'+(it.bucket==='extratos'?'extratos':'comprovantes')+'/legado/'+String(it.path).replace(/[^a-zA-Z0-9._-]+/g,'_');
+    return SB.storage.from('odonto-fin').upload(novo,new Blob([r.data],{type:tipo}),{contentType:tipo,upsert:true}).then(function(u){if(u.error)throw u.error;
+      var q=it.tipo==='pag'?SB.from('odo_fin_pagamentos').update({comprovante_path:novo}).eq('id',it.id):SB.from('odo_fin_meses').update({extrato_path:novo}).eq('id',it.id);
+      return q.then(function(x){if(x.error)throw x.error;var o=(it.tipo==='pag'?FIN.P:FIN.M).filter(function(z){return z.id===it.id;})[0];if(o){if(it.tipo==='pag')o.comprovante_path=novo;else o.extrato_path=novo;}});});});}
+Object.assign(ACT,{
+  finMigra:function(){var em=(document.getElementById('mg-email')||{}).value,se=(document.getElementById('mg-senha')||{}).value;if(!em||!se){toast('Digite o e-mail e a senha do sistema antigo.');return;}
+    if(!window.supabase||!window.supabase.createClient){toast('Recarregue a página e tente de novo.');return;}
+    var ant=window.supabase.createClient(ANT_URL,ANT_KEY,{auth:{persistSession:false,autoRefreshToken:false,storageKey:'io-antigo-temp'}});
+    ant.auth.signInWithPassword({email:em.trim(),password:se}).then(function(r){if(r.error){toast('Login do sistema antigo não confere.');return;}
+      var P=finMigPend(),L=P.pag.map(function(p){return {tipo:'pag',id:p.id,bucket:'comprovantes',path:p.arquivo_legado};}).concat(P.mes.map(function(m){return {tipo:'mes',id:m.id,bucket:'extratos',path:m.arquivo_legado};}));
+      FIN.mig={tot:L.length,ok:0,err:0,rodando:true};render();var i=0;
+      function prox(){if(i>=L.length)return Promise.resolve();var it=L[i++];return finMigCopia(ant,it).then(function(){FIN.mig.ok++;},function(e){FIN.mig.err++;console.warn('migra',it.path,e);}).then(function(){render();return prox();});}
+      Promise.all([prox(),prox(),prox()]).then(function(){FIN.mig.rodando=false;render();ant.auth.signOut();toast(FIN.mig.err?'Terminei, mas '+FIN.mig.err+' arquivo(s) deram erro.':'Pronto! Todos os arquivos vieram para a pasta nova.');});});},
+  finMigDeNovo:function(){FIN.mig=null;render();}});
 var _rPTrava=rPTrava;rPTrava=function(q){if(q==='financeiro'&&typeof pedAtivo==='function'&&pedAtivo())return rFin();return _rPTrava(q);};
 
 /* ===== Conta espelho: o parceiro (ex.: Inove) vê tudo da conta do dono, sem editar nada ===== */
@@ -3507,7 +3534,7 @@ var _rlBarra=rlBarra;rlBarra=function(){_rlBarra();var b=document.getElementById
   else if(ESP.lista.length){var x=document.createElement('button');x.dataset.act='espTroca';x.dataset.v=ESP.lista[0].dono_id;x.textContent='🪞 Ver '+(ESP.lista[0].emp||'conta espelho');b.insertBefore(x,b.lastChild);}};
 /* nada se grava no modo espelho (o banco também recusa) */
 var ESP_ESCRITA=['cliNovo','cliSalva','cliApaga','pedNovo','pedSalva','pedApaga','pedAprova','pedDesFeito','pedInove','pedPronto','pedEntrega','pedCadNovo','pedCadAtivo','pedTipo','pedCalc',
-  'finNovoAbre','finNovoSalva','finMesSalva','finMesApaga','finCred','finPagNovo','finPagAnula','finCfgSalva','finComSaca','finResumoTeste','negTabCat','negServNovo','negServTira','negApaga','negIr','pUpgrade','cfgSenha','espNovo','espCorta','espVolta','espApaga'];
+  'finNovoAbre','finNovoSalva','finMigra','finMesSalva','finMesApaga','finCred','finPagNovo','finPagAnula','finCfgSalva','finComSaca','finResumoTeste','negTabCat','negServNovo','negServTira','negApaga','negIr','pUpgrade','cfgSenha','espNovo','espCorta','espVolta','espApaga'];
 ESP_ESCRITA.forEach(function(k){var f=ACT[k];if(typeof f!=='function')return;ACT[k]=function(){if(ESP.dono){toast('🪞 Conta espelho: aqui é só para acompanhar, sem editar.');return;}return f.apply(this,arguments);};});
 var _negSalvaE=negSalva;negSalva=function(){if(ESP.dono)return;return _negSalvaE.apply(this,arguments);};
 var _rlSalvaPfE=rlSalvaPf;rlSalvaPf=function(){if(ESP.dono)return;return _rlSalvaPfE.apply(this,arguments);};
