@@ -17,7 +17,7 @@
 #rl-bar{position:fixed;left:0;right:0;bottom:0;z-index:120;display:flex;align-items:center;gap:10px;padding:6px 12px;background:rgba(10,13,36,.92);color:#C9D0FF;font-size:.78rem;backdrop-filter:blur(6px);border-top:1px solid rgba(255,255,255,.1)}
 #rl-bar .spacer{flex:1}#rl-bar button{border:1px solid rgba(255,255,255,.25);background:none;color:#fff;border-radius:999px;padding:4px 12px;font-weight:700;cursor:pointer}
 .rl-mst{background:linear-gradient(135deg,#FFD166,#F0A53A);color:#3a2400;border-radius:999px;padding:2px 10px;font-weight:800;white-space:nowrap}
-body.rl-in{padding-bottom:40px}body.rl-in .vt-b{bottom:52px!important}
+body.rl-in{padding-bottom:64px}body.rl-in .rl-sen{display:none}.inst-lista{position:relative!important;top:auto!important;margin-top:6px;max-height:260px!important}body.rl-in .vt-b{bottom:52px!important}
 body:not(.rl-master) .vt-b,body:not(.rl-master) .roles,body:not(.rl-master) .proto,body.rl-in:not(.rl-master) .voltar-site{display:none!important}
 @media (max-width:600px){.rl-tst{display:none}}
 </style>
@@ -1550,7 +1550,7 @@ function rCadastro(){var c=S.cad,P=c.passo,tot=5;
       '<div class="folha-s"><h3>Formação</h3><div class="folha-g"><label class="lin"><span>Escolaridade</span><select id="cd-esc" data-c="escola" data-re="1">'+ESCOLAS.map(function(x){return '<option'+(x===c.escola?' selected':'')+'>'+x+'</option>';}).join('')+'</select></label>'+
         '<div class="lin"><span>Situação</span>'+sitCampo('cad',c)+'</div>'+
         '<div class="lin lin-full"><span>Instituição de ensino'+(precisaInst(c)?'':' <span class="muted">(opcional)</span>')+'</span>'+instCampo('cad',c)+'</div></div></div>'+
-      '<div class="folha-s"><h3>Acesso</h3><div class="folha-g"><label class="lin"><span>Crie uma senha</span><input type="text" id="cd-sen" placeholder="mínimo 8 caracteres"></label></div></div>'+
+      '<div class="folha-s rl-sen"><h3>Acesso</h3><div class="folha-g"><label class="lin"><span>Crie uma senha</span><input type="text" id="cd-sen" placeholder="mínimo 8 caracteres"></label></div></div>'+
       (c.erro?'<p class="err">'+esc(c.erro)+'</p>':'')+
       '<div class="row"><button class="btn" data-act="cadIr" data-v="1">← Voltar</button><span class="spacer"></span><button class="btn palco-ok" data-act="cadIr" data-v="3">Continuar →</button></div></div></div></section>'+
     (!c.anaOi?'<div class="ana-ov" role="dialog" aria-modal="true" aria-label="Ana, sua assistente"><div class="ana-cena"><img class="ana-img" src="'+ANA.feliz+'" alt="Ana, assistente do Ideali"><div class="ana-balao"><b>Oi! Eu sou a Ana 💛</b><small>Sua assistente no Ideali</small>'+
