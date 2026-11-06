@@ -1163,6 +1163,21 @@ body.espelho [data-act=inoVenc],body.espelho [data-act=inoVencAuto],body.espelho
 .pfx select,.pfx input{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;background:var(--surface);color:inherit}
 .pfx-ban{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 body.espelho [data-act=pfxAbre],body.espelho .pfx-ban{display:none!important}
+
+/* João flutuante */
+#joao-w{position:fixed;right:18px;bottom:56px;z-index:80}
+.jw-b{display:flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:10px 16px 10px 12px;background:linear-gradient(135deg,#FFE066,#FFC300);color:#2A2100;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);font-size:1.05rem}
+.jw-b span{font-size:.92rem}.jw-b i{font-style:normal;background:#D2433A;color:#fff;border-radius:999px;font-size:.75rem;padding:1px 8px}
+.jw-p{width:min(420px,calc(100vw - 32px));max-height:min(70vh,620px);display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 60px -20px rgba(0,0,0,.6);overflow:hidden}
+.jw-ph{display:flex;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(135deg,#FFE066,#FFC300);color:#2A2100}.jw-ph>div{display:grid}.jw-ph small{opacity:.75}
+.jw-x{border:0;background:rgba(255,255,255,.7);color:#2A2100;width:30px;height:30px;border-radius:9px;font-size:1.2rem;font-weight:800;cursor:pointer}
+.jw-c{overflow:auto;padding:6px 14px 14px}.jw-c h4{margin:12px 0 4px;font-size:.92rem}
+.jw-c .bia-li{grid-template-columns:1fr}.jw-c .bia-b{justify-content:flex-start}.jw-c .joao-li{grid-template-columns:1fr auto}.jw-c .joao-li .row{grid-column:1/-1}
+.jw-al{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,calc(100vw - 32px));background:var(--surface);color:var(--ink);border:2px solid #FFC300;border-radius:20px;padding:18px;box-shadow:0 30px 80px -20px rgba(0,0,0,.7);display:grid;gap:14px;z-index:90}
+.jw-alc{display:flex;gap:12px;align-items:flex-start}.jw-alc p{margin:4px 0 0}.jw-alav{font-size:2rem;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:color-mix(in srgb,#FFC300 25%,var(--surface))}
+.jw-al .row{justify-content:flex-end;gap:8px}
+@media (prefers-reduced-motion:no-preference){.jw-al{animation:jwPop .35s cubic-bezier(.2,1.3,.4,1) both}.jw-b i{animation:joaoPulsa 1.4s ease-in-out infinite}}
+@keyframes jwPop{from{opacity:0;transform:translate(-50%,-46%) scale(.92)}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3701,7 +3716,7 @@ var _finCobWa=ACT.finCobWa;ACT.finCobWa=function(v,b){_finCobWa(v,b);var k=FIN.c
 /* a mensagem padrão da cobrança segue o tom da Bia */
 var _finMsg=finMsg;finMsg=function(k){if(FIN.cfg&&FIN.cfg.msg_cobranca)return _finMsg(k);var b=biaLista().filter(function(x){return x.k===k;})[0];return b?biaMsg(b):_finMsg(k);};
 /* Bia aparece na aba Inove e nas Pendências */
-var _rInove=rInove;rInove=function(){var h=_rInove();if(INO.hist||!FIN.carregado||FIN.erro)return h;var i=h.indexOf('<div class="ino-pont">');return i<0?h:h.slice(0,i)+rBia('inove')+h.slice(i);};
+
 var _rFinPend=rFinPend;rFinPend=function(){return rBia('fin')+_rFinPend();};
 /* a Ana avisa da Bia no topo */
 var _pFrasesB=pFrases;pFrases=function(D){var L=_pFrasesB(D);try{if(pedAtivo()&&FIN.carregado&&!FIN.erro){var dev=biaLista().filter(function(b){return b.dias>0&&!b.prom;}),cr=dev.filter(function(b){return b.f[0]==='critico';}).length;
@@ -3730,10 +3745,8 @@ function rFinLeit(){if(LEIT.falta)return '<section class="card"><p>Falta rodar a
 Object.assign(ACT,{
   joaoVer:function(v){var p=FIN.P.filter(function(x){return x.id===v;})[0];if(!p)return;if(p.comprovante_path)ACT.finArqVer(p.comprovante_path);else toast('Este pagamento não tem comprovante anexado.');leitGrava(v,'aberto_em');},
   joaoOk:function(v){var x=leitDe(v);if(!x||!x.aberto_em){toast('Abra o comprovante antes de confirmar.');return;}leitGrava(v,'confirmado_em').then(function(){toast('Confirmado. Obrigado!');});}});
-/* lembrete do João: a cada 5 min, até 12 por dia, nunca das 20h às 8h */
-setInterval(function(){try{var n=joaoNovos().length,h=new Date().getHours();if(!n||h<8||h>=20||document.hidden)return;var k='io_joao_'+dHoje(),c=+(espLS(k)||0);if(c>=12)return;espLS(k,String(c+1));
-  toast('🧑‍🔧 João: '+n+' pagamento'+(n>1?'s':'')+' esperando a sua verificação na aba Inove.');}catch(e){}},300000);
-var _rInoveJ=rInove;rInove=function(){var h=_rInoveJ();if(!ESP.dono||INO.hist)return h;var i=h.indexOf('<div class="ino-kpis">');return i<0?h:h.slice(0,i)+rJoao()+h.slice(i);};
+
+
 
 /* ===== Fechar pedidos antigos em lote (com histórico e desfazer) ===== */
 var PFX={on:false,st:'finalizado',ate:'',acao:'entregue',sel:null,busy:false};
@@ -3775,6 +3788,31 @@ document.addEventListener('change',function(e){var t=e.target;if(!PFX.on)return;
   else if(t.dataset&&t.dataset.pfx){if(t.checked)PFX.sel[t.dataset.pfx]=1;else delete PFX.sel[t.dataset.pfx];render();}});
 var _rPedidosF=rPedidos;rPedidos=function(){if(PFX.on&&!ESP.dono&&PED.carregado&&!PED.erro)return rPedFecha();var h=_rPedidosF();if(!PED.carregado||PED.erro||PED.ed||PED.vcad)return h;
   h=h.replace('<button class="btn" data-act="pedCadistas">','<button class="btn" data-act="pfxAbre">🧹 Fechar antigos</button><button class="btn" data-act="pedCadistas">');var i=h.indexOf('<div class="cli-bar">');return i<0?h:h.slice(0,i)+rPedLoteBanner()+h.slice(i);};
+
+/* ===== João flutuante: minimizado no canto, abre o painel, avisa de vez em quando no meio da tela ===== */
+var JW={aberto:false,alerta:null,i:0};
+function joaoVisivel(){return typeof pedAtivo==='function'&&pedAtivo()&&FIN.carregado&&!FIN.erro&&(ESP.dono||(S.role==='prot'&&S.tab&&S.tab.prot==='inove'));}
+function joaoDev(){try{return biaLista().filter(function(b){return b.dias>0&&!b.prom;});}catch(e){return [];}}
+function rJoaoPainel(){var P=ESP.dono?joaoNovos():[],D=joaoDev(),tot=D.reduce(function(s,b){return s+b.tot;},0);
+  return '<div class="jw-p" role="dialog" aria-label="João"><div class="jw-ph"><span class="bia-av">🧑‍🔧</span><div><b>João</b><small>acompanhamento da Inove</small></div><span class="spacer"></span><button class="jw-x" data-act="jwFecha" aria-label="Minimizar">–</button></div><div class="jw-c">'+
+    (ESP.dono?(P.length?'<h4>🎉 '+P.length+' pagamento'+(P.length>1?'s':'')+' novo'+(P.length>1?'s':'')+' para verificar</h4>'+P.map(function(p){var m=FIN.M.filter(function(x){return x.id===p.mes_id;})[0],x=leitDe(p.id),ab=x&&x.aberto_em;
+        return '<div class="joao-li"><div><b>'+esc(m?finCliNome(m):'—')+'</b><small>'+(m?finMesNome(m.ano,m.mes)+' · ':'')+'pago em '+(p.data?p.data.split('-').reverse().join('/'):'—')+'</small></div><b class="joao-v">'+fmtR(p.valor)+'</b><div class="row wrap"><button class="btn sm" data-act="joaoVer" data-v="'+p.id+'">🔎 Verificar</button><button class="btn sm pri" data-act="joaoOk" data-v="'+p.id+'"'+(ab?'':' disabled title="Abra o comprovante primeiro"')+'>✅ OK, confirmado</button></div></div>';}).join(''):'<p class="small muted">✅ Nenhum pagamento novo para verificar.</p>'):'')+
+    '<h4>'+(D.length?'📌 '+D.length+' cliente'+(D.length>1?'s':'')+' em atraso · '+fmtR(tot):'📌 Ninguém em atraso. 🎉')+'</h4>'+
+    D.map(function(b){var w=cliWa(b.cli);return '<div class="bia-li" style="--k:'+b.f[2]+'"><div class="bia-t"><b>'+esc(b.nome)+'</b><small><i class="bia-f">'+b.f[1]+'</i> há '+b.dias+' dia'+(b.dias>1?'s':'')+' · '+fmtR(b.tot)+(b.cob?' · ✉️ cobrado em '+b.cob.split('-').reverse().join('/'):'')+'</small></div><div class="row wrap bia-b">'+
+      (ESP.dono?'':'<button class="btn sm pri" data-act="biaCobra" data-v="'+b.k+'">Cobrar</button>')+(w?'<a class="btn sm" href="https://wa.me/'+w+'" target="_blank" rel="noopener">💬 WhatsApp</a>':'')+'</div></div>';}).join('')+'</div></div>';}
+function joaoDesenha(){var el=document.getElementById('joao-w');if(!joaoVisivel()){if(el)el.remove();return;}
+  if(!el){el=document.createElement('div');el.id='joao-w';document.body.appendChild(el);}
+  var n=(ESP.dono?joaoNovos().length:0),d=joaoDev().length;
+  el.innerHTML=(JW.aberto?rJoaoPainel():'')+(JW.alerta?'<div class="jw-al" role="alertdialog" aria-live="assertive"><div class="jw-alc"><span class="jw-alav">🧑‍🔧</span><div><b>João</b><p>'+JW.alerta+'</p></div></div><div class="row"><button class="btn" data-act="jwDepois">Depois</button><button class="btn pri" data-act="jwVer">Ver agora</button></div></div>':'')+
+    (JW.aberto?'':'<button class="jw-b" data-act="jwAbre" aria-label="Abrir o João">🧑‍🔧<span>João</span>'+(n+d?'<i>'+(n||d)+'</i>':'')+'</button>');}
+var _renderJ=render;render=function(){var r=_renderJ.apply(this,arguments);try{joaoDesenha();}catch(e){}return r;};
+function joaoAvisa(){if(!joaoVisivel()||JW.aberto||JW.alerta||document.hidden)return;var h=new Date().getHours();if(h<8||h>=20)return;var k='io_joao_'+dHoje(),c=+(espLS(k)||0);if(c>=12)return;
+  var P=ESP.dono?joaoNovos():[],D=joaoDev(),txt='';
+  if(P.length)txt='Chegou <b>'+P.length+' pagamento'+(P.length>1?'s':'')+' novo'+(P.length>1?'s':'')+'</b>. Abra o comprovante e confirme que viu. 🎉';
+  else if(D.length){var b=D[JW.i++%D.length];txt='<b>'+esc(b.nome)+'</b> está há <b>'+b.dias+' dia'+(b.dias>1?'s':'')+'</b> em atraso, devendo <b>'+fmtR(b.tot)+'</b>.';}
+  if(!txt)return;espLS(k,String(c+1));JW.alerta=txt;joaoDesenha();}
+setTimeout(joaoAvisa,25000);setInterval(joaoAvisa,300000);
+Object.assign(ACT,{jwAbre:function(){JW.aberto=true;JW.alerta=null;joaoDesenha();},jwFecha:function(){JW.aberto=false;joaoDesenha();},jwDepois:function(){JW.alerta=null;joaoDesenha();},jwVer:function(){JW.alerta=null;JW.aberto=true;joaoDesenha();}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
