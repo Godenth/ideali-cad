@@ -925,6 +925,13 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .cxp-b.eu{justify-self:end;background:#5B45E0;color:#fff;border-radius:14px 14px 4px 14px;display:none}.cxp-b.eu small{color:#d8d2ff}.cxp-b.eu.in{display:block;animation:flTx .4s}
 @media (max-width:860px){.cxp-w{grid-template-columns:1fr;min-height:0}.cxp-l{display:none}.cxp-h{font-size:.78rem;padding:8px 10px}.cxp-m{padding:8px 10px}.cxp-b{font-size:.8rem;max-width:92%}.cxp-in{display:none}
  .cxp-al,.cxp-ok{margin:0 10px 8px}}
+
+.agz-bl{background:repeating-linear-gradient(135deg,#F3EDE2 0 10px,#EEE6D6 10px 20px)}
+.agz-lk{font-size:.7rem;font-weight:800;color:#9a8a6a}
+.agz-sl{border:1.5px dashed #CBBE9F;color:#8a7a5c;border-radius:10px;padding:8px;font-size:.8rem;font-weight:700;text-align:center}
+.agz-sl.ok{border-color:#1DAE8A;color:#0f7a5a;background:#E8F8F2}
+.agz-sl.try{border-color:#E0533A;color:#B3261E;background:#FFECE8;animation:agTr .12s 6}
+.agz-d.nao{box-shadow:inset 0 0 0 2px #E0533A}
 </style>
 <body>
 <header class="top">
@@ -1396,21 +1403,22 @@ var CENAS=[
  {cap:'IA vigiando as entregas',pt:3,who:'ot',p:'serio',d:11000,lab:1,h:'<div class="sc"><div class="alr">'+[['⚠️','#D2433A','Pedido #1043 vai atrasar 1 dia','O Lab Digital Centro ainda não iniciou a fresagem. Já avisei o lab e remarquei o paciente das 10h?'],['🕑','#B7791F','Prova da faceta chega hoje às 14h','Paciente C. M. confirmado às 15h. Está tudo encaixado.'],['✅','#1E8A5A','Coroa #1042 saiu para entrega','Previsão: amanhã cedo, dentro do prazo.'],['📈','#5B45E0','Lab Arte Dental: 3 entregas antecipadas este mês','Bom sinal. Ele está melhorando no prazo.']].map(function(a){return '<div class="al fx" style="--c:'+a[1]+'"><span>'+a[0]+'</span><div><b>'+a[2]+'</b><p>'+a[3]+'</p></div></div>';}).join('')+'</div></div>',
   go:function(){inn('.fx',200,700);falas([[0,'E tem uma <b>IA vigiando as entregas</b> 24 horas. Se um pedido vai atrasar, ela avisa <b>antes</b> do paciente chegar.'],[5400,'Prova chegando, trabalho saindo, lab melhorando ou piorando: <b>você fica sabendo de tudo.</b>']]);}},
 
- {cap:'Agenda × prazo do lab',pt:3,who:'ot',p:'serio',d:16500,lab:1,h:'<div class="sc"><div class="agz">'+
-   '<div class="win agz-w fx"><div class="wbar">📅 Agenda da clínica · semana</div><div class="agz-g">'+
-    ['Seg','Ter','Qua','Qui','Sex'].map(function(d,i){return '<div class="agz-d" id="agd'+i+'"><b>'+d+'</b>'+(i===1?'<div class="agz-c" id="agc"><small>14h</small>Maria Souza<em>cimentação da coroa 46</em></div>':'')+(i===3?'<div class="agz-lab" id="aglab">🧪 Coroa 46 fica pronta</div>':'')+(i===0?'<div class="agz-x">9h · Avaliação</div>':'')+(i===2?'<div class="agz-x">10h · Limpeza</div>':'')+'</div>';}).join('')+'</div>'+
-    '<div class="agz-al" id="agal"><b>⚠️ A coroa da Maria Souza só chega na quinta.</b><span>O retorno dela está marcado para terça, 14h.</span><button id="agbt">⚡ Pedir urgência ao laboratório</button><button class="agz-2">Remarcar a paciente</button>'+
-     '<div class="agz-ch" id="agch"><div class="agz-m ia" id="agm0"><small>🤖 IA da clínica → Laboratório Exemplo</small>A coroa 46 da Maria Souza consegue ficar pronta até <b>terça, 11h</b>? A paciente volta às 14h.</div>'+
+ {cap:'Agenda × prazo do lab',pt:3,who:'ot',p:'serio',d:19000,lab:1,h:'<div class="sc"><div class="agz">'+
+   '<div class="win agz-w fx"><div class="wbar">📅 Agenda da clínica · marcar retorno da Maria Souza (coroa 46)</div><div class="agz-g">'+
+    ['Seg','Ter','Qua','Qui','Sex'].map(function(d,i){return '<div class="agz-d'+(i<3?' agz-bl':'')+'" id="agd'+i+'"><b>'+d+'</b>'+(i<3?'<div class="agz-lk">🔒 coroa ainda no lab</div>':'')+(i===1?'<div class="agz-sl" id="agsl">14h · livre</div>':'')+(i===3?'<div class="agz-lab in" id="aglab">🧪 Coroa 46 fica pronta</div><div class="agz-sl ok">a partir de 14h</div>':'')+(i===4?'<div class="agz-sl ok">✓ livre</div>':'')+'</div>';}).join('')+'</div>'+
+    '<div class="agz-al" id="agal"><b>⛔ Não dá para marcar na terça.</b><span>A coroa da Maria só fica pronta <b>quinta</b>. O sistema não deixa o paciente vir antes da prótese.</span><button id="agbt">⚡ Pedir ao laboratório para adiantar</button><button class="agz-2">Marcar quinta, 14h</button>'+
+     '<div class="agz-ch" id="agch"><div class="agz-m ia" id="agm0"><small>🤖 IA da clínica → Laboratório Exemplo</small>A coroa 46 da Maria Souza consegue ficar pronta até <b>terça, 11h</b>? A paciente pode vir às 14h.</div>'+
      '<div class="agz-m dig" id="agdg"><i></i><i></i><i></i></div>'+
-     '<div class="agz-m lab" id="agm1"><small>🧪 Laboratório · resposta automática</small>✓ <b>Sim!</b> A bancada tem espaço. Entrego <b>terça, 11h</b> como urgência.</div></div></div>'+
-    '<div class="agz-wa" id="agwa">✓ <span>Prazo do laboratório atualizado: <b>terça, 11h</b>. O retorno da Maria às 14h está garantido.</span></div></div></div></div>',
-  go:function(){inn('.fx',100,250);at(1400,function(){var l=$('#aglab');if(l)l.classList.add('in');});
-   at(3000,function(){var a=$('#agal');if(a)a.classList.add('in');var c=$('#agc');if(c)c.classList.add('mal');});
-   clica('#agbt',4700,function(){var a=$('#agal');if(a)a.classList.add('chat');var ch=$('#agch');if(ch)ch.classList.add('in');
+     '<div class="agz-m lab" id="agm1"><small>🧪 Laboratório · resposta automática</small>✓ <b>Sim!</b> A bancada tem espaço. Entrego <b>terça, 11h</b>.</div></div></div>'+
+    '<div class="agz-wa" id="agwa">🛡️ <span><b>Retorno marcado: terça, 14h.</b> Se o laboratório atrasar, eu aviso <b>2 dias antes</b> e já sugiro um novo horário. Paciente nunca chega antes da prótese.</span></div></div></div></div>',
+  go:function(){inn('.fx',100,250);
+   clica('#agsl',2000,function(){var sl=$('#agsl');if(sl)sl.classList.add('try');var a=$('#agal');if(a)a.classList.add('in');var d=$('#agd1');if(d)d.classList.add('nao');});
+   clica('#agbt',6200,function(){var a=$('#agal');if(a)a.classList.add('chat');var ch=$('#agch');if(ch)ch.classList.add('in');
      at(300,function(){var m=$('#agm0');if(m)m.classList.add('in');var ms=$('.mouse');if(ms)ms.remove();});at(1300,function(){var d=$('#agdg');if(d)d.classList.add('in');});
      at(3100,function(){var d=$('#agdg');if(d)d.classList.remove('in');var m=$('#agm1');if(m)m.classList.add('in');});
-     at(5000,function(){var a2=$('#agal');if(a2)a2.classList.remove('in');var l=$('#aglab'),t=$('#agd1'),c=$('#agc');if(c){c.classList.remove('mal');c.classList.add('ok');}if(l&&t){l.innerHTML='🧪 Coroa 46 pronta · 11h';l.classList.add('ok');t.insertBefore(l,c);}at(700,function(){var w=$('#agwa');if(w)w.classList.add('in');});});});
-   falas([[0,'Sabe o pior? <b>Paciente na cadeira</b> e a prótese ainda no laboratório. Vergonha. 😤'],[4600,'Agora a agenda conversa com o <b>prazo do lab</b>. Não vai dar tempo? A IA já pergunta ao laboratório se dá para <b>adiantar</b>…'],[8700,'…e o laboratório responde <b>na hora, automático</b>, olhando a bancada dele. Paciente garantida, sem eu ligar para ninguém. 😎']]);}},
+     at(5000,function(){var a2=$('#agal');if(a2)a2.classList.remove('in');var d1=$('#agd1'),l=$('#aglab'),sl=$('#agsl');[0,1,2].forEach(function(k){var x=$('#agd'+k);if(x){x.classList.remove('agz-bl','nao');var q=x.querySelector('.agz-lk');if(q)q.remove();}});var t3=$('#agd3 .agz-sl');if(t3)t3.textContent='✓ livre';
+       if(l&&d1){l.innerHTML='🧪 Coroa 46 pronta · 11h';l.classList.add('ok');d1.insertBefore(l,sl);}if(sl){sl.className='agz-c ok';sl.innerHTML='<small>14h</small>Maria Souza<em>cimentação da coroa 46</em>';}at(700,function(){var w=$('#agwa');if(w)w.classList.add('in');});});});
+   falas([[0,'Paciente na cadeira e a prótese ainda no laboratório? <b>Aqui isso não acontece.</b> 😤'],[2800,'A recepção tenta marcar a Maria na <b>terça</b>… e o sistema <b>trava</b>: a coroa só fica pronta quinta.'],[7600,'Quer na terça mesmo? A IA pergunta ao laboratório se dá para <b>adiantar</b>, e ele responde <b>na hora, automático</b>.'],[12800,'E se o lab atrasar depois, eu fico sabendo <b>2 dias antes</b>. Paciente nunca mais chega antes da prótese. 🛡️']]);}},
 
  {cap:'Rastreio do motoboy',pt:3,who:'ot',p:'satisfeito',d:14000,lab:1,h:'<div class="sc"><div class="rst"><div class="rmap fx"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet"><g stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none"><path d="M0 80 H400"/><path d="M0 200 H400"/><path d="M90 0 V300"/><path d="M250 0 V300"/><path d="M0 140 Q200 120 400 150"/></g>'+
    '<path id="rota" d="M60 250 L90 250 L90 200 L250 200 L250 80 L340 80" stroke="#F0C46A" stroke-width="5" fill="none" stroke-dasharray="10 8" stroke-linecap="round"/>'+
