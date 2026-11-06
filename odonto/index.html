@@ -902,6 +902,29 @@ footer{padding:36px 16px 48px;text-align:center;color:var(--muted);font-size:.9r
 .cim-sts{display:flex;gap:2px;font-size:1.5rem;color:#D7C9AE}.cim-sts b.on{color:#F0B429}
 .cim-aval em{font-style:normal;color:#0f5a3a;opacity:0;transition:.3s}.cim-aval em.in{opacity:1}
 @media (max-width:860px){.cim-e{padding:6px 4px}.cim-e small{display:none}.cim-e b{font-size:.78rem}.cim-sts{font-size:1.2rem}.cim-aval{font-size:.8rem;padding:6px 8px}}
+
+/* Chat de cada paciente */
+.cxp{width:100%;max-width:880px;position:relative}.cxp-w{max-width:none;display:grid;grid-template-columns:200px 1fr;min-height:340px;position:relative}
+.cxp-l{border-right:1px solid #EFE7D8;background:#FBF8F2;padding:8px}
+.cxp-i{position:relative;padding:10px;border-radius:10px;color:#2a2418;display:grid}.cxp-i small{color:#8a7a5c;font-size:.76rem}.cxp-i.on{background:#FFF1D6}
+.cxp-i em{position:absolute;right:10px;top:12px;font-style:normal;background:#E0533A;color:#fff;border-radius:999px;font-size:.7rem;font-weight:800;padding:1px 7px}
+.cxp-c{display:flex;flex-direction:column}.cxp-h{padding:12px 14px;border-bottom:1px solid #EFE7D8;font-weight:800;color:#2a2418;font-size:.9rem}
+.cxp-m{flex:1;padding:12px 14px;display:grid;gap:8px;align-content:start}
+.cxp-b{max-width:80%;background:#F2EEE6;color:#2a2418;border-radius:14px 14px 14px 4px;padding:8px 12px;font-size:.88rem}.cxp-b small{display:block;font-size:.68rem;color:#8a7a5c;font-weight:700}
+.cxp-aud{display:flex;align-items:center;gap:8px;margin:4px 0}.cxp-aud i{width:30px;height:30px;border-radius:50%;background:#B0762A;color:#fff;display:grid;place-items:center;font-style:normal;font-size:.75rem}
+.cxp-wv{display:flex;align-items:center;gap:2px}.cxp-wv s{width:3px;height:var(--h);background:#C9B48C;border-radius:2px;text-decoration:none}
+.cxp-aud.play .cxp-wv s{animation:cxW .5s ease-in-out infinite alternate}.cxp-aud.play .cxp-wv s:nth-child(3n){animation-delay:.15s}.cxp-aud.play .cxp-wv s:nth-child(2n){animation-delay:.3s}
+@keyframes cxW{to{transform:scaleY(1.7);background:#B0762A}}
+.cxp-aud em{font-style:normal;font-size:.72rem;color:#8a7a5c}
+.cxp-tx{margin:4px 0 0;font-size:.82rem;color:#5a4e38;font-style:italic;opacity:0;transition:.5s}.cxp-tx.in{opacity:1}
+.cxp-in{margin:0 14px 12px;display:flex;justify-content:space-between;align-items:center;border:1px solid #EFE7D8;border-radius:999px;padding:8px 14px;color:#A89A7E;font-size:.86rem}
+.cxp-al{position:relative;margin:0 14px 10px;display:none;gap:10px;background:#fff;border:2px solid #E8A33A;border-radius:16px;padding:12px;color:#2a2418;box-shadow:0 24px 50px -10px rgba(0,0,0,.55);opacity:0;transform:translateY(20px) scale(.95);transition:.45s cubic-bezier(.2,1.4,.4,1)}.cxp-al.in{display:flex;opacity:1;transform:none;animation:flTx .5s}
+.cxp-al img{width:44px;height:44px;border-radius:50%;flex:none}.cxp-al b{color:#9a5a00}.cxp-al p{margin:3px 0 8px;font-size:.86rem}.cxp-al p b{color:#2a2418}
+.cxp-bt{display:flex;gap:6px;flex-wrap:wrap}.cxp-bt button{border:0;border-radius:999px;background:#1DAE8A;color:#fff;font:800 .82rem var(--f-body);padding:7px 12px}.cxp-bt button+button{background:#F2EEE6;color:#5a4e38}
+.cxp-ok{margin:0 14px 10px;background:#1DAE8A;color:#fff;border-radius:12px;padding:9px 14px;font-weight:700;display:none}.cxp-ok.in{display:block;animation:flTx .5s}
+.cxp-b.eu{justify-self:end;background:#5B45E0;color:#fff;border-radius:14px 14px 4px 14px;display:none}.cxp-b.eu small{color:#d8d2ff}.cxp-b.eu.in{display:block;animation:flTx .4s}
+@media (max-width:860px){.cxp-w{grid-template-columns:1fr;min-height:0}.cxp-l{display:none}.cxp-h{font-size:.78rem;padding:8px 10px}.cxp-m{padding:8px 10px}.cxp-b{font-size:.8rem;max-width:92%}.cxp-in{display:none}
+ .cxp-al,.cxp-ok{margin:0 10px 8px}}
 </style>
 <body>
 <header class="top">
@@ -1358,6 +1381,18 @@ var CENAS=[
    clica('#pe',6400,function(){var b=$('#pe');if(b){b.textContent='✓ Enviado';b.classList.add('ok');}at(500,function(){var f=$('#pf');if(f)f.classList.add('voa');var cp=$('#cp');if(cp)cp.classList.add('sai');var l=$('#lr');if(l)l.classList.add('in');});at(2400,function(){var c=$('#cs');if(c)c.classList.add('on');});});
    falas([[0,'E o pedido? Nem precisa digitar: <b>tire uma foto da comanda</b> de papel…'],[3400,'…e a <b>IA cadastra o pedido sozinha</b>: paciente, trabalho, dentes <b>Delara A2</b>, laboratório e prazo de <b>3 dias, urgente</b>.'],[8600,'O laboratório recebe <b>na hora</b>, com tudo junto, e a coleta já fica agendada. 🛵']]);}},
 
+ {cap:'Chat de cada paciente',pt:3,who:'ot',p:'serio',d:16000,lab:1,h:'<div class="sc"><div class="cxp">'+
+   '<div class="win cxp-w fx"><div class="cxp-l">'+[['Maria Souza','Coroa 46','2',1],['José Almeida','Protocolo sup.','',0],['Ana Lima','Facetas','',0]].map(function(c){return '<div class="cxp-i'+(c[3]?' on':'')+'"><b>'+c[0]+'</b><small>'+c[1]+'</small>'+(c[2]?'<em>'+c[2]+'</em>':'')+'</div>';}).join('')+'</div>'+
+    '<div class="cxp-c"><div class="cxp-h">💬 Maria Souza · coroa 46 · com Laboratório Exemplo</div><div class="cxp-m">'+
+     '<div class="cxp-b lab"><small>Laboratório · ontem 17h</small><div class="cxp-aud"><i>▶</i><span class="cxp-wv">'+Array.from({length:22}).map(function(_,i){return '<s style="--h:'+(4+((i*7)%11)*1.4)+'px"></s>';}).join('')+'</span><em>0:14</em></div><p class="cxp-tx">📝 "Doutor, a cor da coroa fica A2 ou A3? A foto ficou com muita luz."</p></div>'+
+     '<div class="cxp-b lab"><small>Laboratório · ontem 17h</small>Preciso disso até amanhã cedo para não atrasar. 🙏</div>'+
+    '<div class="cxp-b eu" id="cxeu"><small>Você · agora</small>Cor <b>A2</b> 👍</div></div>'+'<div class="cxp-al" id="cxal"><img src="../app/equipe/ana-av-preocupada.webp" alt=""><div><b>Você ainda não respondeu</b><p>No chat da <b>Maria Souza</b>, o laboratório perguntou a <b>cor da coroa</b> (A2 ou A3). Faz 15 horas.</p><div class="cxp-bt"><button id="cxa2">Responder: A2</button><button>Abrir o chat</button></div></div></div>'+
+    '<div class="cxp-ok" id="cxok">✓ Respondido: <b>cor A2</b> · o laboratório já seguiu</div></div></div></div>',
+  go:function(){inn('.fx',100,250);at(1300,function(){var a=$('.cxp-aud');if(a)a.classList.add('play');});at(2800,function(){var t=$('.cxp-tx');if(t)t.classList.add('in');});
+   at(6200,function(){var a=$('#cxal');if(a)a.classList.add('in');});
+   clica('#cxa2',8800,function(){var a=$('#cxal');if(a)a.classList.remove('in');var o=$('#cxok');if(o)o.classList.add('in');var eu=$('#cxeu');if(eu)eu.classList.add('in');var e=$('.cxp-i em');if(e)e.remove();var ms=$('.mouse');at(600,function(){if(ms)ms.remove();});});
+   falas([[0,'Cada paciente tem o <b>seu chat</b> com o laboratório: texto, foto e <b>áudio</b>. E o áudio vira texto sozinho.'],[5800,'A IA lê as conversas e me cobra: <b>"você ainda não respondeu a cor que ele perguntou no chat da Maria"</b>.'],[11200,'Respondi com um toque. Nada de pergunta esquecida no meio de 200 mensagens de WhatsApp. 😎']]);}},
+
  {cap:'IA vigiando as entregas',pt:3,who:'ot',p:'serio',d:11000,lab:1,h:'<div class="sc"><div class="alr">'+[['⚠️','#D2433A','Pedido #1043 vai atrasar 1 dia','O Lab Digital Centro ainda não iniciou a fresagem. Já avisei o lab e remarquei o paciente das 10h?'],['🕑','#B7791F','Prova da faceta chega hoje às 14h','Paciente C. M. confirmado às 15h. Está tudo encaixado.'],['✅','#1E8A5A','Coroa #1042 saiu para entrega','Previsão: amanhã cedo, dentro do prazo.'],['📈','#5B45E0','Lab Arte Dental: 3 entregas antecipadas este mês','Bom sinal. Ele está melhorando no prazo.']].map(function(a){return '<div class="al fx" style="--c:'+a[1]+'"><span>'+a[0]+'</span><div><b>'+a[2]+'</b><p>'+a[3]+'</p></div></div>';}).join('')+'</div></div>',
   go:function(){inn('.fx',200,700);falas([[0,'E tem uma <b>IA vigiando as entregas</b> 24 horas. Se um pedido vai atrasar, ela avisa <b>antes</b> do paciente chegar.'],[5400,'Prova chegando, trabalho saindo, lab melhorando ou piorando: <b>você fica sabendo de tudo.</b>']]);}},
 
@@ -1464,7 +1499,8 @@ var CENAS=[
   go:function(){at(50,function(){$('#tr').classList.add('go');});inn('.fx',700,300);
    falas([[0,'Ôôô, minha vez! 📣 Eu sou a <b>Mika</b>, do marketing. E agora a gente fala de quem faz a clínica <b>girar</b>.'],[5400,'Porque clínica não é só cadeira: tem <b>gerência, financeiro, atendimento, comercial, marketing</b>… e muita vaga nessas áreas!']]);}},
 
- {cap:'Os cargos',pt:4,who:'mi',p:'ideia',d:14000,mk:1,h:'<div class="sc"><div class="sl">'+L('Os cargos de cada setor')+'<div class="setr">'+SETORES.map(function(g){return '<div class="st4 fx" style="--c:'+g[2]+'"><b>'+g[0]+' '+g[1]+'</b><div>'+g[3].map(function(c){return '<span>'+c+'</span>';}).join('')+'</div></div>';}).join('')+'</div></div></div>',
+ {cap:'Os cargos',pt:4,who:'mi',p:'ideia',d:14000,mk:1,h:'<div class="sc"><div class="sl">'+L('Os cargos de cada setor')+'<div class="setr">'+SETORES.map(function(g){return '<div class="st4 fx" style="--c:'+g[2]+'"><b>'+g[0]+' '+g[1]+'</b><div>'+g[3].map(function(c){return '<span>'+c+'</span>';}).join('')+'</div></div>';}).join('')+'<div class="cxp-in"><span>Escreva ou grave um áudio…</span><b>🎤</b></div></div>'+
+    '</div></div></div>',
   go:function(){inn('.fx',100,220);$$('.st4 span').forEach(function(e,i){at(700+i*55,function(){e.classList.add('in');});});
    falas([[0,'Olha quanta gente! <b>Gerência e administrativo</b>, <b>financeiro</b>, <b>atendimento</b> com recepção, CRC e leads…'],[5200,'…<b>comercial</b>, <b>marketing</b> com social media, designer, tráfego, <b>filmmaker</b> e fotógrafo…'],[9600,'…e a <b>indústria e o comércio</b>: representantes, vendedores, técnicos de equipamento. <b>Cada um com o seu perfil e as suas vagas.</b>']]);}},
 
