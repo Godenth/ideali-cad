@@ -1181,6 +1181,7 @@ body.espelho [data-act=pfxAbre],body.espelho .pfx-ban{display:none!important}
 
 .jw-av{width:40px;height:40px;border-radius:12px;object-fit:cover;border:2px solid rgba(42,33,0,.25)}
 .jw-bav{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #2A2100;margin:-4px 0}
+.jw-al.bravo{border-color:#D2433A}@media (prefers-reduced-motion:no-preference){.jw-al.bravo{animation:jwPop .35s cubic-bezier(.2,1.3,.4,1) both,jwTreme .5s .35s ease-in-out 2}}@keyframes jwTreme{0%,100%{margin-left:0}25%{margin-left:-6px}75%{margin-left:6px}}
 .jw-alimg{width:84px;height:115px;object-fit:cover;object-position:top;border-radius:14px;flex-shrink:0;background:#111}
 .jw-b{padding:6px 14px 6px 6px}
 </style>
@@ -3808,13 +3809,13 @@ function rJoaoPainel(){var P=ESP.dono?joaoNovos():[],D=joaoDev(),tot=D.reduce(fu
 function joaoDesenha(){var el=document.getElementById('joao-w');if(!joaoVisivel()){if(el)el.remove();return;}
   if(!el){el=document.createElement('div');el.id='joao-w';document.body.appendChild(el);}
   var n=(ESP.dono?joaoNovos().length:0),d=joaoDev().length;
-  el.innerHTML=(JW.aberto?rJoaoPainel():'')+(JW.alerta?'<div class="jw-al" role="alertdialog" aria-live="assertive"><div class="jw-alc"><img class="jw-alimg" src="joao.webp" alt=""><div><b>João</b><p>'+JW.alerta+'</p></div></div><div class="row"><button class="btn" data-act="jwDepois">Depois</button><button class="btn pri" data-act="jwVer">Ver agora</button></div></div>':'')+
+  el.innerHTML=(JW.aberto?rJoaoPainel():'')+(JW.alerta?'<div class="jw-al'+(JW.bravo?' bravo':'')+'" role="alertdialog" aria-live="assertive"><div class="jw-alc"><img class="jw-alimg" src="'+(JW.bravo?'joao-bravo.webp':'joao.webp')+'" alt=""><div><b>João</b><p>'+JW.alerta+'</p></div></div><div class="row"><button class="btn" data-act="jwDepois">Depois</button><button class="btn pri" data-act="jwVer">Ver agora</button></div></div>':'')+
     (JW.aberto?'':'<button class="jw-b" data-act="jwAbre" aria-label="Abrir o João"><img class="jw-bav" src="joao-av.webp" alt=""><span>João</span>'+(n+d?'<i>'+(n||d)+'</i>':'')+'</button>');}
 var _renderJ=render;render=function(){var r=_renderJ.apply(this,arguments);try{joaoDesenha();}catch(e){}return r;};
 function joaoAvisa(){if(!joaoVisivel()||JW.aberto||JW.alerta||document.hidden)return;var h=new Date().getHours();if(h<8||h>=20)return;var k='io_joao_'+dHoje(),c=+(espLS(k)||0);if(c>=12)return;
   var P=ESP.dono?joaoNovos():[],D=joaoDev(),txt='';
-  if(P.length)txt='Chegou <b>'+P.length+' pagamento'+(P.length>1?'s':'')+' novo'+(P.length>1?'s':'')+'</b>. Abra o comprovante e confirme que viu. 🎉';
-  else if(D.length){var b=D[JW.i++%D.length];txt='<b>'+esc(b.nome)+'</b> está há <b>'+b.dias+' dia'+(b.dias>1?'s':'')+'</b> em atraso, devendo <b>'+fmtR(b.tot)+'</b>.';}
+  JW.bravo=false;if(P.length)txt='Chegou <b>'+P.length+' pagamento'+(P.length>1?'s':'')+' novo'+(P.length>1?'s':'')+'</b>. Abra o comprovante e confirme que viu. 🎉';
+  else if(D.length){var b=D[JW.i++%D.length];JW.bravo=true;txt=(b.dias>30?'De novo! ':'')+'<b>'+esc(b.nome)+'</b> está há <b>'+b.dias+' dia'+(b.dias>1?'s':'')+'</b> em atraso, devendo <b>'+fmtR(b.tot)+'</b>.';}
   if(!txt)return;espLS(k,String(c+1));JW.alerta=txt;joaoDesenha();}
 setTimeout(joaoAvisa,25000);setInterval(joaoAvisa,300000);
 Object.assign(ACT,{jwAbre:function(){JW.aberto=true;JW.alerta=null;joaoDesenha();},jwFecha:function(){JW.aberto=false;joaoDesenha();},jwDepois:function(){JW.alerta=null;joaoDesenha();},jwVer:function(){JW.alerta=null;JW.aberto=true;joaoDesenha();}});
