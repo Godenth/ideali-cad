@@ -4664,7 +4664,7 @@ function aiAbre(){if(document.getElementById('aipan'))return;AI.on=true;if(!AI.m
     '<div class="ai-acoes"><label class="btn pri ai-bt">📄 Enviar extratos (PDF)<input type="file" id="ai-ext" accept="application/pdf" multiple hidden></label><label class="btn ai-bt">📎 Enviar comprovante<input type="file" id="ai-comp" accept="application/pdf,image/*" hidden></label><button class="btn ai-bt" data-ai="verif">🔍 Verificar extratos anexados</button></div></section></div></div>';
   document.body.appendChild(d);aiRender();
   d.addEventListener('click',function(e){var b=e.target.closest('[data-ai]');if(e.target===d){aiFecha();return;}if(!b)return;var a=b.getAttribute('data-ai'),v=b.getAttribute('data-v');
-    if(a==='fecha')aiFecha();else if(a==='cli'){AI.cli=v;aiRender();}else if(a==='lanca')aiLancaComp();else if(a==='invest')aiInvest(v);else if(a==='baixalista')invCopiaLista();else if(a==='verif'){if(!AI.busy)aiVerifica();}else if(a==='cancela'){AI.comp=null;aiDiz('Tudo bem, não lancei nada.');}});
+    if(a==='fecha')aiFecha();else if(a==='cli'){AI.cli=v;aiRender();}else if(a==='lanca')aiLancaComp();else if(a==='invest')aiInvest(v);else if(a==='abrirmes')aiAbreMes(v);else if(a==='baixalista')invCopiaLista();else if(a==='verif'){if(!AI.busy)aiVerifica();}else if(a==='cancela'){AI.comp=null;aiDiz('Tudo bem, não lancei nada.');}});
   d.addEventListener('input',function(e){if(e.target.classList.contains('ai-q')){AI.q=e.target.value;d.querySelector('.ai-lista').innerHTML=aiLista();}});
   d.addEventListener('change',function(e){var t=e.target;if(t.id==='ai-ext'){var fs=[].slice.call(t.files||[]);t.value='';aiExtratos(fs);}else if(t.id==='ai-comp'){var f=(t.files||[])[0];t.value='';if(f)aiComprovante(f);}else if(t.id==='ai-rel'){var f2=(t.files||[])[0];t.value='';if(f2)aiRelatorio(f2);}});
   document.addEventListener('keydown',aiEsc);}
@@ -4778,7 +4778,7 @@ aiInvest=function(v){var a=v.split('|'),k=a[0],ano=+a[1],mes=+a[2],sa=+a[3],c=EM
     var res='📋 <b>Resultado:</b> '+(comArq.length-dups.length-dif.length)+' comprovante'+(comArq.length-dups.length-dif.length!==1?'s':'')+' ✅ conferido'+(comArq.length-dups.length-dif.length!==1?'s':'')+(dups.length?', <b class="bad">'+dups.length+' duplicado'+(dups.length>1?'s':'')+' ('+fmtR(somaDup)+')</b>':'')+(dif.length?', <b class="bad">'+dif.length+' com valor diferente</b>':'')+'.<br>💰 Somando tudo: <b>'+L.length+' pagamentos = '+fmtR(totC)+'</b> · os '+M.length+' meses somam <b>'+fmtR(totM)+'</b>'+(totC>totM+0.5?' (pago '+fmtR(totC-totM)+' a mais)':totM>totC+0.5?' (falta '+fmtR(totM-totC)+')':'')+'.<br>';
     if(Math.abs(dfz)<=1){aiDiz(res+'🎉 Conferindo um por um, o saldo daqui bate com o da Inove. <b>Resolvido.</b>');invPlanilha();return;}
     res+=(temFim?'No fim do extrato a Inove mostra <b>'+fmtR(inove)+'</b> devendo; pelos comprovantes daqui (até '+invDt(a[5])+') seria <b>'+fmtR(nosso)+'</b>.':'A Inove cobra <b>'+fmtR(inove)+'</b> de saldo anterior; aqui consta <b>'+fmtR(nosso)+'</b>.')+' Diferença: <b>'+fmtR(dfz)+'</b>.';
-    if(dups.length&&Math.abs(somaDup+somaDif-dfz)<=1){aiDiz(res+'<br>✅ <b>Achei a causa:</b> a diferença é exatamente o'+(dups.length>1?'s comprovantes lançados':' comprovante lançado')+' em dobro aqui. Não é baixa da Inove: '+(ESP.dono?'peça para o laboratório anular':'já anulei')+' o lançamento repetido ('+dups.map(function(d){return invDt(d.x.p.data)+' · '+fmtR(d.x.p.valor);}).join(', ')+').',false,'erro');invPlanilha();return;}
+    if(dups.length&&Math.abs(somaDup+somaDif-dfz)<=1){aiDiz(res+'<br>✅ <b>Achei a causa:</b> a diferença é exatamente o'+(dups.length>1?'s comprovantes lançados':' comprovante lançado')+' em dobro aqui. Não é baixa da Inove. Abra os dois meses (botões acima) e decida qual lançamento fica ('+dups.map(function(d){return invDt(d.x.p.data)+' · '+fmtR(d.x.p.valor);}).join(', ')+').',false,'erro');invPlanilha();return;}
     var sub=dfz>1?invSubRecente(L.filter(function(x){return (temFim?(x.m.ano*100+x.m.mes)<=(ano*100+mes)&&(!a[5]||!x.p.data||x.p.data<=a[5]):(x.m.ano*100+x.m.mes)<(ano*100+mes))&&!dups.some(function(d){return d.x===x;});}),dfz):null;
     if(sub){aiDiz(res+'<br>✅ Estes comprovantes somam exatamente a diferença. <b>Possivelmente não tiveram baixa na Inove:</b><br>'+sub.map(invChip).join(' ')+'<br>Mande esses comprovantes para a Inove dar baixa.',false,'erro');invPlanilha();return;}
     aiDiz(res+'<br>Conferi um por um e ainda não consegui explicar a diferença só com os comprovantes daqui.',false,'erro');AI.inv.pedeLab=true;invPlanilha();});};
@@ -4859,6 +4859,22 @@ ACT.urgOk=function(id){empDadosGrava('urgente',id,null,'Verificação concluída
 /* a conferência diária da Ana também lembra dos urgentes */
 var _anaAudU=anaAuditoria;anaAuditoria=function(){var R=_anaAudU.apply(this,arguments);if(!R)return R;var U=urgL();Object.keys(U).forEach(function(id){var m=FIN.M.filter(function(x){return x.id===id;})[0];if(!m)return;
   R.itens.unshift({k:finCliK(m),chave:'u|'+id,nome:finCliNome(m),grave:true,tit:'🚨 Verificação urgente · '+MESES[m.mes-1],mot:[U[id].motivo],mid:id});});return R;};
+
+/* ===== Duplicado v2: a Ana NÃO anula. Marca os dois meses como urgentes e mostra botões para você abrir e decidir ===== */
+invResolveDups=function(dups,nome){if(!dups.length)return Promise.resolve();
+  dups.forEach(function(d){var A=d.de,B=d.x,txt='Mesmo comprovante ('+fmtR(B.p.valor)+' · '+invDt(B.p.data)+') aparece lançado em '+MESES[A.m.mes-1]+' e em '+MESES[B.m.mes-1]+'. Confira qual é o certo.';
+    urgMarca(A.m.id,txt,nome);if(B.m.id!==A.m.id)urgMarca(B.m.id,txt,nome);
+    aiDiz('🚩 <b>Comprovante lançado em dobro</b> · '+esc(nome)+'<br>O mesmo Pix de <b>'+fmtR(B.p.valor)+'</b> ('+invDt(B.p.data)+') está em <b>'+MESES[A.m.mes-1]+'</b> e em <b>'+MESES[B.m.mes-1]+'</b>. Não mexi em nada: abra os dois e decida.'+
+      '<div class="ai-form"><button class="btn sm pri" data-ai="abrirmes" data-v="'+A.m.id+'">Abrir '+MESES[A.m.mes-1]+'/'+A.m.ano+'</button>'+(B.m.id!==A.m.id?'<button class="btn sm pri" data-ai="abrirmes" data-v="'+B.m.id+'">Abrir '+MESES[B.m.mes-1]+'/'+B.m.ano+'</button>':'')+'</div>'+
+      (ESP.dono?'':'<small>Os dois meses ficam piscando 🚨 até você marcar "Conferido".</small>'),false,'erro');});
+  return Promise.resolve();};
+function aiAbreMes(id){var m=FIN.M.filter(function(x){return x.id===id;})[0];if(!m)return;aiFecha();FIN.ano=m.ano;FIN.mes=m.mes;FIN.aba='mes';FIN.ed=m.id;FIN.cob=null;ACT.dTab('financeiro');window.scrollTo(0,0);}
+/* desfazer anulação feita pela Ana (ou qualquer anulação) */
+ACT.pagDesanula=function(id){if(ESP.dono)return;if(!confirm('Desfazer a anulação deste pagamento? Ele volta a contar como pago.'))return;
+  SB.from('odo_fin_pagamentos').update({anulado_em:null,anulado_motivo:null}).eq('id',id).select('*').single().then(function(r){if(r.error){toast('Não consegui desfazer.');return;}var o=FIN.P.filter(function(z){return z.id===id;})[0];if(o){o.anulado_em=null;o.anulado_motivo=null;}render();toast('Pagamento voltou a contar.');});};
+var _rFinDetD=rFinDet;rFinDet=function(m){var h=_rFinDetD.apply(this,arguments);if(!m||ESP.dono)return h;
+  finPags(m).filter(function(p){return p.anulado_em;}).forEach(function(p){var a='data-act="finPagAnula" data-v="'+p.id+'"';if(h.indexOf(a)>=0)return;
+    var k=h.indexOf('<div class="finpag anulado"><span><b>'+fmtR(p.valor)+'</b><small>'+(p.data?String(p.data).split('-').reverse().join('/'):'sem data'));if(k<0)return;var fim=h.indexOf('</div>',k);if(fim<0)return;h=h.slice(0,fim)+'<button class="btn sm" data-act="pagDesanula" data-v="'+p.id+'">↩ Desfazer anulação</button>'+h.slice(fim);});return h;};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
