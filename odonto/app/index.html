@@ -1208,6 +1208,10 @@ body.espelho [data-act=pfxAbre],body.espelho .pfx-ban{display:none!important}
 
 .nm-borra{display:inline-block;filter:blur(5px);user-select:none;pointer-events:none;letter-spacing:.05em;opacity:.85}
 .pc-pre{background:color-mix(in srgb,#F5C451 18%,transparent);color:#B7791F;font-weight:700}
+
+.pvis{display:flex;justify-content:flex-end;margin:8px 0 4px}
+.rmapa .mcnt{background:transparent;border:0;box-shadow:none;color:#fff;font-weight:800;font-size:.8rem;text-shadow:0 1px 2px rgba(0,0,0,.6)}.rmapa .mcnt:before{display:none}
+.mver{margin-top:6px;border:0;border-radius:8px;background:#3D7BFF;color:#fff;font:inherit;font-weight:700;padding:5px 10px;cursor:pointer}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3941,6 +3945,31 @@ function navAplica(h){var a=String(h||'').split('/');if(!a[0])return;
   else if(a[0]==='tab'&&a[1]&&S.role){S.cfgOn=false;S.redeOn=false;S.tab[S.role]=a[1];if(a[1]==='financeiro'&&a[2])FIN.aba=a[2];if(a[1]==='producao'&&a[2]==='lista')PED.vista='lista';}}
 var _renderN=render;render=function(){var r=_renderN.apply(this,arguments);try{if(NAV.pronto&&typeof RL!=='undefined'&&RL.user&&!S.pos){var h=navAtual();if(location.hash!=='#'+h)history.replaceState(null,'','#'+h);}}catch(e){}return r;};
 var _rlEntraN=rlEntra;rlEntra=function(){var r=_rlEntraN.apply(this,arguments);try{if(!NAV.pronto&&RL.perfil){NAV.pronto=true;if(NAV0){navAplica(NAV0);render();}}}catch(e){}return r;};
+
+/* ===== Mapa dos profissionais: só por estado (e por município quando a pessoa informou). Nunca o endereço. ===== */
+var UF_CENTRO={AC:[-9.0,-70.5],AL:[-9.6,-36.6],AP:[1.4,-51.8],AM:[-4.0,-63.0],BA:[-12.5,-41.7],CE:[-5.3,-39.3],DF:[-15.8,-47.9],ES:[-19.6,-40.5],GO:[-16.0,-49.6],MA:[-5.1,-45.3],MT:[-12.9,-56.0],MS:[-20.5,-54.8],MG:[-18.5,-44.6],PA:[-3.8,-52.5],PB:[-7.2,-36.6],PR:[-24.6,-51.6],PE:[-8.4,-37.9],PI:[-7.4,-42.7],RJ:[-22.3,-42.7],RN:[-5.8,-36.6],RS:[-29.7,-53.2],RO:[-10.9,-62.8],RR:[2.1,-61.4],SC:[-27.2,-50.4],SP:[-22.2,-48.7],SE:[-10.6,-37.4],TO:[-10.2,-48.3]};
+var PROF_COR={'Dentista':'#2BC7B8','Protético':'#5B8CFF','ASB / TSB':'#E86AA6','Estudante':'#5BE3A4','Corporativo':'#F5C451','Indústria e comércio':'#9E8CFF'};
+function profGrupos(){var G={};profsFiltra().L.forEach(function(p){var m=String(p.cid||'').match(/^(.*?)\s*\/\s*([A-Z]{2})\b/),uf=m?m[2]:null,cid=m&&m[1]?cidadeDe(m[1]):null;if(!uf)return;
+    var k=cid?'c:'+cid:'u:'+uf,pos=cid?CIDADES[cid]:UF_CENTRO[uf];if(!pos)return;
+    var g=G[k]=G[k]||{nome:cid?cid.replace(/(^|\s)\S/g,function(x){return x.toUpperCase();})+' / '+uf:'Estado de '+uf,uf:uf,pos:pos,n:0,por:{}};g.n++;(p.profs||[p.prof]).forEach(function(x){g.por[x]=(g.por[x]||0)+1;});});
+  return Object.keys(G).map(function(k){return G[k];});}
+function montaMapaProfs(el2){var G=profGrupos();
+  if(!window.L){el2.classList.add('semmapa');el2.innerHTML='<div class="mfall"><b>Não consegui carregar o mapa agora.</b>'+G.sort(function(a,b){return b.n-a.n;}).map(function(g){return '<div class="mfall-c"><b>'+esc(g.nome)+'</b><span>'+g.n+' profissional(is)</span></div>';}).join('')+'</div>';return;}
+  if(LF.map){LF.map.remove();LF.map=null;}
+  var map=L.map(el2,{zoomControl:true,scrollWheelZoom:false}).setView([-15.8,-50],4);LF.map=map;
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'© OpenStreetMap'}).addTo(map);
+  var b=[];G.forEach(function(g){var top=Object.keys(g.por).sort(function(a,c){return g.por[c]-g.por[a];});b.push(g.pos);
+    L.circleMarker(g.pos,{radius:Math.min(30,6+Math.sqrt(g.n)*1.6),color:'#fff',weight:2,fillColor:PROF_COR[top[0]]||'#5B8CFF',fillOpacity:.85}).addTo(map)
+      .bindTooltip(String(g.n),{permanent:g.n>=5,direction:'center',className:'mcnt'})
+      .bindPopup('<b>'+esc(g.nome)+'</b><br>'+g.n+' profissional'+(g.n>1?'is':'')+'<br>'+top.map(function(x){return '• '+esc(x)+': '+g.por[x];}).join('<br>')+'<br><button class="mver" data-act="profMapaUf" data-v="'+g.uf+'">Ver a lista de '+g.uf+'</button>');});
+  if(b.length>1)map.fitBounds(b,{padding:[40,40],maxZoom:7});else if(b.length)map.setView(b[0],6);
+  setTimeout(function(){map.invalidateSize();},60);}
+var _montaMapaP=montaMapa;montaMapa=function(){if(S.redeOn&&S.rede.sec==='profs'){var el=$('rmapa');if(!el)return;lfCarrega(function(){var e2=$('rmapa');if(e2)montaMapaProfs(e2);});return;}return _montaMapaP.apply(this,arguments);};
+var _rProfsListaM=rProfsLista;rProfsLista=function(){if(S.rede.pvis!=='mapa')return _rProfsListaM();var n=profsFiltra().L.length;
+  return '<p class="small rmuted">'+n+' profissional(is) no mapa. O mapa mostra só o estado ou o município, nunca o endereço.</p><div id="rmapa" class="rmapa" role="region" aria-label="Mapa dos profissionais por estado"></div>';};
+var _rProfsM=rProfs;rProfs=function(){var h=_rProfsM();return h.replace('<div id="rprofs">','<div class="pvis"><div class="seg rseg" role="group" aria-label="Ver como"><button aria-pressed="'+(S.rede.pvis!=='mapa')+'" data-act="profVis" data-v="lista">☰ Lista</button><button aria-pressed="'+(S.rede.pvis==='mapa')+'" data-act="profVis" data-v="mapa">🗺 Mapa</button></div></div><div id="rprofs">');};
+Object.assign(ACT,{profVis:function(v){S.rede.pvis=v;render();},profMapaUf:function(v){S.rede.fuf=v;S.rede.fcid='';S.rede.pvis='lista';if(LF.map){LF.map.remove();LF.map=null;}render();window.scrollTo(0,0);}});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='rede-q'&&S.rede.pvis==='mapa'){clearTimeout(LF.tq);LF.tq=setTimeout(function(){if($('rmapa'))montaMapa();},350);}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
