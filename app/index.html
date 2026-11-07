@@ -1601,7 +1601,7 @@ html[data-tema="cystreet"]{background:#0B0620}html[data-tema="cystreet"] body{ba
 .exo-ov{position:fixed;inset:0;z-index:9999;background:rgba(8,6,20,.7);display:flex;align-items:center;justify-content:center;padding:12px}.exo-box{width:min(760px,100%);background:#1C1730;color:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .exo-h{display:flex;gap:10px;align-items:center;padding:10px 12px}.exo-h img{border-radius:50%}.exo-h div{flex:1;display:flex;flex-direction:column}.exo-h small{opacity:.75}.exo-x{border:0;background:#ffffff22;color:#fff;width:34px;height:34px;border-radius:10px;font-size:1.3rem;cursor:pointer}
 .exo-fr iframe{display:block;width:100%;height:420px;border:0;background:#473A6D}
-.exo-res{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(160,110,255,.45);border-radius:14px;padding:10px;margin:0 0 10px;background:rgba(124,92,255,.10)}.exo-res img{width:180px;max-width:40%;border-radius:10px;flex:none}.exo-res small{opacity:.8}
+.exo-res{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(160,110,255,.45);border-radius:14px;padding:10px;margin:0 0 10px;background:rgba(124,92,255,.10)}.exo-res img{width:180px;max-width:40%;border-radius:10px;flex:none}.exo-res small{opacity:.8}.exo-falta{margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(245,197,24,.14);border:1px solid rgba(245,197,24,.5);font-size:.86rem}
 </style>
 
 <div id="app"></div>
@@ -7736,25 +7736,32 @@ function exoAplica(f,d){var A=exoAnalisa(d.itens||[]);if(!A.dentes.length){toast
   if(d.img&&/^data:image/.test(d.img)){try{var bs=atob(d.img.split(',')[1]),u=new Uint8Array(bs.length);for(var i=0;i<bs.length;i++)u[i]=bs.charCodeAt(i);arqs.push(new File([u],'print-exocad.jpg',{type:'image/jpeg'}));}catch(e){}}
   var desc=A.partes.map(function(p){return (p.ds.length>1?'<b>'+p.ds.join('-')+'</b> fixa ('+p.ds.length+' elementos)'+(p.peca?' <small>⚠️ veio como uma peça só: confira se é fixa mesmo</small>':''):'<b>'+p.ds[0]+'</b> unitário')+' · '+esc(EXO_NOME[p.cl])+(p.enc?' <small>(no HTML: "'+esc(p.nome)+'")</small>':'');});
   var cliAtual=(document.getElementById('pd-cli')||{}).value||'',pacAtual=(document.getElementById('pd-pac')||{}).value||'';
-  var rede=ui.pdRede,ex=ui.pdExtras||[];ui.ppImp=null;closeSheet();ui.pdRede=rede;ui.pdInit=false;ui.pdItens=its;ui.pdExtras=ex;ui.pdEd=null;
   var pacF=pac||pacAtual;ui.pdPre={pac:pacF,prazo:'',mat:'',urg:false,obs:'',resumo:{deTexto:true,exo:true,cli:cliAtual?cliente(cliAtual):null,pac:pacF,dentes:its.map(function(x){return x.d;}),tipo:{nome:its.length+' elemento'+(its.length>1?'s':'')+' do exocad'},prazo:'',mat:'',cor:''}};
-  openSheet(fPedido,null,cliAtual||null);ui.sheet.after=depoisFormPedido;depoisFormPedido();
-  setTimeout(function(){var inp=document.getElementById('pd-files');if(inp&&window.DataTransfer){try{var dt=new DataTransfer();arqs.forEach(function(x){dt.items.add(x);});inp.files=dt.files;inp.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){}}
-    var box=document.querySelector('.anacad');if(box){var res=document.createElement('div');res.className='exo-res';res.innerHTML=(d.img?'<img src="'+d.img+'" alt="Print do projeto no exocad">':'')+'<div><b>📎 Li o HTML do exocad</b><br>'+desc.join('<br>')+'<br><small>Confira cada elemento antes de criar o pedido. O HTML'+(d.img?' e o print já estão anexados':' já está anexado')+'.</small></div>';box.parentNode.insertBefore(res,box);}},80);
+  ui.exoRes='<div class="exo-res">'+(d.img?'<img src="'+d.img+'" alt="Print do projeto no exocad">':'')+'<div><b>📎 Li o HTML do exocad</b><br>'+desc.join('<br>')+'<br><small>O HTML'+(d.img?' e o print já estão anexados':' já está anexado')+'.</small><div class="exo-falta">✍️ <b>Agora complete ou corrija escrevendo aqui embaixo</b>, ex.: <i>"46 sobre implante Neodent GM, 36-35 ponte, cliente Dr. Paulo, zircônia, pra sexta"</i> e toque em ✨ Preencher. Eu só mudo o que você escrever.</div></div></div>';
+  anaReabre(its,ui.pdPre,cliAtual||null,arqs);
   toast('Marquei '+its.length+' elemento'+(its.length>1?'s':'')+' do HTML. Confira antes de criar.');}
 
-function anaCadBloco(){return '<div class="anacad"><div class="anacad-h"><img src="equipe/ana-av-feliz.webp" alt="" width="34" height="34"><div><b>Escreva o pedido para a Ana</b><small>Ela marca os dentes e preenche o resto. No celular, use o microfone do teclado para ditar.</small></div></div>'+
+function anaCadBloco(){return (ui.exoRes||'')+'<div class="anacad"><div class="anacad-h"><img src="equipe/ana-av-feliz.webp" alt="" width="34" height="34"><div><b>Escreva o pedido para a Ana</b><small>Ela marca os dentes e preenche o resto. No celular, use o microfone do teclado para ditar.</small></div></div>'+
   '<textarea id="anacad-t" rows="2" maxlength="1500" placeholder="Ex.: Dr. Paulo, paciente Maria Souza, coroa zircônia sobre dente do 11 ao 25 e 23 sobre implante Neodent CM, cor A2, pra sexta">'+esc(ui.anaCadTxt||'')+'</textarea>'+
   '<div class="anacad-b"><label class="btn sm" style="position:relative">📎 Ler HTML do exocad<input id="anacad-html" type="file" accept=".html,.htm,text/html" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label><button type="button" class="btn sm pri" data-a="anaCadPreenche">✨ Preencher</button></div></div>';}
 document.addEventListener('change',function(e){var t=e.target;if(t&&t.id==='anacad-html'){var f=(t.files||[])[0];t.value='';if(f)exoLer(f);}});
 var _fPedidoAna=fPedido;fPedido=function(id,preCli){var h=_fPedidoAna.apply(this,arguments);if(id)return h;return h.replace('<form data-form="pedido"',anaCadBloco()+'<form data-form="pedido"');};
+/* Preencher: completa e CORRIGE o que já está no pedido (não apaga os dentes que já estavam marcados) */
+function anaFormVal(){var f=document.querySelector('form[data-form="pedido"]'),g=function(id){return (document.getElementById(id)||{}).value||'';};
+  return {cli:g('pd-cli'),pac:g('pd-pac'),prazo:g('pd-prazo'),obs:g('pd-obs'),mat:f&&f.querySelector('[name=material]')?f.querySelector('[name=material]').value:'',urg:!!(document.getElementById('pd-urg')||{}).checked,
+    arqs:[].slice.call((document.getElementById('pd-files')||{}).files||[])};}
+function anaReabre(itens,pre,cliId,arqs){var rede=ui.pdRede,ex=ui.pdExtras||[];ui.ppImp=null;ui.keepExo=true;closeSheet();ui.pdRede=rede;ui.pdInit=false;ui.pdItens=itens;ui.pdExtras=ex;ui.pdEd=null;ui.pdPre=pre;
+  openSheet(fPedido,null,cliId||null);ui.sheet.after=depoisFormPedido;depoisFormPedido();
+  if(arqs&&arqs.length)setTimeout(function(){var inp=document.getElementById('pd-files');if(inp&&window.DataTransfer){try{var dt=new DataTransfer();arqs.forEach(function(x){dt.items.add(x);});inp.files=dt.files;inp.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){}}},60);}
+var _closeSheetA=closeSheet;closeSheet=function(){if(!ui.keepExo){ui.exoRes=null;}ui.keepExo=false;return _closeSheetA.apply(this,arguments);};
 A.anaCadPreenche=function(){var ta=document.getElementById('anacad-t'),tx=ta?ta.value.trim():'';if(!tx){toast('Escreva o pedido primeiro.');return;}ui.anaCadTxt=tx;
-  var r=anaCadTexto(tx);if(!r||(!r.itensAna.length&&!r.cli&&!r.pac)){toast('Não entendi. Diga o trabalho e os dentes, ex.: coroa do 11 ao 13.');return;}
-  var cliAtual=(document.getElementById('pd-cli')||{}).value||'';if(!r.cli&&cliAtual)r.cli=cliente(cliAtual)||null;
-  var rede=ui.pdRede,ex=ui.pdExtras||[];ui.ppImp=null;closeSheet();ui.pdRede=rede;ui.pdInit=false;ui.pdItens=r.itensAna;ui.pdExtras=ex;ui.pdEd=null;ui.anaCadTxt=tx;
-  ui.pdPre={pac:r.pac,prazo:r.prazo,mat:r.mat,urg:r.urg,obs:[r.cor?'Cor '+r.cor:''].filter(Boolean).join(' · '),resumo:r};
-  openSheet(fPedido,null,r.cli?r.cli.id:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();
-  toast(r.itensAna.length?'Pronto! Marquei '+r.itensAna.length+' elemento'+(r.itensAna.length>1?'s':'')+'. Confira e toque em Criar pedido.':'Preenchi o que entendi. Marque os dentes.');};
+  var r=anaCadTexto(tx),V=anaFormVal();if(!r||(!r.itensAna.length&&!r.cli&&!r.pac&&!r.prazo&&!r.mat&&!r.cor&&!r.urg)){toast('Não entendi. Ex.: "46 sobre implante, cliente Dr. Paulo, zircônia, pra sexta".');return;}
+  var its=(ui.pdItens||[]).map(function(x){return Object.assign({},x);}),mud=0,nov=0;
+  r.itensAna.forEach(function(n){var e=its.filter(function(x){return x.d===n.d;})[0];if(e){if(n.t)e.t=n.t;e.imp=n.imp;if(n.imp){e.m=n.m||e.m;e.c=n.c||e.c;}else{e.m='';e.c='';}mud++;}else{its.push(n);nov++;}});
+  var cli=r.cli||(V.cli?cliente(V.cli):null),obs=[V.obs,r.cor?'Cor '+r.cor:''].filter(Boolean).join(' · ');
+  r.dentes=its.map(function(x){return x.d;});r.cli=cli;r.pac=r.pac||V.pac;r.prazo=r.prazo||V.prazo;r.mat=r.mat||V.mat;
+  anaReabre(its,{pac:r.pac,prazo:r.prazo,mat:r.mat,urg:r.urg||V.urg,obs:obs,resumo:r},cli?cli.id:null,V.arqs);
+  toast((mud?'Atualizei '+mud+' elemento'+(mud>1?'s':''):'')+(mud&&nov?' e ':'')+(nov?'marquei '+nov+' novo'+(nov>1?'s':''):'')+(mud||nov?'. ':'')+'Confira e toque em Criar pedido.');};
 var F={
   compNota:function(fd){var id=String(fd.get('id')||''),t=String(fd.get('t')||'').trim().slice(0,600);compNotaSalva(id,{texto:t}).then(function(ok){if(ok)toast(t?'Anotação salva.':'Anotação apagada.');});renderSheet();},
   prEqAdd:function(fd,f){var email=String(fd.get('email')||'').trim().toLowerCase(),nome=String(fd.get('nome')||'').trim().slice(0,60),lim=Math.max(1,Math.min(200,+fd.get('lim')||40));if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){toast('E-mail inválido.');return;}
