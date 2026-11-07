@@ -1346,7 +1346,7 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .ai-sel{margin:0;color:var(--muted)}.ai-acoes{display:flex;gap:8px;flex-wrap:wrap}
 @media (max-width:760px){.ai-corpo{grid-template-columns:1fr;grid-template-rows:38% 1fr}.ai-esq{border-right:0;border-bottom:1px solid var(--line)}.ai-abre{margin:8px 0 0}}
 .inv-tab{margin:6px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.82rem}.inv-tr{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;padding:4px 8px;border-bottom:1px solid var(--line)}.inv-tr:last-child{border-bottom:0}.inv-th{color:var(--muted);font-size:.7rem;text-transform:uppercase}.inv-tr .bad,.ai-msg .bad{color:#E5484D}
-.ai-msg .ih-ver,.ai-msg .ih-tag{margin:2px 2px 2px 0;display:inline-block}
+.ai-msg code{font-size:.78rem;background:rgba(128,128,160,.18);padding:1px 5px;border-radius:5px}.ai-msg .ih-ver,.ai-msg .ih-tag{margin:2px 2px 2px 0;display:inline-block}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4723,6 +4723,41 @@ function aiRelatorio(f){var I=AI.inv;if(!I){aiDiz('Primeiro toque em "Investigar
       (soAqui.length?'<br><br>❗ <b>Estão aqui mas NÃO no LabFácil</b> (a Inove precisa dar baixa):<br>'+soAqui.map(invChip).join(' '):'')+
       (soLa.length?'<br><br>❗ <b>Estão no LabFácil mas NÃO aqui</b> (falta anexar o comprovante no Ideali):<br>'+soLa.map(function(r){return '<span class="ih-tag">'+invDt(r.data)+' · '+fmtR(r.valor)+'</span>';}).join(' '):'')+
       (!soAqui.length&&!soLa.length?'<br><br>Tudo bate! A diferença deve estar em outro lançamento (por exemplo, um serviço cobrado em dobro). Confira o extrato com o laboratório.':'<br><br>Resolvendo esses itens, o extrato volta a bater e eu consigo anexar.'),false,soAqui.length||soLa.length?'erro':'');}).catch(function(){AI.busy=false;aiDiz('Não consegui ler esse arquivo.',false,'erro');});}
+
+/* ===== Investigação v2: confere comprovante por comprovante (data, hora, código), acha duplicados e só então pede o LabFácil ===== */
+function invDetalhes(tx){var t=String(tx||''),L=aiLeComp(t),h=t.match(/\b([01]\d|2[0-3])[:h]([0-5]\d)(?::([0-5]\d))?\b/),cod=null;
+  var e2e=t.match(/\b[ED]\d{8}[A-Za-z0-9]{12,30}\b/);if(e2e)cod=e2e[0];
+  if(!cod){var m=t.match(/(?:id(?:entificador)?(?:\s+da\s+transa[cç][aã]o)?|autentica[cç][aã]o|c[oó]digo(?:\s+da\s+transa[cç][aã]o)?|protocolo|n[ºo°]?\s*(?:de\s+)?controle|nsu|transa[cç][aã]o)\s*[:#nº°]*\s*([A-Za-z0-9][A-Za-z0-9.\-\/]{5,})/i);if(m)cod=m[1];}
+  if(!cod){var tk=(t.match(/\b[A-Za-z0-9]{16,}\b/g)||[]).filter(function(x){return /\d/.test(x)&&/[A-Za-z]/.test(x);}).sort(function(a,b){return b.length-a.length;});if(tk.length)cod=tk[0];}
+  L.hora=h?h[1]+':'+h[2]+(h[3]?':'+h[3]:''):null;L.cod=cod;return L;}
+function invHash(b){try{return b.arrayBuffer().then(function(a){return crypto.subtle.digest('SHA-256',a);}).then(function(h){return Array.prototype.map.call(new Uint8Array(h),function(x){return ('0'+x.toString(16)).slice(-2);}).join('').slice(0,16);});}catch(e){return Promise.resolve(null);}}
+invLeArquivo=function(path){return finUrlAssinada(path).then(function(u){return fetch(u);}).then(function(r){if(!r.ok)throw 0;return r.blob();}).then(function(b){var f=new File([b],path.split('/').pop(),{type:b.type||(/\.pdf$/i.test(path)?'application/pdf':'image/jpeg')});
+  return Promise.all([aiTextoArq(f).then(invDetalhes).catch(function(){return {valor:null,data:null,hora:null,cod:null};}),invHash(b)]).then(function(r){r[0].hash=r[1];return r[0];});});};
+function invCodCurto(c){c=String(c||'');return c.length>14?c.slice(0,6)+'…'+c.slice(-6):c;}
+aiInvest=function(v){var a=v.split('|'),k=a[0],ano=+a[1],mes=+a[2],sa=+a[3],c=EMP.cli.filter(function(x){return x.id===k;})[0];if(!c)return;
+  var L=invPags(k),M=FIN.M.filter(function(m){return finCliK(m)===k;}).sort(function(x,y){return (x.ano*100+x.mes)-(y.ano*100+y.mes);}),comArq=L.filter(function(x){return x.p.comprovante_path;});
+  AI.inv={k:k,nome:c.nome,ano:ano,mes:mes,L:L};aiDiz('🔎 Investigar o ocorrido · '+esc(c.nome),true);
+  var tab='<div class="inv-tab"><div class="inv-tr inv-th"><span>Mês</span><span>Valor</span><span>Pago</span><span>Falta</span></div>'+M.map(function(m){return '<div class="inv-tr"><span>'+MESES[m.mes-1].slice(0,3)+'/'+m.ano+'</span><span>'+fmtR(m.valor_mes)+'</span><span>'+fmtR(finPagoTela(m))+'</span><span'+(finFaltaTela(m)>0.005?' class="bad"':'')+'>'+fmtR(finFaltaTela(m))+'</span></div>';}).join('')+'</div>';
+  aiDiz('📒 <b>Histórico de '+esc(c.nome)+'</b>'+tab+'Agora vou abrir e conferir <b>um por um</b> os '+comArq.length+' comprovantes'+(L.length>comArq.length?' (e '+(L.length-comArq.length)+' pagamento'+(L.length-comArq.length>1?'s':'')+' sem arquivo)':'')+'.');
+  AI.busy=true;aiRender();var vistos=[],dups=[],dif=[],i=0;
+  comArq.reduce(function(pr,x){return pr.then(function(){return invLeArquivo(x.p.comprovante_path).then(function(r){x.r=r;}).catch(function(){x.r={};}).then(function(){i++;var r=x.r||{},lnk='<button class="ih-ver" data-act="finArqVer" data-v="'+esc(x.p.comprovante_path)+'">📎 abrir</button>';
+      var desc=(r.data?invDt(r.data):invDt(x.p.data))+(r.hora?' às '+r.hora:'')+' · <b>'+fmtR(r.valor!=null?r.valor:x.p.valor)+'</b>'+(r.cod?' · código <code>'+esc(invCodCurto(r.cod))+'</code>':''),onde=' (lançado em '+MESES[x.m.mes-1]+')';
+      var igual=vistos.filter(function(y){var s=y.r||{};return (r.hash&&s.hash&&r.hash===s.hash)||(r.cod&&s.cod&&r.cod===s.cod);})[0];
+      var parecido=!igual&&vistos.filter(function(y){var s=y.r||{};return Math.abs((+y.p.valor)-(+x.p.valor))<0.01;})[0];
+      var h;if(igual){dups.push({x:x,de:igual});h='⚠️ '+i+'/'+comArq.length+' · '+lnk+' '+desc+onde+'<br><b>É o MESMO comprovante</b> do pagamento de '+invDt(igual.p.data)+' ('+MESES[igual.m.mes-1]+'): '+(r.cod&&igual.r.cod===r.cod?'mesmo código':'mesmo arquivo')+'. Está lançado 2 vezes aqui.';}
+      else if(r.valor!=null&&Math.abs(r.valor-(+x.p.valor))>0.009){dif.push(x);h='⚠️ '+i+'/'+comArq.length+' · '+lnk+' '+desc+onde+'<br>O arquivo mostra <b>'+fmtR(r.valor)+'</b>, mas foi lançado <b>'+fmtR(x.p.valor)+'</b>.';}
+      else{h='✅ '+i+'/'+comArq.length+' · '+lnk+' '+desc+onde+(r.valor==null?' <small>(não consegui ler o valor no arquivo; usei o lançado)</small>':' · confere');
+        if(parecido){var s=parecido.r||{};h+='<br><small>ℹ️ Valor igual ao de '+invDt(parecido.p.data)+(s.hora?' '+s.hora:'')+', mas '+(r.cod&&s.cod?'o código é outro':r.hora&&s.hora&&r.hora!==s.hora?'a hora é outra':'o arquivo é outro')+': são pagamentos diferentes.</small>';}}
+      vistos.push(x);aiDiz(h,false,igual||(r.valor!=null&&Math.abs(r.valor-(+x.p.valor))>0.009)?'erro':'');});});},Promise.resolve())
+  .then(function(){AI.busy=false;var inove=-sa,nosso=Math.max(0,extAbertoAntes(k,ano,mes)),dfz=Math.round((inove-nosso)*100)/100,somaDup=dups.reduce(function(s,d){return s+(+d.x.p.valor);},0),somaDif=dif.reduce(function(s,x){return s+((+x.p.valor)-(x.r.valor||0));},0);
+    var res='📋 <b>Resultado:</b> '+(comArq.length-dups.length-dif.length)+' comprovante'+(comArq.length-dups.length-dif.length!==1?'s':'')+' ✅ conferido'+(comArq.length-dups.length-dif.length!==1?'s':'')+(dups.length?', <b class="bad">'+dups.length+' duplicado'+(dups.length>1?'s':'')+' ('+fmtR(somaDup)+')</b>':'')+(dif.length?', <b class="bad">'+dif.length+' com valor diferente</b>':'')+'.<br>';
+    if(Math.abs(dfz)<=1){aiDiz(res+'🎉 Conferindo um por um, o saldo daqui bate com o da Inove. <b>Resolvido.</b>');return;}
+    res+='A Inove cobra <b>'+fmtR(inove)+'</b> de saldo anterior; aqui consta <b>'+fmtR(nosso)+'</b>. Diferença: <b>'+fmtR(dfz)+'</b>.';
+    if(dups.length&&Math.abs(somaDup+somaDif-dfz)<=1){aiDiz(res+'<br>✅ <b>Achei a causa:</b> a diferença é exatamente o'+(dups.length>1?'s comprovantes lançados':' comprovante lançado')+' em dobro aqui. Não é baixa da Inove: '+(ESP.dono?'peça para o laboratório apagar':'é só anular')+' o lançamento repetido ('+dups.map(function(d){return invDt(d.x.p.data)+' · '+fmtR(d.x.p.valor);}).join(', ')+').',false,'erro');return;}
+    var sub=dfz>1?invSubconjunto(L.filter(function(x){return (x.m.ano*100+x.m.mes)<(ano*100+mes)&&!dups.some(function(d){return d.x===x;});}),dfz):null;
+    if(sub){aiDiz(res+'<br>✅ Estes comprovantes somam exatamente a diferença. <b>Possivelmente não tiveram baixa na Inove:</b><br>'+sub.map(invChip).join(' ')+'<br>Mande esses comprovantes para a Inove dar baixa.',false,'erro');return;}
+    aiDiz(res+'<br>Conferi um por um e não consegui explicar a diferença só com os comprovantes daqui.',false,'erro');
+    aiDiz('📩 Agora sim: <b>me envie o extrato de comprovantes da Inove 3D do seu LabFácil</b>, com o registro dos pagamentos recebidos de '+esc(c.nome)+'. Eu comparo item por item e te digo exatamente o que falta de cada lado.<div class="ai-form"><label class="btn pri">📑 Enviar relatório do LabFácil<input type="file" id="ai-rel" accept="application/pdf,image/*" hidden></label></div>');});};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
