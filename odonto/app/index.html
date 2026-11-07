@@ -1332,6 +1332,19 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .ext-l1{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.ext-l1 small{color:var(--muted)}.ext-st{margin-left:auto;font-style:normal;font-size:.74rem;font-weight:700}
 .ext-m{margin:0;font-size:.8rem;color:var(--muted)}.ext-m.bad{color:#E5484D;font-weight:600}.ext-cli{font:inherit;font-size:.86rem;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);max-width:360px}
 .ext-bts{gap:6px}.ext-inove{border-color:#E5484D!important;color:#E5484D!important}
+.ai-abre{display:inline-flex;align-items:center;gap:8px;margin-left:14px;border:0;border-radius:999px;padding:6px 14px 6px 6px;background:#1B1830;color:#fff;font:inherit;font-weight:800;font-size:.86rem;cursor:pointer}.ai-abre img{width:30px;height:30px;border-radius:50%;background:#fff;object-fit:cover}
+.aipan{position:fixed;inset:0;z-index:310;background:rgba(6,10,24,.65);display:flex;align-items:center;justify-content:center;padding:12px}
+.ai-p{width:min(1100px,100%);height:min(88vh,860px);background:var(--surface);color:var(--ink);border-radius:18px;display:flex;flex-direction:column;overflow:hidden}
+.ai-h{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}.ai-h img{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid #F5C518}.ai-h div{flex:1;display:flex;flex-direction:column}.ai-h small{color:var(--muted)}
+.ai-x{border:0;background:var(--bg);color:var(--ink);width:36px;height:36px;border-radius:10px;font-size:1.4rem;cursor:pointer}
+.ai-corpo{flex:1;display:grid;grid-template-columns:300px 1fr;min-height:0}.ai-esq{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.ai-q{margin:10px;font:inherit;font-size:15px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}.ai-lista{overflow:auto;flex:1;padding:0 8px 10px;display:flex;flex-direction:column;gap:4px}
+.ai-cli{text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 9px;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:2px}.ai-cli.on{border-color:#F5C518;box-shadow:0 0 0 2px rgba(245,197,24,.35)}.ai-cli b{font-size:.86rem}.ai-cli span{font-size:.72rem;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}.ai-cli i{font-style:normal}.ai-cli i.ok{color:#13875F}.ai-cli i.bad{color:#E5484D}
+.ai-dir{display:flex;flex-direction:column;min-height:0;padding:10px 14px;gap:8px}.ai-chat{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
+.ai-msg{max-width:82%;align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:9px 12px;font-size:.9rem;line-height:1.45}.ai-msg.eu{align-self:flex-end;background:#2F6BFF;color:#fff;border-color:#2F6BFF;border-radius:14px 14px 4px 14px}.ai-dig{opacity:.7;font-style:italic}
+.ai-form{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.ai-form input{font:inherit;font-size:15px;padding:7px 9px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:140px}
+.ai-sel{margin:0;color:var(--muted)}.ai-acoes{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:760px){.ai-corpo{grid-template-columns:1fr;grid-template-rows:38% 1fr}.ai-esq{border-right:0;border-bottom:1px solid var(--line)}.ai-abre{margin:8px 0 0}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4593,6 +4606,76 @@ document.addEventListener('change',function(e){var t=e.target;if(t.id!=='fx-arq'
   extTexto(f).then(function(tx){var it=extAnalisa({id:'x'+Date.now(),file:f,d:extParse(tx),cliId:c.id});if(it.d.cod&&it.cli)extSalvaCod(it);
     if(it.baixa>0){extBaixaGuarda(it);EXT.itens.push(it);EXT.msg=it.id;setTimeout(function(){AUD.res=anaAuditoria();if(AUD.res)audMostra();},1200);}
     else if(it.st==='dif')setTimeout(function(){toast('Atenção: o extrato diz '+fmtR(it.d.debitos)+' e o lançado é '+fmtR(m.valor_mes)+'.');},1500);}).catch(function(){});},true);
+
+/* ===== Ana na aba Inove: a Inove (ou você) anexa extratos e comprovantes conversando com ela ===== */
+var TESS={js:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js',wk:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',core:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1',lang:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/por@1.0.0/4.0.0_best_int'};
+var AI={on:false,cli:'',msgs:[],busy:false,comp:null,q:''};
+function aiTess(){if(window.Tesseract)return Promise.resolve(window.Tesseract);return new Promise(function(ok,no){var s=document.createElement('script');s.src=TESS.js;s.onload=function(){ok(window.Tesseract);};s.onerror=no;document.head.appendChild(s);});}
+function aiTextoArq(f){if(/pdf/i.test(f.type)||/\.pdf$/i.test(f.name))return extTexto(f);
+  return aiTess().then(function(T){return T.createWorker('por',1,{workerPath:TESS.wk,corePath:TESS.core,langPath:TESS.lang});}).then(function(w){return w.recognize(f).then(function(r){var t=r.data.text;w.terminate();return t;});});}
+var AI_MES={jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12};
+function aiLeComp(tx){var t=String(tx||'').replace(/ /g,' '),v=null,m=t.match(/valor[^0-9\n]{0,30}(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2})/i);if(m)v=extNum(m[1]);
+  if(v==null){var L=[];t.replace(/R\$\s*(\d{1,3}(?:\.\d{3})*,\d{2})/g,function(x,a){L.push(extNum(a));});if(L.length)v=Math.max.apply(null,L);}
+  var d=null,md=t.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/);if(md)d=md[3]+'-'+md[2]+'-'+md[1];else{var mm=semAc(t).match(/\b(\d{1,2})\s*(?:de\s*)?(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)[a-z]*\.?\s*(?:de\s*)?(\d{4})\b/);if(mm)d=mm[3]+'-'+String(AI_MES[mm[2]]).padStart(2,'0')+'-'+String(mm[1]).padStart(2,'0');}
+  return {valor:v,data:d};}
+function aiDiz(html,eu){AI.msgs.push({eu:!!eu,h:html});aiRender();}
+function aiUp(f,pasta){var ext=(String(f.name).match(/\.([a-z0-9]+)$/i)||[])[1]||(/pdf/.test(f.type)?'pdf':'jpg'),path=donoId()+'/'+pasta+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.'+ext.toLowerCase();
+  if(f.size>10485760)return Promise.reject({message:'Arquivo maior que 10 MB.'});var tipo=f.type||(ext==='pdf'?'application/pdf':'image/jpeg');
+  return SB.storage.from('odonto-fin').upload(path,f,{contentType:tipo,upsert:false}).then(function(r){if(r.error)throw r.error;return path;});}
+function aiErro(e){var s=String(e&&(e.message||e.error)||e||'');return /odo_inove_|function/i.test(s)?'falta rodar a atualização 055 no Supabase':s.slice(0,120)||'erro desconhecido';}
+function aiRecarrega(){return finCarrega().catch(function(){});}
+function aiCliRow(c){return FIN.M.filter(function(m){return m.cliente_id===c.id&&m.ano===FIN.ano&&m.mes===FIN.mes;})[0]||null;}
+function aiLista(){var q=semAc(AI.q||'');return EMP.cli.filter(function(c){return c.ativo!==false&&(!q||semAc(c.nome).indexOf(q)>=0);}).sort(function(a,b){return a.nome.localeCompare(b.nome,'pt-BR');}).map(function(c){var m=aiCliRow(c),n=m?finPags(m).filter(function(p){return !p.anulado_em;}).length:0;
+  return '<button class="ai-cli'+(AI.cli===c.id?' on':'')+'" data-ai="cli" data-v="'+c.id+'"><b>'+esc(c.nome)+'</b><span>'+(m?(m.extrato_path||m.arquivo_legado?'<i class="ok">📄 extrato anexado</i>':'<i>📄 sem extrato</i>')+(n?' <i class="ok">📎 '+n+'</i>':'')+(finFaltaTela(m)>0.005?' <i class="bad">falta '+fmtR(finFaltaTela(m))+'</i>':' <i class="ok">quitado</i>'):'<i>sem lançamento</i>')+'</span></button>';}).join('')||'<p class="small muted">Nenhum cliente.</p>';}
+function aiRender(){var d=document.getElementById('aipan');if(!d)return;d.querySelector('.ai-lista').innerHTML=aiLista();var ch=d.querySelector('.ai-chat');ch.innerHTML=AI.msgs.map(function(m){return '<div class="ai-msg'+(m.eu?' eu':'')+'">'+m.h+'</div>';}).join('')+(AI.busy?'<div class="ai-msg ai-dig">Ana está lendo…</div>':'');ch.scrollTop=ch.scrollHeight;
+  var c=EMP.cli.filter(function(x){return x.id===AI.cli;})[0];d.querySelector('.ai-sel').innerHTML=c?'Cliente escolhido: <b>'+esc(c.nome)+'</b> · '+MESES[FIN.mes-1]+'/'+FIN.ano:'Escolha um cliente à esquerda para anexar comprovante.';
+  d.querySelectorAll('.ai-bt').forEach(function(b){b.disabled=AI.busy;});}
+function aiAbre(){if(document.getElementById('aipan'))return;AI.on=true;if(!AI.msgs.length)AI.msgs=[{eu:false,h:'Oi'+(ESP.dono?', equipe Inove':'')+'! 👋 Sou a Ana. Me mande os <b>extratos do mês</b> (pode ser vários PDFs de uma vez) ou escolha um cliente à esquerda e me mande o <b>comprovante</b>. Eu confiro os valores antes de lançar.'}];
+  var d=document.createElement('div');d.id='aipan';d.className='aipan';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Ana · extratos e comprovantes');
+  d.innerHTML='<div class="ai-p"><div class="ai-h"><img src="'+ANA_AV[0]+'" alt=""><div><b>Ana · extratos e comprovantes</b><small>'+MESES[FIN.mes-1]+' de '+FIN.ano+'</small></div><button class="ai-x" data-ai="fecha" aria-label="Fechar">×</button></div>'+
+    '<div class="ai-corpo"><aside class="ai-esq"><input class="ai-q" type="search" placeholder="🔍 Buscar cliente" value="'+esc(AI.q)+'"><div class="ai-lista"></div></aside><section class="ai-dir"><div class="ai-chat" aria-live="polite"></div><p class="ai-sel small"></p>'+
+    '<div class="ai-acoes"><label class="btn pri ai-bt">📄 Enviar extratos (PDF)<input type="file" id="ai-ext" accept="application/pdf" multiple hidden></label><label class="btn ai-bt">📎 Enviar comprovante<input type="file" id="ai-comp" accept="application/pdf,image/*" hidden></label></div></section></div></div>';
+  document.body.appendChild(d);aiRender();
+  d.addEventListener('click',function(e){var b=e.target.closest('[data-ai]');if(e.target===d){aiFecha();return;}if(!b)return;var a=b.getAttribute('data-ai'),v=b.getAttribute('data-v');
+    if(a==='fecha')aiFecha();else if(a==='cli'){AI.cli=v;aiRender();}else if(a==='lanca')aiLancaComp();else if(a==='cancela'){AI.comp=null;aiDiz('Tudo bem, não lancei nada.');}});
+  d.addEventListener('input',function(e){if(e.target.classList.contains('ai-q')){AI.q=e.target.value;d.querySelector('.ai-lista').innerHTML=aiLista();}});
+  d.addEventListener('change',function(e){var t=e.target;if(t.id==='ai-ext'){var fs=[].slice.call(t.files||[]);t.value='';aiExtratos(fs);}else if(t.id==='ai-comp'){var f=(t.files||[])[0];t.value='';if(f)aiComprovante(f);}});
+  document.addEventListener('keydown',aiEsc);}
+function aiEsc(e){if(e.key==='Escape')aiFecha();}
+function aiFecha(){var d=document.getElementById('aipan');if(d)d.remove();AI.on=false;document.removeEventListener('keydown',aiEsc);render();}
+/* extratos: lê, confere e já anexa (lança o mês se faltar) */
+function aiExtratos(fs){fs=fs.filter(function(f){return /pdf/i.test(f.type)||/\.pdf$/i.test(f.name);});if(!fs.length){aiDiz('Mande os extratos em PDF, por favor.');return;}
+  aiDiz('📄 '+fs.length+' extrato'+(fs.length>1?'s':''),true);AI.busy=true;aiRender();var ok=0,alertas=[];
+  fs.reduce(function(pr,f){return pr.then(function(){return extTexto(f).then(function(tx){var it=extAnalisa({id:'a'+Date.now(),file:f,d:extParse(tx)}),d=it.d,c=it.cli;
+      if(it.st==='erro'||!c){aiDiz('⚠️ <b>'+esc(d.nome||f.name)+'</b>: '+esc((it.msgs||[])[0]||'não consegui ler.'));return;}
+      var row=extRow(c.id,d.ano,d.mes),pm=row?Promise.resolve(row.id):SB.rpc('odo_inove_lanca_mes',{p_dono:donoId(),p_cliente:c.id,p_ano:d.ano,p_mes:d.mes,p_valor:d.debitos}).then(function(r){if(r.error)throw r.error;return r.data;});
+      return pm.then(function(mid){return aiUp(f,'extratos/'+d.ano+'-'+String(d.mes).padStart(2,'0')).then(function(path){return SB.rpc('odo_inove_extrato',{p_mes:mid,p_path:path}).then(function(r){if(r.error)throw r.error;});});})
+        .then(function(){ok++;var linhas=['✅ <b>'+esc(c.nome)+'</b> · '+MESES[d.mes-1]+': extrato anexado'+(row?'':' (cliente lançado com '+fmtR(d.debitos)+')')+'.'];
+          if(it.st==='dif')linhas.push('⚠️ O extrato diz <b>'+fmtR(d.debitos)+'</b>, mas no sistema está lançado <b>'+fmtR(row.valor_mes)+'</b>. O laboratório vai conferir.');
+          if(it.baixa>0){linhas.push('🚨 <b>Suspeita:</b> o extrato cobra <b>'+fmtR(-d.saldoAnt)+'</b> de saldo anterior, mas os comprovantes no sistema mostram que isso já foi pago. Falta dar baixa de <b>'+fmtR(it.baixa)+'</b>.');extBaixaGuarda(it);alertas.push(c.nome);}
+          if(it.inoveAMenos>0){linhas.push('🚨 <b>Suspeita:</b> o extrato já deu baixa de <b>'+fmtR(it.inoveAMenos)+'</b> que não tem comprovante no sistema. Está faltando anexar comprovante.');alertas.push(c.nome);}
+          if(d.cod)extSalvaCod(it);aiDiz(linhas.join('<br>'));})
+        .catch(function(e){aiDiz('❌ <b>'+esc(c.nome)+'</b>: não consegui anexar ('+esc(aiErro(e))+').');});}).catch(function(){aiDiz('❌ Não consegui abrir <b>'+esc(f.name)+'</b>.');});});},Promise.resolve())
+  .then(aiRecarrega).then(function(){AI.busy=false;aiDiz(ok?'Pronto: '+ok+' de '+fs.length+' anexado'+(ok>1?'s':'')+'.'+(alertas.length?' Verifique os 🚨 acima.':' Tudo conferido.'):'Nenhum extrato foi anexado.');});}
+/* comprovante: lê o valor, confere e trava se divergir */
+function aiComprovante(f){var c=EMP.cli.filter(function(x){return x.id===AI.cli;})[0];if(!c){aiDiz('Antes, escolha à esquerda de qual cliente é o comprovante. 👈');return;}
+  var m=aiCliRow(c);if(!m){aiDiz('<b>'+esc(c.nome)+'</b> não tem lançamento em '+MESES[FIN.mes-1]+'. Mande primeiro o extrato dele.');return;}
+  aiDiz('📎 Comprovante de '+esc(c.nome),true);AI.busy=true;aiRender();
+  aiTextoArq(f).then(aiLeComp).catch(function(){return {valor:null,data:null};}).then(function(L){AI.busy=false;AI.comp={f:f,m:m,c:c,lido:L.valor,data:L.data};var falta=finFaltaTela(m)+Math.max(0,extAbertoAntes(c.id,m.ano,m.mes));
+    var h=L.valor!=null?'Li neste comprovante: <b>'+fmtR(L.valor)+'</b>'+(L.data?' em '+L.data.split('-').reverse().join('/'):'')+'. '+esc(c.nome)+' deve <b>'+fmtR(falta)+'</b>.':'⚠️ Não consegui ler o valor deste comprovante. Digite o valor que está nele:';
+    if(L.valor!=null&&L.valor-falta>1)h+='<br>⚠️ É mais do que deve: a diferença vira crédito para o mês que vem.';
+    aiDiz(h+'<div class="ai-form"><input id="ai-v" inputmode="decimal" placeholder="Valor do comprovante (R$)" value="'+(L.valor!=null?String(L.valor.toFixed(2)).replace('.',','):'')+'"><input id="ai-d" type="date" value="'+(L.data||dHoje())+'"><button class="btn pri" data-ai="lanca">Lançar pagamento</button><button class="btn" data-ai="cancela">Cancelar</button></div>');});}
+function aiLancaComp(){var C=AI.comp;if(!C)return;var v=num((document.getElementById('ai-v')||{}).value),dt=(document.getElementById('ai-d')||{}).value||dHoje();
+  if(!(v>0)){aiDiz('Digite o valor do comprovante.');return;}
+  if(C.lido!=null&&Math.abs(v-C.lido)>0.009){aiDiz('🛑 <b>Valor divergente!</b> O comprovante mostra <b>'+fmtR(C.lido)+'</b>, mas foi digitado <b>'+fmtR(v)+'</b>. Não lancei. Verifique o comprovante e tente de novo.');return;}
+  var dup=finPags(C.m).filter(function(p){return !p.anulado_em&&Math.abs(+p.valor-v)<0.01&&p.data===dt;})[0];if(dup){aiDiz('🛑 Já existe um pagamento de '+fmtR(v)+' em '+dt.split('-').reverse().join('/')+' para '+esc(C.c.nome)+'. Parece duplicado; não lancei.');AI.comp=null;return;}
+  AI.busy=true;aiRender();aiUp(C.f,'comprovantes/'+C.m.ano+'-'+String(C.m.mes).padStart(2,'0')).then(function(path){return SB.rpc('odo_inove_pagamento',{p_mes:C.m.id,p_valor:v,p_data:dt,p_path:path}).then(function(r){if(r.error)throw r.error;});})
+    .then(aiRecarrega).then(function(){AI.busy=false;AI.comp=null;var m=aiCliRow(C.c);aiDiz('✅ Pagamento de <b>'+fmtR(v)+'</b> lançado para <b>'+esc(C.c.nome)+'</b> com o comprovante.'+(m?(finFaltaTela(m)>0.005?' Ainda falta '+fmtR(finFaltaTela(m))+'.':' Mês quitado! 🎉'):''));})
+    .catch(function(e){AI.busy=false;aiDiz('❌ Não consegui lançar ('+esc(aiErro(e))+').');});}
+/* botão na faixa amarela da aba Inove */
+var _rInoveAI=rInove;rInove=function(){var h=_rInoveAI.apply(this,arguments);if(INO.hist)return h;
+  return h.replace('<h2>Conferência do mês</h2></div>','<h2>Conferência do mês</h2></div><button class="ai-abre" data-act="aiAbre"><img src="'+ANA_AV[0]+'" alt=""> Ana · anexar extratos e comprovantes</button>');};
+ACT.aiAbre=function(){aiAbre();};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
