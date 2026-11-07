@@ -1305,6 +1305,19 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .cobbts{gap:6px;margin:6px 0}.cobwa{background:#25D366!important;border-color:#25D366!important;color:#fff!important}
 .cobwa-novo{display:flex;gap:6px;flex-wrap:wrap;flex:1}.cobwa-novo input{flex:1;min-width:190px;font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 .cobmods textarea{width:100%;font:inherit;font-size:.86rem;line-height:1.4}.cobmods label>span{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.ih-mes{border:1px solid var(--line);border-left:4px solid var(--k);border-radius:14px;background:var(--surface);margin:0 0 14px;overflow:hidden}
+.ih-cab{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;flex-wrap:wrap}.ih-cab h3{margin:0;font-size:1.1rem;color:#E8A33A;display:flex;align-items:center;gap:8px}.ih-cab small{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
+.ih-todos{margin-top:8px;border:1px solid #5B8CFF;background:transparent;color:#5B8CFF;border-radius:8px;padding:5px 10px;font:inherit;font-size:.8rem;font-weight:700;cursor:pointer}
+.ih-num{text-align:right;display:flex;flex-direction:column;align-items:flex-end}.ih-num small{font-size:.66rem;color:var(--muted);letter-spacing:.04em}.ih-num b{font-size:1.35rem}.ih-num span{font-size:.78rem;color:var(--muted)}.ih-num em{font-style:normal;color:#E5484D;font-weight:700;font-size:.86rem}.ih-num em.ok{color:#13875F}
+.ih-tab{border-top:1px solid var(--line)}.ih-tr{display:grid;grid-template-columns:110px 120px 1fr 150px;gap:8px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line);font-size:.86rem}.ih-tr:last-child{border-bottom:0}
+.ih-th{font-size:.68rem;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;padding-top:6px;padding-bottom:6px}
+.ih-ext{background:#E8954A;color:#1B1200;font-weight:700;grid-template-columns:1fr 150px}.ih-ext>span:empty{display:none}.ih-cred{background:rgba(229,72,77,.08)}
+.ih-v{color:#2BB673;font-weight:700}.ih-c{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ih-ver{border:1px solid var(--line);background:var(--bg);color:inherit;border-radius:7px;padding:3px 9px;font:inherit;font-size:.78rem;cursor:pointer}.ih-ver.off{opacity:.45;cursor:not-allowed}.ih-ver.marca{border-color:#E33;color:#E33}.ih-ext .ih-ver{background:#fff3;border-color:#0003}
+.ih-tag{font-size:.7rem;border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--muted)}.ih-tag.ok{color:#13875F;border-color:#13875F}.ih-tag.bad{color:#E5484D;border-color:#E5484D}.ih-tag.novo{background:#F5C518;color:#1B1200;border-color:#F5C518;font-weight:800}
+.ih-conf{border:0;background:#2BB6A3;color:#04201C;border-radius:8px;padding:6px 12px;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer}.ih-ok{border:1px solid #13875F;background:transparent;color:#13875F;border-radius:8px;padding:5px 10px;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+.ih-vz{padding:10px 16px;color:var(--muted);font-size:.84rem}.ino-novo{display:block;color:#E8A33A;font-size:.72rem;font-weight:700;margin-top:2px}
+@media (max-width:700px){.ih-tr{grid-template-columns:1fr 1fr}.ih-th{display:none}.ih-num{align-items:flex-start;text-align:left}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4374,6 +4387,33 @@ var _rFinCfgC=rFinCfg;rFinCfg=function(){var h=_rFinCfgC.apply(this,arguments);i
     ed('cm-m1','m1','1️⃣ Extrato e vencimento (5º dia útil)','Enviada junto com o extrato.',12)+ed('cm-m2','m2','2️⃣ Lembrete de pagamento','Para quem passou do vencimento.',10)+
     ed('cm-av','aviso','📣 Aviso extra (opcional)','Entra no lugar de {aviso}. Deixe vazio quando não tiver aviso, por exemplo depois do fim de ano.',5)+
     '<div class="row cli-full"><span class="spacer"></span><button class="btn pri" data-act="cobModSalva">Salvar mensagens</button></div></section>';};
+
+/* ===== Histórico Geral no formato do sistema antigo + confirmação da Inove ===== */
+function inoNovos(m){return finPags(m).filter(function(p){return !p.anulado_em&&!p.inove_ok_em;});}
+function inoDt(x){return x?String(x).slice(0,10).split('-').reverse().join('/'):'';}
+function inoBtnComp(p,m){if(!p.comprovante_path)return p.arquivo_legado?'<span class="ih-ver off" title="Arquivo ainda no sistema antigo">📎 Ver</span>':'<span class="muted small">sem arquivo</span>';
+  var so=finSobraPags(m).indexOf(p)>=0;return so?'<button class="ih-ver marca" data-act="finArqMarca" data-v="'+esc(p.comprovante_path)+'" data-m="'+esc(finTxtSobra(m))+'">📎 Ver</button>':'<button class="ih-ver" data-act="finArqVer" data-v="'+esc(p.comprovante_path)+'">📎 Ver</button>';}
+function inoConfTxt(p){return p.conferencia==='ok'?'<span class="ih-tag ok">✓ valor confere</span>':p.conferencia==='diverge'?'<span class="ih-tag bad">⚠ valor diferente</span>':p.conferencia==='sem_leitura'?'<span class="ih-tag">? não deu para ler o valor</span>':'';}
+function rInoMes(m){var s=inoStatus(m),P=finPags(m).filter(function(p){return !p.anulado_em;}).sort(function(a,b){return String(a.data||a.criado_em).localeCompare(String(b.data||b.criado_em));}),nv=inoNovos(m),ok=P.length-nv.length,C=finCredComps(m);
+  var linhas=(m.extrato_path||m.arquivo_legado?'<div class="ih-tr ih-ext"><span>📄 Extrato do mês</span><span></span><span></span><span>'+(m.extrato_path?'<button class="ih-ver" data-act="finArqVer" data-v="'+esc(m.extrato_path)+'">Ver ↗</button>':'<span class="ih-ver off" title="Arquivo ainda no sistema antigo">Ver ↗</span>')+'</span></div>':'')+
+    C.map(function(c){return '<div class="ih-tr ih-cred"><span>crédito de '+MESES[finMesRow(m,-1).mes-1]+'</span><span class="ih-v">'+fmtR(finCredAtivo(m))+'</span><span><button class="ih-ver marca" data-act="finArqMarca" data-v="'+esc(c.p.comprovante_path)+'" data-m="'+esc(c.txt)+'">📎 Ver</button><span class="ih-tag bad">valor abatido</span></span><span></span></div>';}).join('')+
+    (P.length?P.map(function(p){return '<div class="ih-tr"><span>'+(inoDt(p.data)||'—')+'</span><span class="ih-v">'+fmtR(p.valor)+'</span><span class="ih-c">'+inoBtnComp(p,m)+inoConfTxt(p)+(p.inove_ok_em?'':'<span class="ih-tag novo">COMPROVANTE NOVO</span>')+'</span><span>'+
+      (p.inove_ok_em?'<button class="ih-ok" data-act="inoConf" data-v="u:'+p.id+'" title="Toque para desfazer">✓ Confirmado '+inoDt(p.inove_ok_em).slice(0,5)+'</button>':'<button class="ih-conf" data-act="inoConf" data-v="p:'+p.id+'">☐ Confirmar</button>')+'</span></div>';}).join(''):'<div class="ih-vz">nenhum pagamento lançado</div>');
+  return '<section class="ih-mes" style="--k:'+(s[1]==='ok'?'#13875F':s[1]==='warn'?'#E8A33A':'#D2433A')+'"><div class="ih-cab"><div><h3>'+MESES[m.mes-1].charAt(0).toUpperCase()+MESES[m.mes-1].slice(1)+'/'+m.ano+' <i class="ino-st '+s[1]+'">'+s[0]+'</i></h3>'+
+    '<small>'+(P.length?P.length+' comprovante'+(P.length>1?'s':'')+' · '+ok+' de '+P.length+' confirmado'+(P.length>1?'s':'')+' pela Inove':'nenhum comprovante')+'</small>'+
+    (nv.length>1?'<button class="ih-todos" data-act="inoConf" data-v="m:'+m.id+'">✓ Confirmar todos do mês ('+nv.length+')</button>':'')+'</div>'+
+    '<div class="ih-num"><small>VALOR DO MÊS</small><b>'+fmtR(m.valor_mes)+'</b><span>Pago '+fmtR(finPagoTela(m))+'</span>'+(finFaltaTela(m)>0.005?'<em>Falta pagar '+fmtR(finFaltaTela(m))+'</em>':'<em class="ok">Quitado</em>')+'</div></div>'+
+    '<div class="ih-tab"><div class="ih-tr ih-th"><span>Data</span><span>Valor</span><span>Comprovante</span><span>Inove</span></div>'+linhas+'</div></section>';}
+rInoHist=function(k){var L=FIN.M.filter(function(m){return finCliK(m)===k;}).sort(function(a,b){return (b.ano*100+b.mes)-(a.ano*100+a.mes);}),nm=L.length?finCliNome(L[0]):'',tot=L.reduce(function(s,m){return s+finFaltaTela(m);},0);
+  return '<div class="ino"><div class="dtop"><div><h2>🕘 Histórico Geral · '+esc(nm)+'</h2><p class="small muted">'+(tot>0.005?'Em aberto no total: <b>'+fmtR(tot)+'</b>':'Tudo em dia')+'</p></div><span class="spacer"></span><button class="btn" data-act="inoHistFecha">← Voltar</button></div>'+L.map(rInoMes).join('')+'</div>';};
+/* selo na lista principal da Inove */
+var _rInoveN=rInove;rInove=function(){var h=_rInoveN.apply(this,arguments);if(INO.hist)return h;
+  finDoMes().forEach(function(m){var n=inoNovos(m).length;if(!n)return;var a='<span class="ino-cli">'+esc(finCliNome(m));var i=h.indexOf(a);if(i<0)return;var j=h.indexOf('</span><span data-l="Valor do mês">',i);if(j<0)return;
+    h=h.slice(0,j)+'<small class="ino-novo">🟡 '+(n>1?n+' pagamentos novos':'Novo pagamento')+' · aguardando confirmação</small>'+h.slice(j);});return h;};
+ACT.inoConf=function(v){var t=v.slice(0,1),id=v.slice(2),ids=t==='m'?inoNovos(FIN.M.filter(function(x){return x.id===id;})[0]||{}).map(function(p){return p.id;}):[id],ok=t!=='u';if(!ids.length)return;
+  if(t==='u'&&!confirm('Desfazer a confirmação deste pagamento?'))return;
+  SB.rpc('odo_inove_confirma',{p_ids:ids,p_ok:ok}).then(function(r){if(r.error){toast(/odo_inove_confirma|function/i.test(r.error.message||'')?'Falta rodar a atualização 054 no Supabase.':'Não consegui confirmar agora.');return;}
+    var agora=new Date().toISOString();FIN.P.forEach(function(p){if(ids.indexOf(p.id)>=0){p.inove_ok_em=ok?agora:null;}});render();toast(ok?(ids.length>1?ids.length+' pagamentos confirmados.':'Pagamento confirmado.'):'Confirmação desfeita.');});};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
