@@ -3673,17 +3673,17 @@ document.addEventListener('change',function(e){var t=e.target;if(t.id==='fx-arq'
 var ANT_URL='https://alqhhgysvehtgkwsxeok.supabase.co',ANT_KEY='sb_publishable_oq7JWHoMvMqvjeaTDGHoqA_din8-sjJ';
 function finMigPend(){return {pag:FIN.P.filter(function(p){return p.arquivo_legado&&!p.comprovante_path;}),mes:FIN.M.filter(function(m){return m.arquivo_legado&&!m.extrato_path;})};}
 function rFinMig(){var P=finMigPend(),n=P.pag.length+P.mes.length,G=FIN.mig;if(!n&&!G)return '';
-  if(G)return '<section class="card finmig"><h3>📦 Arquivos do sistema antigo</h3><div class="finbar" style="--w:100%;--p:'+Math.round((G.ok+G.err)/Math.max(1,G.tot)*100)+'%"><i></i></div><p class="small">'+(G.rodando?'Copiando… ':'Pronto: ')+G.ok+' de '+G.tot+' copiados'+(G.err?' · '+G.err+' com erro':'')+'.</p>'+(!G.rodando&&G.err?'<button class="btn sm" data-act="finMigDeNovo">Tentar os que deram erro</button>':'')+'</section>';
+  if(G)return '<section class="card finmig"><h3>📦 Arquivos do sistema antigo</h3><div class="finbar" style="--w:100%;--p:'+Math.round((G.ok+G.err)/Math.max(1,G.tot)*100)+'%"><i></i></div><p class="small">'+(G.rodando?'Copiando… ':'Pronto: ')+G.ok+' de '+G.tot+' copiados'+(G.err?' · '+G.err+' com erro':'')+'.</p>'+(G.msgs?'<p class="small" style="color:#E66">Motivo: '+Object.keys(G.msgs).slice(0,3).map(function(k){return esc(String(k).slice(0,140))+' ('+G.msgs[k]+')';}).join(' · ')+'</p>':'')+(!G.rodando&&G.err?'<button class="btn sm" data-act="finMigDeNovo">Tentar os que deram erro</button>':'')+'</section>';
   return '<section class="card finmig cli-form"><h3 class="cli-full">📦 Trazer arquivos do sistema antigo</h3><p class="small muted cli-full">Faltam <b>'+P.pag.length+' comprovantes</b> e <b>'+P.mes.length+' extratos</b>. Entre com o login do sistema antigo: o seu navegador copia cada arquivo para a sua pasta privada nova. A senha não fica guardada. Escaneamentos e STL não vêm.</p>'+
     '<label class="fld"><span>E-mail do sistema antigo</span><input id="mg-email" type="email" autocomplete="off" value="'+esc(RL.user.email)+'"></label><label class="fld"><span>Senha do sistema antigo</span><input id="mg-senha" type="password" autocomplete="off"></label>'+
     '<div class="row cli-full"><span class="spacer"></span><button class="btn pri" data-act="finMigra">Trazer arquivos</button></div></section>';}
 function finMigCopia(ant,it){var ext=(String(it.path).match(/\.([a-z0-9]+)$/i)||[])[1]||'',e=ext.toLowerCase(),tipo={pdf:'application/pdf',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'}[e];
   if(!tipo)return Promise.reject('tipo');
-  return ant.storage.from(it.bucket).download(it.path).then(function(r){if(r.error||!r.data)throw r.error||'baixar';
+  return ant.storage.from(it.bucket).download(it.path).then(function(r){if(r.error||!r.data){var e1=r.error||{message:'arquivo vazio'};e1.etapa='baixar do antigo';throw e1;}
     var novo=RL.user.id+'/'+(it.bucket==='extratos'?'extratos':'comprovantes')+'/legado/'+String(it.path).replace(/[^a-zA-Z0-9._-]+/g,'_');
-    return SB.storage.from('odonto-fin').upload(novo,new Blob([r.data],{type:tipo}),{contentType:tipo,upsert:true}).then(function(u){if(u.error)throw u.error;
+    return SB.storage.from('odonto-fin').upload(novo,new Blob([r.data],{type:tipo}),{contentType:tipo,upsert:true}).then(function(u){if(u.error){u.error.etapa='enviar para a pasta nova';throw u.error;}
       var q=it.tipo==='pag'?SB.from('odo_fin_pagamentos').update({comprovante_path:novo}).eq('id',it.id):SB.from('odo_fin_meses').update({extrato_path:novo}).eq('id',it.id);
-      return q.then(function(x){if(x.error)throw x.error;var o=(it.tipo==='pag'?FIN.P:FIN.M).filter(function(z){return z.id===it.id;})[0];if(o){if(it.tipo==='pag')o.comprovante_path=novo;else o.extrato_path=novo;}});});});}
+      return q.then(function(x){if(x.error){x.error.etapa='gravar no financeiro';throw x.error;}var o=(it.tipo==='pag'?FIN.P:FIN.M).filter(function(z){return z.id===it.id;})[0];if(o){if(it.tipo==='pag')o.comprovante_path=novo;else o.extrato_path=novo;}});});});}
 Object.assign(ACT,{
   finMigra:function(){var em=(document.getElementById('mg-email')||{}).value,se=(document.getElementById('mg-senha')||{}).value;if(!em||!se){toast('Digite o e-mail e a senha do sistema antigo.');return;}
     if(!window.supabase||!window.supabase.createClient){toast('Recarregue a página e tente de novo.');return;}
@@ -3691,7 +3691,7 @@ Object.assign(ACT,{
     ant.auth.signInWithPassword({email:em.trim(),password:se}).then(function(r){if(r.error){toast('Login do sistema antigo não confere.');return;}
       var P=finMigPend(),L=P.pag.map(function(p){return {tipo:'pag',id:p.id,bucket:'comprovantes',path:p.arquivo_legado};}).concat(P.mes.map(function(m){return {tipo:'mes',id:m.id,bucket:'extratos',path:m.arquivo_legado};}));
       FIN.mig={tot:L.length,ok:0,err:0,rodando:true};render();var i=0;
-      function prox(){if(i>=L.length)return Promise.resolve();var it=L[i++];return finMigCopia(ant,it).then(function(){FIN.mig.ok++;},function(e){FIN.mig.err++;console.warn('migra',it.path,e);}).then(function(){render();return prox();});}
+      function prox(){if(i>=L.length)return Promise.resolve();var it=L[i++];return finMigCopia(ant,it).then(function(){FIN.mig.ok++;},function(e){FIN.mig.err++;var msg=(e&&(e.message||e.error||e.statusCode))||String(e);if(e&&e.etapa)msg=e.etapa+': '+msg;FIN.mig.msgs=FIN.mig.msgs||{};FIN.mig.msgs[msg]=(FIN.mig.msgs[msg]||0)+1;console.warn('migra',it.path,e);}).then(function(){render();return prox();});}
       Promise.all([prox(),prox(),prox()]).then(function(){FIN.mig.rodando=false;render();ant.auth.signOut();toast(FIN.mig.err?'Terminei, mas '+FIN.mig.err+' arquivo(s) deram erro.':'Pronto! Todos os arquivos vieram para a pasta nova.');});});},
   finMigDeNovo:function(){FIN.mig=null;render();}});
 var _rPTrava=rPTrava;rPTrava=function(q){if(q==='financeiro'&&typeof pedAtivo==='function'&&pedAtivo())return rFin();return _rPTrava(q);};
@@ -4270,7 +4270,7 @@ var _rPedidosA=rPedidos;rPedidos=function(){var h=_rPedidosA.apply(this,argument
   return h.replace('class="btn pri" data-act="pedNovo">+ Novo pedido</button>','class="btn pri" data-act="pedNovo">+ Novo pedido</button><button class="btn anap-top" data-act="anaPed"><img src="'+ANA_AV[0]+'" alt=""> Ditar para a Ana</button>')+
     '<button class="anap-fab" data-act="anaPed" aria-label="Pedir para a Ana"><img src="'+ANA_AV[0]+'" alt=""><span>Novo pedido com a Ana</span></button>';};
 Object.assign(ACT,{anaPed:function(){anaAbre();}});
-if(typeof ESP_ESCRITA!=='undefined')ESP_ESCRITA.push('anaPed');
+(function(){var f=ACT.anaPed;ACT.anaPed=function(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espelho: só leitura.');return;}return f.apply(this,arguments);};})();
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
