@@ -1368,6 +1368,16 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .urg-tag{display:inline-block;margin-left:8px;font-size:.7rem;font-weight:800;color:#fff;background:#E5484D;border-radius:999px;padding:2px 8px;vertical-align:middle}
 .ino-urg{display:none}.urg-ban{border:2px solid #E5484D;background:rgba(229,72,77,.14);animation:urgPisca 1.2s ease-in-out infinite;display:flex;justify-content:space-between;gap:10px;align-items:center}
 @media (prefers-reduced-motion:reduce){.finli.urg,.ino-urg+.ino-tr,.urg-ban{animation:none}}
+.dabas button.aba-lab{background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;border-radius:10px;margin:4px 2px}.dabas button.aba-lab .di{color:#fff}.dabas button.aba-lab[aria-selected=true]{box-shadow:inset 0 -3px 0 #1E1B4B;filter:brightness(1.08)}.dabas button.aba-lab i{background:#fff;color:#5B21B6}
+.labv-hero{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:20px;border-radius:16px;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(37,99,235,.10));border:1px solid rgba(124,58,237,.25)}
+.labv-n{font-size:42px;font-weight:800;line-height:1;color:#7C3AED}.labv-hero p{margin:0}.labv-hero .sp{flex:1;min-width:160px}
+.labv-box{margin-top:12px;padding:16px;border-radius:14px;border:1px dashed rgba(124,58,237,.45);display:grid;gap:10px}
+.labv-box .row input{flex:1;min-width:120px;font-size:20px;letter-spacing:2px;text-align:center}
+.labv-ach{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px;border-radius:12px;background:rgba(124,58,237,.08)}
+.labv-l{display:grid;gap:8px;margin-top:14px}.labv-i{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border-radius:12px;border:1px solid var(--line,rgba(127,127,127,.25))}
+.labv-i .sp{flex:1;min-width:160px}.labv-i small{display:block;opacity:.75}.labv-st{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px}
+.labv-st.pendente{background:#FEF3C7;color:#92400E}.labv-st.aceito{background:#DCFCE7;color:#166534}.labv-st.recusado{background:#FEE2E2;color:#991B1B}
+.labv-rec{margin:0 0 12px;padding:12px;border-radius:12px;background:rgba(124,58,237,.08);display:grid;gap:8px}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -2060,7 +2070,7 @@ function rDModal(D){var m=D.modal;if(!m)return '';var body='',tit='';
   return '<div class="dm-ov"><button class="dm-fundo" data-act="dFecha" aria-label="Fechar" tabindex="-1"></button><div class="dm-box" role="dialog" aria-modal="true" aria-label="'+esc(tit)+'"><div class="row"><h2>'+esc(tit)+'</h2><span class="spacer"></span><button class="btn sm" data-act="dFecha" aria-label="Fechar">✕</button></div>'+body+
     (D.erro?'<p class="err">'+esc(D.erro)+'</p>':'')+(m==='mais'?'':'<div class="row"><span class="spacer"></span><button class="btn" data-act="dFecha">Cancelar</button><button class="btn pri" data-act="dSalva" data-v="'+m+'">Salvar</button></div>')+'</div></div>';}
 
-var DMENU=[['inicio','Início','home'],['agenda','Agenda','ag'],['pedidos','Pedidos','ped'],['empresa','Minha empresa','fin'],['agentes','Agentes de IA','bot'],['rede','Rede','rede'],['perfil','Perfil','eu']];
+var DMENU=[['inicio','Início','home'],['agenda','Agenda','ag'],['pedidos','Laboratório','lab'],['empresa','Minha empresa','fin'],['agentes','Agentes de IA','bot'],['rede','Rede','rede'],['perfil','Perfil','eu']];
 DIC.bot='<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 13h.01M15 13h.01M9 17h6"/><circle cx="12" cy="3.5" r="1"/>';
 DIC.esq='<path d="M15 5l-7 7 7 7"/>';DIC.dir='<path d="M9 5l7 7-7 7"/>';
 var AST=[['agendado','Agendado','#3A7BD5'],['confirmado','Confirmado','#13875F'],['atendimento','Em atendimento','#7B5CF2'],['atendido','Atendido','#8A8FA3'],['faltou','Faltou','#C23B3B']];
@@ -2197,11 +2207,11 @@ function rDAgentes(D){var AGL=D.estud?AG_STU:D.corp?agCorp(D):D.chk?AG_ASB:D.fil
   return '<div class="dtop"><div><h2>Agentes de IA</h2><p class="small muted">Sua equipe de assistentes. Toque em um agente para conversar.</p></div></div><div class="aglay">'+lista+chat+'</div>';}
 /* ----- Montagem do painel ----- */
 function rDent(){var D=S.dent;if(!D){D=S.dent=dCarrega()||dSeed((S.cad.nome||'').split(' ')[0]);}var t=S.tab.dent||'inicio';
-  var corpo=t==='pedidos'?rDPedidos2(D):t==='agenda'?rDAgenda(D):t==='agentes'?rDAgentes(D):t==='rede'?rDRede(D):t==='perfil'?rDPerfil(D):rDInicio(D);
+  var corpo=t==='pedidos'?(typeof rDLabTab==='function'?rDLabTab(D):rDPedidos2(D)):t==='agenda'?rDAgenda(D):t==='agentes'?rDAgentes(D):t==='rede'?rDRede(D):t==='perfil'?rDPerfil(D):rDInicio(D);
   var hj=D.ag.filter(function(a){return a.data===dHoje()&&a.tipo==='consulta'&&(a.st==='agendado'||a.st==='confirmado');}).length,pr=D.peds.filter(function(p){return dRisco(p);}).length,nv=DVAGAS.filter(function(v){return v.novo;}).length;
   var badge={agenda:hj,pedidos:pr,agentes:nv};
   return rFestaDecor()+'<div class="dp2">'+rAnaTopo(D)+
-    '<nav class="dabas" role="tablist" aria-label="Painel do dentista">'+DMENU.map(function(x){return '<button role="tab" aria-selected="'+(t===x[0])+'" data-act="dTab" data-v="'+x[0]+'">'+dIco(x[2],'di sm')+'<span>'+x[1]+'</span>'+(badge[x[0]]?'<i>'+badge[x[0]]+'</i>':'')+'</button>';}).join('')+'</nav>'+
+    '<nav class="dabas" role="tablist" aria-label="Painel do dentista">'+DMENU.map(function(x){return '<button role="tab" aria-selected="'+(t===x[0])+'" data-act="dTab" data-v="'+x[0]+'"'+(x[0]==='pedidos'?' class="aba-lab"':'')+'>'+dIco(x[2],'di sm')+'<span>'+x[1]+'</span>'+(badge[x[0]]?'<i>'+badge[x[0]]+'</i>':'')+'</button>';}).join('')+'</nav>'+
     '<div class="dcont" data-tab="'+t+'">'+corpo+'</div></div>'+rDModal(D);}
 
 setInterval(function(){if(['dent','prot','asb','corp','ind','stu'].indexOf(S.role)<0)return;var D=PN();if(!D||D.anaAberta||document.hidden)return;var el=document.querySelector('.atopo-f');if(!el)return;var L=anaFrases(D);D.anaI=((D.anaI||0)+1)%L.length;
@@ -3275,7 +3285,7 @@ function rConfig(){var a=S.cfgAba||'conta',N=S.neg,abas=[['conta','Minha conta']
 function rCfgConta(){var R=typeof RL!=='undefined'?RL:{},p=R.perfil||{},c=S.cad,em=(R.user&&R.user.email)||c.email||'';
   return '<section class="card cfg-c"><h2>Minha conta</h2>'+[['Nome',p.nome||c.nome],['E-mail de acesso',em],['WhatsApp',p.whats?rlTel(p.whats):c.whats],['Profissão',p.prof||c.prof],['Cargo',p.cargo||c.cargo],['Cidade',(p.cidade||c.cidade||'')+((p.uf||c.uf)?' / '+(p.uf||c.uf):'')],['Tipo de conta',R.admin?'👑 Conta master':'Profissional']].map(function(x){return '<div class="cfg-l"><span>'+x[0]+'</span><b>'+esc(x[1]||'—')+'</b></div>';}).join('')+
     '<div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap"><button class="btn" data-act="cfgVai" data-v="perfil">Editar currículo</button>'+(R.user?'<button class="btn" data-act="cfgSenha">Trocar senha</button><button class="btn danger" data-rl="sair">Sair</button>':'')+'</div></section>';}
-function rCfgEmpresa(N){var T=negT();return '<section class="card cfg-c"><h2>'+T.ic+' Minha empresa</h2>'+[['Nome',N.nome],['Tipo',T.t],['Cidade',N.cid+' / '+N.uf],['Seu papel',N.papel==='faz'?'Dono e responsável técnico':'Dono, cuida da gestão'],N.rt?['Responsável técnico',N.rt]:null,['Criada em',N.criado?String(N.criado).split('-').reverse().join('/'):'—']].filter(Boolean).map(function(x){return '<div class="cfg-l"><span>'+x[0]+'</span><b>'+esc(x[1]||'—')+'</b></div>';}).join('')+
+function rCfgEmpresa(N){var T=negT();return '<section class="card cfg-c"><h2>'+T.ic+' Minha empresa</h2>'+(typeof labVRecebidos==='function'?labVRecebidos():'')+[EMP.row&&EMP.row.codigo?['Seu ID no Ideali',labIdTxt(EMP.row.codigo)+' (passe este número para os dentistas te convidarem)']:null,['Nome',N.nome],['Tipo',T.t],['Cidade',N.cid+' / '+N.uf],['Seu papel',N.papel==='faz'?'Dono e responsável técnico':'Dono, cuida da gestão'],N.rt?['Responsável técnico',N.rt]:null,['Criada em',N.criado?String(N.criado).split('-').reverse().join('/'):'—']].filter(Boolean).map(function(x){return '<div class="cfg-l"><span>'+x[0]+'</span><b>'+esc(x[1]||'—')+'</b></div>';}).join('')+
   '<div class="row" style="margin-top:12px"><button class="btn danger" data-act="negApaga">Apagar empresa de teste</button></div></section>';}
 function rCfgArmaz(){var R=typeof RL!=='undefined'?RL:{},N=S.neg,cli=(typeof EMP!=='undefined'&&EMP.cli)?EMP.cli.length:0;
   var it=[['Clientes',cli],['Itens na tabela de preços',N?N.servs.length:0],['Foto do perfil',R.perfil&&R.perfil.foto?'1 imagem':'nenhuma']];
@@ -4875,6 +4885,51 @@ ACT.pagDesanula=function(id){if(ESP.dono)return;if(!confirm('Desfazer a anulaç�
 var _rFinDetD=rFinDet;rFinDet=function(m){var h=_rFinDetD.apply(this,arguments);if(!m||ESP.dono)return h;
   finPags(m).filter(function(p){return p.anulado_em;}).forEach(function(p){var a='data-act="finPagAnula" data-v="'+p.id+'"';if(h.indexOf(a)>=0)return;
     var k=h.indexOf('<div class="finpag anulado"><span><b>'+fmtR(p.valor)+'</b><small>'+(p.data?String(p.data).split('-').reverse().join('/'):'sem data'));if(k<0)return;var fim=h.indexOf('</div>',k);if(fim<0)return;h=h.slice(0,fim)+'<button class="btn sm" data-act="pagDesanula" data-v="'+p.id+'">↩ Desfazer anulação</button>'+h.slice(fim);});return h;};
+
+/* ===== Aba Laboratório: o dentista convida o laboratório pelo ID (Ideali Lab = 01) ===== */
+var LABV={L:[],carregado:false,erro:'',busca:null,q:'',busy:false,abre:false,avisou:false};
+function labIdTxt(n){n=parseInt(n,10);return isNaN(n)?'—':(n<10?'0'+n:String(n));}
+function labVCarrega(){if(!RL.user)return Promise.resolve();
+  return SB.from('odo_lab_vinculos').select('*').order('criado_em',{ascending:false}).then(function(r){LABV.carregado=true;
+    if(r.error){LABV.erro=/odo_lab_vinculos|does not exist|schema cache/.test(r.error.message||'')?'falta056':'erro';render();return;}
+    LABV.erro='';LABV.L=r.data||[];render();
+    var pend=labVRec().filter(function(v){return v.status==='pendente';}).length;
+    if(pend&&!LABV.avisou){LABV.avisou=true;setTimeout(function(){toast(pend===1?'Um dentista convidou o seu laboratório. Veja em Minha empresa.':pend+' dentistas convidaram o seu laboratório. Veja em Minha empresa.');},1800);}});}
+function labVMeus(){var u=RL.user&&RL.user.id;return (LABV.L||[]).filter(function(v){return v.user_id===u;});}
+function labVRec(){var u=RL.user&&RL.user.id;return (LABV.L||[]).filter(function(v){return v.user_id!==u;});}
+var LABV_ST={pendente:'⏳ Aguardando o laboratório aceitar',aceito:'✅ Conectado',recusado:'Recusou o convite'};
+function rDLabTab(D){
+  if(!RL.user)return rDPedidos2(D);
+  var M=labVMeus(),n=M.filter(function(v){return v.status!=='recusado';}).length,b=LABV.busca;
+  var h='<div class="dtop"><div><h2>🧪 Laboratório</h2><p class="small muted">Os laboratórios com quem você trabalha.</p></div></div>';
+  if(LABV.erro==='falta056')h+='<div class="card" style="border-color:#F59E0B">⚠️ Falta rodar a atualização 056 no Supabase.</div>';
+  h+='<section class="labv-hero"><div class="labv-n">'+n+'</div><div class="sp"><b>'+(n===1?'laboratório cadastrado':'laboratórios cadastrados')+'</b><p class="small muted">Peça o ID para o seu laboratório e convide.</p></div>'+
+     '<button class="btn pri" data-act="labConvAbre">+ Convidar laboratório</button></section>';
+  if(LABV.abre){h+='<div class="labv-box"><b>Digite o ID do laboratório</b>'+
+     '<div class="row wrap"><input type="text" id="labv-id" inputmode="numeric" maxlength="6" placeholder="Ex.: 01" value="'+esc(LABV.q)+'" autocomplete="off"><button class="btn" data-act="labBusca"'+(LABV.busy?' disabled':'')+'>'+(LABV.busy?'Procurando…':'Procurar')+'</button><button class="btn sm" data-act="labConvFecha">Fechar</button></div>'+
+     (b===false?'<p class="small" style="color:#B91C1C;margin:0">Nenhum laboratório com esse ID. Confira o número com o laboratório.</p>':'')+
+     (b?'<div class="labv-ach"><span style="font-size:26px">🧪</span><div class="sp" style="flex:1"><b>'+esc(b.nome)+'</b><small class="muted" style="display:block">'+esc([b.cidade,b.uf].filter(Boolean).join(' / '))+' · ID '+labIdTxt(b.codigo)+'</small></div><button class="btn pri" data-act="labConvida"'+(LABV.busy?' disabled':'')+'>Enviar convite</button></div>':'')+'</div>';}
+  h+=M.length?'<div class="labv-l">'+M.map(function(v){return '<div class="labv-i"><span style="font-size:22px">🧪</span><div class="sp"><b>'+esc(v.lab_nome||'Laboratório')+'</b><small>'+esc(v.lab_local||'')+'</small></div><span class="labv-st '+v.status+'">'+LABV_ST[v.status]+'</span>'+
+     (v.status!=='aceito'?'<button class="btn sm" data-act="labTira" data-v="'+v.id+'">'+(v.status==='pendente'?'Cancelar':'Tirar')+'</button>':'')+'</div>';}).join('')+'</div>':'';
+  if(D&&D.peds&&D.peds.length)h+='<div style="margin-top:18px"></div>'+rDPedidos(D);
+  return h;}
+function labVRecebidos(){var R=labVRec();if(!R.length)return '';
+  return '<div class="labv-rec"><b>🦷 Convites de dentistas</b>'+R.map(function(v){return '<div class="labv-i"><div class="sp"><b>'+esc(v.quem_nome||'Dentista')+'</b><small>'+new Date(v.criado_em).toLocaleDateString('pt-BR')+'</small></div>'+
+    (v.status==='pendente'?'<button class="btn sm pri" data-act="labResp" data-v="'+v.id+'|1">Aceitar</button><button class="btn sm" data-act="labResp" data-v="'+v.id+'|0">Recusar</button>':'<span class="labv-st '+v.status+'">'+(v.status==='aceito'?'✅ Conectado':'Recusado')+'</span>')+'</div>';}).join('')+'</div>';}
+function labLeId(){var el=document.getElementById('labv-id');if(el)LABV.q=el.value;return parseInt(String(LABV.q).replace(/\D/g,''),10);}
+Object.assign(ACT,{
+  labConvAbre:function(){LABV.abre=true;LABV.busca=null;render();setTimeout(function(){var el=document.getElementById('labv-id');if(el)el.focus();},50);},
+  labConvFecha:function(){LABV.abre=false;LABV.busca=null;LABV.q='';render();},
+  labBusca:function(){var n=labLeId();if(!n){toast('Digite o número do ID.');return;}LABV.busy=true;render();
+    SB.rpc('odo_lab_busca',{p_codigo:n}).then(function(r){LABV.busy=false;if(r.error){LABV.busca=null;toast(/odo_lab_busca|function/.test(r.error.message||'')?'Falta rodar a atualização 056 no Supabase.':'Não consegui procurar agora.');}else LABV.busca=r.data||false;render();});},
+  labConvida:function(){var b=LABV.busca;if(!b)return;LABV.busy=true;render();
+    SB.rpc('odo_lab_convida',{p_codigo:b.codigo}).then(function(r){LABV.busy=false;if(r.error){toast(String(r.error.message||'Não consegui enviar o convite.').replace(/^.*?:\s*/,''));render();return;}
+      LABV.abre=false;LABV.busca=null;LABV.q='';toast('Convite enviado para '+b.nome+'. Agora é só o laboratório aceitar.');labVCarrega();});},
+  labTira:function(v){SB.from('odo_lab_vinculos').delete().eq('id',v).then(function(r){if(r.error){toast('Não consegui tirar.');return;}labVCarrega();});},
+  labResp:function(v){var a=String(v).split('|');SB.rpc('odo_lab_responde',{p_id:a[0],p_ok:a[1]==='1'}).then(function(r){if(r.error||!r.data){toast('Não consegui responder.');return;}toast(a[1]==='1'?'Pronto! Agora vocês estão conectados.':'Convite recusado.');labVCarrega();});}});
+document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='labv-id'&&e.key==='Enter'){e.preventDefault();ACT.labBusca();}});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='labv-id')LABV.q=e.target.value;});
+var _rlEntraLab=rlEntra;rlEntra=function(){_rlEntraLab.apply(this,arguments);if(RL.user&&!LABV.carregando){LABV.carregando=true;labVCarrega().then(function(){LABV.carregando=false;},function(){LABV.carregando=false;});}};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
