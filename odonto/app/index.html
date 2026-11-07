@@ -4656,7 +4656,7 @@ function aiAbre(){if(document.getElementById('aipan'))return;AI.on=true;if(!AI.m
     '<div class="ai-acoes"><label class="btn pri ai-bt">📄 Enviar extratos (PDF)<input type="file" id="ai-ext" accept="application/pdf" multiple hidden></label><label class="btn ai-bt">📎 Enviar comprovante<input type="file" id="ai-comp" accept="application/pdf,image/*" hidden></label><button class="btn ai-bt" data-ai="verif">🔍 Verificar extratos anexados</button></div></section></div></div>';
   document.body.appendChild(d);aiRender();
   d.addEventListener('click',function(e){var b=e.target.closest('[data-ai]');if(e.target===d){aiFecha();return;}if(!b)return;var a=b.getAttribute('data-ai'),v=b.getAttribute('data-v');
-    if(a==='fecha')aiFecha();else if(a==='cli'){AI.cli=v;aiRender();}else if(a==='lanca')aiLancaComp();else if(a==='invest')aiInvest(v);else if(a==='verif'){if(!AI.busy)aiVerifica();}else if(a==='cancela'){AI.comp=null;aiDiz('Tudo bem, não lancei nada.');}});
+    if(a==='fecha')aiFecha();else if(a==='cli'){AI.cli=v;aiRender();}else if(a==='lanca')aiLancaComp();else if(a==='invest')aiInvest(v);else if(a==='baixalista')invCopiaLista();else if(a==='verif'){if(!AI.busy)aiVerifica();}else if(a==='cancela'){AI.comp=null;aiDiz('Tudo bem, não lancei nada.');}});
   d.addEventListener('input',function(e){if(e.target.classList.contains('ai-q')){AI.q=e.target.value;d.querySelector('.ai-lista').innerHTML=aiLista();}});
   d.addEventListener('change',function(e){var t=e.target;if(t.id==='ai-ext'){var fs=[].slice.call(t.files||[]);t.value='';aiExtratos(fs);}else if(t.id==='ai-comp'){var f=(t.files||[])[0];t.value='';if(f)aiComprovante(f);}else if(t.id==='ai-rel'){var f2=(t.files||[])[0];t.value='';if(f2)aiRelatorio(f2);}});
   document.addEventListener('keydown',aiEsc);}
@@ -4775,11 +4775,15 @@ aiInvest=function(v){var a=v.split('|'),k=a[0],ano=+a[1],mes=+a[2],sa=+a[3],c=EM
     if(sub){aiDiz(res+'<br>✅ Estes comprovantes somam exatamente a diferença. <b>Possivelmente não tiveram baixa na Inove:</b><br>'+sub.map(invChip).join(' ')+'<br>Mande esses comprovantes para a Inove dar baixa.',false,'erro');invPlanilha();return;}
     aiDiz(res+'<br>Conferi um por um e ainda não consegui explicar a diferença só com os comprovantes daqui.',false,'erro');AI.inv.pedeLab=true;invPlanilha();});};
 
+function invSubRecente(L,alvo){var V=L.slice(-18).reverse(),best=null;(function dfs(i,soma,usa){if(best)return;if(Math.abs(soma-alvo)<=0.5){best=usa.slice();return;}if(i>=V.length||soma>alvo+0.5)return;usa.push(V[i]);dfs(i+1,soma+(+V[i].p.valor),usa);usa.pop();dfs(i+1,soma,usa);})(0,0,[]);
+  return best?best.sort(function(a,b){return String(a.p.data).localeCompare(String(b.p.data));}):null;}
+function invCopiaLista(){var S2=AI.suspeitos||[];if(!S2.length)return;var t='Comprovantes que precisam de baixa ('+MESES[FIN.mes-1]+'/'+FIN.ano+'):\n'+S2.map(function(x){return '\n'+x.nome+' · total '+fmtR(x.v)+'\n'+x.L.map(function(y){return '• '+invDt(y.p.data)+' · '+fmtR(y.p.valor)+' ('+MESES[y.m.mes-1]+')';}).join('\n');}).join('\n');
+  try{navigator.clipboard.writeText(t).then(function(){toast('Lista copiada.');});}catch(e){toast('Não consegui copiar.');}}
 /* ===== Verificar extratos já anexados do mês: abre cada PDF e mostra as divergências ===== */
 function aiVerifica(){var R=finDoMes(),comPdf=R.filter(function(m){return m.extrato_path&&/\.pdf$/i.test(m.extrato_path);}),semArq=R.filter(function(m){return !m.extrato_path&&!m.arquivo_legado;}).length,antigos=R.filter(function(m){return !m.extrato_path&&m.arquivo_legado;}).length;
   aiDiz('🔍 Verificar extratos anexados · '+MESES[FIN.mes-1]+'/'+FIN.ano,true);
   if(!comPdf.length){aiDiz('Não há extratos em PDF anexados neste mês para eu conferir.'+(antigos?' ('+antigos+' ainda estão no sistema antigo.)':''));return;}
-  aiDiz('Vou abrir e conferir <b>'+comPdf.length+' extrato'+(comPdf.length>1?'s':'')+'</b> anexado'+(comPdf.length>1?'s':'')+'…');AI.busy=true;aiRender();var ok=0,ruins=[];
+  var suspeitos=[],semExpl=[];AI.suspeitos=suspeitos;aiDiz('Vou abrir e conferir <b>'+comPdf.length+' extrato'+(comPdf.length>1?'s':'')+'</b> anexado'+(comPdf.length>1?'s':'')+'…');AI.busy=true;aiRender();var ok=0,ruins=[];
   comPdf.reduce(function(pr,m){return pr.then(function(){var nome=finCliNome(m);return finUrlAssinada(m.extrato_path).then(function(u){return fetch(u);}).then(function(r){if(!r.ok)throw 0;return r.blob();})
     .then(function(b){return extTexto(new File([b],'extrato.pdf',{type:'application/pdf'}));}).then(function(tx){var d=extParse(tx),div=[],lnk='<button class="ih-ver" data-act="finArqVer" data-v="'+esc(m.extrato_path)+'">📄 abrir extrato</button>';
       if(!d.mes||d.debitos==null){div.push('não consegui ler o mês ou o total deste PDF');}
@@ -4789,10 +4793,16 @@ function aiVerifica(){var R=finDoMes(),comPdf=R.filter(function(m){return m.extr
           if(Math.abs((+m.valor_mes)-d.debitos)>0.009)div.push('o extrato diz <b>'+fmtR(d.debitos)+'</b>, mas está lançado <b>'+fmtR(m.valor_mes)+'</b>');
           if(it.baixa>0)div.push('o extrato cobra <b>'+fmtR(-d.saldoAnt)+'</b> de saldo anterior, mas aqui <b>'+fmtR(it.baixa)+'</b> disso já está pago (falta baixa na Inove)');
           if(it.inoveAMenos>0)div.push('o extrato já deu baixa de <b>'+fmtR(it.inoveAMenos)+'</b> que não tem comprovante aqui');
-          if(div.length&&(it.baixa>0||it.inoveAMenos>0))div.push('<span class="ai-form"><button class="btn sm pri" data-ai="invest" data-v="'+m.cliente_id+'|'+d.ano+'|'+d.mes+'|'+(d.saldoAnt||0)+'">🔎 Investigar o ocorrido</button></span>');}}
-      if(div.length){ruins.push(nome);aiDiz('⛔ <b>'+esc(nome)+'</b> · '+lnk+'<br>• '+div.join('<br>• '),false,'erro');}else ok++;})
+          var extra='';if(it.baixa>0){var pv=invPags(m.cliente_id).filter(function(x){return (x.m.ano*100+x.m.mes)<(d.ano*100+d.mes);}),sub=invSubRecente(pv,it.baixa);
+            if(sub){suspeitos.push({nome:nome,v:it.baixa,L:sub});extra='<br>🔎 <b>Possíveis comprovantes sem baixa</b> (somam exatamente '+fmtR(it.baixa)+'):<br>'+sub.map(invChip).join(' ');}
+            else{semExpl.push(nome);extra='<br>Nenhuma combinação exata de comprovantes dá '+fmtR(it.baixa)+'. Os mais recentes são: '+pv.slice(-4).map(invChip).join(' ');}}
+          if(div.length&&(it.baixa>0||it.inoveAMenos>0))extra+='<div class="ai-form"><button class="btn sm pri" data-ai="invest" data-v="'+m.cliente_id+'|'+d.ano+'|'+d.mes+'|'+(d.saldoAnt||0)+'">🔎 Investigar o ocorrido</button></div>';}}
+      if(div.length){ruins.push(nome);aiDiz('⛔ <b>'+esc(nome)+'</b> · '+lnk+'<br>• '+div.join('<br>• ')+(typeof extra!=='undefined'?extra:''),false,'erro');}else ok++;})
     .catch(function(){ruins.push(nome);aiDiz('⛔ <b>'+esc(nome)+'</b>: não consegui abrir o extrato anexado.',false,'erro');});});},Promise.resolve())
-  .then(function(){AI.busy=false;aiDiz('📋 <b>Resultado:</b> '+ok+' extrato'+(ok!==1?'s':'')+' ✅ sem divergência'+(ruins.length?', <b class="bad">'+ruins.length+' com divergência</b> ('+esc(ruins.join(', '))+')':'')+'.'+(semArq?'<br>📭 '+semArq+' cliente'+(semArq>1?'s':'')+' do mês ainda sem extrato anexado.':'')+(antigos?'<br>'+antigos+' extrato'+(antigos>1?'s':'')+' ainda no sistema antigo (não deu para abrir).':''),false,ruins.length?'erro':'');});}
+  .then(function(){AI.busy=false;if(suspeitos.length){var tot=suspeitos.reduce(function(a,x){return a+x.v;},0),n=suspeitos.reduce(function(a,x){return a+x.L.length;},0);
+      aiDiz('🧾 <b>Comprovantes que estão no sistema e possivelmente NÃO tiveram baixa na Inove</b> · '+n+' comprovante'+(n>1?'s':'')+' · '+fmtR(tot)+'<br>'+suspeitos.map(function(x){return '<br><b>'+esc(x.nome)+'</b> · '+fmtR(x.v)+'<br>'+x.L.map(invChip).join(' ');}).join('')+
+        (semExpl.length?'<br><br>Sem combinação exata (use 🔎 Investigar): '+esc(semExpl.join(', '))+'.':'')+'<div class="ai-form"><button class="btn sm pri" data-ai="baixalista">📋 Copiar lista para dar baixa</button></div>',false,'erro');}
+    aiDiz('📋 <b>Resultado:</b> '+ok+' extrato'+(ok!==1?'s':'')+' ✅ sem divergência'+(ruins.length?', <b class="bad">'+ruins.length+' com divergência</b> ('+esc(ruins.join(', '))+')':'')+'.'+(semArq?'<br>📭 '+semArq+' cliente'+(semArq>1?'s':'')+' do mês ainda sem extrato anexado.':'')+(antigos?'<br>'+antigos+' extrato'+(antigos>1?'s':'')+' ainda no sistema antigo (não deu para abrir).':''),false,ruins.length?'erro':'');});}
 
 /* ===== Conversa estilo WhatsApp: Ana "digitando…", planilha para conferir juntos ===== */
 function aiHora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
