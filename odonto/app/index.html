@@ -3681,7 +3681,7 @@ function finMigCopia(ant,it){var ext=(String(it.path).match(/\.([a-z0-9]+)$/i)||
   if(!tipo)return Promise.reject('tipo');
   return ant.storage.from(it.bucket).download(it.path).then(function(r){if(r.error||!r.data){var e1=r.error||{message:'arquivo vazio'};e1.etapa='baixar do antigo';throw e1;}
     var novo=RL.user.id+'/'+(it.bucket==='extratos'?'extratos':'comprovantes')+'/legado/'+String(it.path).replace(/[^a-zA-Z0-9._-]+/g,'_');
-    return SB.storage.from('odonto-fin').upload(novo,new Blob([r.data],{type:tipo}),{contentType:tipo,upsert:true}).then(function(u){if(u.error){u.error.etapa='enviar para a pasta nova';throw u.error;}
+    return SB.storage.from('odonto-fin').upload(novo,new Blob([r.data],{type:tipo}),{contentType:tipo,upsert:false}).then(function(u){if(u.error&&!/exist|duplicate|409/i.test(String(u.error.message||'')+(u.error.statusCode||''))){u.error.etapa='enviar para a pasta nova';throw u.error;}
       var q=it.tipo==='pag'?SB.from('odo_fin_pagamentos').update({comprovante_path:novo}).eq('id',it.id):SB.from('odo_fin_meses').update({extrato_path:novo}).eq('id',it.id);
       return q.then(function(x){if(x.error){x.error.etapa='gravar no financeiro';throw x.error;}var o=(it.tipo==='pag'?FIN.P:FIN.M).filter(function(z){return z.id===it.id;})[0];if(o){if(it.tipo==='pag')o.comprovante_path=novo;else o.extrato_path=novo;}});});});}
 Object.assign(ACT,{
