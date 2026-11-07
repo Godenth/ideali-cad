@@ -4169,7 +4169,7 @@ var ANA_ARCO_SUP=[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28],ANA_ARCO_INF=
 function anaDenteOk(n){var q=Math.floor(n/10),d=n%10;return q>=1&&q<=4&&d>=1&&d<=8;}
 function anaFaixa(a,b){var A=ANA_ARCO_SUP.indexOf(a)>=0&&ANA_ARCO_SUP.indexOf(b)>=0?ANA_ARCO_SUP:ANA_ARCO_INF.indexOf(a)>=0&&ANA_ARCO_INF.indexOf(b)>=0?ANA_ARCO_INF:null;
   if(!A)return [a,b];var i=A.indexOf(a),j=A.indexOf(b);return i<=j?A.slice(i,j+1):A.slice(j,i+1).reverse();}
-function anaDentes(t){var out=[],s=String(t).replace(/(\d{2})\s*(?:a|ao|à|até|ate|-|–|—)\s*(?:o\s+)?(\d{2})\b/g,function(m,a,b){a=+a;b=+b;if(anaDenteOk(a)&&anaDenteOk(b))anaFaixa(a,b).forEach(function(n){out.push(n);});return ' ';});
+function anaDentes(t){var out=[],s=String(t).replace(/(\d{2})\s*(?:a|ao|al|à|até|ate|-|–|—)\s*(?:o\s+)?(\d{2})\b/g,function(m,a,b){a=+a;b=+b;if(anaDenteOk(a)&&anaDenteOk(b))anaFaixa(a,b).forEach(function(n){out.push(n);});return ' ';});
   (s.match(/\b\d{2}\b/g)||[]).forEach(function(x){x=+x;if(anaDenteOk(x))out.push(x);});
   var u=[];out.forEach(function(n){if(u.indexOf(n)<0)u.push(n);});return u;}
 var ANA_TRAB=[[/coroa|coroinha/,'Coroa'],[/faceta|laminado|lente(s)? de contato/,'Faceta'],[/onlay|inlay|overlay|endocrown/,'Onlay / inlay'],[/protocolo/,'Protocolo'],[/provis[oó]ri/,'Provisório'],
@@ -4196,7 +4196,20 @@ function anaPrazo(t){var h=new Date(dHoje()+'T12:00:00'),iso=function(d){return 
   var W=['domingo','segunda','terca','quarta','quinta','sexta','sabado'];for(var i=0;i<7;i++){if(new RegExp('\\b(pra|para|ate|na|no)\\s+(a\\s+|o\\s+)?'+W[i]).test(t)){var k=(i-h.getDay()+7)%7||7;h.setDate(h.getDate()+k);return iso(h);}}
   return null;}
 function anaCap(s){return String(s||'').trim().split(/\s+/).map(function(w){return /^(de|da|do|dos|das|e)$/i.test(w)?w.toLowerCase():w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' ');}
-function anaEntende(txt){var raw=String(txt||'').trim();if(!raw)return null;var t=semAc(raw).replace(/\s+/g,' '),tl=raw.replace(/\s+/g,' ');
+/* Ana entende nome de dente: "inferior de primeiro molar a primeiro molar" -> 46 a 36 */
+var ANA_NOMES=[[/incisivos? centra(?:l|is)/,1],[/incisivos? latera(?:l|is)/,2],[/(?:primeiro|1o|1º|1) pre ?-?molar(?:es)?/,4],[/(?:segundo|2o|2º|2) pre ?-?molar(?:es)?/,5],[/(?:terceiro|3o|3º|3) molar(?:es)?|sisos?/,8],[/(?:primeiro|1o|1º|1) molar(?:es)?/,6],[/(?:segundo|2o|2º|2) molar(?:es)?/,7],[/caninos?/,3]];
+var ANA_NOME_RE=ANA_NOMES.map(function(x){return x[0].source;}).join('|');
+function anaNomeNum(s){for(var i=0;i<ANA_NOMES.length;i++)if(ANA_NOMES[i][0].test(s))return ANA_NOMES[i][1];return 0;}
+function anaArcoDe(t,ini,fim){var dep=t.slice(fim,fim+20).match(/^\s*(?:da\s+|do\s+)?(?:arcada\s+)?(superior|inferior|maxila|mandibula)/),ant=t.slice(0,ini).match(/(superior|inferior|maxila|mandibula)(?![\s\S]*(superior|inferior|maxila|mandibula))/);
+  var a=dep?dep[1]:ant?ant[1]:'superior';return a==='inferior'||a==='mandibula'?'inf':'sup';}
+function anaLadoDe(t,ini,fim){var j=t.slice(fim,fim+28),m=j.match(/^\s*(?:(?:da\s+|do\s+)?(?:arcada\s+)?(?:superior|inferior|maxila|mandibula)\s+)?(?:lado\s+)?(direit[oa]|esquerd[oa])\b/)||t.slice(Math.max(0,ini-14),ini).match(/\b(direit[oa]|esquerd[oa])\s*$/);return m?(/^dir/.test(m[1])?'d':'e'):'';}
+function anaNomesDentes(t){t=String(t||'');
+  t=t.replace(new RegExp('(?:\\b(?:de|do|da|dos|das)\\s+)?('+ANA_NOME_RE+')\\s+(?:a|ao|al|ate|até|-)\\s+(?:o\\s+|a\\s+|os\\s+)?('+ANA_NOME_RE+')','g'),function(m,a,b,off,full){
+    var na=anaNomeNum(a),nb=anaNomeNum(b);if(!na||!nb)return m;var arc=anaArcoDe(full,off,off+m.length),lado=anaLadoDe(full,off,off+m.length),sup=arc==='sup';
+    if(na===nb&&!lado)return ' '+(sup?1:4)+na+' a '+(sup?2:3)+nb+' ';var q=lado==='e'?(sup?2:3):(sup?1:4);return ' '+q+na+' a '+q+nb+' ';});
+  t=t.replace(new RegExp('('+ANA_NOME_RE+')','g'),function(m,a,off,full){var n=anaNomeNum(a),lado=anaLadoDe(full,off,off+m.length);if(!n||!lado)return m;var sup=anaArcoDe(full,off,off+m.length)==='sup';return ' '+(lado==='e'?(sup?2:3):(sup?1:4))+n+' ';});
+  return t;}
+function anaEntende(txt){var raw=String(txt||'').trim();if(!raw)return null;var t=semAc(raw).replace(/\s+/g,' '),tl=raw.replace(/\s+/g,' ');t=anaNomesDentes(t);
   var res={cliente:anaCliente(t),paciente:'',cor:'',prazo:anaPrazo(t),urgente:/urgent|correndo|prioridade/.test(t),tipo:/analogic|bancada/.test(t)?'analogico':null,itens:[]};
   var mp=tl.match(/\b(?:paciente|pac\.?)\s*:?\s+([A-Za-zÀ-ÿ']+(?:\s+(?!coroa|faceta|elemento|dente|cor\b|sobre|em\b|dia\b|pra\b|para\b|ate\b|até\b|urgente|protocolo|onlay|provis|de\s+(?:zirc|e\.?max|resina))[A-Za-zÀ-ÿ']+){0,3})/i);if(mp)res.paciente=anaCap(mp[1].replace(/\s+(e|com|para|pra|do|da)$/i,''));
   var mc=t.match(/\bcor\s*:?\s*([a-d]\s?[1-4](?:[.,]5)?|bl\s?[1-4]|\d\s?m\s?\d(?:[.,]5)?)/)||t.match(/\b([a-d][1-4](?:[.,]5)?)\b/);if(mc)res.cor=mc[1].replace(/\s/g,'').toUpperCase().replace(',','.');
@@ -4206,7 +4219,7 @@ function anaEntende(txt){var raw=String(txt||'').trim();if(!raw)return null;var 
   var segs=[];if(!pos.length)segs=[t];else pos.forEach(function(p,i){var ini=i===0?0:p,fim=i+1<pos.length?pos[i+1]:t.length;segs.push(t.slice(ini,fim));});
   /* quando o trecho entre dois trabalhos é só "e", junta números que ficaram antes do primeiro */
   var matG=null;ANA_MAT.forEach(function(x){if(!matG&&x[0].test(t))matG=x[1];});
-  segs.forEach(function(sg){var base=anaTrabTipo(sg),ds=anaDentes(sg.replace(/\bcor\s*\S+/,'').replace(/\b\d{1,2}\/\d{1,2}(\/\d{2,4})?\b/g,'').replace(/\bdia\s+\d{1,2}\b/,'').replace(/\bem\s+\d{1,2}\s+dias?\b/,''));
+  segs.forEach(function(sg){var base=anaTrabTipo(sg),ds=anaDentes(sg.replace(/\bcor\b\s*\S+/,'').replace(/\b\d{1,2}\/\d{1,2}(\/\d{2,4})?\b/g,'').replace(/\bdia\s+\d{1,2}\b/,'').replace(/\bem\s+\d{1,2}\s+dias?\b/,''));
     if(!base&&!ds.length)return;var mat=null;ANA_MAT.forEach(function(x){if(!mat&&x[0].test(sg))mat=x[1];});mat=mat||matG;
     var impl=/implant/.test(sg)&&!/sobre dente/.test(sg),qn=(sg.match(/\b(\d{1,2})\s+(coroas|facetas|laminados|onlays|elementos|provisorios|unidades)\b/)||[])[1];
     var serv=anaServ(sg,base,mat,impl),trab=serv||[base||'Trabalho',mat?'de '+mat:'',impl?'sobre implante':''].filter(Boolean).join(' ');

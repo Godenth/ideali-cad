@@ -7663,9 +7663,22 @@ function anaDOk(n){var q=Math.floor(n/10),d=n%10;return q>=1&&q<=4&&d>=1&&d<=8;}
 function anaFaixaC(a,b){var A=UP.indexOf(a)>=0&&UP.indexOf(b)>=0?UP:LO.indexOf(a)>=0&&LO.indexOf(b)>=0?LO:null;if(!A)return [a,b];var i=A.indexOf(a),j=A.indexOf(b);return i<=j?A.slice(i,j+1):A.slice(j,i+1).reverse();}
 function anaDentesC(t){var out=[],s=String(t).replace(/\b(\d{2})\s*(?:a|ao|al|à|até|ate|-|–|—)\s*(?:o\s+)?(\d{2})\b/g,function(m,a,b){a=+a;b=+b;if(anaDOk(a)&&anaDOk(b))anaFaixaC(a,b).forEach(function(n){out.push(n);});return ' ';});
   (s.match(/\b\d{2}\b/g)||[]).forEach(function(x){x=+x;if(anaDOk(x))out.push(x);});var u=[];out.forEach(function(n){if(u.indexOf(n)<0)u.push(n);});return u;}
-function anaCadTexto(txt){var raw=String(txt||'').trim();if(!raw)return null;var r=pedDoTexto(raw),t=ppNorm(raw).replace(/\s+/g,' ');
+/* Ana entende nome de dente: "inferior de primeiro molar a primeiro molar" -> 46 a 36 */
+var ANA_NOMES=[[/incisivos? centra(?:l|is)/,1],[/incisivos? latera(?:l|is)/,2],[/(?:primeiro|1o|1º|1) pre ?-?molar(?:es)?/,4],[/(?:segundo|2o|2º|2) pre ?-?molar(?:es)?/,5],[/(?:terceiro|3o|3º|3) molar(?:es)?|sisos?/,8],[/(?:primeiro|1o|1º|1) molar(?:es)?/,6],[/(?:segundo|2o|2º|2) molar(?:es)?/,7],[/caninos?/,3]];
+var ANA_NOME_RE=ANA_NOMES.map(function(x){return x[0].source;}).join('|');
+function anaNomeNum(s){for(var i=0;i<ANA_NOMES.length;i++)if(ANA_NOMES[i][0].test(s))return ANA_NOMES[i][1];return 0;}
+function anaArcoDe(t,ini,fim){var dep=t.slice(fim,fim+20).match(/^\s*(?:da\s+|do\s+)?(?:arcada\s+)?(superior|inferior|maxila|mandibula)/),ant=t.slice(0,ini).match(/(superior|inferior|maxila|mandibula)(?![\s\S]*(superior|inferior|maxila|mandibula))/);
+  var a=dep?dep[1]:ant?ant[1]:'superior';return a==='inferior'||a==='mandibula'?'inf':'sup';}
+function anaLadoDe(t,ini,fim){var j=t.slice(fim,fim+28),m=j.match(/^\s*(?:(?:da\s+|do\s+)?(?:arcada\s+)?(?:superior|inferior|maxila|mandibula)\s+)?(?:lado\s+)?(direit[oa]|esquerd[oa])\b/)||t.slice(Math.max(0,ini-14),ini).match(/\b(direit[oa]|esquerd[oa])\s*$/);return m?(/^dir/.test(m[1])?'d':'e'):'';}
+function anaNomesDentes(t){t=String(t||'');
+  t=t.replace(new RegExp('(?:\\b(?:de|do|da|dos|das)\\s+)?('+ANA_NOME_RE+')\\s+(?:a|ao|al|ate|até|-)\\s+(?:o\\s+|a\\s+|os\\s+)?('+ANA_NOME_RE+')','g'),function(m,a,b,off,full){
+    var na=anaNomeNum(a),nb=anaNomeNum(b);if(!na||!nb)return m;var arc=anaArcoDe(full,off,off+m.length),lado=anaLadoDe(full,off,off+m.length),sup=arc==='sup';
+    if(na===nb&&!lado)return ' '+(sup?1:4)+na+' a '+(sup?2:3)+nb+' ';var q=lado==='e'?(sup?2:3):(sup?1:4);return ' '+q+na+' a '+q+nb+' ';});
+  t=t.replace(new RegExp('('+ANA_NOME_RE+')','g'),function(m,a,off,full){var n=anaNomeNum(a),lado=anaLadoDe(full,off,off+m.length);if(!n||!lado)return m;var sup=anaArcoDe(full,off,off+m.length)==='sup';return ' '+(lado==='e'?(sup?2:3):(sup?1:4))+n+' ';});
+  return t;}
+function anaCadTexto(txt){var raw=String(txt||'').trim();if(!raw)return null;var r=pedDoTexto(raw),t=ppNorm(raw).replace(/\s+/g,' ');t=anaNomesDentes(t);
   if(!r.cli){var cs=alive(S.clientes).filter(function(c){var w=ppNorm(c.pnome||c.nome||'').replace(/^(dra?|lab|clinica)\.?\s+/,'').split(/\s+/)[0];return w&&w.length>=4&&new RegExp('\\b'+w+'\\b').test(t);});if(cs.length===1)r.cli=cs[0];}
-  var limpo=t.replace(/\+?\d[\d\s().-]{8,}\d/g,function(x){var g=x.trim().split(/[\s().-]+/);return g.every(function(y){return /^\d{2}$/.test(y)&&anaDOk(+y);})?x:' ';}).replace(/\b\d{1,2}:\d{2}\b/g,' ').replace(/\b\d{1,2}\s*\/\s*\d{1,2}(\s*\/\s*\d{2,4})?\b/g,' ').replace(/\bdia\s+\d{1,2}\b/g,' ').replace(/\bem\s+\d{1,2}\s+dias?\b/g,' ').replace(/\bcor\s*\S+/g,' ').replace(/\b(he|hi|cm)\s*\d[.,]\d\b/g,' ');
+  var limpo=t.replace(/\+?\d[\d\s().-]{8,}\d/g,function(x){var g=x.trim().split(/[\s().-]+/);return g.every(function(y){return /^\d{2}$/.test(y)&&anaDOk(+y);})?x:' ';}).replace(/\b\d{1,2}:\d{2}\b/g,' ').replace(/\b\d{1,2}\s*\/\s*\d{1,2}(\s*\/\s*\d{2,4})?\b/g,' ').replace(/\bdia\s+\d{1,2}\b/g,' ').replace(/\bem\s+\d{1,2}\s+dias?\b/g,' ').replace(/\bcor\b\s*\S+/g,' ').replace(/\b(he|hi|cm)\s*\d[.,]\d\b/g,' ');
   var KW=/coroas?|facetas?|lentes? de contato|onlays?|inlays?|overlays?|placas?|protocolos?|provisorios?|enceramentos?|mock ?ups?|modelos?|elementos?|ponticos?|pontes?|copings?/g,pos=[],m;while((m=KW.exec(limpo))){pos.push(m.index);}
   /* "elementos" logo depois de um trabalho não abre item novo (ex.: "coroa dos elementos 11 ao 25") */
   pos=pos.filter(function(p,i){if(i===0)return true;var ent=limpo.slice(pos[i-1],p);return !(/^(elementos?|dentes?)/.test(limpo.slice(p))&&!/\d/.test(ent));});
