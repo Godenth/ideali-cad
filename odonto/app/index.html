@@ -736,7 +736,7 @@ body.redem{background:#0A1430;color:#E8EEFF}
 .vc-pe{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--rln);padding-top:10px;margin-top:2px}
 .vc-dist{font-size:.82rem;font-weight:700;color:#9DE0FF}
 .rmapa{height:min(60vh,520px);border-radius:18px;overflow:hidden;border:1px solid var(--rln);background:#0F1B40}
-.rmapa .leaflet-tile-pane{filter:invert(1) hue-rotate(195deg) brightness(.95) contrast(.9) saturate(.7)}
+.rmapa{contain:strict;isolation:isolate}.rmapa .leaflet-tile-pane{filter:none}
 .rmapa .leaflet-popup-content{color:#1B1830}.mtip{background:#FF5C8A;color:#fff;border:0;font-weight:700}.mtip:before{border-top-color:#FF5C8A}
 .rmapa.semmapa{height:auto}.mfall{display:grid;gap:8px;padding:16px;color:var(--rtx)}.mfall-c{display:grid;background:#13214A;border-radius:12px;padding:10px}.mfall-c small{color:var(--rmu)}.mfall-c span{color:var(--rmu);font-size:.85rem}
 
@@ -2738,7 +2738,7 @@ function pontosRede(){var s=S.rede.sec,P=[];
 function montaMapa(){var el=$('rmapa');if(!el)return;lfCarrega(function(){var el2=$('rmapa');if(!el2)return;
   if(!window.L){var P=pontosRede(),g={};P.forEach(function(p){(g[p.c]=g[p.c]||[]).push(p);});el2.classList.add('semmapa');el2.innerHTML='<div class="mfall"><b>Não consegui carregar o mapa agora (sem internet?).</b><span>Mostrando por cidade:</span>'+Object.keys(g).map(function(c){var d=distKm(minhaCidade(),c);return '<div class="mfall-c"><b>'+esc(c.replace(/(^|\s)\S/g,function(x){return x.toUpperCase();}))+'</b> <small>'+(d<15?'sua cidade':d+' km')+'</small><span>'+g[c].map(function(p){return esc(p.t);}).join(' · ')+'</span></div>';}).join('')+'</div>';return;}
   if(LF.map){LF.map.remove();LF.map=null;}
-  var mc=minhaCidade(),C=CIDADES[mc],map=L.map(el2,{zoomControl:true,scrollWheelZoom:false}).setView([-15.8,-50],4);LF.map=map;
+  var mc=minhaCidade(),C=CIDADES[mc],map=L.map(el2,{zoomControl:true,scrollWheelZoom:true,preferCanvas:true}).setView([-15.8,-50],4);LF.map=map;
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'© OpenStreetMap'}).addTo(map);
   var R=S.rede.raio||'brasil',b=[C];
   L.circleMarker(C,{radius:9,color:'#fff',weight:3,fillColor:'#FF5C8A',fillOpacity:1}).addTo(map).bindTooltip('Você',{permanent:true,direction:'top',className:'mtip'});
@@ -3990,10 +3990,10 @@ function profGrupos(){var G={};profsFiltra().L.forEach(function(p){var m=String(
 function montaMapaProfs(el2){var G=profGrupos();
   if(!window.L){el2.classList.add('semmapa');el2.innerHTML='<div class="mfall"><b>Não consegui carregar o mapa agora.</b>'+G.sort(function(a,b){return b.n-a.n;}).map(function(g){return '<div class="mfall-c"><b>'+esc(g.nome)+'</b><span>'+g.n+' profissional(is)</span></div>';}).join('')+'</div>';return;}
   if(LF.map){LF.map.remove();LF.map=null;}
-  var map=L.map(el2,{zoomControl:true,scrollWheelZoom:false}).setView([-15.8,-50],4);LF.map=map;
+  var map=L.map(el2,{zoomControl:true,scrollWheelZoom:true,preferCanvas:true}).setView([-15.8,-50],4);LF.map=map;
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'© OpenStreetMap'}).addTo(map);
   var b=[];G.forEach(function(g){var top=Object.keys(g.por).sort(function(a,c){return g.por[c]-g.por[a];});b.push(g.pos);
-    L.circleMarker(g.pos,{radius:Math.min(30,6+Math.sqrt(g.n)*1.6),color:'#fff',weight:2,fillColor:PROF_COR[top[0]]||'#5B8CFF',fillOpacity:.85}).addTo(map)
+    L.circleMarker(g.pos,{radius:Math.min(24,5+Math.sqrt(g.n)*1.1),color:'#fff',weight:2,fillColor:PROF_COR[top[0]]||'#5B8CFF',fillOpacity:.85}).addTo(map)
       .bindTooltip(String(g.n),{permanent:g.n>=5,direction:'center',className:'mcnt'})
       .bindPopup('<b>'+esc(g.nome)+'</b><br>'+g.n+' profissional'+(g.n>1?'is':'')+'<br>'+top.map(function(x){return '• '+esc(x)+': '+g.por[x];}).join('<br>')+'<br><button class="mver" data-act="profMapaUf" data-v="'+g.uf+'">Ver a lista de '+g.uf+'</button>');});
   if(b.length>1)map.fitBounds(b,{padding:[40,40],maxZoom:7});else if(b.length)map.setView(b[0],6);
@@ -4090,6 +4090,9 @@ Object.assign(ACT,{
   bmLimpa:function(){S.rede.fuf='';S.rede.fcid='';S.rede.msel='';BRV.vb=null;render();}});
 /* "Ver a lista do estado" volta para a lista mas deixa claro como tirar o filtro */
 var _profMapaUf=ACT.profMapaUf;ACT.profMapaUf=function(v){BRV.vb=null;_profMapaUf(v);setTimeout(function(){toast('Mostrando só '+v+'. Para ver todos, toque em "Limpar" ao lado do estado.');},200);};
+
+/* mapa real (OpenStreetMap) de volta: leve, sem filtro de cor, zoom na rodinha e arrastar */
+montaMapa=function(){var el=$('rmapa');if(!el)return;el.classList.remove('bmapa');if(S.redeOn&&S.rede.sec==='profs'){lfCarrega(function(){var e2=$('rmapa');if(e2)montaMapaProfs(e2);});return;}return _montaMapaP.apply(this,arguments);};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
