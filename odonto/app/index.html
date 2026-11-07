@@ -1246,6 +1246,23 @@ body.espelho [data-act=pfxAbre],body.espelho .pfx-ban{display:none!important}
 .bm-ctl{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
 .bm-btn{min-width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(11,20,51,.85);color:#fff;font:inherit;font-weight:800;cursor:pointer;padding:0 10px}
 .bm-btn:hover{background:#3D7BFF}.bm-limpa{background:#FFD43B;color:#2A2100;border-color:#FFD43B}
+
+/* cartões da Rede (tema escuro) */
+.pgrid .pg{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px;display:grid;gap:12px;align-content:start;box-shadow:0 10px 30px -14px rgba(0,0,0,.6);position:relative;overflow:hidden;color:#E9EDFF;transition:transform .15s,border-color .15s}
+.pgrid .pg:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--k) 55%,transparent)}
+.pg:before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--k)}
+.pg-h{display:flex;gap:12px;align-items:center;min-width:0}.pg-id{display:grid;gap:5px;min-width:0}.pg-id b{font-size:1.02rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pg-av{width:48px;height:48px;flex-shrink:0;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:1.15rem;background:color-mix(in srgb,var(--k) 24%,#0B1433);color:#fff;border:1px solid color-mix(in srgb,var(--k) 60%,transparent)}
+.pg-chip{justify-self:start;white-space:nowrap;flex-shrink:0;display:inline-flex;gap:5px;align-items:center;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--k) 22%,transparent);color:color-mix(in srgb,var(--k) 65%,#fff);border:1px solid color-mix(in srgb,var(--k) 45%,transparent)}
+.pg-ic{width:13px;height:13px}
+.pg-meta{display:flex;flex-wrap:wrap;gap:6px;font-size:.78rem;color:#AEB8E6}.pg-meta span{background:rgba(255,255,255,.06);border-radius:8px;padding:4px 8px}
+.pg-res{margin:0;font-size:.82rem;color:#C5CDF0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pg-f{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}.pg-pend{font-size:.74rem;font-weight:800;color:#F5C451}
+.pgrid.plinhas{display:grid;grid-template-columns:1fr!important;gap:8px}
+.pl{display:grid;grid-template-columns:44px minmax(0,1.2fr) minmax(0,1.5fr) minmax(0,.8fr) auto;gap:14px;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-left:4px solid var(--k);border-radius:14px;padding:9px 14px;color:#E9EDFF}
+.pl-av{width:40px;height:40px;border-radius:50%;font-size:1rem}.pl-n{display:grid;min-width:0}.pl-n b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl-p{display:flex;gap:8px;align-items:center;min-width:0;font-size:.82rem;color:#C5CDF0}.pl-p>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pl-l{font-size:.82rem;color:#AEB8E6}
+@media (max-width:760px){.pl{grid-template-columns:40px 1fr auto}.pl-p,.pl-l{grid-column:2/3}.pl .btn{grid-column:3;grid-row:1}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4093,6 +4110,23 @@ var _profMapaUf=ACT.profMapaUf;ACT.profMapaUf=function(v){BRV.vb=null;_profMapaU
 
 /* mapa real (OpenStreetMap) de volta: leve, sem filtro de cor, zoom na rodinha e arrastar */
 montaMapa=function(){var el=$('rmapa');if(!el)return;el.classList.remove('bmapa');if(S.redeOn&&S.rede.sec==='profs'){lfCarrega(function(){var e2=$('rmapa');if(e2)montaMapaProfs(e2);});return;}return _montaMapaP.apply(this,arguments);};
+
+/* ===== Cartões da Rede no tema escuro: A (vidro) e C (linhas) ===== */
+function profCor(p){return PROF_COR[p.prof]||'#5B8CFF';}
+function profIni(p){return esc(String(p.nome||'?').trim().charAt(0).toUpperCase());}
+function profProfsTxt(p){var L=(p.profs&&p.profs.length?p.profs:[p.cargo||p.prof]);return L.join(' · ');}
+function profPend(p){return p.pre?'<span class="pg-pend">⏳ Perfil a confirmar</span>':'';}
+profCard=function(p){var m=PCARD[p.prof]||PCARD.Dentista,ct=S.rede.cont[p.id],loc=String(p.cid||'').replace(/^\s*\/\s*/,''),d=distTxt(p.cid).replace('📍 ','');
+  return '<article class="pg" style="--k:'+profCor(p)+'"><div class="pg-h"><span class="pg-av">'+(p.vis.foto?profIni(p):profIni(p))+'</span><div class="pg-id"><b>'+profNomeH(p)+(p.vis.nome?'':' <span title="O nome aparece quando a pessoa aceita o contato">🔒</span>')+'</b><span class="pg-chip">'+icoProf(m,'pg-ic')+esc(m.t)+'</span></div></div>'+
+    '<div class="pg-meta"><span>📍 '+esc(loc||'—')+(d?' · '+esc(d):'')+'</span><span>'+esc(profProfsTxt(p))+'</span>'+(p.softs&&p.softs.length?p.softs.slice(0,3).map(function(x){return '<span>💻 '+esc(x[0])+'</span>';}).join(''):'')+'</div>'+
+    (p.resumo?'<p class="pg-res">'+esc(p.resumo)+'</p>':'')+
+    '<div class="pg-f">'+(ct?'<span class="pill ok">Contato pedido ✓</span>':profPend(p)||'<span></span>')+'<button class="btn sm rpri" data-act="profVer" data-v="'+p.id+'">Ver perfil</button></div></article>';};
+function profLinha(p){var m=PCARD[p.prof]||PCARD.Dentista,loc=String(p.cid||'').replace(/^\s*\/\s*/,'');
+  return '<div class="pl" style="--k:'+profCor(p)+'"><span class="pg-av pl-av">'+profIni(p)+'</span><div class="pl-n"><b>'+profNomeH(p)+'</b>'+profPend(p)+'</div><div class="pl-p"><span class="pg-chip">'+esc(m.t)+'</span><span>'+esc(profProfsTxt(p))+'</span></div><div class="pl-l">📍 '+esc(loc||'—')+'</div><button class="btn sm rpri" data-act="profVer" data-v="'+p.id+'">Ver perfil</button></div>';}
+var _profCardC=profCard;profCard=function(p){return S.rede.pvis==='linhas'?profLinha(p):_profCardC(p);};
+var _rProfsListaC=rProfsLista;rProfsLista=function(){var h=_rProfsListaC();return S.rede.pvis==='linhas'?h.replace('<div class="pgrid">','<div class="pgrid plinhas">'):h;};
+var _rProfsC=rProfs;rProfs=function(){var h=_rProfsC(),v=S.rede.pvis||'cards';
+  return h.replace(/<div class="pvis">[\s\S]*?<\/div><\/div>/,'<div class="pvis"><div class="seg rseg" role="group" aria-label="Ver como">'+[['cards','▦ Cartões'],['linhas','☰ Lista'],['mapa','🗺 Mapa']].map(function(o){return '<button aria-pressed="'+(v===o[0]||(o[0]==='cards'&&v==='lista'))+'" data-act="profVis" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>');};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
