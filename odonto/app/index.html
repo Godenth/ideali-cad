@@ -1378,6 +1378,25 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .labv-i .sp{flex:1;min-width:160px}.labv-i small{display:block;opacity:.75}.labv-st{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px}
 .labv-st.pendente{background:#FEF3C7;color:#92400E}.labv-st.aceito{background:#DCFCE7;color:#166534}.labv-st.recusado{background:#FEE2E2;color:#991B1B}
 .labv-rec{margin:0 0 12px;padding:12px;border-radius:12px;background:rgba(124,58,237,.08);display:grid;gap:8px}
+.pdg-ov{position:fixed;inset:0;z-index:300;background:rgba(10,12,30,.55);display:grid;place-items:center;padding:12px}
+.pdg-box{background:var(--surface,#fff);color:inherit;width:min(760px,100%);max-height:94vh;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+.pdg-h,.pdg-f{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line,rgba(127,127,127,.2))}.pdg-f{border-top:1px solid var(--line,rgba(127,127,127,.2));border-bottom:0}
+.pdg-h b{font-size:1.1rem;flex:1}.pdg-b{padding:16px 18px;overflow:auto;display:grid;gap:14px}
+.pdg-ana{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(37,99,235,.08));border:1px solid rgba(124,58,237,.25)}
+.pdg-ana img{width:44px;height:44px;border-radius:50%;object-fit:cover}.pdg-ana textarea{width:100%;margin:6px 0;box-sizing:border-box}
+.pdg-odo{display:grid;gap:6px;padding:10px;border-radius:14px;background:rgba(127,127,127,.06);overflow-x:auto}
+.pdg-arc{display:grid;grid-template-columns:repeat(16,minmax(30px,1fr));gap:3px}.pdg-arc button:nth-child(8){margin-right:6px}
+.pdg-mid{height:1px;background:rgba(127,127,127,.3)}
+.pdg-d{padding:8px 0;border-radius:8px;border:1px solid rgba(127,127,127,.35);background:transparent;color:inherit;font:600 .8rem var(--f-body,inherit);cursor:pointer}
+.pdg-d.tem{background:#DCFCE7;color:#166534;border-color:#22C55E}.pdg-d.sel{background:#7C3AED;color:#fff;border-color:#7C3AED}
+.pdg-add{margin-top:8px;gap:8px;align-items:center}.pdg-add select{width:auto;flex:1;min-width:150px}.pdg-arq .chip{display:inline-flex;align-items:center;gap:4px}.pdg-i small.muted{display:inline}.pdg-chk{display:inline-flex;align-items:center;gap:6px;font-size:.9rem}
+.pdg-its{display:grid;gap:6px;margin-top:8px}.pdg-it{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(127,127,127,.08)}.pdg-it span{flex:1;font-size:.85rem;opacity:.8}
+.pdg-arq{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}.pdg-arq .chip small{opacity:.7;margin-left:4px}
+.btn.pdg-novo{background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;border:0}
+.pdg-rec{margin:0 0 16px;padding:14px;border-radius:16px;border:2px solid #7C3AED;background:rgba(124,58,237,.06)}.pdg-rec h3{margin:0 0 4px}
+.pdg-rc{margin-top:10px;padding:12px;border-radius:12px;background:var(--surface,#fff);border:1px solid rgba(127,127,127,.25);display:grid;gap:4px}.pdg-rc.urg{border-color:#EF4444}
+.pdg-rc-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.pdg-rc-a{margin-top:8px;gap:8px;align-items:center}.pdg-rc-a select{max-width:260px}
+@media(max-width:600px){.pdg-arc{grid-template-columns:repeat(8,1fr)}.pdg-arc button:nth-child(8){margin-right:0}.pdg-b{padding:12px}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4930,6 +4949,135 @@ Object.assign(ACT,{
 document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='labv-id'&&e.key==='Enter'){e.preventDefault();ACT.labBusca();}});
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='labv-id')LABV.q=e.target.value;});
 var _rlEntraLab=rlEntra;rlEntra=function(){_rlEntraLab.apply(this,arguments);if(RL.user&&!LABV.carregando){LABV.carregando=true;labVCarrega().then(function(){LABV.carregando=false;},function(){LABV.carregando=false;});}};
+
+/* ===== Pedido digital: dentista → laboratório conectado (escaneamento + fotos; arquivos apagam em 3 dias) ===== */
+var PDG={L:[],carregado:false,erro:'',ed:null,busy:false,prog:'',sel:[],aviso:false,resp:{}};
+var PDG_TRAB=['Coroa','Coroa sobre implante','Faceta / laminado','Onlay / inlay','Provisório','Prótese fixa (ponte)','Protocolo','Guia cirúrgico','Placa','Modelo impresso','Outro'];
+var PDG_MAT=['Zircônia','E.max (dissilicato)','Resina impressa','PMMA','Metalocerâmica','Outro'];
+var PDG_UP=[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28],PDG_LO=[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+var PDG_MAX=100*1024*1024,PDG_ARQ=50*1024*1024;
+function pdgMB(b){return (b/1048576).toFixed(b<10485760?1:0).replace('.',',')+' MB';}
+function pdgCarrega(){if(!RL.user)return Promise.resolve();
+  return SB.from('odo_ped_env').select('*').order('criado_em',{ascending:false}).limit(300).then(function(r){PDG.carregado=true;
+    if(r.error){PDG.erro=/odo_ped_env|does not exist|schema cache/.test(r.error.message||'')?'falta057':'erro';render();return;}
+    PDG.erro='';PDG.L=r.data||[];render();pdgLimpa();
+    var n=pdgRecebidos().length;if(n&&!PDG.aviso){PDG.aviso=true;setTimeout(function(){toast(n===1?'📥 Chegou 1 pedido digital de dentista. Veja em Pedidos.':'📥 Chegaram '+n+' pedidos digitais de dentistas. Veja em Pedidos.');},2600);}});}
+function pdgMeus(){var u=RL.user&&RL.user.id;return PDG.L.filter(function(e){return e.user_id===u&&e.status!=='enviando';});}
+function pdgRecebidos(){var u=RL.user&&RL.user.id;return PDG.L.filter(function(e){return e.user_id!==u&&e.status==='enviado';});}
+function pdgDias(e){var ms=new Date(e.apagar_em)-Date.now();if(e.arquivos_apagados||ms<=0)return 0;return Math.ceil(ms/86400000);}
+function pdgLimpa(){PDG.L.forEach(function(e){if(e.arquivos_apagados||new Date(e.apagar_em)>new Date())return;var P=(e.arquivos||[]).map(function(a){return a.path;}).filter(Boolean);
+  (P.length?SB.storage.from('odonto-ped').remove(P):Promise.resolve({})).then(function(r){if(r&&r.error)return;return SB.rpc('odo_ped_env_limpo',{p_id:e.id}).then(function(x){if(!x.error)e.arquivos_apagados=true;});});});}
+function pdgItensTxt(e){return (e.itens||[]).map(function(it){return esc(it.trabalho||'Trabalho')+(it.dentes&&it.dentes.length?' <span class="muted" style="font-size:.85em">('+it.dentes.join(', ')+')</span>':'');}).join(' · ')||'—';}
+function pdgArqsHtml(e){var A=e.arquivos||[];if(!A.length)return '';var d=pdgDias(e);
+  if(!d)return '<div class="pdg-arq small muted">📎 '+A.length+' arquivo'+(A.length>1?'s':'')+' · já apagado'+(A.length>1?'s':'')+' (3 dias)</div>';
+  return '<div class="pdg-arq">'+A.map(function(a){return '<button class="chip" data-act="pdgArq" data-v="'+esc(a.path)+'">'+(a.tipo==='foto'?'📷 ':'🦷 ')+esc(a.nome)+' <small>'+pdgMB(a.tam||0)+'</small></button>';}).join('')+'<small class="muted">⏳ apaga'+(A.length>1?'m':'')+' em '+d+' dia'+(d>1?'s':'')+'</small></div>';}
+var PDG_ST={enviado:['⏳ Aguardando o laboratório aceitar','pendente'],aceito:['✅ Aceito pelo laboratório','aceito'],recusado:['Recusado','recusado'],cancelado:['Cancelado','recusado']};
+function pdgEnviadosHtml(){var M=pdgMeus();if(!M.length)return '';
+  return '<h3 style="margin:22px 0 8px">📤 Pedidos enviados</h3><div class="labv-l">'+M.slice(0,60).map(function(e){var s=PDG_ST[e.status]||['',''];
+    return '<div class="labv-i pdg-i"><div class="sp"><b>'+esc(e.paciente||'Paciente')+'</b><small>'+pdgItensTxt(e)+'</small><small>'+esc((PDG.labNome&&PDG.labNome[e.lab_id])||'')+' · enviado em '+new Date(e.enviado_em||e.criado_em).toLocaleDateString('pt-BR')+(e.prazo?' · prazo '+e.prazo.split('-').reverse().join('/'):'')+'</small>'+pdgArqsHtml(e)+(e.status==='recusado'&&e.motivo?'<small style="color:#B91C1C">Motivo: '+esc(e.motivo)+'</small>':'')+'</div>'+
+      '<span class="labv-st '+s[1]+'">'+s[0]+'</span>'+(e.status==='enviado'?'<button class="btn sm" data-act="pdgCancela" data-v="'+e.id+'">Cancelar</button>':'')+'</div>';}).join('')+'</div>';}
+/* ---- formulário do dentista ---- */
+function pdgNovo(vid){var V=labVMeus().filter(function(v){return v.status==='aceito';});var v=V.filter(function(x){return x.id===vid;})[0]||V[0];if(!v){toast('Conecte um laboratório primeiro.');return;}
+  PDG.ed={vid:v.id,lab:v.lab_id,labNome:v.lab_nome,paciente:'',itens:[],cor:'',prazo:'',urgente:false,obs:'',texto:'',arqs:[]};PDG.sel=[];PDG.trab='Coroa';PDG.mat='Zircônia';PDG.impl=false;PDG.prog='';pdgDesenha();}
+function pdgDenteDe(n){var it=(PDG.ed.itens||[]).filter(function(i){return (i.dentes||[]).indexOf(n)>=0;})[0];return it;}
+function pdgDentesHtml(){function linha(L){return '<div class="pdg-arc">'+L.map(function(n){var it=pdgDenteDe(n),sl=PDG.sel.indexOf(n)>=0;return '<button type="button" class="pdg-d'+(sl?' sel':'')+(it?' tem':'')+'" data-act="pdgDente" data-v="'+n+'" title="'+(it?esc(it.trabalho):'')+'">'+n+'</button>';}).join('')+'</div>';}
+  return '<div class="pdg-odo">'+linha(PDG_UP)+'<div class="pdg-mid"></div>'+linha(PDG_LO)+'</div>';}
+function pdgHtml(){var E=PDG.ed,tot=E.arqs.reduce(function(s,f){return s+f.size;},0),V=labVMeus().filter(function(v){return v.status==='aceito';});
+  return '<div class="pdg-ov" role="dialog" aria-modal="true"><div class="pdg-box"><div class="pdg-h"><b>📤 Novo pedido digital</b><button class="btn sm" data-act="pdgFecha"'+(PDG.busy?' disabled':'')+'>Fechar</button></div><div class="pdg-b">'+
+   '<label class="fld"><span>Laboratório</span><select id="pdg-lab">'+V.map(function(v){return '<option value="'+v.id+'"'+(v.id===E.vid?' selected':'')+'>'+esc(v.lab_nome)+'</option>';}).join('')+'</select></label>'+
+   '<div class="pdg-ana"><img src="ana.webp" alt=""><div style="flex:1"><b>Escreva para a Ana</b><textarea id="pdg-txt" rows="2" placeholder="Ex.: paciente Maria Souza, coroa de zircônia do 11 ao 21 e coroa do 36 sobre implante, cor A2, pra sexta">'+esc(E.texto)+'</textarea><button class="btn sm pri" data-act="pdgAna">✨ Preencher</button></div></div>'+
+   '<label class="fld"><span>Paciente</span><input id="pdg-pac" type="text" maxlength="120" value="'+esc(E.paciente)+'" placeholder="Nome ou iniciais"></label>'+
+   '<div class="fld"><span>Dentes <small class="muted">· toque nos dentes, escolha o trabalho e adicione</small></span>'+pdgDentesHtml()+
+   '<div class="row wrap pdg-add"><select id="pdg-trab">'+PDG_TRAB.map(function(t){return '<option'+(t===PDG.trab?' selected':'')+'>'+t+'</option>';}).join('')+'</select><select id="pdg-mat">'+PDG_MAT.map(function(t){return '<option'+(t===PDG.mat?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+   '<label class="pdg-chk"><input type="checkbox" id="pdg-impl"'+(PDG.impl?' checked':'')+'> sobre implante</label><button class="btn sm pri" data-act="pdgAdd"'+(PDG.sel.length?'':' disabled')+'>+ Adicionar'+(PDG.sel.length?' ('+PDG.sel.length+')':'')+'</button></div>'+
+   (E.itens.length?'<div class="pdg-its">'+E.itens.map(function(it,i){return '<div class="pdg-it"><b>'+esc(it.trabalho)+'</b><span>'+(it.dentes.length?'Dentes '+it.dentes.join(', '):'Sem dente marcado')+(it.material?' · '+esc(it.material):'')+'</span><button class="btn sm" data-act="pdgTira" data-v="'+i+'" aria-label="Tirar">✕</button></div>';}).join('')+'</div>':'')+'</div>'+
+   '<div class="grid2"><label class="fld"><span>Cor</span><input id="pdg-cor" type="text" maxlength="20" value="'+esc(E.cor)+'" placeholder="Ex.: A2"></label><label class="fld"><span>Prazo desejado</span><input id="pdg-prz" type="date" value="'+esc(E.prazo)+'"></label></div>'+
+   '<label class="pdg-chk"><input type="checkbox" id="pdg-urg"'+(E.urgente?' checked':'')+'> 🔴 Urgente</label>'+
+   '<label class="fld"><span>Observações</span><textarea id="pdg-obs" rows="2" maxlength="2000">'+esc(E.obs)+'</textarea></label>'+
+   '<div class="fld"><span>Arquivos <small class="muted">· até 100 MB por pedido · apagam 3 dias depois do envio</small></span><div class="row wrap">'+
+   '<label class="btn">🦷 Escaneamento (STL, PLY, OBJ)<input type="file" id="pdg-scan" multiple accept=".stl,.ply,.obj,.dcm,.zip,.3mf" hidden></label>'+
+   '<label class="btn">📷 Fotos<input type="file" id="pdg-foto" multiple accept="image/*" hidden></label></div>'+
+   (E.arqs.length?'<div class="pdg-its">'+E.arqs.map(function(f,i){return '<div class="pdg-it"><b>'+(/^image\//.test(f.type)?'📷 ':'🦷 ')+esc(f.name)+'</b><span>'+pdgMB(f.size)+'</span><button class="btn sm" data-act="pdgArqTira" data-v="'+i+'" aria-label="Tirar">✕</button></div>';}).join('')+'<small class="muted">Total: '+pdgMB(tot)+' (o escaneamento é compactado antes de enviar)</small></div>':'')+'</div>'+
+   '</div><div class="pdg-f">'+(PDG.prog?'<span class="small">'+esc(PDG.prog)+'</span>':'')+'<span class="spacer" style="flex:1"></span><button class="btn pri" data-act="pdgEnvia"'+(PDG.busy?' disabled':'')+'>'+(PDG.busy?'Enviando…':'Enviar para '+esc(E.labNome||'o laboratório'))+'</button></div></div></div>';}
+function pdgDesenha(){var el=document.getElementById('pdg-ov');if(!PDG.ed){if(el)el.remove();document.body.style.overflow='';return;}
+  var sc=0;if(el){var b=el.querySelector('.pdg-b');if(b)sc=b.scrollTop;}else{el=document.createElement('div');el.id='pdg-ov';document.body.appendChild(el);}
+  el.innerHTML=pdgHtml();document.body.style.overflow='hidden';var b2=el.querySelector('.pdg-b');if(b2)b2.scrollTop=sc;}
+function pdgLe(){var E=PDG.ed;if(!E)return;var g=function(id){var x=document.getElementById(id);return x;};
+  if(g('pdg-pac'))E.paciente=g('pdg-pac').value;if(g('pdg-cor'))E.cor=g('pdg-cor').value;if(g('pdg-prz'))E.prazo=g('pdg-prz').value;if(g('pdg-obs'))E.obs=g('pdg-obs').value;if(g('pdg-txt'))E.texto=g('pdg-txt').value;
+  if(g('pdg-urg'))E.urgente=g('pdg-urg').checked;if(g('pdg-trab'))PDG.trab=g('pdg-trab').value;if(g('pdg-mat'))PDG.mat=g('pdg-mat').value;if(g('pdg-impl'))PDG.impl=g('pdg-impl').checked;
+  if(g('pdg-lab')&&g('pdg-lab').value!==E.vid){var v=labVMeus().filter(function(x){return x.id===g('pdg-lab').value;})[0];if(v){E.vid=v.id;E.lab=v.lab_id;E.labNome=v.lab_nome;}}}
+var PDG_FFLATE=null;function pdgFflate(){if(window.fflate)return Promise.resolve(window.fflate);if(PDG_FFLATE)return PDG_FFLATE;
+  PDG_FFLATE=new Promise(function(ok,no){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js';s.onload=function(){window.fflate?ok(window.fflate):no('fflate');};s.onerror=function(){PDG_FFLATE=null;no('fflate');};document.head.appendChild(s);});return PDG_FFLATE;}
+function pdgZip(f){return pdgFflate().then(function(ff){return f.arrayBuffer().then(function(buf){return new Promise(function(ok,no){var o={};o[f.name]=new Uint8Array(buf);ff.zip(o,{level:6},function(err,z){if(err)no(err);else ok(new Blob([z],{type:'application/zip'}));});});});});}
+function pdgFotoJpg(f){return new Promise(function(ok){var u=URL.createObjectURL(f),im=new Image();im.onload=function(){var M=2048,w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,M/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(function(b){ok(b||f);},'image/jpeg',.85);};
+  im.onerror=function(){URL.revokeObjectURL(u);ok(/^image\/(jpeg|png|webp)$/.test(f.type)?f:null);};im.src=u;});}
+function pdgNomeSeguro(n){return semAc(n).replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'arquivo';}
+function pdgEnvia(){pdgLe();var E=PDG.ed;if(!E||PDG.busy)return;
+  if(!E.itens.length&&PDG.sel.length)ACT.pdgAdd();
+  if(!E.itens.length){toast('Marque os dentes e o trabalho (ou escreva para a Ana).');return;}
+  if(!String(E.paciente).trim()){toast('Falta o nome do paciente.');var p=document.getElementById('pdg-pac');if(p)p.focus();return;}
+  var bruto=E.arqs.reduce(function(s,f){return s+f.size;},0);if(bruto>400*1024*1024){toast('Arquivos grandes demais. Envie até 100 MB (compactado).');return;}
+  PDG.busy=true;PDG.prog='Preparando…';pdgDesenha();var envId=null,feitos=[],tot=0,uid=RL.user.id;
+  function falha(msg){PDG.busy=false;PDG.prog='';pdgDesenha();toast(msg);if(envId){var P=feitos.map(function(a){return a.path;});(P.length?SB.storage.from('odonto-ped').remove(P):Promise.resolve()).then(function(){SB.rpc('odo_ped_env_cancela',{p_id:envId});});}}
+  SB.from('odo_ped_env').insert({vinculo_id:E.vid,lab_id:E.lab}).select('id').single().then(function(r){
+    if(r.error){falha(/odo_ped_env|schema cache|does not exist/.test(r.error.message||'')?'Falta rodar a atualização 057 no Supabase.':'Não consegui criar o pedido. O laboratório ainda está conectado?');throw 0;}
+    envId=r.data.id;
+    return E.arqs.reduce(function(pr,f,i){return pr.then(function(){var foto=/^image\//.test(f.type);PDG.prog=(foto?'Preparando foto ':'Compactando ')+(i+1)+' de '+E.arqs.length+'…';pdgDesenha();
+      return (foto?pdgFotoJpg(f):pdgZip(f)).then(function(b){if(!b)throw 'Não consegui ler a foto '+f.name;if(b.size>PDG_ARQ)throw f.name+' passou de 50 MB mesmo compactado.';tot+=b.size;if(tot>PDG_MAX)throw 'O pedido passou de 100 MB.';
+        var nm=(i+1)+'-'+pdgNomeSeguro(f.name.replace(/\.[^.]+$/,''))+(foto?'.jpg':'.zip'),path=uid+'/'+envId+'/'+nm;PDG.prog='Enviando '+(i+1)+' de '+E.arqs.length+' ('+pdgMB(b.size)+')…';pdgDesenha();
+        return SB.storage.from('odonto-ped').upload(path,b,{contentType:foto?'image/jpeg':'application/zip',upsert:false}).then(function(u){if(u.error)throw 'Falha ao enviar '+f.name+': '+(u.error.message||'');feitos.push({path:path,nome:foto?f.name.replace(/\.[^.]+$/,'')+'.jpg':f.name+'.zip',tam:b.size,tipo:foto?'foto':'scan'});});});});},Promise.resolve());
+  }).then(function(){if(!envId)return;PDG.prog='Finalizando…';pdgDesenha();
+    return SB.rpc('odo_ped_env_fecha',{p_id:envId,p_dados:{paciente:E.paciente.trim(),itens:E.itens,cor:E.cor,prazo:E.prazo||'',urgente:E.urgente,obs:E.obs,texto_ana:E.texto,arquivos:feitos}}).then(function(x){if(x.error)throw 'Não consegui finalizar: '+(x.error.message||'');
+      PDG.busy=false;var ln=E.labNome;PDG.ed=null;PDG.prog='';pdgDesenha();toast('✅ Pedido enviado para '+ln+'. Os arquivos ficam disponíveis por 3 dias.');pdgCarrega();});})
+  .catch(function(e){if(e===0)return;falha(typeof e==='string'?e:'Não consegui enviar. Verifique a internet e tente de novo.');});}
+/* ---- lado do laboratório: pedidos recebidos ---- */
+function pdgCliSug(e){var v=(LABV.L||[]).filter(function(x){return x.id===e.vinculo_id;})[0];if(v&&v.cliente_id)return v.cliente_id;var n=semAc(e.dentista_nome||'');if(!n)return '';
+  var best='',bp=0;(EMP.cli||[]).forEach(function(c){var cn=semAc(c.nome),p=cn===n?3:(cn.indexOf(n)>=0||n.indexOf(cn)>=0)?2:0;if(p>bp){bp=p;best=c.id;}});return best;}
+function pdgRecebidosHtml(){var R=pdgRecebidos();if(PDG.erro==='falta057'||!R.length)return '';
+  return '<section class="pdg-rec"><h3>📥 Pedidos recebidos <span class="labv-st pendente">'+R.length+'</span></h3><p class="small muted">Pedidos que os dentistas conectados mandaram. Confira e aceite: eles vão para "a fazer".</p>'+R.map(function(e){var sug=PDG.resp[e.id]!=null?PDG.resp[e.id]:pdgCliSug(e);
+    return '<div class="pdg-rc'+(e.urgente?' urg':'')+'"><div class="pdg-rc-h"><b>🦷 '+esc(e.dentista_nome||'Dentista')+'</b><small>'+new Date(e.enviado_em||e.criado_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+(e.urgente?' · 🔴 URGENTE':'')+'</small></div>'+
+      '<div class="small"><b>Paciente:</b> '+esc(e.paciente||'—')+'</div><div class="small"><b>Trabalho:</b> '+pdgItensTxt(e)+'</div>'+
+      '<div class="small">'+[e.cor?'<b>Cor:</b> '+esc(e.cor):'',e.prazo?'<b>Prazo pedido:</b> '+e.prazo.split('-').reverse().join('/'):''].filter(Boolean).join(' · ')+'</div>'+(e.obs?'<div class="small"><b>Obs.:</b> '+esc(e.obs)+'</div>':'')+(e.texto_ana?'<div class="small muted">“'+esc(e.texto_ana)+'”</div>':'')+pdgArqsHtml(e)+
+      '<div class="row wrap pdg-rc-a"><label class="small">Cliente no seu cadastro: <select data-pdgcli="'+e.id+'"><option value="">— novo / sem cliente —</option>'+(EMP.cli||[]).filter(function(c){return c.ativo!==false;}).map(function(c){return '<option value="'+c.id+'"'+(c.id===sug?' selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select></label>'+
+      '<span class="spacer" style="flex:1"></span><button class="btn sm" data-act="pdgRecusa" data-v="'+e.id+'">Recusar</button><button class="btn sm pri" data-act="pdgAceita" data-v="'+e.id+'">✓ Aceitar</button></div></div>';}).join('')+'</section>';}
+Object.assign(ACT,{
+  pdgNovo:function(v){pdgNovo(v);},
+  pdgFecha:function(){if(PDG.busy)return;PDG.ed=null;pdgDesenha();},
+  pdgDente:function(v){pdgLe();var n=+v,i=PDG.sel.indexOf(n);if(i>=0)PDG.sel.splice(i,1);else PDG.sel.push(n);pdgDesenha();},
+  pdgAdd:function(){pdgLe();if(!PDG.sel.length)return;var E=PDG.ed,ds=PDG.sel.slice().sort(function(a,b){return PDG_UP.concat(PDG_LO).indexOf(a)-PDG_UP.concat(PDG_LO).indexOf(b);});
+    E.itens.forEach(function(it){it.dentes=it.dentes.filter(function(d){return ds.indexOf(d)<0;});});E.itens=E.itens.filter(function(it){return it.dentes.length;});
+    var tr=PDG.impl&&PDG.trab==='Coroa'?'Coroa sobre implante':PDG.trab;E.itens.push({trabalho:tr+(PDG.mat&&PDG.mat!=='Outro'&&tr.indexOf(PDG.mat)<0?' de '+PDG.mat:''),dentes:ds,qtd:ds.length,material:PDG.mat,sobre_implante:PDG.impl||/implante/i.test(tr)});PDG.sel=[];pdgDesenha();},
+  pdgTira:function(v){pdgLe();PDG.ed.itens.splice(+v,1);pdgDesenha();},
+  pdgArqTira:function(v){pdgLe();PDG.ed.arqs.splice(+v,1);pdgDesenha();},
+  pdgAna:function(){pdgLe();var E=PDG.ed,res=null;try{res=anaEntende(E.texto);}catch(x){}if(!res||!res.itens.length){toast('Não entendi. Escreva o trabalho e os dentes, ex.: coroa do 11 ao 21.');return;}
+    if(res.paciente&&!E.paciente)E.paciente=res.paciente;if(res.cor)E.cor=res.cor;if(res.prazo)E.prazo=res.prazo;if(res.urgente)E.urgente=true;
+    res.itens.forEach(function(it){var ds=(it.dentes||[]).slice();E.itens.forEach(function(o){o.dentes=o.dentes.filter(function(d){return ds.indexOf(d)<0;});});E.itens=E.itens.filter(function(o){return o.dentes.length;});
+      E.itens.push({trabalho:it.trabalho,dentes:ds,qtd:it.qtd||ds.length||1,material:it.material||'',sobre_implante:!!it.sobre_implante});});
+    pdgDesenha();toast('A Ana preencheu. Confira antes de enviar.');},
+  pdgEnvia:function(){pdgEnvia();},
+  pdgCancela:function(v){SB.rpc('odo_ped_env_cancela',{p_id:v}).then(function(r){if(r.error||!r.data){toast('Não deu para cancelar (o laboratório já respondeu?).');return;}var e=PDG.L.filter(function(x){return x.id===v;})[0];
+    if(e){var P=(e.arquivos||[]).map(function(a){return a.path;});if(P.length)SB.storage.from('odonto-ped').remove(P).then(function(){SB.rpc('odo_ped_env_limpo',{p_id:v});});}toast('Pedido cancelado.');pdgCarrega();});},
+  pdgArq:function(v){var w=window.open('','_blank');SB.storage.from('odonto-ped').createSignedUrl(v,600,{download:true}).then(function(r){if(r.error||!r.data){if(w)w.close();toast('Não consegui abrir (o arquivo pode ter sido apagado).');return;}if(w)w.location.href=r.data.signedUrl;else location.href=r.data.signedUrl;});},
+  pdgAceita:function(v,b){var s=document.querySelector('[data-pdgcli="'+v+'"]'),cli=s&&s.value||null;if(b)b.disabled=true;
+    SB.rpc('odo_ped_env_responde',{p_id:v,p_ok:true,p_cliente:cli,p_motivo:null}).then(function(r){if(r.error){if(b)b.disabled=false;toast('Não consegui aceitar: '+(r.error.message||''));return;}
+      toast('✅ Pedido aceito: '+r.data+' trabalho'+(r.data>1?'s':'')+' em "a fazer".');pdgCarrega();if(typeof pedCarrega==='function')pedCarrega().then(function(){render();});LABV.carregando||labVCarrega();});},
+  pdgRecusa:function(v){var m=window.prompt('Motivo da recusa (o dentista vai ver):','');if(m===null)return;
+    SB.rpc('odo_ped_env_responde',{p_id:v,p_ok:false,p_cliente:null,p_motivo:m||null}).then(function(r){if(r.error){toast('Não consegui recusar.');return;}toast('Pedido recusado.');pdgCarrega();});}});
+document.addEventListener('change',function(e){var t=e.target;if(!t)return;
+  if(t.getAttribute&&t.getAttribute('data-pdgcli')){PDG.resp[t.getAttribute('data-pdgcli')]=t.value;return;}
+  if((t.id==='pdg-scan'||t.id==='pdg-foto')&&PDG.ed){pdgLe();var F=Array.prototype.slice.call(t.files||[]);F.forEach(function(f){if(PDG.ed.arqs.length<20)PDG.ed.arqs.push(f);});if(F.length+PDG.ed.arqs.length>20)toast('Máximo de 20 arquivos por pedido.');pdgDesenha();return;}
+  if(t.id==='pdg-lab'||t.id==='pdg-impl'||t.id==='pdg-trab'){pdgLe();pdgDesenha();}});
+/* a aba Laboratório do dentista ganha os botões e a lista de enviados */
+var _rDLabTabP=rDLabTab;rDLabTab=function(D){var h=_rDLabTabP(D);if(!RL.user)return h;
+  PDG.labNome={};labVMeus().forEach(function(v){PDG.labNome[v.lab_id]=v.lab_nome;});
+  var ok=labVMeus().filter(function(v){return v.status==='aceito';}).length;
+  if(ok)h=h.replace('<button class="btn pri" data-act="labConvAbre">','<button class="btn pdg-novo" data-act="pdgNovo">📤 Novo pedido digital</button><button class="btn pri" data-act="labConvAbre">');
+  h=h.replace(/<span class="labv-st aceito">✅ Conectado<\/span><\/div>/g,'<span class="labv-st aceito">✅ Conectado</span>__PDGBT__</div>');
+  labVMeus().filter(function(v){return v.status==='aceito';}).forEach(function(v){h=h.replace('__PDGBT__','<button class="btn sm pri" data-act="pdgNovo" data-v="'+v.id+'">📤 Enviar pedido</button>');});h=h.replace(/__PDGBT__/g,'');
+  if(PDG.erro==='falta057')h+='<div class="card" style="margin-top:12px;border-color:#F59E0B">⚠️ Falta rodar a atualização 057 no Supabase para enviar pedidos.</div>';
+  return h+pdgEnviadosHtml();};
+var _rPedidosP=rPedidos;rPedidos=function(){var h=_rPedidosP();if(!PED.carregado||PED.erro||PED.ed||PED.vcad)return h;return pdgRecebidosHtml()+h;};
+var _rlEntraPdg=rlEntra;rlEntra=function(){_rlEntraPdg.apply(this,arguments);if(RL.user&&!PDG.carregando){PDG.carregando=true;pdgCarrega().then(function(){PDG.carregando=false;},function(){PDG.carregando=false;});}};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
