@@ -1328,6 +1328,10 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .aud-it{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-left:4px solid #8A8FA3;border-radius:10px;padding:8px 10px}.aud-it.grave{border-left-color:#E5484D}.aud-it>div:first-child{display:flex;flex-direction:column}.aud-it small{color:var(--muted);font-size:.78rem}
 .aud-bt{display:flex;gap:6px;flex:none}.aud-box{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0;display:flex;flex-direction:column;gap:6px}.aud-top{display:flex;gap:10px;align-items:center;justify-content:space-between}.aud-top>div{display:flex;flex-direction:column}.aud-top small{color:var(--muted);font-size:.78rem}.aud-ok{color:#13875F;margin:0}
 @media (max-width:600px){.aud-it{flex-direction:column;align-items:flex-start}.aud-top{flex-direction:column;align-items:flex-start}}
+.ext-it{border:1px solid var(--line);border-left:4px solid #8A8FA3;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:4px}.ext-it.ok{border-left-color:#13875F}.ext-it.warn{border-left-color:#E8A33A}.ext-it.bad{border-left-color:#E5484D}
+.ext-l1{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.ext-l1 small{color:var(--muted)}.ext-st{margin-left:auto;font-style:normal;font-size:.74rem;font-weight:700}
+.ext-m{margin:0;font-size:.8rem;color:var(--muted)}.ext-m.bad{color:#E5484D;font-weight:600}.ext-cli{font:inherit;font-size:.86rem;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);max-width:360px}
+.ext-bts{gap:6px}.ext-inove{border-color:#E5484D!important;color:#E5484D!important}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4510,6 +4514,85 @@ var _rAnaChatA=rAnaChat;rAnaChat=function(D){var h=_rAnaChatA.apply(this,argumen
   var R=AUD.res,bl='<div class="aud-box"><div class="aud-top"><div><b>🔍 Conferência de extratos</b><small>Todo dia eu cruzo o mês passado com este e com os pedidos, para nenhum cliente ficar sem lançamento.'+(AUD.em?' Última conferência: '+AUD.em.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'.':'')+'</small></div><button class="btn pri" data-act="audAgora">Conferir agora</button></div>'+
     (R?(R.itens.length?audHtmlItens(R):'<p class="small aud-ok">✅ '+MESES[R.alvo.mes-1]+': tudo lançado certinho.</p>'):'')+'</div>';
   return h.replace('<div class="achat-tar">',bl+'<div class="achat-tar">');};
+
+/* ===== Ana lê os extratos da Inove (PDF): confere valores, anexa no mês certo e acha baixa esquecida ===== */
+var PDFJS_URL='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',PDFJS_WK='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+var EXT={itens:[],lendo:0};
+function extPdfJs(){if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);return new Promise(function(ok,no){var s=document.createElement('script');s.src=PDFJS_URL;s.onload=function(){window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS_WK;ok(window.pdfjsLib);};s.onerror=no;document.head.appendChild(s);});}
+function extNum(t){if(t==null)return null;var s=String(t).replace(/\s/g,''),neg=/^-/.test(s)||/-$/.test(s);s=s.replace(/[^\d,]/g,'').replace(',','.');var v=parseFloat(s);return isNaN(v)?null:(neg?-v:v);}
+function extTexto(f){return extPdfJs().then(function(L){return f.arrayBuffer().then(function(b){return L.getDocument({data:b}).promise;});}).then(function(doc){var ps=[];for(var i=1;i<=doc.numPages;i++)ps.push(doc.getPage(i).then(function(pg){return pg.getTextContent();}));
+  return Promise.all(ps).then(function(cs){return cs.map(function(c){var linhas={};c.items.forEach(function(it){var y=Math.round(it.transform[5]/2)*2;(linhas[y]=linhas[y]||[]).push(it);});
+    return Object.keys(linhas).map(Number).sort(function(a,b){return b-a;}).map(function(y){return linhas[y].sort(function(a,b){return a.transform[4]-b.transform[4];}).map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();}).join('\n');}).join('\n');});});}
+function extParse(tx){var g=function(re){var m=tx.match(re);return m?m:null;},NUM='(-?\\s?[\\d.]+,\\d{2}-?)';
+  var c=g(/Cliente:\s*(.+?)\s*(?:\(([^)]*)\))?\s*\[(\d+)\]/)||g(/Cliente:\s*(.+?)\s{2,}/),p=g(/(\d{2})\/(\d{2})\/(\d{4})\s*a\s*(\d{2})\/(\d{2})\/(\d{4})/);
+  var sa=g(new RegExp('Saldo Anterior:\\s*'+NUM)),db=g(new RegExp('Total de D[ée]bitos[^:]*:\\s*'+NUM)),cr=g(new RegExp('Total de Cr[ée]ditos[^:]*:\\s*'+NUM)),at=g(new RegExp('Saldo Atual:\\s*'+NUM)),sv=g(new RegExp('Total de Servi[çc]os:\\s*'+NUM));
+  return {nome:c?String(c[1]).replace(/\s+/g,' ').trim():'',cod:c&&c[3]?c[3]:'',ano:p?+p[3]:null,mes:p?+p[2]:null,saldoAnt:sa?extNum(sa[1]):0,debitos:db?Math.abs(extNum(db[1])):(sv?Math.abs(extNum(sv[1])):null),creditos:cr?Math.abs(extNum(cr[1])):0,saldoAtual:at?extNum(at[1]):null};}
+function extNorm(s){return semAc(String(s||'')).replace(/\b(dr|dra|drs|lab|clinica|odontologia|odonto)\b\.?/g,' ').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();}
+function extAchaCli(d){var map=empDados().inoveCod||{};if(d.cod&&map[d.cod]){var c0=EMP.cli.filter(function(x){return x.id===map[d.cod];})[0];if(c0)return c0;}
+  var a=extNorm(d.nome),ta=a.split(' ').filter(function(w){return w.length>2;}),best=null,bs=0,emp=false;if(!ta.length)return null;
+  EMP.cli.forEach(function(c){var b=extNorm(c.nome);if(b===a){best=c;bs=99;return;}var tb=b.split(' ');var n=ta.filter(function(w){return tb.indexOf(w)>=0;}).length,sc=n/ta.length;if(n>=2||sc===1){if(sc>bs){bs=sc;best=c;emp=false;}else if(sc===bs)emp=true;}});
+  return bs>=0.6&&!emp?best:null;}
+function extRow(k,ano,mes){return FIN.M.filter(function(m){return finCliK(m)===k&&m.ano===ano&&m.mes===mes;})[0]||null;}
+function extAbertoAntes(k,ano,mes){return FIN.M.filter(function(m){return finCliK(m)===k&&(m.ano*100+m.mes)<(ano*100+mes);}).reduce(function(s,m){return s+finFaltaTela(m);},0);}
+function extPagosAntes(k,ano,mes){var L=FIN.M.filter(function(m){return finCliK(m)===k&&(m.ano*100+m.mes)<(ano*100+mes);}).sort(function(a,b){return (b.ano*100+b.mes)-(a.ano*100+a.mes);}),out=[];
+  L.slice(0,2).forEach(function(m){finPags(m).filter(function(p){return !p.anulado_em;}).forEach(function(p){out.push({m:m,p:p});});});return out;}
+function extAnalisa(it){var d=it.d,c=it.cliId?EMP.cli.filter(function(x){return x.id===it.cliId;})[0]:extAchaCli(d);it.cli=c||null;it.cliId=c?c.id:'';it.msgs=[];it.baixa=0;it.inoveAMenos=0;
+  if(!d.ano||!d.mes||d.debitos==null){it.st='erro';it.msgs.push('Não consegui ler o mês ou o total deste PDF.');return it;}
+  if(!c){it.st='cliente';it.msgs.push('Não achei o cliente "'+d.nome+'". Escolha abaixo.');return it;}
+  var k=c.id,row=extRow(k,d.ano,d.mes);it.row=row;
+  if(!row){it.st='novo';it.msgs.push('Não está lançado em '+MESES[d.mes-1]+'. Vou lançar com '+fmtR(d.debitos)+'.');}
+  else if(Math.abs((+row.valor_mes)-d.debitos)>0.009){it.st='dif';it.msgs.push('Lançado '+fmtR(row.valor_mes)+', o extrato diz '+fmtR(d.debitos)+'.');}
+  else it.st='ok';
+  var inove=-(d.saldoAnt||0),nosso=Math.max(0,extAbertoAntes(k,d.ano,d.mes));
+  if(inove-nosso>1){it.baixa=Math.round((inove-nosso)*100)/100;it.msgs.push('⚠️ A Inove cobra '+fmtR(inove)+' de saldo anterior, mas aqui consta '+(nosso>0.005?fmtR(nosso)+' em aberto':'tudo pago')+'. Possível baixa esquecida de '+fmtR(it.baixa)+'.');}
+  else if(nosso-inove>1){it.inoveAMenos=Math.round((nosso-inove)*100)/100;it.msgs.push('A Inove já deu baixa de '+fmtR(it.inoveAMenos)+' que aqui ainda consta em aberto. Lance o pagamento que falta.');}
+  return it;}
+function extLerArquivos(files){var L=[].slice.call(files||[]).filter(function(f){return /pdf/i.test(f.type)||/\.pdf$/i.test(f.name);});if(!L.length){toast('Escolha os PDFs dos extratos.');return;}
+  EXT.lendo=L.length;render();
+  return L.reduce(function(pr,f){return pr.then(function(){return extTexto(f).then(function(tx){var it=extAnalisa({id:'x'+Math.random().toString(36).slice(2,8),file:f,d:extParse(tx)});EXT.itens.push(it);}).catch(function(){EXT.itens.push({id:'x'+Math.random().toString(36).slice(2,8),file:f,d:{nome:f.name},st:'erro',msgs:['Não consegui abrir este PDF.']});}).then(function(){EXT.lendo--;render();});});},Promise.resolve())
+    .then(function(){EXT.lendo=0;render();var b=EXT.itens.filter(function(i){return i.baixa>0;}).length;toast('Li '+L.length+' extrato'+(L.length>1?'s':'')+'.'+(b?' ⚠️ '+b+' com possível baixa esquecida pela Inove.':''));});}
+var EXT_ST={ok:['✓ confere','ok'],novo:['➕ não lançado','warn'],dif:['≠ valor diferente','warn'],cliente:['? cliente','warn'],erro:['✕ não li','bad'],feito:['✓ anexado','ok']};
+function extMsgInove(it){var c=it.cli,d=it.d,P=extPagosAntes(c.id,d.ano,d.mes);
+  return 'Olá! Tudo bem? No extrato de '+MESES[d.mes-1]+' do cliente '+c.nome+(d.cod?' ['+d.cod+']':'')+' aparece saldo anterior de '+fmtR(-d.saldoAnt)+', mas esse valor já foi pago.\n\n'+
+    (P.length?'Pagamentos já feitos:\n'+P.map(function(x){return '• '+(x.p.data?x.p.data.split('-').reverse().join('/'):'')+' · '+fmtR(x.p.valor)+' ('+MESES[x.m.mes-1]+')';}).join('\n')+'\n\n':'')+
+    'Podem dar baixa de '+fmtR(it.baixa)+', por favor? Os comprovantes estão no sistema. Obrigado!';}
+function rExtItem(it){var s=EXT_ST[it.st]||['',''],c=it.cli,d=it.d||{};
+  return '<div class="ext-it '+s[1]+'"><div class="ext-l1"><b>'+esc(d.nome||(it.file&&it.file.name)||'')+'</b>'+(d.mes?'<small>'+MESES[d.mes-1]+'/'+d.ano+(d.debitos!=null?' · '+fmtR(d.debitos):'')+'</small>':'')+'<i class="ext-st">'+s[0]+'</i></div>'+
+    (it.msgs||[]).map(function(m){return '<p class="ext-m'+(/⚠️/.test(m)?' bad':'')+'">'+esc(m)+'</p>';}).join('')+
+    (it.st==='cliente'?'<select class="ext-cli" data-ext="'+it.id+'"><option value="">— escolha o cliente —</option>'+EMP.cli.filter(function(c){return c.ativo!==false;}).map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+'</option>';}).join('')+'</select>':'')+
+    '<div class="row wrap ext-bts">'+(it.st==='novo'||it.st==='ok'||it.st==='dif'?'<button class="btn sm pri" data-act="extAplica" data-v="'+it.id+'">'+(it.st==='novo'?'Lançar e anexar':it.st==='dif'?'Anexar e usar '+fmtR(d.debitos):'Anexar extrato')+'</button>'+(it.st==='dif'?'<button class="btn sm" data-act="extAplica" data-v="'+it.id+'|manter">Anexar e manter '+fmtR(it.row.valor_mes)+'</button>':''):'')+
+      (it.baixa>0&&c?'<button class="btn sm ext-inove" data-act="extInove" data-v="'+it.id+'">📣 Avisar a Inove</button>':'')+'<button class="btn sm" data-act="extTira" data-v="'+it.id+'" aria-label="Tirar da lista">✕</button></div>'+
+    (EXT.msg===it.id?'<div class="fincobm"><textarea id="ext-txt" rows="8">'+esc(extMsgInove(it))+'</textarea><div class="row wrap"><button class="btn" data-act="extCopia">Copiar</button><a class="btn pri cobwa" href="https://wa.me/?text='+encodeURIComponent(extMsgInove(it))+'" target="_blank" rel="noopener">'+WA_SVG+' Escolher contato no WhatsApp</a></div></div>':'')+'</div>';}
+function rExtBox(){var n=EXT.itens.length,ok=EXT.itens.filter(function(i){return i.st==='ok'||i.st==='novo';}).length;
+  return '<div class="aud-box ext-box"><div class="aud-top"><div><b>📤 Enviar extratos do mês</b><small>Selecione os PDFs da Inove (pode ser vários). Eu confiro cliente, mês e valor, anexo no lugar certo e aviso se a Inove esqueceu de dar baixa.</small></div>'+
+    '<label class="btn pri">'+(EXT.lendo?'Lendo… ('+EXT.lendo+')':'Escolher PDFs')+'<input type="file" id="ext-arqs" accept="application/pdf" multiple hidden></label></div>'+
+    (n?EXT.itens.map(rExtItem).join('')+'<div class="row wrap">'+(ok?'<button class="btn pri" data-act="extTodos">Aplicar todos que conferem ('+ok+')</button>':'')+'<button class="btn" data-act="extLimpa">Limpar lista</button></div>':'')+'</div>';}
+function extSalvaCod(it){if(!it.d.cod||!it.cli)return;var m=empDados().inoveCod||{};if(m[it.d.cod]===it.cli.id)return;empDadosGrava('inoveCod',it.d.cod,it.cli.id);}
+function extAplicaItem(it,manter){var d=it.d,c=it.cli;if(!c||it.busy)return Promise.resolve();it.busy=true;var row=extRow(c.id,d.ano,d.mes);
+  var pr=row?Promise.resolve(row):SB.from('odo_fin_meses').insert({user_id:RL.user.id,cliente_id:c.id,cliente_reg:c.reg||null,ano:d.ano,mes:d.mes,valor_mes:d.debitos}).select('*').single().then(function(r){if(r.error)throw r.error;finAtual(r.data);return r.data;});
+  return pr.then(function(m){return finTrocaArq(it.file,'extratos/'+d.ano+'-'+String(d.mes).padStart(2,'0')).then(function(path){var up={extrato_path:path,extrato_recebido:true};if(row&&!manter&&it.st==='dif')up.valor_mes=d.debitos;var velho=m.extrato_path;
+    return SB.from('odo_fin_meses').update(up).eq('id',m.id).select('*').single().then(function(r){if(r.error)throw r.error;finAtual(r.data);if(velho&&velho!==path)SB.storage.from('odonto-fin').remove([velho]);it.st='feito';it.msgs=it.baixa>0?it.msgs.filter(function(x){return /⚠️/.test(x);}):[];extSalvaCod(it);if(it.baixa>0)extBaixaGuarda(it);});});})
+  .catch(function(){toast('Não consegui salvar o extrato de '+c.nome+'.');}).then(function(){it.busy=false;render();});}
+function extBaixaGuarda(it){var k='b|'+it.cli.id+'|'+it.d.ano+'-'+String(it.d.mes).padStart(2,'0');var B=empDados().baixa||{};if(B[k])return;empDadosGrava('baixa',k,{v:it.baixa,nome:it.cli.nome,mes:it.d.mes,ano:it.d.ano,em:dHoje()});}
+document.addEventListener('change',function(e){var t=e.target;if(t.id==='ext-arqs'){extLerArquivos(t.files);t.value='';}
+  else if(t.classList&&t.classList.contains('ext-cli')){var it=EXT.itens.filter(function(x){return x.id===t.getAttribute('data-ext');})[0];if(it&&t.value){it.cliId=t.value;extAnalisa(it);render();}}});
+Object.assign(ACT,{
+  extAplica:function(v){var a=v.split('|'),it=EXT.itens.filter(function(x){return x.id===a[0];})[0];if(it)extAplicaItem(it,a[1]==='manter').then(function(){if(it.st==='feito')toast('Extrato de '+it.cli.nome+' anexado.');});},
+  extTodos:function(){var L=EXT.itens.filter(function(i){return i.st==='ok'||i.st==='novo';});L.reduce(function(p,it){return p.then(function(){return extAplicaItem(it,false);});},Promise.resolve()).then(function(){toast(L.length+' extrato'+(L.length>1?'s':'')+' anexado'+(L.length>1?'s':'')+'.');});},
+  extTira:function(v){EXT.itens=EXT.itens.filter(function(x){return x.id!==v;});if(EXT.msg===v)EXT.msg=null;render();},
+  extLimpa:function(){EXT.itens=[];EXT.msg=null;render();},
+  extInove:function(v){EXT.msg=EXT.msg===v?null:v;var it=EXT.itens.filter(function(x){return x.id===v;})[0];if(it&&it.cli)extBaixaGuarda(it);render();},
+  extCopia:function(){var t=document.getElementById('ext-txt');if(!t)return;try{navigator.clipboard.writeText(t.value).then(function(){toast('Mensagem copiada.');});}catch(e){t.select();}}});
+/* no painel da Ana, junto da conferência */
+var _rAnaChatX=rAnaChat;rAnaChat=function(D){var h=_rAnaChatX.apply(this,arguments);if(!D.fila||typeof pedAtivo!=='function'||!pedAtivo()||(typeof ESP!=='undefined'&&ESP.dono))return h;return h.replace('<div class="aud-box">',rExtBox()+'<div class="aud-box">');};
+/* baixas esquecidas entram na conferência diária até você marcar "Já conferi" */
+var _anaAudX=anaAuditoria;anaAuditoria=function(){var R=_anaAudX.apply(this,arguments);if(!R)return R;var B=empDados().baixa||{},ok=empDados().audit||{};
+  Object.keys(B).forEach(function(ch){if(ok[ch])return;var b=B[ch],k=ch.split('|')[1];R.itens.unshift({k:k,chave:ch,nome:b.nome,grave:true,tit:'Baixa pendente na Inove',mot:[fmtR(b.v)+' já pago, mas cobrado no extrato de '+MESES[b.mes-1]],mid:(extRow(k,b.ano,b.mes)||{}).id||null});});return R;};
+/* ao anexar o extrato dentro do cliente, a Ana confere a baixa na hora */
+document.addEventListener('change',function(e){var t=e.target;if(t.id!=='fx-arq')return;var f=(t.files||[])[0],m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0];if(!f||!m||!/pdf/i.test(f.type))return;var c=finCliObj(m);if(!c)return;
+  extTexto(f).then(function(tx){var it=extAnalisa({id:'x'+Date.now(),file:f,d:extParse(tx),cliId:c.id});if(it.d.cod&&it.cli)extSalvaCod(it);
+    if(it.baixa>0){extBaixaGuarda(it);EXT.itens.push(it);EXT.msg=it.id;setTimeout(function(){AUD.res=anaAuditoria();if(AUD.res)audMostra();},1200);}
+    else if(it.st==='dif')setTimeout(function(){toast('Atenção: o extrato diz '+fmtR(it.d.debitos)+' e o lançado é '+fmtR(m.valor_mes)+'.');},1500);}).catch(function(){});},true);
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
