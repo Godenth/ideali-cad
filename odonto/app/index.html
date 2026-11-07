@@ -3931,6 +3931,17 @@ function redeRealCarrega(){if(typeof RL==='undefined'||!RL.user)return;
 function profNomeH(p){if(p.pre)return esc(p.nome)+' <span class="nm-borra" aria-label="sobrenome oculto">'+'x'.repeat(p.sob)+'</span>';return esc(profNome(p));}
 
 Object.assign(ACT,{profMais:function(){S.rede.nmax=(S.rede.nmax||30)+30;var b=document.getElementById('rprofs');if(b)b.innerHTML=rProfsLista();else render();}});
+/* ===== F5 volta para a mesma tela: a tela atual fica no endereço (#...) ===== */
+var NAV0=(location.hash||'').replace(/^#/,''),NAV={pronto:false};
+function navAtual(){if(S.cfgOn)return 'config/'+(S.cfgAba||'conta');if(S.redeOn)return 'rede/'+((S.rede&&S.rede.sec)||'vagas');var t=(S.tab&&S.role&&S.tab[S.role])||'inicio';
+  return 'tab/'+t+(t==='financeiro'&&FIN.aba&&FIN.aba!=='mes'?'/'+FIN.aba:'')+(t==='producao'&&PED.vista==='lista'?'/lista':'');}
+function navAplica(h){var a=String(h||'').split('/');if(!a[0])return;
+  if(a[0]==='config'&&a[1]){S.cfgOn=true;S.cfgAba=a[1];S.redeOn=false;}
+  else if(a[0]==='rede'&&a[1]){S.redeOn=true;S.rede.sec=a[1];S.cfgOn=false;}
+  else if(a[0]==='tab'&&a[1]&&S.role){S.cfgOn=false;S.redeOn=false;S.tab[S.role]=a[1];if(a[1]==='financeiro'&&a[2])FIN.aba=a[2];if(a[1]==='producao'&&a[2]==='lista')PED.vista='lista';}}
+var _renderN=render;render=function(){var r=_renderN.apply(this,arguments);try{if(NAV.pronto&&typeof RL!=='undefined'&&RL.user&&!S.pos){var h=navAtual();if(location.hash!=='#'+h)history.replaceState(null,'','#'+h);}}catch(e){}return r;};
+var _rlEntraN=rlEntra;rlEntra=function(){var r=_rlEntraN.apply(this,arguments);try{if(!NAV.pronto&&RL.perfil){NAV.pronto=true;if(NAV0){navAplica(NAV0);render();}}}catch(e){}return r;};
+
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
   var z=function(D,f){if(!D||!D.exemplo)return;f(D);D.exemplo=false;D.conv=[{de:'ana',t:'Seu painel está pronto. Me peça para anotar o que precisar.'}];};
