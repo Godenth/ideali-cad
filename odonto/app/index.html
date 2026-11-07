@@ -2489,7 +2489,7 @@ function buscaEntende(q){var s=' '+semAc(q).replace(/[,;]+/g,' ')+' ',R={softs:[
   R.txt=R.txt.concat(fica);return R;}
 function profsFiltra(){var Q=buscaEntende(S.rede.q||''),sel=(S.rede.softs||[]).concat(Q.softs);
   return {Q:Q,L:REDE_PROFS.filter(function(p){var ps=p.softs.map(function(x){return x[0];});
-    if(sel.some(function(n){return ps.indexOf(n)<0;}))return false;if(Q.cid&&cidadeDe(p.cid)!==Q.cid)return false;if(Q.uf&&p.cid.slice(-2)!==Q.uf)return false;if(Q.prof&&p.prof!==Q.prof)return false;if(S.rede.fprof&&p.prof!==S.rede.fprof)return false;
+    if(sel.some(function(n){return ps.indexOf(n)<0;}))return false;if(Q.cid&&cidadeDe(p.cid)!==Q.cid)return false;if(Q.uf&&p.cid.slice(-2)!==Q.uf)return false;if(Q.prof&&!temProf(p,Q.prof))return false;if(S.rede.fprof&&!temProf(p,S.rede.fprof))return false;
     var tudo=semAc([p.cargo,p.esp,p.prof,p.formacao,p.resumo].concat(p.areas,p.cursos).join(' '));if(Q.txt.some(function(t){return tudo.indexOf(t.slice(0,Math.max(4,t.length-2)))<0;}))return false;
     if(!redeFiltro(p.cid)||!noRaio(p.cid))return false;return true;})};}
 function profAv(p,lg){var m=PCARD[p.prof]||PCARD.Dentista,ini=p.nome.split(/\s+/).map(function(x){return x[0];}).slice(0,2).join('');
@@ -3859,6 +3859,10 @@ function preProf(t){var s=semAc(t);return /dentist|cirurg|odontolog/.test(s)?'De
 var UF_NOME={'acre':'AC','alagoas':'AL','amapa':'AP','amazonas':'AM','bahia':'BA','ceara':'CE','distrito federal':'DF','brasilia':'DF','espirito santo':'ES','goias':'GO','maranhao':'MA','mato grosso':'MT','mato grosso do sul':'MS','minas gerais':'MG','minas':'MG','para':'PA','paraiba':'PB','parana':'PR','pernambuco':'PE','piaui':'PI','rio de janeiro':'RJ','rio grande do norte':'RN','rio grande do sul':'RS','rondonia':'RO','roraima':'RR','santa catarina':'SC','sao paulo':'SP','sergipe':'SE','tocantins':'TO'};
 function preUf(t){var s=semAc(String(t||'')).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();if(!s)return null;if(/^[a-z]{2}$/.test(s)&&UFS.map(semAc).indexOf(s)>=0)return s.toUpperCase();if(UF_NOME[s])return UF_NOME[s];
   var m=s.match(/\b([a-z]{2})$/);if(m&&UFS.map(semAc).indexOf(m[1])>=0)return m[1].toUpperCase();var ks=Object.keys(UF_NOME).sort(function(a,b){return b.length-a.length;});for(var i=0;i<ks.length;i++)if(ks[i].length>4&&s.indexOf(ks[i])>=0)return UF_NOME[ks[i]];return null;}
+var PRE_PROFS=['Dentista','Protético','ASB / TSB','Estudante','Corporativo','Indústria e comércio'];
+function preProfs(t){var out=[];String(t||'').replace(/[\[\]"]/g,' ').split(/[,;|\n]+|\s+e\s+/).forEach(function(x){x=x.trim();if(!x)return;var p=preProf(x);if(PRE_PROFS.indexOf(p)<0)p=x.slice(0,30);if(out.indexOf(p)<0)out.push(p);});
+  out.sort(function(a,b){var ia=PRE_PROFS.indexOf(a),ib=PRE_PROFS.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib);});return out;}
+function temProf(p,x){return (p.profs||[p.prof]).indexOf(x)>=0;}
 function preCsv(txt){txt=String(txt).replace(/^﻿/,'');var l1=txt.split(/\r?\n/)[0]||'',sep=(l1.split(';').length>l1.split(',').length)?';':(l1.split('\t').length>l1.split(',').length?'\t':','),R=[],row=[],cur='',q=false;
   for(var i=0;i<txt.length;i++){var c=txt[i];if(q){if(c==='"'){if(txt[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=c;}else if(c==='"')q=true;else if(c===sep){row.push(cur);cur='';}else if(c==='\n'||c==='\r'){if(c==='\r'&&txt[i+1]==='\n')i++;row.push(cur);cur='';if(row.some(function(x){return x.trim();}))R.push(row);row=[];}else cur+=c;}
   row.push(cur);if(row.some(function(x){return x.trim();}))R.push(row);return R;}
@@ -3870,8 +3874,8 @@ function preAnalisa(R){if(!R.length)return null;var h=R[0].map(function(x){retur
     if(!e&&!t){inval++;continue;}
     var ex=(e&&jaE[e])||(t&&jaT[t]);
     var j=(e&&vistoE[e]!=null)?vistoE[e]:(t&&vistoT[t]!=null)?vistoT[t]:-1;
-    var o={nome:g(cN).replace(/\s+/g,' ').slice(0,120)||null,email:e||null,whatsapp:t||null,profissao:preProf(g(cP))||null,cidade:g(cC).slice(0,80)||null,uf:preUf(g(cU)),tem_negocio:cNg>=0?/^s/i.test(g(cNg)):null,origem:'GoDenth · landing page'};
-    if(ex){exist++;var u=upd[ex.id]||{};['nome','profissao','cidade','uf','tem_negocio'].forEach(function(k){if((ex[k]==null||ex[k]==='')&&o[k]!=null&&o[k]!=='')u[k]=o[k];});if(Object.keys(u).length)upd[ex.id]=u;continue;}
+    var o={nome:g(cN).replace(/\s+/g,' ').slice(0,120)||null,email:e||null,whatsapp:t||null,profissao:(preProfs(g(cP)).join(' · ').slice(0,80))||null,cidade:g(cC).slice(0,80)||null,uf:preUf(g(cU)),tem_negocio:cNg>=0?/^s/i.test(g(cNg)):null,origem:'GoDenth · landing page'};
+    if(ex){exist++;var u=upd[ex.id]||{};['nome','profissao','cidade','uf','tem_negocio'].forEach(function(k){if((ex[k]==null||ex[k]==='')&&o[k]!=null&&o[k]!=='')u[k]=o[k];});if(o.profissao&&ex.profissao&&o.profissao!==ex.profissao&&o.profissao.split(' · ').length>ex.profissao.split(' · ').length)u.profissao=o.profissao;if(Object.keys(u).length)upd[ex.id]=u;continue;}
     if(j>=0){dupArq++;var a=ok[j];Object.keys(o).forEach(function(k){if(!a[k]&&o[k])a[k]=o[k];});if(a.email)vistoE[a.email]=j;if(a.whatsapp)vistoT[a.whatsapp]=j;continue;}
     ok.push(o);var n=ok.length-1;if(e)vistoE[e]=n;if(t)vistoT[t]=n;}
   return {ok:ok,upd:upd,nUpd:Object.keys(upd).length,dupArq:dupArq,inval:inval,exist:exist,total:R.length-ini,cols:{nome:cN,email:cE,tel:cT,prof:cP,uf:cU}};}
@@ -3913,14 +3917,14 @@ document.addEventListener('input',function(e){if(e.target.id==='pre-q'){PRE.q=e.
 function prePrepara(){var tk=espLS('io_pre_token');if(!tk||!RL.user)return Promise.resolve();
   return SB.rpc('odo_pre_aceita',{p_token:tk}).then(function(r){espLS('io_pre_token',null);if(r.error){toast(/usado/.test(r.error.message||'')?'Este convite já foi usado.':'Convite inválido.');return;}RL.pre=r.data||null;});}
 var _rlEntraP=rlEntra;rlEntra=function(){_rlEntraP.apply(this,arguments);var d=RL.pre;if(!d||RL.perfil||!S.cad)return;var c=S.cad;
-  if(d.nome&&!c.nome)c.nome=d.nome;if(d.whatsapp&&!c.whats)c.whats=rlTel(String(d.whatsapp).replace(/^55/,''));if(d.profissao&&ROLE_DE[d.profissao]&&!c.prof)c.prof=d.profissao;if(d.cidade&&!c.cidade)c.cidade=d.cidade;if(d.uf&&!c.uf)c.uf=d.uf;RL.pre=null;render();toast('Seus dados já vieram preenchidos. Confira e confirme.');};
+  if(d.nome&&!c.nome)c.nome=d.nome;if(d.whatsapp&&!c.whats)c.whats=rlTel(String(d.whatsapp).replace(/^55/,''));if(d.profissao&&!c.prof){var ps=String(d.profissao).split(' · ').map(function(x){var q=preProf(x);return q==='ASB / TSB'?'ASB / TSB':q;}).filter(function(x){return ROLE_DE[x]||x==='Protético';});if(ps.length){c.prof=ps[0];c.outras=ps.slice(1).filter(function(x){return PROFS.indexOf(x)>=0;});}}if(d.cidade&&!c.cidade)c.cidade=d.cidade;if(d.uf&&!c.uf)c.uf=d.uf;RL.pre=null;render();toast('Seus dados já vieram preenchidos. Confira e confirme.');};
 
 /* ===== Rede de verdade: perfis reais + pré-cadastros (primeiro nome e sobrenome embaçado) ===== */
 var REDE_REAL={ok:false,n:0};
 function redeProfMap(r){var sw=Array.isArray(r.softs)?r.softs.map(function(x){return Array.isArray(x)?[String(x[0]),x[1]||'m']:[String((x&&(x.n||x.nome))||x),'m'];}):[];
   return {id:r.id,nome:r.nome||'Profissional',prof:r.prof||'Dentista',cargo:r.cargo||r.prof||'',esp:'',cid:(r.cidade?r.cidade+' / ':'')+(r.uf||''),anos:0,softs:sw,areas:[],formacao:r.formacao||'',cursos:Array.isArray(r.cursos)?r.cursos.map(String):[],exp:Array.isArray(r.exp)?r.exp.map(function(e){return {cargo:e.cargo||'',anos:+e.anos||0,empresa:e.empresa||''};}):[],resumo:r.resumo||'',vis:{nome:r.nome?1:0,foto:r.tem_foto?1:0,empresas:1,cursos:1}};}
-function redePreMap(r){var pf=preProf(r.profissao||''),prof=['Dentista','Protético','ASB / TSB','Estudante','Indústria e comércio','Corporativo'].indexOf(pf)>=0?pf:'Corporativo';
-  return {id:r.id,pre:true,nome:r.primeiro_nome||'Profissional',sob:Math.min(14,Math.max(4,+r.letras_sobrenome||6)),prof:prof,cargo:r.profissao||'Profissão não informada',esp:'',cid:r.uf?(r.cidade?r.cidade:'')+' / '+r.uf:'Brasil',anos:0,softs:[],areas:[],formacao:'',cursos:[],exp:[],resumo:'',vis:{nome:1,foto:0,empresas:0,cursos:0}};}
+function redePreMap(r){var ps=String(r.profissao||'').split(' · ').map(function(x){var q=preProf(x);return PRE_PROFS.indexOf(q)>=0?q:null;}).filter(Boolean),prof=ps[0]||'Corporativo';
+  return {id:r.id,pre:true,profs:ps.length?ps:[prof],nome:r.primeiro_nome||'Profissional',sob:Math.min(14,Math.max(4,+r.letras_sobrenome||6)),prof:prof,cargo:r.profissao||'Profissão não informada',esp:'',cid:r.uf?(r.cidade?r.cidade:'')+' / '+r.uf:'Brasil',anos:0,softs:[],areas:[],formacao:'',cursos:[],exp:[],resumo:'',vis:{nome:1,foto:0,empresas:0,cursos:0}};}
 function redeRealCarrega(){if(typeof RL==='undefined'||!RL.user)return;
   Promise.all([SB.rpc('odo_rede_profs',{f_uf:null,f_cidade:null}),SB.rpc('odo_rede_pre',{f_uf:null})]).then(function(r){var A=(r[0].data||[]).map(redeProfMap),B=r[1].error?[]:(r[1].data||[]).map(redePreMap);
     REDE_PROFS.length=0;A.concat(B).forEach(function(x){REDE_PROFS.push(x);});REDE_REAL.ok=true;REDE_REAL.n=REDE_PROFS.length;REDE_REAL.pre=B.length;render();}).catch(function(){});}
