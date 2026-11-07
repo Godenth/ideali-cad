@@ -1397,6 +1397,9 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .pdg-rc{margin-top:10px;padding:12px;border-radius:12px;background:var(--surface,#fff);border:1px solid rgba(127,127,127,.25);display:grid;gap:4px}.pdg-rc.urg{border-color:#EF4444}
 .pdg-rc-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.pdg-rc-a{margin-top:8px;gap:8px;align-items:center}.pdg-rc-a select{max-width:260px}
 @media(max-width:600px){.pdg-arc{grid-template-columns:repeat(8,1fr)}.pdg-arc button:nth-child(8){margin-right:0}.pdg-b{padding:12px}}
+.pkan .pedc{cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.pkan .pedc.parr{opacity:.35}
+.pghost{position:fixed;z-index:400;pointer-events:none;transform:rotate(2deg) scale(1.03);cursor:grabbing;opacity:.96;display:block!important;margin:0!important;padding:0!important;overflow:visible!important}.pghost .pcol{padding:0!important;background:none!important;border:0!important;min-height:0!important;box-shadow:none!important}.pghost .pcol>.pedc{box-shadow:0 18px 40px rgba(0,0,0,.35);margin:0}
+body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:3px dashed var(--k,#7C3AED);outline-offset:-3px;background:color-mix(in srgb,var(--k,#7C3AED) 10%,transparent)}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3543,7 +3546,7 @@ function rPedidos(){if(!PED.carregado)return '<div class="empty">Carregando os p
 function rPedQuadro(){var L=pedFiltra(pedAtivos());
   return '<div class="pkan">'+PEDCOL.map(function(s){var C=L.filter(function(p){return p.status===s||(s==='desenho'&&p.status==='aguardando');}),cap=s==='entregue'?15:40;
     C.sort(s==='entregue'?function(a,b){return (b.entregue_em||b.criado_em)<(a.entregue_em||a.criado_em)?-1:1;}:pedOrdem);
-    return '<section class="pcol" style="--k:'+PEDST[s][1]+'"><div class="pcol-h"><i></i><b>'+PEDST[s][0]+'</b><span>'+C.length+'</span></div>'+(C.length?C.slice(0,cap).map(pedCard).join('')+(C.length>cap?'<button class="btn sm" data-act="pedVerSt" data-v="'+s+'">Ver todos os '+C.length+' na lista</button>':''):'<div class="pvazio">—</div>')+'</section>';}).join('')+'</div>';}
+    return '<section class="pcol" data-pst="'+s+'" style="--k:'+PEDST[s][1]+'"><div class="pcol-h"><i></i><b>'+PEDST[s][0]+'</b><span>'+C.length+'</span></div>'+(C.length?C.slice(0,cap).map(pedCard).join('')+(C.length>cap?'<button class="btn sm" data-act="pedVerSt" data-v="'+s+'">Ver todos os '+C.length+' na lista</button>':''):'<div class="pvazio">—</div>')+'</section>';}).join('')+'</div>';}
 function rPedLista(){var st=PED.st,L=PED.L.filter(function(p){return st==='ativos'?(!p.arquivado&&p.status!=='cancelado'):st==='arquivados'?p.arquivado:(p.status===st&&!p.arquivado);});L=pedFiltra(L);
   return '<div class="row wrap" style="margin:6px 0"><label class="small muted">Mostrar <select id="ped-st">'+[['ativos','Todos ativos']].concat(Object.keys(PEDST).map(function(k){return [k,PEDST[k][0]];})).concat([['arquivados','Arquivados']]).map(function(o){return '<option value="'+o[0]+'"'+(st===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label><span class="small muted">'+L.length+' pedido'+(L.length!==1?'s':'')+'</span></div>'+
     (L.length?'<div class="pedlista">'+L.slice(0,PED.mais).map(function(p){var r=pedRisco(p);return '<button class="pedli'+(p.tipo==='cad'?' pc-cad':'')+'" data-act="pedAbre" data-v="'+p.id+'"><span class="pedn">#'+(p.numero||'—')+'</span><span class="pedli-t"><b>'+esc(p.paciente||'Sem paciente')+'</b><small>'+esc(pedCli(p))+(p.trabalho?' · '+esc(p.trabalho):'')+'</small></span><span class="pill" style="--k:'+PEDST[p.status][1]+'">'+PEDST[p.status][0]+'</span><span class="small'+(r?' pprz '+r:' muted')+'">'+(p.prazo?dFmt(p.prazo):String(p.criado_em||'').slice(0,10).split('-').reverse().join('/'))+'</span><span class="pedv">'+(p.valor!=null?'R$ '+Number(p.valor).toLocaleString('pt-BR',{minimumFractionDigits:2}):'')+'</span></button>';}).join('')+'</div>'+
@@ -5078,6 +5081,29 @@ var _rDLabTabP=rDLabTab;rDLabTab=function(D){var h=_rDLabTabP(D);if(!RL.user)ret
   return h+pdgEnviadosHtml();};
 var _rPedidosP=rPedidos;rPedidos=function(){var h=_rPedidosP();if(!PED.carregado||PED.erro||PED.ed||PED.vcad)return h;return pdgRecebidosHtml()+h;};
 var _rlEntraPdg=rlEntra;rlEntra=function(){_rlEntraPdg.apply(this,arguments);if(RL.user&&!PDG.carregando){PDG.carregando=true;pdgCarrega().then(function(){PDG.carregando=false;},function(){PDG.carregando=false;});}};
+
+/* ===== Quadro de pedidos: clicar e arrastar o cartão para outra coluna ===== */
+(function(){var D=null,just=0;
+  var PATCH={desenho:function(p){return {status:'desenho'};},producao:function(p){return p.tipo==='cad'?{status:'producao',desenho_feito:true,enviado_inove:true}:{status:'producao'};},
+    finalizado:function(){return {status:'finalizado',finalizado_em:new Date().toISOString()};},entregue:function(){return {status:'entregue',entregue_em:new Date().toISOString()};}};
+  var MSG={desenho:'Voltou para Desenho CAD a fazer.',producao:'Foi para Em produção.',finalizado:'Marcado como pronto.',entregue:'Entregue.'};
+  function colEm(x,y){var el=document.elementFromPoint(x,y);return el&&el.closest?el.closest('.pkan .pcol[data-pst]'):null;}
+  function marca(c){Array.prototype.forEach.call(document.querySelectorAll('.pcol.pdrop'),function(e){if(e!==c)e.classList.remove('pdrop');});if(c)c.classList.add('pdrop');}
+  function comeca(e){var cd=D.card,r=cd.getBoundingClientRect(),g=document.createElement('div');g.className='pkan pghost';g.innerHTML='<section class="pcol" style="--k:'+(cd.closest('.pcol').style.getPropertyValue('--k'))+'"></section>';g.firstChild.appendChild(cd.cloneNode(true));g.style.width=r.width+'px';g.style.left=r.left+'px';g.style.top=r.top+'px';document.body.appendChild(g);
+    D.g=g;D.dx=D.x0-r.left;D.dy=D.y0-r.top;D.on=true;cd.classList.add('parr');document.body.classList.add('arrastando');if(navigator.vibrate&&D.touch)try{navigator.vibrate(15);}catch(x){}}
+  document.addEventListener('pointerdown',function(e){if(e.button>0||document.body.classList.contains('espelho'))return;var cd=e.target.closest&&e.target.closest('.pkan .pedc');if(!cd||e.target.closest('button,a,input,select'))return;
+    var col=cd.closest('.pcol[data-pst]');if(!col)return;D={card:cd,id:cd.getAttribute('data-v'),de:col.getAttribute('data-pst'),x0:e.clientX,y0:e.clientY,touch:e.pointerType!=='mouse',on:false,pid:e.pointerId};
+    if(D.touch)D.tm=setTimeout(function(){if(D&&!D.on)comeca(e);},380);});
+  document.addEventListener('pointermove',function(e){if(!D||e.pointerId!==D.pid)return;var mv=Math.abs(e.clientX-D.x0)+Math.abs(e.clientY-D.y0);
+    if(!D.on){if(D.touch){if(mv>10){clearTimeout(D.tm);D=null;}return;}if(mv<8)return;comeca(e);}
+    e.preventDefault();D.g.style.left=(e.clientX-D.dx)+'px';D.g.style.top=(e.clientY-D.dy)+'px';marca(colEm(e.clientX,e.clientY));
+    var k=e.clientX<60?-1:e.clientX>innerWidth-60?1:0,kv=e.clientY<70?-1:e.clientY>innerHeight-70?1:0,pk=document.querySelector('.pkan');if(k&&pk)pk.scrollLeft+=k*14;if(kv)window.scrollBy(0,kv*14);},{passive:false});
+  function fim(e){if(!D)return;clearTimeout(D.tm);var d=D;D=null;if(!d.on)return;just=Date.now();d.card.classList.remove('parr');document.body.classList.remove('arrastando');if(d.g)d.g.remove();
+    var c=colEm(e.clientX,e.clientY);marca(null);if(!c)return;var para=c.getAttribute('data-pst');if(para===d.de||!PATCH[para])return;
+    var p=PED.L.filter(function(x){return x.id===d.id;})[0];if(!p)return;pedMuda(d.id,PATCH[para](p),'#'+(p.numero||'')+' '+MSG[para]);}
+  document.addEventListener('pointerup',fim);document.addEventListener('pointercancel',function(e){if(D&&D.on)fim(e);else if(D){clearTimeout(D.tm);D=null;}});
+  document.addEventListener('click',function(e){if(Date.now()-just<350){e.stopPropagation();e.preventDefault();}},true);
+  document.addEventListener('contextmenu',function(e){if(D&&D.touch)e.preventDefault();});})();
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
