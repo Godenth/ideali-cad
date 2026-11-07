@@ -1293,6 +1293,15 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .finpq .finnav b{font-size:1.02rem}.finpq .finabas button{font-size:.86rem}.finpq .banner{font-size:.84rem}
 .finabrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.finabrow .finabas{margin:0}.finabrow .spacer{flex:1}
 .finnav.finnav-top{margin:0;display:inline-flex;align-items:center;gap:8px}.finnav.finnav-top b{min-width:132px;text-align:center}
+.finmarca-b,.ino-chip.marca{border-color:#E33!important;color:#E33!important}
+.fincred-pag{border-left:4px solid #E33}
+.finmv{position:fixed;inset:0;z-index:320;background:rgba(6,10,24,.7);display:flex;align-items:center;justify-content:center;padding:16px}
+.finmv-p{width:min(900px,100%);height:min(92vh,1100px);background:var(--surface);color:var(--ink);border-radius:16px;display:flex;flex-direction:column;overflow:hidden}
+.finmv-h{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}.finmv-h .spacer{flex:1}
+.finmv-c{position:relative;flex:1;overflow:auto;background:#fff}.finmv-c iframe{width:100%;height:100%;border:0;display:block}.finmv-c img{display:block;max-width:100%;margin:0 auto}
+.finmv-wm{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-around;align-items:center;overflow:hidden}
+.finmv-wm span{transform:rotate(-24deg);color:rgba(220,25,25,.42);font-weight:900;font-size:clamp(13px,2.4vw,26px);white-space:nowrap;letter-spacing:.02em;text-transform:uppercase}
+.finmv-leg{position:absolute;left:0;right:0;bottom:0;margin:0;padding:8px 12px;background:#D61F1F;color:#fff;font-weight:800;font-size:.86rem;text-align:center}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4278,6 +4287,54 @@ var _rPedidosA=rPedidos;rPedidos=function(){var h=_rPedidosA.apply(this,argument
     '<button class="anap-fab" data-act="anaPed" aria-label="Pedir para a Ana"><img src="'+ANA_AV[0]+'" alt=""><span>Novo pedido com a Ana</span></button>';};
 Object.assign(ACT,{anaPed:function(){anaAbre();}});
 (function(){var f=ACT.anaPed;ACT.anaPed=function(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espelho: só leitura.');return;}return f.apply(this,arguments);};})();
+
+/* ===== Crédito de um mês para o outro: comprovante com marca d'água vermelha ===== */
+function finMesRow(m,desl){var a=m.ano,ms=m.mes+desl;if(ms<1){ms=12;a--;}if(ms>12){ms=1;a++;}var k=finCliK(m);return FIN.M.filter(function(x){return x.ano===a&&x.mes===ms&&finCliK(x)===k;})[0]||null;}
+/* pagamentos que passaram do valor do mês (o que cruzou o valor e os seguintes) */
+function finSobraPags(m){if(!m)return [];var sobra=finPago(m)-(+m.valor_mes);if(sobra<=0.005)return [];var L=finPags(m).filter(function(p){return !p.anulado_em;}).slice().sort(function(a,b){return String(a.data||a.criado_em).localeCompare(String(b.data||b.criado_em));}),cum=0,out=[];
+  L.forEach(function(p){cum+=+p.valor;if(cum-(+m.valor_mes)>0.005)out.push(p);});return out;}
+function finTxtSobra(m){var s=finPago(m)-(+m.valor_mes),px=finMesRow(m,1);return 'PAGOU A MAIS ('+fmtR(s)+') · VAI ABATER EM '+(px?MESES[px.mes-1]:MESES[m.mes%12]).toUpperCase();}
+function finCredAtivo(m){var a=finAnt(m);return a>0.005&&m.abater_credito!==false?a:0;}
+function finCredComps(m){var a=finCredAtivo(m);if(!a)return [];var pv=finMesRow(m,-1);return finSobraPags(pv).filter(function(p){return p.comprovante_path;}).map(function(p){return {p:p,txt:'VALOR ABATIDO · SOBROU '+fmtR(a)+' DE '+MESES[pv.mes-1].toUpperCase()};});}
+/* abate por padrão: só não abate se você marcar "Não abater" */
+finRest=function(m){var r=(+m.valor_mes)-finPago(m),a=finAnt(m);if(a>0&&m.abater_credito!==false)r-=a;return Math.round(r*100)/100;};
+/* detalhe do mês */
+var _rFinDetM=rFinDet;rFinDet=function(m){var h=_rFinDetM.apply(this,arguments);if(!m)return h;
+  h=h.replace("Abater deste mês?","Está sendo abatido deste mês.");
+  finSobraPags(m).forEach(function(p){if(!p.comprovante_path)return;var b='<button class="btn sm" data-act="finArqVer" data-v="'+esc(p.comprovante_path)+'">📎 Comprovante</button>';
+    h=h.replace(b,'<button class="btn sm finmarca-b" data-act="finArqMarca" data-v="'+esc(p.comprovante_path)+'" data-m="'+esc(finTxtSobra(m))+'">📎 Comprovante</button><span class="pill bad">pagou a mais</span>');});
+  var C=finCredComps(m);if(C.length){var cr='<div class="finpag fincred-pag"><span><b>'+fmtR(finCredAtivo(m))+'</b><small>crédito que sobrou do mês passado · já abatido</small></span>'+C.map(function(c){return '<button class="btn sm finmarca-b" data-act="finArqMarca" data-v="'+esc(c.p.comprovante_path)+'" data-m="'+esc(c.txt)+'">📎 Comprovante</button>';}).join('')+'</div>';
+    h=h.replace('<div class="finpagnovo">',cr+'<div class="finpagnovo">');}
+  return h;};
+/* aba Inove */
+var _inoCompsM=inoComps;inoComps=function(m){var h=_inoCompsM.apply(this,arguments);
+  finSobraPags(m).forEach(function(p){if(!p.comprovante_path)return;h=h.replace('class="ino-chip" data-act="finArqVer" data-v="'+esc(p.comprovante_path)+'"','class="ino-chip marca" data-act="finArqMarca" data-v="'+esc(p.comprovante_path)+'" data-m="'+esc(finTxtSobra(m))+'"');});
+  finCredComps(m).forEach(function(c){h+='<button class="ino-chip marca" data-act="finArqMarca" data-v="'+esc(c.p.comprovante_path)+'" data-m="'+esc(c.txt)+'" title="Crédito do mês passado">📎 crédito</button>';});
+  return h;};
+/* visualizador com a marca d'água */
+function finUrlAssinada(path){return SB.storage.from('odonto-fin').createSignedUrl(path,600).then(function(r){if(r.error||!r.data)throw r.error||'url';return r.data.signedUrl;});}
+function finMarcaFecha(){var d=document.getElementById('finmv');if(d)d.remove();document.removeEventListener('keydown',finMarcaEsc);}
+function finMarcaEsc(e){if(e.key==='Escape')finMarcaFecha();}
+var PDFLIB_URL='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';
+function finPdfLib(){if(window.PDFLib)return Promise.resolve(window.PDFLib);return new Promise(function(ok,no){var s=document.createElement('script');s.src=PDFLIB_URL;s.onload=function(){ok(window.PDFLib);};s.onerror=no;document.head.appendChild(s);});}
+function finBaixa(blob,nome){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},800);}
+function finCarimba(url,ePdf,txt){return fetch(url).then(function(r){if(!r.ok)throw 'baixar';return r.arrayBuffer();}).then(function(buf){
+  if(ePdf)return finPdfLib().then(function(L){return L.PDFDocument.load(buf).then(function(doc){return doc.embedFont(L.StandardFonts.HelveticaBold).then(function(f){
+    doc.getPages().forEach(function(pg){var w=pg.getWidth(),h=pg.getHeight(),sz=Math.max(12,Math.min(w,h)/22),tw=f.widthOfTextAtSize(txt,sz);
+      [0.3,0.55,0.8].forEach(function(y){pg.drawText(txt,{x:w/2-tw*0.42,y:h*y-tw*0.26,size:sz,font:f,color:L.rgb(0.86,0.1,0.1),opacity:0.42,rotate:L.degrees(30)});});});
+    return doc.save();});}).then(function(b){return new Blob([b],{type:'application/pdf'});});});
+  return new Promise(function(ok,no){var im=new Image();im.onload=function(){var c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;var x=c.getContext('2d');x.drawImage(im,0,0);
+    var sz=Math.max(18,Math.min(c.width,c.height)/16);x.font='800 '+sz+'px Arial,sans-serif';x.fillStyle='rgba(220,25,25,.5)';x.textAlign='center';x.textBaseline='middle';
+    [0.3,0.55,0.8].forEach(function(y){x.save();x.translate(c.width/2,c.height*y);x.rotate(-Math.PI/7);x.fillText(txt,0,0);x.restore();});c.toBlob(ok,'image/png');};im.onerror=no;im.src=URL.createObjectURL(new Blob([buf]));});});}
+ACT.finArqMarca=function(v,el){var txt=(el&&el.getAttribute('data-m'))||'',ePdf=/\.pdf$/i.test(v);finMarcaFecha();
+  var d=document.createElement('div');d.id='finmv';d.className='finmv';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Comprovante');
+  d.innerHTML='<div class="finmv-p"><div class="finmv-h"><b>📎 Comprovante</b><span class="spacer"></span><button class="btn sm" data-mv="baixa" disabled>⬇ Baixar com a marca</button><button class="btn sm" data-mv="fecha" aria-label="Fechar">✕</button></div><div class="finmv-c"><div class="empty">Abrindo…</div></div></div>';
+  document.body.appendChild(d);document.addEventListener('keydown',finMarcaEsc);
+  var marca='<div class="finmv-wm" aria-hidden="true">'+[0,1,2].map(function(){return '<span>'+esc(txt)+'</span>';}).join('')+'</div><p class="finmv-leg">'+esc(txt)+'</p>';
+  finUrlAssinada(v).then(function(url){var c=d.querySelector('.finmv-c');c.innerHTML=(ePdf?'<iframe src="'+esc(url)+'" title="Comprovante"></iframe>':'<img src="'+esc(url)+'" alt="Comprovante">')+marca;var b=d.querySelector('[data-mv=baixa]');b.disabled=false;
+    b.onclick=function(){b.disabled=true;b.textContent='Preparando…';finCarimba(url,ePdf,txt).then(function(bl){finBaixa(bl,'comprovante-marcado.'+(ePdf?'pdf':'png'));b.disabled=false;b.textContent='⬇ Baixar com a marca';}).catch(function(){b.disabled=false;b.textContent='⬇ Baixar com a marca';toast('Não consegui preparar o arquivo.');});};})
+  .catch(function(){finMarcaFecha();toast('Não consegui abrir o arquivo.');});
+  d.addEventListener('click',function(e){if(e.target===d||e.target.closest('[data-mv=fecha]'))finMarcaFecha();});};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
