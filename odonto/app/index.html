@@ -3730,7 +3730,7 @@ function inoAtrasados(L,vi){var hoje=dHoje(),out=[];L.forEach(function(m){if(+m.
   else if(hoje>vi)out.push([m,Math.round((new Date(hoje+'T12:00:00')-new Date(vi+'T12:00:00'))/864e5),'ainda falta '+fmtR(Math.max(0,finRest(m)))]);});return out.sort(function(a,b){return b[1]-a[1];});}
 function inoStatus(m){var s=finSt(m)[0];return s==='pago'?['Quitado','ok']:s==='parcial'?['Parcial','warn']:s==='zero'?['—','']:['Nada Pago','bad'];}
 function inoComps(m){return finPags(m).filter(function(p){return !p.anulado_em;}).map(function(p){var d=(p.data||String(p.criado_em).slice(0,10)).split('-').reverse().slice(0,2).join('/');
-  return p.comprovante_path?'<button class="ino-chip" data-act="finArqVer" data-v="'+esc(p.comprovante_path)+'" title="'+fmtR(p.valor)+'">📎 '+d+'</button>':'<span class="ino-chip off" title="'+fmtR(p.valor)+' · arquivo ainda no sistema antigo">📎 '+d+'</span>';}).join('');}
+  return p.comprovante_path?'<button class="ino-chip" data-act="finArqVer" data-v="'+esc(p.comprovante_path)+'" title="'+fmtR(p.valor)+'">📎 '+d+' · <b>'+fmtR(p.valor)+'</b></button>':'<span class="ino-chip off" title="'+fmtR(p.valor)+' · arquivo ainda no sistema antigo">📎 '+d+' · <b>'+fmtR(p.valor)+'</b></span>';}).join('');}
 function rInove(){if(!FIN.carregado)return '<div class="empty">Carregando…</div>';if(FIN.erro)return rFin();if(INO.hist)return rInoHist(INO.hist);
   var L=finDoMes(),tot=0,pg=0,sal=0;L.forEach(function(m){tot+=+m.valor_mes;pg+=finPago(m);sal+=Math.max(0,finRest(m));});
   var com=L.filter(function(m){return +m.valor_mes>0;}),pagaram=com.filter(function(m){return finPago(m)>0.005||m.quitado;}).length,pc=tot?Math.round(pg/tot*100):0;
@@ -4314,7 +4314,7 @@ var _rFinDetM=rFinDet;rFinDet=function(m){var h=_rFinDetM.apply(this,arguments);
 /* aba Inove */
 var _inoCompsM=inoComps;inoComps=function(m){var h=_inoCompsM.apply(this,arguments);
   finSobraPags(m).forEach(function(p){if(!p.comprovante_path)return;h=h.replace('class="ino-chip" data-act="finArqVer" data-v="'+esc(p.comprovante_path)+'"','class="ino-chip marca" data-act="finArqMarca" data-v="'+esc(p.comprovante_path)+'" data-m="'+esc(finTxtSobra(m))+'"');});
-  finCredComps(m).forEach(function(c){h+='<button class="ino-chip marca" data-act="finArqMarca" data-v="'+esc(c.p.comprovante_path)+'" data-m="'+esc(c.txt)+'" title="Crédito do mês passado">📎 crédito</button>';});
+  finCredComps(m).forEach(function(c){h+='<button class="ino-chip marca" data-act="finArqMarca" data-v="'+esc(c.p.comprovante_path)+'" data-m="'+esc(c.txt)+'" title="Crédito do mês passado">📎 crédito · <b>'+fmtR(finCredAtivo(m))+'</b></button>';});
   return h;};
 /* visualizador com a marca d'água */
 function finUrlAssinada(path){return SB.storage.from('odonto-fin').createSignedUrl(path,600).then(function(r){if(r.error||!r.data)throw r.error||'url';return r.data.signedUrl;});}
