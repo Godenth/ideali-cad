@@ -1286,6 +1286,11 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .anp-n{width:24px;height:24px;flex:none;border-radius:50%;background:#7C5CFF;color:#fff;font-weight:800;display:grid;place-items:center;font-size:.8rem}
 .anp-tot{margin:0;text-align:right}
 .anap-b{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}.anap-b .btn{min-height:46px}.anap-b .btn.pri{flex:1;max-width:260px}
+.finbusca{margin:4px 0 10px}.finbusca input{width:100%;max-width:420px;font:inherit;font-size:16px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.finli[hidden]{display:none!important}
+.finpq{font-size:.9rem}.finpq h2{font-size:1.15rem}.finpq .finkpi b{font-size:1.15rem}.finpq .finkpi span{font-size:.76rem}
+.finpq .finli{padding-top:8px;padding-bottom:8px}.finpq .finli b{font-size:.92rem}.finpq .finli small{font-size:.74rem}.finpq .finv{font-size:.86rem}
+.finpq .finnav b{font-size:1.02rem}.finpq .finabas button{font-size:.86rem}.finpq .banner{font-size:.84rem}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -2228,7 +2233,7 @@ function rPPerfil(D){var c=S.cad,pf=PROFS[1];var res=(c.prof===pf||(c.outras||[]
 function rProt(){var D=S.prot;if(!D){D=S.prot=pCarrega()||pSeed((S.cad.nome||'').split(' ')[0]);}var t=S.tab.prot||'inicio';
   var corpo=t==='inove'&&typeof pedAtivo==='function'&&pedAtivo()?rInove():t==='equipe'&&S.neg?rNegEquipe(S.neg,negT()):t==='vagas'&&S.neg?rNegVagas(S.neg,negT()):t==='producao'?(pedAtivo()?rPedidos():rPProducao(D)):t==='clientes'||t==='financeiro'?rPTrava(t):t==='agentes'?rDAgentes(D):t==='rede'?rDRede(D):t==='perfil'?rPPerfil(D):rPInicio(D);
   var ab=D.fila.filter(function(f){return (f.st==='fila'||f.st==='fazendo')&&dDif(f.prazo)<=1;}).length,nv=PVAGAS.filter(function(v){return v.novo;}).length,badge={producao:(typeof pedAtivo==='function'&&pedAtivo())?pedBadge():ab,agentes:nv};
-  return rFestaDecor()+'<div class="dp2 pp">'+rAnaTopo(D)+
+  return rFestaDecor()+'<div class="dp2 pp">'+(t==='inicio'?rAnaTopo(D):'')+
     '<nav class="dabas" role="tablist" aria-label="Painel do protético">'+(S.neg?PMENU.slice(0,4).concat((typeof pedAtivo==='function'&&pedAtivo()?[['inove','Inove','fin']]:[]).concat([['equipe','Equipe','eu'],['vagas','Vagas','rede']]),PMENU.slice(4)):PMENU).map(function(x){var tr=!S.neg&&(x[0]==='clientes'||x[0]==='financeiro');return '<button role="tab" aria-selected="'+(t===x[0])+'" data-act="dTab" data-v="'+x[0]+'"'+(tr?' class="trava"':x[0]==='inove'?' class="aba-inove"':'')+'>'+dIco(tr?'cad':x[2],'di sm')+'<span>'+(x[0]==='producao'&&typeof pedAtivo==='function'&&pedAtivo()?'Pedidos':x[1])+'</span>'+(badge[x[0]]?'<i>'+badge[x[0]]+'</i>':'')+'</button>';}).join('')+'</nav>'+
     '<div class="dcont" data-tab="'+t+'">'+corpo+'</div></div>';}
 
@@ -3566,14 +3571,16 @@ function rFin(){if(!FIN.carregado)return '<div class="empty">Carregando o financ
   return '<div class="dtop"><div><h2>Financeiro</h2><p class="small muted">Quanto cada cliente deve, o que já pagou e os comprovantes. Só você vê.</p></div></div>'+
     '<div class="seg finabas">'+abas.map(function(a){return '<button aria-pressed="'+(FIN.aba===a[0])+'" data-act="finAba" data-v="'+a[0]+'">'+a[1]+'</button>';}).join('')+'</div>'+
     (FIN.aba==='leit'&&!ESP.dono?rFinLeit():FIN.aba==='pend'?rFinPend():FIN.aba==='hist'?rFinHist():FIN.aba==='cfg'?rFinCfg():rFinMes());}
+var _rFinPq=rFin;rFin=function(){return '<div class="finpq">'+_rFinPq.apply(this,arguments)+'</div>';};
+document.addEventListener('input',function(e){if(!e.target||e.target.id!=='fin-q')return;FIN.q=e.target.value;var q=semAc(FIN.q.trim());document.querySelectorAll('.finli[data-n]').forEach(function(b){b.hidden=!!q&&b.getAttribute('data-n').indexOf(q)<0;});});
 function rFinMes(){var L=finDoMes(),fat=0,rec=0,fal=0;L.forEach(function(m){fat+=+m.valor_mes;rec+=finPago(m);fal+=Math.max(0,finRest(m));});
   var ordem={aberto:0,parcial:1,zero:2,pago:3};L.sort(function(a,b){return (ordem[finSt(a)[0]]-ordem[finSt(b)[0]])||finCliNome(a).localeCompare(finCliNome(b),'pt');});
   var com=finComPend(),pct=+(FIN.cfg.comissao_pct||0);
   return '<div class="finnav"><button class="btn sm" data-act="finMesMuda" data-v="-1" aria-label="Mês anterior">‹</button><b>'+MESES[FIN.mes-1].charAt(0).toUpperCase()+MESES[FIN.mes-1].slice(1)+' de '+FIN.ano+'</b><button class="btn sm" data-act="finMesMuda" data-v="1" aria-label="Próximo mês">›</button><span class="spacer"></span><button class="btn pri" data-act="finNovoAbre">+ Lançar cliente no mês</button></div>'+
     '<div class="finkpis">'+[[fmtR(fat),'faturado no mês',''],[fmtR(rec),'recebido','ok'],[fmtR(fal),'falta receber',fal>0.005?'bad':''],[fmtR(com),'comissão a receber ('+pct+'%)','roxo']].map(function(k){return '<div class="finkpi '+k[2]+'"><b>'+k[0]+'</b><span>'+k[1]+'</span></div>';}).join('')+'</div>'+
     (com>0.005?'<div class="banner fincom"><span>💜 Comissão de <b>'+fmtR(com)+'</b> sobre o que os clientes já pagaram.</span><button class="btn sm" data-act="finComSaca">Registrar que recebi</button></div>':'')+
-    (FIN.novo?rFinNovo():'')+
-    (L.length?'<div class="finlista">'+L.map(function(m){var s=finSt(m),pg=finPago(m),r=finRest(m),a=finAnt(m);return '<button class="finli" data-act="finAbre" data-v="'+m.id+'" style="--k:'+s[2]+'"><span class="finli-n"><b>'+esc(finCliNome(m))+'</b><small>'+(m.extrato_path||m.arquivo_legado?'📄 extrato · ':'')+(m.enviado?'✉️ enviado':'não enviado')+(a<-0.005?' · ⚠️ devia '+fmtR(-a)+' do mês anterior':'')+(a>0.005?' · crédito de '+fmtR(a):'')+'</small></span><span class="finv"><small>mês</small>'+fmtR(m.valor_mes)+'</span><span class="finv"><small>pago</small>'+fmtR(pg)+'</span><span class="finv"><small>falta</small>'+fmtR(Math.max(0,r))+'</span><span class="pill">'+s[1]+'</span></button>';}).join('')+'</div>':'<div class="empty">Nenhum cliente lançado em '+MESES[FIN.mes-1]+'. Use “+ Lançar cliente no mês”.</div>');}
+    (FIN.novo?rFinNovo():'')+'<div class="finbusca"><input id="fin-q" type="search" placeholder="🔍 Buscar cliente pelo nome" autocomplete="off" value="'+esc(FIN.q||'')+'" aria-label="Buscar cliente pelo nome"></div>'+
+    (L.length?'<div class="finlista">'+L.map(function(m){var s=finSt(m),pg=finPago(m),r=finRest(m),a=finAnt(m);return '<button class="finli" data-act="finAbre" data-v="'+m.id+'" data-n="'+esc(semAc(finCliNome(m)))+'"'+(FIN.q&&semAc(finCliNome(m)).indexOf(semAc(FIN.q.trim()))<0?' hidden':'')+' style="--k:'+s[2]+'"><span class="finli-n"><b>'+esc(finCliNome(m))+'</b><small>'+(m.extrato_path||m.arquivo_legado?'📄 extrato · ':'')+(m.enviado?'✉️ enviado':'não enviado')+(a<-0.005?' · ⚠️ devia '+fmtR(-a)+' do mês anterior':'')+(a>0.005?' · crédito de '+fmtR(a):'')+'</small></span><span class="finv"><small>mês</small>'+fmtR(m.valor_mes)+'</span><span class="finv"><small>pago</small>'+fmtR(pg)+'</span><span class="finv"><small>falta</small>'+fmtR(Math.max(0,r))+'</span><span class="pill">'+s[1]+'</span></button>';}).join('')+'</div>':'<div class="empty">Nenhum cliente lançado em '+MESES[FIN.mes-1]+'. Use “+ Lançar cliente no mês”.</div>');}
 function rFinNovo(){var tem={};finDoMes().forEach(function(m){tem[finCliK(m)]=1;});var L=EMP.cli.filter(function(c){return c.ativo&&!tem[c.id];});
   return '<section class="card finnovo"><h3>Lançar cliente em '+MESES[FIN.mes-1]+'</h3><div class="row wrap"><select id="fn-cli"><option value="">— cliente —</option>'+L.map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+'</option>';}).join('')+'</select><input id="fn-valor" inputmode="decimal" placeholder="Valor do mês (R$)"><button class="btn pri" data-act="finNovoSalva"'+(FIN.busy?' disabled':'')+'>Lançar</button><button class="btn" data-act="finNovoFecha">Cancelar</button></div></section>';}
 function rFinDet(m){if(!m){FIN.ed=null;return rFin();}var c=finCliObj(m),pg=finPago(m),r=finRest(m),a=finAnt(m),s=finSt(m),P=finPags(m);
