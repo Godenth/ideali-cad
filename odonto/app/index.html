@@ -1347,6 +1347,22 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 @media (max-width:760px){.ai-corpo{grid-template-columns:1fr;grid-template-rows:38% 1fr}.ai-esq{border-right:0;border-bottom:1px solid var(--line)}.ai-abre{margin:8px 0 0}}
 .inv-tab{margin:6px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.82rem}.inv-tr{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;padding:4px 8px;border-bottom:1px solid var(--line)}.inv-tr:last-child{border-bottom:0}.inv-th{color:var(--muted);font-size:.7rem;text-transform:uppercase}.inv-tr .bad,.ai-msg .bad{color:#E5484D}
 .ai-msg code{font-size:.78rem;background:rgba(128,128,160,.18);padding:1px 5px;border-radius:5px}.ai-msg .ih-ver,.ai-msg .ih-tag{margin:2px 2px 2px 0;display:inline-block}
+.aipan{padding:0!important}.ai-p{width:100%!important;height:100%!important;max-height:none!important;border-radius:0!important}
+.ai-corpo{grid-template-columns:330px 1fr!important}.ai-dir{padding:0!important;gap:0!important}
+.ai-chat{background:#0B141A;background-image:radial-gradient(rgba(255,255,255,.03) 1px,transparent 1px);background-size:18px 18px;padding:18px 6% !important;gap:6px!important}
+.zp{max-width:min(720px,78%);align-self:flex-start;background:#202C33;color:#E9EDEF;border-radius:2px 12px 12px 12px;padding:6px 10px 18px;position:relative;font-size:.93rem;line-height:1.45;box-shadow:0 1px 1px rgba(0,0,0,.25);animation:in .25s}
+.zp.eu{align-self:flex-end;background:#005C4B;border-radius:12px 2px 12px 12px}.zp.erro{background:#3B1D22;border:1px solid #E5484D}.zp.zpl{max-width:min(980px,96%);width:100%}
+.zp-n{display:block;font-size:.74rem;font-weight:800;color:#F5C518;margin-bottom:2px}.zp.eu .zp-n{color:#7EE2B8}
+.zp-t{position:absolute;right:9px;bottom:3px;font-size:.66rem;color:#8696A0}.zp.eu .zp-t{color:#9fd6c6}
+.zp-dig .zp-c{color:#8696A0;font-style:italic;display:flex;align-items:center;gap:3px}.zp-dig i{width:6px;height:6px;border-radius:50%;background:#8696A0;display:inline-block;animation:dig 1s infinite}.zp-dig i:nth-child(2){animation-delay:.15s}.zp-dig i:nth-child(3){animation-delay:.3s}
+@keyframes dig{0%,60%,100%{opacity:.25;transform:none}30%{opacity:1;transform:translateY(-3px)}}
+.zp .ih-ver{background:rgba(255,255,255,.08);color:#E9EDEF;border-color:rgba(255,255,255,.18)}.zp .ih-tag{color:#C7CDD1}.zp code{background:rgba(255,255,255,.1)}
+.ai-sel{padding:6px 14px 0;background:var(--surface)}.ai-acoes{padding:8px 14px 12px;background:var(--surface)}
+.inv-pl{margin-top:6px;border:1px solid rgba(255,255,255,.14);border-radius:10px;overflow:hidden;font-size:.82rem}
+.inv-pr{display:grid;grid-template-columns:30px 30px 1.3fr 1fr 1.3fr .7fr .9fr;gap:6px;align-items:center;padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
+.inv-pr.ok{background:rgba(43,182,115,.16)}.inv-pr.dup{background:rgba(229,72,77,.18)}.inv-ph{font-size:.68rem;text-transform:uppercase;color:#8696A0;cursor:default}.inv-pf{cursor:default;background:rgba(255,255,255,.05)}.inv-pf .okt{color:#2BB673;font-weight:800}
+.inv-pr input{width:18px;height:18px;accent-color:#2BB673;cursor:pointer}
+@media (max-width:760px){.ai-corpo{grid-template-columns:1fr!important}.ai-chat{padding:12px 8px!important}.zp{max-width:92%}.inv-pr{grid-template-columns:26px 1fr 1fr 1fr;}.inv-pr span:nth-child(2),.inv-pr span:nth-child(5),.inv-pr span:nth-child(6){display:none}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4750,14 +4766,14 @@ aiInvest=function(v){var a=v.split('|'),k=a[0],ano=+a[1],mes=+a[2],sa=+a[3],c=EM
         if(parecido){var s=parecido.r||{};h+='<br><small>ℹ️ Valor igual ao de '+invDt(parecido.p.data)+(s.hora?' '+s.hora:'')+', mas '+(r.cod&&s.cod?'o código é outro':r.hora&&s.hora&&r.hora!==s.hora?'a hora é outra':'o arquivo é outro')+': são pagamentos diferentes.</small>';}}
       vistos.push(x);aiDiz(h,false,igual||(r.valor!=null&&Math.abs(r.valor-(+x.p.valor))>0.009)?'erro':'');});});},Promise.resolve())
   .then(function(){AI.busy=false;var inove=-sa,nosso=Math.max(0,extAbertoAntes(k,ano,mes)),dfz=Math.round((inove-nosso)*100)/100,somaDup=dups.reduce(function(s,d){return s+(+d.x.p.valor);},0),somaDif=dif.reduce(function(s,x){return s+((+x.p.valor)-(x.r.valor||0));},0);
-    var res='📋 <b>Resultado:</b> '+(comArq.length-dups.length-dif.length)+' comprovante'+(comArq.length-dups.length-dif.length!==1?'s':'')+' ✅ conferido'+(comArq.length-dups.length-dif.length!==1?'s':'')+(dups.length?', <b class="bad">'+dups.length+' duplicado'+(dups.length>1?'s':'')+' ('+fmtR(somaDup)+')</b>':'')+(dif.length?', <b class="bad">'+dif.length+' com valor diferente</b>':'')+'.<br>';
-    if(Math.abs(dfz)<=1){aiDiz(res+'🎉 Conferindo um por um, o saldo daqui bate com o da Inove. <b>Resolvido.</b>');return;}
+    var totC=L.reduce(function(s,x){return s+(+x.p.valor);},0),totM=M.reduce(function(s,m){return s+(+m.valor_mes);},0);dups.forEach(function(d){d.x.dup=1;});AI.inv.dif=dfz;
+    var res='📋 <b>Resultado:</b> '+(comArq.length-dups.length-dif.length)+' comprovante'+(comArq.length-dups.length-dif.length!==1?'s':'')+' ✅ conferido'+(comArq.length-dups.length-dif.length!==1?'s':'')+(dups.length?', <b class="bad">'+dups.length+' duplicado'+(dups.length>1?'s':'')+' ('+fmtR(somaDup)+')</b>':'')+(dif.length?', <b class="bad">'+dif.length+' com valor diferente</b>':'')+'.<br>💰 Somando tudo: <b>'+L.length+' pagamentos = '+fmtR(totC)+'</b> · os '+M.length+' meses somam <b>'+fmtR(totM)+'</b>'+(totC>totM+0.5?' (pago '+fmtR(totC-totM)+' a mais)':totM>totC+0.5?' (falta '+fmtR(totM-totC)+')':'')+'.<br>';
+    if(Math.abs(dfz)<=1){aiDiz(res+'🎉 Conferindo um por um, o saldo daqui bate com o da Inove. <b>Resolvido.</b>');invPlanilha();return;}
     res+='A Inove cobra <b>'+fmtR(inove)+'</b> de saldo anterior; aqui consta <b>'+fmtR(nosso)+'</b>. Diferença: <b>'+fmtR(dfz)+'</b>.';
-    if(dups.length&&Math.abs(somaDup+somaDif-dfz)<=1){aiDiz(res+'<br>✅ <b>Achei a causa:</b> a diferença é exatamente o'+(dups.length>1?'s comprovantes lançados':' comprovante lançado')+' em dobro aqui. Não é baixa da Inove: '+(ESP.dono?'peça para o laboratório apagar':'é só anular')+' o lançamento repetido ('+dups.map(function(d){return invDt(d.x.p.data)+' · '+fmtR(d.x.p.valor);}).join(', ')+').',false,'erro');return;}
+    if(dups.length&&Math.abs(somaDup+somaDif-dfz)<=1){aiDiz(res+'<br>✅ <b>Achei a causa:</b> a diferença é exatamente o'+(dups.length>1?'s comprovantes lançados':' comprovante lançado')+' em dobro aqui. Não é baixa da Inove: '+(ESP.dono?'peça para o laboratório apagar':'é só anular')+' o lançamento repetido ('+dups.map(function(d){return invDt(d.x.p.data)+' · '+fmtR(d.x.p.valor);}).join(', ')+').',false,'erro');invPlanilha();return;}
     var sub=dfz>1?invSubconjunto(L.filter(function(x){return (x.m.ano*100+x.m.mes)<(ano*100+mes)&&!dups.some(function(d){return d.x===x;});}),dfz):null;
-    if(sub){aiDiz(res+'<br>✅ Estes comprovantes somam exatamente a diferença. <b>Possivelmente não tiveram baixa na Inove:</b><br>'+sub.map(invChip).join(' ')+'<br>Mande esses comprovantes para a Inove dar baixa.',false,'erro');return;}
-    aiDiz(res+'<br>Conferi um por um e não consegui explicar a diferença só com os comprovantes daqui.',false,'erro');
-    aiDiz('📩 Agora sim: <b>me envie o extrato de comprovantes da Inove 3D do seu LabFácil</b>, com o registro dos pagamentos recebidos de '+esc(c.nome)+'. Eu comparo item por item e te digo exatamente o que falta de cada lado.<div class="ai-form"><label class="btn pri">📑 Enviar relatório do LabFácil<input type="file" id="ai-rel" accept="application/pdf,image/*" hidden></label></div>');});};
+    if(sub){aiDiz(res+'<br>✅ Estes comprovantes somam exatamente a diferença. <b>Possivelmente não tiveram baixa na Inove:</b><br>'+sub.map(invChip).join(' ')+'<br>Mande esses comprovantes para a Inove dar baixa.',false,'erro');invPlanilha();return;}
+    aiDiz(res+'<br>Conferi um por um e ainda não consegui explicar a diferença só com os comprovantes daqui.',false,'erro');AI.inv.pedeLab=true;invPlanilha();});};
 
 /* ===== Verificar extratos já anexados do mês: abre cada PDF e mostra as divergências ===== */
 function aiVerifica(){var R=finDoMes(),comPdf=R.filter(function(m){return m.extrato_path&&/\.pdf$/i.test(m.extrato_path);}),semArq=R.filter(function(m){return !m.extrato_path&&!m.arquivo_legado;}).length,antigos=R.filter(function(m){return !m.extrato_path&&m.arquivo_legado;}).length;
@@ -4777,6 +4793,31 @@ function aiVerifica(){var R=finDoMes(),comPdf=R.filter(function(m){return m.extr
       if(div.length){ruins.push(nome);aiDiz('⛔ <b>'+esc(nome)+'</b> · '+lnk+'<br>• '+div.join('<br>• '),false,'erro');}else ok++;})
     .catch(function(){ruins.push(nome);aiDiz('⛔ <b>'+esc(nome)+'</b>: não consegui abrir o extrato anexado.',false,'erro');});});},Promise.resolve())
   .then(function(){AI.busy=false;aiDiz('📋 <b>Resultado:</b> '+ok+' extrato'+(ok!==1?'s':'')+' ✅ sem divergência'+(ruins.length?', <b class="bad">'+ruins.length+' com divergência</b> ('+esc(ruins.join(', '))+')':'')+'.'+(semArq?'<br>📭 '+semArq+' cliente'+(semArq>1?'s':'')+' do mês ainda sem extrato anexado.':'')+(antigos?'<br>'+antigos+' extrato'+(antigos>1?'s':'')+' ainda no sistema antigo (não deu para abrir).':''),false,ruins.length?'erro':'');});}
+
+/* ===== Conversa estilo WhatsApp: Ana "digitando…", planilha para conferir juntos ===== */
+function aiHora(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+AI.fila=[];AI.dig=false;
+aiDiz=function(html,eu,cls,fn){var m={eu:!!eu,h:html,c:cls||'',fn:fn||null,t:aiHora()};if(eu||!document.getElementById('aipan')){AI.msgs.push(m);aiRender();return;}AI.fila.push(m);if(!AI.dig)aiFila();};
+function aiFila(){if(!AI.fila.length){AI.dig=false;aiRender();return;}AI.dig=true;aiRender();var m=AI.fila[0],n=String(m.h).replace(/<[^>]+>/g,'').length,ms=Math.max(450,Math.min(1600,300+n*6));
+  setTimeout(function(){AI.fila.shift();m.t=aiHora();AI.msgs.push(m);aiFila();},ms);}
+aiRender=function(){var d=document.getElementById('aipan');if(!d)return;d.querySelector('.ai-lista').innerHTML=aiLista();var ch=d.querySelector('.ai-chat'),fim=ch.scrollHeight-ch.scrollTop-ch.clientHeight<80,quem=ESP.dono?'Inove':'Você';
+  ch.innerHTML=AI.msgs.map(function(m){return '<div class="zp'+(m.eu?' eu':'')+(m.c?' '+m.c:'')+'"><span class="zp-n">'+(m.eu?quem:'Ana')+'</span><div class="zp-c">'+(m.fn?m.fn():m.h)+'</div><span class="zp-t">'+(m.t||'')+(m.eu?' ✓✓':'')+'</span></div>';}).join('')+
+    (AI.dig||AI.busy?'<div class="zp zp-dig"><span class="zp-n">Ana</span><div class="zp-c">digitando<i></i><i></i><i></i></div></div>':'');
+  if(fim||AI.dig)ch.scrollTop=ch.scrollHeight;
+  var c=EMP.cli.filter(function(x){return x.id===AI.cli;})[0];d.querySelector('.ai-sel').innerHTML=c?'Cliente escolhido: <b>'+esc(c.nome)+'</b> · '+MESES[FIN.mes-1]+'/'+FIN.ano:'Escolha um cliente à esquerda para anexar comprovante.';
+  d.querySelectorAll('.ai-bt').forEach(function(b){b.disabled=AI.busy||AI.dig;});};
+/* planilha de comprovantes para conferir juntos */
+function invTickK(id){return 'io_tick_'+id;}
+function invTicado(id){try{return localStorage.getItem(invTickK(id))==='1';}catch(e){return !!(AI.ticks&&AI.ticks[id]);}}
+function invPlanilhaHtml(){var I=AI.inv;if(!I)return '';var L=I.L,n=L.filter(function(x){return invTicado(x.p.id);}).length,tot=L.reduce(function(s,x){return s+(+x.p.valor);},0);
+  return '<b>📊 Planilha de comprovantes · '+esc(I.nome)+'</b><div class="inv-pl"><div class="inv-pr inv-ph"><span>✓</span><span>#</span><span>Data e hora</span><span>Valor</span><span>Código</span><span>Mês</span><span>Arquivo</span></div>'+
+    L.map(function(x,i){var r=x.r||{},t=invTicado(x.p.id);return '<label class="inv-pr'+(t?' ok':'')+(x.dup?' dup':'')+'"><span><input type="checkbox" data-tick="'+x.p.id+'"'+(t?' checked':'')+'></span><span>'+(i+1)+'</span><span>'+invDt(r.data||x.p.data)+(r.hora?' '+r.hora.slice(0,5):'')+'</span><span>'+fmtR(x.p.valor)+'</span><span><code>'+esc(invCodCurto(r.cod)||'—')+'</code></span><span>'+MESES[x.m.mes-1].slice(0,3)+'</span><span>'+(x.p.comprovante_path?'<button type="button" class="ih-ver" data-act="finArqVer" data-v="'+esc(x.p.comprovante_path)+'">📎 abrir</button>':'—')+'</span></label>';}).join('')+
+    '<div class="inv-pr inv-pf"><span></span><span></span><span><b>Total</b></span><span><b>'+fmtR(tot)+'</b></span><span></span><span></span><span class="'+(n===L.length?'okt':'')+'">'+n+'/'+L.length+' ✓</span></div></div>';}
+function invPlanilha(){var I=AI.inv;if(!I||!I.L.length)return;AI.ticks=AI.ticks||{};aiDiz('Agora vamos <b>conferir juntos</b> 🤝 Abra cada comprovante e vá <b>ticando ✓</b> os que você também tem aí. Quando ticar todos, eu te digo o próximo passo.');aiDiz('',false,'zpl',invPlanilhaHtml);}
+document.addEventListener('change',function(e){var t=e.target;if(!t.getAttribute||!t.getAttribute('data-tick'))return;var id=t.getAttribute('data-tick');try{if(t.checked)localStorage.setItem(invTickK(id),'1');else localStorage.removeItem(invTickK(id));}catch(x){}AI.ticks=AI.ticks||{};AI.ticks[id]=t.checked;aiRender();
+  var I=AI.inv;if(!I)return;var falt=I.L.filter(function(x){return !invTicado(x.p.id);});if(falt.length||I.fimDito)return;I.fimDito=true;
+  if(I.pedeLab)aiDiz('Conferimos os <b>'+I.L.length+'</b> juntos ✅ e mesmo assim sobra a diferença de <b>'+fmtR(I.dif)+'</b>. 📩 Agora sim: <b>me envie o extrato de comprovantes da Inove 3D do seu LabFácil</b>, com o registro dos pagamentos recebidos de '+esc(I.nome)+'. Eu comparo item por item e te digo exatamente o que falta de cada lado.<div class="ai-form"><label class="btn pri">📑 Enviar relatório do LabFácil<input type="file" id="ai-rel" accept="application/pdf,image/*" hidden></label></div>');
+  else aiDiz('Conferimos os <b>'+I.L.length+'</b> comprovantes juntos ✅. Obrigada! 💛');});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
