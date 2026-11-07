@@ -1212,6 +1212,23 @@ body.espelho [data-act=pfxAbre],body.espelho .pfx-ban{display:none!important}
 .pvis{display:flex;justify-content:flex-end;margin:8px 0 4px}
 .rmapa .mcnt{background:transparent;border:0;box-shadow:none;color:#fff;font-weight:800;font-size:.8rem;text-shadow:0 1px 2px rgba(0,0,0,.6)}.rmapa .mcnt:before{display:none}
 .mver{margin-top:6px;border:0;border-radius:8px;background:#3D7BFF;color:#fff;font:inherit;font-weight:700;padding:5px 10px;cursor:pointer}
+
+/* mapa 2D leve */
+.rmapa.bmapa{height:auto;background:#0F1B40;padding:10px}
+.bm-wrap{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(220px,1fr);gap:14px;align-items:start}
+.bm-wrap svg{width:100%;height:auto;max-height:68vh;display:block}
+.bm-st{fill:rgba(61,123,255,var(--a));stroke:#5A6FB0;stroke-width:.7;cursor:pointer;transition:fill .15s}
+.bm-st[style*="--a:0.00"]{fill:#16244E}
+.bm-st:hover{fill:rgba(120,170,255,.75)}.bm-st.sel{stroke:#FFD43B;stroke-width:2}
+.bm-uf,.bm-n{font:700 9px system-ui,sans-serif;fill:rgba(255,255,255,.55);text-anchor:middle;pointer-events:none}.bm-n{font-size:11px;fill:#fff;paint-order:stroke;stroke:#0F1B40;stroke-width:3px}
+.bm-pt{cursor:pointer}.bm-pt circle{stroke:#fff;stroke-width:1.5;opacity:.95}.bm-pt.sel circle{stroke:#FFD43B;stroke-width:3}.bm-pt text{font:800 8px system-ui,sans-serif;fill:#fff;text-anchor:middle;pointer-events:none}
+.bm-eu circle{fill:#FF5C8A;stroke:#fff;stroke-width:2}.bm-eu text{font:800 10px system-ui,sans-serif;fill:#fff;text-anchor:middle;paint-order:stroke;stroke:#FF5C8A;stroke-width:4px}
+.bm-info{color:var(--rtx,#fff)}.bm-dica{color:var(--rmu,#9aa);font-size:.9rem;margin:6px 0}
+.bm-box{display:grid;gap:8px;background:#13214A;border-radius:14px;padding:12px}.bm-tags{display:flex;flex-wrap:wrap;gap:6px}
+.bm-tag{border-radius:999px;padding:3px 10px;font-size:.8rem;font-weight:700;background:color-mix(in srgb,var(--k) 22%,transparent);color:#fff;border:1px solid color-mix(in srgb,var(--k) 55%,transparent)}
+.bm-l{list-style:none;margin:0;padding:0;display:grid;gap:6px}.bm-l li{display:grid}.bm-l small{color:var(--rmu,#9aa)}
+.bm-fonte{display:block;margin-top:6px;color:rgba(255,255,255,.35);font-size:.68rem}
+@media (max-width:760px){.bm-wrap{grid-template-columns:1fr}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3970,6 +3987,38 @@ var _rProfsListaM=rProfsLista;rProfsLista=function(){if(S.rede.pvis!=='mapa')ret
 var _rProfsM=rProfs;rProfs=function(){var h=_rProfsM();return h.replace('<div id="rprofs">','<div class="pvis"><div class="seg rseg" role="group" aria-label="Ver como"><button aria-pressed="'+(S.rede.pvis!=='mapa')+'" data-act="profVis" data-v="lista">☰ Lista</button><button aria-pressed="'+(S.rede.pvis==='mapa')+'" data-act="profVis" data-v="mapa">🗺 Mapa</button></div></div><div id="rprofs">');};
 Object.assign(ACT,{profVis:function(v){S.rede.pvis=v;render();},profMapaUf:function(v){S.rede.fuf=v;S.rede.fcid='';S.rede.pvis='lista';if(LF.map){LF.map.remove();LF.map=null;}render();window.scrollTo(0,0);}});
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='rede-q'&&S.rede.pvis==='mapa'){clearTimeout(LF.tq);LF.tq=setTimeout(function(){if($('rmapa'))montaMapa();},350);}});
+
+/* ===== Mapa 2D leve (SVG do Brasil por estados, sem arrastar e sem imagens de satélite) =====
+   Mapa base: @svg-maps/brazil (CC BY 4.0). Projeção Mercator ajustada ao desenho. */
+var BRM={d:null,st:''};
+function brCarrega(cb){if(BRM.d){cb();return;}BRM.cbs=(BRM.cbs||[]).concat([cb]);if(BRM.st==='carregando')return;BRM.st='carregando';
+  fetch('br-mapa.json',{cache:'force-cache'}).then(function(r){return r.json();}).then(function(j){BRM.d=j;BRM.st='ok';}).catch(function(){BRM.st='erro';}).then(function(){var c=BRM.cbs||[];BRM.cbs=[];c.forEach(function(f){f();});});}
+function brMerc(la){return Math.log(Math.tan(Math.PI/4+la*Math.PI/360));}
+function brXY(ll){return [(ll[1]+73.99)/39.2*612+0.26,(brMerc(5.27)-brMerc(ll[0]))*888.68+0.26];}
+function brCap(c){return String(c).replace(/(^|\s)\S/g,function(x){return x.toUpperCase();});}
+function brUfDe(cid){var m=String(cid||'').match(/\/\s*([A-Z]{2})\b/);return m?m[1]:null;}
+function brDados(){var s=S.rede.sec,uf={},pts={},mc=minhaCidade();
+  if(s==='profs'){profsFiltra().L.forEach(function(p){var u=brUfDe(p.cid);if(!u)return;var m=String(p.cid).match(/^(.*?)\s*\//),c=m&&m[1]?cidadeDe(m[1]):null;
+      var U=uf[u]=uf[u]||{n:0,por:{},itens:[]};U.n++;(p.profs||[p.prof]).forEach(function(x){U.por[x]=(U.por[x]||0)+1;});
+      if(c&&CIDADES[c]){var P=pts[c]=pts[c]||{c:c,n:0,por:{},cor:PROF_COR[p.prof]||'#5B8CFF',itens:[]};P.n++;(p.profs||[p.prof]).forEach(function(x){P.por[x]=(P.por[x]||0)+1;});}});}
+  else pontosRede().forEach(function(x){var P=pts[x.c]=pts[x.c]||{c:x.c,n:0,cor:x.cor,itens:[]};P.n++;P.itens.push(x);var u=brUfDe(x.s)||null;if(u){var U=uf[u]=uf[u]||{n:0,itens:[]};U.n++;}});
+  return {uf:uf,pts:pts,mc:mc};}
+function brInfo(D){var k=S.rede.msel;if(!k)return '<p class="bm-dica">Toque num estado'+(S.rede.sec==='profs'?'':' ou numa bolinha')+' para ver os detalhes.</p>';
+  var s=S.rede.sec,lis=function(o){return Object.keys(o).sort(function(a,b){return o[b]-o[a];}).map(function(x){return '<span class="bm-tag" style="--k:'+(PROF_COR[x]||'#5B8CFF')+'">'+esc(x)+' · '+o[x]+'</span>';}).join('');};
+  if(k.indexOf('u:')===0){var u=k.slice(2),U=D.uf[u],nm=(BRM.d.e.filter(function(e){return e[0]===u;})[0]||[])[1]||u;
+    if(!U)return '<div class="bm-box"><b>'+esc(nm)+'</b><p class="small">Ninguém aqui ainda.</p></div>';
+    return '<div class="bm-box"><b>'+esc(nm)+' · '+U.n+(s==='profs'?' profissional'+(U.n>1?'is':''):' no mapa')+'</b>'+(U.por?'<div class="bm-tags">'+lis(U.por)+'</div>':'')+(s==='profs'?'<button class="btn sm rpri" data-act="profMapaUf" data-v="'+u+'">Ver a lista de '+u+'</button>':'')+'</div>';}
+  var P=D.pts[k.slice(2)];if(!P)return '';
+  return '<div class="bm-box"><b>'+esc(brCap(P.c))+' · '+P.n+'</b>'+(P.por?'<div class="bm-tags">'+lis(P.por)+'</div>':'<ul class="bm-l">'+P.itens.slice(0,12).map(function(x){return '<li><b>'+esc(x.t)+'</b><small>'+esc(x.s)+'</small></li>';}).join('')+(P.itens.length>12?'<li><small>e mais '+(P.itens.length-12)+'</small></li>':'')+'</ul>')+'</div>';}
+function brDesenha(el){var M=BRM.d;if(!M){el.innerHTML='<div class="mfall"><b>Não consegui carregar o mapa agora.</b></div>';return;}
+  var D=brDados(),mx=1;Object.keys(D.uf).forEach(function(u){mx=Math.max(mx,D.uf[u].n);});var sel=S.rede.msel||'',prof=S.rede.sec==='profs';
+  var paths=M.e.map(function(e){var U=D.uf[e[0]],n=U?U.n:0,a=n?0.18+0.72*Math.sqrt(n/mx):0;return '<path class="bm-st'+(sel==='u:'+e[0]?' sel':'')+'" d="'+e[2]+'" data-act="bmSel" data-v="u:'+e[0]+'" style="--a:'+a.toFixed(2)+'"><title>'+esc(e[1])+(n?' · '+n:'')+'</title></path>';}).join('');
+  var lab=M.e.map(function(e){var U=D.uf[e[0]];return prof&&U?'<text class="bm-n" x="'+e[3]+'" y="'+(e[4]+4)+'">'+U.n+'</text>':'<text class="bm-uf" x="'+e[3]+'" y="'+(e[4]+3)+'">'+e[0]+'</text>';}).join('');
+  var dots=Object.keys(D.pts).map(function(c){var P=D.pts[c],xy=brXY(CIDADES[c]),r=Math.min(16,4+Math.sqrt(P.n)*2);return '<g class="bm-pt'+(sel==='c:'+c?' sel':'')+'" data-act="bmSel" data-v="c:'+esc(c)+'"><circle cx="'+xy[0].toFixed(1)+'" cy="'+xy[1].toFixed(1)+'" r="'+r.toFixed(1)+'" style="fill:'+P.cor+'"/>'+(P.n>1?'<text x="'+xy[0].toFixed(1)+'" y="'+(xy[1]+3).toFixed(1)+'">'+P.n+'</text>':'')+'<title>'+esc(brCap(c))+' · '+P.n+'</title></g>';}).join('');
+  var eu=CIDADES[D.mc]&&!prof?(function(){var xy=brXY(CIDADES[D.mc]);return '<g class="bm-eu"><circle cx="'+xy[0].toFixed(1)+'" cy="'+xy[1].toFixed(1)+'" r="5"/><text x="'+xy[0].toFixed(1)+'" y="'+(xy[1]-9).toFixed(1)+'">Você</text></g>';})():'';
+  el.classList.add('bmapa');el.innerHTML='<div class="bm-wrap"><svg viewBox="'+M.vb+'" role="img" aria-label="Mapa do Brasil">'+paths+lab+dots+eu+'</svg><div class="bm-info">'+brInfo(D)+'</div></div><small class="bm-fonte">Mapa: @svg-maps/brazil (CC BY 4.0)</small>';}
+montaMapa=function(){var el=$('rmapa');if(!el)return;if(LF.map){try{LF.map.remove();}catch(e){}LF.map=null;}brCarrega(function(){var e2=$('rmapa');if(e2)brDesenha(e2);});};
+Object.assign(ACT,{bmSel:function(v){S.rede.msel=S.rede.msel===v?'':v;var el=$('rmapa');if(el)brDesenha(el);}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
