@@ -1302,6 +1302,9 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .finmv-wm{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-around;align-items:center;overflow:hidden}
 .finmv-wm span{transform:rotate(-24deg);color:rgba(220,25,25,.42);font-weight:900;font-size:clamp(13px,2.4vw,26px);white-space:nowrap;letter-spacing:.02em;text-transform:uppercase}
 .finmv-leg{position:absolute;left:0;right:0;bottom:0;margin:0;padding:8px 12px;background:#D61F1F;color:#fff;font-weight:800;font-size:.86rem;text-align:center}
+.cobbts{gap:6px;margin:6px 0}.cobwa{background:#25D366!important;border-color:#25D366!important;color:#fff!important}
+.cobwa-novo{display:flex;gap:6px;flex-wrap:wrap;flex:1}.cobwa-novo input{flex:1;min-width:190px;font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.cobmods textarea{width:100%;font:inherit;font-size:.86rem;line-height:1.4}.cobmods label>span{display:flex;align-items:center;gap:8px;justify-content:space-between}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4337,6 +4340,40 @@ ACT.finArqMarca=function(v,el){var txt=(el&&el.getAttribute('data-m'))||'',ePdf=
     b.onclick=function(){b.disabled=true;b.textContent='Preparando…';finCarimba(url,ePdf,txt).then(function(bl){finBaixa(bl,'comprovante-marcado.'+(ePdf?'pdf':'png'));b.disabled=false;b.textContent='⬇ Baixar com a marca';}).catch(function(){b.disabled=false;b.textContent='⬇ Baixar com a marca';toast('Não consegui preparar o arquivo.');});};})
   .catch(function(){finMarcaFecha();toast('Não consegui abrir o arquivo.');});
   d.addEventListener('click',function(e){if(e.target===d||e.target.closest('[data-mv=fecha]'))finMarcaFecha();});};
+
+/* ===== Mensagens de cobrança prontas (1: extrato e vencimento · 2: lembrete) + WhatsApp do cliente ===== */
+var COB_PADRAO={
+  m1:'Olá, {cliente}! Tudo bem? ☀️\nSegue o extrato dos serviços realizados no mês de {mes}. 🧾👇\n\n📌 Informações Importantes:\n✅ Contato do Financeiro é Elisangela no WhatsApp 11 93914-5325 ✅\n📆 Pagamento: deve ocorrer até o 5º dia útil (dia {vencimento})\n🔑 Pix: 34 832 219 0001 79. Assim que efetuar o pagamento, por favor, envie o comprovante para a devida baixa em nosso sistema!\n💳 Cartão de Crédito: caso opte por essa forma de pagamento, entre em contato conosco para solicitar o link.{aviso}\n\nSeguimos à disposição e desejamos um mês de {mes_seguinte} cheio de sucesso! ✨',
+  m2:'Olá, {cliente}! Tudo bem? 😊\nAinda não identificamos o pagamento referente aos serviços de {mes} ({total}), que venceu no dia {vencimento}.\n\nJá conseguiu realizar? Se já pagou, por favor nos envie o comprovante para darmos baixa no sistema. 🧾\nSe ainda não conseguiu, pedimos que o pagamento seja feito hoje, pois estamos fazendo o fechamento do nosso mês.\n\n🔑 Pix: 34 832 219 0001 79\nQualquer dúvida, fale com a Elisangela no WhatsApp 11 93914-5325.\n\nObrigado! 🙏',
+  aviso:'🚀 Programação de Final de Ano:\n✅ Como o final do ano está chegando e a demanda aumenta bastante, já informamos que receberemos novas solicitações até o dia 30 de novembro.\n⚠️ Assim, conseguimos planejar nossa programação e garantir a entrega para sua clínica até dia 14 de dezembro.'};
+function cobModelo(k){var M=empDados().modelos||{};return M[k]!=null?M[k]:COB_PADRAO[k];}
+function cobTexto(tipo,m){var k=finCliK(m),g=finPend().filter(function(x){return x.k===k;})[0],c=finCliObj(m),nome=c?c.nome:finCliNome(m),v=finVenc(m.ano,m.mes),px=m.mes===12?1:m.mes+1,av=cobModelo('aviso');
+  var tot=g?g.tot:finFaltaTela(m),det=g?g.meses.map(function(x){return '• '+finMesNome(x[0].ano,x[0].mes)+': '+fmtR(x[1]);}).join('\n'):'';
+  var V={cliente:nome,mes:MESES[m.mes-1],mes_seguinte:MESES[px-1],vencimento:('0'+v.getDate()).slice(-2)+'/'+('0'+(v.getMonth()+1)).slice(-2),valor_mes:fmtR(m.valor_mes),total:fmtR(tot),detalhe:det,empresa:(S.neg&&S.neg.nome)||'',pix:FIN.cfg&&FIN.cfg.chave_pix||'',aviso:av&&av.trim()?'\n\n'+av.trim():''};
+  return String(cobModelo(tipo)).replace(/\{(\w+)\}/g,function(x,n){return V[n]!=null?V[n]:x;});}
+var _rFinDetC=rFinDet;rFinDet=function(m){var h=_rFinDetC.apply(this,arguments);if(!m)return h;var k=finCliK(m);
+  return h.replace('<button class="btn" data-act="finCob" data-v="'+k+'">Montar mensagem</button>','<div class="row wrap cobbts"><button class="btn sm'+(FIN.cob&&FIN.cob.tipo==='m1'?' pri':'')+'" data-act="cobMonta" data-v="m1">1️⃣ Extrato e vencimento</button><button class="btn sm'+(FIN.cob&&FIN.cob.tipo==='m2'?' pri':'')+'" data-act="cobMonta" data-v="m2">2️⃣ Lembrete de pagamento</button><button class="btn sm'+(FIN.cob&&FIN.cob.tipo==='bia'?' pri':'')+'" data-act="cobMonta" data-v="bia">🤖 Atraso (Bia)</button></div>')
+    .replace('A Bia monta a mensagem com tudo o que este cliente tem em aberto','Escolha a mensagem. Dá para editar antes de enviar');};
+rFinCob=function(){var c=FIN.cob,cli=EMP.cli.filter(function(x){return x.id===c.k;})[0],w=cliWa(cli);
+  return '<div class="fincobm"><textarea id="fc-txt" rows="12">'+esc(c.txt)+'</textarea><div class="row wrap"><button class="btn" data-act="finCobCopia">Copiar</button>'+
+    (w?'<a class="btn pri cobwa" href="https://wa.me/'+w+'?text='+encodeURIComponent(c.txt)+'" target="_blank" rel="noopener" data-act="finCobWa">🟢 Enviar no WhatsApp</a>':
+      cli?'<span class="cobwa-novo"><input id="cob-wa" type="tel" inputmode="tel" placeholder="WhatsApp do cliente (DDD + número)" autocomplete="off"><button class="btn pri" data-act="cobWaSalva">Salvar e enviar</button></span>':'<span class="small muted">Cliente sem cadastro: copie a mensagem.</span>')+'</div></div>';};
+Object.assign(ACT,{
+  cobMonta:function(t){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0];if(!m)return;var k=finCliK(m);FIN.cob={k:k,tipo:t,txt:t==='bia'?finMsg(k):cobTexto(t,m)};render();setTimeout(function(){var e=document.getElementById('fc-txt');if(e)e.scrollIntoView({block:'center',behavior:'smooth'});},50);},
+  cobWaSalva:function(){var i=document.getElementById('cob-wa'),n=i?i.value.replace(/\D/g,''):'';if(n.length<10||n.length>13){toast('Digite o WhatsApp com DDD. Ex.: 11 91234-5678');return;}
+    var cli=EMP.cli.filter(function(x){return x.id===FIN.cob.k;})[0];if(!cli)return;var t=document.getElementById('fc-txt');if(t)FIN.cob.txt=t.value;var w=n.length<=11?'55'+n:n,win=window.open('https://wa.me/'+w+'?text='+encodeURIComponent(FIN.cob.txt),'_blank');
+    SB.from('odo_clientes').update({whatsapp:n.slice(0,30)}).eq('id',cli.id).then(function(r){if(r.error){toast('Abri o WhatsApp, mas não consegui salvar o número.');return;}cli.whatsapp=n;render();toast('WhatsApp salvo no cadastro do cliente.');});
+    if(!win)location.href='https://wa.me/'+w+'?text='+encodeURIComponent(FIN.cob.txt);},
+  cobModSalva:function(){var d=Object.assign({},EMP.row&&EMP.row.dados||{});d.modelos={m1:(document.getElementById('cm-m1')||{}).value||'',m2:(document.getElementById('cm-m2')||{}).value||'',aviso:(document.getElementById('cm-av')||{}).value||''};
+    if(!EMP.row){toast('Cadastre sua empresa primeiro.');return;}SB.from('odo_empresas').update({dados:d}).eq('id',EMP.row.id).select('*').single().then(function(r){if(r.error){toast('Não consegui salvar.');return;}EMP.row=r.data;render();toast('Mensagens salvas.');});},
+  cobModPadrao:function(v){var e=document.getElementById(v==='m1'?'cm-m1':v==='m2'?'cm-m2':'cm-av');if(e)e.value=COB_PADRAO[v];}});
+/* editor das mensagens em Ajustes */
+var _rFinCfgC=rFinCfg;rFinCfg=function(){var h=_rFinCfgC.apply(this,arguments);if(ESP.dono)return h;
+  var ed=function(id,k,tit,ajuda,rows){return '<label class="fld cli-full"><span>'+tit+' <button type="button" class="btn sm" data-act="cobModPadrao" data-v="'+k+'">Voltar ao padrão</button></span><textarea id="'+id+'" rows="'+rows+'" maxlength="3000">'+esc(cobModelo(k))+'</textarea><small class="muted">'+ajuda+'</small></label>';};
+  return h+'<section class="card cli-form finform cobmods"><h3 class="cli-full">💬 Mensagens de cobrança</h3><p class="small muted cli-full">Use: {cliente} {mes} {mes_seguinte} {vencimento} {valor_mes} {total} {detalhe} {aviso}. O sistema troca pelos dados de cada cliente.</p>'+
+    ed('cm-m1','m1','1️⃣ Extrato e vencimento (5º dia útil)','Enviada junto com o extrato.',12)+ed('cm-m2','m2','2️⃣ Lembrete de pagamento','Para quem passou do vencimento.',10)+
+    ed('cm-av','aviso','📣 Aviso extra (opcional)','Entra no lugar de {aviso}. Deixe vazio quando não tiver aviso, por exemplo depois do fim de ano.',5)+
+    '<div class="row cli-full"><span class="spacer"></span><button class="btn pri" data-act="cobModSalva">Salvar mensagens</button></div></section>';};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
