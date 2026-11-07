@@ -1205,6 +1205,9 @@ body.espelho [data-act=pfxAbre],body.espelho .pfx-ban{display:none!important}
 .pre-l{display:grid;max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
 .pre-i{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line)}.pre-i>span{display:grid;min-width:0}.pre-i small{color:var(--muted)}
 #pre-q{width:100%}
+
+.nm-borra{display:inline-block;filter:blur(5px);user-select:none;pointer-events:none;letter-spacing:.05em;opacity:.85}
+.pc-pre{background:color-mix(in srgb,#F5C451 18%,transparent);color:#B7791F;font-weight:700}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -2494,16 +2497,16 @@ function profAv(p,lg){var m=PCARD[p.prof]||PCARD.Dentista,ini=p.nome.split(/\s+/
 function profNome(p){return p.vis.nome?p.nome:'Profissional #'+p.id.replace(/\D/g,'').padStart(4,'0');}
 function profCard(p){var m=PCARD[p.prof]||PCARD.Dentista,nv=profNivel(p),ct=S.rede.cont[p.id],d=distTxt(p.cid).replace('📍 ','');
   return '<article class="pcard pfolha" style="--c1:'+m.c1+'">'+
-    '<header class="pf-h">'+profAv(p,1)+'<div class="pf-id"><b>'+esc(profNome(p))+(p.vis.nome?'':' <span class="pc-lock" title="O nome aparece quando a pessoa aceita o contato">🔒</span>')+'</b><span class="pc-esp">'+icoProf(m)+esc(m.t)+'</span><span class="pf-cargo">'+esc(p.cargo)+' · '+esc(p.esp)+'</span></div></header>'+
+    '<header class="pf-h">'+profAv(p,1)+'<div class="pf-id"><b>'+profNomeH(p)+(p.vis.nome?'':' <span class="pc-lock" title="O nome aparece quando a pessoa aceita o contato">🔒</span>')+'</b><span class="pc-esp">'+icoProf(m)+esc(m.t)+'</span><span class="pf-cargo">'+esc(p.cargo)+(p.esp?' · '+esc(p.esp):'')+'</span></div></header>'+
     (p.resumo?'<p class="pf-res">'+esc(p.resumo)+'</p>':'')+
     '<dl class="pf-d"><dt>Experiência</dt><dd><span class="pc-nv" style="--n:'+nv[1]+'">'+nv[0]+'</span> '+(p.anos?p.anos+(p.anos>1?' anos':' ano'):'')+'</dd>'+
       '<dt>Formação</dt><dd>'+esc(p.formacao||'—')+'</dd>'+
-      '<dt>Local</dt><dd>'+esc(p.cid)+(d?' <small>· '+esc(d)+'</small>':'')+'</dd></dl>'+
+      '<dt>Local</dt><dd>'+esc(String(p.cid).replace(/^\s*\/\s*/,''))+(d?' <small>· '+esc(d)+'</small>':'')+'</dd></dl>'+
     '<div class="pf-sw"><h4>Softwares</h4><div>'+(p.softs.length?p.softs.slice(0,4).map(function(x){return '<span>'+esc(x[0])+'<b class="nv-'+x[1]+'">'+NIVL[x[1]]+'</b></span>';}).join('')+(p.softs.length>4?'<span class="pc-mais">+'+(p.softs.length-4)+'</span>':''):'<small>Nenhum informado</small>')+'</div></div>'+
-    '<footer class="pf-f">'+(ct?'<span class="pill ok">Contato pedido ✓</span>':'')+'<button class="btn sm rpri" data-act="profVer" data-v="'+p.id+'">Ver currículo completo</button></footer></article>';}
+    '<footer class="pf-f">'+(p.pre?'<span class="pill pc-pre" title="Veio do cadastro do GoDenth e ainda vai confirmar o perfil">⏳ Perfil a confirmar</span>':'')+(ct?'<span class="pill ok">Contato pedido ✓</span>':'')+'<button class="btn sm rpri" data-act="profVer" data-v="'+p.id+'">Ver currículo completo</button></footer></article>';}
 function profModal(p){var m=PCARD[p.prof]||PCARD.Dentista,nv=profNivel(p),ct=S.rede.cont[p.id],pv='<span class="pv-off">🔒 Oculto na Rede</span>';
   return '<div class="pmod-ov"><div class="pmod" role="dialog" aria-modal="true" aria-label="Currículo" style="--c1:'+m.c1+'"><button class="pmod-x" data-act="profFecha" aria-label="Fechar">✕</button>'+
-    '<div class="pm-h">'+profAv(p,1)+'<div><h2>'+esc(profNome(p))+'</h2><span class="pc-cargo">'+esc(p.cargo)+' · '+esc(p.esp)+'</span><div class="pc-tags"><span class="pc-esp">'+icoProf(m)+esc(m.t)+'</span><span class="pc-nv" style="--n:'+nv[1]+'">'+nv[0]+'</span><span>📍 '+esc(p.cid)+'</span></div></div></div>'+
+    '<div class="pm-h">'+profAv(p,1)+'<div><h2>'+profNomeH(p)+'</h2><span class="pc-cargo">'+esc(p.cargo)+(p.esp?' · '+esc(p.esp):'')+'</span><div class="pc-tags"><span class="pc-esp">'+icoProf(m)+esc(m.t)+'</span><span class="pc-nv" style="--n:'+nv[1]+'">'+nv[0]+'</span><span>📍 '+esc(String(p.cid).replace(/^\s*\/\s*/,''))+'</span></div></div></div>'+
     '<div class="pm-s"><h3>Softwares</h3><div class="pm-sw">'+(p.softs.length?p.softs.map(function(x){return '<span>'+esc(x[0])+'<b class="nv-'+x[1]+'">'+NIVL[x[1]]+'</b></span>';}).join(''):'<small>Nenhum informado</small>')+'</div></div>'+
     '<div class="pm-s"><h3>Habilidades</h3><div class="pc-tags">'+p.areas.map(function(a){return '<span>'+esc(a)+'</span>';}).join('')+'</div></div>'+
     '<div class="pm-s"><h3>Formação</h3><p>'+esc(p.formacao)+'</p></div>'+
@@ -2514,7 +2517,7 @@ function profModal(p){var m=PCARD[p.prof]||PCARD.Dentista,nv=profNivel(p),ct=S.r
     '<div class="row"><span class="spacer"></span>'+(ct?'<span class="pill ok">Contato pedido ✓</span>':'<button class="btn rpri" data-act="redeCont" data-v="'+p.id+'">Pedir contato</button>')+'</div></div></div>';}
 function rProfsLista(){var F=profsFiltra(),Q=F.Q,ent=[].concat(Q.softs.map(function(x){return '💻 '+x;}),Q.cid?['📍 '+Q.cid.split(' ').map(function(w){return w.length>2?w[0].toUpperCase()+w.slice(1):w;}).join(' ')]:[],Q.uf?['🗺️ '+Q.uf]:[],Q.prof?['👤 '+Q.prof]:[],Q.txt.map(function(t){return '🔎 '+t;}));
   return (S.rede.q&&ent.length?'<p class="pb-ent">Entendi: '+ent.map(function(e){return '<span>'+esc(e)+'</span>';}).join('')+'</p>':'')+
-    '<p class="small rmuted">'+F.L.length+' profissional(is). Perfis fictícios para teste.</p><div class="pgrid">'+(F.L.length?F.L.map(profCard).join(''):'<div class="rvazio">Ninguém com esse filtro. Tire um software ou aumente a distância.</div>')+'</div>'+
+    '<p class="small rmuted">'+F.L.length+' profissional(is).'+(REDE_REAL.ok?'':' Perfis fictícios para teste.')+'</p><div class="pgrid">'+(F.L.length?F.L.map(profCard).join(''):'<div class="rvazio">Ninguém com esse filtro. Tire um software ou aumente a distância.</div>')+'</div>'+
     (S.rede.pver?profModal(REDE_PROFS.filter(function(p){return p.id===S.rede.pver;})[0]):'');}
 function rProfs(){var sel=S.rede.softs||[];
   return '<div class="rtit"><h2>Profissionais</h2><p>Encontre quem tem a habilidade certa. Escreva do seu jeito: <i>"Exocad São Paulo"</i>, <i>"ceramista Campinas"</i>, <i>"TSB cirurgia"</i>.</p></div>'+
@@ -3856,14 +3859,14 @@ function preCsv(txt){txt=String(txt).replace(/^﻿/,'');var l1=txt.split(/\r?\n/
   for(var i=0;i<txt.length;i++){var c=txt[i];if(q){if(c==='"'){if(txt[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=c;}else if(c==='"')q=true;else if(c===sep){row.push(cur);cur='';}else if(c==='\n'||c==='\r'){if(c==='\r'&&txt[i+1]==='\n')i++;row.push(cur);cur='';if(row.some(function(x){return x.trim();}))R.push(row);row=[];}else cur+=c;}
   row.push(cur);if(row.some(function(x){return x.trim();}))R.push(row);return R;}
 function preAnalisa(R){if(!R.length)return null;var h=R[0].map(function(x){return semAc(x).trim();}),ix=function(re){for(var i=0;i<h.length;i++)if(re.test(h[i]))return i;return -1;};
-  var cN=ix(/^(nome|name|full ?name|nome completo)/),cE=ix(/mail/),cT=ix(/whats|celular|telefone|fone|phone|tel\b/),cP=ix(/profiss|cargo|ocupa|area|funcao|job/),cC=ix(/cidade|city/),cU=ix(/^uf$|estado|state/),ini=1;
+  var cN=ix(/^(nome|name|full ?name|nome completo)/),cE=ix(/mail/),cT=ix(/whats|celular|telefone|fone|phone|tel\b/),cP=ix(/profiss|cargo|ocupa|area|funcao|job/),cC=ix(/cidade|city/),cU=ix(/^uf$|estado|state/),cNg=ix(/negocio/),ini=1;
   if(cN<0&&cE<0&&cT<0){ini=0;cN=0;cE=R[0].findIndex(function(x){return /@/.test(x);});cT=R[0].findIndex(function(x){return String(x).replace(/\D/g,'').length>=10;});}
   var vistoE={},vistoT={},ok=[],dupArq=0,inval=0,exist=0,jaE={},jaT={};(PRE.L||[]).forEach(function(p){if(p.email)jaE[p.email.toLowerCase()]=1;if(p.whatsapp)jaT[p.whatsapp]=1;});
   for(var i=ini;i<R.length;i++){var r=R[i],g=function(c){return c>=0?String(r[c]||'').trim():'';},e=preMail(g(cE)),t=preTel(g(cT));
     if(!e&&!t){inval++;continue;}
     if((e&&jaE[e])||(t&&jaT[t])){exist++;continue;}
     var j=(e&&vistoE[e]!=null)?vistoE[e]:(t&&vistoT[t]!=null)?vistoT[t]:-1;
-    var o={nome:g(cN).replace(/\s+/g,' ').slice(0,120)||null,email:e||null,whatsapp:t||null,profissao:preProf(g(cP))||null,cidade:g(cC).slice(0,80)||null,uf:(g(cU).toUpperCase().match(/^[A-Z]{2}$/)||[null])[0],origem:'GoDenth · landing page'};
+    var o={nome:g(cN).replace(/\s+/g,' ').slice(0,120)||null,email:e||null,whatsapp:t||null,profissao:preProf(g(cP))||null,cidade:g(cC).slice(0,80)||null,uf:(g(cU).toUpperCase().match(/^[A-Z]{2}$/)||[null])[0],tem_negocio:cNg>=0?/^s/i.test(g(cNg)):null,origem:'GoDenth · landing page'};
     if(j>=0){dupArq++;var a=ok[j];Object.keys(o).forEach(function(k){if(!a[k]&&o[k])a[k]=o[k];});if(a.email)vistoE[a.email]=j;if(a.whatsapp)vistoT[a.whatsapp]=j;continue;}
     ok.push(o);var n=ok.length-1;if(e)vistoE[e]=n;if(t)vistoT[t]=n;}
   return {ok:ok,dupArq:dupArq,inval:inval,exist:exist,total:R.length-ini,cols:{nome:cN,email:cE,tel:cT,prof:cP}};}
@@ -3875,17 +3878,18 @@ function rCfgPre(){if(!RL.user)return '';if(PRE.L===null){PRE.L=false;preCarrega
   if(PRE.erro==='falta049')return '<section class="card"><h2>📋 Pré-cadastros</h2><p>Falta rodar a atualização 049 no Supabase.</p></section>';
   var L=PRE.L,conv=L.filter(function(p){return p.convidado_em;}).length,acc=L.filter(function(p){return p.aceito_em;}).length,q=semAc(PRE.q||''),V=L.filter(function(p){return (PRE.f==='todos'||(PRE.f==='novos'&&!p.convidado_em)||(PRE.f==='conv'&&p.convidado_em&&!p.aceito_em)||(PRE.f==='ok'&&p.aceito_em))&&(!q||semAc([p.nome,p.email,p.whatsapp,p.profissao].join(' ')).indexOf(q)>=0);});
   var P=PRE.prev;
-  return '<section class="card cfg-c"><h2>📋 Pré-cadastros</h2><p class="small muted">Contatos importados ficam <b>escondidos</b>: ninguém aparece na Rede por estar aqui. Cada um recebe um link pessoal; ao abrir, o cadastro já vem preenchido e a pessoa confirma e escolhe o que fica visível.</p>'+
+  return '<section class="card cfg-c"><h2>📋 Pré-cadastros</h2><p class="small muted">Na Rede aparece <b>só o primeiro nome</b> (sobrenome embaçado), a profissão e a cidade/UF. <b>Telefone e e-mail nunca aparecem.</b> Cada um recebe um link pessoal; ao aceitar, o cadastro já vem preenchido e o perfil completo é liberado por ele.</p>'+
     '<div class="finkpis">'+[[L.length,'na lista',''],[conv,'convidados',''],[acc,'confirmaram','ok']].map(function(k){return '<div class="finkpi '+k[2]+'"><b>'+k[0]+'</b><span>'+k[1]+'</span></div>';}).join('')+'</div>'+
     (P?'<div class="pre-prev"><b>Arquivo lido: '+P.total+' linhas</b><ul><li>✅ <b>'+P.ok.length+'</b> novos para importar</li><li>🔁 '+P.dupArq+' repetidos dentro do arquivo (juntei os dados)</li><li>⏭️ '+P.exist+' já estavam na lista</li><li>⚠️ '+P.inval+' sem e-mail nem WhatsApp válido (ignorados)</li></ul>'+
       (P.ok.length?'<p class="small muted">Exemplo: '+P.ok.slice(0,3).map(function(o){return esc((o.nome||'—')+' · '+(o.profissao||'sem profissão')+' · '+(o.email||o.whatsapp));}).join(' | ')+'</p>':'')+
       '<div class="row wrap"><button class="btn" data-act="preCancela">Cancelar</button>'+(P.ok.length?'<button class="btn pri" data-act="preImporta"'+(PRE.busy?' disabled':'')+'>'+(PRE.busy?'Importando… '+(PRE.prog||''):'Importar '+P.ok.length+' contatos')+'</button>':'')+'</div></div>':
       '<label class="btn pri pre-arq">📥 Importar planilha (CSV)<input type="file" id="pre-arq" accept=".csv,text/csv,text/plain" hidden></label><p class="small muted">Colunas reconhecidas: nome, e-mail, celular/WhatsApp, profissão, cidade, UF. Repetidos (mesmo e-mail ou mesmo WhatsApp) entram uma vez só.</p>')+
     (L.length?'<div class="cli-bar"><label class="cli-q"><span aria-hidden="true">🔎</span><input id="pre-q" type="search" placeholder="Buscar nome, e-mail ou telefone" value="'+esc(PRE.q||'')+'"></label><div class="seg">'+[['todos','Todos'],['novos','Sem convite'],['conv','Convidados'],['ok','Confirmaram']].map(function(o){return '<button aria-pressed="'+(PRE.f===o[0])+'" data-act="preFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
-      '<div class="pre-l">'+V.slice(0,200).map(function(p){var w=p.whatsapp;return '<div class="pre-i"><span><b>'+esc(p.nome||'Sem nome')+'</b><small>'+esc([p.profissao,p.email,w?'+'+w:''].filter(Boolean).join(' · '))+'</small><small>'+(p.aceito_em?'✅ confirmou em '+new Date(p.aceito_em).toLocaleDateString('pt-BR'):p.convidado_em?'✉️ convidado em '+new Date(p.convidado_em).toLocaleDateString('pt-BR'):'ainda sem convite')+'</small></span><div class="row wrap">'+
+      '<div class="pre-l">'+V.slice(0,200).map(function(p){var w=p.whatsapp;return '<div class="pre-i"><span><b>'+esc(p.nome||'Sem nome')+'</b><small>'+esc([p.profissao,p.email,w?'+'+w:''].filter(Boolean).join(' · '))+'</small><small>'+(p.aceito_em?'✅ confirmou em '+new Date(p.aceito_em).toLocaleDateString('pt-BR'):p.convidado_em?'✉️ convidado em '+new Date(p.convidado_em).toLocaleDateString('pt-BR'):'ainda sem convite')+(p.na_rede===false?' · <b>fora da Rede</b>':p.aceito_em?'':' · 👁️ na Rede (só o primeiro nome)')+(p.tem_negocio?' · 🏢 tem negócio':'')+'</small></span><div class="row wrap">'+(!p.aceito_em?'<button class="btn sm" data-act="preRede" data-v="'+p.id+'">'+(p.na_rede===false?'Mostrar na Rede':'Tirar da Rede')+'</button>':'')+
         (w&&!p.aceito_em?'<a class="btn sm pri" href="https://wa.me/'+w+'?text='+encodeURIComponent(preMsg(p))+'" target="_blank" rel="noopener" data-act="preConv" data-v="'+p.id+'">💬 Convidar</a>':'')+(!p.aceito_em?'<button class="btn sm" data-act="preCopia" data-v="'+p.id+'">Copiar convite</button>':'')+'</div></div>';}).join('')+(V.length>200?'<p class="small muted">Mostrando 200 de '+V.length+'. Use a busca.</p>':'')+'</div>':'')+'</section>';}
 Object.assign(ACT,{
   preCancela:function(){PRE.prev=null;render();},
+  preRede:function(v){var p=(PRE.L||[]).filter(function(x){return x.id===v;})[0];if(!p)return;SB.from('odo_pre_cadastros').update({na_rede:p.na_rede===false}).eq('id',v).select('*').single().then(function(r){if(r.error){toast(/na_rede/.test(r.error.message||'')?'Falta rodar a atualização 050.':'Não consegui salvar.');return;}Object.assign(p,r.data);render();});},
   preFil:function(v){PRE.f=v;render();},
   preImporta:function(){var L=PRE.prev&&PRE.prev.ok;if(!L||!L.length)return;PRE.busy=true;var feitos=0,falhas=0,i=0;render();
     function lote(){if(i>=L.length)return Promise.resolve();var c=L.slice(i,i+200).map(function(o){return Object.assign({user_id:RL.user.id},o);});i+=200;
@@ -3905,6 +3909,17 @@ function prePrepara(){var tk=espLS('io_pre_token');if(!tk||!RL.user)return Promi
 var _rlEntraP=rlEntra;rlEntra=function(){_rlEntraP.apply(this,arguments);var d=RL.pre;if(!d||RL.perfil||!S.cad)return;var c=S.cad;
   if(d.nome&&!c.nome)c.nome=d.nome;if(d.whatsapp&&!c.whats)c.whats=rlTel(String(d.whatsapp).replace(/^55/,''));if(d.profissao&&ROLE_DE[d.profissao]&&!c.prof)c.prof=d.profissao;if(d.cidade&&!c.cidade)c.cidade=d.cidade;if(d.uf&&!c.uf)c.uf=d.uf;RL.pre=null;render();toast('Seus dados já vieram preenchidos. Confira e confirme.');};
 
+/* ===== Rede de verdade: perfis reais + pré-cadastros (primeiro nome e sobrenome embaçado) ===== */
+var REDE_REAL={ok:false,n:0};
+function redeProfMap(r){var sw=Array.isArray(r.softs)?r.softs.map(function(x){return Array.isArray(x)?[String(x[0]),x[1]||'m']:[String((x&&(x.n||x.nome))||x),'m'];}):[];
+  return {id:r.id,nome:r.nome||'Profissional',prof:r.prof||'Dentista',cargo:r.cargo||r.prof||'',esp:'',cid:(r.cidade?r.cidade+' / ':'')+(r.uf||''),anos:0,softs:sw,areas:[],formacao:r.formacao||'',cursos:Array.isArray(r.cursos)?r.cursos.map(String):[],exp:Array.isArray(r.exp)?r.exp.map(function(e){return {cargo:e.cargo||'',anos:+e.anos||0,empresa:e.empresa||''};}):[],resumo:r.resumo||'',vis:{nome:r.nome?1:0,foto:r.tem_foto?1:0,empresas:1,cursos:1}};}
+function redePreMap(r){var pf=preProf(r.profissao||'')||'Dentista',prof=['Dentista','Protético','ASB / TSB','Estudante','Indústria e comércio','Corporativo'].indexOf(pf)>=0?pf:'Dentista';
+  return {id:r.id,pre:true,nome:r.primeiro_nome||'Profissional',sob:Math.min(14,Math.max(4,+r.letras_sobrenome||6)),prof:prof,cargo:r.profissao||prof,esp:'',cid:r.uf?(r.cidade?r.cidade:'')+' / '+r.uf:'Brasil',anos:0,softs:[],areas:[],formacao:'',cursos:[],exp:[],resumo:'',vis:{nome:1,foto:0,empresas:0,cursos:0}};}
+function redeRealCarrega(){if(typeof RL==='undefined'||!RL.user)return;
+  Promise.all([SB.rpc('odo_rede_profs',{f_uf:null,f_cidade:null}),SB.rpc('odo_rede_pre',{f_uf:null})]).then(function(r){var A=(r[0].data||[]).map(redeProfMap),B=r[1].error?[]:(r[1].data||[]).map(redePreMap);
+    REDE_PROFS.length=0;A.concat(B).forEach(function(x){REDE_PROFS.push(x);});REDE_REAL.ok=true;REDE_REAL.n=REDE_PROFS.length;REDE_REAL.pre=B.length;render();}).catch(function(){});}
+function profNomeH(p){if(p.pre)return esc(p.nome)+' <span class="nm-borra" aria-label="sobrenome oculto">'+'x'.repeat(p.sob)+'</span>';return esc(profNome(p));}
+
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
   var z=function(D,f){if(!D||!D.exemplo)return;f(D);D.exemplo=false;D.conv=[{de:'ana',t:'Seu painel está pronto. Me peça para anotar o que precisar.'}];};
@@ -3923,6 +3938,6 @@ var _render0=render;render=function(){try{rlZera();rlZera2();}catch(e){}return _
     Promise.all([SB.from('odo_perfis').select('*').eq('user_id',u.id).maybeSingle(),SB.rpc('sou_admin'),SB.from('perfis').select('nome,telefone').eq('user_id',u.id).maybeSingle()]).then(function(r){
       if(r[0].error)toast('O banco do Ideali Odonto precisa da atualização 040.');
       RL.perfil=r[0].data||null;RL.admin=!!r[1].data;var cp=r[2].data||{};RL.cadNome=cp.nome||'';RL.cadTel=cp.telefone||'';
-      espPrepara().catch(function(){}).then(prePrepara).catch(function(){}).then(function(){rlBarra();empCarrega().then(function(){rlEntra();pedCarrega();finCarrega();leitCarrega();});});});});})();
+      espPrepara().catch(function(){}).then(prePrepara).catch(function(){}).then(function(){rlBarra();empCarrega().then(function(){rlEntra();pedCarrega();finCarrega();leitCarrega();redeRealCarrega();});});});});})();
 
 </script>
