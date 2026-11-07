@@ -4637,10 +4637,10 @@ function aiAbre(){if(document.getElementById('aipan'))return;AI.on=true;if(!AI.m
   var d=document.createElement('div');d.id='aipan';d.className='aipan';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Ana · extratos e comprovantes');
   d.innerHTML='<div class="ai-p"><div class="ai-h"><img src="'+ANA_AV[0]+'" alt=""><div><b>Ana · extratos e comprovantes</b><small>'+MESES[FIN.mes-1]+' de '+FIN.ano+'</small></div><button class="ai-x" data-ai="fecha" aria-label="Fechar">×</button></div>'+
     '<div class="ai-corpo"><aside class="ai-esq"><input class="ai-q" type="search" placeholder="🔍 Buscar cliente" value="'+esc(AI.q)+'"><div class="ai-lista"></div></aside><section class="ai-dir"><div class="ai-chat" aria-live="polite"></div><p class="ai-sel small"></p>'+
-    '<div class="ai-acoes"><label class="btn pri ai-bt">📄 Enviar extratos (PDF)<input type="file" id="ai-ext" accept="application/pdf" multiple hidden></label><label class="btn ai-bt">📎 Enviar comprovante<input type="file" id="ai-comp" accept="application/pdf,image/*" hidden></label></div></section></div></div>';
+    '<div class="ai-acoes"><label class="btn pri ai-bt">📄 Enviar extratos (PDF)<input type="file" id="ai-ext" accept="application/pdf" multiple hidden></label><label class="btn ai-bt">📎 Enviar comprovante<input type="file" id="ai-comp" accept="application/pdf,image/*" hidden></label><button class="btn ai-bt" data-ai="verif">🔍 Verificar extratos anexados</button></div></section></div></div>';
   document.body.appendChild(d);aiRender();
   d.addEventListener('click',function(e){var b=e.target.closest('[data-ai]');if(e.target===d){aiFecha();return;}if(!b)return;var a=b.getAttribute('data-ai'),v=b.getAttribute('data-v');
-    if(a==='fecha')aiFecha();else if(a==='cli'){AI.cli=v;aiRender();}else if(a==='lanca')aiLancaComp();else if(a==='invest')aiInvest(v);else if(a==='cancela'){AI.comp=null;aiDiz('Tudo bem, não lancei nada.');}});
+    if(a==='fecha')aiFecha();else if(a==='cli'){AI.cli=v;aiRender();}else if(a==='lanca')aiLancaComp();else if(a==='invest')aiInvest(v);else if(a==='verif'){if(!AI.busy)aiVerifica();}else if(a==='cancela'){AI.comp=null;aiDiz('Tudo bem, não lancei nada.');}});
   d.addEventListener('input',function(e){if(e.target.classList.contains('ai-q')){AI.q=e.target.value;d.querySelector('.ai-lista').innerHTML=aiLista();}});
   d.addEventListener('change',function(e){var t=e.target;if(t.id==='ai-ext'){var fs=[].slice.call(t.files||[]);t.value='';aiExtratos(fs);}else if(t.id==='ai-comp'){var f=(t.files||[])[0];t.value='';if(f)aiComprovante(f);}else if(t.id==='ai-rel'){var f2=(t.files||[])[0];t.value='';if(f2)aiRelatorio(f2);}});
   document.addEventListener('keydown',aiEsc);}
@@ -4758,6 +4758,25 @@ aiInvest=function(v){var a=v.split('|'),k=a[0],ano=+a[1],mes=+a[2],sa=+a[3],c=EM
     if(sub){aiDiz(res+'<br>✅ Estes comprovantes somam exatamente a diferença. <b>Possivelmente não tiveram baixa na Inove:</b><br>'+sub.map(invChip).join(' ')+'<br>Mande esses comprovantes para a Inove dar baixa.',false,'erro');return;}
     aiDiz(res+'<br>Conferi um por um e não consegui explicar a diferença só com os comprovantes daqui.',false,'erro');
     aiDiz('📩 Agora sim: <b>me envie o extrato de comprovantes da Inove 3D do seu LabFácil</b>, com o registro dos pagamentos recebidos de '+esc(c.nome)+'. Eu comparo item por item e te digo exatamente o que falta de cada lado.<div class="ai-form"><label class="btn pri">📑 Enviar relatório do LabFácil<input type="file" id="ai-rel" accept="application/pdf,image/*" hidden></label></div>');});};
+
+/* ===== Verificar extratos já anexados do mês: abre cada PDF e mostra as divergências ===== */
+function aiVerifica(){var R=finDoMes(),comPdf=R.filter(function(m){return m.extrato_path&&/\.pdf$/i.test(m.extrato_path);}),semArq=R.filter(function(m){return !m.extrato_path&&!m.arquivo_legado;}).length,antigos=R.filter(function(m){return !m.extrato_path&&m.arquivo_legado;}).length;
+  aiDiz('🔍 Verificar extratos anexados · '+MESES[FIN.mes-1]+'/'+FIN.ano,true);
+  if(!comPdf.length){aiDiz('Não há extratos em PDF anexados neste mês para eu conferir.'+(antigos?' ('+antigos+' ainda estão no sistema antigo.)':''));return;}
+  aiDiz('Vou abrir e conferir <b>'+comPdf.length+' extrato'+(comPdf.length>1?'s':'')+'</b> anexado'+(comPdf.length>1?'s':'')+'…');AI.busy=true;aiRender();var ok=0,ruins=[];
+  comPdf.reduce(function(pr,m){return pr.then(function(){var nome=finCliNome(m);return finUrlAssinada(m.extrato_path).then(function(u){return fetch(u);}).then(function(r){if(!r.ok)throw 0;return r.blob();})
+    .then(function(b){return extTexto(new File([b],'extrato.pdf',{type:'application/pdf'}));}).then(function(tx){var d=extParse(tx),div=[],lnk='<button class="ih-ver" data-act="finArqVer" data-v="'+esc(m.extrato_path)+'">📄 abrir extrato</button>';
+      if(!d.mes||d.debitos==null){div.push('não consegui ler o mês ou o total deste PDF');}
+      else{if(d.ano!==m.ano||d.mes!==m.mes)div.push('o PDF é de <b>'+MESES[d.mes-1]+'/'+d.ano+'</b>, mas está anexado em '+MESES[m.mes-1]+'/'+m.ano);
+        var c=extAchaCli(d);if(c&&m.cliente_id&&c.id!==m.cliente_id)div.push('o PDF é do cliente <b>'+esc(d.nome)+'</b>, não de '+esc(nome));else if(!c&&d.nome&&extNorm(d.nome)!==extNorm(nome))div.push('o nome no PDF é <b>'+esc(d.nome)+'</b>');
+        if(!div.length){var it=extAnalisa({id:'v'+m.id,d:d,cliId:m.cliente_id});
+          if(Math.abs((+m.valor_mes)-d.debitos)>0.009)div.push('o extrato diz <b>'+fmtR(d.debitos)+'</b>, mas está lançado <b>'+fmtR(m.valor_mes)+'</b>');
+          if(it.baixa>0)div.push('o extrato cobra <b>'+fmtR(-d.saldoAnt)+'</b> de saldo anterior, mas aqui <b>'+fmtR(it.baixa)+'</b> disso já está pago (falta baixa na Inove)');
+          if(it.inoveAMenos>0)div.push('o extrato já deu baixa de <b>'+fmtR(it.inoveAMenos)+'</b> que não tem comprovante aqui');
+          if(div.length&&(it.baixa>0||it.inoveAMenos>0))div.push('<span class="ai-form"><button class="btn sm pri" data-ai="invest" data-v="'+m.cliente_id+'|'+d.ano+'|'+d.mes+'|'+(d.saldoAnt||0)+'">🔎 Investigar o ocorrido</button></span>');}}
+      if(div.length){ruins.push(nome);aiDiz('⛔ <b>'+esc(nome)+'</b> · '+lnk+'<br>• '+div.join('<br>• '),false,'erro');}else ok++;})
+    .catch(function(){ruins.push(nome);aiDiz('⛔ <b>'+esc(nome)+'</b>: não consegui abrir o extrato anexado.',false,'erro');});});},Promise.resolve())
+  .then(function(){AI.busy=false;aiDiz('📋 <b>Resultado:</b> '+ok+' extrato'+(ok!==1?'s':'')+' ✅ sem divergência'+(ruins.length?', <b class="bad">'+ruins.length+' com divergência</b> ('+esc(ruins.join(', '))+')':'')+'.'+(semArq?'<br>📭 '+semArq+' cliente'+(semArq>1?'s':'')+' do mês ainda sem extrato anexado.':'')+(antigos?'<br>'+antigos+' extrato'+(antigos>1?'s':'')+' ainda no sistema antigo (não deu para abrir).':''),false,ruins.length?'erro':'');});}
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
