@@ -2490,7 +2490,7 @@ function buscaEntende(q){var s=' '+semAc(q).replace(/[,;]+/g,' ')+' ',R={softs:[
 function profsFiltra(){var Q=buscaEntende(S.rede.q||''),sel=(S.rede.softs||[]).concat(Q.softs);
   return {Q:Q,L:REDE_PROFS.filter(function(p){var ps=p.softs.map(function(x){return x[0];});
     if(sel.some(function(n){return ps.indexOf(n)<0;}))return false;if(Q.cid&&cidadeDe(p.cid)!==Q.cid)return false;if(Q.uf&&p.cid.slice(-2)!==Q.uf)return false;if(Q.prof&&!temProf(p,Q.prof))return false;if(S.rede.fprof&&!temProf(p,S.rede.fprof))return false;
-    var tudo=semAc([p.cargo,p.esp,p.prof,p.formacao,p.resumo].concat(p.areas,p.cursos).join(' '));if(Q.txt.some(function(t){return tudo.indexOf(t.slice(0,Math.max(4,t.length-2)))<0;}))return false;
+    var tudo=semAc([p.vis&&p.vis.nome?p.nome:'',p.cargo,p.esp,p.prof,p.formacao,p.resumo].concat(p.profs||[],p.areas,p.cursos).join(' '));if(Q.txt.some(function(t){return tudo.indexOf(t.slice(0,Math.max(4,t.length-2)))<0;}))return false;
     if(!redeFiltro(p.cid)||!noRaio(p.cid))return false;return true;})};}
 function profAv(p,lg){var m=PCARD[p.prof]||PCARD.Dentista,ini=p.nome.split(/\s+/).map(function(x){return x[0];}).slice(0,2).join('');
   return '<span class="pc-av'+(lg?' lg':'')+'" style="--c1:'+m.c1+'">'+(p.vis.foto?esc(ini):'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="4.2" fill="currentColor"/><path d="M4 21c1.2-4.4 4.4-6.5 8-6.5s6.8 2.1 8 6.5" fill="currentColor"/></svg>')+'</span>';}
