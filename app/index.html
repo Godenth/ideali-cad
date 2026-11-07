@@ -1594,6 +1594,10 @@ html[data-tema="cystreet"] input,html[data-tema="cystreet"] select,html[data-tem
 @media (prefers-reduced-motion:reduce){#cySt *{animation:none!important}#cySt .cs-chuva{display:none}}
 html[data-tema="cystreet"]{background:#0B0620}html[data-tema="cystreet"] body{background:transparent}
 .tm[data-v="cystreet"] .tm-pv{background:linear-gradient(180deg,transparent 40%,rgba(11,6,32,.7)),url(img/temas/cystreet-m.webp) center 40%/cover!important}
+.anacad{border:1px solid rgba(160,110,255,.45);background:linear-gradient(135deg,rgba(124,92,255,.16),rgba(255,80,200,.10));border-radius:14px;padding:10px 12px;margin:0 0 12px;display:flex;flex-direction:column;gap:8px}
+.anacad-h{display:flex;gap:10px;align-items:center}.anacad-h img{border-radius:50%;flex:none;border:2px solid #A06EFF}.anacad-h div{display:flex;flex-direction:column}.anacad-h small{opacity:.75;font-size:.8rem}
+#anacad-t{width:100%;font:inherit;font-size:16px;line-height:1.35;padding:10px;border-radius:10px;resize:vertical;min-height:58px}
+.anacad-b{display:flex;justify-content:flex-end}
 </style>
 
 <div id="app"></div>
@@ -4952,45 +4956,10 @@ function redeIni(){
   if(ui.rede){sincEu(ui.rede);return ui.rede;}
   var hoje=today();
   ui.rede={tab:'delegar',passo:1,pid:null,repasse:'',prazo:addDays(hoje,1),hora:'18:00',quem:'favoritos',cadista:'',busca:null,obs:'',
-    parceiros:[
-      {id:'r1',porTipo:{'Coroas':142,'Facetas':96,'Protocolos':38,'Pontes fixas':30,'Mockups':21,'Placas de bruxismo':15},elementos:611,noPrazo:98,desde:'mar/2026',coment:[[5,'Anatomia perfeita, nem precisei ajustar.','Cadista de Recife'],[5,'Rápida e caprichosa.','Lab. de BH']],pix:'juliana.cad@email.com',nome:'Juliana Mendes',cidade:'Belo Horizonte, MG',sw:['exocad','3Shape'],esp:['Coroas','Facetas','Protocolos'],nota:4.9,av:128,feitos:342,prazo:'1 dia',on:true,fav:true,cor:5},
-      {id:'r2',porTipo:{'Protocolos':88,'Elementos sobre implante':74,'Barras':22,'Coroas':18,'Placas de bruxismo':9},elementos:802,noPrazo:96,desde:'abr/2026',coment:[[5,'Protocolos impecáveis.','Lab. de Curitiba']],pix:'(41) 99999-0000',nome:'Rafael Torres',cidade:'Curitiba, PR',sw:['exocad'],esp:['Protocolos','Sobre implante'],nota:4.8,av:96,feitos:211,prazo:'1–2 dias',on:true,fav:true,cor:4},
-      {id:'r3',porTipo:{'Facetas':64,'Mockups':31,'Enceramentos':17,'Coroas':8},elementos:390,noPrazo:94,desde:'mai/2026',nome:'Camila Rocha',cidade:'Recife, PE',sw:['3Shape'],esp:['Facetas','Enceramento'],nota:4.7,av:54,feitos:120,prazo:'1 dia',on:false,fav:false,cor:6},
-      {id:'r4',porTipo:{'Coroas':260,'Placas de bruxismo':120,'Pontes fixas':80,'Facetas':70,'Provisórios':50},elementos:1240,noPrazo:99,desde:'fev/2026',coment:[[5,'Entrega no mesmo dia, salvou meu fim de semana.','Cadista de SP'],[4,'Muito bom, um ajuste pequeno.','Clínica de Santos']],pix:'diego@alvescad.com.br',nome:'Diego Alves',cidade:'São Paulo, SP',sw:['exocad','DentalWings'],esp:['Coroas','Placas'],nota:4.9,av:203,feitos:580,prazo:'mesmo dia',on:true,fav:false,cor:3},
-      {id:'r5',porTipo:{'Provisórios':30,'Coroas':28,'Placas de bruxismo':16},elementos:152,noPrazo:92,desde:'jul/2026',nome:'Patrícia Lima',cidade:'Goiânia, GO',sw:['exocad'],esp:['Provisórios','Coroas'],nota:4.6,av:31,feitos:74,prazo:'2 dias',on:true,fav:false,cor:2},
-      {id:'r6',porTipo:{'Elementos sobre implante':70,'Barras':40,'Protocolos':52,'Coroas':28},elementos:530,noPrazo:95,desde:'abr/2026',nome:'Marcos Vieira',cidade:'Porto Alegre, RS',sw:['3Shape','exocad'],esp:['Sobre implante','Barras'],nota:4.8,av:77,feitos:190,prazo:'1–2 dias',on:false,fav:false,cor:1}
-    ],
-    eu:{id:'eu',nome:(S.perfil.nome||'Você').trim(),cidade:((S.perfil.cidade||'Sua cidade')+(S.perfil.uf?', '+S.perfil.uf:'')),sw:['exocad'],esp:['Coroas','Sobre implante'],nota:4.9,av:18,feitos:42,prazo:'1 dia',on:true,cor:5,desde:'out/2026',elementos:71,noPrazo:98,
-      porTipo:{'Coroas':17,'Elementos sobre implante':11,'Facetas':6,'Placas de bruxismo':5,'Pontes fixas':3},coment:[[5,'Entregou antes do prazo e com ótima anatomia.','Lab. de Campinas'],[5,'Sempre caprichoso nos contatos.','Cadista de Natal']]},
-    mural:[
-      {id:'m1',cod:'R-2501',trab:'Elemento sobre implante',dentes:[36],mat:'Zircônia',sw:'exocad',repasse:45,hora:'18:00',prazo:hoje,de:'x1',min:4,paraMim:true,st:'aberto'},
-      {id:'m2',cod:'R-2499',trab:'Facetas',dentes:[13,12,11,21,22,23],mat:'Dissilicato de lítio',sw:'exocad',repasse:150,hora:'12:00',prazo:addDays(hoje,1),de:'x2',min:12,st:'aberto'},
-      {id:'m3',cod:'R-2498',trab:'Placa de bruxismo',dentes:[],mat:'PMMA',sw:'qualquer',repasse:35,hora:'10:00',prazo:addDays(hoje,1),de:'x3',min:25,st:'aberto'},
-      {id:'m4',cod:'R-2496',trab:'Protocolo (superior ou inferior)',dentes:[],mat:'PMMA',sw:'exocad',repasse:280,hora:'18:00',prazo:addDays(hoje,2),de:'x1',min:40,st:'aberto'},
-      {id:'m5',cod:'R-2495',trab:'Mockup',dentes:[14,13,12,11,21,22,23,24],mat:'Impressão 3D',sw:'3Shape',repasse:80,hora:'20:00',prazo:hoje,de:'x4',min:55,st:'aberto'},
-      {id:'m6',cod:'R-2493',trab:'Ponte fixa',dentes:[24,25,26],mat:'Zircônia',sw:'exocad',repasse:105,hora:'16:00',prazo:addDays(hoje,1),de:'x2',min:90,st:'aberto'},
-      {id:'m7',cod:'R-2492',trab:'Lente de contato',dentes:[12,11,21,22],mat:'Dissilicato de lítio',sw:'exocad',repasse:180,hora:'14:00',prazo:addDays(hoje,2),de:'x5',min:18,st:'aberto'},
-      {id:'m8',cod:'R-2490',trab:'Coroa sobre dente',dentes:[16],mat:'Zircônia',sw:'qualquer',repasse:40,hora:'18:00',prazo:addDays(hoje,1),de:'x6',min:33,st:'aberto'}
-    ],
-    meus:[{id:'k1',arqs:[{nome:'escaneamento_11_21.zip',tipo:'stl',de:'outro'},{nome:'referencia_sorriso.html',tipo:'html',de:'outro'}],cod:'R-2470',trab:'Enceramento digital',dentes:[11,21],mat:'Cera',repasse:30,hora:'19:00',prazo:hoje,de:'x3',st:'desenho'}],
-    chat:{
-      d1:[{de:'sis',t:'Juliana aceitou o R-2481. Chat liberado.'},{de:'outro',t:'Oi! Peguei o 36 sobre implante. O scanbody é Neodent Cone Morse mesmo?',h:'09:12'},{de:'eu',t:'Isso, Neodent CM. Pode fazer parafusada.',h:'09:20'},{de:'outro',t:'Perfeito, te mando o HTML até as 10h amanhã.',h:'09:21'}],
-      d2:[{de:'sis',t:'Rafael aceitou o R-2475. Chat liberado.'},{de:'outro',t:'Protocolo pronto, subi o HTML e a STL. Dá uma olhada na gengiva rosa.',h:'16:40'}],
-      d3:[{de:'sis',t:'Diego aceitou o R-2460. Chat liberado.'},{de:'eu',t:'Ficou ótimo, Diego. Pix enviado!',h:'18:05'},{de:'outro',t:'Recebido, obrigado! 🙌',h:'18:09'}],
-      k1:[{de:'sis',t:'Você aceitou o R-2470. Chat liberado.'},{de:'outro',t:'Oi! O caso é enceramento do 11 e 21, quero bem natural. Mandei o HTML do sorriso de referência.',h:'13:02'}]
-    },
-    cadDe:{x1:{id:'x1',tipo:'lab',nome:'Lab. de Campinas',cidade:'Campinas, SP',sw:['exocad'],nota:4.8,av:40,cor:4},x2:{id:'x2',tipo:'cad',nome:'Cadista de Salvador',cidade:'Salvador, BA',sw:['exocad'],nota:4.6,av:22,cor:6},x3:{id:'x3',tipo:'cad',nome:'Cadista de Natal',cidade:'Natal, RN',sw:['3Shape'],nota:4.9,av:61,cor:3},x4:{id:'x4',tipo:'den',nome:'Clínica Sorriso Digital',cidade:'Recife, PE',sw:['3Shape'],nota:4.7,av:15,cor:2},x5:{id:'x5',tipo:'den',nome:'Dra. Renata Lopes',cidade:'Goiânia, GO',sw:['exocad'],nota:4.9,av:9,cor:1},x6:{id:'x6',tipo:'lab',nome:'Lab. Prótese Sul',cidade:'Florianópolis, SC',sw:['exocad','3Shape'],nota:4.7,av:33,cor:5}},
-    enviados:[
-      {id:'d0',cod:'R-2486',trab:'Placa de bruxismo',dentes:[],repasse:35,hora:'12:00',prazo:addDays(hoje,2),parceiro:null,st:'oferta',quando:hoje,para:'Toda a rede'},
-      {id:'d1',arqs:[{nome:'escaneamento_36.zip',tipo:'stl',de:'eu'}],cod:'R-2481',trab:'Elemento sobre implante',dentes:[36],repasse:45,hora:'10:00',prazo:addDays(hoje,1),parceiro:'r1',st:'desenho',quando:hoje},
-      {id:'d2',arqs:[{nome:'escaneamento_superior.zip',tipo:'stl',de:'eu'},{nome:'protocolo_superior.html',tipo:'html',de:'outro'},{nome:'protocolo_superior.stl',tipo:'stl',de:'outro'}],cod:'R-2475',trab:'Protocolo (superior ou inferior)',dentes:[],repasse:280,hora:'17:00',prazo:hoje,parceiro:'r2',st:'revisao',quando:addDays(hoje,-1)},
-      {id:'d3',cod:'R-2460',trab:'Facetas',dentes:[11,12,21,22],repasse:96,hora:'18:00',prazo:addDays(hoje,-3),parceiro:'r4',st:'pago',quando:addDays(hoje,-4),nota:5}
-    ],
-    recebidos:[
-      {id:'o1',cod:'R-2490',trab:'Elemento sobre dente',dentes:[14,15],mat:'Zircônia',repasse:40,hora:'14:00',prazo:addDays(hoje,1),de:'Cadista de Campinas, SP',nota:4.8,st:'oferta'},
-      {id:'o2',cod:'R-2488',trab:'Placa de bruxismo',dentes:[],mat:'PMMA',repasse:35,hora:'09:00',prazo:addDays(hoje,2),de:'Cadista de Salvador, BA',nota:4.6,st:'oferta'},
-      {id:'o3',cod:'R-2470',trab:'Enceramento digital',dentes:[11,21],mat:'Cera',repasse:30,hora:'19:00',prazo:hoje,de:'Cadista de Natal, RN',nota:4.9,st:'aceito'}
-    ]};
+    /* exemplos inventados removidos: a Rede mostra só o que é real */
+    parceiros:[],
+    eu:{id:'eu',nome:(S.perfil.nome||'Você').trim(),cidade:((S.perfil.cidade||'Sua cidade')+(S.perfil.uf?', '+S.perfil.uf:'')),sw:['exocad'],esp:[],nota:0,av:0,feitos:0,prazo:'',on:true,cor:5,desde:'',elementos:0,noPrazo:0,porTipo:{},coment:[]},
+    mural:[],meus:[],chat:{},cadDe:{},enviados:[],recebidos:[]};
   sincEu(ui.rede);if(!S.rede)carregaPerfilRede();return ui.rede;
 }
 var ETAPAS_REDE=[['oferta','Ofertado'],['desenho','Em desenho'],['revisao','Para revisar'],['aprovado','Aprovado'],['pago','Repasse pago']];
@@ -6114,7 +6083,7 @@ function ppAbrePedido(r){ui.ppImp=null;closeSheet();ui.pdRede=false;ui.pdInit=fa
   ui.pdPre={pac:r.pac,prazo:r.prazo,mat:r.mat,urg:r.urg,obs:obs,resumo:r};
   openSheet(fPedido,null,r.cli?r.cli.id:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();}
 function ppResumo(r){var ok=[],falta=[];
-  (r.cli?ok.push('cliente '+r.cli.nome):falta.push('cliente'));(r.dentes.length?ok.push('dentes '+r.dentes.join(', ')):falta.push('dentes'));
+  (r.cli?ok.push('cliente '+r.cli.nome):falta.push('cliente'));(r.deTexto&&r.dentes.length?0:r.dentes.length?ok.push('dentes '+r.dentes.join(', ')):falta.push('dentes'));
   (r.tipo?ok.push(r.tipo.nome):falta.push('tipo de trabalho'));(r.pac?ok.push('paciente '+r.pac):falta.push('paciente'));
   if(r.prazo)ok.push('prazo '+dmy(r.prazo));if(r.cor)ok.push('cor '+r.cor);if(r.mat)ok.push(r.mat);if(r.marca)ok.push(r.marca+(r.con?' '+r.con:''));if(r.urg)ok.push('urgente');
   return {ok:ok,falta:falta};}
@@ -6156,7 +6125,7 @@ function fPedido(id,preCli){
   function arch(list){return '<div class="arch">'+list.map(function(n,i){return '<button type="button" class="tooth '+(i===8?'mid':'')+'" data-a="tooth" data-n="'+n+'">'+n+'</button>';}).join('')+'</div>';}
   function conn(list){return '<div class="conn" aria-label="Uniões entre dentes">'+list.map(function(n,i){return '<span data-cn="'+n+'">'+(i<15?'<button type="button" class="cn" data-a="pdUne" data-n="'+n+'" aria-label="Unir '+n+' e '+list[i+1]+'"></button>':'')+'</span>';}).join('')+'</div>';}
   return head(p?'Editar pedido #'+p.num:(ui.pdRede?'Publicar trabalho novo':'Novo pedido'))+
-  (!p&&pre.resumo?(function(){var R=ppResumo(pre.resumo);return '<div class="banner" style="align-items:flex-start"><img src="equipe/ana-av-feliz.webp" alt="" width="36" height="36" style="border-radius:50%;flex:none"><span><b>'+(ui.caixaPend?'A Ana montou o pré-cadastro pela Caixa de entrada.':'A Ana preencheu pelo print.')+'</b> Achei: '+esc(R.ok.join(' · ')||'pouca coisa')+'.'+(R.falta.length?' <b>Falta conferir:</b> '+esc(R.falta.join(', '))+'.':'')+' Confira antes de salvar.</span></div>';})():'')+
+  (!p&&pre.resumo?(function(){var R=ppResumo(pre.resumo);return '<div class="banner" style="align-items:flex-start"><img src="equipe/ana-av-feliz.webp" alt="" width="36" height="36" style="border-radius:50%;flex:none"><span><b>'+(pre.resumo.deTexto?'A Ana preencheu pelo que você escreveu.':ui.caixaPend?'A Ana montou o pré-cadastro pela Caixa de entrada.':'A Ana preencheu pelo print.')+'</b> Achei: '+esc(R.ok.join(' · ')||'pouca coisa')+'.'+(R.falta.length?' <b>Falta conferir:</b> '+esc(R.falta.join(', '))+'.':'')+' Confira antes de salvar.</span></div>';})():'')+
   (ui.pdRede&&!p?'<div class="banner"><span><b>Vai para a Rede.</b> Anexe o escaneamento. Em dente sobre implante, a <b>marca do implante</b> e o <b>scanbody</b> são obrigatórios. Depois de salvar, você escolhe o repasse e o prazo.</span></div>':'')+
   '<form data-form="pedido" data-id="'+(id||'')+'" class="stack">'+
     '<div class="pdf"><div class="pdf-b1">'+
@@ -7689,6 +7658,39 @@ tselAbre:function(d,el){var l=el.parentNode.querySelector('.tsel-l');l.hidden=!l
   fechar:function(){closeSheet();},
   bg:function(d,el,e){if(e.target===el)closeSheet();}
 };
+/* ===== Ana dentro do "Novo pedido": o cadista escreve (ou dita) e ela preenche o formulário ===== */
+function anaDOk(n){var q=Math.floor(n/10),d=n%10;return q>=1&&q<=4&&d>=1&&d<=8;}
+function anaFaixaC(a,b){var A=UP.indexOf(a)>=0&&UP.indexOf(b)>=0?UP:LO.indexOf(a)>=0&&LO.indexOf(b)>=0?LO:null;if(!A)return [a,b];var i=A.indexOf(a),j=A.indexOf(b);return i<=j?A.slice(i,j+1):A.slice(j,i+1).reverse();}
+function anaDentesC(t){var out=[],s=String(t).replace(/\b(\d{2})\s*(?:a|ao|al|à|até|ate|-|–|—)\s*(?:o\s+)?(\d{2})\b/g,function(m,a,b){a=+a;b=+b;if(anaDOk(a)&&anaDOk(b))anaFaixaC(a,b).forEach(function(n){out.push(n);});return ' ';});
+  (s.match(/\b\d{2}\b/g)||[]).forEach(function(x){x=+x;if(anaDOk(x))out.push(x);});var u=[];out.forEach(function(n){if(u.indexOf(n)<0)u.push(n);});return u;}
+function anaCadTexto(txt){var raw=String(txt||'').trim();if(!raw)return null;var r=pedDoTexto(raw),t=ppNorm(raw).replace(/\s+/g,' ');
+  if(!r.cli){var cs=alive(S.clientes).filter(function(c){var w=ppNorm(c.pnome||c.nome||'').replace(/^(dra?|lab|clinica)\.?\s+/,'').split(/\s+/)[0];return w&&w.length>=4&&new RegExp('\\b'+w+'\\b').test(t);});if(cs.length===1)r.cli=cs[0];}
+  var limpo=t.replace(/\+?\d[\d\s().-]{8,}\d/g,function(x){var g=x.trim().split(/[\s().-]+/);return g.every(function(y){return /^\d{2}$/.test(y)&&anaDOk(+y);})?x:' ';}).replace(/\b\d{1,2}:\d{2}\b/g,' ').replace(/\b\d{1,2}\s*\/\s*\d{1,2}(\s*\/\s*\d{2,4})?\b/g,' ').replace(/\bdia\s+\d{1,2}\b/g,' ').replace(/\bem\s+\d{1,2}\s+dias?\b/g,' ').replace(/\bcor\s*\S+/g,' ').replace(/\b(he|hi|cm)\s*\d[.,]\d\b/g,' ');
+  var KW=/coroas?|facetas?|lentes? de contato|onlays?|inlays?|overlays?|placas?|protocolos?|provisorios?|enceramentos?|mock ?ups?|modelos?|elementos?|ponticos?|pontes?|copings?/g,pos=[],m;while((m=KW.exec(limpo))){pos.push(m.index);}
+  /* "elementos" logo depois de um trabalho não abre item novo (ex.: "coroa dos elementos 11 ao 25") */
+  pos=pos.filter(function(p,i){if(i===0)return true;var ent=limpo.slice(pos[i-1],p);return !(/^(elementos?|dentes?)/.test(limpo.slice(p))&&!/\d/.test(ent));});
+  var segs=pos.length?pos.map(function(p,i){return limpo.slice(i===0?0:p,i+1<pos.length?pos[i+1]:limpo.length);}):[limpo],itens=[],usados=[];
+  segs.forEach(function(sg){var ds=anaDentesC(sg);if(!ds.length)return;var imp=/implante|parafus|munhao|t-?base|ti-?base|scanbody|scan body/.test(sg)&&!/sobre dente/.test(sg);
+    var tp=ppTipo(sg)||(imp?ppTipo('coroa sobre implante'):r.tipo)||r.tipo;itens.push({ds:ds,tp:tp,imp:imp});});
+  /* dente que aparece em dois trabalhos fica só no mais específico (ex.: 11 ao 25 sobre dente + 23 sobre implante) */
+  itens.forEach(function(a){a.ds=a.ds.filter(function(n){return !itens.some(function(b){return b!==a&&b.ds.indexOf(n)>=0&&b.ds.length<a.ds.length;});});});
+  var L=[];itens.forEach(function(it){it.ds.forEach(function(d){if(usados.indexOf(d)>=0)return;usados.push(d);L.push({d:d,t:it.tp?it.tp.id:'',imp:it.imp,m:it.imp?r.marca:'',c:it.imp?r.con:''});});});
+  if(!L.length&&r.dentes.length)L=r.dentes.map(function(d){return {d:d,t:r.tipo?r.tipo.id:'',imp:!!r.imp,m:r.imp?r.marca:'',c:r.imp?r.con:''};});
+  if(r.pac)r.pac=r.pac.replace(/\s+(dia|pra|para|ate|até|no|na|com)(\s.*)?$/i,'');
+  if(!r.prazo){var md=t.match(/\bdia\s+(\d{1,2})\b/);if(md){var hj=new Date(today()+'T12:00:00'),dd=new Date(hj.getFullYear(),hj.getMonth(),+md[1],12);if(dd<hj)dd.setMonth(dd.getMonth()+1);r.prazo=dd.toISOString().slice(0,10);}}
+  r.itensAna=L;r.dentes=L.map(function(x){return x.d;});if(!r.tipo&&itens[0])r.tipo=itens[0].tp;
+  r.tiposAna=itens.filter(function(i){return i.ds.length;}).map(function(i){return (i.tp?i.tp.nome:'trabalho')+' ('+i.ds.join(', ')+')';});if(r.tiposAna.length)r.tipo={id:'',nome:r.tiposAna.join(' + ')};r.deTexto=true;return r;}
+function anaCadBloco(){return '<div class="anacad"><div class="anacad-h"><img src="equipe/ana-av-feliz.webp" alt="" width="34" height="34"><div><b>Escreva o pedido para a Ana</b><small>Ela marca os dentes e preenche o resto. No celular, use o microfone do teclado para ditar.</small></div></div>'+
+  '<textarea id="anacad-t" rows="2" maxlength="1500" placeholder="Ex.: Dr. Paulo, paciente Maria Souza, coroa zircônia sobre dente do 11 ao 25 e 23 sobre implante Neodent CM, cor A2, pra sexta">'+esc(ui.anaCadTxt||'')+'</textarea>'+
+  '<div class="anacad-b"><button type="button" class="btn sm pri" data-a="anaCadPreenche">✨ Preencher</button></div></div>';}
+var _fPedidoAna=fPedido;fPedido=function(id,preCli){var h=_fPedidoAna.apply(this,arguments);if(id)return h;return h.replace('<form data-form="pedido"',anaCadBloco()+'<form data-form="pedido"');};
+A.anaCadPreenche=function(){var ta=document.getElementById('anacad-t'),tx=ta?ta.value.trim():'';if(!tx){toast('Escreva o pedido primeiro.');return;}ui.anaCadTxt=tx;
+  var r=anaCadTexto(tx);if(!r||(!r.itensAna.length&&!r.cli&&!r.pac)){toast('Não entendi. Diga o trabalho e os dentes, ex.: coroa do 11 ao 13.');return;}
+  var cliAtual=(document.getElementById('pd-cli')||{}).value||'';if(!r.cli&&cliAtual)r.cli=cliente(cliAtual)||null;
+  var rede=ui.pdRede,ex=ui.pdExtras||[];ui.ppImp=null;closeSheet();ui.pdRede=rede;ui.pdInit=false;ui.pdItens=r.itensAna;ui.pdExtras=ex;ui.pdEd=null;ui.anaCadTxt=tx;
+  ui.pdPre={pac:r.pac,prazo:r.prazo,mat:r.mat,urg:r.urg,obs:[r.cor?'Cor '+r.cor:''].filter(Boolean).join(' · '),resumo:r};
+  openSheet(fPedido,null,r.cli?r.cli.id:null);ui.sheet.after=depoisFormPedido;depoisFormPedido();
+  toast(r.itensAna.length?'Pronto! Marquei '+r.itensAna.length+' elemento'+(r.itensAna.length>1?'s':'')+'. Confira e toque em Criar pedido.':'Preenchi o que entendi. Marque os dentes.');};
 var F={
   compNota:function(fd){var id=String(fd.get('id')||''),t=String(fd.get('t')||'').trim().slice(0,600);compNotaSalva(id,{texto:t}).then(function(ok){if(ok)toast(t?'Anotação salva.':'Anotação apagada.');});renderSheet();},
   prEqAdd:function(fd,f){var email=String(fd.get('email')||'').trim().toLowerCase(),nome=String(fd.get('nome')||'').trim().slice(0,60),lim=Math.max(1,Math.min(200,+fd.get('lim')||40));if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){toast('E-mail inválido.');return;}
