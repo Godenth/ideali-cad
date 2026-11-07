@@ -1318,6 +1318,9 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .ih-conf{border:0;background:#2BB6A3;color:#04201C;border-radius:8px;padding:6px 12px;font:inherit;font-size:.8rem;font-weight:800;cursor:pointer}.ih-ok{border:1px solid #13875F;background:transparent;color:#13875F;border-radius:8px;padding:5px 10px;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
 .ih-vz{padding:10px 16px;color:var(--muted);font-size:.84rem}.ino-novo{display:block;color:#E8A33A;font-size:.72rem;font-weight:700;margin-top:2px}
 @media (max-width:700px){.ih-tr{grid-template-columns:1fr 1fr}.ih-th{display:none}.ih-num{align-items:flex-start;text-align:left}}
+.ext-selo{display:inline-block;font-size:.72rem;font-weight:700;border-radius:999px;padding:2px 9px;border:1px solid var(--line);color:var(--muted)}.ext-selo.on{background:#2F6BFF;border-color:#2F6BFF;color:#fff}
+.ext-filtro{margin:0 8px 8px 0;border:1px solid #2F6BFF;background:transparent;color:#5B8CFF;border-radius:999px;padding:6px 12px;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}.ext-filtro.on{background:#2F6BFF;color:#fff}
+.finbusca{display:flex;flex-wrap:wrap;align-items:center}.cobwa{display:inline-flex;align-items:center;gap:6px}.cobwa svg path{fill:#fff}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4416,6 +4419,48 @@ ACT.inoConf=function(v){var t=v.slice(0,1),id=v.slice(2),ids=t==='m'?inoNovos(FI
   if(t==='u'&&!confirm('Desfazer a confirmação deste pagamento?'))return;
   SB.rpc('odo_inove_confirma',{p_ids:ids,p_ok:ok}).then(function(r){if(r.error){toast(/odo_inove_confirma|function/i.test(r.error.message||'')?'Falta rodar a atualização 054 no Supabase.':'Não consegui confirmar agora.');return;}
     var agora=new Date().toISOString();FIN.P.forEach(function(p){if(ids.indexOf(p.id)>=0){p.inove_ok_em=ok?agora:null;}});render();toast(ok?(ids.length>1?ids.length+' pagamentos confirmados.':'Pagamento confirmado.'):'Confirmação desfeita.');});};
+
+/* ===== Enviar a cobrança com o extrato junto + controle de "extrato enviado" ===== */
+var CEXT={id:null,file:null,carregando:false};
+function cobMesAtual(){return FIN.M.filter(function(x){return x.id===FIN.ed;})[0]||null;}
+function cobPrepExtrato(m){if(!m||!m.extrato_path){CEXT={id:null,file:null};return;}if(CEXT.id===m.id&&(CEXT.file||CEXT.carregando))return;CEXT={id:m.id,file:null,carregando:true};
+  finUrlAssinada(m.extrato_path).then(function(u){return fetch(u);}).then(function(r){if(!r.ok)throw 0;return r.blob();}).then(function(b){if(CEXT.id!==m.id)return;var ext=/\.pdf$/i.test(m.extrato_path)?'pdf':(String(m.extrato_path).split('.').pop()||'pdf');
+    var nm=('extrato-'+finCliNome(m)+'-'+MESES[m.mes-1]+'-'+m.ano).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9-]+/g,'-').toLowerCase()+'.'+ext;
+    CEXT.file=new File([b],nm,{type:b.type||(ext==='pdf'?'application/pdf':'image/'+ext)});CEXT.carregando=false;var e=document.querySelector('[data-act=cobEnvia]');if(e)e.innerHTML=cobEnviaRot(m);}).catch(function(){CEXT.carregando=false;});}
+function cobEnviaRot(m){return WA_SVG+' Enviar no WhatsApp'+(m&&m.extrato_path?' + extrato':'');}
+function cobMarcaEnviado(m){if(!m||m.enviado)return;m.enviado=true;SB.from('odo_fin_meses').update({enviado:true}).eq('id',m.id).select('*').single().then(function(r){if(!r.error)finAtual(r.data);render();});}
+var _cobMontaE=ACT.cobMonta;ACT.cobMonta=function(t){_cobMontaE.apply(this,arguments);cobPrepExtrato(cobMesAtual());};
+rFinCob=function(){var c=FIN.cob,cli=EMP.cli.filter(function(x){return x.id===c.k;})[0],w=cliWa(cli),m=cobMesAtual();
+  return '<div class="fincobm"><textarea id="fc-txt" rows="12">'+esc(c.txt)+'</textarea>'+
+    (m&&!m.extrato_path?'<p class="small muted">Este mês ainda não tem extrato anexado. Anexe em "Extrato do mês" para ele ir junto.</p>':'')+
+    '<div class="row wrap"><button class="btn" data-act="finCobCopia">Copiar</button>'+
+    (w?'<button class="btn pri cobwa" data-act="cobEnvia">'+cobEnviaRot(m)+'</button>':
+      cli?'<span class="cobwa-novo"><input id="cob-wa" type="tel" inputmode="tel" placeholder="WhatsApp do cliente (DDD + número)" autocomplete="off"><button class="btn pri" data-act="cobEnvia">Salvar e enviar</button></span>':'<span class="small muted">Cliente sem cadastro: copie a mensagem.</span>')+'</div></div>';};
+ACT.cobEnvia=function(){var m=cobMesAtual(),c=FIN.cob,cli=EMP.cli.filter(function(x){return x.id===(c&&c.k);})[0],t=document.getElementById('fc-txt'),txt=t?t.value:(c?c.txt:''),w=cliWa(cli);if(c)c.txt=txt;
+  if(!w){var i=document.getElementById('cob-wa'),n=i?i.value.replace(/\D/g,''):'';if(n.length<10||n.length>13){toast('Digite o WhatsApp com DDD. Ex.: 11 91234-5678');return;}
+    w=n.length<=11?'55'+n:n;if(cli){cli.whatsapp=n;SB.from('odo_clientes').update({whatsapp:n.slice(0,30)}).eq('id',cli.id).then(function(r){if(r.error)toast('Não consegui salvar o número no cadastro.');});}}
+  var f=CEXT.id===(m&&m.id)?CEXT.file:null,celular=matchMedia('(pointer:coarse)').matches;
+  if(f&&celular&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],text:txt}).then(function(){cobMarcaEnviado(m);toast('Extrato enviado ✓');}).catch(function(){});return;}
+  var win=window.open('https://wa.me/'+w+'?text='+encodeURIComponent(txt),'_blank');if(!win)location.href='https://wa.me/'+w+'?text='+encodeURIComponent(txt);
+  if(f){finBaixa(f,f.name);toast('O extrato foi baixado. É só arrastar o arquivo para a conversa do WhatsApp.');}
+  else if(m&&m.extrato_path){toast('Ainda carregando o extrato… tente de novo em 2 segundos.');}
+  cobMarcaEnviado(m);};
+/* selo azul "Extrato enviado" */
+var _rFinDetE=rFinDet;rFinDet=function(m){var h=_rFinDetE.apply(this,arguments);if(!m)return h;
+  return h.replace('<span class="pill" style="--k:','<span class="ext-selo'+(m.enviado?' on':'')+'">'+(m.enviado?'✉️ Extrato enviado':'📭 Extrato não enviado')+'</span> <span class="pill" style="--k:');};
+/* lista do Financeiro: selo + filtro de quem ainda não recebeu */
+var _rFinMesE=rFinMes;rFinMes=function(){var h=_rFinMesE.apply(this,arguments),L=finDoMes().filter(function(m){return +m.valor_mes>0&&!m.enviado;});
+  h=h.split("✉️ enviado").join('<span class="ext-selo on">✉️ Extrato enviado</span>').split("não enviado").join('<span class="ext-selo">📭 não enviado</span>');
+  var bt='<button class="ext-filtro'+(FIN.soNaoEnv?' on':'')+'" data-act="extFiltro">📭 Sem extrato enviado ('+L.length+')</button>';
+  h=h.replace('<div class="finbusca">','<div class="finbusca">'+bt);
+  if(FIN.soNaoEnv){finDoMes().forEach(function(m){if(m.enviado||!(+m.valor_mes>0))h=h.replace('data-v="'+m.id+'" data-n=','data-v="'+m.id+'" hidden data-n=');});}
+  return h;};
+ACT.extFiltro=function(){FIN.soNaoEnv=!FIN.soNaoEnv;render();};
+/* Ana lembra no Início quem ainda não recebeu o extrato */
+function extPendentes(){if(!FIN.carregado||FIN.erro||!FIN.M.length)return null;var mx=FIN.M.reduce(function(a,m){return Math.max(a,m.ano*100+m.mes);},0),ano=Math.floor(mx/100),mes=mx%100;
+  var L=FIN.M.filter(function(m){return m.ano===ano&&m.mes===mes&&+m.valor_mes>0&&!m.enviado;});return {mes:mes,ano:ano,L:L};}
+var _pFrasesE=pFrases;pFrases=function(D){var L=_pFrasesE(D);try{var x=extPendentes();if(x&&x.L.length){var nm=x.L.slice(0,3).map(function(m){return finCliNome(m);});
+  L.splice(0,0,'📭 '+x.L.length+' cliente'+(x.L.length>1?'s':'')+' ainda não '+(x.L.length>1?'receberam':'recebeu')+' o extrato de '+MESES[x.mes-1]+': '+nm.join(', ')+(x.L.length>3?' e mais '+(x.L.length-3):'')+'. Veja em Financeiro › "Sem extrato enviado".');}}catch(e){}return L;};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
