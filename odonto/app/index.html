@@ -1363,6 +1363,11 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .inv-pr.ok{background:rgba(43,182,115,.16)}.inv-pr.dup{background:rgba(229,72,77,.18)}.inv-ph{font-size:.68rem;text-transform:uppercase;color:#8696A0;cursor:default}.inv-pf{cursor:default;background:rgba(255,255,255,.05)}.inv-pf .okt{color:#2BB673;font-weight:800}
 .inv-pr input{width:18px;height:18px;accent-color:#2BB673;cursor:pointer}
 @media (max-width:760px){.ai-corpo{grid-template-columns:1fr!important}.ai-chat{padding:12px 8px!important}.zp{max-width:92%}.inv-pr{grid-template-columns:26px 1fr 1fr 1fr;}.inv-pr span:nth-child(2),.inv-pr span:nth-child(5),.inv-pr span:nth-child(6){display:none}}
+.finli.urg,.ino-urg+.ino-tr{animation:urgPisca 1.2s ease-in-out infinite}
+@keyframes urgPisca{0%,100%{box-shadow:inset 0 0 0 2px rgba(229,72,77,.9);background-color:rgba(229,72,77,.22)}50%{box-shadow:inset 0 0 0 2px rgba(229,72,77,.15);background-color:transparent}}
+.urg-tag{display:inline-block;margin-left:8px;font-size:.7rem;font-weight:800;color:#fff;background:#E5484D;border-radius:999px;padding:2px 8px;vertical-align:middle}
+.ino-urg{display:none}.urg-ban{border:2px solid #E5484D;background:rgba(229,72,77,.14);animation:urgPisca 1.2s ease-in-out infinite;display:flex;justify-content:space-between;gap:10px;align-items:center}
+@media (prefers-reduced-motion:reduce){.finli.urg,.ino-urg+.ino-tr,.urg-ban{animation:none}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4556,14 +4561,17 @@ function extTexto(f){return extPdfJs().then(function(L){return f.arrayBuffer().t
     return Object.keys(linhas).map(Number).sort(function(a,b){return b-a;}).map(function(y){return linhas[y].sort(function(a,b){return a.transform[4]-b.transform[4];}).map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ').trim();}).join('\n');}).join('\n');});});}
 function extParse(tx){var g=function(re){var m=tx.match(re);return m?m:null;},NUM='(-?\\s?[\\d.]+,\\d{2}-?)';
   var c=g(/Cliente:\s*(.+?)\s*(?:\(([^)]*)\))?\s*\[(\d+)\]/)||g(/Cliente:\s*(.+?)\s{2,}/),p=g(/(\d{2})\/(\d{2})\/(\d{4})\s*a\s*(\d{2})\/(\d{2})\/(\d{4})/);
-  var sa=g(new RegExp('Saldo Anterior:\\s*'+NUM)),db=g(new RegExp('Total de D[ée]bitos[^:]*:\\s*'+NUM)),cr=g(new RegExp('Total de Cr[ée]ditos[^:]*:\\s*'+NUM)),at=g(new RegExp('Saldo Atual:\\s*'+NUM)),sv=g(new RegExp('Total de Servi[çc]os:\\s*'+NUM));
-  return {nome:c?String(c[1]).replace(/\s+/g,' ').trim():'',cod:c&&c[3]?c[3]:'',ano:p?+p[3]:null,mes:p?+p[2]:null,saldoAnt:sa?extNum(sa[1]):0,debitos:db?Math.abs(extNum(db[1])):(sv?Math.abs(extNum(sv[1])):null),creditos:cr?Math.abs(extNum(cr[1])):0,saldoAtual:at?extNum(at[1]):null};}
+  var sa=g(new RegExp('Saldo Anterior:\\s*'+NUM)),db=g(new RegExp('Total de D[ée]bitos[^:]*:\\s*'+NUM)),cr=g(new RegExp('Total de Cr[ée]ditos[^:]*:\\s*'+NUM)),at=g(new RegExp('Saldo Atual:\\s*'+NUM)),sv=g(new RegExp('Total de Servi[çc]os:\\s*'+NUM)),pg=g(new RegExp('Total de Pagamentos[^:]*:\\s*'+NUM));
+  return {nome:c?String(c[1]).replace(/\s+/g,' ').trim():'',cod:c&&c[3]?c[3]:'',ano:p?+p[3]:null,mes:p?+p[2]:null,saldoAnt:sa?extNum(sa[1]):0,debitos:db?Math.abs(extNum(db[1])):(sv?Math.abs(extNum(sv[1])):null),creditos:cr?Math.abs(extNum(cr[1])):(pg?Math.abs(extNum(pg[1])):0),fim:p?p[6]+'-'+p[5]+'-'+p[4]:null,saldoAtual:at?extNum(at[1]):null};}
 function extNorm(s){return semAc(String(s||'')).replace(/\b(dr|dra|drs|lab|clinica|odontologia|odonto)\b\.?/g,' ').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();}
 function extAchaCli(d){var map=empDados().inoveCod||{};d.ambiguo=null;if(d.cod&&map[d.cod]){var c0=EMP.cli.filter(function(x){return x.id===map[d.cod];})[0];if(c0)return c0;}
   var a=extNorm(d.nome),ta=a.split(' ').filter(function(w){return w.length>2;});if(!ta.length)return null;
   var ex=EMP.cli.filter(function(c){return extNorm(c.nome)===a;});if(ex.length===1)return ex[0];if(ex.length>1){d.ambiguo=ex.map(function(c){return c.nome;});return null;}
   var C=EMP.cli.map(function(c){var tb=extNorm(c.nome).split(' ').filter(function(w){return w.length>2;}),n=ta.filter(function(w){return tb.indexOf(w)>=0;}).length;return {c:c,n:n,sc:n/ta.length,cob:tb.length?n/tb.length:0};}).filter(function(x){return x.n>=2&&x.sc>=0.6;}).sort(function(x,y){return (y.sc+y.cob)-(x.sc+x.cob);});
   if(!C.length)return null;if(C.length>1&&Math.abs((C[0].sc+C[0].cob)-(C[1].sc+C[1].cob))<0.01){d.ambiguo=C.slice(0,4).map(function(x){return x.c.nome;});return null;}return C[0].c;}
+function extInoveDeve(d){if(d.saldoAtual!=null)return Math.round(-d.saldoAtual*100)/100;return Math.round((-(d.saldoAnt||0)+(d.debitos||0)-(d.creditos||0))*100)/100;}
+/* quanto o cliente devia no fim do período do extrato, pelo que está aqui (só conta pagamento feito até essa data) */
+function extNossoDeve(k,ano,mes,fim){var lim=ano*100+mes,v=0;FIN.M.forEach(function(m){if(finCliK(m)!==k||(m.ano*100+m.mes)>lim)return;v+=+m.valor_mes;finPags(m).forEach(function(p){if(p.anulado_em)return;if(!fim||!p.data||p.data<=fim)v-=+p.valor;});});return Math.round(v*100)/100;}
 function extRow(k,ano,mes){return FIN.M.filter(function(m){return finCliK(m)===k&&m.ano===ano&&m.mes===mes;})[0]||null;}
 function extAbertoAntes(k,ano,mes){return FIN.M.filter(function(m){return finCliK(m)===k&&(m.ano*100+m.mes)<(ano*100+mes);}).reduce(function(s,m){return s+finFaltaTela(m);},0);}
 function extPagosAntes(k,ano,mes){var L=FIN.M.filter(function(m){return finCliK(m)===k&&(m.ano*100+m.mes)<(ano*100+mes);}).sort(function(a,b){return (b.ano*100+b.mes)-(a.ano*100+a.mes);}),out=[];
@@ -4575,8 +4583,8 @@ function extAnalisa(it){var d=it.d,c=it.cliId?EMP.cli.filter(function(x){return 
   if(!row){it.st='novo';it.msgs.push('Não está lançado em '+MESES[d.mes-1]+'. Vou lançar com '+fmtR(d.debitos)+'.');}
   else if(Math.abs((+row.valor_mes)-d.debitos)>0.009){it.st='dif';it.msgs.push('Lançado '+fmtR(row.valor_mes)+', o extrato diz '+fmtR(d.debitos)+'.');}
   else it.st='ok';
-  var inove=-(d.saldoAnt||0),nosso=Math.max(0,extAbertoAntes(k,d.ano,d.mes));
-  if(inove-nosso>1){it.baixa=Math.round((inove-nosso)*100)/100;it.msgs.push('⚠️ A Inove cobra '+fmtR(inove)+' de saldo anterior, mas aqui consta '+(nosso>0.005?fmtR(nosso)+' em aberto':'tudo pago')+'. Possível baixa esquecida de '+fmtR(it.baixa)+'.');}
+  var inove=extInoveDeve(d),nosso=extNossoDeve(k,d.ano,d.mes,d.fim);it.inoveDeve=inove;it.nossoDeve=nosso;
+  if(inove-nosso>1){it.baixa=Math.round((inove-nosso)*100)/100;it.msgs.push('⚠️ No fim do extrato a Inove mostra '+fmtR(inove)+' devendo, mas pelos comprovantes daqui seria '+fmtR(nosso)+'. Possível baixa esquecida de '+fmtR(it.baixa)+'.');}
   else if(nosso-inove>1){it.inoveAMenos=Math.round((nosso-inove)*100)/100;it.msgs.push('A Inove já deu baixa de '+fmtR(it.inoveAMenos)+' que aqui ainda consta em aberto. Lance o pagamento que falta.');}
   return it;}
 function extLerArquivos(files){var L=[].slice.call(files||[]).filter(function(f){return /pdf/i.test(f.type)||/\.pdf$/i.test(f.name);});if(!L.length){toast('Escolha os PDFs dos extratos.');return;}
@@ -4673,14 +4681,14 @@ function aiExtratos(fs){fs=fs.filter(function(f){return /pdf/i.test(f.type)||/\.
       var kv=c.id+'|'+d.ano+'-'+d.mes;if(vistos[kv]){barra('Extrato <b>repetido</b>: já veio outro PDF de '+esc(c.nome)+' para este mês ('+esc(vistos[kv])+').');return;}vistos[kv]=f.name;
       var rx=extRow(c.id,d.ano,d.mes);if(rx&&(rx.extrato_path||rx.arquivo_legado)){barra(esc(c.nome)+' já tem extrato anexado em '+MESES[d.mes-1]+'. Para trocar, fale com o laboratório.');return;}
       var div=[];if(it.st==='dif')div.push('o extrato diz <b>'+fmtR(d.debitos)+'</b>, mas no sistema está lançado <b>'+fmtR(it.row.valor_mes)+'</b>');
-      if(it.baixa>0)div.push('o extrato cobra <b>'+fmtR(-d.saldoAnt)+'</b> de saldo anterior, mas os comprovantes no sistema mostram que <b>'+fmtR(it.baixa)+'</b> disso já foi pago (falta dar baixa)');
+      if(it.baixa>0)div.push('no fim do extrato a Inove mostra <b>'+fmtR(it.inoveDeve)+'</b> devendo, mas pelos comprovantes daqui seria <b>'+fmtR(it.nossoDeve)+'</b>: <b>'+fmtR(it.baixa)+'</b> já pago sem baixa');
       if(it.inoveAMenos>0)div.push('o extrato já deu baixa de <b>'+fmtR(it.inoveAMenos)+'</b> que não tem comprovante no sistema (falta anexar comprovante)');
-      if(div.length){if(it.baixa>0)extBaixaGuarda(it);alertas.push(c.nome);aiDiz('⛔ <b>Extrato NÃO anexado por divergência</b> · '+esc(c.nome)+' · '+MESES[d.mes-1]+'<br>• '+div.join('<br>• ')+'<br>Verifique e corrija antes de anexar de novo.<div class="ai-form"><button class="btn pri" data-ai="invest" data-v="'+c.id+'|'+d.ano+'|'+d.mes+'|'+(d.saldoAnt||0)+'">🔎 Investigar o ocorrido</button></div>',false,'erro');return;}
+      if(div.length){if(it.baixa>0)extBaixaGuarda(it);alertas.push(c.nome);aiDiz('⛔ <b>Extrato NÃO anexado por divergência</b> · '+esc(c.nome)+' · '+MESES[d.mes-1]+'<br>• '+div.join('<br>• ')+'<br>Verifique e corrija antes de anexar de novo.<div class="ai-form"><button class="btn pri" data-ai="invest" data-v="'+c.id+'|'+d.ano+'|'+d.mes+'|'+(d.saldoAnt||0)+'|'+extInoveDeve(d)+'|'+(d.fim||'')+'">🔎 Investigar o ocorrido</button></div>',false,'erro');return;}
       var row=extRow(c.id,d.ano,d.mes),pm=row?Promise.resolve(row.id):SB.rpc('odo_inove_lanca_mes',{p_dono:donoId(),p_cliente:c.id,p_ano:d.ano,p_mes:d.mes,p_valor:d.debitos}).then(function(r){if(r.error)throw r.error;return r.data;});
       return pm.then(function(mid){return aiUp(f,'extratos/'+d.ano+'-'+String(d.mes).padStart(2,'0')).then(function(path){return SB.rpc('odo_inove_extrato',{p_mes:mid,p_path:path}).then(function(r){if(r.error)throw r.error;});});})
         .then(function(){ok++;var linhas=['✅ <b>'+esc(c.nome)+'</b> · '+MESES[d.mes-1]+': extrato anexado'+(row?'':' (cliente lançado com '+fmtR(d.debitos)+')')+'.'];
           if(it.st==='dif')linhas.push('⚠️ O extrato diz <b>'+fmtR(d.debitos)+'</b>, mas no sistema está lançado <b>'+fmtR(row.valor_mes)+'</b>. O laboratório vai conferir.');
-          if(it.baixa>0){linhas.push('🚨 <b>Suspeita:</b> o extrato cobra <b>'+fmtR(-d.saldoAnt)+'</b> de saldo anterior, mas os comprovantes no sistema mostram que isso já foi pago. Falta dar baixa de <b>'+fmtR(it.baixa)+'</b>.');extBaixaGuarda(it);alertas.push(c.nome);}
+          if(it.baixa>0){linhas.push('🚨 <b>Suspeita:</b> '+'no fim do extrato a Inove mostra <b>'+fmtR(it.inoveDeve)+'</b> devendo, mas pelos comprovantes daqui seria <b>'+fmtR(it.nossoDeve)+'</b>: <b>'+fmtR(it.baixa)+'</b> já pago sem baixa'+'.');extBaixaGuarda(it);alertas.push(c.nome);}
           if(it.inoveAMenos>0){linhas.push('🚨 <b>Suspeita:</b> o extrato já deu baixa de <b>'+fmtR(it.inoveAMenos)+'</b> que não tem comprovante no sistema. Está faltando anexar comprovante.');alertas.push(c.nome);}
           if(d.cod)extSalvaCod(it);aiDiz(linhas.join('<br>'));})
         .catch(function(e){aiDiz('❌ <b>'+esc(c.nome)+'</b>: não consegui anexar ('+esc(aiErro(e))+').');});}).catch(function(){aiDiz('❌ Não consegui abrir <b>'+esc(f.name)+'</b>.');});});},Promise.resolve())
@@ -4765,13 +4773,13 @@ aiInvest=function(v){var a=v.split('|'),k=a[0],ano=+a[1],mes=+a[2],sa=+a[3],c=EM
       else{h='✅ '+i+'/'+comArq.length+' · '+lnk+' '+desc+onde+(r.valor==null?' <small>(não consegui ler o valor no arquivo; usei o lançado)</small>':' · confere');
         if(parecido){var s=parecido.r||{};h+='<br><small>ℹ️ Valor igual ao de '+invDt(parecido.p.data)+(s.hora?' '+s.hora:'')+', mas '+(r.cod&&s.cod?'o código é outro':r.hora&&s.hora&&r.hora!==s.hora?'a hora é outra':'o arquivo é outro')+': são pagamentos diferentes.</small>';}}
       vistos.push(x);aiDiz(h,false,igual||(r.valor!=null&&Math.abs(r.valor-(+x.p.valor))>0.009)?'erro':'');});});},Promise.resolve())
-  .then(function(){AI.busy=false;var inove=-sa,nosso=Math.max(0,extAbertoAntes(k,ano,mes)),dfz=Math.round((inove-nosso)*100)/100,somaDup=dups.reduce(function(s,d){return s+(+d.x.p.valor);},0),somaDif=dif.reduce(function(s,x){return s+((+x.p.valor)-(x.r.valor||0));},0);
+  .then(function(){return invResolveDups(dups,c.nome);}).then(function(){AI.busy=false;var temFim=a.length>5&&a[4]!=='',inove=temFim?+a[4]:-sa,nosso=temFim?extNossoDeve(k,ano,mes,a[5]||null):Math.max(0,extAbertoAntes(k,ano,mes)),dfz=Math.round((inove-nosso)*100)/100,somaDup=dups.reduce(function(s,d){return s+(+d.x.p.valor);},0),somaDif=dif.reduce(function(s,x){return s+((+x.p.valor)-(x.r.valor||0));},0);
     var totC=L.reduce(function(s,x){return s+(+x.p.valor);},0),totM=M.reduce(function(s,m){return s+(+m.valor_mes);},0);dups.forEach(function(d){d.x.dup=1;});AI.inv.dif=dfz;
     var res='📋 <b>Resultado:</b> '+(comArq.length-dups.length-dif.length)+' comprovante'+(comArq.length-dups.length-dif.length!==1?'s':'')+' ✅ conferido'+(comArq.length-dups.length-dif.length!==1?'s':'')+(dups.length?', <b class="bad">'+dups.length+' duplicado'+(dups.length>1?'s':'')+' ('+fmtR(somaDup)+')</b>':'')+(dif.length?', <b class="bad">'+dif.length+' com valor diferente</b>':'')+'.<br>💰 Somando tudo: <b>'+L.length+' pagamentos = '+fmtR(totC)+'</b> · os '+M.length+' meses somam <b>'+fmtR(totM)+'</b>'+(totC>totM+0.5?' (pago '+fmtR(totC-totM)+' a mais)':totM>totC+0.5?' (falta '+fmtR(totM-totC)+')':'')+'.<br>';
     if(Math.abs(dfz)<=1){aiDiz(res+'🎉 Conferindo um por um, o saldo daqui bate com o da Inove. <b>Resolvido.</b>');invPlanilha();return;}
-    res+='A Inove cobra <b>'+fmtR(inove)+'</b> de saldo anterior; aqui consta <b>'+fmtR(nosso)+'</b>. Diferença: <b>'+fmtR(dfz)+'</b>.';
-    if(dups.length&&Math.abs(somaDup+somaDif-dfz)<=1){aiDiz(res+'<br>✅ <b>Achei a causa:</b> a diferença é exatamente o'+(dups.length>1?'s comprovantes lançados':' comprovante lançado')+' em dobro aqui. Não é baixa da Inove: '+(ESP.dono?'peça para o laboratório apagar':'é só anular')+' o lançamento repetido ('+dups.map(function(d){return invDt(d.x.p.data)+' · '+fmtR(d.x.p.valor);}).join(', ')+').',false,'erro');invPlanilha();return;}
-    var sub=dfz>1?invSubconjunto(L.filter(function(x){return (x.m.ano*100+x.m.mes)<(ano*100+mes)&&!dups.some(function(d){return d.x===x;});}),dfz):null;
+    res+=(temFim?'No fim do extrato a Inove mostra <b>'+fmtR(inove)+'</b> devendo; pelos comprovantes daqui (até '+invDt(a[5])+') seria <b>'+fmtR(nosso)+'</b>.':'A Inove cobra <b>'+fmtR(inove)+'</b> de saldo anterior; aqui consta <b>'+fmtR(nosso)+'</b>.')+' Diferença: <b>'+fmtR(dfz)+'</b>.';
+    if(dups.length&&Math.abs(somaDup+somaDif-dfz)<=1){aiDiz(res+'<br>✅ <b>Achei a causa:</b> a diferença é exatamente o'+(dups.length>1?'s comprovantes lançados':' comprovante lançado')+' em dobro aqui. Não é baixa da Inove: '+(ESP.dono?'peça para o laboratório anular':'já anulei')+' o lançamento repetido ('+dups.map(function(d){return invDt(d.x.p.data)+' · '+fmtR(d.x.p.valor);}).join(', ')+').',false,'erro');invPlanilha();return;}
+    var sub=dfz>1?invSubRecente(L.filter(function(x){return (temFim?(x.m.ano*100+x.m.mes)<=(ano*100+mes)&&(!a[5]||!x.p.data||x.p.data<=a[5]):(x.m.ano*100+x.m.mes)<(ano*100+mes))&&!dups.some(function(d){return d.x===x;});}),dfz):null;
     if(sub){aiDiz(res+'<br>✅ Estes comprovantes somam exatamente a diferença. <b>Possivelmente não tiveram baixa na Inove:</b><br>'+sub.map(invChip).join(' ')+'<br>Mande esses comprovantes para a Inove dar baixa.',false,'erro');invPlanilha();return;}
     aiDiz(res+'<br>Conferi um por um e ainda não consegui explicar a diferença só com os comprovantes daqui.',false,'erro');AI.inv.pedeLab=true;invPlanilha();});};
 
@@ -4791,12 +4799,12 @@ function aiVerifica(){var R=finDoMes(),comPdf=R.filter(function(m){return m.extr
         var c=extAchaCli(d);if(c&&m.cliente_id&&c.id!==m.cliente_id)div.push('o PDF é do cliente <b>'+esc(d.nome)+'</b>, não de '+esc(nome));else if(!c&&d.nome&&extNorm(d.nome)!==extNorm(nome))div.push('o nome no PDF é <b>'+esc(d.nome)+'</b>');
         if(!div.length){var it=extAnalisa({id:'v'+m.id,d:d,cliId:m.cliente_id});
           if(Math.abs((+m.valor_mes)-d.debitos)>0.009)div.push('o extrato diz <b>'+fmtR(d.debitos)+'</b>, mas está lançado <b>'+fmtR(m.valor_mes)+'</b>');
-          if(it.baixa>0)div.push('o extrato cobra <b>'+fmtR(-d.saldoAnt)+'</b> de saldo anterior, mas aqui <b>'+fmtR(it.baixa)+'</b> disso já está pago (falta baixa na Inove)');
+          if(it.baixa>0)div.push('no fim do extrato a Inove mostra <b>'+fmtR(it.inoveDeve)+'</b> devendo, mas pelos comprovantes daqui seria <b>'+fmtR(it.nossoDeve)+'</b>: <b>'+fmtR(it.baixa)+'</b> já pago sem baixa');
           if(it.inoveAMenos>0)div.push('o extrato já deu baixa de <b>'+fmtR(it.inoveAMenos)+'</b> que não tem comprovante aqui');
-          var extra='';if(it.baixa>0){var pv=invPags(m.cliente_id).filter(function(x){return (x.m.ano*100+x.m.mes)<(d.ano*100+d.mes);}),sub=invSubRecente(pv,it.baixa);
+          var extra='';if(it.baixa>0){var pv=invPags(m.cliente_id).filter(function(x){return (x.m.ano*100+x.m.mes)<=(d.ano*100+d.mes)&&(!d.fim||!x.p.data||x.p.data<=d.fim);}),sub=invSubRecente(pv,it.baixa);
             if(sub){suspeitos.push({nome:nome,v:it.baixa,L:sub});extra='<br>🔎 <b>Possíveis comprovantes sem baixa</b> (somam exatamente '+fmtR(it.baixa)+'):<br>'+sub.map(invChip).join(' ');}
             else{semExpl.push(nome);extra='<br>Nenhuma combinação exata de comprovantes dá '+fmtR(it.baixa)+'. Os mais recentes são: '+pv.slice(-4).map(invChip).join(' ');}}
-          if(div.length&&(it.baixa>0||it.inoveAMenos>0))extra+='<div class="ai-form"><button class="btn sm pri" data-ai="invest" data-v="'+m.cliente_id+'|'+d.ano+'|'+d.mes+'|'+(d.saldoAnt||0)+'">🔎 Investigar o ocorrido</button></div>';}}
+          if(div.length&&(it.baixa>0||it.inoveAMenos>0))extra+='<div class="ai-form"><button class="btn sm pri" data-ai="invest" data-v="'+m.cliente_id+'|'+d.ano+'|'+d.mes+'|'+(d.saldoAnt||0)+'|'+extInoveDeve(d)+'|'+(d.fim||'')+'">🔎 Investigar o ocorrido</button></div>';}}
       if(div.length){ruins.push(nome);aiDiz('⛔ <b>'+esc(nome)+'</b> · '+lnk+'<br>• '+div.join('<br>• ')+(typeof extra!=='undefined'?extra:''),false,'erro');}else ok++;})
     .catch(function(){ruins.push(nome);aiDiz('⛔ <b>'+esc(nome)+'</b>: não consegui abrir o extrato anexado.',false,'erro');});});},Promise.resolve())
   .then(function(){AI.busy=false;if(suspeitos.length){var tot=suspeitos.reduce(function(a,x){return a+x.v;},0),n=suspeitos.reduce(function(a,x){return a+x.L.length;},0);
@@ -4828,6 +4836,29 @@ document.addEventListener('change',function(e){var t=e.target;if(!t.getAttribute
   var I=AI.inv;if(!I)return;var falt=I.L.filter(function(x){return !invTicado(x.p.id);});if(falt.length||I.fimDito)return;I.fimDito=true;
   if(I.pedeLab)aiDiz('Conferimos os <b>'+I.L.length+'</b> juntos ✅ e mesmo assim sobra a diferença de <b>'+fmtR(I.dif)+'</b>. 📩 Agora sim: <b>me envie o extrato de comprovantes da Inove 3D do seu LabFácil</b>, com o registro dos pagamentos recebidos de '+esc(I.nome)+'. Eu comparo item por item e te digo exatamente o que falta de cada lado.<div class="ai-form"><label class="btn pri">📑 Enviar relatório do LabFácil<input type="file" id="ai-rel" accept="application/pdf,image/*" hidden></label></div>');
   else aiDiz('Conferimos os <b>'+I.L.length+'</b> comprovantes juntos ✅. Obrigada! 💛');});
+
+/* ===== Duplicado: a Ana anula o lançamento errado e marca o mês para verificação urgente (piscando) ===== */
+function urgL(){return empDados().urgente||{};}
+function urgMarca(mid,motivo,nome){if(ESP.dono||!EMP.row)return;empDadosGrava('urgente',mid,{motivo:String(motivo).slice(0,300),nome:nome||'',em:dHoje()});}
+function invErrado(a,b){var dist=function(x){var v=finVenc(x.m.ano,x.m.mes),d=new Date((x.p.data||dHoje())+'T12:00:00');return Math.abs(d-v);};return dist(a)>=dist(b)?a:b;}
+function invResolveDups(dups,nome){if(ESP.dono||!dups.length){if(dups.length)aiDiz('🚩 Achei comprovante lançado em dobro. Só o laboratório pode anular: avise para conferir com urgência.',false,'erro');return Promise.resolve();}
+  return dups.reduce(function(pr,d){return pr.then(function(){var errado=invErrado(d.x,d.de),certo=errado===d.x?d.de:d.x,mot='Duplicado: mesmo comprovante do pagamento de '+invDt(certo.p.data)+' lançado em '+MESES[certo.m.mes-1]+' (anulado pela Ana)';
+    if(errado.p.anulado_em)return;return SB.from('odo_fin_pagamentos').update({anulado_em:new Date().toISOString(),anulado_motivo:mot}).eq('id',errado.p.id).select('*').single().then(function(r){if(r.error)throw r.error;
+      var o=FIN.P.filter(function(z){return z.id===errado.p.id;})[0];if(o){o.anulado_em=r.data.anulado_em;o.anulado_motivo=mot;}
+      urgMarca(errado.m.id,'Pagamento de '+fmtR(errado.p.valor)+' ('+invDt(errado.p.data)+') era o mesmo comprovante de '+MESES[certo.m.mes-1]+' e foi anulado. Confira com urgência se o cliente pagou este mês com outro comprovante.',nome);
+      aiDiz('🛠️ <b>Corrigi:</b> anulei o lançamento repetido de <b>'+MESES[errado.m.mes-1]+'</b> ('+fmtR(errado.p.valor)+' · '+invDt(errado.p.data)+') e mantive o de <b>'+MESES[certo.m.mes-1]+'</b>, que é o mês que esse pagamento quita.<br>🚨 Marquei <b>'+MESES[errado.m.mes-1]+'</b> para <b>verificação urgente</b>: ele fica piscando no extrato até alguém conferir.',false,'erro');});}).catch(function(){aiDiz('Não consegui anular o lançamento repetido agora. Anule pelo Financeiro.',false,'erro');});},Promise.resolve());}
+/* piscando nas listas */
+var _rFinMesU=rFinMes;rFinMes=function(){var h=_rFinMesU.apply(this,arguments),U=urgL();Object.keys(U).forEach(function(id){var a='data-act="finAbre" data-v="'+id+'"';if(h.indexOf(a)<0)return;h=h.replace('class="finli" '+a,'class="finli urg" '+a);
+  var i=h.indexOf(a),j=h.indexOf('</b>',i);if(j>0)h=h.slice(0,j+4)+'<span class="urg-tag">🚨 Verificação urgente</span>'+h.slice(j+4);});return h;};
+var _rInoveU=rInove;rInove=function(){var h=_rInoveU.apply(this,arguments);if(INO.hist)return h;var U=urgL();finDoMes().forEach(function(m){if(!U[m.id])return;var a='<span class="ino-cli">'+esc(finCliNome(m));var i=h.indexOf(a);if(i<0)return;
+  var k=h.lastIndexOf('<div class="ino-tr',i);if(k>=0)h=h.slice(0,k)+'<div class="ino-urg"></div>'+h.slice(k);i=h.indexOf(a);var j=h.indexOf('</span><span data-l="Valor do mês">',i);if(j>0)h=h.slice(0,j)+'<small class="urg-tag">🚨 Verificação urgente</small>'+h.slice(j);});return h;};
+var _rFinDetU=rFinDet;rFinDet=function(m){var h=_rFinDetU.apply(this,arguments);if(!m)return h;var u=urgL()[m.id];if(!u)return h;
+  var b='<div class="banner urg-ban"><span>🚨 <b>Verificação urgente</b> · '+esc(u.motivo)+' <small>('+invDt(u.em)+')</small></span>'+(ESP.dono?'':'<button class="btn sm" data-act="urgOk" data-v="'+m.id+'">✓ Conferido</button>')+'</div>';
+  var i=h.indexOf('<div class="finkpis">');return i>=0?h.slice(0,i)+b+h.slice(i):b+h;};
+ACT.urgOk=function(id){empDadosGrava('urgente',id,null,'Verificação concluída.');};
+/* a conferência diária da Ana também lembra dos urgentes */
+var _anaAudU=anaAuditoria;anaAuditoria=function(){var R=_anaAudU.apply(this,arguments);if(!R)return R;var U=urgL();Object.keys(U).forEach(function(id){var m=FIN.M.filter(function(x){return x.id===id;})[0];if(!m)return;
+  R.itens.unshift({k:finCliK(m),chave:'u|'+id,nome:finCliNome(m),grave:true,tit:'🚨 Verificação urgente · '+MESES[m.mes-1],mot:[U[id].motivo],mid:id});});return R;};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
