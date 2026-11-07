@@ -1341,7 +1341,7 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .ai-q{margin:10px;font:inherit;font-size:15px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}.ai-lista{overflow:auto;flex:1;padding:0 8px 10px;display:flex;flex-direction:column;gap:4px}
 .ai-cli{text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 9px;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:2px}.ai-cli.on{border-color:#F5C518;box-shadow:0 0 0 2px rgba(245,197,24,.35)}.ai-cli b{font-size:.86rem}.ai-cli span{font-size:.72rem;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}.ai-cli i{font-style:normal}.ai-cli i.ok{color:#13875F}.ai-cli i.bad{color:#E5484D}
 .ai-dir{display:flex;flex-direction:column;min-height:0;padding:10px 14px;gap:8px}.ai-chat{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
-.ai-msg{max-width:82%;align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:9px 12px;font-size:.9rem;line-height:1.45}.ai-msg.eu{align-self:flex-end;background:#2F6BFF;color:#fff;border-color:#2F6BFF;border-radius:14px 14px 4px 14px}.ai-dig{opacity:.7;font-style:italic}
+.ai-msg{max-width:82%;align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:9px 12px;font-size:.9rem;line-height:1.45}.ai-msg.eu{align-self:flex-end;background:#2F6BFF;color:#fff;border-color:#2F6BFF;border-radius:14px 14px 4px 14px}.ai-dig{opacity:.7;font-style:italic}.ai-msg.erro{background:rgba(229,72,77,.14);border:2px solid #E5484D;color:inherit}
 .ai-form{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.ai-form input{font:inherit;font-size:15px;padding:7px 9px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:140px}
 .ai-sel{margin:0;color:var(--muted)}.ai-acoes{display:flex;gap:8px;flex-wrap:wrap}
 @media (max-width:760px){.ai-corpo{grid-template-columns:1fr;grid-template-rows:38% 1fr}.ai-esq{border-right:0;border-bottom:1px solid var(--line)}.ai-abre{margin:8px 0 0}}
@@ -4618,7 +4618,7 @@ function aiLeComp(tx){var t=String(tx||'').replace(/ /g,' '),v=null,m=t.match(/
   if(v==null){var L=[];t.replace(/R\$\s*(\d{1,3}(?:\.\d{3})*,\d{2})/g,function(x,a){L.push(extNum(a));});if(L.length)v=Math.max.apply(null,L);}
   var d=null,md=t.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/);if(md)d=md[3]+'-'+md[2]+'-'+md[1];else{var mm=semAc(t).match(/\b(\d{1,2})\s*(?:de\s*)?(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)[a-z]*\.?\s*(?:de\s*)?(\d{4})\b/);if(mm)d=mm[3]+'-'+String(AI_MES[mm[2]]).padStart(2,'0')+'-'+String(mm[1]).padStart(2,'0');}
   return {valor:v,data:d};}
-function aiDiz(html,eu){AI.msgs.push({eu:!!eu,h:html});aiRender();}
+function aiDiz(html,eu,cls){AI.msgs.push({eu:!!eu,h:html,c:cls||''});aiRender();}
 function aiUp(f,pasta){var ext=(String(f.name).match(/\.([a-z0-9]+)$/i)||[])[1]||(/pdf/.test(f.type)?'pdf':'jpg'),path=donoId()+'/'+pasta+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.'+ext.toLowerCase();
   if(f.size>10485760)return Promise.reject({message:'Arquivo maior que 10 MB.'});var tipo=f.type||(ext==='pdf'?'application/pdf':'image/jpeg');
   return SB.storage.from('odonto-fin').upload(path,f,{contentType:tipo,upsert:false}).then(function(r){if(r.error)throw r.error;return path;});}
@@ -4627,7 +4627,7 @@ function aiRecarrega(){return finCarrega().catch(function(){});}
 function aiCliRow(c){return FIN.M.filter(function(m){return m.cliente_id===c.id&&m.ano===FIN.ano&&m.mes===FIN.mes;})[0]||null;}
 function aiLista(){var q=semAc(AI.q||'');return EMP.cli.filter(function(c){return c.ativo!==false&&(!q||semAc(c.nome).indexOf(q)>=0);}).sort(function(a,b){return a.nome.localeCompare(b.nome,'pt-BR');}).map(function(c){var m=aiCliRow(c),n=m?finPags(m).filter(function(p){return !p.anulado_em;}).length:0;
   return '<button class="ai-cli'+(AI.cli===c.id?' on':'')+'" data-ai="cli" data-v="'+c.id+'"><b>'+esc(c.nome)+'</b><span>'+(m?(m.extrato_path||m.arquivo_legado?'<i class="ok">📄 extrato anexado</i>':'<i>📄 sem extrato</i>')+(n?' <i class="ok">📎 '+n+'</i>':'')+(finFaltaTela(m)>0.005?' <i class="bad">falta '+fmtR(finFaltaTela(m))+'</i>':' <i class="ok">quitado</i>'):'<i>sem lançamento</i>')+'</span></button>';}).join('')||'<p class="small muted">Nenhum cliente.</p>';}
-function aiRender(){var d=document.getElementById('aipan');if(!d)return;d.querySelector('.ai-lista').innerHTML=aiLista();var ch=d.querySelector('.ai-chat');ch.innerHTML=AI.msgs.map(function(m){return '<div class="ai-msg'+(m.eu?' eu':'')+'">'+m.h+'</div>';}).join('')+(AI.busy?'<div class="ai-msg ai-dig">Ana está lendo…</div>':'');ch.scrollTop=ch.scrollHeight;
+function aiRender(){var d=document.getElementById('aipan');if(!d)return;d.querySelector('.ai-lista').innerHTML=aiLista();var ch=d.querySelector('.ai-chat');ch.innerHTML=AI.msgs.map(function(m){return '<div class="ai-msg'+(m.eu?' eu':'')+(m.c?' '+m.c:'')+'">'+m.h+'</div>';}).join('')+(AI.busy?'<div class="ai-msg ai-dig">Ana está lendo…</div>':'');ch.scrollTop=ch.scrollHeight;
   var c=EMP.cli.filter(function(x){return x.id===AI.cli;})[0];d.querySelector('.ai-sel').innerHTML=c?'Cliente escolhido: <b>'+esc(c.nome)+'</b> · '+MESES[FIN.mes-1]+'/'+FIN.ano:'Escolha um cliente à esquerda para anexar comprovante.';
   d.querySelectorAll('.ai-bt').forEach(function(b){b.disabled=AI.busy;});}
 function aiAbre(){if(document.getElementById('aipan'))return;AI.on=true;if(!AI.msgs.length)AI.msgs=[{eu:false,h:'Oi'+(ESP.dono?', equipe Inove':'')+'! 👋 Sou a Ana. Me mande os <b>extratos do mês</b> (pode ser vários PDFs de uma vez) ou escolha um cliente à esquerda e me mande o <b>comprovante</b>. Eu confiro os valores antes de lançar.'}];
@@ -4648,6 +4648,10 @@ function aiExtratos(fs){fs=fs.filter(function(f){return /pdf/i.test(f.type)||/\.
   aiDiz('📄 '+fs.length+' extrato'+(fs.length>1?'s':''),true);AI.busy=true;aiRender();var ok=0,alertas=[];
   fs.reduce(function(pr,f){return pr.then(function(){return extTexto(f).then(function(tx){var it=extAnalisa({id:'a'+Date.now(),file:f,d:extParse(tx)}),d=it.d,c=it.cli;
       if(it.st==='erro'||!c){aiDiz('⚠️ <b>'+esc(d.nome||f.name)+'</b>: '+esc((it.msgs||[])[0]||'não consegui ler.'));return;}
+      var div=[];if(it.st==='dif')div.push('o extrato diz <b>'+fmtR(d.debitos)+'</b>, mas no sistema está lançado <b>'+fmtR(it.row.valor_mes)+'</b>');
+      if(it.baixa>0)div.push('o extrato cobra <b>'+fmtR(-d.saldoAnt)+'</b> de saldo anterior, mas os comprovantes no sistema mostram que <b>'+fmtR(it.baixa)+'</b> disso já foi pago (falta dar baixa)');
+      if(it.inoveAMenos>0)div.push('o extrato já deu baixa de <b>'+fmtR(it.inoveAMenos)+'</b> que não tem comprovante no sistema (falta anexar comprovante)');
+      if(div.length){if(it.baixa>0)extBaixaGuarda(it);alertas.push(c.nome);aiDiz('⛔ <b>Extrato NÃO anexado por divergência</b> · '+esc(c.nome)+' · '+MESES[d.mes-1]+'<br>• '+div.join('<br>• ')+'<br>Verifique e corrija antes de anexar de novo.',false,'erro');return;}
       var row=extRow(c.id,d.ano,d.mes),pm=row?Promise.resolve(row.id):SB.rpc('odo_inove_lanca_mes',{p_dono:donoId(),p_cliente:c.id,p_ano:d.ano,p_mes:d.mes,p_valor:d.debitos}).then(function(r){if(r.error)throw r.error;return r.data;});
       return pm.then(function(mid){return aiUp(f,'extratos/'+d.ano+'-'+String(d.mes).padStart(2,'0')).then(function(path){return SB.rpc('odo_inove_extrato',{p_mes:mid,p_path:path}).then(function(r){if(r.error)throw r.error;});});})
         .then(function(){ok++;var linhas=['✅ <b>'+esc(c.nome)+'</b> · '+MESES[d.mes-1]+': extrato anexado'+(row?'':' (cliente lançado com '+fmtR(d.debitos)+')')+'.'];
@@ -4656,7 +4660,7 @@ function aiExtratos(fs){fs=fs.filter(function(f){return /pdf/i.test(f.type)||/\.
           if(it.inoveAMenos>0){linhas.push('🚨 <b>Suspeita:</b> o extrato já deu baixa de <b>'+fmtR(it.inoveAMenos)+'</b> que não tem comprovante no sistema. Está faltando anexar comprovante.');alertas.push(c.nome);}
           if(d.cod)extSalvaCod(it);aiDiz(linhas.join('<br>'));})
         .catch(function(e){aiDiz('❌ <b>'+esc(c.nome)+'</b>: não consegui anexar ('+esc(aiErro(e))+').');});}).catch(function(){aiDiz('❌ Não consegui abrir <b>'+esc(f.name)+'</b>.');});});},Promise.resolve())
-  .then(aiRecarrega).then(function(){AI.busy=false;aiDiz(ok?'Pronto: '+ok+' de '+fs.length+' anexado'+(ok>1?'s':'')+'.'+(alertas.length?' Verifique os 🚨 acima.':' Tudo conferido.'):'Nenhum extrato foi anexado.');});}
+  .then(aiRecarrega).then(function(){AI.busy=false;aiDiz((ok?'Pronto: '+ok+' de '+fs.length+' anexado'+(ok>1?'s':'')+'.':'Nenhum extrato foi anexado.')+(alertas.length?' ⛔ '+alertas.length+' com divergência ficaram de fora: '+esc(alertas.join(', '))+'.':ok?' Tudo conferido.':''),false,alertas.length?'erro':'');});}
 /* comprovante: lê o valor, confere e trava se divergir */
 function aiComprovante(f){var c=EMP.cli.filter(function(x){return x.id===AI.cli;})[0];if(!c){aiDiz('Antes, escolha à esquerda de qual cliente é o comprovante. 👈');return;}
   var m=aiCliRow(c);if(!m){aiDiz('<b>'+esc(c.nome)+'</b> não tem lançamento em '+MESES[FIN.mes-1]+'. Mande primeiro o extrato dele.');return;}
