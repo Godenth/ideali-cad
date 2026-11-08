@@ -3391,7 +3391,7 @@ function rlMsg(e){var m=(e&&e.message)||'';
   if(/already registered|already been registered/i.test(m))return 'Já existe uma conta com esse e-mail. Use "Entrar" (se você usa o Ideali CAD, é a mesma conta).';
   if(/Password should be|weak/i.test(m))return 'Senha fraca. Use pelo menos 8 caracteres, misturando letras e números.';
   if(/rate limit|too many/i.test(m))return 'Muitas tentativas. Aguarde alguns minutos.';
-  if(/fetch|network/i.test(m))return 'Sem conexão com a internet.';return 'Não deu certo agora. Tente de novo.';}
+  if(/sending.*(confirmation|email)|smtp/i.test(m))return 'O sistema não conseguiu enviar o e-mail de confirmação agora ('+m+'). Tente de novo em alguns minutos.';if(/fetch|network/i.test(m))return 'Sem conexão com a internet.';return 'Não deu certo agora. Tente de novo.'+(m?' ('+m.slice(0,120)+')':'');}
 function rlTel(d){d=String(d||'').replace(/\D/g,'').slice(0,11);return d.length>10?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length>6?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d.length>2?'('+d.slice(0,2)+') '+d.slice(2):d;}
 
 /* login por cima do site */
