@@ -1401,6 +1401,7 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .pghost{position:fixed;z-index:400;pointer-events:none;transform:rotate(2deg) scale(1.03);cursor:grabbing;opacity:.96;display:block!important;margin:0!important;padding:0!important;overflow:visible!important}.pghost .pcol{padding:0!important;background:none!important;border:0!important;min-height:0!important;box-shadow:none!important}.pghost .pcol>.pedc{box-shadow:0 18px 40px rgba(0,0,0,.35);margin:0}
 body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:3px dashed var(--k,#7C3AED);outline-offset:-3px;background:color-mix(in srgb,var(--k,#7C3AED) 10%,transparent)}
 .chk-m{margin:0 0 8px;line-height:1.5}.chk-m code{font-size:.8em;background:rgba(127,127,127,.15);padding:1px 5px;border-radius:5px}.chk-bt{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;border:0}.chk-bt img{width:24px;height:24px;border-radius:50%;object-fit:cover}
+#anap-cli{max-width:260px;background:transparent;border:1px dashed currentColor;border-radius:99px;padding:4px 10px;font:inherit;color:inherit}.anp-x{border:0;background:none;color:inherit;cursor:pointer;opacity:.6}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4357,7 +4358,7 @@ function anaPedidos(res){return res.itens.map(function(it,i){return {tipo:res.ti
 function anaFmtData(d){if(!d)return '';var x=new Date(d+'T12:00:00');return x.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});}
 function anaPrevia(res){if(!res)return '<p class="anp-dica">Escreva do seu jeito. Ex.: <i>"Dr. Paulo, paciente Maria Souza, coroa de zircônia sobre dente do 11 ao 25 e coroa do 23 sobre implante, cor A2, pra sexta"</i></p>';
   if(!res.itens.length)return '<p class="anp-dica">Ainda não entendi o trabalho. Diga o que é (coroa, faceta, protocolo…) e os dentes (ex.: 11 ao 25).</p>';
-  var cab='<div class="anp-cab"><span>'+(res.cliente?'👤 <b>'+esc(res.cliente.nome)+'</b>':'<span class="anp-falta">👤 Cliente não reconhecido</span>')+'</span>'+
+  var cab='<div class="anp-cab"><span>'+(res.cliente?'👤 <b>'+esc(res.cliente.nome)+'</b>'+(ANAP.cliId===res.cliente.id?' <button type="button" class="anp-x" data-anacli="" title="Trocar cliente">✕</button>':''):'<select id="anap-cli" class="anp-falta" aria-label="Escolher cliente"><option value="">👤 Cliente não reconhecido · escolha</option>'+EMP.cli.filter(function(c){return c.ativo!==false;}).slice().sort(function(a,b){return String(a.nome).localeCompare(b.nome);}).map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+'</option>';}).join('')+'</select>')+'</span>'+
     (res.paciente?'<span>🧑 '+esc(res.paciente)+'</span>':'<span class="anp-falta">🧑 Sem paciente</span>')+(res.cor?'<span>🎨 '+esc(res.cor)+'</span>':'')+
     '<span>'+(res.tipo==='cad'?'🟣 CAD':'🧪 Analógico')+'</span>'+(res.urgente?'<span class="anp-urg">⚡ Urgente</span>':'')+'</div>';
   var tot=0;var its=res.itens.map(function(it,i){if(it.valor!=null)tot+=it.valor;var pz=res.prazo||it.prazoTab;
@@ -4372,7 +4373,7 @@ function anaAbre(){if(document.getElementById('anap'))return;ANAP.on=true;var d=
     '<div id="anap-r" class="anap-r" aria-live="polite"></div>'+
     '<div class="anap-b"><button class="btn" data-ana="ajusta">✏️ Ajustar no formulário</button><button class="btn pri" data-ana="cria">Criar pedido</button></div></div>';
   document.body.appendChild(d);var ta=d.querySelector('#anap-t');ta.value=ANAP.txt||'';
-  var upd=function(){ANAP.txt=ta.value;ANAP.res=anaEntende(ta.value);d.querySelector('#anap-r').innerHTML=anaPrevia(ANAP.res);var n=ANAP.res?ANAP.res.itens.length:0,b=d.querySelector('[data-ana=cria]');
+  var upd=function(){ANAP.txt=ta.value;ANAP.res=anaEntende(ta.value);if(ANAP.res&&!ANAP.res.cliente&&ANAP.cliId){var cx=EMP.cli.filter(function(c){return c.id===ANAP.cliId;})[0];if(cx)ANAP.res.cliente=cx;}d.querySelector('#anap-r').innerHTML=anaPrevia(ANAP.res);var n=ANAP.res?ANAP.res.itens.length:0,b=d.querySelector('[data-ana=cria]');
     b.disabled=!n||ANAP.busy;b.textContent=ANAP.busy?'Criando…':n>1?'Criar 1 pedido ('+n+' trabalhos)':'Criar pedido';d.querySelector('[data-ana=ajusta]').disabled=!n;};
   var tm=null;ta.addEventListener('input',function(){clearTimeout(tm);tm=setTimeout(upd,180);});upd();
   d.addEventListener('click',function(e){var b=e.target.closest('[data-ana]');if(e.target===d){anaFecha();return;}if(!b)return;var a=b.getAttribute('data-ana');
@@ -4381,7 +4382,7 @@ function anaAbre(){if(document.getElementById('anap'))return;ANAP.on=true;var d=
     else if(a==='cria'){upd();if(!ANAP.res||!ANAP.res.itens.length||ANAP.busy)return;anaCria(anaPedidos(ANAP.res),upd);}});
   document.addEventListener('keydown',anaEsc);setTimeout(function(){ta.focus();},60);}
 function anaEsc(e){if(e.key==='Escape')anaFecha();}
-function anaFecha(){var d=document.getElementById('anap');if(d)d.remove();ANAP.on=false;document.removeEventListener('keydown',anaEsc);}
+function anaFecha(){var d=document.getElementById('anap');if(d)d.remove();ANAP.on=false;ANAP.cliId=null;document.removeEventListener('keydown',anaEsc);}
 function anaCria(L,upd){if(!RL||!RL.user)return;ANAP.busy=true;upd();var n0=PED.L.reduce(function(m,x){return Math.max(m,x.numero||0);},0),feitos=[];
   L.reduce(function(pr,p,i){return pr.then(function(){return SB.from('odo_pedidos').insert(Object.assign({user_id:RL.user.id,numero:n0+i+1},pedRow(p))).select('*').single().then(function(r){if(r.error)throw r.error;pedGuarda(r.data);feitos.push(r.data.numero);});});},Promise.resolve())
   .then(function(){ANAP.busy=false;ANAP.txt='';anaFecha();render();toast(feitos.length>1?'Pronto! Criei os pedidos #'+feitos.join(', #')+'.':'Pronto! Pedido #'+feitos[0]+' criado.');})
@@ -5170,6 +5171,10 @@ var _anaPedidosSep=anaPedidos;anaPedidos=function(res){var L=_anaPedidosSep(res)
     material:u(it.map(function(x){return x.material;})).join(' / ')||null,sobre_implante:it.some(function(x){return x.sobre_implante;}),componente:comp.join(', ').slice(0,120)||null,valor:val,prazo:pz,
     descricao:('Pedido escrito para a Ana ('+it.length+' trabalhos no mesmo pedido):\n'+det+'\n\nTexto: '+res.texto).slice(0,4000)});
   return [P];};
+
+/* Ana: escolher o cliente na mão quando ela não reconhece pelo texto */
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='anap-cli'){ANAP.cliId=e.target.value||null;var ta=document.getElementById('anap-t');if(ta)ta.dispatchEvent(new Event('input',{bubbles:true}));}});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-anacli]');if(b){ANAP.cliId=null;var ta=document.getElementById('anap-t');if(ta)ta.dispatchEvent(new Event('input',{bubbles:true}));}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
