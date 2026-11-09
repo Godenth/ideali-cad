@@ -3558,7 +3558,7 @@ function pedDentesLe(t){var L=[];String(t||'').split(/[^0-9]+/).forEach(function
 function rPedForm(p){var cli=p.cliente_id&&EMP.cli.filter(function(x){return x.id===p.cliente_id;})[0],cliL=EMP.cli.filter(function(c){return c.ativo||c.id===p.cliente_id;}),N=S.neg;
   var sel=function(k,ops,v){return '<select data-pf="'+k+'">'+ops.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(v==null?'':v)===String(o[0])?' selected':'')+'>'+esc(o[1])+'</option>';}).join('')+'</select>';};
   var fld=function(k,lab,v,extra){return '<label class="fld ped-'+k+'"><span>'+lab+'</span><input data-pf="'+k+'" value="'+esc(v==null?'':v)+'"'+(extra||'')+'></label>';};
-  return '<div class="dtop"><div><h2>'+(p.id?'Pedido #'+(p.numero||'—'):'Novo pedido')+'</h2>'+(p.legado?'<p class="small muted">Veio do sistema antigo'+(p.legado.indexOf('o:')===0?' (Ordens CAM)':'')+'.</p>':'')+'</div></div>'+
+  return '<div class="dtop"><div><h2>'+(p.id?'Pedido #'+(p.numero||'—'):'Novo pedido')+'</h2>'+(p.legado?'<p class="small muted">Veio do sistema antigo'+(p.legado.indexOf('o:')===0?' (Ordens CAM)':'')+'.</p>':'')+'</div><span class="spacer"></span><button type="button" class="btn" data-act="pedCopia">📋 Copiar tudo</button></div>'+
     '<section class="card cli-form pedform">'+
     '<div class="fld cli-full"><span>Tipo</span><div class="seg pedseg">'+[['cad','🟣 CAD (desenho a fazer)'],['analogico','🧪 Analógico (laboratório)']].map(function(o){return '<button type="button" aria-pressed="'+(p.tipo===o[0])+'" data-act="pedTipo" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
     '<label class="fld cli-full"><span>Cliente</span>'+sel('cliente_id',[['','— escolha —']].concat(cliL.map(function(c){return [c.id,c.nome+(c.reg?' (nº '+c.reg+')':'')];})),p.cliente_id)+'</label>'+
@@ -5104,6 +5104,17 @@ var _rlEntraPdg=rlEntra;rlEntra=function(){_rlEntraPdg.apply(this,arguments);if(
   document.addEventListener('pointerup',fim);document.addEventListener('pointercancel',function(e){if(D&&D.on)fim(e);else if(D){clearTimeout(D.tm);D=null;}});
   document.addEventListener('click',function(e){if(Date.now()-just<350){e.stopPropagation();e.preventDefault();}},true);
   document.addEventListener('contextmenu',function(e){if(D&&D.touch)e.preventDefault();});})();
+
+/* ===== Pedido: botão "Copiar tudo" (copia o que está na tela, mesmo sem salvar) ===== */
+ACT.pedCopia=function(){var raiz=document.querySelector('[data-act="pedCopia"]');raiz=raiz&&(raiz.closest('section,main,.card')||document);
+  var FORA={valor:1,status:1,origem:1,arquivado:1,enviado_inove:1,desenho_feito:1,cadista_id:1,tipo:1},L=[],h=raiz.querySelector('h2');if(h)L.push(h.textContent.trim());
+  Array.prototype.forEach.call(document.querySelectorAll('[data-pf]'),function(el){var k=el.getAttribute('data-pf');if(FORA[k])return;var lb=el.closest('label'),rot=lb&&lb.querySelector('span')?lb.querySelector('span').textContent.replace(/\(ex\.[^)]*\)/i,'').trim():'';
+    if(el.type==='checkbox'){if(el.checked)L.push('✔ '+(lb?lb.textContent.trim():k));return;}
+    var v=el.tagName==='SELECT'?(el.selectedIndex>=0?el.options[el.selectedIndex].text:''):el.value;v=String(v||'').trim();if(!v||/^—.*—$/.test(v))return;
+    if(el.type==='date')v=v.split('-').reverse().join('/');L.push((rot||k)+': '+v);});
+  var t=L.join('\n');function ok(){toast('📋 Copiado! É só colar onde quiser.');}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,function(){pedCopiaVelho(t);ok();});else{pedCopiaVelho(t);ok();}};
+function pedCopiaVelho(t){var x=document.createElement('textarea');x.value=t;x.style.position='fixed';x.style.opacity='0';document.body.appendChild(x);x.select();try{document.execCommand('copy');}catch(e){}x.remove();}
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
