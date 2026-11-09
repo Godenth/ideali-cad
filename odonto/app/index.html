@@ -1400,6 +1400,7 @@ body.espelho .anap-top,body.espelho .anap-fab{display:none!important}
 .pkan .pedc{cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.pkan .pedc.parr{opacity:.35}
 .pghost{position:fixed;z-index:400;pointer-events:none;transform:rotate(2deg) scale(1.03);cursor:grabbing;opacity:.96;display:block!important;margin:0!important;padding:0!important;overflow:visible!important}.pghost .pcol{padding:0!important;background:none!important;border:0!important;min-height:0!important;box-shadow:none!important}.pghost .pcol>.pedc{box-shadow:0 18px 40px rgba(0,0,0,.35);margin:0}
 body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:3px dashed var(--k,#7C3AED);outline-offset:-3px;background:color-mix(in srgb,var(--k,#7C3AED) 10%,transparent)}
+.chk-m{margin:0 0 8px;line-height:1.5}.chk-m code{font-size:.8em;background:rgba(127,127,127,.15);padding:1px 5px;border-radius:5px}.chk-bt{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;border:0}.chk-bt img{width:24px;height:24px;border-radius:50%;object-fit:cover}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5115,6 +5116,47 @@ ACT.pedCopia=function(){var raiz=document.querySelector('[data-act="pedCopia"]')
   var t=L.join('\n');function ok(){toast('📋 Copiado! É só colar onde quiser.');}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,function(){pedCopiaVelho(t);ok();});else{pedCopiaVelho(t);ok();}};
 function pedCopiaVelho(t){var x=document.createElement('textarea');x.value=t;x.style.position='fixed';x.style.opacity='0';document.body.appendChild(x);x.select();try{document.execCommand('copy');}catch(e){}x.remove();}
+
+/* ===== Ana confere se um comprovante já está anexado em algum lugar (arquivo igual, mesmo código, ou mesmo valor/dia/hora) ===== */
+var CHK={on:false,busy:false,msgs:[],res:null};
+function chkCache(path,r){var k='io_ch_'+path;try{if(r){localStorage.setItem(k,JSON.stringify(r));return r;}var x=localStorage.getItem(k);return x?JSON.parse(x):null;}catch(e){return r||null;}}
+function chkLe(path){var c=chkCache(path);if(c&&c.hash)return Promise.resolve(c);return invLeArquivo(path).then(function(r){return chkCache(path,{hash:r.hash,cod:r.cod,hora:r.hora,valor:r.valor,data:r.data});});}
+function chkHtml(){return '<div class="pdg-ov chk-ov" role="dialog" aria-modal="true"><div class="pdg-box"><div class="pdg-h"><b>🔎 Esse comprovante já está anexado?</b><button class="btn sm" data-act="chkFecha"'+(CHK.busy?' disabled':'')+'>Fechar</button></div>'+
+  '<div class="pdg-b"><div class="pdg-ana"><img src="'+ANA_AV[0]+'" alt=""><div style="flex:1">'+(CHK.msgs.length?CHK.msgs.map(function(m){return '<div class="chk-m">'+m+'</div>';}).join(''):'<div class="chk-m">Me mande o comprovante (foto ou PDF). Eu vasculho <b>todos os meses de todos os clientes</b> e te digo se ele já foi anexado: arquivo igual, mesmo código da transação, ou mesmo valor no mesmo dia e hora.</div>')+
+  (CHK.busy?'<div class="chk-m muted">digitando…</div>':'')+'</div></div>'+
+  (CHK.busy?'':'<label class="btn pri" style="justify-self:start">📎 '+(CHK.msgs.length?'Conferir outro comprovante':'Escolher comprovante')+'<input type="file" id="chk-arq" accept="application/pdf,image/*" hidden></label>')+'</div></div></div>';}
+function chkDesenha(){var el=document.getElementById('chk-ov');if(!CHK.on){if(el)el.remove();document.body.style.overflow='';return;}if(!el){el=document.createElement('div');el.id='chk-ov';document.body.appendChild(el);}el.innerHTML=chkHtml();document.body.style.overflow='hidden';
+  var b=el.querySelector('.pdg-b');if(b)b.scrollTop=b.scrollHeight;}
+function chkDiz(h){CHK.msgs.push(h);chkDesenha();}
+function chkLocal(x){return '<b>'+esc(finCliNome(x.m))+'</b> · '+MESES[x.m.mes-1]+'/'+x.m.ano+' · pago em '+invDt(x.p.data)+' · '+fmtR(x.p.valor)+(x.p.anulado_em?' <span class="labv-st recusado">anulado</span>':'')+
+  ' <button class="ih-ver" data-act="finArqVer" data-v="'+esc(x.p.comprovante_path)+'">📎 abrir</button> <button class="ih-ver" data-act="chkMes" data-v="'+x.m.id+'">📂 ir ao mês</button>';}
+function chkConfere(f){CHK.msgs=[];CHK.busy=true;chkDiz('📎 <b>'+esc(f.name)+'</b>');
+  Promise.all([aiTextoArq(f).then(invDetalhes).catch(function(){return {valor:null,data:null,hora:null,cod:null};}),invHash(f)]).then(function(a){var L=a[0];L.hash=a[1];
+    chkDiz('Li neste comprovante: '+(L.valor!=null?'<b>'+fmtR(L.valor)+'</b>':'<i>valor não identificado</i>')+(L.data?' em <b>'+invDt(L.data)+'</b>':'')+(L.hora?' às '+L.hora:'')+(L.cod?' · código <code>'+esc(invCodCurto(L.cod))+'</code>':'')+'.');
+    var M={};FIN.M.forEach(function(m){M[m.id]=m;});
+    var T=FIN.P.filter(function(p){return p.comprovante_path&&M[p.mes_id];}).map(function(p){return {p:p,m:M[p.mes_id]};});
+    var C=L.valor!=null?T.filter(function(x){return Math.abs(+x.p.valor-L.valor)<0.01||(L.data&&x.p.data===L.data);}):T;
+    chkDiz('Vou abrir e comparar <b>'+C.length+'</b> comprovante'+(C.length===1?'':'s')+(L.valor!=null?' com valor ou data parecidos':'')+' (de '+T.length+' anexados no sistema)…');
+    var achou={igual:[],cod:[],quase:[],parecido:[]},n=0;
+    return C.reduce(function(pr,x){return pr.then(function(){return chkLe(x.p.comprovante_path).then(function(r){x.r=r;n++;
+      if(L.hash&&r.hash&&r.hash===L.hash)achou.igual.push(x);
+      else if(L.cod&&r.cod&&String(L.cod).length>=8&&r.cod===L.cod)achou.cod.push(x);
+      else{var v=r.valor!=null?r.valor:+x.p.valor,d=r.data||x.p.data;if(L.valor!=null&&Math.abs(v-L.valor)<0.01&&L.data&&d===L.data){if(L.hora&&r.hora&&L.hora.slice(0,5)===r.hora.slice(0,5))achou.quase.push(x);else achou.parecido.push(x);}}}).catch(function(){});});},Promise.resolve()).then(function(){CHK.busy=false;
+      if(achou.igual.length)chkDiz('🛑 <b>Já está anexado!</b> É exatamente o mesmo arquivo:<br>'+achou.igual.map(chkLocal).join('<br>'));
+      if(achou.cod.length)chkDiz('🛑 <b>Já está anexado</b> (arquivo diferente, mas é o <b>mesmo código da transação</b>):<br>'+achou.cod.map(chkLocal).join('<br>'));
+      if(achou.quase.length)chkDiz('⚠️ <b>Muito provável que já esteja anexado:</b> mesmo valor, mesmo dia e mesma hora:<br>'+achou.quase.map(chkLocal).join('<br>'));
+      if(achou.parecido.length)chkDiz('🔸 Parecido, mas <b>parece outro pagamento</b> (mesmo valor e dia, hora ou código diferentes). Confira:<br>'+achou.parecido.map(chkLocal).join('<br>'));
+      var tot=achou.igual.length+achou.cod.length+achou.quase.length;
+      if(tot>1)chkDiz('❗ Ele aparece em <b>mais de um lugar</b>. Pode ter sido lançado em duplicidade: abra os meses e decida qual fica.');
+      if(!tot&&!achou.parecido.length)chkDiz('✅ <b>Não está no sistema.</b> Conferi '+n+' comprovante'+(n===1?'':'s')+' e nenhum é igual a este. Pode anexar no cliente e mês certos.');
+      else if(!tot)chkDiz('✅ Não achei este comprovante anexado. Só tem os parecidos acima; se forem outros pagamentos, pode anexar.');});
+  }).catch(function(){CHK.busy=false;chkDiz('❌ Não consegui ler esse arquivo. Tente uma foto mais nítida ou o PDF.');});}
+Object.assign(ACT,{chkAbre:function(){if(!FIN.carregado){toast('Abra o Financeiro primeiro.');return;}CHK.on=true;CHK.msgs=[];chkDesenha();},chkFecha:function(){if(CHK.busy)return;CHK.on=false;chkDesenha();},
+  chkMes:function(v){var m=FIN.M.filter(function(x){return x.id===v;})[0];if(!m)return;CHK.on=false;chkDesenha();if(typeof AI!=='undefined'&&AI.on&&typeof aiFecha==='function')aiFecha();FIN.ano=m.ano;FIN.mes=m.mes;FIN.aba='mes';FIN.ed=m.id;FIN.cob=null;ACT.dTab('financeiro');window.scrollTo(0,0);}});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='chk-arq'&&e.target.files&&e.target.files[0])chkConfere(e.target.files[0]);});
+var _rFinChk=rFin;rFin=function(){var h=_rFinChk.apply(this,arguments);return h.replace('<div class="finabrow">','<div class="finabrow"><button class="btn chk-bt" data-act="chkAbre"><img src="'+ANA_AV[0]+'" alt=""> Comprovante já anexado?</button>');};
+
+var _rInoveChk=rInove;rInove=function(){var h=_rInoveChk.apply(this,arguments);return h.replace(' Ana · anexar extratos e comprovantes</button>',' Ana · anexar extratos e comprovantes</button><button class="btn chk-bt" data-act="chkAbre"><img src="'+ANA_AV[0]+'" alt=""> Comprovante já anexado?</button>');};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
