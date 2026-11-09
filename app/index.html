@@ -1690,6 +1690,11 @@ var MAP={
     to:function(x){return x.origem==='link'?{pedido_id:x.pedidoId,origem:'link',nome:x.nome,url_externa:x.url,categoria:x.cat||null,deleted_at:ts(x.deleted)}:{deleted_at:ts(x.deleted)};},
     from:function(r){return {id:r.id,pedidoId:r.pedido_id,origem:r.origem,cat:r.categoria||null,nome:r.nome,url:r.url_externa,tamOrig:+r.tamanho_original||0,tamZip:+r.tamanho_zip||0,criado:dia(r.criado_em),cont:r.conteudo||null,removido:dia(r.removido_em),deleted:dia(r.deleted_at)};}}
 };
+(function(){var tp=MAP.pedidos.to,fp=MAP.pedidos.from,tg=MAP.pagamentos.to,fg=MAP.pagamentos.from;
+  MAP.pedidos.to=function(x){var o=tp(x);if('recParc' in x)o.recebido_parcial=+x.recParc||0;return o;};
+  MAP.pedidos.from=function(r){var o=fp(r);if(+r.recebido_parcial>0)o.recParc=+r.recebido_parcial;return o;};
+  MAP.pagamentos.to=function(x){var o=tg(x);if(x.parciais&&x.parciais.length)o.parciais=x.parciais;return o;};
+  MAP.pagamentos.from=function(r){var o=fg(r);if(r.parciais&&r.parciais.length)o.parciais=r.parciais;return o;};})();
 var ORDEM=['clientes','tipos','precos','faixas','pagamentos','pedidos','arquivos'];
 var SNAP={},syncTimer=null,syncFila=Promise.resolve();
 function perfilRow(){var p=S.perfil;return {nome:nn(p.nome),telefone:nn(p.telefone),tipo_chave_pix:nn(p.tipoChave),chave_pix:nn(p.chave),nome_recebedor:nn(p.recebedor),cidade:nn(p.cidade),uf:nn(p.uf),
@@ -1882,6 +1887,9 @@ function usado(){return alive(S.arquivos).filter(function(a){return a.origem==='
 function expira(a){var p=byId(S.pedidos,a.pedidoId);return (p&&p.entregue&&a.origem==='upload')?addDays(p.entregue,60):null;}
 function aReceber(cid){return alive(S.pedidos).filter(function(p){return (p.status==='finalizado'||p.status==='arquivado')&&!p.pago&&(!cid||p.clienteId===cid);});}
 function soma(ps){return ps.reduce(function(s,p){return s+(+p.valor||0);},0);}
+/* quanto ainda falta receber do pedido (desconta pagamento parcial) */
+function restante(p){return Math.max(0,Math.round(((+p.valor||0)-(+p.recParc||0))*100)/100);}
+function somaAb(ps){return Math.round(ps.reduce(function(s,p){return s+restante(p);},0)*100)/100;}
 function limpezaAutomatica(){var t=today(),n=0;S.arquivos.forEach(function(a){var e=expira(a);if(e&&e<t&&!a.removido&&!a.deleted){a.removido=t;blobs.delete(a.id);n++;}});if(n)save();return n;}
 
 /* ===================== Estado da tela ===================== */
@@ -2272,7 +2280,7 @@ function valuation(){var t=today(),P=alive(S.pedidos).filter(function(p){return 
   var E=R12.filter(function(p){return p.entregue&&p.prazo;}),pz=E.length?E.filter(function(p){return p.entregue<=p.prazo;}).length/E.length:null,E2=R12.filter(function(p){return p.entregue;}),ap=E2.length?E2.filter(function(p){return !(p.ajustes>0);}).length/E2.length:null;
   if(pz!=null)add('Prazo',pz>=0.95?0.05:pz>=0.8?0:-0.1,Math.round(pz*100)+'% das entregas no prazo.');
   if(ap!=null)add('Qualidade',ap>=0.9?0.05:ap>=0.75?0:-0.1,Math.round(ap*100)+'% aprovados de primeira, sem ajuste.');
-  var dv=0;try{aReceber().forEach(function(p){var d=p.entregue||p.recebido;if(d&&daysBetween(d,t)>30)dv+=+p.valor||0;});}catch(e){}
+  var dv=0;try{aReceber().forEach(function(p){var d=p.entregue||p.recebido;if(d&&daysBetween(d,t)>30)dv+=restante(p);});}catch(e){}
   if(rec12)add('Inadimplência',dv/rec12>0.1?-0.15:dv/rec12>0.03?-0.05:0.03,dv?brl(dv)+' parado há mais de 30 dias ('+Math.round(dv/rec12*100)+'% do faturamento).':'Ninguém devendo há mais de 30 dias.');
   if(rec12)add('Tempo de casa',idade<180?-0.2:idade<365?-0.1:idade>=730?0.1:0,idade<365?'Menos de 1 ano de histórico: o valor ainda é uma projeção.':'Mais de '+plural(Math.floor(idade/365),'ano','anos')+' de histórico.');
   m=Math.max(0.3,Math.min(2,m));var val=Math.round(anual*m/100)*100;
@@ -3834,7 +3842,7 @@ function cliStats(cid){var t=today(),c=cliente(cid),P=alive(S.pedidos).filter(fu
     tipos:Object.keys(tipos).sort(function(a,b){return tipos[b]-tipos[a];}).slice(0,3).map(function(k){return k+' ('+tipos[k]+')';}),
     ultimos:P.slice(-3).reverse().map(function(p){return (nomeTrab(p)||'Trabalho')+(p.paciente?' do paciente '+pacIniciais(p.paciente):'')+' em '+dmy(p.recebido).slice(0,5)+(p.ajustes>0?' (teve '+p.ajustes+' ajuste)':'');}),
     ajN:P.filter(function(p){return p.ajustes>0;}).length,atrN:noPr.filter(function(p){return p.entregue>p.prazo;}).length,mesPico:(function(){var m=null;Object.keys(pm).forEach(function(k){if(!m||pm[k]>pm[m])m=k;});return m;})(),
-    dev:soma(aReceber(cid)),total:soma(P),ticket:n?soma(P)/n:0,diasSem:diasSem};}
+    dev:somaAb(aReceber(cid)),total:soma(P),ticket:n?soma(P)/n:0,diasSem:diasSem};}
 function cliRisco(s){return s.padrao==='parou'||s.padrao==='caindo'||s.padrao==='umavez'||(s.diasSem!=null&&s.diasSem>30);}
 function cliPadraoTxt(s){var r=String(s.ritmoAntes).replace('.',',');
   return s.padrao==='parou'?'Parou de mandar: costumava mandar a cada '+plural(s.freq||7,'dia','dias')+' e está há '+plural(s.diasSem,'dia','dias')+' sem mandar.':
@@ -4415,7 +4423,7 @@ function liPedido(p){
   return '<button class="li" data-a="verPedido" data-id="'+p.id+'"><span class="t"><b><span class="pac-i">'+esc(p.paciente)+'</span> · '+esc(t?t.nome:'')+'</b><span><span class="cli-i">'+esc(c?c.nome:'')+'</span> · '+stLabel(p.status)+'</span></span>'+
     '<span class="row">'+(p.urgente?'<span class="tag u">Urgente</span>':'')+'<span class="mono small '+(late?'late':!aberto(p)?'val':'')+'">'+(!aberto(p)?brl(p.valor):(p.prazo?dm(p.prazo):''))+'</span></span></button>';
 }
-function devedores(){var m={};aReceber().forEach(function(p){m[p.clienteId]=(m[p.clienteId]||0)+(+p.valor||0);});
+function devedores(){var m={};aReceber().forEach(function(p){m[p.clienteId]=(m[p.clienteId]||0)+restante(p);});
   return Object.keys(m).map(function(k){return {c:cliente(k),v:m[k],n:aReceber(k).length};}).filter(function(x){return x.c;}).sort(function(a,b){return b.v-a.v;});}
 function liDevedor(d){return '<div class="li" style="cursor:default"><span class="t"><b>'+esc(d.c.nome)+'</b><span>'+d.n+' pedido(s) entregue(s) sem pagamento</span></span><span class="row"><span class="mono">'+brl(d.v)+'</span><button class="btn sm pri" data-a="cobranca" data-id="'+d.c.id+'">Gerar cobrança</button></span></div>';}
 
@@ -4430,7 +4438,7 @@ function rPedidos(){
     return true;}
   var ps=alive(S.pedidos).filter(match);
   var arq=ps.filter(function(p){return p.status==='arquivado';});
-  var abertos=ps.filter(aberto),atr=abertos.filter(function(p){return atrasado(p);}).length,rec=soma(aReceber());
+  var abertos=ps.filter(aberto),atr=abertos.filter(function(p){return atrasado(p);}).length,rec=somaAb(aReceber());
   var head_='<div class="between wrap"><div class="row wrap">'+
       '<input class="search so-cel" id="busca" type="search" autocomplete="off" placeholder="Buscar paciente, cliente, dente ou nº" value="'+esc(ui.busca)+'" style="width:min(280px,100%)">'+(ui.busca.trim()?'<span class="btn sm so-pc" style="cursor:default">🔎 '+esc(ui.busca.trim())+'</span><button class="btn sm pri" data-a="buscaLimpa" title="Limpar a busca e mostrar todos os pedidos">✕ Limpar busca</button>':'')+
       '<button class="btn sm pri" data-a="ppAbre" title="Cole o print da conversa do WhatsApp e a Ana preenche o pedido">📷 Pedido pelo print</button>'+
@@ -4596,7 +4604,7 @@ function rClientes(){
     '<div class="row wrap"><input class="search" id="cli-busca" type="search" placeholder="Buscar cliente por nome, WhatsApp ou e-mail" value="'+esc(ui.cliBusca||'')+'" style="flex:1;min-width:220px;max-width:420px">'+
     dd('cliTipo')+dd('cliOrd')+'</div>'+
     '<p class="small muted">'+cs.length+' cliente(s)'+(ord==='inativos'?' sem pedidos há mais de '+INATIVO_DIAS+' dias':'')+(q?' para “'+esc(ui.cliBusca)+'”':'')+'</p></div>'+
-    (cs.length?'<div class="card"><div class="list">'+cs.map(function(x){var c=x.c,ab=soma(aReceber(c.id));
+    (cs.length?'<div class="card"><div class="list">'+cs.map(function(x){var c=x.c,ab=somaAb(aReceber(c.id));
       var info=ord==='recentes'||ord==='antigos'?(c.criado?'cadastrado em '+dmy(c.criado):'sem data de cadastro'):
         x.n?(geral()?x.n+' pedido(s)':x.np+' pedido(s) '+perCurto())+' · último '+(x.dias===0?'hoje':'há '+x.dias+' dia(s)'):'nenhum pedido ainda';
       return '<button class="li" data-a="verCliente" data-id="'+c.id+'"><span class="row" style="min-width:0;gap:12px"><span class="av" style="background:color-mix(in srgb,var(--p'+(1+hashN(c.nome)%6)+') 26%,var(--surface));color:var(--ink)">'+esc(c.nome.replace(/^(Dra?\.|Lab\.|Clínica)\s*/i,'').charAt(0).toUpperCase())+'</span>'+
@@ -4632,7 +4640,7 @@ function fJuntar(id){var c=cliente(id);if(!c)return head('Juntar cadastros')+'<p
 function rCliente(id){
   var c=cliente(id); if(!c){ui.sub=null;return rClientes();}
   var ps=alive(S.pedidos).filter(function(p){return p.clienteId===id;}).sort(function(a,b){return b.recebido<a.recebido?-1:1;});
-  var ab=soma(aReceber(id)), mes=totalMes(id,monthOf(today())), f=faixaDe(totalMes(id,prevMonth(monthOf(today()))));
+  var ab=somaAb(aReceber(id)), mes=totalMes(id,monthOf(today())), f=faixaDe(totalMes(id,prevMonth(monthOf(today()))));
   return '<div class="row"><button class="icon-btn" data-a="voltarClientes" aria-label="Voltar">‹</button><div style="flex:1;min-width:0"><h1>'+esc(c.nome)+'</h1><p class="small muted" style="margin:2px 0 0">'+TIPO_CLI[c.tipo]+(c.empresa&&pessoaCli(c)?' · '+esc(pessoaCli(c)):'')+(c.cidade||c.uf?' · '+cidUF(c):'')+(c.doc?' · '+(c.doc.length===11?'CPF ':'CNPJ ')+fmtDoc(c.doc):'')+(c.telefone?' · '+esc(c.telefone):'')+'</p></div></div>'+
     '<div class="grid2"><div class="stat" style="cursor:default"><span class="lbl">A receber</span><span class="v" style="color:'+(ab?'var(--urgent)':'inherit')+'">'+brl(ab)+'</span></div>'+
     '<div class="stat" style="cursor:default"><span class="lbl">Este mês</span><span class="v">'+brl(mes)+'</span></div></div>'+
@@ -4725,7 +4733,7 @@ function rFinanceiro(){
         hbars(Object.keys(porForma).sort(function(a,b){return porForma[b]-porForma[a];}).map(function(f){return {l:formaNome(f),r:brl(porForma[f]),v:porForma[f]};}),'Nenhum pagamento neste período.')+'</section>'+
     '</div>'+
     '<section class="card stack"><div class="between wrap"><div><h2>Quem está devendo</h2><p class="small muted">Pedidos finalizados ou enviados e ainda não pagos, de todos os meses.</p></div>'+(dev.length?'<button class="btn sm pri" data-a="cobranca">Gerar cobrança</button>':'')+'</div>'+
-      (dev.length?'<div class="list">'+dev.map(liDevedor).join('')+'</div><div class="between"><b>Total a receber</b><span class="mono"><b>'+brl(soma(aReceber()))+'</b></span></div>':'<p class="empty">Ninguém devendo.</p>')+'</section>'+
+      (dev.length?'<div class="list">'+dev.map(liDevedor).join('')+'</div><div class="between"><b>Total a receber</b><span class="mono"><b>'+brl(somaAb(aReceber()))+'</b></span></div>':'<p class="empty">Ninguém devendo.</p>')+'</section>'+
     '<section class="card stack"><h2>Extrato por cliente</h2><p class="small muted">Pedidos recebidos em '+perNome()+'.</p>'+
       (linhas.length?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.9rem;min-width:420px">'+
       '<thead><tr class="muted small" style="text-align:left"><th style="padding:6px 0">Cliente</th><th style="text-align:right">Pedidos</th><th style="text-align:right">Total</th><th style="text-align:right">Pago</th><th style="text-align:right">Em aberto</th></tr></thead><tbody>'+
@@ -6514,14 +6522,17 @@ function fPagamento(cid,preIds){
   var cs=alive(S.clientes).sort(function(a,b){return a.nome.localeCompare(b.nome);});
   var abertos=cid?alive(S.pedidos).filter(function(p){return p.clienteId===cid&&!p.pago;}).sort(function(a,b){return a.recebido<b.recebido?-1:1;}):[];
   preIds=preIds||abertos.filter(function(p){return !aberto(p);}).map(function(p){return p.id;});
-  var tot=soma(abertos.filter(function(p){return preIds.indexOf(p.id)>=0;}));
+  var tot=somaAb(abertos.filter(function(p){return preIds.indexOf(p.id)>=0;}));
   return head('Registrar pagamento')+'<form data-form="pagamento" class="stack">'+
     '<label class="fld"><span>Cliente</span><select id="pg-cli" name="clienteId" required data-a2="pgCli"><option value="">Escolha…</option>'+cs.map(function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select></label>'+
     (cid?'<div class="fld"><span>Pedidos que este pagamento quita</span>'+(abertos.length?'<div class="list card" style="padding:4px 12px">'+abertos.map(function(p){var t=tipoPed(p);
-      return '<label class="li check" style="justify-content:flex-start"><input type="checkbox" name="pedidos" value="'+p.id+'" data-v="'+p.valor+'" '+(preIds.indexOf(p.id)>=0?'checked':'')+'><span class="t" style="flex:1"><b>#'+p.num+' '+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</b><span>'+stLabel(p.status)+' · '+dm(p.recebido)+'</span></span><span class="mono small">'+brl(p.valor)+'</span></label>';}).join('')+'</div>':'<p class="small muted">Este cliente não tem pedidos em aberto.</p>')+'</div>':'')+
+      return '<label class="li check" style="justify-content:flex-start"><input type="checkbox" name="pedidos" value="'+p.id+'" data-v="'+restante(p)+'" '+(preIds.indexOf(p.id)>=0?'checked':'')+'><span class="t" style="flex:1"><b>#'+p.num+' '+esc(t?t.nome:'')+' · '+esc(p.paciente)+'</b><span>'+stLabel(p.status)+' · '+dm(p.recebido)+'</span></span><span class="mono small">'+(+p.recParc>0?'<s class="muted">'+brl(p.valor)+'</s> falta '+brl(restante(p)):brl(p.valor))+'</span></label>';}).join('')+'</div>':'<p class="small muted">Este cliente não tem pedidos em aberto.</p>')+'</div>':'')+
     (cid&&abertos.length?'<div class="grid2"><label class="fld"><span>Desconto</span><span class="row" style="gap:6px"><input id="pg-desc" name="desc" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0" style="flex:1"><select id="pg-dtipo" name="dtipo" style="width:76px"><option value="r">R$</option><option value="p">%</option></select></span></label><div class="fld"><span>Total com desconto</span><b id="pg-tot" class="mono" style="font-size:1.1rem;padding-top:8px">'+brl(tot)+'</b></div></div>':'')+
     '<div class="grid2"><label class="fld"><span>Valor recebido (R$)</span><input id="pg-valor" name="valor" type="number" step="0.01" min="0.01" required value="'+(tot?tot.toFixed(2):'')+'"></label>'+
     '<label class="fld"><span>Data</span><input id="pg-data" name="data" type="date" required value="'+today()+'"></label></div>'+
+    '<div id="pg-dif" class="calc" hidden><b>Recebeu menos que o total. Os <span id="pg-difv"></span> que faltam:</b>'+
+    '<label class="check" style="justify-content:flex-start;gap:8px"><input type="radio" name="dif" value="aberto" checked> <span><b>Ficam em aberto</b> para receber depois</span></label>'+
+    '<label class="check" style="justify-content:flex-start;gap:8px"><input type="radio" name="dif" value="desc"> <span>Foi <b>desconto</b> (os pedidos ficam quitados)</span></label></div>'+
     '<label class="fld"><span>Forma</span><select id="pg-forma" name="forma"><option value="pix">Pix</option><option value="transferencia">Transferência</option><option value="dinheiro">Dinheiro</option><option value="cartao">Cartão</option></select></label>'+
     '<label class="fld"><span>Comprovante (imagem ou PDF)</span><input id="pg-comp" name="comprovante" type="file" accept="image/*,application/pdf"></label>'+
     '<label class="fld"><span>Observações</span><input id="pg-obs" name="obs" maxlength="200"></label>'+
@@ -6529,13 +6540,15 @@ function fPagamento(cid,preIds){
 }
 /* soma dos pedidos marcados menos o desconto (em R$ ou %) */
 function pgDesconto(f){var s=0;[].forEach.call(f.querySelectorAll('input[name="pedidos"]:checked'),function(c){s+=+c.dataset.v;});var dv=f.desc?Math.max(0,parseFloat(f.desc.value)||0):0,pc=f.dtipo&&f.dtipo.value==='p';var d=pc?s*Math.min(dv,100)/100:Math.min(dv,s);return {soma:s,d:Math.round(d*100)/100};}
-function pgCalc(f){var r=pgDesconto(f),liq=Math.max(0,r.soma-r.d);f.valor.value=liq?liq.toFixed(2):'';var e=f.querySelector('#pg-tot');if(e)e.innerHTML=r.d?'<s class="muted" style="font-size:.85rem">'+brl(r.soma)+'</s> '+brl(liq):brl(liq);}
+function pgCalc(f){var r=pgDesconto(f),liq=Math.max(0,r.soma-r.d);f.valor.value=liq?liq.toFixed(2):'';var e=f.querySelector('#pg-tot');if(e)e.innerHTML=r.d?'<s class="muted" style="font-size:.85rem">'+brl(r.soma)+'</s> '+brl(liq):brl(liq);pgDif(f);}
+function pgDif(f){var b=f.querySelector('#pg-dif');if(!b)return;var r=pgDesconto(f),liq=Math.max(0,r.soma-r.d),v=parseFloat(f.valor.value)||0,dif=Math.round((liq-v)*100)/100;b.hidden=!(v>0&&dif>0.009);var e=f.querySelector('#pg-difv');if(e)e.textContent=brl(dif);}
 function fPagDet(id){
   var g=byId(S.pagamentos,id),c=cliente(g.clienteId),w=canWrite()?'':'disabled';
   return head('Pagamento')+'<div class="grid2 small">'+kv('Cliente',esc(c?c.nome:''))+kv('Valor','<b class="mono">'+brl(g.valor)+'</b>')+kv('Data',dmy(g.data))+kv('Forma',formaNome(g.forma))+'</div>'+
     (g.comprovante?'<div class="calc"><b>Comprovante</b><span>'+esc(g.comprovante.nome)+' · '+bytes(g.comprovante.tam)+'</span></div>':'')+
     (g.obs?'<p class="muted">'+esc(g.obs)+'</p>':'')+
-    '<h3>Pedidos quitados</h3><div class="list">'+g.pedidos.map(function(pid){var p=byId(S.pedidos,pid);return p?liPedido(p):'';}).join('')+'</div>'+
+    '<h3>Pedidos quitados</h3><div class="list">'+(g.pedidos.length?g.pedidos.map(function(pid){var p=byId(S.pedidos,pid);return p?liPedido(p):'';}).join(''):'<p class="small muted">Nenhum pedido quitado por inteiro.</p>')+'</div>'+
+    ((g.parciais||[]).length?'<h3>Pago em parte</h3><div class="list">'+g.parciais.map(function(x){var p=byId(S.pedidos,x.id);return p?'<div class="calc"><b>#'+p.num+' · '+esc(p.paciente)+'</b><span>recebeu '+brl(x.v)+' · ainda falta '+brl(restante(p))+'</span></div>':'';}).join('')+'</div>':'')+
     '<button class="btn danger" data-a="delPagamento" data-id="'+id+'" '+w+'>Excluir pagamento</button><p class="small muted">Ao excluir, os pedidos voltam para "Entregue".</p>';
 }
 
@@ -6559,9 +6572,9 @@ function brcode(valor,txid){
   return p+crc16(p);
 }
 function fPix(cid){
-  var c=cliente(cid),ps=aReceber(cid).sort(function(a,b){return a.recebido<b.recebido?-1:1;}),v=soma(ps);
+  var c=cliente(cid),ps=aReceber(cid).sort(function(a,b){return a.recebido<b.recebido?-1:1;}),v=somaAb(ps);
   if(!S.perfil.chave)return head('Cobrar '+esc(c.nome))+'<p>Para gerar o QR Code, cadastre sua chave Pix nas configurações.</p><button class="btn pri" data-a="irConfig">Cadastrar chave Pix</button>';
-  var msg='Olá! Segue o extrato dos trabalhos entregues e ainda não pagos:\n'+ps.map(function(p){var t=tipoPed(p);return '• #'+p.num+' '+(t?t.nome:'')+' '+p.paciente+(p.elementos.length?' ('+p.elementos.join(', ')+')':'')+': '+brl(p.valor);}).join('\n')+'\nTotal: '+brl(v)+'\n\n'+pixTxt()+'\n\nObrigado!';
+  var msg='Olá! Segue o extrato dos trabalhos entregues e ainda não pagos:\n'+ps.map(function(p){var t=tipoPed(p);return '• #'+p.num+' '+(t?t.nome:'')+' '+p.paciente+(p.elementos.length?' ('+p.elementos.join(', ')+')':'')+': '+(+p.recParc>0?brl(restante(p))+' (falta, de '+brl(p.valor)+')':brl(p.valor));}).join('\n')+'\nTotal: '+brl(v)+'\n\n'+pixTxt()+'\n\nObrigado!';
   ui.pixMsg=msg;
   return head('Cobrar '+esc(c.nome))+
     (ps.length?'<div class="list">'+ps.map(liPedido).join('')+'</div>':'<p class="small muted">Nenhum pedido entregue em aberto. Digite um valor se quiser cobrar mesmo assim.</p>')+
@@ -6588,15 +6601,15 @@ function fCobranca(cid){
     '<p class="small muted"><b>Enviar no WhatsApp</b> manda o PDF (lista dos pedidos, total e QR Code Pix) com a mensagem e a sua chave Pix. No computador, o PDF é baixado para você arrastar na conversa.</p>';
 }
 function cobPeds(cid){var sel=ui.cobSel||{};return aReceber(cid).filter(function(p){return sel[p.id]!==false;}).sort(function(a,b){return (a.entregue||a.recebido)<(b.entregue||b.recebido)?-1:1;});}
-function cobMsgTxt(cid,comPdf){var c=cliente(cid),ps=cobPeds(cid),v=soma(ps),nm=c?String(nomeCurtoCli(c)||'').trim():'';
-  return saudTxt()+(nm?', '+nm:'')+'! Segue a cobrança dos trabalhos entregues e ainda não pagos'+(comPdf?' (o PDF com os detalhes e o QR Code vai junto)':'')+':\n'+ps.map(function(p){return '• '+['#'+p.num,nomeTrab(p)||'',p.paciente||''].filter(Boolean).join(' ')+(p.elementos&&p.elementos.length?' ('+p.elementos.join(', ')+')':'')+': '+brl(p.valor);}).join('\n')+'\nTotal: '+brl(v)+(S.perfil.chave?'\n\n'+pixTxt():'')+'\n\nObrigado!';}
+function cobMsgTxt(cid,comPdf){var c=cliente(cid),ps=cobPeds(cid),v=somaAb(ps),nm=c?String(nomeCurtoCli(c)||'').trim():'';
+  return saudTxt()+(nm?', '+nm:'')+'! Segue a cobrança dos trabalhos entregues e ainda não pagos'+(comPdf?' (o PDF com os detalhes e o QR Code vai junto)':'')+':\n'+ps.map(function(p){return '• '+['#'+p.num,nomeTrab(p)||'',p.paciente||''].filter(Boolean).join(' ')+(p.elementos&&p.elementos.length?' ('+p.elementos.join(', ')+')':'')+': '+(+p.recParc>0?brl(restante(p))+' (falta, de '+brl(p.valor)+')':brl(p.valor));}).join('\n')+'\nTotal: '+brl(v)+(S.perfil.chave?'\n\n'+pixTxt():'')+'\n\nObrigado!';}
 function cobTotal(cid){return soma(cobPeds(cid));}
 function carregaJsPDF(){if(window.jspdf)return Promise.resolve();return new Promise(function(ok,ruim){var sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';sc.onload=ok;sc.onerror=function(){ruim(new Error('Não consegui carregar o gerador de PDF. Confira a internet.'));};document.head.appendChild(sc);});}
 function qrDataURL(code){var box=document.createElement('div');box.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(box);
   try{new QRCode(box,{text:code,width:360,height:360,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});var cv=box.querySelector('canvas');return cv?cv.toDataURL('image/png'):null;}catch(e){return null;}finally{box.remove();}}
 function pdfTxt(t){return String(t==null?'':t).replace(/[^\u0000-ÿ]/g,'');}
 async function geraPdfCobranca(cid,soGerar){
-  var c=cliente(cid),ps=cobPeds(cid),tot=soma(ps);if(!ps.length){toast('Marque pelo menos um pedido.');return;}
+  var c=cliente(cid),ps=cobPeds(cid),tot=somaAb(ps);if(!ps.length){toast('Marque pelo menos um pedido.');return;}
   await carregaJsPDF();var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,M=16,y=0;
   var roxo=[91,69,224],cinza=[98,94,117],tinta=[27,24,48];
   var quem=pdfTxt(S.perfil.nome||'Cadista'),hoje=dmy(today());
@@ -7177,8 +7190,8 @@ function setStatus(id,st){
   p.status=st;save();render();if(ui.sheet)renderSheet();
   toast('#'+p.num+' → '+stLabel(st)+(st==='arquivado'?'. Arquivos STL expiram em '+dmy(addDays(p.entregue,60))+'.':''));
 }
-function excluirPagamento(g){softDel(g);g.pedidos.forEach(function(pid){var p=byId(S.pedidos,pid);if(p&&p.pagamentoId===g.id){p.pago=null;p.pagamentoId=null;}});}
-function restaurarPagamento(g){delete g.deleted;g.pedidos.forEach(function(pid){var p=byId(S.pedidos,pid);if(p){p.pago=g.data;p.pagamentoId=g.id;}});}
+function excluirPagamento(g){softDel(g);g.pedidos.forEach(function(pid){var p=byId(S.pedidos,pid);if(p&&p.pagamentoId===g.id){p.pago=null;p.pagamentoId=null;}});(g.parciais||[]).forEach(function(x){var p=byId(S.pedidos,x.id);if(p)p.recParc=Math.max(0,Math.round(((+p.recParc||0)-x.v)*100)/100);});}
+function restaurarPagamento(g){delete g.deleted;g.pedidos.forEach(function(pid){var p=byId(S.pedidos,pid);if(p){p.pago=g.data;p.pagamentoId=g.id;}});(g.parciais||[]).forEach(function(x){var p=byId(S.pedidos,x.id);if(p)p.recParc=Math.round(((+p.recParc||0)+x.v)*100)/100;});}
 
 var A={
   delTab:function(d,el){if(!guard())return;var t=tipo(d.id);if(!t)return;softDel(t);save();
@@ -7933,9 +7946,16 @@ var F={
     var g={id:uid(),clienteId:cid,valor:parseFloat(fd.get('valor'))||0,data:fd.get('data'),forma:fd.get('forma'),obs:(fd.get('obs')||'').trim(),pedidos:ids,
       comprovante:file&&file.size?{nome:file.name,tam:file.size}:null};
     if(g.comprovante&&file.size>10*MB){toast('Comprovante maior que 10 MB.');return;}
-    var peds=ids.map(function(i){return byId(S.pedidos,i);}).filter(Boolean),soma_=soma(peds),fm=document.querySelector('form[data-form="pagamento"]'),dsc=fm?pgDesconto(fm).d:0;
+    var peds=ids.map(function(i){return byId(S.pedidos,i);}).filter(Boolean),soma_=somaAb(peds),fm=document.querySelector('form[data-form="pagamento"]'),dsc=fm?pgDesconto(fm).d:0;
     /* recebeu menos que o total e não marcou desconto: pergunta se a diferença é desconto */
-    if(!dsc&&peds.length&&g.valor<soma_-0.009&&confirm('Recebido '+brl(g.valor)+', mas os pedidos somam '+brl(soma_)+'.\n\nOK = a diferença ('+brl(soma_-g.valor)+') foi DESCONTO e os pedidos ficam quitados.\nCancelar = registrar sem desconto.'))dsc=Math.round((soma_-g.valor)*100)/100;
+    if(!dsc&&peds.length&&g.valor<soma_-0.009){
+      if(fd.get('dif')==='desc')dsc=Math.round((soma_-g.valor)*100)/100;
+      else{/* a diferença fica EM ABERTO: quita os pedidos mais antigos que o valor cobre e guarda o resto como recebido parcial */
+        var rem=g.valor,quit=[],parc=[];peds.slice().sort(function(a,b){return (a.entregue||a.recebido||'')<(b.entregue||b.recebido||'')?-1:1;}).forEach(function(p){var rs=restante(p);if(rem<=0.009)return;
+          if(rem>=rs-0.009){p.pago=g.data;p.pagamentoId=g.id;quit.push(p.id);rem=Math.round((rem-rs)*100)/100;}
+          else{p.recParc=Math.round(((+p.recParc||0)+rem)*100)/100;parc.push({id:p.id,v:Math.round(rem*100)/100});rem=0;}});
+        var falta=Math.round((soma_-g.valor)*100)/100;g.pedidos=quit;g.parciais=parc;g.obs=((g.obs?g.obs+' · ':'')+'Parcial: ficaram '+brl(falta)+' em aberto').slice(-140);
+        S.pagamentos.push(g);save();closeSheet();render();toast('Pagamento de '+brl(g.valor)+' registrado. '+(quit.length?quit.length+' pedido(s) quitado(s). ':'')+'Ficaram '+brl(falta)+' em aberto para receber.',5000);return;}}
     if(dsc>0&&soma_>0){var resto=dsc;peds.forEach(function(p,k){var orig=+p.valor||0,parte=k===peds.length-1?resto:Math.round(orig*dsc/soma_*100)/100;parte=Math.min(parte,orig);resto=Math.round((resto-parte)*100)/100;
         p.valor=Math.round((orig-parte)*100)/100;p.obs=((p.obs?p.obs+' · ':'')+'Desconto de '+brl(parte)+' no pagamento (era '+brl(orig)+')').slice(-500);});
       g.obs=((g.obs?g.obs+' · ':'')+'Desconto de '+brl(dsc)+' (pedidos somavam '+brl(soma_)+')').slice(-140);soma_=Math.round((soma_-dsc)*100)/100;}
@@ -8037,6 +8057,7 @@ document.addEventListener('input',function(e){
   if(t.closest&&t.closest('form[data-form="pedido"]')){if(t.id==='pd-valor')t.dataset.manual='1';else atualizaCalc();}
   if(t.id==='px-valor')desenhaPix();
   if(t.name==='pedidos'||t.id==='pg-desc'||t.id==='pg-dtipo'){var f=t.closest('form');if(f)pgCalc(f);}
+  if(t.id==='pg-valor'){var fv=t.closest('form');if(fv)pgDif(fv);}
 });
 document.addEventListener('paste',function(e){if(!SBED&&!ui.sheet&&ui.tab==='leads'){var ae2=document.activeElement,im2=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(im2){e.preventDefault();leadsLePrint(im2.getAsFile());return;}if(ae2&&/^(INPUT|TEXTAREA)$/.test(ae2.tagName))return;var tx2=e.clipboardData&&e.clipboardData.getData('text');if(tx2&&leadsDoTexto(tx2).length){e.preventDefault();leadsTextoImp(tx2);}return;}if(SBED){var i0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(i0){e.preventDefault();SBED.carrega(i0.getAsFile());}return;}if(!ui.sheet&&ui.tab==='secretarios'&&ui.secAg==='mkt'){var tx0=e.clipboardData&&e.clipboardData.getData('text'),hasImg=[].some.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);});if(!hasImg&&tx0&&/\n/.test(tx0.trim())&&leadsDoTexto(tx0).length){e.preventDefault();mikaListaLeads(tx0);return;}var im0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(im0){e.preventDefault();leadsLePrint(im0.getAsFile());return;}}if(!ui.sheet){var R0=ui.rede;if(ui.tab==='rede'&&R0&&R0.envSel){var it0=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(it0){e.preventDefault();rdSbCola(R0.envSel,it0.getAsFile());}}return;}var it=[].filter.call((e.clipboardData&&e.clipboardData.items)||[],function(x){return /^image\//.test(x.type);})[0];if(!it&&ui.sheet&&ui.sheet.fn===fLeads){var ae1=document.activeElement;if(ae1&&/^(INPUT|TEXTAREA)$/.test(ae1.tagName))return;var tx1=e.clipboardData&&e.clipboardData.getData('text');if(tx1&&leadsDoTexto(tx1).length){e.preventDefault();leadsTextoImp(tx1);}return;}if(!it)return;if(ui.sheet&&ui.sheet.fn===fLeads){e.preventDefault();leadsLePrint(it.getAsFile());return;}
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&ae.type!=='file')return;
