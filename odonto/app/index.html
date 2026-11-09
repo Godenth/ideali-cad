@@ -4373,11 +4373,11 @@ function anaAbre(){if(document.getElementById('anap'))return;ANAP.on=true;var d=
     '<div class="anap-b"><button class="btn" data-ana="ajusta">✏️ Ajustar no formulário</button><button class="btn pri" data-ana="cria">Criar pedido</button></div></div>';
   document.body.appendChild(d);var ta=d.querySelector('#anap-t');ta.value=ANAP.txt||'';
   var upd=function(){ANAP.txt=ta.value;ANAP.res=anaEntende(ta.value);d.querySelector('#anap-r').innerHTML=anaPrevia(ANAP.res);var n=ANAP.res?ANAP.res.itens.length:0,b=d.querySelector('[data-ana=cria]');
-    b.disabled=!n||ANAP.busy;b.textContent=ANAP.busy?'Criando…':n>1?'Criar '+n+' pedidos':'Criar pedido';d.querySelector('[data-ana=ajusta]').disabled=n!==1;};
+    b.disabled=!n||ANAP.busy;b.textContent=ANAP.busy?'Criando…':n>1?'Criar 1 pedido ('+n+' trabalhos)':'Criar pedido';d.querySelector('[data-ana=ajusta]').disabled=!n;};
   var tm=null;ta.addEventListener('input',function(){clearTimeout(tm);tm=setTimeout(upd,180);});upd();
   d.addEventListener('click',function(e){var b=e.target.closest('[data-ana]');if(e.target===d){anaFecha();return;}if(!b)return;var a=b.getAttribute('data-ana');
     if(a==='fecha')anaFecha();
-    else if(a==='ajusta'){upd();if(!ANAP.res||ANAP.res.itens.length!==1)return;var p=anaPedidos(ANAP.res)[0];anaFecha();PED.ed=p;PED.erroF='';render();window.scrollTo(0,0);toast('Confira e toque em Salvar.');}
+    else if(a==='ajusta'){upd();if(!ANAP.res||!ANAP.res.itens.length)return;var p=anaPedidos(ANAP.res)[0];anaFecha();PED.ed=p;PED.erroF='';render();window.scrollTo(0,0);toast('Confira e toque em Salvar.');}
     else if(a==='cria'){upd();if(!ANAP.res||!ANAP.res.itens.length||ANAP.busy)return;anaCria(anaPedidos(ANAP.res),upd);}});
   document.addEventListener('keydown',anaEsc);setTimeout(function(){ta.focus();},60);}
 function anaEsc(e){if(e.key==='Escape')anaFecha();}
@@ -5157,6 +5157,19 @@ document.addEventListener('change',function(e){if(e.target&&e.target.id==='chk-a
 var _rFinChk=rFin;rFin=function(){var h=_rFinChk.apply(this,arguments);return h.replace('<div class="finabrow">','<div class="finabrow"><button class="btn chk-bt" data-act="chkAbre"><img src="'+ANA_AV[0]+'" alt=""> Comprovante já anexado?</button>');};
 
 var _rInoveChk=rInove;rInove=function(){var h=_rInoveChk.apply(this,arguments);return h.replace(' Ana · anexar extratos e comprovantes</button>',' Ana · anexar extratos e comprovantes</button><button class="btn chk-bt" data-act="chkAbre"><img src="'+ANA_AV[0]+'" alt=""> Comprovante já anexado?</button>');};
+
+/* ===== Ana: vários trabalhos do mesmo paciente viram UM pedido só (com os trabalhos listados na descrição) ===== */
+var _anaPedidosSep=anaPedidos;anaPedidos=function(res){var L=_anaPedidosSep(res);if(L.length<2)return L;
+  var u=function(a){var o=[];a.forEach(function(x){if(x&&o.indexOf(x)<0)o.push(x);});return o;},it=res.itens;
+  var trs=u(it.map(function(x){return x.trabalho;})),ds=[];it.forEach(function(x){(x.dentes||[]).forEach(function(d){if(ds.indexOf(d)<0)ds.push(d);});});
+  var comp=u(it.map(function(x){return x.componente;}));if(!comp.length)comp=u((String(res.texto||'').match(/\b(?:jig|mini\s*pilar|ucla|munh[aã]o|scan\s*body|an[aá]logo)\s+[A-Za-z0-9]{2,}\b/gi)||[]).map(function(x){return x.toUpperCase().replace(/\s+/g,' ');}));
+  var vs=it.map(function(x){return x.valor;}),val=vs.every(function(v){return v!=null;})?Math.round(vs.reduce(function(a,b){return a+b;},0)*100)/100:null;
+  var pz=res.prazo||it.map(function(x){return x.prazoTab;}).filter(Boolean).sort().pop()||null;
+  var det=it.map(function(x,i){return (i+1)+') '+x.trabalho+(x.dentes&&x.dentes.length?' · dentes '+x.dentes.join(', '):'')+' ('+x.qtd+' elem.)'+(x.componente?' · '+x.componente:'');}).join('\n');
+  var P=Object.assign({},L[0],{trabalho:(trs.length===1?trs[0]:trs.join(' + ')).slice(0,120),dentes:ds.length?ds:null,qtd:it.reduce(function(a,x){return a+(+x.qtd||0);},0),
+    material:u(it.map(function(x){return x.material;})).join(' / ')||null,sobre_implante:it.some(function(x){return x.sobre_implante;}),componente:comp.join(', ').slice(0,120)||null,valor:val,prazo:pz,
+    descricao:('Pedido escrito para a Ana ('+it.length+' trabalhos no mesmo pedido):\n'+det+'\n\nTexto: '+res.texto).slice(0,4000)});
+  return [P];};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
