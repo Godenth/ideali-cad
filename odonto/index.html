@@ -1598,12 +1598,6 @@ var CENAS=[
 ];
 
 (function(){['megafone','ideia','animada','gravando','novo'].forEach(function(p){new Image().src='../app/equipe/mica-'+p+'.webp';new Image().src='../app/equipe/mica-av-'+p+'.webp';});new Image().src='../app/equipe/bia-dinheiro.webp';new Image().src='../app/equipe/bia-av-dinheiro.webp';['serio','satisfeito','bravo','presente'].forEach(function(p){new Image().src='../app/equipe/otavio-'+p+'.webp';new Image().src='../app/equipe/otavio-av-'+p+'.webp';});['tranquila','feliz','pensativa','determinada'].forEach(function(p){new Image().src='../app/equipe/ana-'+p+'.webp';new Image().src='../app/equipe/ana-av-'+p+'.webp';});})();
-/* versão curta (cerca de 6 minutos): estas cenas ficam de fora */
-var CORTA={'A Ideali':1,'Um ecossistema':1,'Dor: a vaga que passou':1,'Dor: currículo que não serve':1,'Prótese e especialistas':1,'Como gira':1,'Estudantes no centro':1,'Missão e visão':1,'Valores':1,
-  'Estudante':1,'Você decide o que mostrar':1,'O Brasil inteiro':1,'A Ana procura por você':1,'Candidatos':1,'Contato aceito':1,'Freela para o dia 20':1,'Escolas e cursos':1,'E no dia a dia':1,
-  'Laboratório':1,'Cansou?':1,'Foto na cadeira':1,'Chat de cada paciente':1,'Prazo do laboratório':1,'Certificado para o paciente':1,'Histórico do paciente':1,'Carga imediata: quem chamar':1,'Abaixo da média':1,'Gastos com laboratório':1,'Clínicas parecidas':1,
-  'Quem faz a clínica girar':1,'Vagas e freelas':1,'Perfis e portfólios':1,'Vagas no financeiro':1};
-CENAS=CENAS.filter(function(c){return !CORTA[c.cap];});
 var RG={a:0,b:0,pt:0},TEMAS={1:['A Ideali','O problema da odontologia, o tamanho do mercado e a solução.','ana-av-tranquila'],2:['Como funciona','Vagas, currículo com a Ana, estágios e freelas.','ana-av-feliz'],3:['Laboratório','Pedidos, foto na cadeira, entregas e atrasos, com o Sr. Otávio.','otavio-av-satisfeito'],4:['Gestão, marketing e comércio','Vagas, perfis e divulgação, com a Mika e a Bia.','mica-av-ideia']};
 function ptDe(c){return c.fim?4:c.pt;}
 function faixa(p){var a=-1,b=-1;CENAS.forEach(function(c,i){if(ptDe(c)===p){if(a<0)a=i;b=i;}});return {a:a,b:b,pt:p};}
