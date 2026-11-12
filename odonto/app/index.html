@@ -1438,6 +1438,12 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 .gm-c{display:grid;gap:6px;padding:10px;border-radius:12px;border:1px dashed rgba(124,58,237,.45)}.gm-h{display:flex;align-items:center;gap:8px}.gm-h b{margin-right:auto}.gm-a{display:flex;align-items:center;gap:6px;font-size:.9rem}.gm-cfg .row{margin-top:6px;gap:6px}.gm-cfg input{flex:1;min-width:200px}
 .ped-inv{display:inline-block;margin-top:6px;font-size:.78rem;font-weight:700;color:#3A7BD5;background:rgba(58,123,213,.12);padding:3px 10px;border-radius:99px}.ped-inv small{font-weight:500;opacity:.8}
 .gm-err{margin:0 18px 8px;padding:8px 10px;border-radius:10px;background:rgba(239,68,68,.12);color:#EF4444;font-size:.88rem;font-weight:600}
+#et-ov{position:fixed;inset:0;z-index:330;background:rgba(10,12,30,.45);display:grid;place-items:center;padding:16px;animation:etIn .25s ease}
+.et-box{display:flex;gap:16px;align-items:center;max-width:520px;width:100%;background:var(--surface,#fff);border-radius:20px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.4);border:2px solid #7C3AED;animation:etPop .35s cubic-bezier(.2,1.4,.4,1)}
+.et-box img{width:110px;height:110px;object-fit:cover;border-radius:50%;background:rgba(124,58,237,.12);flex-shrink:0}.et-t{display:grid;gap:6px}.et-t p{margin:0;font-size:1.1rem;line-height:1.4}.et-t small{opacity:.75}
+.et-trab{font-size:.85rem;opacity:.8}.et-b{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+@keyframes etIn{from{opacity:0}}@keyframes etPop{from{transform:scale(.85);opacity:0}}
+@media(max-width:520px){.et-box{flex-direction:column;text-align:center}.et-b{justify-content:center}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5502,6 +5508,32 @@ function gmSucesso(n,para){try{if(para&&para!==((empDados().inove||{}).email||''
 function gmTalvez(para){var c=document.querySelector('#exo-mail .pdg-box');if(!c)return;var bx=document.getElementById('gm-err');if(bx)bx.remove();bx=document.createElement('div');bx.id='gm-err';bx.className='gm-err';
   bx.innerHTML='⚠️ O Gmail não confirmou o envio para o sistema. Confira na sua pasta <b>Enviados</b>: se o e-mail está lá, clique em <button type="button" class="btn sm pri" data-gmfoi="1">Foi enviado ✓</button>';c.insertBefore(bx,c.querySelector('.pdg-f'));}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-gmfoi]');if(!b)return;e.stopPropagation();gmSucesso(0,'');},true);
+
+/* ===== Clínica: o agente de produção avisa no meio da tela cada etapa do pedido no laboratório ===== */
+var ET={fila:[],on:false,timer:null};
+var ET_MSG={aceito:['foi <b>aceito</b> pelo laboratório 👍','satisfeito'],recusado:['foi <b>recusado</b> pelo laboratório','serio'],'Desenho CAD':['está no <b>desenho CAD</b> ✏️','presente'],'Enviado para fresagem':['foi para a <b>fresagem</b> 🏭','satisfeito'],
+  'Em produção':['está <b>em produção</b> 🛠️','presente'],'Pronto':['está <b>pronto</b>! ✅','satisfeito'],'Entregue':['foi <b>entregue</b> 📦','satisfeito'],'Aguardando informação':['está <b>aguardando uma informação</b> sua','serio'],'Cancelado':['foi <b>cancelado</b> pelo laboratório','serio']};
+function etChave(e){return e.status==='aceito'?(e.etapa||'aceito'):e.status;}
+function etVistos(){try{return JSON.parse(localStorage.getItem('io_et_v_'+(RL.user&&RL.user.id))||'null');}catch(x){return null;}}
+function etGuarda(m){try{localStorage.setItem('io_et_v_'+(RL.user&&RL.user.id),JSON.stringify(m));}catch(x){}}
+function etConfere(){if(!RL.user||typeof PDG==='undefined')return;var M=pdgMeus().filter(function(e){return e.status!=='cancelado'||e.etapa;});if(!M.length)return;var V=etVistos(),novo=!V;V=V||{};
+  M.forEach(function(e){var k=etChave(e);if(V[e.id]===k)return;var ant=V[e.id];V[e.id]=k;if(novo)return;if(!ant&&e.status==='enviado')return;
+    var m=ET_MSG[k];if(!m)return;var lab=(PDG.labNome&&PDG.labNome[e.lab_id])||(labVMeus().filter(function(v){return v.lab_id===e.lab_id;})[0]||{}).lab_nome||'laboratório';
+    ET.fila.push({id:e.id,pose:m[1],h:'O pedido da paciente <b>'+esc(e.paciente||'')+'</b> '+m[0]+(e.status==='recusado'&&e.motivo?'<br><small>Motivo: '+esc(e.motivo)+'</small>':''),lab:lab,trab:pdgItensTxt(e)});});
+  etGuarda(V);etMostra();}
+function etMostra(){if(ET.on||!ET.fila.length)return;var x=ET.fila.shift();ET.on=true;var el=document.createElement('div');el.id='et-ov';
+  el.innerHTML='<div class="et-box" role="alertdialog" aria-live="polite"><img src="../../app/equipe/otavio-av-'+x.pose+'.webp" alt="" onerror="this.style.visibility=&quot;hidden&quot;"><div class="et-t"><small>Sr. Otávio · Agente de produção · '+esc(x.lab)+'</small><p>'+x.h+'</p><span class="et-trab">'+x.trab+'</span>'+
+    '<div class="et-b"><button class="btn" data-et="ok">Ok</button><button class="btn pri" data-et="ver">Ver meus pedidos</button></div>'+(ET.fila.length?'<small class="muted">+ '+ET.fila.length+' aviso'+(ET.fila.length>1?'s':'')+'</small>':'')+'</div></div>';
+  document.body.appendChild(el);}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-et]');if(!b)return;var el=document.getElementById('et-ov');if(el)el.remove();ET.on=false;
+  if(b.getAttribute('data-et')==='ver'){ET.fila=[];if(S.role==='dent'){S.cfgOn=false;ACT.dTab('pedidos');window.scrollTo(0,0);}}else setTimeout(etMostra,250);});
+/* confere quando carrega e a cada 1 minuto (sem atrapalhar quem está digitando) */
+var _pdgCarregaET=pdgCarrega;pdgCarrega=function(){return _pdgCarregaET.apply(this,arguments).then(function(r){try{etConfere();}catch(x){}return r;});};
+function etPoll(){if(!RL.user||document.visibilityState!=='visible'||S.role!=='dent'||!labVMeus().some(function(v){return v.status==='aceito';}))return;
+  SB.from('odo_ped_env').select('id,status,etapa,etapa_em,motivo,paciente').eq('user_id',RL.user.id).neq('status','enviando').order('criado_em',{ascending:false}).limit(100).then(function(r){if(r.error||!r.data)return;var mud=false;
+    r.data.forEach(function(n){var e=PDG.L.filter(function(x){return x.id===n.id;})[0];if(e){if(e.status!==n.status||e.etapa!==n.etapa){Object.assign(e,n);mud=true;}}});
+    if(mud){etConfere();var a=document.activeElement;if(!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&!PC.on)render();}});}
+setInterval(etPoll,60000);document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')setTimeout(etPoll,1500);});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
