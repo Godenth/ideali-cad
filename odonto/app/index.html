@@ -1435,6 +1435,7 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 @media(max-width:600px){.exo-i{grid-template-columns:22px 1fr}.exo-i span:last-child{grid-column:1/-1}}
 .exm-c{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.exm-t{display:inline-flex;align-items:center}.exm-x{border:0;background:none;color:inherit;opacity:.5;cursor:pointer}.exm-n summary{list-style:none;cursor:pointer}.exm-n summary::-webkit-details-marker{display:none}.exm-n .row{margin-top:6px;gap:6px}.exm-n input{flex:1;min-width:150px}
 .pdg-et{display:flex;flex-wrap:wrap;gap:4px;width:100%;margin-top:6px}.pdg-et span{font-size:.72rem;padding:3px 9px;border-radius:99px;background:rgba(127,127,127,.12);opacity:.7}.pdg-et span.f{background:#DCFCE7;color:#166534;opacity:1}.pdg-et span.a{background:#7C3AED;color:#fff;opacity:1;font-weight:700}
+.gm-c{display:grid;gap:6px;padding:10px;border-radius:12px;border:1px dashed rgba(124,58,237,.45)}.gm-h{display:flex;align-items:center;gap:8px}.gm-h b{margin-right:auto}.gm-a{display:flex;align-items:center;gap:6px;font-size:.9rem}.gm-cfg .row{margin-top:6px;gap:6px}.gm-cfg input{flex:1;min-width:200px}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5422,9 +5423,9 @@ function exoEmailTxt(p){var R=p._exo,ds=(String(Array.isArray(p.dentes)?p.dentes
 var EXM_P=null;function exoMailAbre(pp){var p=pp||PED.ed;if(!p)return;if(!pp)pedLe();EXM_P=p;var m=exoEmailTxt(p),para=(empDados().inove||{}).email||((exmLista()[0]||{}).email)||'';var el=document.getElementById('exo-mail');if(el)el.remove();el=document.createElement('div');el.id='exo-mail';
   el.innerHTML='<div class="pdg-ov"><div class="pdg-box"><div class="pdg-h"><b>✉️ E-mail para a Inove</b><button class="btn sm" data-exom="fecha">Fechar</button></div><div class="pdg-b">'+
    '<div class="pdg-ana"><img src="'+ANA_AV[0]+'" alt=""><div>Montei o e-mail com os dados do pedido'+(p._exo?' e do projeto do exocad':'')+'. Confira, abra no seu e-mail e <b>arraste os arquivos do caso</b> para anexar.</div></div>'+
-   exmContatos(para)+'<label class="fld"><span>Para</span><input id="exm-para" type="email" list="exm-lista" value="'+esc(para)+'" placeholder="e-mail da Inove"></label>'+(p.id?'<label class="pdg-chk"><input type="checkbox" id="exm-marca" checked> Ao abrir o e-mail, marcar o pedido como <b>Enviado para fresagem</b> (a clínica vê)</label>':'')+'<label class="fld"><span>Assunto</span><input id="exm-as" type="text" value="'+esc(m.assunto)+'"></label>'+
-   '<label class="fld"><span>Mensagem</span><textarea id="exm-co" rows="14">'+esc(m.corpo)+'</textarea></label></div>'+
-   '<div class="pdg-f"><button class="btn" data-exom="copia">📋 Copiar</button><span style="flex:1"></span><button class="btn" data-exom="mailto">Abrir no app de e-mail</button><button class="btn pri" data-exom="gmail">Abrir no Gmail</button></div></div></div>';
+   exmContatos(para)+'<label class="fld"><span>Para</span><input id="exm-para" type="email" list="exm-lista" value="'+esc(para)+'" placeholder="e-mail da Inove"></label>'+(p.id?'<label class="pdg-chk"><input type="checkbox" id="exm-marca" checked> Ao enviar, marcar o pedido como <b>Enviado para fresagem</b> (a clínica vê)</label>':'')+'<label class="fld"><span>Assunto</span><input id="exm-as" type="text" value="'+esc(m.assunto)+'"></label>'+
+   '<label class="fld"><span>Mensagem</span><textarea id="exm-co" rows="12">'+esc(m.corpo)+'</textarea></label>'+(typeof gmBloco==='function'?gmBloco(p):'')+'</div>'+
+   '<div class="pdg-f"><button class="btn" data-exom="copia">📋 Copiar</button><span style="flex:1"></span><button class="btn" data-exom="gmail" title="Abre o Gmail com o texto, sem anexos">Só abrir o Gmail</button><button class="btn pri" data-exom="gmenvia">✉️ Enviar pelo Gmail com anexos</button></div></div></div>';
   document.body.appendChild(el);}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-exom]');if(!b)return;var a=b.getAttribute('data-exom'),el=document.getElementById('exo-mail');if(a==='fecha'){if(el)el.remove();return;}
   var para=document.getElementById('exm-para').value.trim(),as=document.getElementById('exm-as').value,co=document.getElementById('exm-co').value;
@@ -5447,6 +5448,49 @@ Object.assign(ACT,{exoMail:function(){exoMailAbre();},
     var mats=R.dentes.map(function(t){return t.mat;}).filter(Boolean);if(mats[0])p.material=mats[0];if(R.cor)p.cor=R.cor;if(!p.paciente&&R.paciente)p.paciente=R.paciente;
     var imp=R.dentes.filter(function(t){return t.imp;});p.sobre_implante=imp.length>0;if(imp.length)p.componente=(imp.map(function(t){return t.imp;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(', ')+(imp.some(function(t){return t.sb;})?' · com scanbody':'')).slice(0,120);
     if(!p.trabalho)p.trabalho=exoTrab(R).slice(0,120);render();toast('Dados do projeto aplicados. Confira e salve o pedido.');}});
+
+/* ===== Enviar pelo Gmail com anexos (a Ana envia pela conta Google do laboratório; permissão só de ENVIAR) ===== */
+var GM={tok:null,exp:0,arqs:[],busy:false};
+function gmCliente(){return ((empDados().google||{}).clientId)||'';}
+function gmCarregaGis(){if(window.google&&google.accounts&&google.accounts.oauth2)return Promise.resolve();return new Promise(function(ok,no){var s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=function(){ok();};s.onerror=function(){no('gis');};document.head.appendChild(s);});}
+function gmToken(){if(GM.tok&&Date.now()<GM.exp-60000)return Promise.resolve(GM.tok);var cid=gmCliente();if(!cid)return Promise.reject('semcliente');
+  return gmCarregaGis().then(function(){return new Promise(function(ok,no){var tc=google.accounts.oauth2.initTokenClient({client_id:cid,scope:'https://www.googleapis.com/auth/gmail.send',
+    callback:function(r){if(r&&r.access_token){GM.tok=r.access_token;GM.exp=Date.now()+(+r.expires_in||3600)*1000;ok(GM.tok);}else no('negado');},error_callback:function(){no('negado');}});tc.requestAccessToken({prompt:GM.tok?'':'consent'});});});}
+function gmB64(u8){var s='',CH=0x8000;for(var i=0;i<u8.length;i+=CH)s+=String.fromCharCode.apply(null,u8.subarray(i,i+CH));return btoa(s);}
+function gmLinhas(b){return b.replace(/.{1,76}/g,function(x){return x+'\r\n';});}
+function gmUtf8B64(t){return btoa(unescape(encodeURIComponent(t)));}
+function gmMime(para,assunto,corpo,arqs){var bd='==ideali'+Date.now()+'==',L=[];
+  L.push('To: '+para,'Subject: =?UTF-8?B?'+gmUtf8B64(assunto)+'?=','MIME-Version: 1.0','Content-Type: multipart/mixed; boundary="'+bd+'"','','--'+bd,'Content-Type: text/plain; charset="UTF-8"','Content-Transfer-Encoding: base64','',gmLinhas(gmUtf8B64(corpo)));
+  arqs.forEach(function(a){L.push('--'+bd,'Content-Type: '+(a.tipo||'application/octet-stream')+'; name="=?UTF-8?B?'+gmUtf8B64(a.nome)+'?="','Content-Disposition: attachment; filename="=?UTF-8?B?'+gmUtf8B64(a.nome)+'?="','Content-Transfer-Encoding: base64','',gmLinhas(gmB64(a.u8)));});
+  L.push('--'+bd+'--','');return L.join('\r\n');}
+function gmArqsDoPedido(p){var R=[];if(p.envio_id&&typeof PDG!=='undefined'){var e=PDG.L.filter(function(x){return x.id===p.envio_id;})[0];if(e&&!e.arquivos_apagados)(e.arquivos||[]).forEach(function(a){R.push({nome:a.nome,tam:a.tam||0,path:a.path,ok:true,da:'clinica'});});}return R;}
+function gmLista(){if(!GM.arqs.length)return '<small class="muted">Nenhum arquivo. Adicione o STL (ou a pasta do caso em .zip).</small>';
+  return GM.arqs.map(function(a,i){return '<label class="gm-a"><input type="checkbox" data-gma="'+i+'"'+(a.ok?' checked':'')+'> '+(/\.(jpe?g|png|webp)$/i.test(a.nome)?'📷':'🦷')+' '+esc(a.nome)+' <small class="muted">'+pdgMB(a.tam)+(a.da==='clinica'?' · veio da clínica':'')+(a.f&&!/\.zip$/i.test(a.nome)?' · vai compactado':'')+'</small></label>';}).join('');}
+function gmBloco(p){GM.arqs=gmArqsDoPedido(p);
+  return '<div class="gm-c"><div class="gm-h"><b>📎 Anexos</b><label class="btn sm">＋ Adicionar arquivo<input type="file" id="gm-arq" multiple hidden></label></div><div id="gm-l">'+gmLista()+'</div>'+
+   (gmCliente()?'':'<details class="gm-cfg"><summary class="small">⚙️ Para a Ana enviar pelo seu Gmail com os anexos, cole aqui o <b>ID do cliente Google</b> (uma vez só)</summary><div class="row wrap"><input id="gm-cid" type="text" placeholder="xxxxxxxx.apps.googleusercontent.com"><button type="button" class="btn sm pri" data-exom="gmcid">Salvar</button></div></details>')+'</div>';}
+function gmRedesenha(){var l=document.getElementById('gm-l');if(l)l.innerHTML=gmLista();}
+document.addEventListener('change',function(e){var t=e.target;if(!t)return;if(t.id==='gm-arq'){[].forEach.call(t.files||[],function(f){GM.arqs.push({nome:f.name,tam:f.size,f:f,ok:true});});gmRedesenha();}
+  else if(t.getAttribute&&t.getAttribute('data-gma')!=null){var a=GM.arqs[+t.getAttribute('data-gma')];if(a)a.ok=t.checked;}});
+function gmPrepara(){var sel=GM.arqs.filter(function(a){return a.ok;});return sel.reduce(function(pr,a){return pr.then(function(out){
+  if(a.path)return SB.storage.from('odonto-ped').download(a.path).then(function(r){if(r.error||!r.data)throw 'Não consegui pegar o arquivo '+a.nome+' (pode ter sido apagado).';return r.data.arrayBuffer().then(function(b){out.push({nome:a.nome,tipo:/\.jpe?g$/i.test(a.nome)?'image/jpeg':/\.zip$/i.test(a.nome)?'application/zip':'application/octet-stream',u8:new Uint8Array(b)});return out;});});
+  var zipa=!/\.(zip|jpe?g|png|webp|pdf)$/i.test(a.nome);return (zipa?pdgZip(a.f):Promise.resolve(a.f)).then(function(b){return b.arrayBuffer().then(function(buf){out.push({nome:zipa?a.nome+'.zip':a.nome,tipo:zipa?'application/zip':(a.f.type||'application/octet-stream'),u8:new Uint8Array(buf)});return out;});});});},Promise.resolve([]));}
+function gmEnvia(btn){if(GM.busy)return;var para=document.getElementById('exm-para').value.trim(),as=document.getElementById('exm-as').value,co=document.getElementById('exm-co').value;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(para)){toast('Coloque o e-mail da Inove no campo Para.');return;}
+  if(!gmCliente()){var d=document.querySelector('.gm-cfg');if(d)d.open=true;toast('Falta configurar o envio pelo Gmail (ID do cliente Google).');return;}
+  GM.busy=true;var t0=btn.textContent;btn.disabled=true;btn.textContent='Preparando anexos…';
+  var fim=function(msg){GM.busy=false;btn.disabled=false;btn.textContent=t0;if(msg)toast(msg);};
+  gmToken().then(function(tok){return gmPrepara().then(function(arqs){var tot=arqs.reduce(function(s,a){return s+a.u8.length;},0);if(tot>24*1024*1024)throw 'Os anexos somam '+pdgMB(tot)+' e o Gmail aceita até 25 MB. Tire algum arquivo ou envie por link.';
+    btn.textContent='Enviando…';var raw=gmMime(para,as,co,arqs);
+    return fetch('https://gmail.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media',{method:'POST',headers:{'Authorization':'Bearer '+tok,'Content-Type':'message/rfc822'},body:raw}).then(function(r){if(r.status===401){GM.tok=null;throw 'A permissão do Google expirou. Clique de novo para enviar.';}if(!r.ok)return r.text().then(function(x){throw 'O Gmail recusou o envio ('+r.status+').';});return arqs.length;});});})
+  .then(function(n){fim();if(para&&para!==((empDados().inove||{}).email||''))empDadosGrava('inove','email',para);
+    var mk=document.getElementById('exm-marca'),p=EXM_P,el=document.getElementById('exo-mail');
+    if(mk&&mk.checked&&p&&p.id){var pt={status:'producao',desenho_feito:true,enviado_inove:true};Object.assign(p,pt);if(PED.ed&&PED.ed.id===p.id)Object.assign(PED.ed,pt);pedMuda(p.id,pt,'✅ E-mail enviado pelo Gmail'+(n?' com '+n+' anexo'+(n>1?'s':''):'')+'. Pedido #'+(p.numero||'')+' enviado para fresagem.');}
+    else toast('✅ E-mail enviado pelo Gmail'+(n?' com '+n+' anexo'+(n>1?'s':''):'')+'.');if(el)el.remove();})
+  .catch(function(e){fim(e==='semcliente'?'Falta configurar o envio pelo Gmail.':e==='negado'?'Sem a permissão do Google não dá para enviar. Tente de novo e clique em Permitir.':e==='gis'?'Não consegui carregar o login do Google. Verifique a internet.':typeof e==='string'?e:'Não consegui enviar. Tente de novo.');});}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-exom="gmenvia"],[data-exom="gmcid"]');if(!b)return;e.stopPropagation();
+  if(b.getAttribute('data-exom')==='gmcid'){var v=document.getElementById('gm-cid').value.trim();if(!/\.apps\.googleusercontent\.com$/.test(v)){toast('Esse não parece um ID de cliente Google (termina com .apps.googleusercontent.com).');return;}empDadosGrava('google','clientId',v);var d=document.querySelector('.gm-cfg');if(d)d.remove();toast('Pronto! Agora a Ana envia pelo seu Gmail.');return;}
+  gmEnvia(b);},true);
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
