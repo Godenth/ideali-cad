@@ -3557,7 +3557,7 @@ function pedBadge(){return pedAtivo()?pedAtivos().filter(function(p){return p.st
 function pedRisco(p){if(!p.prazo||p.status==='finalizado'||p.status==='entregue'||p.status==='cancelado')return '';var n=dDif(p.prazo);return n<0?'atrasado':n===0?'hoje':n===1?'amanha':'';}
 function pedFiltra(L){var f=PED.f,q=semAc(PED.busca||'');return L.filter(function(p){return (f==='todos'||(f==='urg'?p.urgente:p.tipo===f))&&(!q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(q)>=0);});}
 function pedDentes(p){return p.dentes&&p.dentes.length?(p.dentes.length>1?'dentes ':'dente ')+p.dentes.join(', '):'';}
-function pedNx(p){if(p.status==='orcamento')return ['pedAprova','✓ Aprovar'];if(p.status==='aguardando')return ['pedRetoma','▶ Retomar desenho'];if(p.status==='desenho')return p.desenho_feito?['pedInove','📤 Enviado à Inove']:['pedDesFeito','✓ Desenho feito'];
+function pedNx(p){if(p.status==='orcamento')return ['pedAprova','✓ Aprovar'];if(p.status==='aguardando')return ['pedRetoma','▶ Retomar desenho'];if(p.status==='desenho')return p.desenho_feito?['pedInove','📤 Enviar para Inove']:['pedDesFeito','✓ Desenho feito'];
   return {producao:['pedPronto','✓ Pronto'],finalizado:['pedEntrega','Entregue']}[p.status]||null;}
 function pedCard(p){var r=pedRisco(p),nx=pedNx(p),cad=p.tipo==='cad';
   return '<article class="pcard pedc'+(cad?' pc-cad':' pc-ana')+' st-'+p.status+(r?' '+r:'')+(p.urgente?' urg':'')+'" data-act="pedAbre" data-v="'+p.id+'" tabindex="0">'+
@@ -3654,7 +3654,7 @@ Object.assign(ACT,{
   pedRetoma:function(v){pedMuda(v,{status:'desenho'},'Voltou para Desenho CAD a fazer.');},
   pedAguarda:function(v){pedMuda(v,{status:'aguardando'},'Marcado como aguardando informação.');},
   pedDesFeito:function(v){pedMuda(v,{desenho_feito:true},'Desenho feito. Agora é só enviar à Inove.');},
-  pedInove:function(v){pedMuda(v,{desenho_feito:true,enviado_inove:true,status:'producao'},'Enviado à Inove: foi para Em produção.');},
+  pedInove:function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;if(typeof exoMailAbre==='function')exoMailAbre(p);else pedMuda(v,{desenho_feito:true,enviado_inove:true,status:'producao'},'Enviado à Inove: foi para Em produção.');},
   pedPronto:function(v){pedMuda(v,{status:'finalizado',finalizado_em:new Date().toISOString()},'Marcado como pronto.');},
   pedEntrega:function(v){pedMuda(v,{status:'entregue',entregue_em:new Date().toISOString()},'Entregue.');},
   pedCadistas:function(){PED.vcad=true;render();window.scrollTo(0,0);},
@@ -5419,7 +5419,7 @@ function exoEmailTxt(p){var R=p._exo,ds=(String(Array.isArray(p.dentes)?p.dentes
   var cor=(R&&R.cor)||p.cor;if(cor)L.push('Cor: '+cor);if(p.componente&&R)L.push('Componente: '+p.componente);if(p.prazo)L.push('Prazo: '+String(p.prazo).split('-').reverse().join('/'));if(p.urgente===true||p.urgente==='true')L.push('⚠️ URGENTE');if(p.obs)L.push('Observações: '+p.obs);
   L.push('','Os arquivos do caso seguem em anexo.','Qualquer dúvida, estou à disposição.','','Att.,','Ana · Agente de Inteligência Artificial','Ideali Lab');
   return {assunto:'Pedido #'+(p.numero||'')+' · '+(p.paciente||'')+' · '+pedCli(p),corpo:L.join('\n')};}
-function exoMailAbre(){var p=PED.ed;if(!p)return;pedLe();var m=exoEmailTxt(p),para=(empDados().inove||{}).email||'';var el=document.getElementById('exo-mail');if(el)el.remove();el=document.createElement('div');el.id='exo-mail';
+var EXM_P=null;function exoMailAbre(pp){var p=pp||PED.ed;if(!p)return;if(!pp)pedLe();EXM_P=p;var m=exoEmailTxt(p),para=(empDados().inove||{}).email||'';var el=document.getElementById('exo-mail');if(el)el.remove();el=document.createElement('div');el.id='exo-mail';
   el.innerHTML='<div class="pdg-ov"><div class="pdg-box"><div class="pdg-h"><b>✉️ E-mail para a Inove</b><button class="btn sm" data-exom="fecha">Fechar</button></div><div class="pdg-b">'+
    '<div class="pdg-ana"><img src="'+ANA_AV[0]+'" alt=""><div>Montei o e-mail com os dados do pedido'+(p._exo?' e do projeto do exocad':'')+'. Confira, abra no seu e-mail e <b>arraste os arquivos do caso</b> para anexar.</div></div>'+
    exmContatos(para)+'<label class="fld"><span>Para</span><input id="exm-para" type="email" list="exm-lista" value="'+esc(para)+'" placeholder="e-mail da Inove"></label>'+(p.id?'<label class="pdg-chk"><input type="checkbox" id="exm-marca" checked> Ao abrir o e-mail, marcar o pedido como <b>Enviado para fresagem</b> (a clínica vê)</label>':'')+'<label class="fld"><span>Assunto</span><input id="exm-as" type="text" value="'+esc(m.assunto)+'"></label>'+
@@ -5432,8 +5432,8 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   if(para&&para!==((empDados().inove||{}).email||''))empDadosGrava('inove','email',para);
   if(a==='copia'){(navigator.clipboard?navigator.clipboard.writeText(as+'\n\n'+co):Promise.reject()).then(function(){toast('📋 Copiado!');},function(){pedCopiaVelho(as+'\n\n'+co);toast('📋 Copiado!');});return;}
   var u=a==='gmail'?'https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(para)+'&su='+encodeURIComponent(as)+'&body='+encodeURIComponent(co):'mailto:'+encodeURIComponent(para)+'?subject='+encodeURIComponent(as)+'&body='+encodeURIComponent(co);
-  window.open(u,'_blank');var mk=document.getElementById('exm-marca'),p=PED.ed;
-  if(mk&&mk.checked&&p&&p.id){var pt={status:'producao',desenho_feito:true,enviado_inove:true};Object.assign(p,pt);pedMuda(p.id,pt,'Pedido #'+(p.numero||'')+' marcado como enviado para fresagem.');if(el)el.remove();}});
+  window.open(u,'_blank');var mk=document.getElementById('exm-marca'),p=EXM_P;
+  if(mk&&mk.checked&&p&&p.id){var pt={status:'producao',desenho_feito:true,enviado_inove:true};Object.assign(p,pt);if(PED.ed&&PED.ed.id===p.id)Object.assign(PED.ed,pt);pedMuda(p.id,pt,'Pedido #'+(p.numero||'')+' marcado como enviado para fresagem.');if(el)el.remove();}});
 function exmLista(){var L=(empDados().inove||{}).contatos;return Array.isArray(L)?L:[];}
 function exmContatos(para){var L=exmLista();return '<div class="exm-c"><span class="small muted">E-mails cadastrados:</span>'+(L.length?L.map(function(c){return '<span class="exm-t"><button type="button" class="chip" data-exom="usa" data-v="'+esc(c.email)+'">'+esc(c.nome||c.email)+'</button><button type="button" class="exm-x" data-exom="tira" data-v="'+esc(c.email)+'" aria-label="Tirar">✕</button></span>';}).join(''):'<span class="small muted">nenhum ainda</span>')+
   '<details class="exm-n"><summary class="chip">＋ Cadastrar e-mail</summary><div class="row wrap"><input id="exm-nn" type="text" placeholder="Nome (ex.: Mari · Inove)" maxlength="60"><input id="exm-ne" type="email" placeholder="email@exemplo.com" maxlength="120"><button type="button" class="btn sm pri" data-exom="cad">Salvar</button></div></details></div>'+
