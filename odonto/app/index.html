@@ -1433,6 +1433,8 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 .exo-l{display:grid;gap:4px}.exo-i{display:grid;grid-template-columns:24px 90px 1fr;gap:8px;align-items:baseline;padding:6px 10px;border-radius:10px;background:rgba(34,197,94,.08)}.exo-i.a{background:rgba(245,158,11,.1)}.exo-i.r{background:rgba(239,68,68,.12)}
 .exo-f{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.exo-f small{margin-right:auto}.exo-r{color:#EF4444}.exo-ok{color:#22C55E}
 @media(max-width:600px){.exo-i{grid-template-columns:22px 1fr}.exo-i span:last-child{grid-column:1/-1}}
+.exm-c{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.exm-t{display:inline-flex;align-items:center}.exm-x{border:0;background:none;color:inherit;opacity:.5;cursor:pointer}.exm-n summary{list-style:none;cursor:pointer}.exm-n summary::-webkit-details-marker{display:none}.exm-n .row{margin-top:6px;gap:6px}.exm-n input{flex:1;min-width:150px}
+.pdg-et{display:flex;flex-wrap:wrap;gap:4px;width:100%;margin-top:6px}.pdg-et span{font-size:.72rem;padding:3px 9px;border-radius:99px;background:rgba(127,127,127,.12);opacity:.7}.pdg-et span.f{background:#DCFCE7;color:#166534;opacity:1}.pdg-et span.a{background:#7C3AED;color:#fff;opacity:1;font-weight:700}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5008,10 +5010,13 @@ function pdgArqsHtml(e){var A=e.arquivos||[];if(!A.length)return '';var d=pdgDia
   if(!d)return '<div class="pdg-arq small muted">📎 '+A.length+' arquivo'+(A.length>1?'s':'')+' · já apagado'+(A.length>1?'s':'')+' (3 dias)</div>';
   return '<div class="pdg-arq">'+A.map(function(a){return '<button class="chip" data-act="pdgArq" data-v="'+esc(a.path)+'">'+(a.tipo==='foto'?'📷 ':'🦷 ')+esc(a.nome)+' <small>'+pdgMB(a.tam||0)+'</small></button>';}).join('')+'<small class="muted">⏳ apaga'+(A.length>1?'m':'')+' em '+d+' dia'+(d>1?'s':'')+'</small></div>';}
 var PDG_ST={enviado:['⏳ Aguardando o laboratório aceitar','pendente'],aceito:['✅ Aceito pelo laboratório','aceito'],recusado:['Recusado','recusado'],cancelado:['Cancelado','recusado']};
+var PDG_ETAPAS=['Desenho CAD','Enviado para fresagem','Em produção','Pronto','Entregue'];
+function pdgEtapas(e){var et=e.etapa||'Desenho CAD';if(et==='Cancelado'||et==='Aguardando informação')return '<span class="labv-st recusado">'+esc(et)+'</span>';var L=PDG_ETAPAS.filter(function(x){return !(x==='Em produção'&&et==='Enviado para fresagem')&&!(x==='Enviado para fresagem'&&et==='Em produção');}),i=L.indexOf(et);
+  return '<div class="pdg-et" title="'+(e.etapa_em?'Atualizado em '+new Date(e.etapa_em).toLocaleString('pt-BR'):'')+'">'+L.map(function(x,k){return '<span class="'+(k<i?'f':k===i?'a':'')+'">'+(k<i?'✓ ':'')+x+'</span>';}).join('')+'</div>';}
 function pdgEnviadosHtml(){var M=pdgMeus();if(!M.length)return '';
   return '<h3 style="margin:22px 0 8px">📤 Pedidos enviados</h3><div class="labv-l">'+M.slice(0,60).map(function(e){var s=PDG_ST[e.status]||['',''];
     return '<div class="labv-i pdg-i"><div class="sp"><b>'+esc(e.paciente||'Paciente')+'</b><small>'+pdgItensTxt(e)+'</small><small>'+esc((PDG.labNome&&PDG.labNome[e.lab_id])||'')+' · enviado em '+new Date(e.enviado_em||e.criado_em).toLocaleDateString('pt-BR')+(e.prazo?' · prazo '+e.prazo.split('-').reverse().join('/'):'')+'</small>'+pdgArqsHtml(e)+(e.status==='recusado'&&e.motivo?'<small style="color:#B91C1C">Motivo: '+esc(e.motivo)+'</small>':'')+'</div>'+
-      '<span class="labv-st '+s[1]+'">'+s[0]+'</span>'+(e.status==='enviado'?'<button class="btn sm" data-act="pdgCancela" data-v="'+e.id+'">Cancelar</button>':'')+'</div>';}).join('')+'</div>';}
+      '<span class="labv-st '+s[1]+'">'+s[0]+'</span>'+(e.status==='aceito'?pdgEtapas(e):'')+(e.status==='enviado'?'<button class="btn sm" data-act="pdgCancela" data-v="'+e.id+'">Cancelar</button>':'')+'</div>';}).join('')+'</div>';}
 /* ---- formulário do dentista ---- */
 function pdgNovo(vid){var V=labVMeus().filter(function(v){return v.status==='aceito';});var v=V.filter(function(x){return x.id===vid;})[0]||V[0];if(!v){toast('Conecte um laboratório primeiro.');return;}
   PDG.ed={vid:v.id,lab:v.lab_id,labNome:v.lab_nome,paciente:'',itens:[],cor:'',prazo:'',urgente:false,obs:'',texto:'',arqs:[]};PDG.sel=[];PDG.trab='Coroa';PDG.mat='Zircônia';PDG.impl=false;PDG.prog='';pdgDesenha();}
@@ -5417,16 +5422,26 @@ function exoEmailTxt(p){var R=p._exo,ds=(String(Array.isArray(p.dentes)?p.dentes
 function exoMailAbre(){var p=PED.ed;if(!p)return;pedLe();var m=exoEmailTxt(p),para=(empDados().inove||{}).email||'';var el=document.getElementById('exo-mail');if(el)el.remove();el=document.createElement('div');el.id='exo-mail';
   el.innerHTML='<div class="pdg-ov"><div class="pdg-box"><div class="pdg-h"><b>✉️ E-mail para a Inove</b><button class="btn sm" data-exom="fecha">Fechar</button></div><div class="pdg-b">'+
    '<div class="pdg-ana"><img src="'+ANA_AV[0]+'" alt=""><div>Montei o e-mail com os dados do pedido'+(p._exo?' e do projeto do exocad':'')+'. Confira, abra no seu e-mail e <b>arraste os arquivos do caso</b> para anexar.</div></div>'+
-   '<label class="fld"><span>Para</span><input id="exm-para" type="email" value="'+esc(para)+'" placeholder="e-mail da Inove"></label><label class="fld"><span>Assunto</span><input id="exm-as" type="text" value="'+esc(m.assunto)+'"></label>'+
+   exmContatos(para)+'<label class="fld"><span>Para</span><input id="exm-para" type="email" list="exm-lista" value="'+esc(para)+'" placeholder="e-mail da Inove"></label>'+(p.id?'<label class="pdg-chk"><input type="checkbox" id="exm-marca" checked> Ao abrir o e-mail, marcar o pedido como <b>Enviado para fresagem</b> (a clínica vê)</label>':'')+'<label class="fld"><span>Assunto</span><input id="exm-as" type="text" value="'+esc(m.assunto)+'"></label>'+
    '<label class="fld"><span>Mensagem</span><textarea id="exm-co" rows="14">'+esc(m.corpo)+'</textarea></label></div>'+
    '<div class="pdg-f"><button class="btn" data-exom="copia">📋 Copiar</button><span style="flex:1"></span><button class="btn" data-exom="mailto">Abrir no app de e-mail</button><button class="btn pri" data-exom="gmail">Abrir no Gmail</button></div></div></div>';
   document.body.appendChild(el);}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-exom]');if(!b)return;var a=b.getAttribute('data-exom'),el=document.getElementById('exo-mail');if(a==='fecha'){if(el)el.remove();return;}
   var para=document.getElementById('exm-para').value.trim(),as=document.getElementById('exm-as').value,co=document.getElementById('exm-co').value;
+  if(a==='cad'){exmCadastra();return;}if(a==='usa'){document.getElementById('exm-para').value=b.getAttribute('data-v');return;}if(a==='tira'){exmTira(b.getAttribute('data-v'));return;}
   if(para&&para!==((empDados().inove||{}).email||''))empDadosGrava('inove','email',para);
   if(a==='copia'){(navigator.clipboard?navigator.clipboard.writeText(as+'\n\n'+co):Promise.reject()).then(function(){toast('📋 Copiado!');},function(){pedCopiaVelho(as+'\n\n'+co);toast('📋 Copiado!');});return;}
   var u=a==='gmail'?'https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(para)+'&su='+encodeURIComponent(as)+'&body='+encodeURIComponent(co):'mailto:'+encodeURIComponent(para)+'?subject='+encodeURIComponent(as)+'&body='+encodeURIComponent(co);
-  window.open(u,'_blank');});
+  window.open(u,'_blank');var mk=document.getElementById('exm-marca'),p=PED.ed;
+  if(mk&&mk.checked&&p&&p.id){var pt={status:'producao',desenho_feito:true,enviado_inove:true};Object.assign(p,pt);pedMuda(p.id,pt,'Pedido #'+(p.numero||'')+' marcado como enviado para fresagem.');if(el)el.remove();}});
+function exmLista(){var L=(empDados().inove||{}).contatos;return Array.isArray(L)?L:[];}
+function exmContatos(para){var L=exmLista();return '<div class="exm-c"><span class="small muted">E-mails cadastrados:</span>'+(L.length?L.map(function(c){return '<span class="exm-t"><button type="button" class="chip" data-exom="usa" data-v="'+esc(c.email)+'">'+esc(c.nome||c.email)+'</button><button type="button" class="exm-x" data-exom="tira" data-v="'+esc(c.email)+'" aria-label="Tirar">✕</button></span>';}).join(''):'<span class="small muted">nenhum ainda</span>')+
+  '<details class="exm-n"><summary class="chip">＋ Cadastrar e-mail</summary><div class="row wrap"><input id="exm-nn" type="text" placeholder="Nome (ex.: Mari · Inove)" maxlength="60"><input id="exm-ne" type="email" placeholder="email@exemplo.com" maxlength="120"><button type="button" class="btn sm pri" data-exom="cad">Salvar</button></div></details></div>'+
+  '<datalist id="exm-lista">'+L.map(function(c){return '<option value="'+esc(c.email)+'">'+esc(c.nome||'')+'</option>';}).join('')+'</datalist>';}
+function exmRedesenha(){var c=document.querySelector('#exo-mail .exm-c'),dl=document.getElementById('exm-lista');if(!c)return;var t=document.createElement('div');t.innerHTML=exmContatos('');c.replaceWith(t.firstChild);if(dl)dl.replaceWith(t.querySelector('datalist'));}
+function exmCadastra(){var n=document.getElementById('exm-nn').value.trim(),e=document.getElementById('exm-ne').value.trim().toLowerCase();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){toast('Digite um e-mail válido.');return;}
+  var L=exmLista().filter(function(c){return c.email!==e;});L.push({nome:n.slice(0,60),email:e});empDadosGrava('inove','contatos',L.slice(-20));document.getElementById('exm-para').value=e;toast('E-mail cadastrado.');setTimeout(exmRedesenha,50);}
+function exmTira(e){empDadosGrava('inove','contatos',exmLista().filter(function(c){return c.email!==e;}));setTimeout(exmRedesenha,50);}
 Object.assign(ACT,{exoMail:function(){exoMailAbre();},
   exoAplica:function(){pedLe();var p=PED.ed,R=p&&p._exo;if(!R)return;var A=exoArcada(R);p.dentes=A.map(function(x){return x.d;}).join(', ');p.qtd=String(A.length);p.arcada=A;
     var mats=R.dentes.map(function(t){return t.mat;}).filter(Boolean);if(mats[0])p.material=mats[0];if(R.cor)p.cor=R.cor;if(!p.paciente&&R.paciente)p.paciente=R.paciente;
