@@ -1470,6 +1470,8 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 .lp-h{display:flex;gap:12px;align-items:center}.lp-logo{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:1.8rem;background:rgba(124,58,237,.1);overflow:hidden;flex-shrink:0}.lp-logo img{width:100%;height:100%;object-fit:contain;background:#fff}
 .lp-n{flex:1;min-width:0;display:grid}.lp-n b{font-size:1.05rem}.lp-n small{opacity:.7}.lp-c{display:grid;gap:6px}.lp-i{display:flex;gap:8px;align-items:baseline;font-size:.9rem;min-width:0}.lp-i a,.lp-i b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}.lp-i a{color:inherit;text-decoration:underline;text-decoration-color:rgba(124,58,237,.45)}
 .lp-b{display:flex;gap:8px;justify-content:flex-end}
+.rbar{z-index:80!important;overflow:visible!important}.rav-w{position:relative;z-index:81}.rav-m{position:absolute;right:0;top:calc(100% + 8px);z-index:60;min-width:240px;display:grid;padding:6px;border-radius:14px;background:var(--surface,#fff);color:var(--ink,#1b1830);box-shadow:0 14px 40px rgba(0,0,0,.25);border:1px solid rgba(127,127,127,.2)}.rav-m button{border:0;background:none;text-align:left;padding:10px 12px;border-radius:10px;font:600 .92rem inherit;color:inherit;cursor:pointer}.rav-m button:hover{background:rgba(124,58,237,.1)}.rav-m .danger{color:#DC2626}
+.redeamb .rconteudo .card,.redeamb .rconteudo .agchat{color:#1B1830;--ink:#1B1830}.redeamb .rconteudo .card :where(b,h2,h3,span,p,small,label,.msg):not(.btn):not(.pill),.redeamb .rconteudo .agchat :where(b,span,p,small,.msg):not(.btn):not(.pill){color:#1B1830}.redeamb .rconteudo .card .muted,.redeamb .rconteudo .agchat .muted,.redeamb .rconteudo .agchat small{color:#625E75}.redeamb .rconteudo .card .btn:not(.pri),.redeamb .rconteudo .agchat .btn:not(.pri){color:#1B1830}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5653,6 +5655,36 @@ var _rDLabTabLP=rDLabTab;rDLabTab=function(D){var h=_rDLabTabLP(D);if(!RL.user||
   if(!LP.d&&!LP.carregando)lpCarrega();var M=labVMeus(),i=h.indexOf('<div class="labv-l">');if(!M.length)return h;var cards='<div class="lp-g">'+M.map(lpCard).join('')+'</div>';
   return i>=0?h.slice(0,i)+cards:h+cards;};
 var _labSubLP=ACT.labSub;ACT.labSub=function(v){if(v==='labs'){LP.d=null;}return _labSubLP(v);};
+
+/* ===== Reorganização: currículo e agente de vagas ficam na Rede; a Rede tem cabeçalho "Ideali · REDE" e menu da conta ===== */
+[DMENU,PMENU,AMENU,SMENU].forEach(function(M){for(var i=M.length-1;i>=0;i--)if(M[i][0]==='perfil')M.splice(i,1);});
+var _cAbasRD=cAbas;cAbas=function(D){return _cAbasRD(D).filter(function(x){return x[0]!=='perfil';});};
+/* painel: sem o agente de vagas e sem o quadro "Vagas para você" */
+var RD_VAGAS_RE=/<section class="card"><div class="row"><h2>Vagas para você<\/h2>[\s\S]*?<\/section>/;
+var _rDInicioRD=rDInicio;rDInicio=function(D){return _rDInicioRD(D).replace(RD_VAGAS_RE,'');};
+var _rPInicioRD=rPInicio;rPInicio=function(D){return _rPInicioRD(D).replace(RD_VAGAS_RE,'');};
+var _rDAgentesRD=rDAgentes;rDAgentes=function(D){if(D&&D.agSel==='vagas'&&!D._redeAg)D.agSel='ana';return _rDAgentesRD(D).replace(/<button class="agcard[^"]*" data-act="dAgente" data-v="vagas">[\s\S]*?<\/button>/,'');};
+var _dAgenteRD=ACT.dAgente;ACT.dAgente=function(v){if(v==='vagas'){redeTransicao(true,'agente');return;}return _dAgenteRD.apply(this,arguments);};
+/* Rede: seção do agente de vagas e configurações da conta */
+function rRedeAgente(){var D=PN();if(!D)return '';var sv=D.agSel;D.agSel='vagas';D._redeAg=true;var h=_rDAgentesRD(D);D.agSel=sv;D._redeAg=false;var i=h.indexOf('<div class="agchat">');
+  return '<div class="rtit"><h2>🤖 Agente de vagas</h2><p>Ele procura vagas na Rede que combinam com o seu currículo e te avisa.</p></div>'+(i>=0?h.slice(i,h.length-6):'');}
+function rRedeConfig(){return '<div class="rtit"><h2>⚙️ Configurações</h2><p>Seus dados de acesso e contato.</p></div>'+rCfgConta()+
+  (RL.user?'<section class="card cfg-c"><h2>Trocar e-mail de acesso</h2><p class="small muted">Enviamos um link de confirmação para o e-mail novo. A troca só vale depois que você confirmar.</p><div class="row wrap" style="gap:8px"><input id="rc-email" type="text" inputmode="email" placeholder="novo@email.com" style="flex:1;min-width:200px"><button class="btn pri" data-act="rcEmail">Trocar e-mail</button></div></section>':'');}
+var _rRedeSecRD=rRedeSec;rRedeSec=function(){var s=S.rede.sec;if(s==='agente')return rRedeAgente();if(s==='config')return rRedeConfig();return _rRedeSecRD();};
+rRedeMenu=function(){var s=S.rede.sec,naRede=['perfil','agente','config'].indexOf(s)<0;
+  return '<nav class="rmenu" aria-label="Rede"><button class="rm'+(s==='perfil'?' on':'')+'" data-act="redeSec" data-v="perfil">👤 Meu perfil</button><button class="rm'+(naRede?' on':'')+'" data-act="redeSec" data-v="'+(naRede?s:'vagas')+'">🌐 Rede</button><button class="rm'+(s==='agente'?' on':'')+'" data-act="redeSec" data-v="agente">🤖 Agente de vagas</button></nav>'+
+    (naRede?'<div class="rsub">'+REDE_SECS.map(function(x,i){return '<button class="rs'+(s===x[0]?' on':'')+'" style="--i:'+i+'" data-act="redeSec" data-v="'+x[0]+'"><span>'+x[2]+'</span>'+x[1]+'</button>';}).join('')+'</div>'+rLocBar():'');};
+rRedeTopo=function(){var D=PN(),ini=esc(((RL.perfil&&RL.perfil.nome)||(D&&D.nome)||'?')[0]);
+  return '<header class="appbar rbar"><button class="btn sm rvolta" data-act="redeSai">← Meu painel</button><div class="ab-l"><span class="ab-logo" aria-hidden="true">i</span><b>Ideali</b><span class="ab-papel">REDE</span></div><span class="spacer"></span>'+
+    '<div class="rav-w"><button class="ab-av" data-act="rAvMenu" aria-label="Minha conta" aria-expanded="'+(!!S.rede.menu)+'">'+ini+'</button>'+(S.rede.menu?'<div class="rav-m" role="menu">'+
+      '<button role="menuitem" data-act="rAvVai" data-v="perfil">👤 Editar perfil (currículo)</button><button role="menuitem" data-act="rAvVai" data-v="config">⚙️ Configurações</button><button role="menuitem" data-act="rAvVai" data-v="agente">🤖 Agente de vagas</button>'+
+      '<button role="menuitem" data-act="redeSai">← Voltar ao meu painel</button>'+(RL.user?'<button role="menuitem" class="danger" data-rl="sair">Sair</button>':'')+'</div>':'')+'</div></header>';};
+Object.assign(ACT,{rAvMenu:function(){S.rede.menu=!S.rede.menu;render();},rAvVai:function(v){S.rede.menu=false;ACT.redeSec(v);},
+  rcEmail:function(){var e=(document.getElementById('rc-email')||{}).value||'';e=e.trim().toLowerCase();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){toast('Digite um e-mail válido.');return;}
+    SB.auth.updateUser({email:e},{emailRedirectTo:location.href.split('#')[0].split('?')[0]}).then(function(r){toast(r.error?'Não consegui trocar agora: '+(r.error.message||''):'Pronto! Enviamos um link para '+e+'. Confirme para concluir a troca.');});}});
+document.addEventListener('click',function(e){if(!S.redeOn||!S.rede.menu)return;if(e.target.closest&&e.target.closest('.rav-w'))return;S.rede.menu=false;render();});
+/* no painel, "Editar currículo" e o Perfil abrem a Rede */
+var _cfgVaiRD=ACT.cfgVai;ACT.cfgVai=function(v){if(v==='perfil'){S.cfgMenu=false;S.cfgOn=false;redeTransicao(true,'perfil');return;}return _cfgVaiRD.apply(this,arguments);};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
