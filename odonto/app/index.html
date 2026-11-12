@@ -1465,6 +1465,11 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 .dfl-et{font-size:.75rem;padding:3px 9px;border-radius:99px;background:rgba(124,58,237,.12)}
 @media(max-width:760px){.dfl-hd{display:none}.dfl-r{grid-template-columns:1fr auto;gap:4px 10px}.dfl-r>span:nth-child(1){grid-column:1/-1;font-size:.75rem;opacity:.7;order:0}.dfl-r>span:nth-child(2){order:1}.dfl-r>span:nth-child(6){order:2;text-align:right}.dfl-r>span:nth-child(3){order:3;grid-column:1/-1;font-size:.85rem}.dfl-r>span:nth-child(4){display:none}.dfl-r>span:nth-child(5){order:4;font-size:.8rem;opacity:.8}.dfl-r>span:nth-child(7){order:5;text-align:right}.dfl-ft>span:empty{display:none}}
 .lsub{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 16px;border-bottom:1px solid var(--line,rgba(127,127,127,.2))}.lsub button{border:0;background:none;padding:10px 14px;font:700 .95rem inherit;color:inherit;opacity:.65;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}.lsub button[aria-selected=true]{opacity:1;border-bottom-color:#7C3AED;color:#7C3AED}.lsub-n{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:#7C3AED;color:#fff;font-size:.72rem;margin-left:4px}.lsub-v{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ct-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:10px 0}.ct-logo{display:flex;align-items:center;gap:10px;margin-top:8px}.ct-lg{width:64px;height:64px;border-radius:14px;display:grid;place-items:center;font-size:2rem;background:rgba(127,127,127,.1);overflow:hidden}.ct-lg img{width:100%;height:100%;object-fit:contain}
+.lp-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-top:14px}.lp{border:1px solid var(--line,rgba(127,127,127,.25));border-radius:16px;padding:14px;display:grid;gap:10px;background:var(--surface,transparent)}
+.lp-h{display:flex;gap:12px;align-items:center}.lp-logo{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:1.8rem;background:rgba(124,58,237,.1);overflow:hidden;flex-shrink:0}.lp-logo img{width:100%;height:100%;object-fit:contain;background:#fff}
+.lp-n{flex:1;min-width:0;display:grid}.lp-n b{font-size:1.05rem}.lp-n small{opacity:.7}.lp-c{display:grid;gap:6px}.lp-i{display:flex;gap:8px;align-items:baseline;font-size:.9rem;min-width:0}.lp-i a,.lp-i b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}.lp-i a{color:inherit;text-decoration:underline;text-decoration-color:rgba(124,58,237,.45)}
+.lp-b{display:flex;gap:8px;justify-content:flex-end}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5615,6 +5620,39 @@ var _rDLabTabSub=rDLabTab;rDLabTab=function(D){if(!RL.user)return _rDLabTabSub(D
   var full=_rDLabTabSub(D),e2=pdgEnviadosHtml();if(e2)full=full.replace(e2,'');full=full.replace(/^<div class="dtop"><div><h2>🧪 Laboratório<\/h2>.*?<\/div><\/div>/,'');
   return h+full;};
 ACT.labSub=function(v){S.labSub=v;if(v==='fin'&&typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}render();};
+
+/* ===== Contato do laboratório: o lab preenche em Minha empresa; a clínica parceira vê em Laboratórios parceiros ===== */
+var CT_CAMPOS=[['whats','WhatsApp','(11) 99999-9999','tel'],['tel','Telefone fixo','(11) 3333-3333','tel'],['email','E-mail para pedidos','pedidos@seulab.com','email'],['end','Endereço','Rua, número, complemento','text'],['bairro','Bairro','','text'],['cep','CEP','00000-000','text'],
+  ['horario','Horário','Seg a sex, 8h às 18h','text'],['coleta','Coleta e entrega','Ex.: motoboy próprio na região central','text'],['site','Site','www.seulab.com.br','url'],['insta','Instagram','@seulab','text']];
+function ctForm(){var c=empDados().contato||{},T=negT();if(!S.neg||!/lab/i.test(T.t||'')&&S.neg.tipo!=='lab')return '';
+  return '<section class="card cfg-c ct-f"><h2>📇 Contato para as clínicas</h2><p class="small muted">Isto aparece para as clínicas conectadas a você, na aba Laboratórios parceiros.</p>'+
+    '<div class="ct-logo"><div class="ct-lg">'+(c.logo?'<img src="'+esc(c.logo)+'" alt="Logo">':'🧪')+'</div><label class="btn sm">'+(c.logo?'Trocar logo':'📷 Enviar logo')+'<input type="file" id="ct-logo" accept="image/*" hidden></label>'+(c.logo?'<button class="btn sm" data-act="ctLogoTira">Tirar</button>':'')+'</div>'+
+    '<div class="ct-g">'+CT_CAMPOS.map(function(f){return '<label class="fld"><span>'+f[1]+'</span><input id="ct-'+f[0]+'" type="text" inputmode="'+(f[3]==='tel'?'tel':f[3]==='email'?'email':f[3]==='url'?'url':'text')+'" maxlength="140" placeholder="'+esc(f[2])+'" value="'+esc(c[f[0]]||'')+'"></label>';}).join('')+'</div>'+
+    '<button class="btn pri" data-act="ctSalva">Salvar contato</button></section>';}
+function ctGrava(c,msg){if(!EMP.row)return;var d=Object.assign({},EMP.row.dados||{});d.contato=c;SB.from('odo_empresas').update({dados:d}).eq('id',EMP.row.id).select('*').single().then(function(r){if(r.error){toast('Não consegui salvar.');return;}EMP.row=r.data;render();if(msg)toast(msg);});}
+Object.assign(ACT,{ctSalva:function(){var c=Object.assign({},empDados().contato||{});CT_CAMPOS.forEach(function(f){var e=document.getElementById('ct-'+f[0]);if(e){var v=e.value.trim().slice(0,140);if(v)c[f[0]]=v;else delete c[f[0]];}});ctGrava(c,'Contato salvo. As clínicas parceiras já veem.');},
+  ctLogoTira:function(){var c=Object.assign({},empDados().contato||{});delete c.logo;ctGrava(c,'Logo removida.');}});
+document.addEventListener('change',function(e){if(!e.target||e.target.id!=='ct-logo')return;var f=e.target.files&&e.target.files[0];if(!f)return;var u=URL.createObjectURL(f),im=new Image();
+  im.onload=function(){var M=200,k=Math.min(1,M/Math.max(im.naturalWidth,im.naturalHeight)),cv=document.createElement('canvas');cv.width=Math.round(im.naturalWidth*k);cv.height=Math.round(im.naturalHeight*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);
+    var d=cv.toDataURL('image/webp',.82);if(d.indexOf('data:image/webp')!==0)d=cv.toDataURL('image/png');if(d.length>40000){toast('Logo muito pesada. Tente outra imagem.');return;}var c=Object.assign({},empDados().contato||{});c.logo=d;ctGrava(c,'Logo salva.');};
+  im.onerror=function(){toast('Não consegui ler essa imagem.');};im.src=u;});
+var _rCfgEmpCT=rCfgEmpresa;rCfgEmpresa=function(N){return _rCfgEmpCT(N)+ctForm();};
+/* clínica: carrega os dados dos laboratórios parceiros */
+var LP={d:null,carregando:false};
+function lpCarrega(){if(!RL.user||LP.carregando)return;LP.carregando=true;SB.rpc('odo_labs_parceiros').then(function(r){LP.carregando=false;LP.d={};if(!r.error)(r.data||[]).forEach(function(x){LP.d[x.lab_id]=x;});render();});}
+function lpWa(n){n=String(n||'').replace(/\D/g,'');if(n.length<10)return '';if(n.length<=11)n='55'+n;return n;}
+function lpCard(v){var x=(LP.d&&LP.d[v.lab_id])||{},c=x.contato||{},pre=x.pre||{},wa=c.whats||pre.whatsapp,em=c.email||pre.email,end=[c.end,c.bairro,[x.cidade||'',x.uf||''].filter(Boolean).join(' / '),c.cep].filter(Boolean).join(' · ');
+  var it=function(ic,t,href){return t?'<div class="lp-i"><span>'+ic+'</span>'+(href?'<a href="'+esc(href)+'" target="_blank" rel="noopener">'+esc(t)+'</a>':'<b>'+esc(t)+'</b>')+'</div>':'';};
+  var st=v.status==='aceito'?'<span class="labv-st aceito">✅ Conectado</span>':v.status==='pendente'?'<span class="labv-st pendente">⏳ Aguardando aceitar</span>':'<span class="labv-st recusado">Recusou</span>';
+  return '<article class="lp"><div class="lp-h"><div class="lp-logo">'+(c.logo?'<img src="'+esc(c.logo)+'" alt="">':'🧪')+'</div><div class="lp-n"><b>'+esc(x.nome||v.lab_nome||'Laboratório')+'</b><small>'+(x.codigo?'ID '+labIdTxt(x.codigo)+' · ':'')+esc(v.lab_local||end||'')+'</small>'+(x.rt?'<small>Responsável técnico: '+esc(x.rt)+'</small>':'')+'</div>'+st+'</div>'+
+    '<div class="lp-c">'+it('💬',wa?'WhatsApp '+wa:'',wa&&lpWa(wa)?'https://wa.me/'+lpWa(wa):'')+it('📞',c.tel||'',c.tel?'tel:'+String(c.tel).replace(/[^\d+]/g,''):'')+it('✉️',em||'',em?'mailto:'+em:'')+
+      it('📍',end,end?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((x.nome||'')+' '+end):'')+it('🕘',c.horario||'')+it('🛵',c.coleta||'')+it('🌐',c.site||'',c.site?(/^https?:/i.test(c.site)?c.site:'https://'+c.site):'')+it('📸',c.insta||'',c.insta?'https://instagram.com/'+String(c.insta).replace(/^@/,'').replace(/^.*instagram\.com\//,''):'')+
+      (!wa&&!em&&!c.tel&&!c.end&&LP.d?'<small class="muted">O laboratório ainda não preencheu os dados de contato.</small>':'')+'</div>'+
+    '<div class="lp-b">'+(v.status==='aceito'?'<button class="btn sm pri" data-act="pdgNovo" data-v="'+v.id+'">📤 Enviar pedido</button>':'')+(v.status!=='aceito'?'<button class="btn sm" data-act="labTira" data-v="'+v.id+'">'+(v.status==='pendente'?'Cancelar convite':'Tirar')+'</button>':'')+'</div></article>';}
+var _rDLabTabLP=rDLabTab;rDLabTab=function(D){var h=_rDLabTabLP(D);if(!RL.user||(S.labSub||'')!=='labs'&&!(S.labSub==null&&!labVMeus().some(function(v){return v.status==='aceito';})))return h;
+  if(!LP.d&&!LP.carregando)lpCarrega();var M=labVMeus(),i=h.indexOf('<div class="labv-l">');if(!M.length)return h;var cards='<div class="lp-g">'+M.map(lpCard).join('')+'</div>';
+  return i>=0?h.slice(0,i)+cards:h+cards;};
+var _labSubLP=ACT.labSub;ACT.labSub=function(v){if(v==='labs'){LP.d=null;}return _labSubLP(v);};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
