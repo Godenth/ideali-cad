@@ -1428,6 +1428,11 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 .pc-in{display:flex;gap:8px}.pc-in input{flex:1;border:0;border-radius:99px;padding:11px 16px;background:#2A3942;color:#E9EDEF;font:inherit;font-size:16px}.pc-in button{width:44px;height:44px;border-radius:50%;border:0;background:#00A884;color:#0B141A;font-size:1.1rem;cursor:pointer}
 .pc-prog{color:#AEBAC1;font-size:.9rem;padding:6px}
 @media(max-width:600px){#pc-ov{padding:0}.pc-box{height:100%;width:100%;border-radius:0}}
+.exo-c{grid-column:1/-1;display:grid;gap:8px;padding:12px;border-radius:14px;border:1px solid rgba(37,99,235,.35);background:rgba(37,99,235,.05);margin:6px 0}
+.exo-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.exo-h b{margin-right:auto}.exo-mail{background:linear-gradient(135deg,#7C3AED,#2563EB);color:#fff;border:0}
+.exo-l{display:grid;gap:4px}.exo-i{display:grid;grid-template-columns:24px 90px 1fr;gap:8px;align-items:baseline;padding:6px 10px;border-radius:10px;background:rgba(34,197,94,.08)}.exo-i.a{background:rgba(245,158,11,.1)}.exo-i.r{background:rgba(239,68,68,.12)}
+.exo-f{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.exo-f small{margin-right:auto}.exo-r{color:#EF4444}.exo-ok{color:#22C55E}
+@media(max-width:600px){.exo-i{grid-template-columns:22px 1fr}.exo-i span:last-child{grid-column:1/-1}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5358,6 +5363,75 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&PC.on)pcFec
 /* os botões de novo pedido abrem a conversa */
 ACT.pdgNovo=function(v){pcAbre(v);};
 var _dNovoPC=ACT.dNovo;ACT.dNovo=function(v,b){if(v==='ped'&&RL.user&&labVMeus().some(function(x){return x.status==='aceito';})){pcAbre();return;}return _dNovoPC.apply(this,arguments);};
+
+/* ===== Pedido: anexar o caso do exocad (.dentalProject), a Ana confere com o pedido e monta o e-mail para a Inove ===== */
+var EXO_REC={AnatomicCrown:'Coroa anatômica',ReducedCrown:'Coroa reduzida (coping)',Pontic:'Pôntico',AnatomicPontic:'Pôntico anatômico',ReducedPontic:'Pôntico reduzido',Inlay:'Inlay',Onlay:'Onlay',Veneer:'Faceta',
+  Telescope:'Telescópica',Bar:'Barra',BarSegment:'Barra',Waxup:'Enceramento',Coping:'Coping',Abutment:'Pilar',Mockup:'Mock-up',PartialCrown:'Coroa parcial',Splint:'Placa'};
+function exoLeProjeto(txt){var x=new DOMParser().parseFromString(txt,'application/xml');if(x.getElementsByTagName('parsererror').length||!x.getElementsByTagName('Treatment').length)throw 'arquivo';
+  var g=function(el,t){var e=el.getElementsByTagName(t)[0];return e?String(e.textContent||'').trim():'';},ok=function(v){return v&&v!=='---'&&v!=='None'?v:'';};
+  var D=[].map.call(x.getElementsByTagName('Tooth'),function(t){return {n:+g(t,'Number'),rec:g(t,'ReconstructionType'),prep:g(t,'PreparationType'),mat:g(t,'MaterialName')||g(t,'Material'),imp:ok(g(t,'ImplantType')),sb:g(t,'ScanAbutmentScan')==='true',mes:g(t,'MesialConnector')==='true',cor:ok(g(t,'Color'))};})
+    .filter(function(t){return t.n&&!/antagon|healthy|saud/i.test(t.rec+' '+t.mat);});
+  var pac=[g(x,'PatientFirstName'),g(x,'PatientName')].filter(Boolean).join(' ').trim();
+  var cores=D.map(function(t){return t.cor;}).filter(Boolean);var cor=cores[0]||ok(g(x,'ToothColor'));
+  return {dentes:D,paciente:pac,dentista:g(x,'PracticeName'),cor:cor,notas:g(x,'Notes'),data:g(x,'DateTime').slice(0,10)};}
+function exoMesial(n){var q=Math.floor(n/10),k=n%10;if(k>1)return q*10+k-1;return ({1:21,2:11,3:41,4:31})[q];}
+function exoArcada(R){var par={};R.dentes.forEach(function(t){if(t.mes){var m=exoMesial(t.n);par[t.n+'-'+m]=par[m+'-'+t.n]=1;}});
+  var A=oaOrdena(R.dentes.map(function(t){return t.n;})).map(function(n){var t=R.dentes.filter(function(z){return z.n===n;})[0];return {d:n,k:t.imp?'imp':/pontic/i.test(t.rec)?'pon':/veneer/i.test(t.rec)?'fac':'prep',u:false};});
+  A.forEach(function(x,i){var nx=A[i+1];if(nx&&par[x.d+'-'+nx.d])x.u=true;});return A;}
+function exoTrab(R){var u=function(a){var o=[];a.forEach(function(v){if(v&&o.indexOf(v)<0)o.push(v);});return o;};
+  return u(R.dentes.map(function(t){return (EXO_REC[t.rec]||t.rec)+(t.imp?' sobre implante':'');})).join(' + ');}
+function exoNorm(s){return semAc(String(s||'')).replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
+function exoParece(a,b){a=exoNorm(a);b=exoNorm(b);if(!a||!b)return null;if(a===b||a.indexOf(b)>=0||b.indexOf(a)>=0)return true;var A=a.split(' '),B=b.split(' ');return A.some(function(w){return w.length>2&&B.indexOf(w)>=0;});}
+function exoConfere(p,R){var L=[],pd=(String(Array.isArray(p.dentes)?p.dentes.join(','):p.dentes||'').match(/\b[1-4][1-8]\b/g)||[]).map(Number).sort(),xd=R.dentes.map(function(t){return t.n;}).sort();
+  var eq=pd.length===xd.length&&pd.every(function(v,i){return v===xd[i];});
+  L.push(!pd.length?['⚠️','Dentes','o pedido está sem dentes; no projeto: '+xd.join(', ')]:eq?['✅','Dentes',xd.join(', ')]:['❌','Dentes','pedido: '+pd.join(', ')+' · projeto: '+xd.join(', ')]);
+  var pp=exoParece(p.paciente,R.paciente);L.push(pp===null?['⚠️','Paciente','projeto: '+(R.paciente||'sem nome')]:pp?['✅','Paciente',R.paciente]:['❌','Paciente','pedido: '+p.paciente+' · projeto: '+R.paciente]);
+  var cl=pedCli(p),pc=exoParece(cl,R.dentista);if(R.dentista)L.push(pc?['✅','Dentista',R.dentista]:['⚠️','Dentista','no projeto está "'+R.dentista+'" e o cliente é '+cl]);
+  var mats=R.dentes.map(function(t){return t.mat;}).filter(Boolean);if(mats.length){var pm=exoParece(p.material,mats[0]);L.push(!p.material?['⚠️','Material','pedido sem material; projeto: '+mats[0]]:pm?['✅','Material',mats[0]]:['❌','Material','pedido: '+p.material+' · projeto: '+mats[0]]);}
+  if(R.cor||p.cor)L.push(!R.cor?['⚠️','Cor','não veio no projeto; pedido: '+(p.cor||'—')]:exoNorm(R.cor)===exoNorm(p.cor)?['✅','Cor',R.cor]:['❌','Cor','pedido: '+(p.cor||'—')+' · projeto: '+R.cor]);
+  var imp=R.dentes.filter(function(t){return t.imp;});var simp=p.sobre_implante===true||p.sobre_implante==='true';
+  if(imp.length||simp)L.push(imp.length&&simp?['✅','Implante',imp.map(function(t){return t.n+': '+t.imp+(t.sb?' (com scanbody)':'');}).join(' · ')]:imp.length?['❌','Implante','o projeto tem implante ('+imp[0].imp+') e o pedido não está marcado como sobre implante']:['❌','Implante','pedido marcado sobre implante, mas o projeto não tem implante']);
+  var un=oaResumo(exoArcada(R)).filter(function(r){return r.u;});if(un.length)L.push(['🔗','Unidas',un.map(function(r){return r.txt;}).join(' · ')]);
+  return L;}
+function exoBloco(p){var R=p._exo;
+  var h='<section class="exo-c"><div class="exo-h"><b>🦷 Caso do exocad</b><label class="btn sm">📎 '+(R?'Trocar arquivo':'Anexar .dentalProject')+'<input type="file" id="exo-dp" accept=".dentalProject,.xml" hidden></label>'+
+    '<button type="button" class="btn sm exo-mail" data-act="exoMail">✉️ Enviar por e-mail pela Ana</button></div>';
+  if(!R)return h+'<small class="muted">Anexe o arquivo do projeto do exocad: a Ana confere dentes, paciente, material, cor, implante e scanbody com este pedido.</small></section>';
+  var L=exoConfere(p,R),ruim=L.filter(function(x){return x[0]==='❌';}).length;
+  return h+'<div class="exo-l">'+L.map(function(x){return '<div class="exo-i '+(x[0]==='❌'?'r':x[0]==='⚠️'?'a':'')+'"><span>'+x[0]+'</span><b>'+x[1]+'</b><span>'+esc(x[2])+'</span></div>';}).join('')+'</div>'+
+    '<div class="exo-f"><small class="muted">'+esc(p._exoNome||'')+(R.data?' · '+R.data.split('-').reverse().join('/'):'')+'</small>'+(ruim?'<b class="exo-r">'+ruim+' diferença'+(ruim>1?'s':'')+'</b>':'<b class="exo-ok">Tudo confere ✅</b>')+
+    '<button type="button" class="btn sm pri" data-act="exoAplica">Usar dados do projeto no pedido</button></div></section>';}
+var _rPedFormEXO=rPedForm;rPedForm=function(p){var h=_rPedFormEXO(p),b=exoBloco(p),i=h.indexOf('<section class="oa-form">');if(i<0)i=h.indexOf('<label class="fld ped-descricao');if(i<0){var j=h.indexOf('Descrição');i=j>=0?h.lastIndexOf('<',j):-1;}
+  return i<0?h+b:h.slice(0,i)+b+h.slice(i);};
+document.addEventListener('change',function(e){if(!e.target||e.target.id!=='exo-dp'||!PED.ed)return;var f=e.target.files&&e.target.files[0];if(!f)return;pedLe();
+  f.text().then(function(t){try{PED.ed._exo=exoLeProjeto(t);PED.ed._exoNome=f.name;render();toast('A Ana leu o projeto. Confira o resultado.');}catch(x){toast('Não consegui ler esse arquivo. Envie o .dentalProject do caso.');}});});
+function exoSaudacao(){var h=new Date().getHours();return h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';}
+function exoEmailTxt(p){var R=p._exo,ds=(String(Array.isArray(p.dentes)?p.dentes.join(', '):p.dentes||'')).trim(),L=[];
+  L.push(exoSaudacao()+', Mari! Tudo bem?','','Segue mais um pedido:','');
+  L.push('Cliente: '+pedCli(p));if(p.paciente)L.push('Paciente: '+p.paciente);
+  if(R){oaResumo(exoArcada(R)).forEach(function(r){var t=R.dentes.filter(function(z){return z.n===r.ds[0];})[0];L.push('Elemento'+(r.u?'s ':' ')+r.txt+(r.u?' (unidos)':'')+': '+(EXO_REC[t.rec]||t.rec)+(t.mat?' em '+t.mat:'')+(t.imp?' sobre implante '+t.imp+(t.sb?' (com scanbody)':''):''));});}
+  else{if(p.trabalho)L.push('Trabalho: '+p.trabalho);if(ds)L.push('Elemento'+(ds.indexOf(',')>=0?'s':'')+': '+ds);if(p.material)L.push('Material: '+p.material);if(p.sobre_implante===true||p.sobre_implante==='true')L.push('Sobre implante'+(p.componente?': '+p.componente:''));}
+  var cor=(R&&R.cor)||p.cor;if(cor)L.push('Cor: '+cor);if(p.componente&&R)L.push('Componente: '+p.componente);if(p.prazo)L.push('Prazo: '+String(p.prazo).split('-').reverse().join('/'));if(p.urgente===true||p.urgente==='true')L.push('⚠️ URGENTE');if(p.obs)L.push('Observações: '+p.obs);
+  L.push('','Os arquivos do caso seguem em anexo.','Qualquer dúvida, estou à disposição.','','Att.,','Ana · Agente de Inteligência Artificial','Ideali Lab');
+  return {assunto:'Pedido #'+(p.numero||'')+' · '+(p.paciente||'')+' · '+pedCli(p),corpo:L.join('\n')};}
+function exoMailAbre(){var p=PED.ed;if(!p)return;pedLe();var m=exoEmailTxt(p),para=(empDados().inove||{}).email||'';var el=document.getElementById('exo-mail');if(el)el.remove();el=document.createElement('div');el.id='exo-mail';
+  el.innerHTML='<div class="pdg-ov"><div class="pdg-box"><div class="pdg-h"><b>✉️ E-mail para a Inove</b><button class="btn sm" data-exom="fecha">Fechar</button></div><div class="pdg-b">'+
+   '<div class="pdg-ana"><img src="'+ANA_AV[0]+'" alt=""><div>Montei o e-mail com os dados do pedido'+(p._exo?' e do projeto do exocad':'')+'. Confira, abra no seu e-mail e <b>arraste os arquivos do caso</b> para anexar.</div></div>'+
+   '<label class="fld"><span>Para</span><input id="exm-para" type="email" value="'+esc(para)+'" placeholder="e-mail da Inove"></label><label class="fld"><span>Assunto</span><input id="exm-as" type="text" value="'+esc(m.assunto)+'"></label>'+
+   '<label class="fld"><span>Mensagem</span><textarea id="exm-co" rows="14">'+esc(m.corpo)+'</textarea></label></div>'+
+   '<div class="pdg-f"><button class="btn" data-exom="copia">📋 Copiar</button><span style="flex:1"></span><button class="btn" data-exom="mailto">Abrir no app de e-mail</button><button class="btn pri" data-exom="gmail">Abrir no Gmail</button></div></div></div>';
+  document.body.appendChild(el);}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-exom]');if(!b)return;var a=b.getAttribute('data-exom'),el=document.getElementById('exo-mail');if(a==='fecha'){if(el)el.remove();return;}
+  var para=document.getElementById('exm-para').value.trim(),as=document.getElementById('exm-as').value,co=document.getElementById('exm-co').value;
+  if(para&&para!==((empDados().inove||{}).email||''))empDadosGrava('inove','email',para);
+  if(a==='copia'){(navigator.clipboard?navigator.clipboard.writeText(as+'\n\n'+co):Promise.reject()).then(function(){toast('📋 Copiado!');},function(){pedCopiaVelho(as+'\n\n'+co);toast('📋 Copiado!');});return;}
+  var u=a==='gmail'?'https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(para)+'&su='+encodeURIComponent(as)+'&body='+encodeURIComponent(co):'mailto:'+encodeURIComponent(para)+'?subject='+encodeURIComponent(as)+'&body='+encodeURIComponent(co);
+  window.open(u,'_blank');});
+Object.assign(ACT,{exoMail:function(){exoMailAbre();},
+  exoAplica:function(){pedLe();var p=PED.ed,R=p&&p._exo;if(!R)return;var A=exoArcada(R);p.dentes=A.map(function(x){return x.d;}).join(', ');p.qtd=String(A.length);p.arcada=A;
+    var mats=R.dentes.map(function(t){return t.mat;}).filter(Boolean);if(mats[0])p.material=mats[0];if(R.cor)p.cor=R.cor;if(!p.paciente&&R.paciente)p.paciente=R.paciente;
+    var imp=R.dentes.filter(function(t){return t.imp;});p.sobre_implante=imp.length>0;if(imp.length)p.componente=(imp.map(function(t){return t.imp;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(', ')+(imp.some(function(t){return t.sb;})?' · com scanbody':'')).slice(0,120);
+    if(!p.trabalho)p.trabalho=exoTrab(R).slice(0,120);render();toast('Dados do projeto aplicados. Confira e salve o pedido.');}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
