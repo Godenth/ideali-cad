@@ -1457,6 +1457,13 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 .cx-st{font-weight:800;font-size:.9rem;text-shadow:0 1px 2px rgba(0,0,0,.25);text-align:center}
 .cx-front .pdg-et{justify-content:center;margin:0}.cx-front .pdg-et span{background:rgba(255,255,255,.22);color:#fff;opacity:.85}.cx-front .pdg-et span.f{background:rgba(255,255,255,.9);color:#166534}.cx-front .pdg-et span.a{background:#fff;color:var(--cx)}
 .cx-pe{display:grid;gap:6px;padding:8px 4px 0}.cx-pe .pdg-arq{margin-top:0}.cx-pe .chip{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dfl-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:6px 0 12px}.dfl-nav{display:flex;align-items:center;gap:10px}.dfl-nav b{min-width:150px;text-align:center}
+.dfl-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:14px}.dfl-c{padding:12px 14px;border-radius:14px;border:1px solid var(--line,rgba(127,127,127,.25));display:grid;gap:2px}.dfl-c small{opacity:.7}.dfl-c b{font-size:1.35rem}.dfl-c em{font-style:normal;font-size:.8rem;opacity:.85}
+.dfl-c.tot{background:rgba(124,58,237,.08);border-color:rgba(124,58,237,.35)}.dfl-c.lab{background:rgba(37,99,235,.06)}.dfl-f{color:#DC2626;font-weight:700}.dfl-q{color:#16A34A;font-weight:700}
+.dfl-t{border:1px solid var(--line,rgba(127,127,127,.25));border-radius:14px;overflow:hidden}.dfl-r{display:grid;grid-template-columns:62px 1.2fr 1.6fr 52px 110px 110px 120px;gap:10px;padding:10px 14px;align-items:center;border-top:1px solid var(--line,rgba(127,127,127,.15));font-size:.9rem}
+.dfl-r small{display:block;opacity:.65;font-size:.78rem}.dfl-hd{border-top:0;background:rgba(127,127,127,.08);font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;opacity:.8}.dfl-ft{background:rgba(124,58,237,.06)}
+.dfl-et{font-size:.75rem;padding:3px 9px;border-radius:99px;background:rgba(124,58,237,.12)}
+@media(max-width:760px){.dfl-hd{display:none}.dfl-r{grid-template-columns:1fr auto;gap:4px 10px}.dfl-r>span:nth-child(1){grid-column:1/-1;font-size:.75rem;opacity:.7;order:0}.dfl-r>span:nth-child(2){order:1}.dfl-r>span:nth-child(6){order:2;text-align:right}.dfl-r>span:nth-child(3){order:3;grid-column:1/-1;font-size:.85rem}.dfl-r>span:nth-child(4){display:none}.dfl-r>span:nth-child(5){order:4;font-size:.8rem;opacity:.8}.dfl-r>span:nth-child(7){order:5;text-align:right}.dfl-ft>span:empty{display:none}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -2149,7 +2156,7 @@ function rDModal(D){var m=D.modal;if(!m)return '';var body='',tit='';
   return '<div class="dm-ov"><button class="dm-fundo" data-act="dFecha" aria-label="Fechar" tabindex="-1"></button><div class="dm-box" role="dialog" aria-modal="true" aria-label="'+esc(tit)+'"><div class="row"><h2>'+esc(tit)+'</h2><span class="spacer"></span><button class="btn sm" data-act="dFecha" aria-label="Fechar">✕</button></div>'+body+
     (D.erro?'<p class="err">'+esc(D.erro)+'</p>':'')+(m==='mais'?'':'<div class="row"><span class="spacer"></span><button class="btn" data-act="dFecha">Cancelar</button><button class="btn pri" data-act="dSalva" data-v="'+m+'">Salvar</button></div>')+'</div></div>';}
 
-var DMENU=[['inicio','Início','home'],['agenda','Agenda','ag'],['pedidos','Laboratório','lab'],['empresa','Minha empresa','fin'],['agentes','Agentes de IA','bot'],['rede','Rede','rede'],['perfil','Perfil','eu']];
+var DMENU=[['inicio','Início','home'],['agenda','Agenda','ag'],['pedidos','Laboratório','lab'],['finlab','Financeiro','fin'],['empresa','Minha empresa','fin'],['agentes','Agentes de IA','bot'],['rede','Rede','rede'],['perfil','Perfil','eu']];
 DIC.bot='<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 13h.01M15 13h.01M9 17h6"/><circle cx="12" cy="3.5" r="1"/>';
 DIC.esq='<path d="M15 5l-7 7 7 7"/>';DIC.dir='<path d="M9 5l7 7-7 7"/>';
 var AST=[['agendado','Agendado','#3A7BD5'],['confirmado','Confirmado','#13875F'],['atendimento','Em atendimento','#7B5CF2'],['atendido','Atendido','#8A8FA3'],['faltou','Faltou','#C23B3B']];
@@ -2286,7 +2293,7 @@ function rDAgentes(D){var AGL=D.estud?AG_STU:D.corp?agCorp(D):D.chk?AG_ASB:D.fil
   return '<div class="dtop"><div><h2>Agentes de IA</h2><p class="small muted">Sua equipe de assistentes. Toque em um agente para conversar.</p></div></div><div class="aglay">'+lista+chat+'</div>';}
 /* ----- Montagem do painel ----- */
 function rDent(){var D=S.dent;if(!D){D=S.dent=dCarrega()||dSeed((S.cad.nome||'').split(' ')[0]);}var t=S.tab.dent||'inicio';
-  var corpo=t==='pedidos'?(typeof rDLabTab==='function'?rDLabTab(D):rDPedidos2(D)):t==='agenda'?rDAgenda(D):t==='agentes'?rDAgentes(D):t==='rede'?rDRede(D):t==='perfil'?rDPerfil(D):rDInicio(D);
+  var corpo=t==='finlab'?(typeof rDFinLab==='function'?rDFinLab():''):t==='pedidos'?(typeof rDLabTab==='function'?rDLabTab(D):rDPedidos2(D)):t==='agenda'?rDAgenda(D):t==='agentes'?rDAgentes(D):t==='rede'?rDRede(D):t==='perfil'?rDPerfil(D):rDInicio(D);
   var hj=D.ag.filter(function(a){return a.data===dHoje()&&a.tipo==='consulta'&&(a.st==='agendado'||a.st==='confirmado');}).length,pr=D.peds.filter(function(p){return dRisco(p);}).length,nv=DVAGAS.filter(function(v){return v.novo;}).length;
   var badge={agenda:hj,pedidos:pr,agentes:nv};
   return rFestaDecor()+'<div class="dp2">'+rAnaTopo(D)+
@@ -3141,7 +3148,7 @@ var ACT={
   pUpgrade:function(){toast('Em breve: criar o seu negócio no Ideali e liberar Clientes e Financeiro.');},
   vtAbre:function(){var t=$('vt');if(!t)return;if(!t.hidden){t.hidden=true;return;}t.innerHTML='<div class="vt-in"><div class="row"><b>Ver telas</b><span class="spacer"></span><button class="btn sm" data-act="vtAbre" aria-label="Fechar">✕</button></div><p class="small muted" style="margin:0">Pula direto para a tela, com dados de exemplo.</p>'+VT.map(function(g){return '<div class="vt-g"><small>'+esc(g[0])+'</small>'+g[1].map(function(x){return '<button data-act="vtVai" data-v="'+x[0]+'">'+esc(x[1])+'</button>';}).join('')+'</div>';}).join('')+'</div>';t.hidden=false;},
   vtVai:function(v){vtVai(v);},
-  dTab:function(v){if(v==='empresa'){S.cfgOn=false;ACT.pUpgrade();return;}if(v==='rede'||v==='perfil'){redeTransicao(true,v==='perfil'?'perfil':'vagas');return;}var D=PN();D.modal=null;D.hist=null;D.erro='';S.tab[S.role]=v;render();window.scrollTo(0,0);},
+  dTab:function(v){if(v==='finlab'&&typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}if(v==='empresa'){S.cfgOn=false;ACT.pUpgrade();return;}if(v==='rede'||v==='perfil'){redeTransicao(true,v==='perfil'?'perfil':'vagas');return;}var D=PN();D.modal=null;D.hist=null;D.erro='';S.tab[S.role]=v;render();window.scrollTo(0,0);},
   dNovo:function(v,b){var D=PN();D.modal=v;D.edit=null;D.slot=null;D.modalLab=b&&b.dataset.lab||null;D.erro='';render();var f=document.querySelector('.dm-box input[type=text],.dm-box select');if(f)f.focus();},
   dSlot:function(v){var D=PN();D.modal='ag';D.edit=null;D.slot=v;D.erro='';render();var f=$('dm-tit');if(f)f.focus();},
   dAgVer:function(v){var D=PN();D.modal='ag';D.edit=v;D.slot=null;D.erro='';render();},
@@ -5565,6 +5572,34 @@ pdgEnviadosHtml=function(){var M=pdgMeus();if(!M.length)return '';
 /* arquinho de dentes desenhado na ficha (marca os dentes do pedido) */
 function cxMiniArco(ds){var f=function(L,y,dir){return L.map(function(n,i){var x=6+i*9.2,on=ds.indexOf(n)>=0,yy=y+dir*Math.pow(Math.abs(i-7.5)/7.5,2)*-9;return '<rect x="'+x.toFixed(1)+'" y="'+yy.toFixed(1)+'" width="7" height="9" rx="2.5" class="'+(on?'on':'')+'"/>';}).join('');};
   return '<svg viewBox="0 0 160 46" aria-hidden="true">'+f(OA_UP,10,1)+f(OA_LO,27,-1)+'</svg>';}
+
+/* ===== Clínica: aba Financeiro (trabalhos enviados aos laboratórios e quanto custou, pela tabela do laboratório) ===== */
+var DFL={d:null,carregando:false,erro:'',mes:null,lab:''};
+function dflCarrega(){if(!RL.user||DFL.carregando)return;DFL.carregando=true;SB.rpc('odo_clinica_fin').then(function(r){DFL.carregando=false;
+  if(r.error){DFL.erro=/odo_clinica_fin|function|schema cache/.test(r.error.message||'')?'falta061':'erro';render();return;}DFL.erro='';DFL.d=r.data||{pedidos:[],meses:[]};render();});}
+function dflMesDe(p){return String(p.criado||'').slice(0,7);}
+var DFL_ET={desenho:'Desenho CAD',aguardando:'Aguardando',producao:'Em produção',finalizado:'Pronto',entregue:'Entregue',cancelado:'Cancelado'};
+function rDFinLab(){if(!RL.user)return '<div class="card">Entre na sua conta para ver o financeiro.</div>';
+  if(!DFL.d&&!DFL.erro){dflCarrega();return '<div class="dtop"><div><h2>💰 Financeiro</h2></div></div><div class="card muted">Carregando…</div>';}
+  var h='<div class="dtop"><div><h2>💰 Financeiro</h2><p class="small muted">O que você mandou para os laboratórios e quanto custou, pelo preço da tabela de cada laboratório.</p></div></div>';
+  if(DFL.erro==='falta061')return h+'<div class="card" style="border-color:#F59E0B">⚠️ Falta rodar a atualização 061 no Supabase.</div>';
+  if(DFL.erro)return h+'<div class="card">Não consegui carregar agora. <button class="btn sm" data-act="dflRecarrega">Tentar de novo</button></div>';
+  var P=(DFL.d.pedidos||[]).filter(function(p){return p.status!=='cancelado'&&(!DFL.lab||p.lab_id===DFL.lab);}),labs={};(DFL.d.pedidos||[]).forEach(function(p){labs[p.lab_id]=p.lab;});
+  var meses=[];P.forEach(function(p){var m=dflMesDe(p);if(m&&meses.indexOf(m)<0)meses.push(m);});meses.sort().reverse();var hoje=new Date().toISOString().slice(0,7);if(meses.indexOf(hoje)<0)meses.unshift(hoje);
+  if(!DFL.mes||meses.indexOf(DFL.mes)<0)DFL.mes=meses[0];var i=meses.indexOf(DFL.mes),a=+DFL.mes.slice(0,4),m=+DFL.mes.slice(5,7);
+  var L=P.filter(function(p){return dflMesDe(p)===DFL.mes;}),el=L.reduce(function(s,p){return s+(+p.qtd||1);},0),tot=L.reduce(function(s,p){return s+(+p.valor||0);},0),semV=L.filter(function(p){return p.valor==null;}).length;
+  var F=(DFL.d.meses||[]).filter(function(x){return x.ano===a&&x.mes===m&&(!DFL.lab||x.lab_id===DFL.lab);});
+  h+='<div class="dfl-bar"><div class="dfl-nav"><button class="btn sm" data-act="dflMes" data-v="'+(meses[i+1]||'')+'"'+(meses[i+1]?'':' disabled')+'>◀</button><b>'+MESES[m-1].charAt(0).toUpperCase()+MESES[m-1].slice(1)+' de '+a+'</b><button class="btn sm" data-act="dflMes" data-v="'+(meses[i-1]||'')+'"'+(i>0?'':' disabled')+'>▶</button></div>'+
+    (Object.keys(labs).length>1?'<select id="dfl-lab"><option value="">Todos os laboratórios</option>'+Object.keys(labs).map(function(k){return '<option value="'+k+'"'+(k===DFL.lab?' selected':'')+'>'+esc(labs[k])+'</option>';}).join('')+'</select>':'')+'</div>';
+  h+='<div class="dfl-cards"><div class="dfl-c"><small>Trabalhos</small><b>'+L.length+'</b></div><div class="dfl-c"><small>Elementos</small><b>'+el+'</b></div><div class="dfl-c tot"><small>Total pela tabela</small><b>'+fmtR(tot)+'</b>'+(semV?'<em>'+semV+' sem valor ainda</em>':'')+'</div>'+
+    F.map(function(x){var falta=Math.max(0,(+x.valor||0)-(+x.pago||0));return '<div class="dfl-c lab"><small>Fechamento · '+esc(x.lab)+'</small><b>'+fmtR(x.valor)+'</b><em>pago '+fmtR(x.pago)+' · '+(falta>0.009?'<span class="dfl-f">falta '+fmtR(falta)+'</span>':'<span class="dfl-q">quitado ✓</span>')+'</em></div>';}).join('')+'</div>';
+  if(!L.length)return h+'<div class="card muted" style="text-align:center">Nenhum trabalho enviado em '+MESES[m-1]+'.</div>';
+  h+='<div class="dfl-t"><div class="dfl-r dfl-hd"><span>Data</span><span>Paciente</span><span>Trabalho</span><span>Elem.</span><span>Por elemento</span><span>Total</span><span>Etapa</span></div>'+L.map(function(p){var q=+p.qtd||1,v=p.valor==null?null:+p.valor,ds=(p.dentes||[]).join(', ');
+    return '<div class="dfl-r"><span>'+new Date(p.criado).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+'</span><span><b>'+esc(p.paciente||'—')+'</b>'+(Object.keys(labs).length>1?'<small>'+esc(p.lab)+'</small>':'')+'</span><span>'+esc(p.trabalho||'—')+(ds?'<small>dentes '+ds+'</small>':'')+'</span><span>'+q+'</span><span>'+(v==null?'<i class="muted">a definir</i>':fmtR(v/q))+'</span><span><b>'+(v==null?'—':fmtR(v))+'</b></span><span><span class="dfl-et">'+(p.status==='producao'&&p.enviado_inove?'Na fresagem':DFL_ET[p.status]||p.status)+'</span></span></div>';}).join('')+
+    '<div class="dfl-r dfl-ft"><span></span><span></span><span><b>Total do mês</b></span><span><b>'+el+'</b></span><span></span><span><b>'+fmtR(tot)+'</b></span><span></span></div></div>';
+  return h;}
+Object.assign(ACT,{dflMes:function(v){if(v){DFL.mes=v;render();}},dflRecarrega:function(){DFL.erro='';DFL.d=null;render();}});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='dfl-lab'){DFL.lab=e.target.value;render();}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
