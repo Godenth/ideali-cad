@@ -1436,6 +1436,7 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 .exm-c{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.exm-t{display:inline-flex;align-items:center}.exm-x{border:0;background:none;color:inherit;opacity:.5;cursor:pointer}.exm-n summary{list-style:none;cursor:pointer}.exm-n summary::-webkit-details-marker{display:none}.exm-n .row{margin-top:6px;gap:6px}.exm-n input{flex:1;min-width:150px}
 .pdg-et{display:flex;flex-wrap:wrap;gap:4px;width:100%;margin-top:6px}.pdg-et span{font-size:.72rem;padding:3px 9px;border-radius:99px;background:rgba(127,127,127,.12);opacity:.7}.pdg-et span.f{background:#DCFCE7;color:#166534;opacity:1}.pdg-et span.a{background:#7C3AED;color:#fff;opacity:1;font-weight:700}
 .gm-c{display:grid;gap:6px;padding:10px;border-radius:12px;border:1px dashed rgba(124,58,237,.45)}.gm-h{display:flex;align-items:center;gap:8px}.gm-h b{margin-right:auto}.gm-a{display:flex;align-items:center;gap:6px;font-size:.9rem}.gm-cfg .row{margin-top:6px;gap:6px}.gm-cfg input{flex:1;min-width:200px}
+.ped-inv{display:inline-block;margin-top:6px;font-size:.78rem;font-weight:700;color:#3A7BD5;background:rgba(58,123,213,.12);padding:3px 10px;border-radius:99px}.ped-inv small{font-weight:500;opacity:.8}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5491,6 +5492,10 @@ function gmEnvia(btn){if(GM.busy)return;var para=document.getElementById('exm-pa
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-exom="gmenvia"],[data-exom="gmcid"]');if(!b)return;e.stopPropagation();
   if(b.getAttribute('data-exom')==='gmcid'){var v=document.getElementById('gm-cid').value.trim();if(!/\.apps\.googleusercontent\.com$/.test(v)){toast('Esse não parece um ID de cliente Google (termina com .apps.googleusercontent.com).');return;}empDadosGrava('google','clientId',v);var d=document.querySelector('.gm-cfg');if(d)d.remove();toast('Pronto! Agora a Ana envia pelo seu Gmail.');return;}
   gmEnvia(b);},true);
+
+/* cartão em produção mostra que foi enviado à Inove (fresagem) */
+var _pedCardINV=pedCard;pedCard=function(p){var h=_pedCardINV(p);if(p.status!=='producao'||!p.enviado_inove||p.tipo!=='cad')return h;
+  return h.replace('<div class="pcard-f">','<span class="ped-inv">🏭 Enviado à Inove · fresagem'+(p.envio_id?' <small>(a clínica vê)</small>':'')+'</span><div class="pcard-f">');};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
