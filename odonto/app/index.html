@@ -1464,6 +1464,7 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 .dfl-r small{display:block;opacity:.65;font-size:.78rem}.dfl-hd{border-top:0;background:rgba(127,127,127,.08);font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;opacity:.8}.dfl-ft{background:rgba(124,58,237,.06)}
 .dfl-et{font-size:.75rem;padding:3px 9px;border-radius:99px;background:rgba(124,58,237,.12)}
 @media(max-width:760px){.dfl-hd{display:none}.dfl-r{grid-template-columns:1fr auto;gap:4px 10px}.dfl-r>span:nth-child(1){grid-column:1/-1;font-size:.75rem;opacity:.7;order:0}.dfl-r>span:nth-child(2){order:1}.dfl-r>span:nth-child(6){order:2;text-align:right}.dfl-r>span:nth-child(3){order:3;grid-column:1/-1;font-size:.85rem}.dfl-r>span:nth-child(4){display:none}.dfl-r>span:nth-child(5){order:4;font-size:.8rem;opacity:.8}.dfl-r>span:nth-child(7){order:5;text-align:right}.dfl-ft>span:empty{display:none}}
+.lsub{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 16px;border-bottom:1px solid var(--line,rgba(127,127,127,.2))}.lsub button{border:0;background:none;padding:10px 14px;font:700 .95rem inherit;color:inherit;opacity:.65;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}.lsub button[aria-selected=true]{opacity:1;border-bottom-color:#7C3AED;color:#7C3AED}.lsub-n{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:#7C3AED;color:#fff;font-size:.72rem;margin-left:4px}.lsub-v{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -2156,7 +2157,7 @@ function rDModal(D){var m=D.modal;if(!m)return '';var body='',tit='';
   return '<div class="dm-ov"><button class="dm-fundo" data-act="dFecha" aria-label="Fechar" tabindex="-1"></button><div class="dm-box" role="dialog" aria-modal="true" aria-label="'+esc(tit)+'"><div class="row"><h2>'+esc(tit)+'</h2><span class="spacer"></span><button class="btn sm" data-act="dFecha" aria-label="Fechar">✕</button></div>'+body+
     (D.erro?'<p class="err">'+esc(D.erro)+'</p>':'')+(m==='mais'?'':'<div class="row"><span class="spacer"></span><button class="btn" data-act="dFecha">Cancelar</button><button class="btn pri" data-act="dSalva" data-v="'+m+'">Salvar</button></div>')+'</div></div>';}
 
-var DMENU=[['inicio','Início','home'],['agenda','Agenda','ag'],['pedidos','Laboratório','lab'],['finlab','Financeiro','fin'],['empresa','Minha empresa','fin'],['agentes','Agentes de IA','bot'],['rede','Rede','rede'],['perfil','Perfil','eu']];
+var DMENU=[['inicio','Início','home'],['agenda','Agenda','ag'],['pedidos','Laboratório','lab'],['empresa','Minha empresa','fin'],['agentes','Agentes de IA','bot'],['rede','Rede','rede'],['perfil','Perfil','eu']];
 DIC.bot='<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 13h.01M15 13h.01M9 17h6"/><circle cx="12" cy="3.5" r="1"/>';
 DIC.esq='<path d="M15 5l-7 7 7 7"/>';DIC.dir='<path d="M9 5l7 7-7 7"/>';
 var AST=[['agendado','Agendado','#3A7BD5'],['confirmado','Confirmado','#13875F'],['atendimento','Em atendimento','#7B5CF2'],['atendido','Atendido','#8A8FA3'],['faltou','Faltou','#C23B3B']];
@@ -3148,7 +3149,7 @@ var ACT={
   pUpgrade:function(){toast('Em breve: criar o seu negócio no Ideali e liberar Clientes e Financeiro.');},
   vtAbre:function(){var t=$('vt');if(!t)return;if(!t.hidden){t.hidden=true;return;}t.innerHTML='<div class="vt-in"><div class="row"><b>Ver telas</b><span class="spacer"></span><button class="btn sm" data-act="vtAbre" aria-label="Fechar">✕</button></div><p class="small muted" style="margin:0">Pula direto para a tela, com dados de exemplo.</p>'+VT.map(function(g){return '<div class="vt-g"><small>'+esc(g[0])+'</small>'+g[1].map(function(x){return '<button data-act="vtVai" data-v="'+x[0]+'">'+esc(x[1])+'</button>';}).join('')+'</div>';}).join('')+'</div>';t.hidden=false;},
   vtVai:function(v){vtVai(v);},
-  dTab:function(v){if(v==='finlab'&&typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}if(v==='empresa'){S.cfgOn=false;ACT.pUpgrade();return;}if(v==='rede'||v==='perfil'){redeTransicao(true,v==='perfil'?'perfil':'vagas');return;}var D=PN();D.modal=null;D.hist=null;D.erro='';S.tab[S.role]=v;render();window.scrollTo(0,0);},
+  dTab:function(v){if(v==='finlab'){S.labSub='fin';v='pedidos';if(typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}}if(v==='empresa'){S.cfgOn=false;ACT.pUpgrade();return;}if(v==='rede'||v==='perfil'){redeTransicao(true,v==='perfil'?'perfil':'vagas');return;}var D=PN();D.modal=null;D.hist=null;D.erro='';S.tab[S.role]=v;render();window.scrollTo(0,0);},
   dNovo:function(v,b){var D=PN();D.modal=v;D.edit=null;D.slot=null;D.modalLab=b&&b.dataset.lab||null;D.erro='';render();var f=document.querySelector('.dm-box input[type=text],.dm-box select');if(f)f.focus();},
   dSlot:function(v){var D=PN();D.modal='ag';D.edit=null;D.slot=v;D.erro='';render();var f=$('dm-tit');if(f)f.focus();},
   dAgVer:function(v){var D=PN();D.modal='ag';D.edit=v;D.slot=null;D.erro='';render();},
@@ -5600,6 +5601,20 @@ function rDFinLab(){if(!RL.user)return '<div class="card">Entre na sua conta par
   return h;}
 Object.assign(ACT,{dflMes:function(v){if(v){DFL.mes=v;render();}},dflRecarrega:function(){DFL.erro='';DFL.d=null;render();}});
 document.addEventListener('change',function(e){if(e.target&&e.target.id==='dfl-lab'){DFL.lab=e.target.value;render();}});
+
+/* ===== Aba Laboratório da clínica com sub-abas: Pedidos · Laboratórios parceiros · Financeiro ===== */
+var _rDLabTabSub=rDLabTab;rDLabTab=function(D){if(!RL.user)return _rDLabTabSub(D);PDG.labNome={};labVMeus().forEach(function(v){PDG.labNome[v.lab_id]=v.lab_nome;});
+  var con=labVMeus().filter(function(v){return v.status==='aceito';}).length,sub=S.labSub||(con?'ped':'labs'),nEnv=pdgMeus().filter(function(e){return e.status==='enviado'||(e.status==='aceito'&&e.etapa!=='Entregue');}).length;
+  var abas=[['ped','📦 Pedidos',nEnv],['labs','🧪 Laboratórios parceiros',con],['fin','💰 Financeiro',0]];
+  var h='<div class="dtop"><div><h2>🧪 Laboratório</h2></div>'+(con?'<button class="btn pdg-novo" data-act="pdgNovo">📤 Novo pedido</button>':'')+'</div>'+
+    '<div class="lsub" role="tablist">'+abas.map(function(a){return '<button role="tab" aria-selected="'+(sub===a[0])+'" data-act="labSub" data-v="'+a[0]+'">'+a[1]+(a[2]?' <span class="lsub-n">'+a[2]+'</span>':'')+'</button>';}).join('')+'</div>';
+  if(sub==='ped'){var env=pdgEnviadosHtml();
+    if(!con&&!env)return h+'<div class="card lsub-v">Você ainda não tem laboratório conectado. <button class="btn sm pri" data-act="labSub" data-v="labs">Conectar um laboratório</button></div>';
+    return h+(env?env.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>',''):'<div class="card lsub-v">Nenhum pedido ainda. <button class="btn sm pri" data-act="pdgNovo">📤 Fazer o primeiro pedido</button></div>');}
+  if(sub==='fin'){var f=typeof rDFinLab==='function'?rDFinLab():'';return h+f.replace(/<div class="dtop"><div><h2>💰 Financeiro<\/h2>/,'<div class="dtop"><div>');}
+  var full=_rDLabTabSub(D),e2=pdgEnviadosHtml();if(e2)full=full.replace(e2,'');full=full.replace(/^<div class="dtop"><div><h2>🧪 Laboratório<\/h2>.*?<\/div><\/div>/,'');
+  return h+full;};
+ACT.labSub=function(v){S.labSub=v;if(v==='fin'&&typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}render();};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
