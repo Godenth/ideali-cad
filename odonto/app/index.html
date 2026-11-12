@@ -1437,7 +1437,7 @@ body.arrastando,body.arrastando *{cursor:grabbing!important}.pcol.pdrop{outline:
 .pdg-et{display:flex;flex-wrap:wrap;gap:4px;width:100%;margin-top:6px}.pdg-et span{font-size:.72rem;padding:3px 9px;border-radius:99px;background:rgba(127,127,127,.12);opacity:.7}.pdg-et span.f{background:#DCFCE7;color:#166534;opacity:1}.pdg-et span.a{background:#7C3AED;color:#fff;opacity:1;font-weight:700}
 .gm-c{display:grid;gap:6px;padding:10px;border-radius:12px;border:1px dashed rgba(124,58,237,.45)}.gm-h{display:flex;align-items:center;gap:8px}.gm-h b{margin-right:auto}.gm-a{display:flex;align-items:center;gap:6px;font-size:.9rem}.gm-cfg .row{margin-top:6px;gap:6px}.gm-cfg input{flex:1;min-width:200px}
 .ped-inv{display:inline-block;margin-top:6px;font-size:.78rem;font-weight:700;color:#3A7BD5;background:rgba(58,123,213,.12);padding:3px 10px;border-radius:99px}.ped-inv small{font-weight:500;opacity:.8}
-.gm-err{padding:8px 10px;border-radius:10px;background:rgba(239,68,68,.12);color:#EF4444;font-size:.88rem;font-weight:600}
+.gm-err{margin:0 18px 8px;padding:8px 10px;border-radius:10px;background:rgba(239,68,68,.12);color:#EF4444;font-size:.88rem;font-weight:600}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5481,7 +5481,7 @@ function gmEnvia(btn){if(GM.busy)return;var para=document.getElementById('exm-pa
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(para)){toast('Coloque o e-mail da Inove no campo Para.');return;}
   if(!gmCliente()){var d=document.querySelector('.gm-cfg');if(d)d.open=true;toast('Falta configurar o envio pelo Gmail (ID do cliente Google).');return;}
   GM.busy=true;var t0=btn.textContent;btn.disabled=true;btn.textContent='Preparando anexos…';
-  var fim=function(msg){GM.busy=false;btn.disabled=false;btn.textContent=t0;var bx=document.getElementById('gm-err');if(bx)bx.remove();if(msg){toast(msg);var c=document.querySelector('#exo-mail .gm-c');if(c){bx=document.createElement('div');bx.id='gm-err';bx.className='gm-err';bx.textContent='⚠️ '+msg;c.appendChild(bx);bx.scrollIntoView({block:'nearest'});}}};
+  var fim=function(msg){GM.busy=false;btn.disabled=false;btn.textContent=t0;var bx=document.getElementById('gm-err');if(bx)bx.remove();if(msg){toast(msg);var c=document.querySelector('#exo-mail .pdg-box');if(c){bx=document.createElement('div');bx.id='gm-err';bx.className='gm-err';bx.textContent='⚠️ '+msg;c.insertBefore(bx,c.querySelector('.pdg-f'));}}};
   gmToken().then(function(tok){return gmPrepara().then(function(arqs){var tot=arqs.reduce(function(s,a){return s+a.u8.length;},0);if(tot>24*1024*1024)throw 'Os anexos somam '+pdgMB(tot)+' e o Gmail aceita até 25 MB. Tire algum arquivo ou envie por link.';
     btn.textContent='Enviando…';var raw=gmMime(para,as,co,arqs);
     return fetch('https://gmail.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media',{method:'POST',headers:{'Authorization':'Bearer '+tok,'Content-Type':'message/rfc822'},body:raw}).then(function(r){if(r.status===401){GM.tok=null;throw 'A permissão do Google expirou. Clique de novo para enviar.';}if(!r.ok)return r.text().then(function(x){var d='';try{var j=JSON.parse(x);d=(j.error&&(j.error.message||j.error.status))||'';}catch(e){d=String(x||'').slice(0,160);}throw 'O Gmail recusou o envio ('+r.status+')'+(d?': '+d:'')+(r.status===403?' · Confira se a Gmail API está ativada no projeto Ideali do Google Cloud e se você está na lista de usuários de teste.':'');});return arqs.length;});});})
