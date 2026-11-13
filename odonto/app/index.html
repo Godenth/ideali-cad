@@ -1648,6 +1648,11 @@ body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
 #pc-ov .pc-bar{padding-bottom:max(8px,env(safe-area-inset-bottom))}
 @media(max-width:600px){#pc-ov .pc-h{padding-top:max(10px,env(safe-area-inset-top))}#pc-ov .pc-c{flex:0 0 auto;padding:10px 15px}}
 .pc-h .pc-lab{color:#00A884}
+
+.pc-in .pc-mic{background:#2A3942;color:#E9EDEF;display:grid;place-items:center;flex:0 0 44px}
+.pc-in .pc-mic.on{background:#EF4444;color:#fff;animation:pcmPulse 1.2s infinite}
+.pc-in .pc-mic.on i{width:14px;height:14px;border-radius:3px;background:#fff;display:block}
+@keyframes pcmPulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}70%{box-shadow:0 0 0 12px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6437,6 +6442,23 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   else if(a==='formulario'){e.stopImmediatePropagation();var p=pclMonta()[0];pcFecha();if(ACT.dTab)ACT.dTab('pedidos');PED.ed=p;PED.erroF='';render();window.scrollTo(0,0);toast('Confira e toque em Salvar.');}},true);
 /* no laboratório, o + e o botão da Ana abrem a conversa */
 ACT.anaPed=function(){pclAbre();};
+
+/* ===== Microfone na conversa da Ana: fala e ela escreve a resposta (voz do próprio navegador, grátis) ===== */
+var PCM={rec:null,on:false,txt:''};
+function pcmTem(){return !!(window.SpeechRecognition||window.webkitSpeechRecognition);}
+var _pcBarraM=pcBarra;pcBarra=function(){var h=_pcBarraM.apply(this,arguments);if(!pcmTem())return h;
+  return h.replace('<button type="submit" aria-label="Enviar">➤</button>','<button type="button" class="pc-mic'+(PCM.on?' on':'')+'" data-pcmic="1" aria-label="'+(PCM.on?'Parar de ouvir':'Falar')+'">'+(PCM.on?'<i></i>':'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>')+'</button><button type="submit" aria-label="Enviar">➤</button>');};
+function pcmPara(){PCM.on=false;if(PCM.rec){try{PCM.rec.stop();}catch(e){}}}
+function pcmOuve(){if(PCM.on){pcmPara();return;}var R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return;
+  var r=new R();r.lang='pt-BR';r.interimResults=true;r.continuous=false;r.maxAlternatives=1;PCM.rec=r;PCM.txt='';PCM.on=true;pcDesenha();
+  var t0=document.getElementById('pc-t');if(t0){t0.value='';t0.placeholder='🎤 Pode falar…';}
+  r.onresult=function(e){var s='';for(var i=0;i<e.results.length;i++)s+=e.results[i][0].transcript;PCM.txt=s;var t=document.getElementById('pc-t');if(t)t.value=s;};
+  r.onerror=function(e){PCM.on=false;pcDesenha();if(e.error==='not-allowed'||e.error==='service-not-allowed')toast('Libere o microfone para o site nas configurações do navegador.');else if(e.error==='no-speech')toast('Não ouvi nada. Toque no microfone e fale de novo.');else if(e.error==='network')toast('Sem internet para reconhecer a voz.');};
+  r.onend=function(){var s=String(PCM.txt||'').trim();PCM.on=false;PCM.rec=null;PCM.txt='';
+    if(s&&PC.on){var t=document.getElementById('pc-t');if(t)t.value='';pcResposta(s.replace(/\s+/g,' '));}else pcDesenha();};
+  try{r.start();}catch(e){PCM.on=false;pcDesenha();}}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-pcmic]');if(!b||!PC.on)return;e.preventDefault();pcmOuve();});
+(function(){var f=pcFecha;pcFecha=function(){pcmPara();return f.apply(this,arguments);};})();
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
