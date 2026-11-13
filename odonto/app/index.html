@@ -1594,6 +1594,27 @@ body.membro [data-act="labSub"][data-v="pag"]{display:none!important}
 .pz-quase{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.45)}.pz-atr{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.45)}.pz-atr b{color:#B91C1C}
 .pz-par{background:rgba(217,119,6,.12);border-color:rgba(217,119,6,.5)}.pz-par b{color:#B45309}
 .cx-board .pz{background:rgba(255,255,255,.92);color:#1F2937;border:0;margin:10px 0 0}.cx-board .pz-atr{background:#FEE2E2}.cx-board .pz-par{background:#FEF3C7}.cx-board .pz-quase{background:#FEF3C7}
+.kb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start;margin-top:10px}
+.kb-col{background:rgba(127,127,127,.07);border-radius:18px;padding:12px;min-width:0}.kb-col>header{display:flex;justify-content:space-between;align-items:center;padding:4px 6px 12px}.kb-col>header b{font-size:1rem}.kb-col>header span{min-width:24px;height:24px;border-radius:999px;background:#4B3CC9;color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:800;padding:0 6px}
+.kb-pend>header span{background:#DC2626}.kb-apr>header span{background:#D97706}.kb-vz{opacity:.7;text-align:center;padding:18px 6px;margin:0;font-size:.9rem}
+.kb .cx-g{grid-template-columns:1fr;gap:26px}
+@keyframes cxPisca{0%,100%{box-shadow:0 12px 22px rgba(20,20,60,.18)}50%{box-shadow:0 0 0 5px rgba(220,38,38,.55),0 12px 22px rgba(220,38,38,.3)}}
+@keyframes cxPiscaA{0%,100%{box-shadow:0 12px 22px rgba(20,20,60,.18)}50%{box-shadow:0 0 0 5px rgba(245,158,11,.55),0 12px 22px rgba(245,158,11,.3)}}
+.cx-pend .cx-board{animation:cxPisca 1.6s infinite}.cx-apr .cx-board{animation:cxPiscaA 2.2s infinite}
+@media(prefers-reduced-motion:reduce){.cx-pend .cx-board,.cx-apr .cx-board{animation:none}}
+.pend{border:2px solid #DC2626;background:#FEF2F2;color:#7F1D1D;border-radius:14px;padding:10px 12px;display:grid;gap:8px}.pend p{margin:0;color:#1F2937;font-weight:600}.pend textarea{font:inherit;border-radius:10px;border:1px solid #FCA5A5;padding:8px;min-width:0;resize:vertical}
+.pend-b{display:flex;gap:8px;flex-wrap:wrap}.pend-resp{font-size:.85rem;color:#374151}.pend-arqs{display:flex;flex-wrap:wrap;gap:6px;font-size:.8rem}.pend-arqs span{background:#fff;border-radius:8px;padding:3px 8px}
+.pend-lab{background:#FEF3C7;border-radius:10px;padding:8px 10px;font-size:.88rem;width:100%}.pcard-ch{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.pedmaq{color:#BE185D;font-weight:700}
+.ch-bt b{background:#DC2626;color:#fff;border-radius:999px;padding:0 7px;margin-left:4px;font-size:.75rem}.ch-novo{border-color:#DC2626!important}
+.ch-ov{position:fixed;inset:0;z-index:9990;background:rgba(5,8,20,.5);display:flex;justify-content:flex-end}
+.ch-box{width:min(440px,100%);height:100%;background:#F4F3F9;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.3)}
+.ch-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;background:#4B3CC9;color:#fff}.ch-h>div{display:grid}.ch-h small{opacity:.8}.ch-x{background:none;border:0;color:#fff;font-size:22px;cursor:pointer}
+.ch-msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:8px}.ch-vz{text-align:center;opacity:.7;margin:30px 10px}
+.ch-m{max-width:82%;align-self:flex-start;background:#fff;color:#1F2937;border-radius:14px 14px 14px 4px;padding:8px 10px;box-shadow:0 1px 2px rgba(0,0,0,.08);display:grid;gap:4px}
+.ch-m.eu{align-self:flex-end;background:#DCF8C6;border-radius:14px 14px 4px 14px}.ch-m p{margin:0;white-space:normal;word-wrap:break-word}.ch-m img{max-width:100%;border-radius:10px;display:block}.ch-m time{font-size:.7rem;opacity:.6;justify-self:end}.ch-q{font-weight:700;color:#4B3CC9;font-size:.75rem}
+.ch-prev{display:flex;gap:8px;padding:8px 12px;flex-wrap:wrap;background:#fff;border-top:1px solid #e5e3ee}.ch-prev span{position:relative}.ch-prev img{width:64px;height:64px;object-fit:cover;border-radius:8px}.ch-prev button{position:absolute;top:-6px;right:-6px;border:0;border-radius:50%;width:20px;height:20px;background:#DC2626;color:#fff;font-size:11px;cursor:pointer}
+.ch-f{display:flex;gap:8px;align-items:flex-end;padding:10px 12px;background:#fff;border-top:1px solid #e5e3ee}.ch-f textarea{flex:1;font:inherit;border:1px solid #d6d3e4;border-radius:12px;padding:9px 10px;resize:none;max-height:120px;min-width:0}.ch-clip{font-size:22px;cursor:pointer;padding:6px}
+@media(max-width:900px){.kb{grid-template-columns:1fr}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5669,7 +5690,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 /* ===== Clínica: o agente de produção avisa no meio da tela cada etapa do pedido no laboratório ===== */
 var ET={fila:[],on:false,timer:null};
 var ET_MSG={aceito:['foi <b>aceito</b> pelo laboratório 👍','satisfeito'],recusado:['foi <b>recusado</b> pelo laboratório','serio'],'Desenho CAD':['está no <b>desenho CAD</b> ✏️','presente'],'Enviado para fresagem':['foi para a <b>fresagem</b> 🏭','satisfeito'],
-  'Em produção':['está <b>em produção</b> 🛠️','presente'],'Pronto':['está <b>pronto</b>! ✅','satisfeito'],'Entregue':['foi <b>entregue</b> 📦','satisfeito'],'Aguardando informação':['está <b>aguardando uma informação</b> sua','serio'],'Cancelado':['foi <b>cancelado</b> pelo laboratório','serio']};
+  'Em produção':['está <b>em produção</b> 🛠️','presente'],'Desenhado':['já foi <b>desenhado</b> ✏️✅','satisfeito'],'Maquiagem':['está na <b>maquiagem</b> 🎨','presente'],'Pronto':['está <b>pronto</b>! ✅','satisfeito'],'Entregue':['foi <b>entregue</b> 📦','satisfeito'],'Aguardando informação':['está <b>aguardando uma informação</b> sua','serio'],'Cancelado':['foi <b>cancelado</b> pelo laboratório','serio']};
 function etChave(e){return e.status==='aceito'?(e.etapa||'aceito'):e.status;}
 function etVistos(){try{return JSON.parse(localStorage.getItem('io_et_v_'+(RL.user&&RL.user.id))||'null');}catch(x){return null;}}
 function etGuarda(m){try{localStorage.setItem('io_et_v_'+(RL.user&&RL.user.id),JSON.stringify(m));}catch(x){}}
@@ -5748,7 +5769,7 @@ var _rDLabTabSub=rDLabTab;rDLabTab=function(D){if(!RL.user)return _rDLabTabSub(D
   if(sub==='pag')return h+rDPagHist();
   if(sub==='feitos'){PDG.f={feito:true};var envF=pdgEnviadosHtml();PDG.f=null;
     return h+pdgMesBar(true)+(envF?envF.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>',''):'<div class="card lsub-v">'+(pdgMesSel()==='todos'?'Nenhum pedido finalizado ainda.':'Nenhum pedido finalizado em '+pdgMesNome(pdgMesSel())+'.')+'</div>');}
-  if(sub==='ped'){PDG.f={feito:false};var env=pdgEnviadosHtml();PDG.f=null;var outros=pdgMesSel()!=='todos'?pdgMeus().filter(function(e){return !pdgFeito(e)&&pdgMesDe(e)!==pdgMesSel();}).length:0;
+  if(sub==='ped'){PDG.f={feito:false};var env=pdgEnviadosHtml();PDG.f=null;if(env)env=pdgKanban();var outros=pdgMesSel()!=='todos'?pdgMeus().filter(function(e){return !pdgFeito(e)&&pdgMesDe(e)!==pdgMesSel();}).length:0;
     if(con||env)h+=pdgMesBar(false)+(outros?'<p class="pmes-dica">+ '+outros+' pedido'+(outros>1?'s':'')+' em andamento de outros meses · <button class="lnk" data-act="labMes" data-v="todos">ver todos</button></p>':'');
     if(!con&&!env)return h+'<div class="card lsub-v">Você ainda não tem laboratório conectado. <button class="btn sm pri" data-act="labSub" data-v="labs">Conectar um laboratório</button></div>';
     return h+(env?env.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>',''):(pdgMeus().some(function(e){return !pdgFeito(e);})?'<div class="card lsub-v">Nenhum pedido em andamento em '+pdgMesNome(pdgMesSel())+'.</div>':'<div class="card lsub-v">Nenhum pedido em andamento. <button class="btn sm pri" data-act="pdgNovo">📤 Fazer um pedido</button></div>'));}
@@ -6076,7 +6097,8 @@ function pdgMesDe(e){var d=new Date(e.enviado_em||e.criado_em);return d.getFullY
 function pdgMesHoje(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);}
 function pdgMesSel(){return S.labMes||pdgMesHoje();}
 function pdgMesNome(k){if(k==='todos')return 'todos os meses';var p=k.split('-');return PMES[+p[1]-1]+' de '+p[0];}
-function pdgFiltra(M){if(!PDG.f)return M;var m=pdgMesSel(),fe=PDG.f.feito;return M.filter(function(e){return pdgFeito(e)===fe&&(m==='todos'||pdgMesDe(e)===m);});}
+function pdgCol(e){return e.status==='enviado'?'apr':(e.etapa==='Aguardando informação'?'pend':'prod');}
+function pdgFiltra(M){if(!PDG.f)return M;var m=pdgMesSel(),fe=PDG.f.feito,c=PDG.f.col;return M.filter(function(e){return pdgFeito(e)===fe&&(!c||pdgCol(e)===c)&&(m==='todos'||pdgMesDe(e)===m);});}
 function pdgMesBar(fe){var m=pdgMesSel(),todos=m==='todos',n=pdgMeus().filter(function(e){return pdgFeito(e)===fe&&(todos||pdgMesDe(e)===m);}).length;
   return '<div class="pmes"><div class="pmes-nav"><button class="btn sm" data-act="labMes" data-v="-1" aria-label="Mês anterior"'+(todos?' disabled':'')+'>‹</button><b>'+(todos?'Todos os meses':pdgMesNome(m))+'</b><button class="btn sm" data-act="labMes" data-v="1" aria-label="Próximo mês"'+(todos?' disabled':'')+'>›</button></div>'+
     '<div class="pmes-op"><button class="btn sm'+(todos?' pri':'')+'" data-act="labMes" data-v="'+(todos?'hoje':'todos')+'">'+(todos?'📅 Ver por mês':'🗂️ Todos os meses')+'</button><small>'+n+' pedido'+(n===1?'':'s')+'</small></div></div>';}
@@ -6168,6 +6190,106 @@ var _pedCardPZ=pedCard;pedCard=function(p){var h=_pedCardPZ(p);if(!p||['finaliza
   var e=p.envio_id?(PDG.L||[]).filter(function(x){return x.id===p.envio_id;})[0]:null;
   var o={inicio:(e&&(e.prazo_inicio||e.enviado_em))||p.criado_em,txt:[p.trabalho,p.material,p.descricao].filter(Boolean).join(' '),parado:p.status==='aguardando',falta:p.falta_info};
   var z=pzHtml(o);if(!z)return h;var j=h.indexOf('<div class="pcard-f">');return j<0?h+z:h.slice(0,j)+z+h.slice(j);};
+
+/* ===== Quadro da clínica (estilo Hubt): Aguardando aprovação · Em produção · Pendência ===== */
+function pdgKanban(){var cols=[['apr','⏳ Aguardando aprovação'],['prod','🛠️ Em produção'],['pend','⚠️ Pendência']];
+  return '<div class="kb">'+cols.map(function(c){PDG.f={feito:false,col:c[0]};var h=pdgEnviadosHtml(),n=pdgFiltra(pdgMeus()).length;PDG.f=null;
+    h=h?h.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>',''):'<p class="kb-vz">'+(c[0]==='apr'?'Nenhum pedido esperando o laboratório.':c[0]==='pend'?'Nenhuma pendência. 🎉':'Nada em produção agora.')+'</p>';
+    return '<section class="kb-col kb-'+c[0]+'"><header><b>'+c[1]+'</b><span>'+n+'</span></header>'+h+'</section>';}).join('')+'</div>';}
+/* etapas que a clínica vê */
+var PDG_ETAPAS_CLI=[['Desenho CAD','Desenho'],['Desenhado','Desenhado'],['Enviado para fresagem','Fresagem'],['Maquiagem','Maquiagem'],['Entregue','Enviado']];
+var _pdgEtapasCLI=pdgEtapas;pdgEtapas=function(e){var et=e.etapa||'Desenho CAD';if(et==='Cancelado'||et==='Aguardando informação')return _pdgEtapasCLI(e);
+  var i={'Desenho CAD':0,'Desenhado':1,'Enviado para fresagem':2,'Em produção':2,'Maquiagem':3,'Pronto':4,'Entregue':4}[et];if(i==null)i=0;var feito=et==='Pronto'||et==='Entregue';
+  return '<div class="pdg-et">'+PDG_ETAPAS_CLI.map(function(x,k){var f=k<i||(feito&&k<=i);return '<span class="'+(f?'f':k===i?'a':'')+'">'+(f?'✓ ':'')+(k===4&&et==='Pronto'?'Pronto':x[1])+'</span>';}).join('')+'</div>';};
+CX_COR['Desenhado']='#6D28D9';CX_COR['Maquiagem']='#DB2777';CX_COR['Aguardando informação']='#DC2626';
+/* pendência: a clínica responde na prancheta */
+var PEND={aberto:null,arqs:[],busy:false};
+function pendHtml(e){if(e.etapa!=='Aguardando informação'||e.status!=='aceito'||String(e.id).indexOf('lab-')===0)return '';
+  var resp=e.resposta?'<div class="pend-resp">Você respondeu: <b>'+esc(e.resposta)+'</b>'+(e.resposta_ok===false?' · <i>aguardando você anexar</i>':'')+'</div>':'';
+  var ab=PEND.aberto===e.id;
+  return '<div class="pend"><b>⚠️ Pendência do laboratório</b><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p>'+resp+
+    (ab?'<textarea id="pend-t" maxlength="1000" rows="3" placeholder="O que você vai fazer? Ex.: vou enviar um novo escaneamento"></textarea><label class="btn sm">📎 Anexar arquivo<input type="file" id="pend-arq" multiple hidden accept="image/*,video/*,.stl,.ply,.obj,.zip,.3mf,.pdf"></label>'+
+      (PEND.arqs.length?'<div class="pend-arqs">'+PEND.arqs.map(function(f){return '<span>📄 '+esc(f.name)+'</span>';}).join('')+'</div>':'')+
+      '<div class="pend-b"><button class="btn sm" data-pend="cancela">Voltar</button><button class="btn sm pri" data-pend="envia" data-v="'+e.id+'"'+(PEND.busy?' disabled':'')+'>'+(PEND.busy?'Enviando…':'Enviar resposta')+'</button></div>'
+      :'<div class="pend-b"><button class="btn sm ok" data-pend="sim" data-v="'+e.id+'">✓ Sim, pode prosseguir</button><button class="btn sm" data-pend="nao" data-v="'+e.id+'">✗ Não / vou mandar algo</button></div>')+'</div>';}
+function pendEnvia(id,ok,txt){var e=PDG.L.filter(function(x){return x.id===id;})[0];if(!e||PEND.busy)return;PEND.busy=true;render();var uid=contaId(),feitos=[];
+  PEND.arqs.reduce(function(pr,f,i){return pr.then(function(){var foto=/^image\//.test(f.type),vid=/^video\//.test(f.type);
+    return (foto?pdgFotoJpg(f):vid?Promise.resolve(f):pdgZip(f)).then(function(b){if(!b)throw 'Não consegui ler '+f.name;if(b.size>PDG_ARQ)throw f.name+' passou de 50 MB.';
+      var ext=vid?((f.name.match(/\.(mp4|mov|webm|3gp)$/i)||['','mp4'])[1].toLowerCase()):'',nm='p'+Date.now().toString(36)+i+'-'+pdgNomeSeguro(f.name.replace(/\.[^.]+$/,''))+(foto?'.jpg':vid?'.'+ext:'.zip'),path=uid+'/'+id+'/'+nm;
+      return SB.storage.from('odonto-ped').upload(path,b,{contentType:foto?'image/jpeg':vid?({mov:'video/quicktime',webm:'video/webm','3gp':'video/3gpp'}[ext]||'video/mp4'):'application/zip',upsert:false}).then(function(u){if(u.error)throw 'Falha ao enviar '+f.name+'.';
+        feitos.push({path:path,nome:'Resposta · '+(foto?f.name.replace(/\.[^.]+$/,'')+'.jpg':vid?f.name:f.name+'.zip'),tam:b.size,tipo:foto?'foto':vid?'video':'scan'});});});});},Promise.resolve())
+  .then(function(){return SB.rpc('odo_ped_env_responde_pend',{p_id:id,p_ok:ok,p_texto:txt||null,p_arquivos:feitos});}).then(function(r){PEND.busy=false;
+    if(r.error){toast(/responde_pend|does not exist|schema cache/.test(r.error.message||'')?'Falta rodar a atualização 072 no Supabase.':/sem_pendencia/.test(r.error.message||'')?'Essa pendência já foi resolvida.':'Não consegui enviar a resposta.');render();return;}
+    PEND.aberto=null;PEND.arqs=[];toast(r.data==='retomado'?'Resposta enviada ✓ O pedido voltou para a produção e o prazo recomeçou.':'Resposta enviada ✓ O prazo continua parado até você anexar o arquivo.');pdgCarrega();})
+  .catch(function(m){PEND.busy=false;toast(typeof m==='string'?m:'Não consegui enviar.');render();});}
+document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-pend]');if(!b)return;var k=b.getAttribute('data-pend'),id=b.getAttribute('data-v');ev.preventDefault();
+  if(k==='sim'){if(confirm('Confirmar: o laboratório pode prosseguir?'))pendEnvia(id,true,null);}else if(k==='nao'){PEND.aberto=id;PEND.arqs=[];render();setTimeout(function(){var t=document.getElementById('pend-t');if(t)t.focus();},0);}
+  else if(k==='cancela'){PEND.aberto=null;PEND.arqs=[];render();}else if(k==='envia'){var t=(document.getElementById('pend-t')||{}).value||'';if(!t.trim()&&!PEND.arqs.length){toast('Escreva o que vai fazer ou anexe o arquivo.');return;}pendEnvia(id,false,t.trim());}});
+document.addEventListener('change',function(ev){if(ev.target&&ev.target.id==='pend-arq'){var t=(document.getElementById('pend-t')||{}).value||'';PEND.arqs=PEND.arqs.concat([].slice.call(ev.target.files||[])).slice(0,10);render();var t2=document.getElementById('pend-t');if(t2){t2.value=t;}}});
+/* prancheta: pendência + conversa + piscar */
+var _pdgEnvKB=pdgEnviadosHtml;pdgEnviadosHtml=function(){var h=_pdgEnvKB.apply(this,arguments);if(!h)return h;var M=pdgFiltra(pdgMeus()).slice(0,60),i=0,j=0;
+  h=h.replace(/<article class="cx" /g,function(x){var e=M[i++];if(!e)return x;var c=pdgCol(e);return '<article class="cx'+(c==='pend'&&!pdgFeito(e)?' cx-pend':'')+(c==='apr'?' cx-apr':'')+'" ';});
+  return h.replace(/<div class="cx-pe">/g,function(x){var e=M[j++];if(!e)return x;return x+pendHtml(e)+chBotao(chChaveCli(e),true);});};
+
+/* ===== Mini chat em cada pedido (clínica <-> laboratório), com print colado (Ctrl+V) — migração 072 ===== */
+var CH={on:false,k:null,tit:'',L:[],busy:false,anexos:[],idx:{},falta:false,urls:{}};
+function chChaveCli(e){var id=String(e.id);return id.indexOf('lab-')===0?{pedido:id.slice(4)}:{envio:id};}
+function chChaveLab(p){return p.envio_id?{envio:p.envio_id}:{pedido:p.id};}
+function chK(k){return k.envio?'e:'+k.envio:'p:'+k.pedido;}
+function chLado(){return S.role==='dent'&&!S.negOn?'clinica':'lab';}
+function chLidoLe(k){try{return +localStorage.getItem('io_chl_'+(RL.user&&RL.user.id)+'_'+chK(k))||0;}catch(e){return 0;}}
+function chLidoGrava(k){try{localStorage.setItem('io_chl_'+(RL.user&&RL.user.id)+'_'+chK(k),String(Date.now()));}catch(e){}}
+function chNovas(k){var a=CH.idx[chK(k)]||[],l=chLidoLe(k),eu=chLado();return a.filter(function(x){return x.lado!==eu&&new Date(x.t).getTime()>l;}).length;}
+function chBotao(k,cx){var n=chNovas(k),tot=(CH.idx[chK(k)]||[]).length;return '<button class="btn sm ch-bt'+(n?' ch-novo':'')+'" data-ch="abre" data-k="'+esc(JSON.stringify(k))+'">💬 '+(tot?'Conversa':'Conversar')+(n?' <b>'+n+'</b>':'')+'</button>';}
+function chIndice(){if(!RL.user||CH.falta||!SB)return;SB.from('odo_ped_msgs').select('envio_id,pedido_id,lado,criado_em').order('criado_em',{ascending:false}).limit(800).then(function(r){
+  if(r.error){if(/odo_ped_msgs|does not exist|schema cache/.test(r.error.message||''))CH.falta=true;return;}var I={},mud=false;(r.data||[]).forEach(function(x){var kk=x.envio_id?'e:'+x.envio_id:'p:'+x.pedido_id;(I[kk]=I[kk]||[]).push({lado:x.lado,t:x.criado_em});});
+  if(JSON.stringify(I)!==JSON.stringify(CH.idx)){CH.idx=I;mud=true;}if(mud&&!CH.on){var a=document.activeElement;if(!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)))render();}});}
+setInterval(function(){if(document.visibilityState==='visible')chIndice();},45000);setTimeout(chIndice,3000);
+function chAbre(k,tit){CH={on:true,k:k,tit:tit||'Pedido',L:[],busy:false,anexos:[],idx:CH.idx,falta:CH.falta,urls:CH.urls,carregando:true};chDesenha();chCarrega();document.body.style.overflow='hidden';}
+function chFecha(){CH.on=false;var el=document.getElementById('ch-ov');if(el)el.remove();document.body.style.overflow='';chLidoGrava(CH.k);render();}
+function chCarrega(){if(!CH.on)return;var q=SB.from('odo_ped_msgs').select('*').order('criado_em',{ascending:true}).limit(300);q=CH.k.envio?q.eq('envio_id',CH.k.envio):q.eq('pedido_id',CH.k.pedido);
+  q.then(function(r){CH.carregando=false;if(r.error){CH.erro=/odo_ped_msgs|does not exist|schema cache/.test(r.error.message||'')?'Falta rodar a atualização 072 no Supabase.':'Não consegui carregar a conversa.';chDesenha();return;}
+    var novo=JSON.stringify(r.data||[])!==JSON.stringify(CH.L);CH.L=r.data||[];CH.erro='';if(novo){chUrls();chDesenha(true);}chLidoGrava(CH.k);});}
+setInterval(function(){if(CH.on&&document.visibilityState==='visible')chCarrega();},12000);
+function chUrls(){var P=CH.L.filter(function(m){return m.anexo&&!CH.urls[m.anexo];}).map(function(m){return m.anexo;});if(!P.length)return;
+  SB.storage.from('odonto-chat').createSignedUrls(P,3600).then(function(r){(r.data||[]).forEach(function(x){if(x.signedUrl)CH.urls[x.path]=x.signedUrl;});chDesenha();});}
+function chHora(t){var d=new Date(t),h=new Date();return (d.toDateString()===h.toDateString()?'':('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' ')+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+function chDesenha(rola){if(!CH.on)return;var el=document.getElementById('ch-ov'),foco=document.activeElement&&document.activeElement.id==='ch-t',val=foco?document.activeElement.value:((document.getElementById('ch-t')||{}).value||'');
+  if(!el){el=document.createElement('div');el.id='ch-ov';el.className='ch-ov';document.body.appendChild(el);}var eu=chLado();
+  el.innerHTML='<div class="ch-box" role="dialog" aria-label="Conversa do pedido"><div class="ch-h"><div><b>💬 '+esc(CH.tit)+'</b><small>'+(eu==='clinica'?'Conversa com o laboratório':'Conversa com a clínica')+'</small></div><button class="ch-x" data-ch="fecha" aria-label="Fechar">✕</button></div>'+
+    '<div class="ch-msgs" id="ch-msgs">'+(CH.erro?'<p class="ch-vz">'+esc(CH.erro)+'</p>':CH.carregando?'<p class="ch-vz">Carregando…</p>':!CH.L.length?'<p class="ch-vz">Nenhuma mensagem ainda. Escreva aqui ou cole um print (Ctrl+V).</p>':'')+
+    CH.L.map(function(m){var meu=m.lado===eu,u=m.anexo&&CH.urls[m.anexo],img=m.anexo&&!/\.pdf$/i.test(m.anexo);
+      return '<div class="ch-m'+(meu?' eu':'')+'">'+(meu?'':'<small class="ch-q">'+esc(m.autor_nome||(m.lado==='lab'?'Laboratório':'Clínica'))+'</small>')+
+        (m.anexo?(u?(img?'<a href="'+u+'" target="_blank" rel="noopener"><img src="'+u+'" alt="Imagem anexada"></a>':'<a class="ch-pdf" href="'+u+'" target="_blank" rel="noopener">📄 Abrir PDF</a>'):'<span class="ch-car">📎 carregando…</span>'):'')+
+        (m.texto?'<p>'+esc(m.texto).replace(/\n/g,'<br>')+'</p>':'')+'<time>'+chHora(m.criado_em)+'</time></div>';}).join('')+'</div>'+
+    (CH.anexos.length?'<div class="ch-prev">'+CH.anexos.map(function(a,i){return '<span><img src="'+a.url+'" alt=""><button data-ch="tira" data-v="'+i+'" aria-label="Tirar">✕</button></span>';}).join('')+'</div>':'')+
+    '<form class="ch-f" data-chf="1"><label class="ch-clip" title="Anexar imagem ou PDF">📎<input type="file" id="ch-arq" accept="image/*,application/pdf" multiple hidden></label><textarea id="ch-t" rows="1" maxlength="2000" placeholder="Escreva ou cole um print (Ctrl+V)…"></textarea><button class="btn pri" type="submit"'+(CH.busy?' disabled':'')+'>'+(CH.busy?'…':'Enviar')+'</button></form></div>';
+  var t=document.getElementById('ch-t');if(t){t.value=val;if(foco||window.innerWidth>700)t.focus();}var ms=document.getElementById('ch-msgs');if(ms&&(rola||rola===undefined))ms.scrollTop=ms.scrollHeight;}
+function chAddArq(F){[].slice.call(F||[]).forEach(function(f){if(!/^image\/|application\/pdf/.test(f.type))return;if(CH.anexos.length>=5)return;CH.anexos.push({f:f,url:/^image\//.test(f.type)?URL.createObjectURL(f):'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22><text y=%2228%22 font-size=%2224%22>📄</text></svg>'});});chDesenha(false);}
+function chEnvia(){if(CH.busy)return;var t=document.getElementById('ch-t'),txt=t?t.value.trim():'';if(!txt&&!CH.anexos.length)return;CH.busy=true;chDesenha(false);
+  var base={lado:chLado(),autor_nome:((RL.perfil&&RL.perfil.nome)||'').slice(0,80)||null};if(CH.k.envio)base.envio_id=CH.k.envio;else base.pedido_id=CH.k.pedido;var pasta=CH.k.envio||CH.k.pedido,rows=[];
+  CH.anexos.reduce(function(pr,a,i){return pr.then(function(){var img=/^image\//.test(a.f.type);return (img?pdgFotoJpg(a.f):Promise.resolve(a.f)).then(function(b){if(!b||b.size>10485760)throw 'Arquivo grande demais (máx. 10 MB).';
+    var path=pasta+'/'+Date.now().toString(36)+'-'+i+(img?'.jpg':'.pdf');return SB.storage.from('odonto-chat').upload(path,b,{contentType:img?'image/jpeg':'application/pdf',upsert:false}).then(function(u){if(u.error)throw 'Não consegui enviar a imagem.';rows.push(Object.assign({},base,{anexo:path,texto:null}));});});});},Promise.resolve())
+  .then(function(){if(txt)rows.push(Object.assign({},base,{texto:txt.slice(0,2000)}));return SB.from('odo_ped_msgs').insert(rows);}).then(function(r){CH.busy=false;
+    if(r.error){toast(/odo_ped_msgs|does not exist|schema cache/.test(r.error.message||'')?'Falta rodar a atualização 072 no Supabase.':'Não consegui enviar a mensagem.');chDesenha(false);return;}
+    CH.anexos=[];var t2=document.getElementById('ch-t');if(t2)t2.value='';chCarrega();chIndice();})
+  .catch(function(m){CH.busy=false;toast(typeof m==='string'?m:'Não consegui enviar.');chDesenha(false);});}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-ch]');if(!b)return;var a=b.getAttribute('data-ch');e.preventDefault();
+  if(a==='abre'){var k={};try{k=JSON.parse(b.getAttribute('data-k'));}catch(x){return;}var card=b.closest('.cx,.pcard');var tit=card?((card.querySelector('.cx-l b')||card.querySelector('.pcard-pac,.pcard h4,b')||{}).textContent||'Pedido'):'Pedido';chAbre(k,'Pedido · '+tit.trim());}
+  else if(a==='fecha')chFecha();else if(a==='tira'){CH.anexos.splice(+b.getAttribute('data-v'),1);chDesenha(false);}});
+document.addEventListener('submit',function(e){if(e.target&&e.target.getAttribute&&e.target.getAttribute('data-chf')){e.preventDefault();chEnvia();}});
+document.addEventListener('keydown',function(e){if(!CH.on)return;if(e.key==='Escape')chFecha();else if(e.key==='Enter'&&!e.shiftKey&&e.target&&e.target.id==='ch-t'){e.preventDefault();chEnvia();}});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='ch-arq')chAddArq(e.target.files);});
+document.addEventListener('paste',function(e){if(!CH.on)return;var it=(e.clipboardData&&e.clipboardData.items)||[],F=[];for(var i=0;i<it.length;i++){if(it[i].kind==='file'){var f=it[i].getAsFile();if(f&&/^image\//.test(f.type))F.push(f);}}if(F.length){e.preventDefault();chAddArq(F);toast('Print colado ✓ Toque em Enviar.');}});
+/* laboratório: conversa, resposta da pendência e botão de maquiagem no cartão do pedido */
+var _pedCardCH=pedCard;pedCard=function(p){var h=_pedCardCH(p);if(!p||p.arquivado)return h;var e=p.envio_id?(PDG.L||[]).filter(function(x){return x.id===p.envio_id;})[0]:null;var extra='';
+  if(e&&e.resposta&&p.status==='aguardando')extra+='<div class="pend-lab">💬 <b>Clínica respondeu:</b> '+esc(e.resposta)+(e.resposta_ok===false?' <i>(vai mandar)</i>':'')+'</div>';
+  if(p.status==='producao'&&!p.em_maquiagem&&['finalizado','entregue','cancelado'].indexOf(p.status)<0)extra+='<button class="btn sm" data-act="pedMaq" data-v="'+p.id+'">🎨 Em maquiagem</button>';
+  if(p.status==='producao'&&p.em_maquiagem)extra+='<span class="small pedmaq">🎨 Em maquiagem</span>';
+  if(p.envio_id||p.cliente_id)extra+=chBotao(chChaveLab(p));
+  if(!extra)return h;var j=h.indexOf('<div class="pcard-f">');return j<0?h+'<div class="pcard-ch">'+extra+'</div>':h.slice(0,j)+'<div class="pcard-ch">'+extra+'</div>'+h.slice(j);};
+ACT.pedMaq=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;p.em_maquiagem=true;render();
+  SB.from('odo_pedidos').update({em_maquiagem:true}).eq('id',v).select('*').single().then(function(r){if(r.error){p.em_maquiagem=false;render();toast(/em_maquiagem/.test(r.error.message||'')?'Rode a atualização 072 no Supabase.':'Não consegui salvar agora.');return;}pedGuarda(r.data);render();toast('Em maquiagem 🎨 · a clínica já vê.');});};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
