@@ -3386,7 +3386,7 @@ var NEG_VAZIO={
   alunos:['🧑‍🎓','Nenhum aluno inscrito ainda','As inscrições dos seus cursos chegam aqui, com contato e situação do pagamento.'],
   eventos:['📅','Nenhum evento publicado','Workshops, aulas abertas e palestras aparecem na aba Cursos e eventos da Rede.']};
 var NEG_PAPEL=[['faz','Sou dono e trabalho nele'],['gestao','Sou dono, cuido da gestão'],['func','Sou funcionário(a)']];
-var NEG_CARGOS=['ASB / TSB','Secretária','Recepcionista','Gerente','Auxiliar','Protético(a)','Cadista','Outro'];
+var NEG_CARGOS=['Administrativo','ASB / TSB','Secretária','Recepcionista','Gerente','Auxiliar','Protético(a)','Cadista','Outro'];
 function negCarrega(){try{var x=JSON.parse(localStorage.getItem('io_neg_v1')||'null');if(x&&x.tipo)return x;}catch(e){}return null;}
 function negSalva(){try{if(S.neg)localStorage.setItem('io_neg_v1',JSON.stringify(S.neg));else localStorage.removeItem('io_neg_v1');}catch(e){}}
 function negT(){return NEG_TIPOS[S.neg&&S.neg.tipo]||NEG_TIPOS.lab;}
