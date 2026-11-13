@@ -1561,6 +1561,7 @@ body.rl-in #lmb{bottom:62px}@media(max-width:760px){#lmb{bottom:120px;left:12px}
 .tv-nsel{font:inherit;font-size:12px;padding:3px 6px;border-radius:8px;border:1px solid rgba(127,127,127,.4);background:transparent;color:inherit}.tv-nsel option{color:#111}
 .tv-f2{grid-template-columns:1fr 1fr 1fr}
 @media(max-width:600px){.tv-f2{grid-template-columns:1fr}}
+.plab-cli{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;width:100%;margin-top:6px;font-size:13px}.plab-cli select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--line,#ccd);max-width:100%}.plab-cli small{width:100%;opacity:.7}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5657,7 +5658,7 @@ var CX_COR={aguardando:'#F59E0B','Desenho CAD':'#7C3AED','Enviado para fresagem'
 function cxEtapa(e){if(e.status==='enviado')return ['aguardando','Aguardando o laboratório aceitar'];if(e.status==='recusado')return ['recusado','Recusado pelo laboratório'];if(e.status==='cancelado')return ['cancelado','Cancelado'];var et=e.etapa||'Desenho CAD';return [et,et];}
 function cxDentes(e){var ds=[];(e.itens||[]).forEach(function(it){(it.dentes||[]).forEach(function(d){if(ds.indexOf(d)<0)ds.push(d);});});return ds;}
 pdgEnviadosHtml=function(){var M=pdgMeus();if(!M.length)return '';
-  return '<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3><div class="cx-g">'+M.slice(0,60).map(function(e){var et=cxEtapa(e),cor=CX_COR[et[0]]||'#2563EB',ds=cxDentes(e),lab=(PDG.labNome&&PDG.labNome[e.lab_id])||'',d=new Date(e.enviado_em||e.criado_em);
+  return '<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3><div class="cx-g">'+M.slice(0,60).map(function(e){var et=cxEtapa(e),cor=CX_COR[et[0]]||'#2563EB',ds=cxDentes(e),lab=(PDG.labNome&&PDG.labNome[e.lab_id])||e.lab_nome||'',d=new Date(e.enviado_em||e.criado_em);
     var tr=(e.itens||[]).map(function(it){return it.trabalho;}).filter(Boolean).join(' + ')||'—';
     var linha=function(r,v){return '<div class="cx-l"><span>'+r+'</span><b>'+v+'</b></div>';};
     return '<article class="cx" style="--cx:'+cor+'"><div class="cx-back"><i class="cx-clip"></i></div>'+
@@ -5952,6 +5953,28 @@ setTimeout(function(){if(lmbVisivel()){lmbCarrega();}else lmbDesenha();},2500);
 ACT.anaAbre=function(){LMB.aberto=true;if(LMB.L===null)lmbCarrega();lmbDesenha();setTimeout(function(){var i=document.getElementById('lmb-in');if(i)i.focus();},0);};
 rAnaChat=function(){return '';};
 var _renderLMB=render;render=function(){try{if(lmbVisivel()){var D=PN();if(D&&D.anaAberta)D.anaAberta=false;}}catch(e){}var r=_renderLMB.apply(this,arguments);setTimeout(lmbDesenha,0);return r;};
+
+/* ===== A clínica vê os pedidos que o laboratório lançou para ela (migração 067) =====
+   Aparecem como se ela tivesse mandado, com a etapa em tempo real. Só leitura. */
+var PLAB={L:[],falta:false};
+function plabLinhas(){var u=RL.user&&RL.user.id;return PLAB.L.map(function(p){var mat=p.material||'',tr=(p.trabalho||'Trabalho')+(p.sobre_implante&&!/implante/i.test(p.trabalho||'')?' sobre implante':'');
+  return {id:'lab-'+p.id,user_id:u,lab_id:p.lab_id,lab_nome:p.lab_nome,paciente:p.paciente,itens:[{trabalho:tr+(mat?' · '+mat:''),dentes:p.dentes||[],material:mat}],cor:p.cor,prazo:p.prazo,urgente:p.urgente,status:'aceito',etapa:p.etapa,criado_em:p.criado_em,enviado_em:p.criado_em,arquivos:[],importado:true};});}
+function plabJunta(){PDG.L=PDG.L.filter(function(e){return !e.importado;});if(!PLAB.L.length)return;PDG.labNome=PDG.labNome||{};PLAB.L.forEach(function(p){if(!PDG.labNome[p.lab_id])PDG.labNome[p.lab_id]=p.lab_nome;});
+  PDG.L=PDG.L.concat(plabLinhas()).sort(function(a,b){return String(b.criado_em).localeCompare(String(a.criado_em));});}
+var _pdgCarregaPLAB=pdgCarrega;pdgCarrega=function(){var r0=_pdgCarregaPLAB.apply(this,arguments);if(!RL.user||PLAB.falta)return r0;
+  return Promise.resolve(r0).then(function(){return SB.rpc('odo_clinica_pedidos_lab');}).then(function(r){if(r.error){if(/odo_clinica_pedidos_lab|does not exist|schema cache/.test(r.error.message||''))PLAB.falta=true;return;}
+    var novo=!PLAB.L.length;PLAB.L=r.data||[];plabJunta();
+    try{var V=etVistos()||{},mudou=false;if(etVistos())plabLinhas().forEach(function(e){if(!(e.id in V)){V[e.id]=etChave(e);mudou=true;}});if(mudou)etGuarda(V);etConfere();}catch(x){}
+    render();});};
+/* laboratório: diz qual cliente seu é a clínica conectada */
+var _labVRecebidosPLAB=labVRecebidos;labVRecebidos=function(){var h=_labVRecebidosPLAB.apply(this,arguments);if(!h)return h;var C=(EMP.cli||[]).slice().sort(function(a,b){return a.nome.localeCompare(b.nome);});
+  labVRec().filter(function(v){return v.status==='aceito';}).forEach(function(v){var sel='<label class="plab-cli"><span>É o seu cliente:</span><select data-plabv="'+v.id+'"><option value="">— escolha —</option>'+C.map(function(c){return '<option value="'+c.id+'"'+(v.cliente_id===c.id?' selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select>'+(v.cliente_id?'<small>✓ os pedidos desse cliente aparecem para a clínica</small>':'<small>Escolha para a clínica ver os pedidos que você já lançou para ela.</small>')+'</label>';
+    var marca='<span class="labv-st aceito">✅ Conectado</span>',i=-1,k=0,ids=labVRec().map(function(x){return x.id;});
+    var partes=h.split('<div class="labv-i">');var idx=ids.indexOf(v.id)+1;if(partes[idx])partes[idx]=partes[idx].replace(marca,marca+sel);h=partes.join('<div class="labv-i">');});
+  return h;};
+document.addEventListener('change',function(e){var vid=e.target&&e.target.getAttribute&&e.target.getAttribute('data-plabv');if(!vid)return;var cid=e.target.value||null;
+  SB.rpc('odo_lab_vincula_cliente',{p_vinculo:vid,p_cliente:cid}).then(function(r){if(r.error){toast(/odo_lab_vincula_cliente|does not exist|schema cache/.test(r.error.message||'')?'Rode a atualização 067 no Supabase.':'Não salvou: '+(r.error.message||''));return;}
+    var v=(LABV.L||[]).filter(function(x){return x.id===vid;})[0];if(v)v.cliente_id=cid;toast(cid?'Pronto ✓ A clínica já vê os pedidos desse cliente.':'Ligação tirada.');render();});});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
