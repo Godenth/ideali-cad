@@ -1577,6 +1577,8 @@ body.membro [data-act="dTab"][data-v="financeiro"],body.membro [data-act="dTab"]
 .cx-front{margin-top:10px;clip-path:none;background:none;box-shadow:none;padding:2px 0 0;min-height:0;border-radius:0}
 .cx-front .pdg-et span{background:rgba(255,255,255,.2)}
 .cx-pe{padding:10px 4px 0}
+.pmes{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 4px}.pmes-nav{display:flex;align-items:center;gap:10px}.pmes-nav b{min-width:150px;text-align:center;font-size:1.02rem}.pmes-op{display:flex;align-items:center;gap:10px}.pmes-op small{opacity:.7}
+.pmes-dica{margin:4px 0 0;font-size:.85rem;opacity:.8}.pmes-dica .lnk{background:none;border:0;padding:0;color:var(--pri,#4B3CC9);font:inherit;font-weight:700;cursor:pointer;text-decoration:underline}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5675,7 +5677,7 @@ setInterval(etPoll,60000);document.addEventListener('visibilitychange',function(
 var CX_COR={aguardando:'#F59E0B','Desenho CAD':'#7C3AED','Enviado para fresagem':'#2563EB','Em produção':'#0EA5E9','Pronto':'#16A34A','Entregue':'#64748B','Aguardando informação':'#D97706',recusado:'#DC2626',cancelado:'#94A3B8','Cancelado':'#DC2626'};
 function cxEtapa(e){if(e.status==='enviado')return ['aguardando','Aguardando o laboratório aceitar'];if(e.status==='recusado')return ['recusado','Recusado pelo laboratório'];if(e.status==='cancelado')return ['cancelado','Cancelado'];var et=e.etapa||'Desenho CAD';return [et,et];}
 function cxDentes(e){var ds=[];(e.itens||[]).forEach(function(it){(it.dentes||[]).forEach(function(d){if(ds.indexOf(d)<0)ds.push(d);});});return ds;}
-pdgEnviadosHtml=function(){var M=pdgMeus();if(!M.length)return '';
+pdgEnviadosHtml=function(){var M=pdgFiltra(pdgMeus());if(!M.length)return '';
   return '<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3><div class="cx-g">'+M.slice(0,60).map(function(e){var et=cxEtapa(e),cor=CX_COR[et[0]]||'#2563EB',ds=cxDentes(e),lab=(PDG.labNome&&PDG.labNome[e.lab_id])||e.lab_nome||'',d=new Date(e.enviado_em||e.criado_em);
     var tr=(e.itens||[]).map(function(it){return it.trabalho;}).filter(Boolean).join(' + ')||'—';
     var linha=function(r,v){return '<div class="cx-l"><span>'+r+'</span><b>'+v+'</b></div>';};
@@ -5720,16 +5722,20 @@ document.addEventListener('change',function(e){if(e.target&&e.target.id==='dfl-l
 /* ===== Aba Laboratório da clínica com sub-abas: Pedidos · Laboratórios parceiros · Financeiro ===== */
 var _rDLabTabSub=rDLabTab;rDLabTab=function(D){if(!RL.user)return _rDLabTabSub(D);PDG.labNome={};labVMeus().forEach(function(v){PDG.labNome[v.lab_id]=v.lab_nome;});
   var con=labVMeus().filter(function(v){return v.status==='aceito';}).length,sub=S.labSub||(con?'ped':'labs'),nEnv=pdgMeus().filter(function(e){return e.status==='enviado'||(e.status==='aceito'&&e.etapa!=='Entregue');}).length;
-  var abas=[['ped','📦 Pedidos',nEnv],['labs','🧪 Laboratórios parceiros',con],['fin','💰 Financeiro',0]];
+  nEnv=pdgMeus().filter(function(e){return !pdgFeito(e);}).length;var nFeito=pdgMeus().filter(pdgFeito).length;
+  var abas=[['ped','📦 Pedidos',nEnv],['feitos','✅ Finalizados',nFeito],['labs','🧪 Laboratórios parceiros',con],['fin','💰 Financeiro',0]];
   var h='<div class="dtop"><div><h2>🧪 Laboratório</h2></div>'+(con?'<button class="btn pdg-novo" data-act="pdgNovo">📤 Novo pedido</button>':'')+'</div>'+
     '<div class="lsub" role="tablist">'+abas.map(function(a){return '<button role="tab" aria-selected="'+(sub===a[0])+'" data-act="labSub" data-v="'+a[0]+'">'+a[1]+(a[2]?' <span class="lsub-n">'+a[2]+'</span>':'')+'</button>';}).join('')+'</div>';
-  if(sub==='ped'){var env=pdgEnviadosHtml();
+  if(sub==='feitos'){PDG.f={feito:true};var envF=pdgEnviadosHtml();PDG.f=null;
+    return h+pdgMesBar(true)+(envF?envF.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>',''):'<div class="card lsub-v">'+(pdgMesSel()==='todos'?'Nenhum pedido finalizado ainda.':'Nenhum pedido finalizado em '+pdgMesNome(pdgMesSel())+'.')+'</div>');}
+  if(sub==='ped'){PDG.f={feito:false};var env=pdgEnviadosHtml();PDG.f=null;var outros=pdgMesSel()!=='todos'?pdgMeus().filter(function(e){return !pdgFeito(e)&&pdgMesDe(e)!==pdgMesSel();}).length:0;
+    if(con||env)h+=pdgMesBar(false)+(outros?'<p class="pmes-dica">+ '+outros+' pedido'+(outros>1?'s':'')+' em andamento de outros meses · <button class="lnk" data-act="labMes" data-v="todos">ver todos</button></p>':'');
     if(!con&&!env)return h+'<div class="card lsub-v">Você ainda não tem laboratório conectado. <button class="btn sm pri" data-act="labSub" data-v="labs">Conectar um laboratório</button></div>';
-    return h+(env?env.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>',''):'<div class="card lsub-v">Nenhum pedido ainda. <button class="btn sm pri" data-act="pdgNovo">📤 Fazer o primeiro pedido</button></div>');}
+    return h+(env?env.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>',''):(pdgMeus().some(function(e){return !pdgFeito(e);})?'<div class="card lsub-v">Nenhum pedido em andamento em '+pdgMesNome(pdgMesSel())+'.</div>':'<div class="card lsub-v">Nenhum pedido em andamento. <button class="btn sm pri" data-act="pdgNovo">📤 Fazer um pedido</button></div>'));}
   if(sub==='fin'){var f=typeof rDFinLab==='function'?rDFinLab():'';return h+f.replace(/<div class="dtop"><div><h2>💰 Financeiro<\/h2>/,'<div class="dtop"><div>');}
   var full=_rDLabTabSub(D),e2=pdgEnviadosHtml();if(e2)full=full.replace(e2,'');full=full.replace(/^<div class="dtop"><div><h2>🧪 Laboratório<\/h2>.*?<\/div><\/div>/,'');
   return h+full;};
-ACT.labSub=function(v){S.labSub=v;if(v==='fin'&&typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}render();};
+ACT.labSub=function(v){S.labSub=v;window.scrollTo(0,0);if(v==='fin'&&typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}render();};
 
 /* ===== Contato do laboratório: o lab preenche em Minha empresa; a clínica parceira vê em Laboratórios parceiros ===== */
 var CT_CAMPOS=[['whats','WhatsApp','(11) 99999-9999','tel'],['tel','Telefone fixo','(11) 3333-3333','tel'],['email','E-mail para pedidos','pedidos@seulab.com','email'],['end','Endereço','Rua, número, complemento','text'],['bairro','Bairro','','text'],['cep','CEP','00000-000','text'],
@@ -6042,6 +6048,19 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   else if(k==='cancela'){SB.from('odo_convites_emp').update({ativo:false}).eq('id',id).then(function(r){if(r.error){toast('Não consegui cancelar.');return;}EQ.C=(EQ.C||[]).filter(function(x){return x.id!==id;});render();});}
   else if(k==='tira'||k==='volta'){var on=k==='volta';SB.from('odo_membros').update({ativo:on}).eq('id',id).then(function(r){if(r.error){toast('Não consegui mudar o acesso.');return;}(EQ.L||[]).forEach(function(x){if(x.id===id)x.ativo=on;});toast(on?'Acesso devolvido.':'Acesso tirado. A pessoa sai da empresa na hora.');render();});}});
 Object.assign(ACT,{memTroca:function(v){espLS('io_mem_modo',v==='eu'?'eu':null);location.reload();}});
+
+/* Pedidos x Finalizados, e filtro por mês (com "Todos os meses") */
+var PMES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function pdgFeito(e){return e.status==='recusado'||e.status==='cancelado'||(e.status==='aceito'&&(e.etapa==='Pronto'||e.etapa==='Entregue'||e.etapa==='Cancelado'));}
+function pdgMesDe(e){var d=new Date(e.enviado_em||e.criado_em);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);}
+function pdgMesHoje(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);}
+function pdgMesSel(){return S.labMes||pdgMesHoje();}
+function pdgMesNome(k){if(k==='todos')return 'todos os meses';var p=k.split('-');return PMES[+p[1]-1]+' de '+p[0];}
+function pdgFiltra(M){if(!PDG.f)return M;var m=pdgMesSel(),fe=PDG.f.feito;return M.filter(function(e){return pdgFeito(e)===fe&&(m==='todos'||pdgMesDe(e)===m);});}
+function pdgMesBar(fe){var m=pdgMesSel(),todos=m==='todos',n=pdgMeus().filter(function(e){return pdgFeito(e)===fe&&(todos||pdgMesDe(e)===m);}).length;
+  return '<div class="pmes"><div class="pmes-nav"><button class="btn sm" data-act="labMes" data-v="-1" aria-label="Mês anterior"'+(todos?' disabled':'')+'>‹</button><b>'+(todos?'Todos os meses':pdgMesNome(m))+'</b><button class="btn sm" data-act="labMes" data-v="1" aria-label="Próximo mês"'+(todos?' disabled':'')+'>›</button></div>'+
+    '<div class="pmes-op"><button class="btn sm'+(todos?' pri':'')+'" data-act="labMes" data-v="'+(todos?'hoje':'todos')+'">'+(todos?'📅 Ver por mês':'🗂️ Todos os meses')+'</button><small>'+n+' pedido'+(n===1?'':'s')+'</small></div></div>';}
+ACT.labMes=function(v){var m=pdgMesSel();if(v==='todos')S.labMes='todos';else if(v==='hoje')S.labMes=pdgMesHoje();else{var b=m==='todos'?pdgMesHoje():m,p=b.split('-'),d=new Date(+p[0],+p[1]-1+(+v),1);S.labMes=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);}render();};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
