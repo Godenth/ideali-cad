@@ -1659,7 +1659,7 @@ html[data-tema="cystreet"]{background:#0B0620}html[data-tema="cystreet"] body{ba
 .tut-bf a{color:#9db4ff}
 @media(max-width:600px){.tut-f2{grid-template-columns:1fr}.tut-g{grid-template-columns:1fr}}
 .tut-h{align-items:center}.tut-h h2{margin:0;display:flex;align-items:center;gap:8px}.tut-yt{display:inline-grid;place-items:center;width:34px;height:24px;border-radius:7px;background:#ff0033;color:#fff;font-size:12px}
-.tut-q{flex:1;min-width:180px;max-width:520px;font:inherit;font-size:15px;padding:10px 16px;border-radius:999px;border:1px solid rgba(127,127,127,.4);background:rgba(127,127,127,.08);color:inherit}
+.tutv-busca{flex:1;min-width:180px;max-width:520px;font:inherit;font-size:15px;padding:10px 16px;border-radius:999px;border:1px solid rgba(127,127,127,.4);background:rgba(127,127,127,.08);color:inherit}
 .tut-cats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.tut-cats::-webkit-scrollbar{display:none}.tut-cats button{white-space:nowrap;border-radius:9px;border-color:transparent;background:rgba(127,127,127,.14)}
 .tut-cats button.on{background:linear-gradient(135deg,#4f7cff,#8a5cff);color:#fff}
 .tut-g{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px 16px}.tut-c{border:0;background:transparent;border-radius:0;overflow:visible}.tut-th{border-radius:12px;overflow:hidden}.tut-i{padding:10px 2px 0}.tut-i b{font-size:15px}
@@ -7299,7 +7299,7 @@ function tutForm(){return '<form class="tut-f" data-tutform="1" autocomplete="of
   '<label><span>Aparece em</span><select id="tut-onde"><option value="ambos">CAD e Odonto</option><option value="cad">Só no Ideali CAD</option><option value="odonto">Só no Ideali Odonto</option></select></label></div>'+
   '<input id="tut-canal" type="hidden"><div class="tut-fb"><button type="button" data-tut="addx">Cancelar</button><button type="submit" class="tut-pri"'+(TUTV.salvando?' disabled':'')+'>'+(TUTV.salvando?'Salvando…':'Adicionar')+'</button></div></form>';}
 function rTut(){if(TUTV.L===null&&!TUTV.busy)setTimeout(tutCarrega,0);var L=TUTV.L||[],cs=tutCats(),cat=TUTV.cat&&cs.some(function(c){return c[0]===TUTV.cat;})?TUTV.cat:'',q=lmbNz(TUTV.q||''),V=L.filter(function(v){return (!cat||v.categoria===cat)&&(!q||lmbNz(v.titulo+' '+(v.canal||'')+' '+v.categoria).indexOf(q)>=0);});
-  var h='<div class="tut-w"><div class="tut-h"><h2><span class="tut-yt">▶</span> Tutoriais</h2><input class="tut-q" id="tut-q" type="search" placeholder="Pesquisar tutorial" value="'+esc(TUTV.q||'')+'">'+(tutAdmin()&&!TUTV.add?'<button type="button" class="tut-pri" data-tut="add">➕ Adicionar vídeo</button>':'')+'</div>';
+  var h='<div class="tut-w"><div class="tut-h"><h2><span class="tut-yt">▶</span> Tutoriais</h2><input class="tutv-busca" id="tut-q" type="search" placeholder="Pesquisar tutorial" value="'+esc(TUTV.q||'')+'">'+(tutAdmin()&&!TUTV.add?'<button type="button" class="tut-pri" data-tut="add">➕ Adicionar vídeo</button>':'')+'</div>';
   if(tutAdmin()&&TUTV.add)h+=tutForm();
   if(TUTV.busy&&TUTV.L===null)return h+'<p class="tut-m">Carregando…</p></div>';
   if(TUTV.erro)return h+'<p class="tut-m">'+(tutAdmin()?'A tabela de tutoriais ainda não existe. Rode a atualização 064 no Supabase. ('+esc(TUTV.erro)+')':'Os tutoriais chegam em breve.')+'</p></div>';
