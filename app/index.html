@@ -6075,6 +6075,7 @@ function ppTipo(t){var T=alive(S.tipos||[]).filter(function(x){return x.ativo!==
   if(/enceramento|planejamento|mock/.test(t))return acha(/enceramento/);
   if(/provisori/.test(t))return acha(/provisori/);
   if(/modelo/.test(t)&&!/coroa/.test(t))return acha(/modelo/);
+  if(/pontic/.test(t)&&!/coroa|copping|elemento|implante|faceta/.test(t))return acha(/pontic/)||acha(/coroa sobre dente|sobre dente/)||acha(/coroa/);
   if(/coroa|copping|copi|elemento|unitari|ponte|fixa/.test(t)||imp)return imp?(acha(/coroa sobre implante|sobre implante/)||acha(/coroa/)):(acha(/coroa sobre dente|sobre dente/)||acha(/coroa/));
   return null;}
 function ppClientes(tx){var t=ppNorm(tx),dg=String(tx).replace(/\D/g,''),L=[];
@@ -7745,11 +7746,21 @@ function anaCadTexto(txt){var raw=String(txt||'').trim();if(!raw)return null;var
   /* "elementos" logo depois de um trabalho não abre item novo (ex.: "coroa dos elementos 11 ao 25") */
   pos=pos.filter(function(p,i){if(i===0)return true;var ent=limpo.slice(pos[i-1],p);return !(/^(elementos?|dentes?)/.test(limpo.slice(p))&&!/\d/.test(ent));});
   var segs=pos.length?pos.map(function(p,i){return limpo.slice(i===0?0:p,i+1<pos.length?pos[i+1]:limpo.length);}):[limpo],itens=[],usados=[];
+  /* vírgula antes de outro dente com outro tipo (ex.: "coroa 14 e 15 unidas, 46 sobre implante") vira trecho próprio */
+  var DICA=/implante|parafus|munhao|t-?base|ti-?base|scanbody|sobre dente|pontic|faceta|onlay|inlay/,partiu=false;
+  segs=[].concat.apply([],segs.map(function(sg){var ps=sg.split(/[,;]\s*(?=\d)|\s+e\s+(?=\d)/),out=[];ps.forEach(function(x){if(out.length&&DICA.test(x)&&anaDentesC(x).length){out.push(x);partiu=true;}else if(out.length)out[out.length-1]+=', '+x;else out.push(x);});return out;}));
   segs.forEach(function(sg){var ds=anaDentesC(sg);if(!ds.length)return;var imp=/implante|parafus|munhao|t-?base|ti-?base|scanbody|scan body/.test(sg)&&!/sobre dente/.test(sg);
-    var tp=ppTipo(sg)||(imp?ppTipo('coroa sobre implante'):r.tipo)||r.tipo;itens.push({ds:ds,tp:tp,imp:imp});});
+    var tp=ppTipo(sg)||(imp?ppTipo('coroa sobre implante'):r.tipo)||r.tipo;itens.push({ds:ds,tp:tp,imp:imp,uni:/\bunid[oa]s?\b|\bponte|\bfixa/.test(sg)&&!/unitari/.test(sg)});});
+  /* dentes escritos ANTES do trabalho (ex.: "sendo os 42 41 31 e 32 ponticos"): os números no fim do trecho anterior são desse trabalho */
+  segs.forEach(function(sg,i){if(!i||anaDentesC(sg).length)return;var mm=segs[i-1].match(/((?:\b[1-4][1-8]\b[\s,]*(?:e\s+)?)+)$/);if(!mm)return;var ds=anaDentesC(mm[1]);if(!ds.length)return;
+    var imp=/implante|parafus|munhao|t-?base|ti-?base|scanbody|scan body/.test(sg)&&!/sobre dente/.test(sg);itens.push({ds:ds,tp:ppTipo(sg)||r.tipo,imp:imp,uni:/\bunid[oa]s?\b|\bponte|\bfixa/.test(sg)&&!/unitari/.test(sg)});});
+  if(!partiu&&/\bunid[oa]s?\b|\bponte\b|\bfixa\b/.test(limpo)&&!/unitari/.test(limpo))itens.forEach(function(it){it.uni=true;});
   /* dente que aparece em dois trabalhos fica só no mais específico (ex.: 11 ao 25 sobre dente + 23 sobre implante) */
   itens.forEach(function(a){a.ds=a.ds.filter(function(n){return !itens.some(function(b){return b!==a&&b.ds.indexOf(n)>=0&&b.ds.length<a.ds.length;});});});
-  var L=[];itens.forEach(function(it){it.ds.forEach(function(d){if(usados.indexOf(d)>=0)return;usados.push(d);L.push({d:d,t:it.tp?it.tp.id:'',imp:it.imp,m:it.imp?r.marca:'',c:it.imp?r.con:''});});});
+  var L=[];itens.forEach(function(it){it.ds.forEach(function(d){if(usados.indexOf(d)>=0)return;usados.push(d);L.push({d:d,t:it.tp?it.tp.id:'',imp:it.imp,m:it.imp?r.marca:'',c:it.imp?r.con:'',uni:it.uni});});});
+  /* "unidos/ponte/fixa": liga cada dente ao vizinho que também está no pedido */
+  L.forEach(function(x){if(!x.uni)return;var ar=UP.indexOf(x.d)>=0?UP:LO,nx=ar[ar.indexOf(x.d)+1],y=L.filter(function(z){return z.d===nx;})[0];if(y&&y.uni)x.u=true;});
+  L.forEach(function(x){delete x.uni;});
   if(!L.length&&r.dentes.length)L=r.dentes.map(function(d){return {d:d,t:r.tipo?r.tipo.id:'',imp:!!r.imp,m:r.imp?r.marca:'',c:r.imp?r.con:''};});
   if(r.pac)r.pac=r.pac.replace(/\s+(dia|pra|para|ate|até|no|na|com)(\s.*)?$/i,'');
   if(!r.pac)r.pac=anaPacSolto(raw,r.cli);
@@ -7817,7 +7828,7 @@ A.anaTut=function(d,el,e){if(e&&e.preventDefault)e.preventDefault();anaTutorial(
 A.anaCadPreenche=function(){var ta=document.getElementById('anacad-t'),tx=ta?ta.value.trim():'';if(!tx){toast('Escreva o pedido primeiro.');return;}ui.anaCadTxt=tx;
   var r=anaCadTexto(tx),V=anaFormVal();if(!r||(!r.itensAna.length&&!r.cli&&!r.pac&&!r.prazo&&!r.mat&&!r.cor&&!r.urg)){toast('Não entendi. Ex.: "46 sobre implante, cliente Dr. Paulo, zircônia, pra sexta".');return;}
   var its=(ui.pdItens||[]).map(function(x){return Object.assign({},x);}),mud=0,nov=0;
-  r.itensAna.forEach(function(n){var e=its.filter(function(x){return x.d===n.d;})[0];if(e){if(n.t)e.t=n.t;e.imp=n.imp;if(n.imp){e.m=n.m||e.m;e.c=n.c||e.c;}else{e.m='';e.c='';}mud++;}else{its.push(n);nov++;}});
+  r.itensAna.forEach(function(n){var e=its.filter(function(x){return x.d===n.d;})[0];if(e){if(n.t)e.t=n.t;if(n.u)e.u=true;e.imp=n.imp;if(n.imp){e.m=n.m||e.m;e.c=n.c||e.c;}else{e.m='';e.c='';}mud++;}else{its.push(n);nov++;}});
   var cli=r.cli||(V.cli?cliente(V.cli):null),obs=[V.obs,r.cor?'Cor '+r.cor:''].filter(Boolean).join(' · ');
   r.dentes=its.map(function(x){return x.d;});r.cli=cli;r.pac=r.pac||V.pac;r.prazo=r.prazo||V.prazo;r.mat=r.mat||V.mat;
   anaReabre(its,{pac:r.pac,prazo:r.prazo,mat:r.mat,urg:r.urg||V.urg,obs:obs,resumo:r},cli?cli.id:null,V.arqs);
