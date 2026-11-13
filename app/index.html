@@ -7998,7 +7998,7 @@ function anaCadTexto(txt){var raw=String(txt||'').trim();if(!raw)return null;var
   segs.forEach(function(sg){var ds=anaDentesC(sg);if(!ds.length)return;var imp=/implante|parafus|munhao|t-?base|ti-?base|scanbody|scan body/.test(sg)&&!/sobre dente/.test(sg);
     var tp=ppTipo(sg)||(imp?ppTipo('coroa sobre implante'):r.tipo)||r.tipo;itens.push({ds:ds,tp:tp,imp:imp,uni:/\bunid[oa]s?\b|\bponte|\bfixa/.test(sg)&&!/unitari/.test(sg)});});
   /* dentes escritos ANTES do trabalho (ex.: "sendo os 42 41 31 e 32 ponticos"): os números no fim do trecho anterior são desse trabalho */
-  segs.forEach(function(sg,i){if(!i||anaDentesC(sg).length)return;var mm=segs[i-1].match(/((?:\b[1-4][1-8]\b[\s,]*(?:e\s+)?)+)$/);if(!mm)return;var ds=anaDentesC(mm[1]);if(!ds.length)return;
+  segs.forEach(function(sg,i){if(!i||anaDentesC(sg).length)return;var mm=segs[i-1].match(/((?:\b[1-4][1-8]\b[\s,]*(?:e\s+)?)+)(?:(?:sao|serao|sera|vao ser|ficam|fica|como|os|as|de|em|:|=|-)[\s,]*)*$/);if(!mm)return;var ds=anaDentesC(mm[1]);if(!ds.length)return;
     var imp=/implante|parafus|munhao|t-?base|ti-?base|scanbody|scan body/.test(sg)&&!/sobre dente/.test(sg);itens.push({ds:ds,tp:ppTipo(sg)||r.tipo,imp:imp,uni:/\bunid[oa]s?\b|\bponte|\bfixa/.test(sg)&&!/unitari/.test(sg)});});
   if(!partiu&&/\bunid[oa]s?\b|\bponte\b|\bfixa\b/.test(limpo)&&!/unitari/.test(limpo))itens.forEach(function(it){it.uni=true;});
   /* dente que aparece em dois trabalhos fica só no mais específico (ex.: 11 ao 25 sobre dente + 23 sobre implante) */
