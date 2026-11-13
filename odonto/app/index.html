@@ -1615,6 +1615,18 @@ body.membro [data-act="labSub"][data-v="pag"]{display:none!important}
 .ch-prev{display:flex;gap:8px;padding:8px 12px;flex-wrap:wrap;background:#fff;border-top:1px solid #e5e3ee}.ch-prev span{position:relative}.ch-prev img{width:64px;height:64px;object-fit:cover;border-radius:8px}.ch-prev button{position:absolute;top:-6px;right:-6px;border:0;border-radius:50%;width:20px;height:20px;background:#DC2626;color:#fff;font-size:11px;cursor:pointer}
 .ch-f{display:flex;gap:8px;align-items:flex-end;padding:10px 12px;background:#fff;border-top:1px solid #e5e3ee}.ch-f textarea{flex:1;font:inherit;border:1px solid #d6d3e4;border-radius:12px;padding:9px 10px;resize:none;max-height:120px;min-width:0}.ch-clip{font-size:22px;cursor:pointer;padding:6px}
 @media(max-width:900px){.kb{grid-template-columns:1fr}}
+#bn3{display:none}.bn3-oi{display:none}
+@media(max-width:760px){
+#bn3{display:grid;grid-template-columns:1fr 84px 1fr;align-items:end;position:fixed;left:0;right:0;bottom:0;z-index:118;padding:6px 10px calc(6px + env(safe-area-inset-bottom));background:rgba(14,17,40,.97);border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px)}
+#bn3 button{background:none;border:0;color:#AEB6D9;font:inherit;font-size:.78rem;font-weight:700;display:grid;justify-items:center;gap:2px;padding:6px 0;cursor:pointer}#bn3 button span{font-size:1.35rem;line-height:1}#bn3 button.on{color:#fff}
+#bn3 .bn3-mais{justify-self:center;width:66px;height:66px;margin-top:-30px;border-radius:50%;background:linear-gradient(180deg,#9AA0AE,#6B7280);color:#fff;font-size:2.4rem;font-weight:400;line-height:1;place-items:center;box-shadow:0 8px 20px rgba(0,0,0,.45),0 0 0 5px rgba(14,17,40,.97)}
+body.bn3-on #rl-bar{bottom:calc(64px + env(safe-area-inset-bottom))}
+body.bn3-on{padding-bottom:130px}
+body.bn3-on .dhero,body.bn3-on .dkpis{display:none!important}
+body.bn3-on .bn3-oi{display:block;margin:6px 0 12px;font-size:1.3rem}
+body.bn3-on #lmb{bottom:calc(112px + env(safe-area-inset-bottom))!important}
+body.bn3-on .anap-fab{display:none!important}
+}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6290,6 +6302,27 @@ var _pedCardCH=pedCard;pedCard=function(p){var h=_pedCardCH(p);if(!p||p.arquivad
   if(!extra)return h;var j=h.indexOf('<div class="pcard-f">');return j<0?h+'<div class="pcard-ch">'+extra+'</div>':h.slice(0,j)+'<div class="pcard-ch">'+extra+'</div>'+h.slice(j);};
 ACT.pedMaq=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;p.em_maquiagem=true;render();
   SB.from('odo_pedidos').update({em_maquiagem:true}).eq('id',v).select('*').single().then(function(r){if(r.error){p.em_maquiagem=false;render();toast(/em_maquiagem/.test(r.error.message||'')?'Rode a atualização 072 no Supabase.':'Não consegui salvar agora.');return;}pedGuarda(r.data);render();toast('Em maquiagem 🎨 · a clínica já vê.');});};
+
+/* ===== Celular: tela simples + rodapé com 3 botões (Pedidos · + novo pedido · Financeiro) ===== */
+function bn3Visivel(){return lmbVisivel()&&!S.redeOn&&!S.negOn&&!(typeof ESP!=='undefined'&&ESP.dono);}
+function bn3Desenha(){var el=document.getElementById('bn3');if(!bn3Visivel()){if(el)el.remove();document.body.classList.remove('bn3-on');return;}
+  if(!el){el=document.createElement('nav');el.id='bn3';el.setAttribute('aria-label','Atalhos');document.body.appendChild(el);}document.body.classList.add('bn3-on');
+  var t=S.tab&&S.tab[S.role],dent=S.role==='dent',fin=dent?(t==='pedidos'&&S.labSub==='fin'):(t==='financeiro'),ped=t==='pedidos'&&!fin,semFin=!!MEM.dono;
+  el.innerHTML='<button data-bn3="ped" class="'+(ped?'on':'')+'"><span>📋</span>Pedidos</button>'+
+    '<button data-bn3="novo" class="bn3-mais" aria-label="Novo pedido">+</button>'+
+    (semFin?'<button data-bn3="ini" class="'+(t==='inicio'?'on':'')+'"><span>🏠</span>Início</button>':'<button data-bn3="fin" class="'+(fin?'on':'')+'"><span>💰</span>Financeiro</button>');}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-bn3]');if(!b)return;var k=b.getAttribute('data-bn3'),dent=S.role==='dent';e.preventDefault();
+  if(k==='ped'){if(dent)S.labSub='ped';ACT.dTab('pedidos');}
+  else if(k==='fin'){if(dent){S.labSub='fin';if(typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}ACT.dTab('pedidos');}else ACT.dTab('financeiro');}
+  else if(k==='ini')ACT.dTab('inicio');
+  else if(k==='novo'){if(dent)pcAbre();else ACT.anaPed();}
+  bn3Desenha();});
+var _renderBN3=render;render=function(){var r=_renderBN3.apply(this,arguments);setTimeout(bn3Desenha,0);return r;};
+setTimeout(bn3Desenha,2600);
+/* Início no celular: só uma saudação curta (sem o quadro grande e os números) */
+function bn3Oi(){var n=((RL.perfil&&RL.perfil.nome)||'').split(' ')[0];return '<h2 class="bn3-oi">'+dSaud()+(n?', '+esc(n):'')+'! 👋</h2>';}
+var _rPInicioBN3=rPInicio;rPInicio=function(D){var h=_rPInicioBN3.apply(this,arguments);return tutAba&&tutAba()?h:bn3Oi()+h;};
+var _rDInicioBN3=rDInicio;rDInicio=function(D){var h=_rDInicioBN3.apply(this,arguments);return tutAba&&tutAba()?h:bn3Oi()+h;};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
