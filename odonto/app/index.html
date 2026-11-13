@@ -1641,6 +1641,12 @@ body.bn3-on .anap-fab{display:none!important}
 body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
 @media(prefers-reduced-motion:reduce){#bn3 *{transition:none!important}}
 }
+
+/* Ana novo pedido (laboratório) */
+.pcl-pg{display:inline-block;width:64px;height:5px;border-radius:9px;background:#2A3942;overflow:hidden;vertical-align:middle;margin-right:7px}.pcl-pg i{display:block;height:100%;background:#00A884;border-radius:9px;transition:width .3s}
+#pc-ov.pcl .pc-res{display:grid;gap:4px;margin-top:6px}
+#pc-ov .pc-bar{padding-bottom:max(8px,env(safe-area-inset-bottom))}
+@media(max-width:600px){#pc-ov .pc-h{padding-top:max(10px,env(safe-area-inset-top))}#pc-ov .pc-c{flex:0 0 auto;padding:10px 15px}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6343,6 +6349,93 @@ setTimeout(bn3Desenha,2600);
 function bn3Oi(){var n=((RL.perfil&&RL.perfil.nome)||'').split(' ')[0];return '<h2 class="bn3-oi">'+dSaud()+(n?', '+esc(n):'')+'! 👋</h2>';}
 var _rPInicioBN3=rPInicio;rPInicio=function(D){var h=_rPInicioBN3.apply(this,arguments);return tutAba&&tutAba()?h:bn3Oi()+h;};
 var _rDInicioBN3=rDInicio;rDInicio=function(D){var h=_rDInicioBN3.apply(this,arguments);return tutAba&&tutAba()?h:bn3Oi()+h;};
+
+/* ===== Laboratório: novo pedido conversando com a Ana (tela cheia, uma pergunta por vez) ===== */
+var PCL_ORD=['cliente','paciente','trabalho','dentes','cor','prazo','obs','fim'];
+function pclLev(a,b){if(a===b)return 0;var m=a.length,n=b.length;if(!m||!n)return m||n;var p=[],i,j;for(j=0;j<=n;j++)p[j]=j;
+  for(i=1;i<=m;i++){var q=[i];for(j=1;j<=n;j++)q[j]=Math.min(p[j]+1,q[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=q;}return p[n];}
+function pclClis(){return (EMP.cli||[]).filter(function(c){return c.ativo!==false;});}
+function pclTop(){var C={},L=pclClis();(PED.L||[]).forEach(function(p){if(p.cliente_id)C[p.cliente_id]=(C[p.cliente_id]||0)+1;});
+  return L.slice().sort(function(a,b){return (C[b.id]||0)-(C[a.id]||0)||String(a.nome).localeCompare(b.nome);}).slice(0,6);}
+/* acha o cliente pelo que foi digitado, mesmo com erro de letra (Oralis → Orallis) */
+function pclAcha(txt){var t=semAc(txt).trim(),L=pclClis();if(!t)return [];var ex=anaCliente(t);if(ex)return [ex];
+  var tw=t.split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;});if(!tw.length)return [];
+  var sc=L.map(function(c){var ws=semAc(c.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}),s=0;
+    tw.forEach(function(a){var b=99;ws.forEach(function(w){var d=w.indexOf(a)===0?0:pclLev(a,w);if(d<b)b=d;});if(b===0)s+=3;else if(b===1)s+=2;else if(b===2&&a.length>=5)s+=1;});return {c:c,s:s};})
+    .filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;});
+  if(!sc.length)return [];if(sc.length===1||sc[0].s>sc[1].s)return [sc[0].c];return sc.slice(0,5).map(function(x){return x.c;});}
+PC_P.cliente={q:'Para qual <b>cliente</b> é o pedido? Toque num nome ou digite.',ph:'Nome do cliente (dentista ou clínica)',
+  chips:function(){var E=PC.ed||{};if(E._opc)return E._opc;return pclTop().map(function(c){return [c.nome,'id:'+c.id];});}};
+PC_P.prazo={q:'Para <b>quando</b>? Pode escrever (ex.: sexta, 25/11, em 5 dias úteis).',ph:'Ex.: sexta, 25/11',pula:true,
+  chips:function(){return [['📅 Prazo da tabela','tab'],['⚡ Urgente','urg'],['Amanhã','amanhã'],['Sexta','sexta']];}};
+(function(){var tc=PC_P.trabalho.chips;PC_P.trabalho.chips=function(){if(PC.modo!=='lab')return tc();var N=S.neg&&S.neg.servs||[],s=N.map(function(x){return x[0];}).filter(Boolean).slice(0,8);
+  return (s.length?s:PC_TRAB.filter(function(t){return t!=='Outro';})).map(function(t){return [t,t];});};})();
+function pclAbre(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espelho: só leitura.');return;}if(!RL||!RL.user){toast('Entre na sua conta primeiro.');return;}
+  PC={on:true,modo:'lab',msgs:[],passo:0,ed:{cli:null,cliTxt:'',paciente:'',trabalho:'',dentes:[],cor:'',prazo:null,urgente:false,obs:'',fotoCor:[],fotoSorriso:[],scan:[],video:[],_histVisto:true,_ajVisto:true},busy:false,fila:[],digitando:false};
+  pcDesenha();document.body.style.overflow='hidden';var h=new Date().getHours();
+  pcAna((h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+'! 👋 Vamos cadastrar um pedido. Eu pergunto, você responde.');
+  pcAna('<small>Dica: se preferir, escreva tudo de uma vez, tipo <i>"Orallis, paciente Maria, coroa do 11, A2"</i>.</small>');pcPergunta('cliente');}
+/* escreveu tudo de uma vez: aproveita o que der e pergunta só o que faltou */
+function pclTudo(v){var seg=v.split(/[,;]/),a1=pclAcha(seg[0]),cl=a1.length===1?a1[0]:null,r=anaEntende(cl?seg.slice(1).join(','):v);if(!r||!r.itens.length)return false;var E=PC.ed;cl=cl||r.cliente;if(!cl)return false;
+  E.cli=cl;E.paciente=r.paciente||'';E.trabalho=r.itens[0].trabalho;E.dentes=r.itens[0].dentes||[];E.cor=r.cor||'';E.prazo=r.prazo||(/\b(pra|para|ate|dia|em)\b/.test(semAc(v))?pclData(semAc(v)):null);E.urgente=!!r.urgente;E._tudo=r;
+  pcEu(esc(v));pcAna('Anotei 📝 <b>'+esc(cl.nome)+'</b>'+(E.paciente?' · '+esc(E.paciente):'')+' · '+esc(E.trabalho)+(E.dentes.length?' · 🦷 '+E.dentes.join(', '):'')+(E.cor?' · 🎨 '+esc(E.cor):''));
+  var falta=['paciente','cor','prazo'].filter(function(k){return k==='paciente'?!E.paciente:k==='cor'?!E.cor:!E.prazo&&!E.urgente;});
+  PC.passo=falta.length?PCL_ORD[PCL_ORD.indexOf(falta[0])-1]:'obs';if(!falta.length)pcPergunta('obs');else pcPergunta(falta[0]);return true;}
+var _pcProxL=pcProx;pcProx=function(){if(PC.modo!=='lab')return _pcProxL.apply(this,arguments);var E=PC.ed,i=PCL_ORD.indexOf(PC.passo),nx=PCL_ORD[i+1];
+  if(E._tudo){while(nx&&nx!=='obs'&&nx!=='fim'&&((nx==='paciente'&&E.paciente)||(nx==='trabalho'&&E.trabalho)||(nx==='dentes'&&E.trabalho)||(nx==='cor'&&E.cor)||(nx==='prazo'&&(E.prazo||E.urgente))))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];}
+  pcPergunta(nx||'fim');};
+function pclData(t){var d=anaPrazo(t);if(d)return d;var W=[/\bdom/,/\bseg/,/\bter/,/\bqua(?!n)/,/\bqui/,/\bsex/,/\bsab/],h=new Date(dHoje()+'T12:00:00'),w=-1;W.forEach(function(r,i){if(w<0&&r.test(t))w=i;});
+  if(w>=0){var n=(w-h.getDay()+7)%7||7;if(/\b(proxima|que vem)\b/.test(t)&&n<7)n+=7;h.setDate(h.getDate()+n);return h.toISOString().slice(0,10);}
+  var m=t.match(/\b(\d{1,2})\s+dias?\s*uteis\b/);if(m)return pedUteis(+m[1]);m=t.match(/\bem\s+(\d{1,2})\s+dias?\b/);if(m){h.setDate(h.getDate()+(+m[1]));return h.toISOString().slice(0,10);}return null;}
+var _pcRespL=pcResposta;pcResposta=function(v,txt){if(PC.modo!=='lab')return _pcRespL.apply(this,arguments);var k=PC.passo,E=PC.ed;if(PC.digitando||!E)return;
+  if(k==='cliente'){var s=String(v||'').trim();if(!s)return;
+    if(s.indexOf('id:')===0){var c=pclClis().filter(function(x){return x.id===s.slice(3);})[0];if(!c)return;E.cli=c;E._opc=null;pcEu(esc(c.nome));pcProx();return;}
+    if(s.indexOf('sem:')===0){E.cli=null;E.cliTxt=s.slice(4);E._opc=null;pcEu(esc(E.cliTxt)+' <small>(sem cadastro)</small>');pcAna('Tudo bem, vou anotar o nome na observação. Depois você cadastra o cliente em <b>Clientes</b>.');pcProx();return;}
+    if(s.length>18&&/[,;]/.test(s)&&pclTudo(s))return;
+    var A=pclAcha(s);pcEu(esc(s));
+    if(A.length===1){E.cli=A[0];E._opc=null;if(semAc(A[0].nome).indexOf(semAc(s))<0)pcAna('Entendi: <b>'+esc(A[0].nome)+'</b> 👍');pcProx();return;}
+    if(A.length>1){E._opc=A.map(function(c){return [c.nome,'id:'+c.id];});pcAna('Achei mais de um. Qual deles?');return;}
+    E._opc=pclTop().map(function(c){return [c.nome,'id:'+c.id];}).concat([['➕ Seguir com "'+s.slice(0,30)+'"','sem:'+s.slice(0,80)]]);
+    pcAna('Não achei <b>'+esc(s)+'</b> nos seus clientes. Escolha um da lista ou siga assim mesmo.');return;}
+  if(k==='prazo'){if(v===null||v==='tab'){pcEu(v===null?'<i>Pular</i>':'Prazo da tabela');E.prazo=null;pcProx();return;}
+    if(v==='urg'){E.urgente=true;pcEu('⚡ Urgente');pcAna('Marquei como <b>urgente</b>. Tem uma data? Se não, toque em Prazo da tabela.');return;}
+    var d=pclData(semAc(String(v)));if(!d){pcEu(esc(v));pcAna('Não entendi a data 🤔 Tente assim: <i>sexta</i>, <i>25/11</i> ou <i>em 5 dias úteis</i>.');return;}
+    E.prazo=d;pcEu(esc(v));pcAna('Prazo: <b>'+esc(anaFmtData(d))+'</b> ✅');pcProx();return;}
+  return _pcRespL.apply(this,arguments);};
+/* monta o(s) pedido(s) com preço e prazo da tabela */
+function pclMonta(){var E=PC.ed,s=pedServ(E.trabalho),res;
+  if(s||!E._tudo){var r0=s?null:anaEntende(E.trabalho+(E.dentes.length?' '+E.dentes.join(' e '):''));
+    var it=r0&&r0.itens.length===1?r0.itens[0]:{trabalho:E.trabalho,daTabela:!!s,material:'',sobre_implante:/implant/i.test(E.trabalho)&&!/sobre dente/i.test(E.trabalho),componente:''};
+    it.dentes=E.dentes.slice();it.qtd=it.dentes.length||it.qtd||1;var s2=pedServ(it.trabalho);it.valor=s2&&s2.valor!=null?Math.round(s2.valor*it.qtd*100)/100:null;it.prazoTab=s2&&s2.prazo!=null?pedUteis(s2.prazo):null;
+    res={itens:[it],tipo:r0&&r0.tipo||(/PPR|Prótese total|Modelo/.test(it.trabalho)?'analogico':'cad')};}
+  else res={itens:E._tudo.itens,tipo:E._tudo.tipo};
+  res.cliente=E.cli;res.paciente=E.paciente;res.cor=E.cor;res.prazo=E.prazo;res.urgente=E.urgente;
+  res.texto=[E.cli?E.cli.nome:E.cliTxt,E.paciente,E.trabalho,E.dentes.join(', '),E.cor].filter(Boolean).join(' · ');
+  var L=anaPedidos(res);L.forEach(function(p){p.descricao=('Pedido montado com a Ana: '+res.texto).slice(0,4000);var o=[];if(!E.cli&&E.cliTxt)o.push('Cliente: '+E.cliTxt+' (sem cadastro)');if(E.obs)o.push(E.obs);p.obs=o.join('\n')||null;});
+  return L;}
+var _pcResumoL=pcResumo;pcResumo=function(){if(PC.modo!=='lab')return _pcResumoL.apply(this,arguments);var E=PC.ed,L=pclMonta(),tot=0,sem=false;
+  L.forEach(function(p){if(p.valor!=null)tot+=p.valor;else sem=true;});var pz=L[0].prazo;
+  pcAna('Pronto! Confira o pedido 👇<div class="pc-res"><div><span>Cliente</span><b>'+esc(E.cli?E.cli.nome:E.cliTxt+' (sem cadastro)')+'</b></div>'+(E.paciente?'<div><span>Paciente</span><b>'+esc(E.paciente)+'</b></div>':'')+
+    L.map(function(p){return '<div><span>Trabalho</span><b>'+esc(p.trabalho)+'</b></div>'+(p.dentes&&p.dentes.length?'<div><span>Dentes</span><b>'+p.dentes.join(', ')+' ('+p.qtd+')</b></div>':'');}).join('')+
+    (E.cor?'<div><span>Cor</span><b>'+esc(E.cor)+'</b></div>':'')+'<div><span>Tipo</span><b>'+(L[0].tipo==='cad'?'🟣 CAD':'🧪 Analógico')+'</b></div>'+
+    '<div><span>Prazo</span><b>'+(E.urgente?'⚡ Urgente · ':'')+(pz?esc(anaFmtData(pz)):'—')+'</b></div>'+
+    '<div><span>Valor</span><b>'+(tot?fmtR(tot)+(sem?' + itens sem preço':''):'sem preço na tabela')+'</b></div>'+(E.obs?'<div><span>Observação</span><b>'+esc(E.obs)+'</b></div>':'')+'</div>');};
+var _pcBarraL=pcBarra;pcBarra=function(){var h=_pcBarraL.apply(this,arguments);if(PC.modo!=='lab')return h;
+  return h.replace('📤 Enviar pedido para o laboratório','✅ Criar pedido').replace('<button class="pc-c" data-pc="refaz">Recomeçar</button>','<button class="pc-c" data-pc="formulario">✏️ Ajustar no formulário</button><button class="pc-c" data-pc="refaz">Recomeçar</button>');};
+var _pcDesL=pcDesenha;pcDesenha=function(){_pcDesL.apply(this,arguments);var el=document.getElementById('pc-ov');if(!el)return;el.classList.toggle('pcl',PC.modo==='lab');
+  if(PC.modo==='lab'){var b=el.querySelector('.pc-h b');if(b)b.textContent='Ana · Novo pedido';var f=el.querySelector('.pc-x[data-pc=formulario]');if(f)f.remove();
+    var sm=el.querySelector('.pc-h small');if(sm&&!PC.digitando){var i=PCL_ORD.indexOf(PC.passo);if(i>=0&&!PC.enviado)sm.innerHTML='<span class="pcl-pg"><i style="width:'+Math.round((i+1)/PCL_ORD.length*100)+'%"></i></span>'+(PC.passo==='fim'?'confira e crie':'passo '+(i+1)+' de '+(PCL_ORD.length-1));}}};
+function pclCria(){var E=PC.ed;if(PC.busy||!E)return;var L=pclMonta(),n0=PED.L.reduce(function(m,x){return Math.max(m,x.numero||0);},0),feitos=[];PC.busy=true;PC.prog='Criando pedido…';pcDesenha();
+  L.reduce(function(pr,p,i){return pr.then(function(){return SB.from('odo_pedidos').insert(Object.assign({user_id:contaId(),numero:n0+i+1},pedRow(p))).select('*').single().then(function(r){if(r.error)throw r.error;pedGuarda(r.data);feitos.push(r.data.numero);});});},Promise.resolve())
+  .then(function(){PC.busy=false;PC.prog='';PC.enviado=true;pcAna('✅ <b>Pedido #'+feitos.join(', #')+' criado!</b> Já está na sua lista de pedidos.');render();})
+  .catch(function(){PC.busy=false;PC.prog='';pcDesenha();pcAna(feitos.length?'Criei '+feitos.length+' e parei: não consegui salvar o resto. 😕':'❌ Não consegui salvar agora. Verifique a internet e toque em Criar pedido de novo.');});}
+/* botões da conversa no modo laboratório */
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-pc]');if(!b||!PC.on||PC.modo!=='lab')return;var a=b.getAttribute('data-pc');
+  if(a==='envia'){e.stopImmediatePropagation();pclCria();}
+  else if(a==='novo'||a==='refaz'){e.stopImmediatePropagation();pcFecha();pclAbre();}
+  else if(a==='formulario'){e.stopImmediatePropagation();var p=pclMonta()[0];pcFecha();if(ACT.dTab)ACT.dTab('pedidos');PED.ed=p;PED.erroF='';render();window.scrollTo(0,0);toast('Confira e toque em Salvar.');}},true);
+/* no laboratório, o + e o botão da Ana abrem a conversa */
+ACT.anaPed=function(){pclAbre();};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
