@@ -1647,6 +1647,7 @@ body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
 #pc-ov.pcl .pc-res{display:grid;gap:4px;margin-top:6px}
 #pc-ov .pc-bar{padding-bottom:max(8px,env(safe-area-inset-bottom))}
 @media(max-width:600px){#pc-ov .pc-h{padding-top:max(10px,env(safe-area-inset-top))}#pc-ov .pc-c{flex:0 0 auto;padding:10px 15px}}
+.pc-h .pc-lab{color:#00A884}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6341,7 +6342,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   if(k==='ped'){if(dent)S.labSub='ped';ACT.dTab('pedidos');}
   else if(k==='fin'){if(dent){S.labSub='fin';if(typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}ACT.dTab('pedidos');}else ACT.dTab('financeiro');}
   else if(k==='ini')ACT.dTab('inicio');
-  else if(k==='novo'){if(dent)pcAbre();else ACT.anaPed();}
+  else if(k==='novo'){if(S.role==='prot')pclAbre();else pcAbre();}
   bn3Desenha();});
 var _renderBN3=render;render=function(){var r=_renderBN3.apply(this,arguments);setTimeout(bn3Desenha,0);return r;};
 setTimeout(bn3Desenha,2600);
@@ -6422,7 +6423,7 @@ var _pcResumoL=pcResumo;pcResumo=function(){if(PC.modo!=='lab')return _pcResumoL
     '<div><span>Valor</span><b>'+(tot?fmtR(tot)+(sem?' + itens sem preço':''):'sem preço na tabela')+'</b></div>'+(E.obs?'<div><span>Observação</span><b>'+esc(E.obs)+'</b></div>':'')+'</div>');};
 var _pcBarraL=pcBarra;pcBarra=function(){var h=_pcBarraL.apply(this,arguments);if(PC.modo!=='lab')return h;
   return h.replace('📤 Enviar pedido para o laboratório','✅ Criar pedido').replace('<button class="pc-c" data-pc="refaz">Recomeçar</button>','<button class="pc-c" data-pc="formulario">✏️ Ajustar no formulário</button><button class="pc-c" data-pc="refaz">Recomeçar</button>');};
-var _pcDesL=pcDesenha;pcDesenha=function(){_pcDesL.apply(this,arguments);var el=document.getElementById('pc-ov');if(!el)return;el.classList.toggle('pcl',PC.modo==='lab');
+var _pcDesL=pcDesenha;pcDesenha=function(){_pcDesL.apply(this,arguments);var el=document.getElementById('pc-ov');if(!el)return;el.classList.toggle('pcl',PC.modo==='lab');if(PC.modo!=='lab'&&PC.ed&&PC.ed.labNome){var bb=el.querySelector('.pc-h b');if(bb)bb.innerHTML='Ana · Pedido para <span class="pc-lab">'+esc(PC.ed.labNome)+'</span>';}
   if(PC.modo==='lab'){var b=el.querySelector('.pc-h b');if(b)b.textContent='Ana · Novo pedido';var f=el.querySelector('.pc-x[data-pc=formulario]');if(f)f.remove();
     var sm=el.querySelector('.pc-h small');if(sm&&!PC.digitando){var i=PCL_ORD.indexOf(PC.passo);if(i>=0&&!PC.enviado)sm.innerHTML='<span class="pcl-pg"><i style="width:'+Math.round((i+1)/PCL_ORD.length*100)+'%"></i></span>'+(PC.passo==='fim'?'confira e crie':'passo '+(i+1)+' de '+(PCL_ORD.length-1));}}};
 function pclCria(){var E=PC.ed;if(PC.busy||!E)return;var L=pclMonta(),n0=PED.L.reduce(function(m,x){return Math.max(m,x.numero||0);},0),feitos=[];PC.busy=true;PC.prog='Criando pedido…';pcDesenha();
