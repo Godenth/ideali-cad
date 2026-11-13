@@ -1589,6 +1589,7 @@ body.membro [data-act="dTab"][data-v="financeiro"],body.membro [data-act="dTab"]
 .ph-nada{margin:0}
 @media(max-width:600px){.ph-res{grid-template-columns:1fr 1fr 1fr;gap:6px}.ph-res b{font-size:.95rem}}
 body.membro [data-act="labSub"][data-v="pag"]{display:none!important}
+.pc-hist{margin:6px 0 6px 18px;padding:0;font-size:.88em}.pc-hist li{margin:2px 0}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5165,7 +5166,7 @@ function pdgLimpa(){PDG.L.forEach(function(e){if(e.arquivos_apagados||new Date(e
 function pdgItensTxt(e){return (e.itens||[]).map(function(it){return esc(it.trabalho||'Trabalho')+(it.dentes&&it.dentes.length?' <span class="muted" style="font-size:.85em">('+it.dentes.join(', ')+')</span>':'');}).join(' · ')||'—';}
 function pdgArqsHtml(e){var A=e.arquivos||[];if(!A.length)return '';var d=pdgDias(e);
   if(!d)return '<div class="pdg-arq small muted">📎 '+A.length+' arquivo'+(A.length>1?'s':'')+' · já apagado'+(A.length>1?'s':'')+' (3 dias)</div>';
-  return '<div class="pdg-arq">'+A.map(function(a){return '<button class="chip" data-act="pdgArq" data-v="'+esc(a.path)+'">'+(a.tipo==='foto'?'📷 ':'🦷 ')+esc(a.nome)+' <small>'+pdgMB(a.tam||0)+'</small></button>';}).join('')+'<small class="muted">⏳ apaga'+(A.length>1?'m':'')+' em '+d+' dia'+(d>1?'s':'')+'</small></div>';}
+  return '<div class="pdg-arq">'+A.map(function(a){return '<button class="chip" data-act="pdgArq" data-v="'+esc(a.path)+'">'+(a.tipo==='foto'?'📷 ':a.tipo==='video'?'🎬 ':'🦷 ')+esc(a.nome)+' <small>'+pdgMB(a.tam||0)+'</small></button>';}).join('')+'<small class="muted">⏳ apaga'+(A.length>1?'m':'')+' em '+d+' dia'+(d>1?'s':'')+'</small></div>';}
 var PDG_ST={enviado:['⏳ Aguardando o laboratório aceitar','pendente'],aceito:['✅ Aceito pelo laboratório','aceito'],recusado:['Recusado','recusado'],cancelado:['Cancelado','recusado']};
 var PDG_ETAPAS=['Desenho CAD','Enviado para fresagem','Em produção','Pronto','Entregue'];
 function pdgEtapas(e){var et=e.etapa||'Desenho CAD';if(et==='Cancelado'||et==='Aguardando informação')return '<span class="labv-st recusado">'+esc(et)+'</span>';var L=PDG_ETAPAS.filter(function(x){return !(x==='Em produção'&&et==='Enviado para fresagem')&&!(x==='Enviado para fresagem'&&et==='Em produção');}),i=L.indexOf(et);
@@ -5441,7 +5442,7 @@ var PC_TRAB=['Coroa','Coroa sobre implante','PPR','Protocolo','Prótese total','
 var PC_COR=['A1','A2','A3','A3,5','B1','B2','C1','Não sei'];
 function pcAbre(vid){var V=labVMeus().filter(function(v){return v.status==='aceito';});if(!V.length){toast('Conecte um laboratório primeiro (aba Laboratório).');return;}
   var v=V.filter(function(x){return x.id===vid;})[0]||(V.length===1?V[0]:null);
-  PC={on:true,msgs:[],passo:0,ed:{vid:v&&v.id,lab:v&&v.lab_id,labNome:v&&v.lab_nome,paciente:'',trabalho:'',dentes:[],cor:'',fotoCor:[],fotoSorriso:[],scan:[],obs:''},busy:false,fila:[],digitando:false};
+  PC={on:true,msgs:[],passo:0,ed:{vid:v&&v.id,lab:v&&v.lab_id,labNome:v&&v.lab_nome,paciente:'',trabalho:'',dentes:[],cor:'',fotoCor:[],fotoSorriso:[],scan:[],video:[],obs:''},busy:false,fila:[],digitando:false};
   pcDesenha();document.body.style.overflow='hidden';
   pcAna('Oi! 👋 Vamos montar o pedido juntos. É rapidinho.');if(!v)pcPergunta('lab');else{pcAna('Vai para o <b>'+esc(v.lab_nome)+'</b>.');pcPergunta('paciente');}}
 function pcFecha(){if(PC.busy)return;PC.on=false;var el=document.getElementById('pc-ov');if(el)el.remove();document.body.style.overflow='';}
@@ -5457,9 +5458,10 @@ var PC_P={
   fotoCor:{q:'Tem <b>foto da cor</b>?',sn:true,arq:'image/*',rot:'📷 Anexar foto da cor'},
   fotoSorriso:{q:'Tem <b>foto do sorriso</b>?',sn:true,arq:'image/*',rot:'📷 Anexar foto do sorriso'},
   scan:{q:'Tem <b>arquivo 3D</b> (escaneamento)?',sn:true,arq:'.stl,.ply,.obj,.dcm,.zip,.3mf',rot:'🦷 Anexar arquivo 3D'},
+  video:{q:'Tem algum <b>vídeo</b> para o laboratório? (ex.: mostrando o sorriso ou o problema) · até 50 MB',sn:true,arq:'video/*',rot:'🎬 Anexar vídeo'},
   obs:{q:'Quer deixar alguma <b>observação</b> para o laboratório?',ph:'Observação',pula:true},
   fim:{}};
-var PC_ORD=['lab','paciente','trabalho','dentes','cor','fotoCor','fotoSorriso','scan','obs','fim'];
+var PC_ORD=['lab','paciente','trabalho','dentes','cor','fotoCor','fotoSorriso','scan','video','obs','fim'];
 function pcPergunta(k){PC.passo=k;PC.anexando=false;if(k==='fim'){pcResumo();return;}pcAna(PC_P[k].q);}
 function pcProx(){var i=PC_ORD.indexOf(PC.passo);pcPergunta(PC_ORD[i+1]);}
 function pcResposta(v,txt){var k=PC.passo,E=PC.ed,P=PC_P[k];if(!P||PC.digitando)return;
@@ -5473,32 +5475,33 @@ function pcResposta(v,txt){var k=PC.passo,E=PC.ed,P=PC_P[k];if(!P||PC.digitando)
   if(P.sn){if(v==='nao'){pcEu('Não');pcProx();}else if(v==='sim'){pcEu('Sim');PC.anexando=true;pcAna('Pode anexar 👇');}else if(v==='pronto'){pcProx();}}}
 function pcDentes(t){var ds=[];try{var tt=anaNomesDentes(semAc(String(t)));}catch(e){tt=String(t);}var A=(typeof oaDoTexto==='function')?oaDoTexto(tt):null;
   if(A)return A.map(function(x){return x.d;});(String(tt).match(/\b[1-4][1-8]\b/g)||[]).forEach(function(n){n=+n;if(ds.indexOf(n)<0)ds.push(n);});return ds;}
-function pcAnexa(files){var k=PC.passo,E=PC.ed,F=Array.prototype.slice.call(files||[]);if(!F.length)return;var tot=E.fotoCor.length+E.fotoSorriso.length+E.scan.length;
+function pcAnexa(files){var k=PC.passo,E=PC.ed,F=Array.prototype.slice.call(files||[]);if(!F.length)return;var tot=E.fotoCor.length+E.fotoSorriso.length+E.scan.length+E.video.length;
+  if(k==='video'){var gr=F.filter(function(f){return f.size>PDG_ARQ;});if(gr.length){pcAna('😕 O vídeo <b>'+esc(gr[0].name)+'</b> tem '+pdgMB(gr[0].size)+'. O limite é 50 MB: grave um vídeo mais curto ou em resolução menor.');F=F.filter(function(f){return f.size<=PDG_ARQ;});if(!F.length)return;}}
   F.forEach(function(f){if(tot>=20)return;E[k].push(f);tot++;});
-  pcEu(F.map(function(f){return (/^image\//.test(f.type)?'📷 ':'🦷 ')+esc(f.name)+' <small>'+pdgMB(f.size)+'</small>';}).join('<br>'));
+  pcEu(F.map(function(f){return (/^image\//.test(f.type)?'📷 ':/^video\//.test(f.type)?'🎬 ':'🦷 ')+esc(f.name)+' <small>'+pdgMB(f.size)+'</small>';}).join('<br>'));
   pcAna('Recebi! Quer anexar mais ou seguimos?');}
-function pcResumo(){var E=PC.ed,n=E.fotoCor.length+E.fotoSorriso.length+E.scan.length;
+function pcResumo(){var E=PC.ed,n=E.fotoCor.length+E.fotoSorriso.length+E.scan.length+(E.video||[]).length;
   pcAna('Pronto! Confira o pedido:<div class="pc-res"><div><span>Laboratório</span><b>'+esc(E.labNome)+'</b></div><div><span>Paciente</span><b>'+esc(E.paciente)+'</b></div><div><span>Trabalho</span><b>'+esc(E.trabalho)+'</b></div>'+
     (E.dentes.length?'<div><span>Dentes</span><b>'+E.dentes.join(', ')+'</b></div>':'')+(E.cor?'<div><span>Cor</span><b>'+esc(E.cor)+'</b></div>':'')+
-    '<div><span>Foto da cor</span><b>'+(E.fotoCor.length?'✅ '+E.fotoCor.length:'não')+'</b></div><div><span>Foto do sorriso</span><b>'+(E.fotoSorriso.length?'✅ '+E.fotoSorriso.length:'não')+'</b></div><div><span>Arquivo 3D</span><b>'+(E.scan.length?'✅ '+E.scan.length:'não')+'</b></div>'+
+    '<div><span>Foto da cor</span><b>'+(E.fotoCor.length?'✅ '+E.fotoCor.length:'não')+'</b></div><div><span>Foto do sorriso</span><b>'+(E.fotoSorriso.length?'✅ '+E.fotoSorriso.length:'não')+'</b></div><div><span>Arquivo 3D</span><b>'+(E.scan.length?'✅ '+E.scan.length:'não')+'</b></div><div><span>Vídeo</span><b>'+((E.video||[]).length?'✅ '+E.video.length:'não')+'</b></div>'+
     (E.obs?'<div><span>Observação</span><b>'+esc(E.obs)+'</b></div>':'')+'</div>');}
 function pcEnvia(){var E=PC.ed;if(PC.busy||!E)return;PC.busy=true;PC.prog='Preparando…';pcDesenha();
-  var arqs=[].concat(E.fotoCor.map(function(f){return {f:f,t:'foto',p:'foto-cor'};}),E.fotoSorriso.map(function(f){return {f:f,t:'foto',p:'foto-sorriso'};}),E.scan.map(function(f){return {f:f,t:/^image\//.test(f.type)?'foto':'scan',p:'3d'};}));
+  var arqs=[].concat(E.fotoCor.map(function(f){return {f:f,t:'foto',p:'foto-cor'};}),E.fotoSorriso.map(function(f){return {f:f,t:'foto',p:'foto-sorriso'};}),E.scan.map(function(f){return {f:f,t:/^image\//.test(f.type)?'foto':'scan',p:'3d'};}),(E.video||[]).map(function(f){return {f:f,t:'video',p:'video'};}));
   var envId=null,feitos=[],tot=0,uid=contaId();
   function prog(t){PC.prog=t;pcDesenha();}
   function falha(msg){PC.busy=false;PC.prog='';pcDesenha();pcAna('❌ '+msg);if(envId){var P=feitos.map(function(a){return a.path;});(P.length?SB.storage.from('odonto-ped').remove(P):Promise.resolve()).then(function(){SB.rpc('odo_ped_env_cancela',{p_id:envId});});}}
   SB.from('odo_ped_env').insert({vinculo_id:E.vid,lab_id:E.lab}).select('id').single().then(function(r){
     if(r.error){falha(/odo_ped_env|schema cache|does not exist/.test(r.error.message||'')?'Falta rodar a atualização 057 no Supabase.':'Não consegui criar o pedido. O laboratório ainda está conectado?');throw 0;}
     envId=r.data.id;
-    return arqs.reduce(function(pr,a,i){return pr.then(function(){var f=a.f,foto=a.t==='foto';prog((foto?'Preparando foto ':'Compactando arquivo 3D ')+(i+1)+' de '+arqs.length+'…');
-      return (foto?pdgFotoJpg(f):pdgZip(f)).then(function(b){if(!b)throw 'Não consegui ler '+f.name;if(b.size>PDG_ARQ)throw f.name+' passou de 50 MB mesmo compactado.';tot+=b.size;if(tot>PDG_MAX)throw 'O pedido passou de 100 MB.';
-        var base=a.p+'-'+pdgNomeSeguro(f.name.replace(/\.[^.]+$/,'')),nm=(i+1)+'-'+base+(foto?'.jpg':'.zip'),path=uid+'/'+envId+'/'+nm;prog('Enviando '+(i+1)+' de '+arqs.length+' ('+pdgMB(b.size)+')…');
-        return SB.storage.from('odonto-ped').upload(path,b,{contentType:foto?'image/jpeg':'application/zip',upsert:false}).then(function(u){if(u.error)throw 'Falha ao enviar '+f.name+'.';
-          feitos.push({path:path,nome:(a.p==='foto-cor'?'Foto da cor · ':a.p==='foto-sorriso'?'Foto do sorriso · ':'')+(foto?f.name.replace(/\.[^.]+$/,'')+'.jpg':f.name+'.zip'),tam:b.size,tipo:a.t});});});});},Promise.resolve());
+    return arqs.reduce(function(pr,a,i){return pr.then(function(){var f=a.f,foto=a.t==='foto';prog((foto?'Preparando foto ':vid?'Preparando vídeo ':'Compactando arquivo 3D ')+(i+1)+' de '+arqs.length+'…');
+      var vid=a.t==='video';return (foto?pdgFotoJpg(f):vid?Promise.resolve(f):pdgZip(f)).then(function(b){if(!b)throw 'Não consegui ler '+f.name;if(b.size>PDG_ARQ)throw f.name+' passou de 50 MB mesmo compactado.';tot+=b.size;if(tot>PDG_MAX)throw 'O pedido passou de 100 MB.';
+        var base=a.p+'-'+pdgNomeSeguro(f.name.replace(/\.[^.]+$/,'')),ext=vid?((f.name.match(/\.(mp4|mov|webm|3gp)$/i)||['','mp4'])[1].toLowerCase()):'',nm=(i+1)+'-'+base+(foto?'.jpg':vid?'.'+ext:'.zip'),path=uid+'/'+envId+'/'+nm;prog('Enviando '+(i+1)+' de '+arqs.length+' ('+pdgMB(b.size)+')…');
+        return SB.storage.from('odonto-ped').upload(path,b,{contentType:foto?'image/jpeg':vid?({mov:'video/quicktime',webm:'video/webm','3gp':'video/3gpp'}[ext]||'video/mp4'):'application/zip',upsert:false}).then(function(u){if(u.error)throw 'Falha ao enviar '+f.name+'.';
+          feitos.push({path:path,nome:(a.p==='foto-cor'?'Foto da cor · ':a.p==='foto-sorriso'?'Foto do sorriso · ':'')+(foto?f.name.replace(/\.[^.]+$/,'')+'.jpg':vid?f.name:f.name+'.zip'),tam:b.size,tipo:a.t});});});});},Promise.resolve());
   }).then(function(){if(!envId)return;prog('Finalizando…');var ds=E.dentes||[];
-    var it=[{trabalho:E.trabalho,dentes:ds,qtd:ds.length||1,material:'',sobre_implante:/implante/i.test(E.trabalho)}];
-    var extra=['Foto da cor: '+(E.fotoCor.length?'sim':'não'),'Foto do sorriso: '+(E.fotoSorriso.length?'sim':'não'),'Arquivo 3D: '+(E.scan.length?'sim':'não')].join(' · ');
-    return SB.rpc('odo_ped_env_fecha',{p_id:envId,p_dados:{paciente:E.paciente,itens:it,cor:E.cor,prazo:'',urgente:false,obs:(E.obs?E.obs+'\n':'')+extra,texto_ana:'',arquivos:feitos}}).then(function(x){if(x.error)throw 'Não consegui finalizar o envio.';
+    var it=[{trabalho:E.trabalho,dentes:ds,qtd:ds.length||1,material:'',sobre_implante:/implante/i.test(E.trabalho)}];if(E.ajuste){it[0].ajuste=true;it[0].ajuste_de={data:E.ajuste.data,trabalho:E.ajuste.trabalho,dentes:E.ajuste.dentes};}
+    var extra=['Foto da cor: '+(E.fotoCor.length?'sim':'não'),'Foto do sorriso: '+(E.fotoSorriso.length?'sim':'não'),'Arquivo 3D: '+(E.scan.length?'sim':'não'),'Vídeo: '+((E.video||[]).length?'sim':'não')].join(' · ');
+    return SB.rpc('odo_ped_env_fecha',{p_id:envId,p_dados:{paciente:E.paciente,itens:it,cor:E.cor,prazo:'',urgente:false,obs:(E.ajuste?'🔁 AJUSTE/REFAÇÃO: '+E.ajuste.txt+'\n':'')+(E.obs?E.obs+'\n':'')+extra,texto_ana:pcHistTexto(E),arquivos:feitos}}).then(function(x){if(x.error)throw 'Não consegui finalizar o envio.';
       PC.busy=false;PC.prog='';PC.enviado=true;pcAna('✅ <b>Pedido enviado para '+esc(E.labNome)+'!</b> Assim que o laboratório aceitar, você vê aqui na aba Laboratório. Os arquivos ficam disponíveis por 3 dias.');if(typeof pdgCarrega==='function')pdgCarrega();});})
   .catch(function(e){if(e===0)return;falha(typeof e==='string'?e:'Não consegui enviar. Verifique a internet e tente de novo.');});}
 function pcBarra(){var k=PC.passo,P=PC_P[k]||{};if(PC.digitando)return '';
@@ -5693,7 +5696,7 @@ pdgEnviadosHtml=function(){var M=pdgFiltra(pdgMeus());if(!M.length)return '';
     var linha=function(r,v){return '<div class="cx-l"><span>'+r+'</span><b>'+v+'</b></div>';};
     return '<article class="cx" style="--cx:'+cor+'"><div class="cx-board"><i class="cx-clip" aria-hidden="true"><i></i></i>'+
       '<div class="cx-ficha"><div class="cx-fh"><b>ORDEM DE SERVIÇO</b><span>'+d.toLocaleDateString('pt-BR')+'</span></div>'+
-        linha('Paciente',esc(e.paciente||'—'))+linha('Serviço',esc(tr))+(ds.length?linha('Dentes',ds.join(', ')):'')+(e.cor?linha('Cor',esc(e.cor)):'')+(e.prazo?linha('Prazo',e.prazo.split('-').reverse().join('/')):'')+linha('Laboratório',esc(lab))+
+        linha('Paciente',esc(e.paciente||'—'))+linha('Serviço',esc(tr))+((e.itens||[]).some(function(it){return it.ajuste;})?linha('Tipo','🔁 Ajuste / refação'):'')+(ds.length?linha('Dentes',ds.join(', ')):'')+(e.cor?linha('Cor',esc(e.cor)):'')+(e.prazo?linha('Prazo',e.prazo.split('-').reverse().join('/')):'')+linha('Laboratório',esc(lab))+
         '<div class="cx-dentes">'+cxMiniArco(ds)+'</div></div>'+
       '<div class="cx-front"><span class="cx-st">'+esc(et[1])+'</span>'+(e.status==='aceito'?pdgEtapas(e):'')+'</div></div>'+
       '<div class="cx-pe">'+pdgArqsHtml(e)+(e.status==='recusado'&&e.motivo?'<small style="color:#B91C1C">Motivo: '+esc(e.motivo)+'</small>':'')+(e.status==='enviado'?'<button class="btn sm" data-act="pdgCancela" data-v="'+e.id+'">Cancelar pedido</button>':'')+'</div></article>';}).join('')+'</div>';};
@@ -6101,6 +6104,36 @@ Object.assign(ACT,{
   phMes:function(v){var m=phSel();if(v==='todos')S.pagMes='todos';else if(v==='hoje')S.pagMes=pdgMesHoje();else{var b=m==='todos'?pdgMesHoje():m,p=b.split('-'),d=new Date(+p[0],+p[1]-1+(+v),1);S.pagMes=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);}render();},
   phArq:function(v){var w=window.open('','_blank');SB.storage.from('odonto-fin').createSignedUrl(v,300).then(function(r){if(r.error||!r.data){if(w)w.close();toast('Não consegui abrir o arquivo.');return;}if(w)w.location=r.data.signedUrl;else location.href=r.data.signedUrl;});}});
 var _labSubPH=ACT.labSub;ACT.labSub=function(v){if(v==='pag'){PH.d=null;PH.erro='';}return _labSubPH(v);};
+
+/* ===== Ana confere o histórico do paciente no novo pedido (mesmo paciente? mesmo dente = ajuste/refação?) ===== */
+function pcNomeN(t){return semAc(String(t||'')).toLowerCase().replace(/[^a-z ]/g,' ').replace(/\b(dr|dra|sr|sra|de|da|do|das|dos|e)\b/g,' ').replace(/\s+/g,' ').trim();}
+function pcLev(a,b){var d=[],i,j;for(i=0;i<=a.length;i++)d[i]=[i];for(j=0;j<=b.length;j++)d[0][j]=j;for(i=1;i<=a.length;i++)for(j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length];}
+function pcMesmoNome(a,b){a=pcNomeN(a);b=pcNomeN(b);if(!a||!b)return false;if(a===b)return true;var A=a.split(' '),B=b.split(' ');
+  if(A.length>=2&&B.length>=2&&A[0]===B[0]&&A[A.length-1]===B[B.length-1])return true;
+  if(A.length===1||B.length===1)return false;return a.length>=8&&pcLev(a,b)<=2;}
+function pcHist(nome){return pdgMeus().filter(function(e){return e.status!=='cancelado'&&e.status!=='recusado'&&e.etapa!=='Cancelado'&&e.paciente&&pcMesmoNome(e.paciente,nome);})
+  .map(function(e){var ds=[],tr=[];(e.itens||[]).forEach(function(it){if(it.trabalho)tr.push(it.trabalho);(it.dentes||[]).forEach(function(d){if(ds.indexOf(+d)<0)ds.push(+d);});});
+    return {id:e.id,paciente:e.paciente,data:new Date(e.enviado_em||e.criado_em),trabalho:tr.join(' + ')||'Trabalho',dentes:ds,etapa:e.status==='enviado'?'aguardando o laboratório':(e.etapa||'Desenho CAD'),ajuste:(e.itens||[]).some(function(it){return it.ajuste;})};})
+  .sort(function(a,b){return b.data-a.data;});}
+function pcHistLinha(h){return h.data.toLocaleDateString('pt-BR')+' · '+h.trabalho+(h.dentes.length?' ('+h.dentes.join(', ')+')':'')+' · '+h.etapa+(h.ajuste?' · 🔁 ajuste':'');}
+function pcHistTexto(E){if(!E.hist||!E.hist.length)return '';return ('Histórico do paciente na clínica:\n'+E.hist.slice(0,8).map(function(h){return '• '+pcHistLinha(h);}).join('\n')).slice(0,2000);}
+PC_P.mesmoPac={q:'',sem:true,chips:function(){return [['Sim, é o mesmo paciente','sim'],['Não, é outra pessoa','nao']];}};
+PC_P.ajuste={q:'',sem:true,chips:function(){return [['Sim, é ajuste / refação','sim'],['Não, é trabalho novo','nao']];}};
+var _pcProxHist=pcProx;pcProx=function(){var E=PC.ed,k=PC.passo;
+  if(k==='paciente'&&E&&!E._histVisto){E._histVisto=true;var H=pcHist(E.paciente);if(H.length){E._cand=H;PC.passo='mesmoPac';
+    pcAna('🔎 Já tem '+(H.length===1?'um pedido':H.length+' pedidos')+' de <b>'+esc(H[0].paciente)+'</b>:<ul class="pc-hist">'+H.slice(0,4).map(function(h){return '<li>'+esc(pcHistLinha(h))+'</li>';}).join('')+'</ul>É o mesmo paciente?');return;}}
+  if(k==='dentes'&&E&&E.hist&&!E._ajVisto&&E.dentes.length){var ov=null;E.hist.some(function(h){var c=h.dentes.filter(function(d){return E.dentes.indexOf(d)>=0;});if(c.length){ov={h:h,c:c};return true;}return false;});
+    if(ov){E._ajVisto=true;E._ov=ov;PC.passo='ajuste';pcAna('⚠️ '+(ov.c.length>1?'Os dentes <b>'+ov.c.join(', ')+'</b> já foram feitos':'O dente <b>'+ov.c[0]+'</b> já foi feito')+' antes para esse paciente: <b>'+esc(ov.h.trabalho)+'</b> em '+ov.h.data.toLocaleDateString('pt-BR')+' ('+esc(ov.h.etapa)+').<br>Este pedido é um <b>ajuste ou refação</b> desse trabalho?');return;}}
+  return _pcProxHist.apply(this,arguments);};
+var _pcRespHist=pcResposta;pcResposta=function(v,txt){var k=PC.passo,E=PC.ed;if(PC.digitando)return;
+  if(k==='mesmoPac'){if(v!=='sim'&&v!=='nao')return;if(v==='sim'){E.hist=E._cand;E.paciente=E._cand[0].paciente;pcEu('Sim, é o mesmo paciente');pcAna('Ótimo! Vou deixar este pedido ligado ao histórico de <b>'+esc(E.paciente)+'</b>.');}else{E.hist=null;pcEu('Não, é outra pessoa');pcAna('Certo, vou tratar como um paciente novo.');}
+    PC.passo='paciente';pcProx();return;}
+  if(k==='ajuste'){if(v!=='sim'&&v!=='nao')return;var ov=E._ov;if(v==='sim'){E.ajuste={data:ov.h.data.toLocaleDateString('pt-BR'),trabalho:ov.h.trabalho,dentes:ov.c,txt:'dente'+(ov.c.length>1?'s ':' ')+ov.c.join(', ')+' — refazer/ajustar o trabalho de '+ov.h.data.toLocaleDateString('pt-BR')+' ('+ov.h.trabalho+')'};pcEu('Sim, é ajuste / refação');pcAna('Anotado 🔁 Vou avisar o laboratório que é <b>ajuste/refação</b> do trabalho de '+ov.h.data.toLocaleDateString('pt-BR')+'.');}
+    else{E.ajuste=null;pcEu('Não, é trabalho novo');}PC.passo='dentes';pcProx();return;}
+  return _pcRespHist.apply(this,arguments);};
+var _pcResumoHist=pcResumo;pcResumo=function(){var E=PC.ed;_pcResumoHist();var m=PC.fila[PC.fila.length-1];if(!m||!E)return;
+  var add=(E.ajuste?'<div><span>Tipo</span><b>🔁 Ajuste / refação ('+esc(E.ajuste.data)+')</b></div>':'')+(E.hist&&E.hist.length?'<div><span>Histórico</span><b>'+E.hist.length+' pedido'+(E.hist.length>1?'s':'')+' anterior'+(E.hist.length>1?'es':'')+'</b></div>':'');
+  if(add)m.h=m.h.replace('<div><span>Paciente</span>',add+'<div><span>Paciente</span>');};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
