@@ -7279,7 +7279,7 @@ function restaurarPagamento(g){delete g.deleted;g.pedidos.forEach(function(pid){
 /* ===== Tutoriais em vídeo (YouTube): lista escolhida pela Ideali; toca pelo player oficial do YouTube (sem cookies) =====
    Mesmo módulo no Ideali CAD e no Ideali Odonto. Só o administrador adiciona ou tira vídeos (regra no banco, migração 064). */
 var TUTV={L:null,busy:false,erro:'',cat:'',q:'',add:false,salvando:false};
-var TUT_CATS=['Exocad','Impressora 3D','Fresadora','Scanner','Forno e sinterização','Maquiagem e acabamento','Fotografia','Gestão do laboratório','Outros'];
+var TUT_CATS=['Escaneamento intraoral','Escaneamento de bancada','Arquivos e envio','Exocad básico','Exocad próteses','Exocad implantes','Exocad módulos extras','Planejamento e guia cirúrgica','CAM e nesting','Fresadora','Impressora 3D','Zircônia e sinterização','Maquiagem e acabamento','Outros'];
 function tutSB(){return sb;}
 function tutAdmin(){return !!(S.admin);}
 function tutLogado(){return !!(S.sessao);}
@@ -7295,7 +7295,7 @@ function tutCard(v){return '<article class="tut-c"><button type="button" class="
 function tutForm(){return '<form class="tut-f" data-tutform="1" autocomplete="off"><b>➕ Adicionar vídeo</b>'+
   '<label><span>Link do YouTube</span><input id="tut-url" type="url" placeholder="https://www.youtube.com/watch?v=..." required></label>'+
   '<label><span>Título</span><input id="tut-tit" maxlength="200" placeholder="Preenche sozinho quando você cola o link"></label>'+
-  '<div class="tut-f2"><label><span>Categoria</span><input id="tut-cat" list="tut-cats" maxlength="60" value="'+esc(TUTV.cat||'Exocad')+'"><datalist id="tut-cats">'+TUT_CATS.map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist></label>'+
+  '<div class="tut-f2"><label><span>Categoria</span><input id="tut-cat" list="tut-cats" maxlength="60" value="'+esc(TUTV.cat||'Exocad básico')+'"><datalist id="tut-cats">'+TUT_CATS.map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist></label>'+
   '<label><span>Aparece em</span><select id="tut-onde"><option value="ambos">CAD e Odonto</option><option value="cad">Só no Ideali CAD</option><option value="odonto">Só no Ideali Odonto</option></select></label></div>'+
   '<input id="tut-canal" type="hidden"><div class="tut-fb"><button type="button" data-tut="addx">Cancelar</button><button type="submit" class="tut-pri"'+(TUTV.salvando?' disabled':'')+'>'+(TUTV.salvando?'Salvando…':'Adicionar')+'</button></div></form>';}
 function rTut(){if(TUTV.L===null&&!TUTV.busy)setTimeout(tutCarrega,0);var L=TUTV.L||[],cs=tutCats(),cat=TUTV.cat&&cs.some(function(c){return c[0]===TUTV.cat;})?TUTV.cat:'',q=lmbNz(TUTV.q||''),V=L.filter(function(v){return (!cat||v.categoria===cat)&&(!q||lmbNz(v.titulo+' '+(v.canal||'')+' '+v.categoria).indexOf(q)>=0);});
