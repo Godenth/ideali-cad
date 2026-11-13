@@ -1562,6 +1562,10 @@ body.rl-in #lmb{bottom:62px}@media(max-width:760px){#lmb{bottom:120px;left:12px}
 .tv-f2{grid-template-columns:1fr 1fr 1fr}
 @media(max-width:600px){.tv-f2{grid-template-columns:1fr}}
 .plab-cli{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;width:100%;margin-top:6px;font-size:13px}.plab-cli select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--line,#ccd);max-width:100%}.plab-cli small{width:100%;opacity:.7}
+.eq-c .eq-dono{border:2px dashed #E0B44A;background:rgba(224,180,74,.08);border-radius:14px;padding:12px 14px;margin:10px 0;display:grid;gap:6px}
+.eq-li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line,#e5e3ee)}.eq-li>div:first-child{display:grid}.eq-li small{opacity:.7}.eq-li.off b{opacity:.5}.eq-li.pend b{font-style:italic}
+.eq-f{margin-top:10px;gap:8px}.eq-c .row{flex-wrap:wrap}.eq-f input,.eq-f select{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line,#ccd);min-width:0;flex:1 1 160px}
+body.membro [data-act="dTab"][data-v="financeiro"],body.membro [data-act="dTab"][data-v="inove"],body.membro [data-act="labSub"][data-v="fin"],body.membro [data-act="pUpgrade"],body.membro [data-act="negApaga"]{display:none!important}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3381,7 +3385,8 @@ var NEG_VAZIO={
   financeiro:['💰','Financeiro vazio','Quem deve e quanto, cobrança com Pix e PDF, pagamentos e relatórios do mês.'],
   alunos:['🧑‍🎓','Nenhum aluno inscrito ainda','As inscrições dos seus cursos chegam aqui, com contato e situação do pagamento.'],
   eventos:['📅','Nenhum evento publicado','Workshops, aulas abertas e palestras aparecem na aba Cursos e eventos da Rede.']};
-var NEG_PAPEL=[['faz','Sou dono e trabalho nele'],['gestao','Sou dono, cuido da gestão']];
+var NEG_PAPEL=[['faz','Sou dono e trabalho nele'],['gestao','Sou dono, cuido da gestão'],['func','Sou funcionário(a)']];
+var NEG_CARGOS=['ASB / TSB','Secretária','Recepcionista','Gerente','Auxiliar','Protético(a)','Cadista','Outro'];
 function negCarrega(){try{var x=JSON.parse(localStorage.getItem('io_neg_v1')||'null');if(x&&x.tipo)return x;}catch(e){}return null;}
 function negSalva(){try{if(S.neg)localStorage.setItem('io_neg_v1',JSON.stringify(S.neg));else localStorage.removeItem('io_neg_v1');}catch(e){}}
 function negT(){return NEG_TIPOS[S.neg&&S.neg.tipo]||NEG_TIPOS.lab;}
@@ -3405,7 +3410,7 @@ function negMsgs(){var F=S.negF,R=F.r,T=NEG_TIPOS[R.tipo],h=bA('Que legal! Vamos
   if(F.k===0)return h;h+=bE(T.t);
   h+=bA(R.tipo==='auto'?'Como você quer aparecer para os clientes, e onde atende?':'Qual o <b>nome</b> do negócio e onde ele fica?');if(F.k===1)return h;
   h+=bE(R.nome+' · '+R.cid+' / '+R.uf);
-  if(R.tipo!=='auto'){h+=bA('E qual é o <b>seu papel</b> nele?');if(F.k===2)return h;h+=bE(R.papel==='faz'?NEG_PAPEL[0][1]:NEG_PAPEL[1][1]+(R.rt?' · Responsável: '+R.rt:''));}
+  if(R.tipo!=='auto'){h+=bA('E qual é o <b>seu papel</b> nele?');if(F.k===2)return h;h+=bE(R.papel==='faz'?NEG_PAPEL[0][1]:R.papel==='func'?'Funcionário(a) · '+(R.cargo||''):NEG_PAPEL[1][1]+(R.rt?' · Responsável: '+R.rt:''));}
   h+=bA(R.tipo==='escola'?'Quais <b>cursos</b> vocês oferecem? Toque nos que servem e escreva outros se faltar.':R.tipo==='dental'?'O que vocês <b>vendem</b>? Toque nas categorias e escreva outras se faltar.':'Quais <b>serviços</b> você faz? Toque nos que servem e escreva outros se faltar.');if(F.k===3)return h;
   h+=bE(R.servs.join(', '));
   if(T.funcs.length){h+=bA('Quer <b>convidar alguém da equipe</b> agora? Pode ser depois também.');if(F.k===4)return h;h+=bE(R.eq.length?R.eq.map(function(x){return x[0]+' ('+x[1]+')';}).join(', '):'Depois');}
@@ -3415,12 +3420,12 @@ function negResp(){var F=S.negF,R=F.r,T=NEG_TIPOS[R.tipo],ch=function(L,sel,act)
   if(F.k===1)return '<div class="pch-r">'+er+'<label class="neg-l"><span>'+(R.tipo==='auto'?'Nome profissional':'Nome do negócio')+'</span><input id="ng-nome" maxlength="60" value="'+esc(R.nome||'')+'" placeholder="'+(R.tipo==='auto'?'Ex.: Rafael Souza Prótese Digital':'Ex.: '+({clinica:'Clínica Sorriso',lab:'Laboratório Arte Dental',centro:'Fresa Digital',dental:'Dental Center',escola:'Escola de Prótese Exemplo'}[R.tipo]||''))+'"></label>'+
     '<div class="fg-loc"><label><span>Estado</span><select id="ng-uf">'+ufOpts(R.uf,'Escolha')+'</select></label><label><span>Município</span><input id="ng-cid" list="ng-dl" autocomplete="off" value="'+esc(R.cid||'')+'" placeholder="'+(R.uf?'Digite a cidade':'Escolha o estado primeiro')+'"'+(R.uf?'':' disabled')+'>'+munDatalist('ng-dl',R.uf)+'</label></div><button class="btn pri" data-act="negOk">Continuar →</button></div>';
   if(F.k===2)return '<div class="pch-r">'+er+'<div class="pch-ch">'+NEG_PAPEL.map(function(p){return '<button class="rchip'+(R.papel===p[0]?' on':'')+'" data-act="negPapel" data-v="'+p[0]+'">'+(R.papel===p[0]?'✓ ':'')+p[1]+'</button>';}).join('')+'</div>'+
-    (R.papel==='gestao'&&T.rt?'<label class="neg-l"><span>'+esc(T.rt)+'</span><input id="ng-rt" maxlength="60" value="'+esc(R.rt||'')+'"></label>':R.papel==='faz'&&T.rt?'<p class="neg-nota">Você fica como '+(R.tipo==='escola'?'responsável pedagógico':'responsável técnico')+' do negócio.</p>':'')+(R.papel?'<button class="btn pri" data-act="negOk">Continuar →</button>':'')+'</div>';
+    (R.papel==='func'?'<label class="neg-l"><span>Qual a sua posição na empresa?</span><select id="ng-cargo"><option value="">Escolha…</option>'+NEG_CARGOS.map(function(c){return '<option'+(R.cargo===c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></label><p class="neg-nota">Você monta a empresa agora. Quando o dono entrar no Ideali, você passa a empresa para ele em Minha empresa, e continua na equipe.</p>':'')+(R.papel==='gestao'&&T.rt?'<label class="neg-l"><span>'+esc(T.rt)+'</span><input id="ng-rt" maxlength="60" value="'+esc(R.rt||'')+'"></label>':R.papel==='faz'&&T.rt?'<p class="neg-nota">Você fica como '+(R.tipo==='escola'?'responsável pedagógico':'responsável técnico')+' do negócio.</p>':'')+(R.papel?'<button class="btn pri" data-act="negOk">Continuar →</button>':'')+'</div>';
   if(F.k===3)return '<div class="pch-r">'+er+ch(T.servs.concat(R.servs.filter(function(x){return T.servs.indexOf(x)<0;})),R.servs,'negServ')+'<div class="pch-in"><input id="ng-outro" placeholder="Outro (Enter para adicionar)" maxlength="50"><button class="btn sm" data-act="negAdd">+</button></div><button class="btn pri" data-act="negOk">Continuar →</button></div>';
   if(F.k===4){if(!F.conv)return '<div class="pch-r"><div class="row"><button class="btn pri" data-act="negConv">Convidar agora</button><button class="btn" data-act="negOk">Depois</button></div></div>';
     return '<div class="pch-r">'+(R.eq.length?'<div class="pch-ch">'+R.eq.map(function(x,i){return '<span class="rchip on">'+esc(x[0])+' · '+esc(x[1])+'</span>';}).join('')+'</div>':'')+'<div class="pch-in"><input id="ng-eqn" placeholder="Nome da pessoa" maxlength="50"><select id="ng-eqf">'+T.funcs.map(function(x){return '<option>'+esc(x)+'</option>';}).join('')+'</select><button class="btn sm" data-act="negEqAdd">+</button></div><p class="neg-nota">No sistema de verdade, a pessoa recebe o convite por WhatsApp ou e-mail.</p><button class="btn pri" data-act="negOk">'+(R.eq.length?'Continuar →':'Pular')+'</button></div>';}
   return '<div class="pch-r"><button class="btn pri" data-act="negFim">Ver meu upgrade ✨</button></div>';}
-function negLe(){var F=S.negF,R=F.r,n=$('ng-nome'),c=$('ng-cid'),r=$('ng-rt');if(n)R.nome=n.value.trim();if(c)R.cid=c.value;if(r)R.rt=r.value.trim();}
+function negLe(){var F=S.negF,R=F.r,n=$('ng-nome'),c=$('ng-cid'),r=$('ng-rt');if(n)R.nome=n.value.trim();if(c)R.cid=c.value;if(r)R.rt=r.value.trim();var cg=$('ng-cargo');if(cg)R.cargo=cg.value;}
 var NEG_ACT={
   pUpgrade:function(){if(S.neg){S.negOn=true;render();return;}S.negF={k:0,r:{tipo:'',nome:'',uf:'',cid:'',papel:'',rt:'',servs:[],eq:[]}};negAbre();},
   negSai:function(){S.negF=null;negAbre();toast('Tudo bem! Quando quiser, toque em "Quero criar meu negócio".');},
@@ -3432,11 +3437,11 @@ var NEG_ACT={
   negEqAdd:function(){var n=$('ng-eqn'),f=$('ng-eqf'),t=(n&&n.value||'').trim();if(!t)return;S.negF.r.eq.push([t,f.value]);negAbre();var j=$('ng-eqn');if(j)j.focus();},
   negOk:function(){var F=S.negF,R=F.r,T=NEG_TIPOS[R.tipo];negLe();F.erro='';
     if(F.k===1){if(R.nome.length<3)F.erro='Digite o nome.';else if(!R.uf)F.erro='Escolha o estado.';else if(!munExiste(R.uf,R.cid))F.erro='Escolha o município na lista de '+R.uf+'.';else{R.cid=munNome(R.uf,R.cid);F.k=R.tipo==='auto'?3:2;}}
-    else if(F.k===2){if(!R.papel)F.erro='Escolha uma opção.';else if(R.papel==='gestao'&&T.rt&&R.rt.split(/\s+/).length<2)F.erro='Digite o nome e sobrenome do responsável.';else F.k=3;}
+    else if(F.k===2){if(!R.papel)F.erro='Escolha uma opção.';else if(R.papel==='func'&&!R.cargo)F.erro='Escolha a sua posição na empresa.';else if(R.papel==='gestao'&&T.rt&&R.rt.split(/\s+/).length<2)F.erro='Digite o nome e sobrenome do responsável.';else F.k=3;}
     else if(F.k===3){if(!R.servs.length)F.erro='Escolha pelo menos um.';else F.k=T.funcs.length?4:5;}
     else if(F.k===4)F.k=5;
     negAbre();},
-  negFim:function(){var R=S.negF.r;if(R.tipo==='lab'||R.tipo==='centro'){var gs=R.servs.filter(function(x){return TAB_GR.some(function(g){return g[0]===x;});}),out=R.servs.filter(function(x){return !TAB_GR.some(function(g){return g[0]===x;});});R.servs=TAB_LAB.filter(function(t){return gs.indexOf(t[0])>=0;}).map(function(t){return t[1];}).concat(out);}S.neg={tipo:R.tipo,nome:R.nome,uf:R.uf,cid:R.cid,papel:R.tipo==='auto'?'faz':R.papel,rt:R.papel==='gestao'?R.rt:'',dono:(PN()&&PN().nome)||S.cad.nome||'',servs:R.servs.map(function(s){return [s,''];}),eq:R.eq.map(function(x){return {n:x[0],f:x[1],st:'convite enviado'};}),vagas:[],criado:new Date().toISOString().slice(0,10),aba:'inicio'};
+  negFim:function(){var R=S.negF.r;if(R.tipo==='lab'||R.tipo==='centro'){var gs=R.servs.filter(function(x){return TAB_GR.some(function(g){return g[0]===x;});}),out=R.servs.filter(function(x){return !TAB_GR.some(function(g){return g[0]===x;});});R.servs=TAB_LAB.filter(function(t){return gs.indexOf(t[0])>=0;}).map(function(t){return t[1];}).concat(out);}S.neg={tipo:R.tipo,nome:R.nome,uf:R.uf,cid:R.cid,papel:R.tipo==='auto'?'faz':R.papel,cargo:R.papel==='func'?R.cargo:'',rt:R.papel==='gestao'?R.rt:'',dono:(PN()&&PN().nome)||S.cad.nome||'',servs:R.servs.map(function(s){return [s,''];}),eq:R.eq.map(function(x){return {n:x[0],f:x[1],st:'convite enviado'};}),vagas:[],criado:new Date().toISOString().slice(0,10),aba:'inicio'};
     negSalva();negRede();S.negF.k='fim';negAbre();},
   negIr:function(){S.negF=null;negAbre();S.negOn=false;S.cfgOn=false;S.redeOn=false;if(S.role==='prot')S.tab.prot='clientes';render();window.scrollTo(0,0);toast('Pronto! Clientes, Financeiro, Equipe e Vagas foram liberados no seu menu.');},
   negModo:function(v){S.negOn=v==='neg';render();window.scrollTo(0,0);},
@@ -3462,7 +3467,7 @@ function cfgMenuHtml(D){var em=(typeof RL!=='undefined'&&RL.user&&RL.user.email)
     [['conta','👤','Minha conta'],['perfil','📄','Meu currículo'],S.neg?['empresa',negT().ic,'Minha empresa']:null,S.neg&&negEhLab(S.neg)?['tabela','💲','Tabela de preços']:null,S.neg&&!ESP.dono?['espelho','🪞','Conta espelho']:null,RL.admin&&!ESP.dono?['pre','📋','Pré-cadastros']:null,['armaz','💾','Armazenamento utilizado']].filter(Boolean).map(function(x){return '<button role="menuitem" data-act="cfgVai" data-v="'+x[0]+'"><span>'+x[1]+'</span>'+x[2]+'</button>';}).join('')+
     (S.neg?'':'<button role="menuitem" data-act="pUpgrade"><span>🏢</span>Criar minha empresa</button>')+
     (typeof RL!=='undefined'&&RL.user?'<button role="menuitem" data-rl="sair" class="cfg-sair"><span>↩</span>Sair</button>':'')+'</div>';}
-function rConfig(){var a=S.cfgAba||'conta',N=S.neg,abas=[['conta','Minha conta'],N?['empresa','Minha empresa']:null,N&&negEhLab(N)?['tabela','Tabela de preços']:null,N&&!ESP.dono?['espelho','Conta espelho']:null,RL.admin&&!ESP.dono?['pre','Pré-cadastros']:null,['armaz','Armazenamento']].filter(Boolean),corpo;
+function rConfig(){var a=S.cfgAba||'conta',N=S.neg,abas=[['conta','Minha conta'],N?['empresa','Minha empresa']:null,N&&negEhLab(N)?['tabela','Tabela de preços']:null,N&&!ESP.dono&&!MEM.dono?['espelho','Conta espelho']:null,RL.admin&&!ESP.dono?['pre','Pré-cadastros']:null,['armaz','Armazenamento']].filter(Boolean),corpo;
   if(a==='tabela'&&N)corpo=rNegTabela(N);else if(a==='empresa'&&N)corpo=rCfgEmpresa(N);else if(a==='armaz')corpo=rCfgArmaz();else if(a==='espelho'&&N&&!ESP.dono)corpo=rCfgEspelho();else if(a==='pre'&&RL.admin&&!ESP.dono)corpo=rCfgPre();else corpo=rCfgConta();
   return '<div class="dp2 cfg"><div class="cfg-top"><button class="btn sm" data-act="cfgSai">← Voltar ao painel</button><h1>Configurações</h1></div>'+
     '<nav class="dabas" role="tablist">'+abas.map(function(x){return '<button role="tab" aria-selected="'+(a===x[0])+'" data-act="cfgVai" data-v="'+x[0]+'"><span>'+x[1]+'</span></button>';}).join('')+'</nav><div class="dcont">'+corpo+'</div></div>';}
@@ -3485,7 +3490,7 @@ document.addEventListener('click',function(e){if(S.cfgMenu&&!e.target.closest('.
 function rNegocio(){var N=S.neg,T=negT(),a=N.aba||'inicio';if(!T.abas.some(function(x){return x[0]===a;}))a='inicio';
   var corpo=a==='inicio'?rNegInicio(N,T):a==='servicos'?rNegServ(N,T):a==='equipe'?rNegEquipe(N,T):a==='vagas'?rNegVagas(N,T):a==='clientes'&&typeof rNegClientes==='function'?rNegClientes(N):rNegVazio(a,T);
   return '<div class="dp2 neg">'+
-    '<section class="neg-cab"><span class="neg-cab-ic">'+T.ic+'</span><div><small>'+esc(T.t)+'</small><h1>'+esc(N.nome)+'</h1><span class="small muted">📍 '+esc(N.cid+' / '+N.uf)+' · '+(N.tipo==='auto'?'Você atende por conta':N.papel==='faz'?(N.tipo==='escola'?'Você é dono e responsável pedagógico':N.tipo==='dental'?'Você é dono e trabalha nele':'Você é dono e responsável técnico'):'Você cuida da gestão'+(N.rt?' · Responsável: '+esc(N.rt):''))+'</span></div><span class="spacer"></span><span class="pill warn" title="A equipe Ideali confere os dados antes de mostrar o selo">em conferência</span></section>'+
+    '<section class="neg-cab"><span class="neg-cab-ic">'+T.ic+'</span><div><small>'+esc(T.t)+'</small><h1>'+esc(N.nome)+'</h1><span class="small muted">📍 '+esc(N.cid+' / '+N.uf)+' · '+(N.tipo==='auto'?'Você atende por conta':N.papel==='func'?'Você é '+esc(N.cargo||'funcionário(a)')+' · falta o dono entrar':N.papel==='faz'?(N.tipo==='escola'?'Você é dono e responsável pedagógico':N.tipo==='dental'?'Você é dono e trabalha nele':'Você é dono e responsável técnico'):'Você cuida da gestão'+(N.rt?' · Responsável: '+esc(N.rt):''))+'</span></div><span class="spacer"></span><span class="pill warn" title="A equipe Ideali confere os dados antes de mostrar o selo">em conferência</span></section>'+
     '<nav class="dabas" role="tablist" aria-label="Meu negócio">'+T.abas.map(function(x){return '<button role="tab" aria-selected="'+(a===x[0])+'" data-act="negTab" data-v="'+x[0]+'"><span>'+esc(x[1])+'</span>'+(x[0]==='vagas'&&N.vagas.length?'<i>'+N.vagas.length+'</i>':'')+'</button>';}).join('')+'</nav>'+
     '<div class="dcont">'+corpo+'</div></div>';}
 function rNegInicio(N,T){var tem=function(k){return T.abas.some(function(x){return x[0]===k;});},passos=[[true,'Negócio criado','Você continua com o seu painel de antes.'],[N.servs.some(function(s){return s[1];}),T.abas.filter(function(x){return x[0]==='servicos';})[0][1]+': coloque os valores','Toque em "'+T.abas.filter(function(x){return x[0]==='servicos';})[0][1]+'" e preencha os preços.','servicos']];
@@ -3615,23 +3620,23 @@ function empCarrega(){if(!RL.user)return Promise.resolve();
   return Promise.all([SB.from('odo_empresas').select('*').eq('user_id',donoId()).maybeSingle(),SB.from('odo_clientes').select('*').eq('user_id',donoId()).order('nome'),SB.from('odo_precos').select('*').eq('user_id',donoId()).order('ordem')]).then(function(r){
     if(r[0].error){EMP.erro=/odo_empresas/.test(r[0].error.message||'')?'falta042':'erro';EMP.carregado=true;return;}
     EMP.erro='';EMP.carregado=true;EMP.row=r[0].data||null;EMP.cli=r[1].data||[];
-    if(EMP.row){var d=EMP.row.dados||{};S.neg={tipo:EMP.row.tipo,nome:EMP.row.nome,uf:EMP.row.uf||'',cid:EMP.row.cidade||'',papel:EMP.row.papel||'faz',rt:EMP.row.rt||'',dono:RL.perfil&&RL.perfil.nome||'',
+    if(EMP.row){var d=EMP.row.dados||{};S.neg={tipo:EMP.row.tipo,nome:EMP.row.nome,uf:EMP.row.uf||'',cid:EMP.row.cidade||'',papel:EMP.row.papel||'faz',cargo:(d.criador&&d.criador.cargo)||'',rt:EMP.row.rt||'',dono:RL.perfil&&RL.perfil.nome||'',
       servs:(r[2].data||[]).map(function(p){return [p.nome,p.valor==null?'':String(p.valor).replace('.',','),p.prazo==null?'':String(p.prazo)];}),eq:d.eq||[],vagas:d.vagas||[],criado:String(EMP.row.criado_em).slice(0,10),aba:(S.neg&&S.neg.aba)||'inicio'};
       EMP.precSnap={};(r[2].data||[]).forEach(function(p){EMP.precSnap[p.nome]=JSON.stringify([p.valor,p.prazo,p.grupo,p.ordem]);});
       try{localStorage.removeItem('io_neg_v1');}catch(e){}negRede();}
     else if(S.neg&&!ESP.dono){empCria();}});}
 function num(v){var x=String(v==null?'':v).replace(/\./g,'').replace(',','.').trim();if(x==='')return null;var n=+x;return isFinite(n)&&n>=0?Math.round(n*100)/100:null;}
-function empCria(){var N=S.neg;if(!RL.user||!N)return;SB.from('odo_empresas').insert({user_id:RL.user.id,tipo:N.tipo,nome:N.nome,uf:N.uf||null,cidade:N.cid||null,papel:N.papel||null,rt:N.rt||null,dados:{eq:N.eq||[],vagas:N.vagas||[]}}).select('*').single().then(function(r){
+function empCria(){var N=S.neg;if(!RL.user||!N)return;SB.from('odo_empresas').insert({user_id:RL.user.id,tipo:N.tipo,nome:N.nome,uf:N.uf||null,cidade:N.cid||null,papel:N.papel||null,rt:N.rt||null,dados:{eq:N.eq||[],vagas:N.vagas||[],criador:N.papel==='func'?{cargo:N.cargo||'',user:RL.user.id}:null}}).select('*').single().then(function(r){
   if(r.error){toast(/odo_empresas/.test(r.error.message||'')?'Falta rodar a atualização 042 para salvar a empresa no banco.':'Não consegui salvar a empresa agora.');return;}EMP.row=r.data;empSalvaPrecos();toast('Empresa salva na sua conta.');});}
 function empSalvaPrecos(){if(!RL.user||!EMP.row||!S.neg)return;var N=S.neg,agora={},rows=[];
-  N.servs.forEach(function(s,i){var g=tabGrupo(s[0]),v=num(s[1]),pz=s[2]===''||s[2]==null?null:Math.max(0,Math.min(90,parseInt(s[2],10)||0)),js=JSON.stringify([v,pz,g,i]);agora[s[0]]=js;if(EMP.precSnap[s[0]]!==js)rows.push({user_id:RL.user.id,nome:String(s[0]).slice(0,120),grupo:g,valor:v,prazo:pz,ordem:i});});
+  N.servs.forEach(function(s,i){var g=tabGrupo(s[0]),v=num(s[1]),pz=s[2]===''||s[2]==null?null:Math.max(0,Math.min(90,parseInt(s[2],10)||0)),js=JSON.stringify([v,pz,g,i]);agora[s[0]]=js;if(EMP.precSnap[s[0]]!==js)rows.push({user_id:contaId(),nome:String(s[0]).slice(0,120),grupo:g,valor:v,prazo:pz,ordem:i});});
   var tira=Object.keys(EMP.precSnap).filter(function(n){return !(n in agora);});
   var p=rows.length?SB.from('odo_precos').upsert(rows,{onConflict:'user_id,nome'}):Promise.resolve({});
   p.then(function(r){if(r&&r.error){toast('Não consegui salvar a tabela agora.');return;}rows.forEach(function(x){EMP.precSnap[x.nome]=agora[x.nome];});
-    if(tira.length)SB.from('odo_precos').delete().eq('user_id',RL.user.id).in('nome',tira).then(function(){tira.forEach(function(n){delete EMP.precSnap[n];});});});}
-function empSalvaDados(){if(!RL.user||!EMP.row||!S.neg)return;var N=S.neg;SB.from('odo_empresas').update({nome:N.nome,uf:N.uf||null,cidade:N.cid||null,papel:N.papel||null,rt:N.rt||null,dados:Object.assign({},EMP.row.dados||{},{eq:N.eq||[],vagas:N.vagas||[]})}).eq('id',EMP.row.id).then(function(){});}
+    if(tira.length)SB.from('odo_precos').delete().eq('user_id',contaId()).in('nome',tira).then(function(){tira.forEach(function(n){delete EMP.precSnap[n];});});});}
+function empSalvaDados(){if(!RL.user||!EMP.row||!S.neg)return;var N=S.neg;SB.from('odo_empresas').update({nome:N.nome,uf:N.uf||null,cidade:N.cid||null,papel:N.papel||null,rt:N.rt||null,dados:Object.assign({},EMP.row.dados||{},{eq:N.eq||[],vagas:N.vagas||[]},N.papel==='func'?{criador:{cargo:N.cargo||'',user:(EMP.row.dados&&EMP.row.dados.criador&&EMP.row.dados.criador.user)||RL.user.id}}:{})}).eq('id',EMP.row.id).then(function(){});}
 var _negSalva=negSalva;
-negSalva=function(){_negSalva();if(!RL.user)return;if(!S.neg){if(EMP.row){SB.from('odo_empresas').delete().eq('id',EMP.row.id).then(function(){});SB.from('odo_precos').delete().eq('user_id',RL.user.id).then(function(){});EMP.row=null;EMP.precSnap={};}return;}
+negSalva=function(){_negSalva();if(!RL.user)return;if(!S.neg){if(MEM.dono)return;if(EMP.row){SB.from('odo_empresas').delete().eq('id',EMP.row.id).then(function(){});SB.from('odo_precos').delete().eq('user_id',RL.user.id).then(function(){});EMP.row=null;EMP.precSnap={};}return;}
   if(!EMP.row){empCria();return;}clearTimeout(EMP.t);EMP.t=setTimeout(function(){empSalvaPrecos();empSalvaDados();},700);};
 
 /* ---- Clientes da empresa ---- */
@@ -3663,7 +3668,7 @@ Object.assign(ACT,{
   cliFiltro:function(v){EMP.filtro=v;render();},
   cliSalva:function(){cliLe();var c=EMP.ed;if(!c.nome||c.nome.length<2){EMP.erroF='Digite o nome do cliente.';render();return;}
     var row={};['nome','documento','cro','whatsapp','telefone','email','endereco','bairro','cidade','uf','cep','regra','obs'].forEach(function(k){row[k]=c[k]?String(c[k]):null;});row.ativo=c.ativo!==false;
-    EMP.busy=true;render();var q=c.id?SB.from('odo_clientes').update(row).eq('id',c.id).select('*').single():SB.from('odo_clientes').insert(Object.assign({user_id:RL.user.id},row)).select('*').single();
+    EMP.busy=true;render();var q=c.id?SB.from('odo_clientes').update(row).eq('id',c.id).select('*').single():SB.from('odo_clientes').insert(Object.assign({user_id:contaId()},row)).select('*').single();
     q.then(function(r){EMP.busy=false;if(r.error){EMP.erroF='Não consegui salvar agora.';render();return;}var i=EMP.cli.map(function(x){return x.id;}).indexOf(r.data.id);if(i>=0)EMP.cli[i]=r.data;else EMP.cli.push(r.data);EMP.cli.sort(function(a,b){return a.nome.localeCompare(b.nome,'pt');});EMP.ed=null;render();toast('Cliente salvo.');});},
   cliApaga:function(){var c=EMP.ed;if(!c||!c.id||!confirm('Excluir '+c.nome+'? Isso não pode ser desfeito. Se só parou de mandar trabalho, prefira desmarcar "Cliente ativo".'))return;
     SB.from('odo_clientes').delete().eq('id',c.id).then(function(r){if(r.error){toast('Não consegui excluir.');return;}EMP.cli=EMP.cli.filter(function(x){return x.id!==c.id;});EMP.ed=null;render();toast('Cliente excluído.');});}});
@@ -3773,7 +3778,7 @@ Object.assign(ACT,{
   pedSalva:function(){pedLe();var p=PED.ed;if(!p.paciente&&!p.cliente_id&&!p.trabalho){PED.erroF='Preencha pelo menos o cliente, o paciente ou o trabalho.';render();return;}
     if(!p.id){var s=pedServ(p.trabalho);if(s){if(p.valor==null&&s.valor!=null)p.valor=Math.round(s.valor*(p.qtd||1)*100)/100;if(!p.prazo&&s.prazo!=null)p.prazo=pedUteis(s.prazo);}}
     var row=pedRow(p);PED.busy=true;render();
-    var q=p.id?SB.from('odo_pedidos').update(row).eq('id',p.id).select('*').single():SB.from('odo_pedidos').insert(Object.assign({user_id:RL.user.id,numero:PED.L.reduce(function(m,x){return Math.max(m,x.numero||0);},0)+1},row)).select('*').single();
+    var q=p.id?SB.from('odo_pedidos').update(row).eq('id',p.id).select('*').single():SB.from('odo_pedidos').insert(Object.assign({user_id:contaId(),numero:PED.L.reduce(function(m,x){return Math.max(m,x.numero||0);},0)+1},row)).select('*').single();
     q.then(function(r){PED.busy=false;if(r.error){PED.erroF='Não consegui salvar agora.';render();return;}pedGuarda(r.data);PED.ed=null;render();toast('Pedido #'+r.data.numero+' salvo.');});},
   pedApaga:function(){var p=PED.ed;if(!p||!p.id||!confirm('Excluir o pedido #'+p.numero+'? Se ele só terminou, prefira marcar "Arquivado".'))return;
     SB.from('odo_pedidos').update({apagado:true}).eq('id',p.id).then(function(r){if(r.error){toast('Não consegui excluir.');return;}PED.L=PED.L.filter(function(x){return x.id!==p.id;});PED.ed=null;render();toast('Pedido excluído.');});},
@@ -3787,7 +3792,7 @@ Object.assign(ACT,{
   pedCadistas:function(){PED.vcad=true;render();window.scrollTo(0,0);},
   pedCadVolta:function(){PED.vcad=false;render();},
   pedCadNovo:function(){var g=function(i){var e=document.getElementById(i);return e?e.value.trim():'';},nm=g('pc-nome');if(nm.length<2){toast('Digite o nome do cadista.');return;}
-    SB.from('odo_cadistas').insert({user_id:RL.user.id,nome:nm,email:g('pc-email')||null,tel:g('pc-tel')||null}).select('*').single().then(function(r){if(r.error){toast('Não consegui salvar.');return;}PED.cad.push(r.data);PED.cad.sort(function(a,b){return a.nome.localeCompare(b.nome,'pt');});render();toast('Cadista adicionado.');});},
+    SB.from('odo_cadistas').insert({user_id:contaId(),nome:nm,email:g('pc-email')||null,tel:g('pc-tel')||null}).select('*').single().then(function(r){if(r.error){toast('Não consegui salvar.');return;}PED.cad.push(r.data);PED.cad.sort(function(a,b){return a.nome.localeCompare(b.nome,'pt');});render();toast('Cadista adicionado.');});},
   pedCadAtivo:function(v){var c=PED.cad.filter(function(x){return x.id===v;})[0];if(!c)return;SB.from('odo_cadistas').update({ativo:!c.ativo}).eq('id',v).then(function(r){if(r.error){toast('Não consegui salvar.');return;}c.ativo=!c.ativo;render();});}});
 document.addEventListener('input',function(e){if(e.target.id==='ped-q'){PED.busca=e.target.value;var b=document.getElementById('ped-corpo');if(b)b.innerHTML=PED.vista==='lista'?rPedLista():rPedQuadro();}});
 document.addEventListener('change',function(e){var t=e.target;if(t.id==='ped-st'){PED.st=t.value;PED.mais=100;render();}else if(PED.ed&&t.dataset&&(t.dataset.pf==='cliente_id'||t.dataset.pf==='cadista_id')){if(t.dataset.pf==='cadista_id')PED.ed._mudouCad=true;pedLe();render();}});
@@ -4026,7 +4031,9 @@ document.addEventListener('input',function(e){if(e.target.id==='ino-q'){INO.q=e.
 
 /* ===== Conta espelho: o parceiro (ex.: Inove) vê tudo da conta do dono, sem editar nada ===== */
 var ESP={dono:null,nome:'',lista:[],proprio:null};
-function donoId(){return ESP.dono||(RL.user&&RL.user.id);}
+var MEM={dono:null,empresa:'',cargo:'',proprio:null,ativo:false,minha:null};
+function contaId(){return MEM.dono||(RL.user&&RL.user.id);}
+function donoId(){return ESP.dono||MEM.dono||(RL.user&&RL.user.id);}
 function espLS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}return null;}
 (function(){var m=location.search.match(/[?&]espelho=([a-f0-9]{64})/);if(m){espLS('io_esp_token',m[1]);try{history.replaceState(null,'',location.pathname);}catch(e){}
   setTimeout(function(){toast('Convite de conta espelho: entre ou crie o seu login para aceitar.');},600);}})();
@@ -4246,7 +4253,7 @@ function preAnalisa(R){if(!R.length)return null;var h=R[0].map(function(x){retur
     ok.push(o);var n=ok.length-1;if(e)vistoE[e]=n;if(t)vistoT[t]=n;}
   var nEmp=ok.filter(function(o){return o.empresa_tipo;}).length+Object.keys(upd).filter(function(k){return upd[k].empresa_tipo;}).length;
   return {nEmp:nEmp,ok:ok,upd:upd,nUpd:Object.keys(upd).length,dupArq:dupArq,inval:inval,exist:exist,total:R.length-ini,cols:{nome:cN,email:cE,tel:cT,prof:cP,uf:cU}};}
-function preCarrega(){var out=[];function pg(i){return SB.from('odo_pre_cadastros').select('*').eq('user_id',RL.user.id).order('criado_em').range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data||[]);if((r.data||[]).length===1000)return pg(i+1000);});}
+function preCarrega(){var out=[];function pg(i){return SB.from('odo_pre_cadastros').select('*').eq('user_id',contaId()).order('criado_em').range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data||[]);if((r.data||[]).length===1000)return pg(i+1000);});}
   return pg(0).then(function(){PRE.L=out;PRE.erro='';render();}).catch(function(e){PRE.L=[];PRE.erro=/odo_pre_cadastros/.test((e&&e.message)||'')?'falta049':'erro';render();});}
 function preLink(p){return location.origin+location.pathname.replace(/index\.html$/,'')+'?convite='+p.token;}
 function preMsg(p){var n=(p.nome||'').split(' ')[0];return 'Olá'+(n?', '+n:'')+'! Você se cadastrou no GoDenth, que agora virou o Ideali Odonto: a rede da odontologia, com vagas, laboratórios e clínicas. Seu perfil já está pronto, só falta você confirmar: '+preLink(p)+'\n\nSe não quiser mais receber mensagens, é só responder SAIR.';}
@@ -4268,7 +4275,7 @@ Object.assign(ACT,{
   preRede:function(v){var p=(PRE.L||[]).filter(function(x){return x.id===v;})[0];if(!p)return;SB.from('odo_pre_cadastros').update({na_rede:p.na_rede===false}).eq('id',v).select('*').single().then(function(r){if(r.error){toast(/na_rede/.test(r.error.message||'')?'Falta rodar a atualização 050.':'Não consegui salvar.');return;}Object.assign(p,r.data);render();});},
   preFil:function(v){PRE.f=v;render();},
   preImporta:function(){var L=(PRE.prev&&PRE.prev.ok)||[],U=(PRE.prev&&PRE.prev.upd)||{};if(!L.length&&!Object.keys(U).length)return;PRE.busy=true;var feitos=0,falhas=0,i=0;render();
-    function lote(){if(i>=L.length)return Promise.resolve();var c=L.slice(i,i+200).map(function(o){return Object.assign({user_id:RL.user.id},o);});i+=200;
+    function lote(){if(i>=L.length)return Promise.resolve();var c=L.slice(i,i+200).map(function(o){return Object.assign({user_id:contaId()},o);});i+=200;
       return SB.from('odo_pre_cadastros').insert(c).select('*').then(function(r){if(r.error&&/especialidades|modalidade|funcao|empresa_/.test(r.error.message||'')){toast(/empresa_/.test(r.error.message||'')?'Falta rodar a atualização 052 no Supabase.':'Falta rodar a atualização 051 no Supabase.');throw r.error;}if(!r.error){feitos+=c.length;PRE.L=PRE.L.concat(r.data||[]);}else{
         return c.reduce(function(pr,o){return pr.then(function(){return SB.from('odo_pre_cadastros').insert(o).select('*').then(function(x){if(x.error)falhas++;else{feitos++;PRE.L=PRE.L.concat(x.data||[]);}});});},Promise.resolve());}})
       .then(function(){PRE.prog=feitos+' de '+L.length;render();return lote();});}
@@ -4544,7 +4551,7 @@ function anaAbre(){if(document.getElementById('anap'))return;ANAP.on=true;var d=
 function anaEsc(e){if(e.key==='Escape')anaFecha();}
 function anaFecha(){var d=document.getElementById('anap');if(d)d.remove();ANAP.on=false;ANAP.cliId=null;document.removeEventListener('keydown',anaEsc);}
 function anaCria(L,upd){if(!RL||!RL.user)return;ANAP.busy=true;upd();var n0=PED.L.reduce(function(m,x){return Math.max(m,x.numero||0);},0),feitos=[];
-  L.reduce(function(pr,p,i){return pr.then(function(){return SB.from('odo_pedidos').insert(Object.assign({user_id:RL.user.id,numero:n0+i+1},pedRow(p))).select('*').single().then(function(r){if(r.error)throw r.error;pedGuarda(r.data);feitos.push(r.data.numero);});});},Promise.resolve())
+  L.reduce(function(pr,p,i){return pr.then(function(){return SB.from('odo_pedidos').insert(Object.assign({user_id:contaId(),numero:n0+i+1},pedRow(p))).select('*').single().then(function(r){if(r.error)throw r.error;pedGuarda(r.data);feitos.push(r.data.numero);});});},Promise.resolve())
   .then(function(){ANAP.busy=false;ANAP.txt='';anaFecha();render();toast(feitos.length>1?'Pronto! Criei os pedidos #'+feitos.join(', #')+'.':'Pronto! Pedido #'+feitos[0]+' criado.');})
   .catch(function(){ANAP.busy=false;upd();render();toast(feitos.length?'Criei '+feitos.length+' e parei: não consegui salvar o resto.':'Não consegui salvar agora. Tente de novo.');});}
 /* botão: no topo dos Pedidos e flutuante no celular */
@@ -5079,8 +5086,8 @@ function labVCarrega(){if(!RL.user)return Promise.resolve();
     LABV.erro='';LABV.L=r.data||[];render();
     var pend=labVRec().filter(function(v){return v.status==='pendente';}).length;
     if(pend&&!LABV.avisou){LABV.avisou=true;setTimeout(function(){toast(pend===1?'Um dentista convidou o seu laboratório. Veja em Minha empresa.':pend+' dentistas convidaram o seu laboratório. Veja em Minha empresa.');},1800);}});}
-function labVMeus(){var u=RL.user&&RL.user.id;return (LABV.L||[]).filter(function(v){return v.user_id===u;});}
-function labVRec(){var u=RL.user&&RL.user.id;return (LABV.L||[]).filter(function(v){return v.user_id!==u;});}
+function labVMeus(){var u=RL.user&&contaId();return (LABV.L||[]).filter(function(v){return v.user_id===u;});}
+function labVRec(){var u=RL.user&&contaId();return (LABV.L||[]).filter(function(v){return v.user_id!==u;});}
 var LABV_ST={pendente:'⏳ Aguardando o laboratório aceitar',aceito:'✅ Conectado',recusado:'Recusou o convite'};
 function rDLabTab(D){
   if(!RL.user)return rDPedidos2(D);
@@ -5127,8 +5134,8 @@ function pdgCarrega(){if(!RL.user)return Promise.resolve();
     if(r.error){PDG.erro=/odo_ped_env|does not exist|schema cache/.test(r.error.message||'')?'falta057':'erro';render();return;}
     PDG.erro='';PDG.L=r.data||[];render();pdgLimpa();
     var n=pdgRecebidos().length;if(n&&!PDG.aviso){PDG.aviso=true;setTimeout(function(){toast(n===1?'📥 Chegou 1 pedido digital de dentista. Veja em Pedidos.':'📥 Chegaram '+n+' pedidos digitais de dentistas. Veja em Pedidos.');},2600);}});}
-function pdgMeus(){var u=RL.user&&RL.user.id;return PDG.L.filter(function(e){return e.user_id===u&&e.status!=='enviando';});}
-function pdgRecebidos(){var u=RL.user&&RL.user.id;return PDG.L.filter(function(e){return e.user_id!==u&&e.status==='enviado';});}
+function pdgMeus(){var u=RL.user&&contaId();return PDG.L.filter(function(e){return e.user_id===u&&e.status!=='enviando';});}
+function pdgRecebidos(){var u=RL.user&&contaId();return PDG.L.filter(function(e){return e.user_id!==u&&e.status==='enviado';});}
 function pdgDias(e){var ms=new Date(e.apagar_em)-Date.now();if(e.arquivos_apagados||ms<=0)return 0;return Math.ceil(ms/86400000);}
 function pdgLimpa(){PDG.L.forEach(function(e){if(e.arquivos_apagados||new Date(e.apagar_em)>new Date())return;var P=(e.arquivos||[]).map(function(a){return a.path;}).filter(Boolean);
   (P.length?SB.storage.from('odonto-ped').remove(P):Promise.resolve({})).then(function(r){if(r&&r.error)return;return SB.rpc('odo_ped_env_limpo',{p_id:e.id}).then(function(x){if(!x.error)e.arquivos_apagados=true;});});});}
@@ -5185,7 +5192,7 @@ function pdgEnvia(){pdgLe();var E=PDG.ed;if(!E||PDG.busy)return;
   if(!E.itens.length){toast('Marque os dentes e o trabalho (ou escreva para a Ana).');return;}
   if(!String(E.paciente).trim()){toast('Falta o nome do paciente.');var p=document.getElementById('pdg-pac');if(p)p.focus();return;}
   var bruto=E.arqs.reduce(function(s,f){return s+f.size;},0);if(bruto>400*1024*1024){toast('Arquivos grandes demais. Envie até 100 MB (compactado).');return;}
-  PDG.busy=true;PDG.prog='Preparando…';pdgDesenha();var envId=null,feitos=[],tot=0,uid=RL.user.id;
+  PDG.busy=true;PDG.prog='Preparando…';pdgDesenha();var envId=null,feitos=[],tot=0,uid=contaId();
   function falha(msg){PDG.busy=false;PDG.prog='';pdgDesenha();toast(msg);if(envId){var P=feitos.map(function(a){return a.path;});(P.length?SB.storage.from('odonto-ped').remove(P):Promise.resolve()).then(function(){SB.rpc('odo_ped_env_cancela',{p_id:envId});});}}
   SB.from('odo_ped_env').insert({vinculo_id:E.vid,lab_id:E.lab}).select('id').single().then(function(r){
     if(r.error){falha(/odo_ped_env|schema cache|does not exist/.test(r.error.message||'')?'Falta rodar a atualização 057 no Supabase.':'Não consegui criar o pedido. O laboratório ainda está conectado?');throw 0;}
@@ -5454,7 +5461,7 @@ function pcResumo(){var E=PC.ed,n=E.fotoCor.length+E.fotoSorriso.length+E.scan.l
     (E.obs?'<div><span>Observação</span><b>'+esc(E.obs)+'</b></div>':'')+'</div>');}
 function pcEnvia(){var E=PC.ed;if(PC.busy||!E)return;PC.busy=true;PC.prog='Preparando…';pcDesenha();
   var arqs=[].concat(E.fotoCor.map(function(f){return {f:f,t:'foto',p:'foto-cor'};}),E.fotoSorriso.map(function(f){return {f:f,t:'foto',p:'foto-sorriso'};}),E.scan.map(function(f){return {f:f,t:/^image\//.test(f.type)?'foto':'scan',p:'3d'};}));
-  var envId=null,feitos=[],tot=0,uid=RL.user.id;
+  var envId=null,feitos=[],tot=0,uid=contaId();
   function prog(t){PC.prog=t;pcDesenha();}
   function falha(msg){PC.busy=false;PC.prog='';pcDesenha();pcAna('❌ '+msg);if(envId){var P=feitos.map(function(a){return a.path;});(P.length?SB.storage.from('odonto-ped').remove(P):Promise.resolve()).then(function(){SB.rpc('odo_ped_env_cancela',{p_id:envId});});}}
   SB.from('odo_ped_env').insert({vinculo_id:E.vid,lab_id:E.lab}).select('id').single().then(function(r){
@@ -5648,7 +5655,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 /* confere quando carrega e a cada 1 minuto (sem atrapalhar quem está digitando) */
 var _pdgCarregaET=pdgCarrega;pdgCarrega=function(){return _pdgCarregaET.apply(this,arguments).then(function(r){try{etConfere();}catch(x){}return r;});};
 function etPoll(){if(!RL.user||document.visibilityState!=='visible'||S.role!=='dent'||!labVMeus().some(function(v){return v.status==='aceito';}))return;
-  SB.from('odo_ped_env').select('id,status,etapa,etapa_em,motivo,paciente').eq('user_id',RL.user.id).neq('status','enviando').order('criado_em',{ascending:false}).limit(100).then(function(r){if(r.error||!r.data)return;var mud=false;
+  SB.from('odo_ped_env').select('id,status,etapa,etapa_em,motivo,paciente').eq('user_id',contaId()).neq('status','enviando').order('criado_em',{ascending:false}).limit(100).then(function(r){if(r.error||!r.data)return;var mud=false;
     r.data.forEach(function(n){var e=PDG.L.filter(function(x){return x.id===n.id;})[0];if(e){if(e.status!==n.status||e.etapa!==n.etapa){Object.assign(e,n);mud=true;}}});
     if(mud){etConfere();var a=document.activeElement;if(!(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))&&!PC.on)render();}});}
 setInterval(etPoll,60000);document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')setTimeout(etPoll,1500);});
@@ -5957,7 +5964,7 @@ var _renderLMB=render;render=function(){try{if(lmbVisivel()){var D=PN();if(D&&D.
 /* ===== A clínica vê os pedidos que o laboratório lançou para ela (migração 067) =====
    Aparecem como se ela tivesse mandado, com a etapa em tempo real. Só leitura. */
 var PLAB={L:[],falta:false};
-function plabLinhas(){var u=RL.user&&RL.user.id;return PLAB.L.map(function(p){var mat=p.material||'',tr=(p.trabalho||'Trabalho')+(p.sobre_implante&&!/implante/i.test(p.trabalho||'')?' sobre implante':'');
+function plabLinhas(){var u=RL.user&&contaId();return PLAB.L.map(function(p){var mat=p.material||'',tr=(p.trabalho||'Trabalho')+(p.sobre_implante&&!/implante/i.test(p.trabalho||'')?' sobre implante':'');
   return {id:'lab-'+p.id,user_id:u,lab_id:p.lab_id,lab_nome:p.lab_nome,paciente:p.paciente,itens:[{trabalho:tr+(mat?' · '+mat:''),dentes:p.dentes||[],material:mat}],cor:p.cor,prazo:p.prazo,urgente:p.urgente,status:'aceito',etapa:p.etapa,criado_em:p.criado_em,enviado_em:p.criado_em,arquivos:[],importado:true};});}
 function plabJunta(){PDG.L=PDG.L.filter(function(e){return !e.importado;});if(!PLAB.L.length)return;PDG.labNome=PDG.labNome||{};PLAB.L.forEach(function(p){if(!PDG.labNome[p.lab_id])PDG.labNome[p.lab_id]=p.lab_nome;});
   PDG.L=PDG.L.concat(plabLinhas()).sort(function(a,b){return String(b.criado_em).localeCompare(String(a.criado_em));});}
@@ -5975,6 +5982,55 @@ var _labVRecebidosPLAB=labVRecebidos;labVRecebidos=function(){var h=_labVRecebid
 document.addEventListener('change',function(e){var vid=e.target&&e.target.getAttribute&&e.target.getAttribute('data-plabv');if(!vid)return;var cid=e.target.value||null;
   SB.rpc('odo_lab_vincula_cliente',{p_vinculo:vid,p_cliente:cid}).then(function(r){if(r.error){toast(/odo_lab_vincula_cliente|does not exist|schema cache/.test(r.error.message||'')?'Rode a atualização 067 no Supabase.':'Não salvou: '+(r.error.message||''));return;}
     var v=(LABV.L||[]).filter(function(x){return x.id===vid;})[0];if(v)v.cliente_id=cid;toast(cid?'Pronto ✓ A clínica já vê os pedidos desse cliente.':'Ligação tirada.');render();});});
+
+/* ===== Equipe da empresa (migração 068): funcionário com login próprio; passar a empresa para o dono ===== */
+(function(){var m=location.search.match(/[?&]equipe=([a-f0-9]{64})/);if(m){espLS('io_eq_token',m[1]);try{history.replaceState(null,'',location.pathname);}catch(e){}
+  setTimeout(function(){toast('Convite da empresa: entre ou crie o seu login para aceitar.');},700);}})();
+function memPrepara(){var u=RL.user;if(!u)return Promise.resolve();var tk=espLS('io_eq_token');
+  var p=tk?SB.rpc('odo_convite_aceita',{p_token:tk}).then(function(r){espLS('io_eq_token',null);
+    if(r.error){var e=r.error.message||'';toast(/ja_tem_empresa/.test(e)?'Você já tem uma empresa sua no Ideali, então não dá para entrar nesta com esta conta.':/ja_tem_dados/.test(e)?'Sua conta já tem clientes ou pedidos. Fale com o suporte Ideali para juntar.':/vencido/.test(e)?'Este convite venceu. Peça um novo.':/convite_e_seu/.test(e)?'Este convite é seu: mande o link para a outra pessoa.':/invalido/.test(e)?'Este convite não vale mais. Peça um novo.':/odo_convite_aceita|does not exist|schema cache/.test(e)?'Falta rodar a atualização 068 no Supabase.':'Não consegui aceitar o convite.');}
+    else{var d=r.data||{};espLS('io_mem_modo',null);setTimeout(function(){toast(d.tipo==='dono'?'Pronto! Agora você é o dono de '+(d.empresa||'sua empresa')+'.':'Você entrou na equipe de '+(d.empresa||'empresa')+'. 👋');},900);}}):Promise.resolve();
+  return p.then(function(){return SB.rpc('odo_minha_equipe');}).then(function(r){if(!r||r.error||!r.data)return;MEM.minha=r.data;if(espLS('io_mem_modo')==='eu')return;
+    return SB.from('odo_perfis').select('*').eq('user_id',r.data.dono_id).maybeSingle().then(function(pp){if(!pp||!pp.data)return;
+      MEM.dono=r.data.dono_id;MEM.empresa=r.data.empresa||'empresa';MEM.cargo=r.data.cargo||'';MEM.proprio=RL.perfil;RL.perfil=pp.data;document.body.classList.add('membro');});});}
+var _espPrepMEM=espPrepara;espPrepara=function(){var a=arguments,t=this;return memPrepara().catch(function(){}).then(function(){return _espPrepMEM.apply(t,a);});};
+var _rlBarraMEM=rlBarra;rlBarra=function(){_rlBarraMEM();var b=document.getElementById('rl-bar');if(!b||!RL.user||ESP.dono)return;
+  if(MEM.dono){b.innerHTML='<span class="rl-esp">👥 Equipe de <b>'+esc(MEM.empresa)+'</b>'+(MEM.cargo?' · '+esc(MEM.cargo):'')+'</span><span class="spacer"></span><button data-act="memTroca" data-v="eu">Minha conta</button><button data-rl="sair">Sair</button>';}
+  else if(MEM.minha){var x=document.createElement('button');x.dataset.act='memTroca';x.dataset.v='emp';x.textContent='👥 Entrar em '+(MEM.minha.empresa||'empresa');b.insertBefore(x,b.lastChild);}};
+var MEM_FIN=['financeiro','inove','finlab'];
+var _renderMEM=render;render=function(){if(MEM.dono&&S.tab&&S.role&&MEM_FIN.indexOf(S.tab[S.role])>=0)S.tab[S.role]='inicio';if(MEM.dono&&S.labSub==='fin')S.labSub='ped';return _renderMEM.apply(this,arguments);};
+var _rlSalvaPfMEM=rlSalvaPf;rlSalvaPf=function(){if(MEM.dono){toast('Você está na conta da empresa. Para mexer no seu cadastro, toque em "Minha conta" na barra de baixo.');return;}return _rlSalvaPfMEM.apply(this,arguments);};
+/* dono: equipe, convites e passagem */
+var EQ={L:null,C:null,erro:'',busy:false};
+function eqLink(t){return location.origin+location.pathname.replace(/index\.html$/,'')+'?equipe='+t;}
+function eqCarrega(){if(!RL.user)return;EQ.L=false;Promise.all([SB.from('odo_membros').select('*').eq('dono_id',RL.user.id).order('criado_em'),SB.from('odo_convites_emp').select('*').eq('dono_id',RL.user.id).order('criado_em',{ascending:false}).limit(30)]).then(function(r){
+  var e=r[0].error||r[1].error;if(e){EQ.erro=/odo_membros|odo_convites_emp|does not exist|schema cache/.test(e.message||'')?'falta068':'erro';EQ.L=[];EQ.C=[];}else{EQ.erro='';EQ.L=r[0].data||[];EQ.C=r[1].data||[];}render();});}
+function eqSouCriadorFunc(){var d=EMP.row&&EMP.row.dados||{};return S.neg&&S.neg.papel==='func'&&(!d.criador||!d.criador.user||d.criador.user===RL.user.id);}
+function eqWa(c){var emp=(S.neg&&S.neg.nome)||'empresa',t=c.tipo==='dono'?'Oi'+(c.nome?' '+c.nome.split(' ')[0]:'')+'! Montei a '+emp+' no Ideali Odonto. Abra este link, entre ou crie o seu login e aceite: a empresa passa a ser sua. '+eqLink(c.token):'Oi'+(c.nome?' '+c.nome.split(' ')[0]:'')+'! Convite para a equipe da '+emp+' no Ideali Odonto. Abra, entre ou crie o seu login e aceite: '+eqLink(c.token);return 'https://wa.me/?text='+encodeURIComponent(t);}
+function rEquipe(){if(!RL.user||!S.neg)return '';
+  if(MEM.dono)return '<section class="card cfg-c eq-c"><h2>👥 Equipe</h2><p>Você está na equipe de <b>'+esc(MEM.empresa)+'</b>'+(MEM.cargo?' como <b>'+esc(MEM.cargo)+'</b>':'')+'. Você mexe em tudo, menos no financeiro. Quem convida e tira pessoas é o dono.</p></section>';
+  if(EQ.L===null)eqCarrega();
+  if(EQ.erro==='falta068')return '<section class="card cfg-c eq-c"><h2>👥 Equipe</h2><p>Falta rodar a atualização 068 no Supabase.</p></section>';
+  var L=EQ.L||[],C=(EQ.C||[]).filter(function(c){return c.ativo&&!c.aceito_em&&new Date(c.expira_em)>new Date();}),cria=eqSouCriadorFunc(),cDono=C.filter(function(c){return c.tipo==='dono';})[0];
+  var h='<section class="card cfg-c eq-c"><h2>👥 Equipe</h2><p class="small muted">Cada pessoa entra com o login dela. Funcionário mexe em tudo, <b>menos no financeiro</b>. Você tira o acesso quando quiser.</p>';
+  if(cria)h+='<div class="eq-dono"><b>👑 Passar a empresa para o dono</b><p class="small">Você criou a empresa como <b>'+esc(S.neg.cargo||'funcionário(a)')+'</b>. Quando o dono entrar no Ideali, mande este link para ele. Ele aceita e vira o dono de tudo; você continua na equipe.</p>'+
+    (cDono?'<div class="eq-li"><div><b>'+esc(cDono.nome||'Dono')+'</b><small>link vale até '+new Date(cDono.expira_em).toLocaleDateString('pt-BR')+'</small></div><div class="row"><a class="btn sm pri" href="'+eqWa(cDono)+'" target="_blank" rel="noopener">WhatsApp</a><button class="btn sm" data-eq="copia" data-v="'+cDono.id+'">Copiar link</button><button class="btn sm" data-eq="cancela" data-v="'+cDono.id+'">Cancelar</button></div></div>':
+     '<div class="row eq-f"><input id="eq-dn" maxlength="80" placeholder="Nome do dono"><button class="btn sm pri" data-eq="dono"'+(EQ.busy?' disabled':'')+'>Gerar link para o dono</button></div>')+'</div>';
+  h+=(L.length?L.map(function(m){return '<div class="eq-li'+(m.ativo?'':' off')+'"><div><b>'+esc(m.nome||'Funcionário')+'</b><small>'+esc(m.cargo||'')+(m.ativo?'':' · acesso tirado')+'</small></div><div class="row">'+(m.ativo?'<button class="btn sm danger" data-eq="tira" data-v="'+m.id+'">Tirar acesso</button>':'<button class="btn sm" data-eq="volta" data-v="'+m.id+'">Devolver acesso</button>')+'</div></div>';}).join(''):(EQ.L===false?'<p class="small muted">Carregando…</p>':'<p class="small muted">Ninguém na equipe ainda.</p>'));
+  h+=C.filter(function(c){return c.tipo==='funcionario';}).map(function(c){return '<div class="eq-li pend"><div><b>'+esc(c.nome||'Convite')+'</b><small>'+esc(c.cargo||'')+' · esperando aceitar (vale até '+new Date(c.expira_em).toLocaleDateString('pt-BR')+')</small></div><div class="row"><a class="btn sm" href="'+eqWa(c)+'" target="_blank" rel="noopener">WhatsApp</a><button class="btn sm" data-eq="copia" data-v="'+c.id+'">Copiar link</button><button class="btn sm" data-eq="cancela" data-v="'+c.id+'" aria-label="Cancelar">✕</button></div></div>';}).join('');
+  h+='<div class="row eq-f"><input id="eq-n" maxlength="80" placeholder="Nome do funcionário"><select id="eq-c">'+NEG_CARGOS.map(function(c){return '<option>'+c+'</option>';}).join('')+'</select><button class="btn sm pri" data-eq="func"'+(EQ.busy?' disabled':'')+'>Convidar</button></div></section>';
+  return h;}
+var _rCfgEmpresaEQ=rCfgEmpresa;rCfgEmpresa=function(){return _rCfgEmpresaEQ.apply(this,arguments)+rEquipe();};
+function eqCria(tipo,nome,cargo){EQ.busy=true;render();SB.from('odo_convites_emp').insert({dono_id:RL.user.id,tipo:tipo,nome:nome||null,cargo:cargo||null}).select('*').single().then(function(r){EQ.busy=false;
+  if(r.error){toast(/odo_convites_emp|does not exist|schema cache/.test(r.error.message||'')?'Falta rodar a atualização 068 no Supabase.':'Não consegui criar o convite.');render();return;}
+  (EQ.C=EQ.C||[]).unshift(r.data);render();try{navigator.clipboard.writeText(eqLink(r.data.token));toast('Link copiado ✓ Mande pelo WhatsApp.');}catch(e){toast('Convite criado ✓');}});}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-eq]');if(!b)return;var k=b.getAttribute('data-eq'),id=b.getAttribute('data-v');e.preventDefault();
+  if(k==='func'){var n=(document.getElementById('eq-n')||{}).value||'',c=(document.getElementById('eq-c')||{}).value||'';if(n.trim().length<2){toast('Escreva o nome do funcionário.');return;}eqCria('funcionario',n.trim(),c);}
+  else if(k==='dono'){var dn=((document.getElementById('eq-dn')||{}).value||'').trim();eqCria('dono',dn,S.neg&&S.neg.cargo);}
+  else if(k==='copia'){var c1=(EQ.C||[]).filter(function(x){return x.id===id;})[0];if(c1){try{navigator.clipboard.writeText(eqLink(c1.token));toast('Link copiado ✓');}catch(x){prompt('Copie o link:',eqLink(c1.token));}}}
+  else if(k==='cancela'){SB.from('odo_convites_emp').update({ativo:false}).eq('id',id).then(function(r){if(r.error){toast('Não consegui cancelar.');return;}EQ.C=(EQ.C||[]).filter(function(x){return x.id!==id;});render();});}
+  else if(k==='tira'||k==='volta'){var on=k==='volta';SB.from('odo_membros').update({ativo:on}).eq('id',id).then(function(r){if(r.error){toast('Não consegui mudar o acesso.');return;}(EQ.L||[]).forEach(function(x){if(x.id===id)x.ativo=on;});toast(on?'Acesso devolvido.':'Acesso tirado. A pessoa sai da empresa na hora.');render();});}});
+Object.assign(ACT,{memTroca:function(v){espLS('io_mem_modo',v==='eu'?'eu':null);location.reload();}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
