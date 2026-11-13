@@ -7727,6 +7727,17 @@ function anaNomesDentes(t){t=String(t||'');
     if(na===nb&&!lado)return ' '+(sup?1:4)+na+' a '+(sup?2:3)+nb+' ';var q=lado==='e'?(sup?2:3):(sup?1:4);return ' '+q+na+' a '+q+nb+' ';});
   t=t.replace(new RegExp('('+ANA_NOME_RE+')','g'),function(m,a,off,full){var n=anaNomeNum(a),lado=anaLadoDe(full,off,off+m.length);if(!n||!lado)return m;var sup=anaArcoDe(full,off,off+m.length)==='sup';return ' '+(lado==='e'?(sup?2:3):(sup?1:4))+n+' ';});
   return t;}
+/* paciente escrito sem a palavra "paciente": pega as palavras que sobram (não são cliente, trabalho, dente, cor, material, prazo...) */
+var ANA_PAC_STOP=/^(ao|aos|mais|tambem|so|fazer|faz|quero|preciso|precisa|manda|mandar|enviar|envio|novo|nova|trabalho|trabalhos|dr|dra|doutor|doutora|doutr|lab|laboratorio|clinica|cliente|paciente|pac|de|da|do|das|dos|e|o|a|os|as|no|na|nos|nas|em|um|uma|pra|para|pro|ate|com|sem|sobre|por|que|ai|aqui|segue|caso|pedido|favor|por favor|obrigad[oa]|bom|boa|dia|tarde|noite|oi|ola|hoje|amanha|semana|proxima|prox|urgente|correndo|prazo|entrega|cor|tom|vita|dente|dentes|elemento|elementos|coroas?|facetas?|lentes?|contato|onlays?|inlays?|overlays?|placas?|protocolos?|provisorios?|provisorias?|enceramentos?|mock|up|ups|modelos?|ponticos?|pontes?|copings?|unitari[oa]s?|unidas?|unidos?|fixa|fixas|implantes?|parafusad[oa]s?|cimentad[oa]s?|munhao|base|tbase|tibase|scan|scanbody|body|zirconia|zirconias|dissilicato|emax|litio|pmma|resina|impressa|impresso|impressao|3d|metal|metalocerami[ck]a|ceramica|porcelana|superior|inferior|direito|direita|esquerdo|esquerda|canino|caninos|incisivo|incisivos|central|centrais|lateral|laterais|pre|molar|molares|primeiro|segundo|terceiro|arcada|total|parcial|neodent|straumann|nobel|sin|conexao|implacil|titanium|fix|bionnovation|dentoflex|kopp|osstem|megagen|eff|dental|systhex|singular|emfils|biomet|zimmer|dentsply|ankylos|intraoss|plenum|he|hi|cm|gm|cone|morse|hexagono|hex|externo|interno|mini|pilar|domingo|segunda|terca|quarta|quinta|sexta|sabado|feira|janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)$/;
+function anaPacSolto(raw,cli){var cw={};if(cli)ppNorm([cli.nome,cli.pnome,cli.clinica].filter(Boolean).join(' ')).split(/[^a-z]+/).forEach(function(w){if(w.length>=2)cw[w]=1;});
+  var tk=String(raw||'').replace(/\n/g,' . ').match(/[A-Za-zÀ-ú0-9'.,:;\/-]+/g)||[],runs=[],cur=[],LIG=/^(de|da|do|das|dos|e)$/;
+  var fecha=function(){while(cur.length&&LIG.test(ppNorm(cur[cur.length-1])))cur.pop();if(cur.length)runs.push(cur);cur=[];};
+  tk.forEach(function(w){var lw=w.replace(/[.,:;]+$/,''),n=ppNorm(lw),fimFrase=/[.,:;]$/.test(w)||!lw;
+    var ok=/^[a-z']{2,}$/.test(n)&&!ANA_PAC_STOP.test(n)&&!cw[n]&&!/^[a-d][1-4]$|^bl[1-4]$/.test(n);
+    if(ok)cur.push(lw);else if(cur.length&&LIG.test(n)&&!fimFrase)cur.push(lw);else fecha();
+    if(fimFrase)fecha();});
+  fecha();
+  var r=runs.filter(function(x){return x.join('').length>=3;})[0];if(!r)return '';return nomeProprio(r.slice(0,5).join(' '));}
 function anaCadTexto(txt){var raw=String(txt||'').trim();if(!raw)return null;var r=pedDoTexto(raw),t=ppNorm(raw).replace(/\s+/g,' ');t=anaNomesDentes(t);
   if(!r.cli){var cs=alive(S.clientes).filter(function(c){var w=ppNorm(c.pnome||c.nome||'').replace(/^(dra?|lab|clinica)\.?\s+/,'').split(/\s+/)[0];return w&&w.length>=4&&new RegExp('\\b'+w+'\\b').test(t);});if(cs.length===1)r.cli=cs[0];}
   var limpo=t.replace(/\+?\d[\d\s().-]{8,}\d/g,function(x){var g=x.trim().split(/[\s().-]+/);return g.every(function(y){return /^\d{2}$/.test(y)&&anaDOk(+y);})?x:' ';}).replace(/\b\d{1,2}:\d{2}\b/g,' ').replace(/\b\d{1,2}\s*\/\s*\d{1,2}(\s*\/\s*\d{2,4})?\b/g,' ').replace(/\bdia\s+\d{1,2}\b/g,' ').replace(/\bem\s+\d{1,2}\s+dias?\b/g,' ').replace(/\bcor\b\s*\S+/g,' ').replace(/\b(he|hi|cm)\s*\d[.,]\d\b/g,' ');
@@ -7741,6 +7752,7 @@ function anaCadTexto(txt){var raw=String(txt||'').trim();if(!raw)return null;var
   var L=[];itens.forEach(function(it){it.ds.forEach(function(d){if(usados.indexOf(d)>=0)return;usados.push(d);L.push({d:d,t:it.tp?it.tp.id:'',imp:it.imp,m:it.imp?r.marca:'',c:it.imp?r.con:''});});});
   if(!L.length&&r.dentes.length)L=r.dentes.map(function(d){return {d:d,t:r.tipo?r.tipo.id:'',imp:!!r.imp,m:r.imp?r.marca:'',c:r.imp?r.con:''};});
   if(r.pac)r.pac=r.pac.replace(/\s+(dia|pra|para|ate|até|no|na|com)(\s.*)?$/i,'');
+  if(!r.pac)r.pac=anaPacSolto(raw,r.cli);
   if(!r.prazo){var md=t.match(/\bdia\s+(\d{1,2})\b/);if(md){var hj=new Date(today()+'T12:00:00'),dd=new Date(hj.getFullYear(),hj.getMonth(),+md[1],12);if(dd<hj)dd.setMonth(dd.getMonth()+1);r.prazo=dd.toISOString().slice(0,10);}}
   r.itensAna=L;r.dentes=L.map(function(x){return x.d;});if(!r.tipo&&itens[0])r.tipo=itens[0].tp;
   r.tiposAna=itens.filter(function(i){return i.ds.length;}).map(function(i){return (i.tp?i.tp.nome:'trabalho')+' ('+i.ds.join(', ')+')';});if(r.tiposAna.length)r.tipo={id:'',nome:r.tiposAna.join(' + ')};r.deTexto=true;return r;}
