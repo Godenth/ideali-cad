@@ -1875,6 +1875,12 @@ i.pzs-antes{background:#3B82F6}i.pzs-prazo{background:#22C55E}i.pzs-atraso{backg
 .pzm-bc{min-width:150px}td.pzm-bc{display:flex;align-items:center;gap:8px}td.pzm-bc small{width:36px;text-align:right;font-variant-numeric:tabular-nums}
 .pzm-ruim{color:#DC2626}[data-theme=dark] .pzm-ruim{color:#F87171}.pzm-r{cursor:pointer}.pzm-r:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
 @media(max-width:760px){.pzm-k{grid-template-columns:repeat(2,minmax(0,1fr))}.exb .pfx-i{grid-template-columns:24px 1fr auto}.exb .pfx-i .pedn{display:none}}
+.kc-tl{display:grid;grid-template-columns:3fr 2fr 1fr;gap:8px}.kc-fase{display:grid;gap:6px;padding:8px 6px 6px;border-radius:12px;background:var(--soft);min-width:0}
+.kc-fase>b{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:center}.kc-fase.a>b{color:var(--cx)}.kc-fase.f>b{color:#16A34A}
+.kc-tl .kc-step li span{font-size:.66rem;line-height:1.15}
+@media(max-width:600px){.kc-tl{grid-template-columns:1fr}.kc-fase{grid-template-columns:72px 1fr;align-items:center}.kc-fase>b{text-align:left}}
+.pgc-x{display:grid;gap:6px}.pgc-xi{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid var(--line)}.pgc-xi>span{display:grid}.pgc-xi small{color:var(--muted)}
+.pgc-c{cursor:default}.lsub{overflow-x:auto;scrollbar-width:none}.lsub button{white-space:nowrap}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6750,14 +6756,17 @@ function ic(k,cl){return dIco(k,'ic'+(cl?' '+cl:''));}
 /* ---------- regras da clínica: quem é dono, situação, etapa, cor, prazo ---------- */
 /* funcionário da clínica faz tudo, menos ver dinheiro */
 function cliDono(){if(typeof MEM!=='undefined'&&MEM.dono)return false;if(typeof UNI!=='undefined'&&UNI.ok===true&&UNI.dono===false)return false;return true;}
-var CLI_ET=[['Desenho','No desenho'],['Desenhado','Desenhado'],['Fresagem','Na fresagem'],['Maquiagem','Na maquiagem'],['Enviado','Entregue']];
-var CLI_COR={apr:'#F59E0B',pend:'#DC2626',rec:'#94A3B8',can:'#94A3B8',fin:'#16A34A',e0:'#7C3AED',e1:'#6366F1',e2:'#2563EB',e3:'#DB2777',e4:'#16A34A'};
-function cliEtN(et){return et==='Desenhado'?1:(et==='Enviado para fresagem'||et==='Em produção')?2:et==='Maquiagem'?3:(et==='Pronto'||et==='Entregue')?4:0;}
+/* linha do tempo: Recebido (aguardando aprovação → aprovado → desenhado) · Produção (fresagem → maquiagem) · Pronto (pronto/enviado) */
+var CLI_ET=[['Aguardando aprovação','Aguardando aprovação'],['Aprovado','Aprovado · em desenho'],['Desenhado','Desenhado'],['Fresagem','Na fresagem'],['Maquiagem','Na maquiagem'],['Pronto / enviado','Pronto / enviado']];
+var CLI_FASE=[['Recebido',0,2],['Produção',3,4],['Pronto',5,5]];
+var CLI_COR={apr:'#F59E0B',pend:'#DC2626',rec:'#94A3B8',can:'#94A3B8',fin:'#16A34A',e0:'#F59E0B',e1:'#7C3AED',e2:'#6366F1',e3:'#2563EB',e4:'#DB2777',e5:'#16A34A'};
+function cliEtN(et){return et==='Desenhado'?2:(et==='Enviado para fresagem'||et==='Em produção')?3:et==='Maquiagem'?4:(et==='Pronto'||et==='Entregue')?5:1;}
+function cliEtI(e){var s=cliSt(e);return s==='apr'?0:s==='fin'?6:cliEtN(e.etapa);}
 /* situação de uma linha: apr (esperando o lab aceitar) · pend (pendência) · prod · fin (finalizado) · rec · can */
 function cliSt(e){if(pdgFeito(e))return e.status==='recusado'?'rec':(e.status==='cancelado'||e.etapa==='Cancelado')?'can':'fin';return e.status==='enviado'?'apr':e.etapa==='Aguardando informação'?'pend':'prod';}
 function cliCor(e){var s=cliSt(e);return s==='prod'?CLI_COR['e'+cliEtN(e.etapa)]:CLI_COR[s];}
 function cliEtapaTxt(e){var s=cliSt(e);if(s==='apr')return 'Aguardando o laboratório aceitar';if(s==='pend')return 'O laboratório precisa de você';if(s==='rec')return 'Recusado';if(s==='can')return 'Cancelado';
-  if(s==='fin')return e.etapa==='Pronto'?'Pronto':'Entregue';return e.etapa==='Em produção'?'Em produção':CLI_ET[cliEtN(e.etapa)][1];}
+  if(s==='fin')return 'Pronto / enviado';return e.etapa==='Em produção'?'Em produção':CLI_ET[cliEtN(e.etapa)][1];}
 function cliTrab(e){return (e.itens||[]).map(function(it){return it.trabalho;}).filter(Boolean).join(' + ')||'Pedido';}
 function cliAjuste(e){return (e.itens||[]).some(function(it){return it.ajuste;});}
 function cliLab(e){return (PDG.labNome&&PDG.labNome[e.lab_id])||e.lab_nome||'';}
@@ -6770,7 +6779,7 @@ function kcPrazo(e){if(pdgFeito(e)||e.status==='cancelado'||e.status==='recusado
   return {cls:r.neg?'atr':ms<864e5?'quase':'ok',t:r.neg?'Atrasado '+t:t,ate:cliDia(I.max,false),ord:I.max.getTime(),I:I};}
 function cliAtrasado(e){var p=cliSt(e)==='pend'?null:kcPrazo(e);return !!(p&&p.cls==='atr');}
 function kcPill(p){return '<span class="kc-pz kc-pz-'+p.cls+'">'+ic(p.cls==='atr'?'alerta':p.cls==='par'?'pausa':'relogio')+esc(p.t)+'</span>';}
-function cliBarra(i,cl){return '<span class="'+cl+'" aria-hidden="true">'+[0,1,2,3,4].map(function(k){return '<i class="'+(k<i?'f':k===i?'a':'')+'"></i>';}).join('')+'</span>';}
+function cliBarra(i,cl){return '<span class="'+cl+'" aria-hidden="true">'+[0,1,2,3,4,5].map(function(k){return '<i class="'+(k<i?'f':k===i?'a':'')+'"></i>';}).join('')+'</span>';}
 function cliChatBt(e){var k=chChaveCli(e),n=chNovas(k),tot=(CH.idx[chK(k)]||[]).length;
   return '<button class="btn sm ch-bt'+(n?' ch-novo':'')+'" data-ch="abre" data-k="'+esc(JSON.stringify(k))+'">'+ic('chat')+(tot?'Conversa':'Conversar')+(n?' <b>'+n+'</b>':'')+'</button>';}
 
@@ -6782,7 +6791,7 @@ function kcCard(e,ab){var s=cliSt(e),ds=cxDentes(e),pz=kcPrazo(e),lab=cliLab(e),
       '<div class="kc-top"><b class="kc-pac">'+esc(e.paciente||'Sem nome')+'</b>'+(pz?kcPill(pz):'')+'</div>'+
       '<div class="kc-tr">'+(cliAjuste(e)?'<span class="kc-aj">'+ic('repete')+'Ajuste</span> ':'')+esc(tr)+'</div>'+
       '<div class="kc-tags">'+(ds.length?'<span>'+ic('dente')+ds.join(', ')+'</span>':'')+(e.cor?'<span>'+ic('gota')+esc(e.cor)+'</span>':'')+(na?'<span>'+ic('clipe')+na+'</span>':'')+(nl>1&&lab?'<span>'+ic('frasco')+esc(lab)+'</span>':'')+'</div>'+
-      '<div class="kc-et">'+(s==='prod'?cliBarra(i,'kc-bar'):'')+'<small><b>'+esc(cliEtapaTxt(e))+'</b>'+(pz&&pz.ate?' · até '+pz.ate:'')+' · enviado '+cliDia(e.enviado_em||e.criado_em,false)+'</small></div>'+
+      '<div class="kc-et">'+(s==='prod'||s==='apr'?cliBarra(cliEtI(e),'kc-bar'):'')+'<small><b>'+esc(cliEtapaTxt(e))+'</b>'+(pz&&pz.ate?' · até '+pz.ate:'')+' · enviado '+cliDia(e.enviado_em||e.criado_em,false)+'</small></div>'+
     '</button>'+
     (ab?kcDet(e,s,ds,tr,lab,pz,i):'')+
     (s==='pend'&&!ab?'<div class="kc-pend"><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p>'+(e.resposta?'<small>Você respondeu: '+esc(e.resposta)+'</small>':'')+'</div>':'')+
@@ -6790,13 +6799,13 @@ function kcCard(e,ab){var s=cliSt(e),ds=cxDentes(e),pz=kcPrazo(e),lab=cliLab(e),
       (cliPodeReceber(e)?'<button class="btn sm kc-rcb" data-act="cliRecebi" data-v="'+id+'">'+ic('check')+'Recebi</button>':'')+
       (e.status==='enviado'?'<button class="btn sm kc-can" data-act="pdgCancela" data-v="'+e.id+'">Cancelar</button>':'')+'</div></article>';}
 function kcDet(e,s,ds,tr,lab,pz,i){var L=function(r,v){return v?'<div><span>'+r+'</span><b>'+v+'</b></div>':'';},I=pz&&pz.I,V=cliDono()?plxValores():{v:{},est:{}},v=V.v[e.id];
-  var step=s==='prod'||s==='fin'?'<ol class="kc-step">'+CLI_ET.map(function(x,k){var ok=s==='fin'||k<i;return '<li class="'+(ok?'f':k===i?'a':'')+'"><i>'+(ok?ic('check'):k+1)+'</i><span>'+x[0]+'</span></li>';}).join('')+'</ol>':'';
+  var ii=cliEtI(e),step=s==='prod'||s==='fin'||s==='apr'||s==='pend'?'<div class="kc-tl">'+CLI_FASE.map(function(f){var feita=ii>f[2],ag=ii>=f[1]&&ii<=f[2];return '<div class="kc-fase'+(feita?' f':ag?' a':'')+'"><b>'+f[0]+'</b><ol class="kc-step" style="grid-template-columns:repeat('+(f[2]-f[1]+1)+',1fr)">'+CLI_ET.slice(f[1],f[2]+1).map(function(x,j){var k=f[1]+j,ok=k<ii;return '<li class="'+(ok?'f':k===ii?'a':'')+'"><i>'+(ok?ic('check'):k+1)+'</i><span>'+x[0]+'</span></li>';}).join('')+'</ol></div>';}).join('')+'</div>':'';
   return '<div class="kc-det">'+step+
     '<div class="kc-ficha">'+L('Paciente',esc(e.paciente||''))+L('Trabalho',esc(tr))+(cliAjuste(e)?L('Tipo','Ajuste / refação'):'')+L('Dentes',ds.join(', '))+L('Cor',esc(e.cor||''))+L('Enviado em',cliDia(e.enviado_em||e.criado_em,4))+
       (I?L('Previsão',(I.min.getTime()===I.max.getTime()?'':cliDia(I.min,false)+' a ')+cliDia(I.max,false)+' · '+(I.f[0]===I.f[1]?I.f[0]:I.f[0]+' a '+I.f[1])+' dias úteis'):'')+
       (s==='fin'&&e.etapa_em?L(e.etapa==='Pronto'?'Pronto em':'Entregue em',cliDia(e.etapa_em,4)):'')+
       (v!=null?L('Valor',(V.est[e.id]?'<span title="Valor dividido do fechamento do mês">≈ ':'')+fmtR(v)+(V.est[e.id]?'</span>':'')):'')+L('Laboratório',esc(lab))+'</div>'+
-    (e.partes&&e.partes.length>1?'<div class="kc-partes"><b>Itens deste pedido</b>'+e.partes.map(function(p){return '<div><span>'+esc(uniTrab(p))+(p.dentes&&p.dentes.length?' · dentes '+p.dentes.join(', '):'')+'</span><em>'+esc(uniEtapaTxt(p.etapa))+'</em></div>';}).join('')+'</div>':'')+
+    (e.partes&&e.partes.length>1?'<div class="kc-partes"><b>Itens deste pedido</b>'+e.partes.map(function(p){return '<div><span>'+esc(uniTrab(p))+(p.dentes&&p.dentes.length?' · dentes '+p.dentes.join(', '):'')+'</span><em>'+esc(p.etapa==='Aguardando informação'?'Pendência':p.etapa==='Cancelado'?'Cancelado':CLI_ET[cliEtN(p.etapa)][1])+'</em></div>';}).join('')+'</div>':'')+
     (ds.length?'<div class="kc-arco">'+cxMiniArco(ds)+'</div>':'')+
     (e.status==='recusado'&&e.motivo?'<p class="kc-mot">Motivo: '+esc(e.motivo)+'</p>':'')+
     pendHtml(e)+
@@ -6954,7 +6963,7 @@ function plxAtivo(){return PLX.st==='and'||PLX.st==='apr'||PLX.st==='pend';}
 function plxVis(){var v=PLX.vis||(plxAtivo()?'quadro':'lista');if(v==='quadro'&&!plxAtivo())v='lista';return v;}
 function plxPrazoTd(e){var s=cliSt(e);if(s==='fin')return '<span class="plx-ok">'+ic('check')+(e.etapa_em?cliDia(e.etapa_em):'Entregue')+'</span>';if(s==='rec'||s==='can')return '—';
   var p=kcPrazo(e);if(!p)return '—';return kcPill(p)+(p.ate?'<small>até '+p.ate+'</small>':'');}
-function plxEt(e){var s=cliSt(e);return '<span class="plx-et plx-et-'+s+'">'+esc(cliEtapaTxt(e))+'</span>'+(s==='prod'||s==='fin'?cliBarra(s==='fin'?5:cliEtN(e.etapa),'plx-bar'):'');}
+function plxEt(e){var s=cliSt(e);return '<span class="plx-et plx-et-'+s+'">'+esc(cliEtapaTxt(e))+'</span>'+(s==='prod'||s==='fin'||s==='apr'?cliBarra(cliEtI(e),'plx-bar'):'');}
 function plxLinha(e,V){var v=V.v[e.id];
   return '<tr class="plx-r" data-kc="'+esc(String(e.id))+'" tabindex="0" style="--cx:'+cliCor(e)+'"><td>'+cliDia(e.enviado_em||e.criado_em)+'</td><td><b class="plx-pac">'+esc(e.paciente||'—')+'</b>'+(cliAjuste(e)?' <span class="kc-aj">'+ic('repete')+'Ajuste</span>':'')+'</td><td class="plx-tr">'+esc(cliTrab(e))+'</td><td>'+esc(cxDentes(e).join(', ')||'—')+'</td><td>'+esc(e.cor||'—')+'</td>'+
     '<td>'+plxEt(e)+'</td><td class="plx-pz">'+plxPrazoTd(e)+'</td>'+(V.dono?'<td class="n">'+cliValor(v,V.est[e.id])+'</td>':'')+'</tr>';}
@@ -6976,9 +6985,9 @@ function plxCorpo(L,vis){
     return G.map(function(g){var t=g.L.reduce(function(s,e){return s+(V.v[e.id]||0);},0),p=g.k.split('-');
       return '<div class="card plx-g"><div class="fz-gh"><h3>'+PMES[+p[1]-1]+' de '+p[0]+'</h3><span>'+g.L.length+' pedido'+(g.L.length>1?'s':'')+(dono&&t?' · <b>'+fmtR(t)+'</b>':'')+'</span></div>'+plxTabela(g.L,9999)+'</div>';}).join('');}
   return plxTabela(L);}
-function rPedidosClinica(){var R=plxLista(),C=R.C,L=R.L,vis=plxVis();
+function rPedidosClinica(modo){var ent=modo==='ent';if(ent){PLX.st='fin';if(PLX.ord==='prazo')PLX.ord='data';}else if(PLX.st==='fin')PLX.st='and';var R=plxLista(),C=R.C,L=R.L,vis=plxVis();
   if(cliDono()&&!DFL.d&&!DFL.erro)dflCarrega();
-  var ch=[['and','Em andamento',C.and],['pend','Pendência',C.pend],['apr','Aguardando aprovação',C.apr],['atr','Atrasados',C.atr],['fin','Finalizados',C.fin],['tudo','Todos',C.tudo]];
+  var ch=ent?[]:[['and','Em andamento',C.and],['pend','Pendência',C.pend],['apr','Aguardando aprovação',C.apr],['atr','Atrasados',C.atr],['tudo','Todos',C.tudo]];
   var pers=[['tudo','Todos os períodos'],['mes','Este mês'],['mesp','Mês passado'],['3m','Últimos 3 meses'],['12m','Últimos 12 meses'],['ano','Este ano']];
   return '<div class="plx">'+
     '<div class="plx-st" role="tablist" aria-label="Situação dos pedidos">'+ch.map(function(c){return '<button role="tab" data-plx="st" data-v="'+c[0]+'" aria-selected="'+(PLX.st===c[0])+'" class="plx-s plx-s-'+c[0]+(c[2]&&(c[0]==='pend'||c[0]==='atr')?' alerta':'')+'"><b>'+c[2]+'</b><span>'+c[1]+'</span></button>';}).join('')+'</div>'+
@@ -7074,20 +7083,46 @@ function rLabsClinica(){if(!LP.d&&!LP.carregando)lpCarrega();var M=labVMeus(),n=
   if(PDG.erro==='falta057')h+='<div class="card" style="margin-top:12px;border-color:#F59E0B">'+ic('alerta')+'Falta rodar a atualização 057 no Supabase para enviar pedidos.</div>';
   return h+(M.length?'<div class="lp-g">'+M.map(lpCard).join('')+'</div>':'<div class="card lsub-v">Você ainda não tem laboratório conectado. Convide o seu pelo ID.</div>');}
 
+/* ---------- Pagamentos e comprovantes: lista de tudo que foi pago, com comprovante e extrato de cada mês ---------- */
+var PGC={lab:'',ano:'todos'};
+function rPagClinica(){
+  if(!cliDono())return '<div class="card lsub-v">Os pagamentos ficam só com o dono da empresa.</div>';
+  if(!DFL.d&&!DFL.erro){dflCarrega();return '<div class="card lsub-v">Carregando…</div>';}
+  if(DFL.erro)return '<div class="card lsub-v">Não consegui carregar agora. <button class="btn sm" data-act="dflRecarrega">Tentar de novo</button></div>';
+  var M=cliMeses(),labs={};M.forEach(function(m){labs[m.lab_id]=m.lab;});var P=[],X=[],anos=[];
+  M.forEach(function(m){if(PGC.lab&&m.lab_id!==PGC.lab)return;if(anos.indexOf(m.ano)<0)anos.push(m.ano);if(PGC.ano!=='todos'&&m.ano!==+PGC.ano)return;
+    (m.pagamentos||[]).forEach(function(g){P.push({g:g,m:m});});if(m.extrato)X.push(m);});
+  anos.sort(function(a,b){return b-a;});P.sort(function(a,b){return String(b.g.data)<String(a.g.data)?-1:1;});X.sort(function(a,b){return (b.ano*100+b.mes)-(a.ano*100+a.mes);});
+  var tot=P.reduce(function(s,x){return s+(+x.g.valor||0);},0),nc=P.filter(function(x){return x.g.comprovante;}).length;
+  var h='<div class="fic"><div class="fic-top"><div class="fic-k"><span>'+ic('check')+'Total pago</span><b>'+fmtR(tot)+'</b><small>'+P.length+' pagamento'+(P.length===1?'':'s')+'</small></div><div class="fic-k"><span>'+ic('clipe')+'Comprovantes</span><b>'+nc+'</b><small>de '+P.length+' pagamentos</small></div><div class="fic-k"><span>'+ic('doc')+'Extratos</span><b>'+X.length+'</b><small>meses com extrato</small></div></div>'+
+    '<div class="fic-f">'+(anos.length>1?'<div class="pdb-seg" role="group" aria-label="Ano"><button data-pgc="ano" data-v="todos" aria-pressed="'+(PGC.ano==='todos')+'">Todos</button>'+anos.map(function(a){return '<button data-pgc="ano" data-v="'+a+'" aria-pressed="'+(String(PGC.ano)===String(a))+'">'+a+'</button>';}).join('')+'</div>':'')+
+    (Object.keys(labs).length>1?'<select id="pgc-lab" aria-label="Laboratório"><option value="">Todos os laboratórios</option>'+Object.keys(labs).map(function(k){return '<option value="'+k+'"'+(k===PGC.lab?' selected':'')+'>'+esc(labs[k])+'</option>';}).join('')+'</select>':'')+'</div>';
+  h+='<div class="card"><h3>Pagamentos</h3>'+(P.length?'<div class="plx-tw"><table class="plx-t"><thead><tr><th>Data</th><th>Referente a</th><th class="n">Valor</th><th>Comprovante</th>'+(Object.keys(labs).length>1?'<th>Laboratório</th>':'')+'</tr></thead><tbody>'+
+    P.map(function(x){return '<tr><td>'+cliDia(String(x.g.data).slice(0,10)+'T12:00:00',4)+'</td><td>'+PMES[x.m.mes-1]+'/'+x.m.ano+'</td><td class="n"><b>'+fmtR(x.g.valor)+'</b></td><td>'+(x.g.comprovante?ficArq(x.g.comprovante,'Ver comprovante','clipe'):'<small class="muted">sem comprovante</small>')+'</td>'+(Object.keys(labs).length>1?'<td>'+esc(x.m.lab||'')+'</td>':'')+'</tr>';}).join('')+'</tbody></table></div>'+
+    '<div class="plx-cs">'+P.map(function(x){return '<div class="plx-c pgc-c"><span class="plx-c1"><b>'+fmtR(x.g.valor)+'</b><span>'+cliDia(String(x.g.data).slice(0,10)+'T12:00:00',4)+'</span></span><span class="plx-c2">Referente a '+PMES[x.m.mes-1]+'/'+x.m.ano+'</span>'+(x.g.comprovante?ficArq(x.g.comprovante,'Ver comprovante','clipe'):'<small class="muted">sem comprovante</small>')+'</div>';}).join('')+'</div>'
+    :'<p class="fic-nada">Nenhum pagamento lançado.</p>')+'</div>';
+  h+='<div class="card"><h3>Extratos do laboratório</h3>'+(X.length?'<div class="pgc-x">'+X.map(function(m){return '<div class="pgc-xi"><span><b>'+PMES[m.mes-1]+'/'+m.ano+'</b><small>'+esc(m.lab||'')+' · '+fmtR(m.valor)+'</small></span>'+ficArq(m.extrato,'Ver extrato','doc')+'</div>';}).join('')+'</div>':'<p class="fic-nada">Nenhum extrato anexado ainda.</p>')+'</div>';
+  return h+'</div>';}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-pgc]');if(!b)return;PGC.ano=b.getAttribute('data-v');render();});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='pgc-lab'){PGC.lab=e.target.value;render();}});
+
 /* ---------- casca da aba Laboratório (cabeçalho, abas e a tela escolhida) ---------- */
 function rLabClinica(){PDG.labNome=PDG.labNome||{};labVMeus().forEach(function(v){if(v.lab_nome)PDG.labNome[v.lab_id]=v.lab_nome;});
   var con=labVMeus().filter(function(v){return v.status==='aceito';}).length,tem=pdgMeus().length,dono=cliDono();
-  if(S.labSub==='feitos'){S.labSub='ped';PLX.st='fin';}if(S.labSub==='pag')S.labSub='fin';
+  if(S.labSub==='feitos')S.labSub='ent';
   var sub=S.labSub||(con||tem?'ped':'labs'),nAnd=pdgMeus().filter(function(e){return !pdgFeito(e);}).length;
-  var abas=[['ped','caixa','Pedidos',nAnd]].concat(dono?[['fin','cart','Financeiro',0]]:[]).concat([['labs','frasco','Laboratórios',con]]);
+  var nEnt=pdgMeus().filter(function(e){return cliSt(e)==='fin';}).length;
+  var abas=[['ped','caixa','Em andamento',nAnd],['ent','check','Entregues',nEnt]].concat(dono?[['fin','cart','Financeiro',0],['pag','clipe','Pagamentos e comprovantes',0]]:[]).concat([['labs','frasco','Laboratórios',con]]);
   var h='<div class="dtop"><div><h2>'+ic('frasco')+'Laboratório</h2></div>'+(con?'<button class="btn pdg-novo" data-act="pdgNovo">'+ic('enviar')+'Novo pedido</button>':'')+'</div>'+
     '<div class="lsub" role="tablist">'+abas.map(function(a){return '<button role="tab" aria-selected="'+(sub===a[0])+'" data-act="labSub" data-v="'+a[0]+'">'+ic(a[1])+a[2]+(a[3]?' <span class="lsub-n">'+a[3]+'</span>':'')+'</button>';}).join('')+'</div>';
   if(sub==='fin')return h+rFinClinica();
+  if(sub==='pag')return h+rPagClinica();
+  if(sub==='ent')return h+rPedidosClinica('ent');
   if(sub==='labs')return h+rLabsClinica();
   if(!con&&!tem)return h+'<div class="card lsub-v">Você ainda não tem laboratório conectado. <button class="btn sm pri" data-act="labSub" data-v="labs">Conectar um laboratório</button></div>';
   return h+rPedidosClinica();}
 ACT.labSub=function(v){S.labSub=v;window.scrollTo(0,0);if(v==='labs')LP.d=null;
-  if(v==='fin'){FIC.ab=null;if(typeof UNI!=='undefined'&&UNI.ok===true)pdgCarrega();else{if(!DFL.carregando){DFL.d=null;DFL.erro='';}if(typeof PH!=='undefined'){PH.d=null;PH.erro='';}}}
+  if(v==='fin'||v==='pag'){FIC.ab=null;if(typeof UNI!=='undefined'&&UNI.ok===true)pdgCarrega();else{if(!DFL.carregando){DFL.d=null;DFL.erro='';}if(typeof PH!=='undefined'){PH.d=null;PH.erro='';}}}
   render();};
 
 /* ---------- Início da clínica: o dia (agenda, laboratório, tarefas, novidades) e depois o painel ---------- */

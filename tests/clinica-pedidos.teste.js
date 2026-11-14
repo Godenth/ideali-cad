@@ -19,12 +19,12 @@ for(const [nm,opt] of [['pc-escuro',{viewport:{width:1440,height:900},colorSchem
  const shot=async(n)=>{await ov(n);await p.screenshot({path:'tests/saida/'+nm+'-'+n+'.png'});};
  await shot('1-inicial');
  const chips=await p.$$eval('.plx-s',a=>a.map(x=>x.innerText.replace(/\n/g,' ')));R.push(nm+' chips: '+chips.join(' | '));
- await p.click('.plx-s[data-v=fin]');await p.waitForTimeout(300);await shot('2-finalizados');
+ await p.click('.lsub [data-v=ent]');await p.waitForTimeout(300);await shot('2-finalizados');
  R.push(nm+' finalizados linhas visiveis: '+await p.$$eval(nm.startsWith('cel')?'.plx-c':'.plx-r',a=>a.length));
- await p.fill('#plx-q','cristina');await p.waitForTimeout(300);R.push(nm+' busca cristina: '+await p.$$eval(nm.startsWith('cel')?'.plx-c':'.plx-r',a=>a.length)+' (chip Finalizados='+await p.$eval('.plx-s[data-v=fin] b',x=>x.textContent)+')');
+ await p.fill('#plx-q','cristina');await p.waitForTimeout(300);R.push(nm+' busca cristina: '+await p.$$eval(nm.startsWith('cel')?'.plx-c':'.plx-r',a=>a.length)+'');
  await shot('3-busca');
  await p.click('[data-plx=vis][data-v=mes]');await p.waitForTimeout(300);await shot('4-por-mes');
- await p.fill('#plx-q','');await p.waitForTimeout(200);
+ await p.fill('#plx-q','');await p.waitForTimeout(200);await p.click('.lsub [data-v=ped]');await p.waitForTimeout(300);
  await p.click('.plx-s[data-v=atr]');await p.waitForTimeout(300);R.push(nm+' atrasados: '+await p.$eval('.plx-s[data-v=atr] b',x=>x.textContent));await shot('5-atrasados');
  await p.click(nm.startsWith('cel')?'.plx-c':'.plx-r');await p.waitForTimeout(400);R.push(nm+' modal abriu: '+!!(await p.$('#kc-ov')));await shot('6-detalhe');
  await p.keyboard.press('Escape');await p.waitForTimeout(200);R.push(nm+' modal fechou com Esc: '+!(await p.$('#kc-ov')));

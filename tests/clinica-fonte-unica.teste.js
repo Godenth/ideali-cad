@@ -50,7 +50,7 @@ for(const [nm,opt,modo,dados] of [
    ok((await chip('atr'))===0,nm+': 0 atrasados → os 29 antigos arquivados NÃO aparecem mais como atrasados');
    ok((await chip('pend'))===1,nm+': 1 pendência');
    ok((await chip('apr'))===1,nm+': 1 aguardando aprovação');
-   ok((await chip('fin'))===180,nm+': 180 finalizados (179 entregues + 1 recusado)');
+   ok(+(await p.$eval('.lsub [data-v=ent] .lsub-n',x=>x.textContent))===179,nm+': aba Entregues com 179');
    ok((await chip('tudo'))===187,nm+': 187 no total (184 + 3 envios; o apagado ficou de fora)');
    await larg('Pedidos (quadro)');await p.screenshot({path:path.join(SAIDA,nm+'-1-quadro.png')});
    // botão Recebi: só em pedido que o laboratório já aceitou
@@ -70,12 +70,12 @@ for(const [nm,opt,modo,dados] of [
    // pedido com 2 itens
    await p.fill('#plx-q','maria souza');await p.waitForTimeout(300);await p.click(linha);await p.waitForTimeout(400);
    const det=await p.$eval('#kc-ov',x=>x.innerText).catch(()=> '');
-   ok(/Itens deste pedido/.test(det)&&/Na fresagem/.test(det)&&/No desenho/.test(det),nm+': pedido com 2 itens mostra a etapa de cada item');
+   ok(/Itens deste pedido/.test(det)&&/Na fresagem/.test(det)&&/(No desenho|Aprovado)/.test(det)&&/Recebido/i.test(det)&&/Produção/i.test(det),nm+': pedido com 2 itens mostra a etapa de cada item'+(process.env.DBG?' >> '+det.replace(/\n/g,' / '):''));
    await p.screenshot({path:path.join(SAIDA,nm+'-3-itens.png')});await p.keyboard.press('Escape');await p.waitForTimeout(200);await p.fill('#plx-q','');
    // finalizados: os antigos estão aqui, como entregues
-   await p.click('.plx-s[data-v=fin]');await p.waitForTimeout(300);await p.fill('#plx-q','leyliane');await p.waitForTimeout(300);
-   const fin=await p.$eval('#plx-corpo',x=>x.innerText);ok(/Entregue/.test(fin)&&!/Atrasado/.test(fin),nm+': pedido antigo aparece em Finalizados como Entregue, sem "Atrasado"');
-   await p.fill('#plx-q','');
+   await p.click('.lsub [data-v=ent]');await p.waitForTimeout(300);ok(!(await p.$('.plx-s')),nm+': Entregues é uma aba própria');await p.fill('#plx-q','leyliane');await p.waitForTimeout(300);
+   const fin=await p.$eval('#plx-corpo',x=>x.innerText);ok(/Pronto \/ enviado/.test(fin)&&!/Atrasado/.test(fin),nm+': pedido antigo aparece em Entregues como Pronto / enviado, sem "Atrasado"');
+   await p.fill('#plx-q','');await p.click('.lsub [data-v=ped]');await p.waitForTimeout(300);
    // Início
    await p.evaluate(()=>{S.tab.dent='inicio';render();});await p.waitForTimeout(600);
    const ini=await p.$eval('main, body',x=>x.innerText);
@@ -87,9 +87,10 @@ for(const [nm,opt,modo,dados] of [
    // Financeiro: um extrato por mês, com a conta que vem do banco
    await p.evaluate(()=>{S.tab.dent='pedidos';S.labSub='ped';render();});await p.waitForTimeout(300);
    const abas=await p.$$eval('.lsub button',x=>x.map(y=>y.getAttribute('data-v')).join(','));
-   if(modo==='func'){ok(abas==='ped,labs',nm+': funcionária não tem a aba Financeiro');
+   if(modo==='func'){ok(abas==='ped,ent,labs',nm+': funcionária não tem Financeiro nem Pagamentos');
      await p.evaluate(()=>{S.labSub='fin';render();});await p.waitForTimeout(300);ok(!/R\$/.test(await p.$eval('body',x=>x.innerText)),nm+': forçar o Financeiro não mostra nenhum valor');}
-   else{ok(abas==='ped,fin,labs',nm+': abas Pedidos · Financeiro · Laboratórios');
+   else{ok(abas==='ped,ent,fin,pag,labs',nm+': abas Em andamento · Entregues · Financeiro · Pagamentos e comprovantes · Laboratórios');
+     await p.click('.lsub [data-v=pag]');await p.waitForTimeout(400);const pg=await p.$eval('.fic',x=>x.innerText);ok(/Pagamentos/.test(pg)&&/Ver comprovante/.test(pg)&&/Extratos do laboratório/.test(pg),nm+': Pagamentos e comprovantes lista os pagamentos com comprovante e os extratos');await p.screenshot({path:path.join(SAIDA,nm+'-7-pagamentos.png'),fullPage:true});
      await p.click('.lsub [data-v=fin]');await p.waitForTimeout(500);
      const F=await p.$eval('.fic',x=>x.innerText),br=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2}).replace(/\s/g,' ');
      const M=dados.meses,falta=M.reduce((s,m)=>s+m.falta,0),pago=M.filter(m=>m.ano===2026).reduce((s,m)=>s+m.pago,0);
