@@ -1896,6 +1896,28 @@ i.pzs-antes{background:#3B82F6}i.pzs-prazo{background:#22C55E}i.pzs-atraso{backg
 .cbar.ok:after{animation:none}
 @keyframes cbarCarrega{0%{clip-path:inset(0 100% 0 0)}75%{clip-path:inset(0 calc(100% - var(--p)) 0 0)}92%{clip-path:inset(0 calc(100% - var(--p)) 0 0);opacity:1}100%{clip-path:inset(0 calc(100% - var(--p)) 0 0);opacity:.35}}
 @media (prefers-reduced-motion:reduce){.cbar:after{animation:none}}
+.pgc-top{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pgc-t{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.pgc-h,.pgc-r{display:grid;grid-template-columns:minmax(110px,1fr) minmax(100px,.9fr) minmax(110px,.9fr) minmax(100px,.9fr) 110px minmax(220px,2.4fr) 110px;gap:12px;align-items:center;padding:12px 16px}
+.pgc-h{font-size:.74rem;color:var(--muted);font-weight:600;background:var(--soft);padding-top:10px;padding-bottom:10px}
+.pgc-r{border-top:1px solid var(--line);border-left:4px solid transparent;font-variant-numeric:tabular-nums}
+.pgc-r.pgc-aberto{border-left-color:#DC2626}.pgc-r.pgc-parc{border-left-color:#F59E0B}.pgc-r.pgc-ok{border-left-color:#16A34A}
+.pgc-r:hover{background:color-mix(in srgb,var(--accent) 4%,transparent)}
+.pgc-h .n,.pgc-r .n{text-align:right}.pgc-mes{display:grid}.pgc-mes small{color:var(--muted);font-size:.74rem}
+.pgc-f.deve{color:#DC2626;font-weight:700}[data-theme=dark] .pgc-f.deve{color:#F87171}.pgc-cr{display:block;font-size:.7rem;color:#16A34A}
+.pgc-r .fic-st{font-style:normal;justify-self:start}
+.pgc-cs{display:flex;flex-wrap:wrap;gap:6px}
+.pgc-chip{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:2px;font-size:.78rem;font-weight:600;padding:5px 10px;border-radius:999px;border:1px solid color-mix(in srgb,#16A34A 45%,var(--line));background:color-mix(in srgb,#16A34A 9%,transparent);color:var(--ink);cursor:pointer;white-space:nowrap}
+.pgc-chip:hover{background:color-mix(in srgb,#16A34A 18%,transparent)}.pgc-chip:focus-visible,.pgc-ex:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pgc-chip .ic{color:#16A34A;margin-right:.3em}.pgc-chip.sem{cursor:default;border-style:dashed;border-color:var(--line);background:transparent;color:var(--muted)}
+.pgc-ex{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;font-size:.8rem;font-weight:600;padding:6px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));color:var(--accent);cursor:pointer;white-space:nowrap}
+.pgc-ex:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+@media(max-width:900px){.pgc-top{grid-template-columns:1fr}.pgc-h{display:none}
+  .pgc-r{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 10px;padding:14px}
+  .pgc-mes{grid-column:1/3}.pgc-r>span:nth-child(5){grid-column:3;grid-row:1;justify-self:end}
+  .pgc-r .n{text-align:left;display:grid}.pgc-r .n:before{content:attr(data-l);font-size:.7rem;color:var(--muted);font-weight:500}
+  .pgc-cs{grid-column:1/-1}.pgc-r>span:last-child{grid-column:1/-1}}
+.kc-cd{font-weight:inherit;font-variant-numeric:tabular-nums}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6802,7 +6824,12 @@ function kcPrazo(e){if(pdgFeito(e)||e.etapa==='Pronto'||e.status==='cancelado'||
   var I=pzInfo(o),ms=I.max-Date.now(),r=pzFmt(ms),d=Math.floor(Math.abs(ms)/864e5),t=d>=2?d+' dias':r.t;
   return {cls:r.neg?'atr':ms<864e5?'quase':'ok',t:r.neg?'Atrasado '+t:t,ate:cliDia(I.max,false),ord:I.max.getTime(),I:I};}
 function cliAtrasado(e){var p=cliSt(e)==='pend'?null:kcPrazo(e);return !!(p&&p.cls==='atr');}
-function kcPill(p){return '<span class="kc-pz kc-pz-'+p.cls+'">'+ic(p.cls==='atr'?'alerta':p.cls==='par'?'pausa':'relogio')+esc(p.t)+'</span>';}
+/* cronômetro regressivo: dias, horas e minutos até o fim do prazo (atualiza sozinho) */
+function kcConta(ms){var neg=ms<0;ms=Math.abs(ms);var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4),s2=Math.floor(ms%6e4/1e3),z=function(x){return ('0'+x).slice(-2);};
+  return (neg?'Atrasado ':'')+(d?d+'d '+z(h)+'h '+z(m)+'min':z(h)+'h '+z(m)+'min '+z(s2)+'s');}
+function kcPill(p){return '<span class="kc-pz kc-pz-'+p.cls+'">'+ic(p.cls==='atr'?'alerta':p.cls==='par'?'pausa':'relogio')+(p.ord>0?'<b class="kc-cd" data-cd="'+p.ord+'">'+kcConta(p.ord-Date.now())+'</b>':esc(p.t))+'</span>';}
+setInterval(function(){var L=document.querySelectorAll('[data-cd]');for(var i=0;i<L.length;i++){var ms=+L[i].getAttribute('data-cd')-Date.now(),t=kcConta(ms);if(L[i].textContent!==t)L[i].textContent=t;
+  var pz=L[i].parentNode;if(ms<0&&pz&&pz.classList&&!pz.classList.contains('kc-pz-atr')){pz.classList.remove('kc-pz-ok','kc-pz-quase');pz.classList.add('kc-pz-atr');}else if(ms>0&&ms<864e5&&pz&&pz.classList&&pz.classList.contains('kc-pz-ok')){pz.classList.remove('kc-pz-ok');pz.classList.add('kc-pz-quase');}}},1000);
 function cliBarra(i,cl){var n=CLI_ET.length,pc=Math.min(100,Math.round(Math.min(i+1,n)/n*1000)/10);return '<span class="cbar '+cl+(i>=n?' ok':'')+'" style="--p:'+pc+'%" aria-hidden="true">'+CLI_ET.map(function(){return '<i></i>';}).join('')+'</span>';}
 function cliChatBt(e){var k=chChaveCli(e),n=chNovas(k),tot=(CH.idx[chK(k)]||[]).length;
   return '<button class="btn sm ch-bt'+(n?' ch-novo':'')+'" data-ch="abre" data-k="'+esc(JSON.stringify(k))+'">'+ic('chat')+(tot?'Conversa':'Conversar')+(n?' <b>'+n+'</b>':'')+'</button>';}
@@ -7110,23 +7137,33 @@ function rLabsClinica(){if(!LP.d&&!LP.carregando)lpCarrega();var M=labVMeus(),n=
 
 /* ---------- Pagamentos e comprovantes: lista de tudo que foi pago, com comprovante e extrato de cada mês ---------- */
 var PGC={lab:'',ano:'todos'};
+function pgcChip(g){var t=cliDia(String(g.data).slice(0,10)+'T12:00:00',false)+' · '+fmtR(g.valor);
+  return g.comprovante?'<button class="pgc-chip" data-act="phArq" data-v="'+esc(g.comprovante)+'" title="Abrir comprovante">'+ic('clipe')+t+'</button>':'<span class="pgc-chip sem" title="Sem comprovante">'+t+'</span>';}
 function rPagClinica(){
   if(!cliDono())return '<div class="card lsub-v">Os pagamentos ficam só com o dono da empresa.</div>';
   if(!DFL.d&&!DFL.erro){dflCarrega();return '<div class="card lsub-v">Carregando…</div>';}
   if(DFL.erro)return '<div class="card lsub-v">Não consegui carregar agora. <button class="btn sm" data-act="dflRecarrega">Tentar de novo</button></div>';
-  var M=cliMeses(),labs={};M.forEach(function(m){labs[m.lab_id]=m.lab;});var P=[],X=[],anos=[];
-  M.forEach(function(m){if(PGC.lab&&m.lab_id!==PGC.lab)return;if(anos.indexOf(m.ano)<0)anos.push(m.ano);if(PGC.ano!=='todos'&&m.ano!==+PGC.ano)return;
-    (m.pagamentos||[]).forEach(function(g){P.push({g:g,m:m});});if(m.extrato)X.push(m);});
-  anos.sort(function(a,b){return b-a;});P.sort(function(a,b){return String(b.g.data)<String(a.g.data)?-1:1;});X.sort(function(a,b){return (b.ano*100+b.mes)-(a.ano*100+a.mes);});
-  var tot=P.reduce(function(s,x){return s+(+x.g.valor||0);},0),nc=P.filter(function(x){return x.g.comprovante;}).length;
-  var h='<div class="fic"><div class="fic-top"><div class="fic-k"><span>'+ic('check')+'Total pago</span><b>'+fmtR(tot)+'</b><small>'+P.length+' pagamento'+(P.length===1?'':'s')+'</small></div><div class="fic-k"><span>'+ic('clipe')+'Comprovantes</span><b>'+nc+'</b><small>de '+P.length+' pagamentos</small></div><div class="fic-k"><span>'+ic('doc')+'Extratos</span><b>'+X.length+'</b><small>meses com extrato</small></div></div>'+
+  var M=cliMeses(),labs={},anos=[];M.forEach(function(m){labs[m.lab_id]=m.lab;if(anos.indexOf(m.ano)<0)anos.push(m.ano);});anos.sort(function(a,b){return b-a;});
+  var nl=Object.keys(labs).length>1;
+  var L=M.filter(function(m){return (!PGC.lab||m.lab_id===PGC.lab)&&(PGC.ano==='todos'||m.ano===+PGC.ano)&&((+m.valor||0)>0.005||(m.pagamentos||[]).length||m.extrato);})
+    .sort(function(a,b){return (b.ano*100+b.mes)-(a.ano*100+a.mes);});
+  var tot=0,pg=0,fal=0,np=0,nc=0;L.forEach(function(m){tot+=+m.valor||0;pg+=+m.pago||0;fal+=+m.falta||0;(m.pagamentos||[]).forEach(function(g){np++;if(g.comprovante)nc++;});});
+  var ST={pago:['ok','Quitado'],parcial:['parc','Parcial'],aberto:['aberto','Nada pago'],zero:['zero','Sem valor']};
+  var h='<div class="fic"><div class="fic-top pgc-top">'+
+    '<div class="fic-k"><span>'+ic('moeda')+'Total dos meses</span><b>'+fmtR(tot)+'</b><small>'+L.length+' mes'+(L.length===1?'':'es')+'</small></div>'+
+    '<div class="fic-k"><span>'+ic('check')+'Pago</span><b>'+fmtR(pg)+'</b><small>'+np+' pagamento'+(np===1?'':'s')+' · '+nc+' com comprovante</small></div>'+
+    '<div class="fic-k '+(fal>0.005?'deve':'emdia')+'"><span>'+ic(fal>0.005?'alerta':'check')+'Falta pagar</span><b>'+(fal>0.005?fmtR(fal):'Tudo em dia')+'</b></div></div>'+
     '<div class="fic-f">'+(anos.length>1?'<div class="pdb-seg" role="group" aria-label="Ano"><button data-pgc="ano" data-v="todos" aria-pressed="'+(PGC.ano==='todos')+'">Todos</button>'+anos.map(function(a){return '<button data-pgc="ano" data-v="'+a+'" aria-pressed="'+(String(PGC.ano)===String(a))+'">'+a+'</button>';}).join('')+'</div>':'')+
-    (Object.keys(labs).length>1?'<select id="pgc-lab" aria-label="Laboratório"><option value="">Todos os laboratórios</option>'+Object.keys(labs).map(function(k){return '<option value="'+k+'"'+(k===PGC.lab?' selected':'')+'>'+esc(labs[k])+'</option>';}).join('')+'</select>':'')+'</div>';
-  h+='<div class="card"><h3>Pagamentos</h3>'+(P.length?'<div class="plx-tw"><table class="plx-t"><thead><tr><th>Data</th><th>Referente a</th><th class="n">Valor</th><th>Comprovante</th>'+(Object.keys(labs).length>1?'<th>Laboratório</th>':'')+'</tr></thead><tbody>'+
-    P.map(function(x){return '<tr><td>'+cliDia(String(x.g.data).slice(0,10)+'T12:00:00',4)+'</td><td>'+PMES[x.m.mes-1]+'/'+x.m.ano+'</td><td class="n"><b>'+fmtR(x.g.valor)+'</b></td><td>'+(x.g.comprovante?ficArq(x.g.comprovante,'Ver comprovante','clipe'):'<small class="muted">sem comprovante</small>')+'</td>'+(Object.keys(labs).length>1?'<td>'+esc(x.m.lab||'')+'</td>':'')+'</tr>';}).join('')+'</tbody></table></div>'+
-    '<div class="plx-cs">'+P.map(function(x){return '<div class="plx-c pgc-c"><span class="plx-c1"><b>'+fmtR(x.g.valor)+'</b><span>'+cliDia(String(x.g.data).slice(0,10)+'T12:00:00',4)+'</span></span><span class="plx-c2">Referente a '+PMES[x.m.mes-1]+'/'+x.m.ano+'</span>'+(x.g.comprovante?ficArq(x.g.comprovante,'Ver comprovante','clipe'):'<small class="muted">sem comprovante</small>')+'</div>';}).join('')+'</div>'
-    :'<p class="fic-nada">Nenhum pagamento lançado.</p>')+'</div>';
-  h+='<div class="card"><h3>Extratos do laboratório</h3>'+(X.length?'<div class="pgc-x">'+X.map(function(m){return '<div class="pgc-xi"><span><b>'+PMES[m.mes-1]+'/'+m.ano+'</b><small>'+esc(m.lab||'')+' · '+fmtR(m.valor)+'</small></span>'+ficArq(m.extrato,'Ver extrato','doc')+'</div>';}).join('')+'</div>':'<p class="fic-nada">Nenhum extrato anexado ainda.</p>')+'</div>';
+    (nl?'<select id="pgc-lab" aria-label="Laboratório"><option value="">Todos os laboratórios</option>'+Object.keys(labs).map(function(k){return '<option value="'+k+'"'+(k===PGC.lab?' selected':'')+'>'+esc(labs[k])+'</option>';}).join('')+'</select>':'')+'</div>';
+  if(!L.length)return h+'<div class="card lsub-v">O laboratório ainda não lançou nenhum mês.</div></div>';
+  h+='<div class="pgc-t" role="table" aria-label="Pagamentos por mês"><div class="pgc-h" role="row"><span>Mês</span><span class="n">Valor</span><span class="n">Pago</span><span class="n">Falta</span><span>Situação</span><span>Comprovantes</span><span>Extrato</span></div>'+
+    L.map(function(m){var st=ST[m.situacao]||ST.aberto,P=(m.pagamentos||[]).slice().sort(function(a,b){return String(a.data)<String(b.data)?-1:1;}),f=+m.falta||0;
+      return '<div class="pgc-r pgc-'+st[0]+'" role="row"><span class="pgc-mes"><b>'+PMES[m.mes-1]+'/'+m.ano+'</b>'+(nl?'<small>'+esc(m.lab||'')+'</small>':'')+'</span>'+
+        '<span class="n" data-l="Valor">'+fmtR(+m.valor||0)+'</span><span class="n" data-l="Pago">'+fmtR(+m.pago||0)+(+m.credito>0.005?'<small class="pgc-cr">+ '+fmtR(m.credito)+' de crédito</small>':'')+'</span>'+
+        '<span class="n pgc-f'+(f>0.005?' deve':'')+'" data-l="Falta">'+(f>0.005?fmtR(f):'—')+'</span>'+
+        '<span><i class="fic-st '+st[0]+'">'+st[1]+'</i></span>'+
+        '<span class="pgc-cs">'+(P.length?P.map(pgcChip).join(''):'<small class="muted">nenhum pagamento</small>')+'</span>'+
+        '<span>'+(m.extrato?'<button class="pgc-ex" data-act="phArq" data-v="'+esc(m.extrato)+'">'+ic('doc')+'Extrato</button>':'<small class="muted">sem extrato</small>')+'</span></div>';}).join('')+'</div>';
   return h+'</div>';}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-pgc]');if(!b)return;PGC.ano=b.getAttribute('data-v');render();});
 document.addEventListener('change',function(e){if(e.target&&e.target.id==='pgc-lab'){PGC.lab=e.target.value;render();}});

@@ -92,7 +92,7 @@ for(const [nm,opt,modo,dados] of [
    if(modo==='func'){ok(abas==='ped,ent,labs',nm+': funcionária não tem Financeiro nem Pagamentos');
      await p.evaluate(()=>{S.labSub='fin';render();});await p.waitForTimeout(300);ok(!/R\$/.test(await p.$eval('body',x=>x.innerText)),nm+': forçar o Financeiro não mostra nenhum valor');}
    else{ok(abas==='ped,ent,fin,pag,labs',nm+': abas Em andamento · Entregues · Financeiro · Pagamentos e comprovantes · Laboratórios');
-     await p.click('.lsub [data-v=pag]');await p.waitForTimeout(400);const pg=await p.$eval('.fic',x=>x.innerText);ok(/Pagamentos/.test(pg)&&/Ver comprovante/.test(pg)&&/Extratos do laboratório/.test(pg),nm+': Pagamentos e comprovantes lista os pagamentos com comprovante e os extratos');await p.screenshot({path:path.join(SAIDA,nm+'-7-pagamentos.png'),fullPage:true});
+     await p.evaluate(()=>ACT.labSub('pag'));await p.waitForTimeout(400);const pg=await p.$eval('.fic',x=>x.innerText);ok(/Falta pagar/.test(pg)&&(await p.$$eval('.pgc-chip[data-act=phArq]',x=>x.length))===3&&(await p.$$eval('.pgc-ex',x=>x.length))===2,nm+': Pagamentos e comprovantes lista os pagamentos com comprovante e os extratos'+(process.env.DBG?' >> '+pg.slice(0,300)+' chips='+(await p.$$eval('.pgc-chip',x=>x.length)):''));await p.screenshot({path:path.join(SAIDA,nm+'-7-pagamentos.png'),fullPage:true});
      await p.click('.lsub [data-v=fin]');await p.waitForTimeout(500);
      const F=await p.$eval('.fic',x=>x.innerText),br=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2}).replace(/\s/g,' ');
      const M=dados.meses,falta=M.reduce((s,m)=>s+m.falta,0),pago=M.filter(m=>m.ano===2026).reduce((s,m)=>s+m.pago,0);
