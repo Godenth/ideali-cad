@@ -1684,6 +1684,21 @@ body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
 .kc-open .cx-g{grid-template-columns:1fr}
 @media(max-width:900px){.kb{display:flex;flex-direction:column;align-items:stretch}.kb>.kb-col{width:100%;box-sizing:border-box;max-width:none}.kb-pend{order:-2}.kb-apr{order:-1}.kb-col:has(.kb-vz){padding:8px 10px}.kb-col:has(.kb-vz)>header{padding:2px 4px}.kb-col .kb-vz{display:none}}
 .ab-tema{display:grid;place-items:center;cursor:pointer}.ab-tema:hover{border-color:var(--accent)}
+
+.kc-mais{all:unset;cursor:pointer;margin-left:auto;font-size:.78rem;font-weight:700;color:var(--muted);padding:5px 6px}.kc-mais:hover{color:var(--ink)}.kc-can+.kc-mais{margin-left:0}
+.kc-det{display:grid;gap:10px;margin:2px 12px 4px 16px;padding-top:10px;border-top:1px dashed var(--line)}
+.kc-step{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;position:relative}
+.kc-step li{display:grid;justify-items:center;gap:4px;text-align:center;font-size:.7rem;color:var(--muted);position:relative}
+.kc-step li:before{content:"";position:absolute;top:11px;left:-50%;right:50%;height:2px;background:var(--line);z-index:0}.kc-step li:first-child:before{content:none}
+.kc-step li.f:before,.kc-step li.a:before{background:var(--cx)}
+.kc-step i{position:relative;z-index:1;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:.7rem;background:var(--soft);border:2px solid var(--line);color:var(--muted)}
+.kc-step li.f i{background:var(--cx);border-color:var(--cx);color:#fff}.kc-step li.a i{background:var(--surface);border-color:var(--cx);color:var(--cx);box-shadow:0 0 0 3px color-mix(in srgb,var(--cx) 22%,transparent)}.kc-step li.a span{color:var(--cx);font-weight:700}
+.kc-ficha{display:grid;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.kc-ficha>div{display:flex;gap:10px;padding:7px 10px;font-size:.84rem}.kc-ficha>div+div{border-top:1px solid var(--line)}.kc-ficha span{flex:0 0 92px;color:var(--muted);font-size:.76rem;padding-top:1px}.kc-ficha b{flex:1;min-width:0;font-weight:600;color:var(--ink);overflow-wrap:anywhere}
+.kc-arco{display:flex;justify-content:center;padding:2px 0}.kc-arco svg{width:min(240px,100%);height:auto}.kc-arco rect{fill:none;stroke:var(--line);stroke-width:1}.kc-arco rect.on{fill:var(--cx);stroke:var(--cx)}
+.kc-mot{margin:0;color:#DC2626;font-size:.84rem}
+.kc-det .pdg-arq{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0}.kc-det .pend{margin:0}
+.kc-det .pend{background:color-mix(in srgb,#DC2626 9%,var(--surface));color:var(--ink);border-width:1px}.kc-det .pend p{color:var(--ink)}.kc-det .pend textarea{background:var(--surface);color:var(--ink)}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5849,7 +5864,7 @@ var _rDLabTabSub=rDLabTab;rDLabTab=function(D){if(!RL.user)return _rDLabTabSub(D
   if(sub==='feitos'){PDG.f={feito:true};var envF=pdgEnviadosHtml();PDG.f=null;
     return h+pdgMesBar(true)+(envF?envF.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>',''):'<div class="card lsub-v">'+(pdgMesSel()==='todos'?'Nenhum pedido finalizado ainda.':'Nenhum pedido finalizado em '+pdgMesNome(pdgMesSel())+'.')+'</div>');}
   if(sub==='ped'){PDG.f={feito:false};var env=pdgEnviadosHtml();PDG.f=null;if(env)env=pdgKanban();var outros=pdgMesSel()!=='todos'?pdgMeus().filter(function(e){return !pdgFeito(e)&&pdgMesDe(e)!==pdgMesSel();}).length:0;
-    if(env)h+='<div class="kb-topo"><span><b>'+nEnv+'</b> em andamento</span><small>Do prazo mais apertado para o mais folgado · toque num pedido para ver a ficha</small></div>';
+    if(env)h+='<div class="kb-topo"><span><b>'+nEnv+'</b> em andamento</span><small>Do prazo mais apertado para o mais folgado · toque num pedido para ver os detalhes</small></div>';
     if(!con&&!env)return h+'<div class="card lsub-v">Você ainda não tem laboratório conectado. <button class="btn sm pri" data-act="labSub" data-v="labs">Conectar um laboratório</button></div>';
     return h+(env?env.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>',''):(pdgMeus().some(function(e){return !pdgFeito(e);})?'<div class="card lsub-v">Nenhum pedido em andamento.</div>':'<div class="card lsub-v">Nenhum pedido em andamento. <button class="btn sm pri" data-act="pdgNovo">📤 Fazer um pedido</button></div>'));}
   if(sub==='fin'){var f=typeof rDFinLab==='function'?rDFinLab():'';return h+f.replace(/<div class="dtop"><div><h2>💰 Financeiro<\/h2>/,'<div class="dtop"><div>');}
@@ -6507,29 +6522,37 @@ var KC_ETI={'Desenho CAD':0,'Desenhado':1,'Enviado para fresagem':2,'Em produç�
 function kcPrazo(e){if(e.status==='cancelado'||e.status==='recusado')return null;var o=pzDoEnvio(e);if(!o.inicio)return null;
   if(o.parado)return {cls:'par',t:'Prazo parado',ate:'',ord:-1};var I=pzInfo(o),ms=I.max-Date.now(),r=pzFmt(ms);
   return {cls:r.neg?'atr':ms<864e5?'quase':'ok',t:r.neg?'Atrasado '+r.t:r.t,ate:('0'+I.max.getDate()).slice(-2)+'/'+('0'+(I.max.getMonth()+1)).slice(-2),ord:I.max.getTime()};}
-function kcCard(e){var et=cxEtapa(e),cor=CX_COR[et[0]]||'#2563EB',ds=cxDentes(e),col=pdgCol(e),pz=kcPrazo(e),nl=Object.keys(PDG.labNome||{}).length,lab=(PDG.labNome&&PDG.labNome[e.lab_id])||e.lab_nome||'';
+function kcCard(e,ab){var et=cxEtapa(e),cor=CX_COR[et[0]]||'#2563EB',ds=cxDentes(e),col=pdgCol(e),pz=kcPrazo(e),nl=Object.keys(PDG.labNome||{}).length,lab=(PDG.labNome&&PDG.labNome[e.lab_id])||e.lab_nome||'';
   var tr=(e.itens||[]).map(function(it){return it.trabalho;}).filter(Boolean).join(' + ')||'Pedido',aj=(e.itens||[]).some(function(it){return it.ajuste;}),na=(e.arquivos||[]).length;
   var i=KC_ETI[e.etapa||'Desenho CAD'];if(i==null)i=0;var etTxt=col==='apr'?'Aguardando o laboratório aceitar':col==='pend'?'Laboratório precisa de você':PDG_ETAPAS_CLI[i][1]==='Enviado'?'Enviado':(PDG_ETAPAS_CLI[i][1]==='Fresagem'?'Na fresagem':PDG_ETAPAS_CLI[i][1]==='Desenho'?'No desenho':PDG_ETAPAS_CLI[i][1]);
   var bar=col==='prod'?'<div class="kc-bar" aria-hidden="true">'+PDG_ETAPAS_CLI.map(function(x,k){return '<i class="'+(k<i?'f':k===i?'a':'')+'"></i>';}).join('')+'</div>':'';
   var d=new Date(e.enviado_em||e.criado_em);
   return '<article class="kc kc-c-'+col+'" style="--cx:'+cor+'">'+
-    '<button type="button" class="kc-main" data-kc="'+esc(String(e.id))+'" aria-expanded="false" aria-label="Abrir ficha de '+esc(e.paciente||'pedido')+'">'+
+    '<button type="button" class="kc-main" data-kc="'+esc(String(e.id))+'" aria-expanded="'+!!ab+'" aria-label="'+(ab?'Fechar':'Abrir')+' detalhes de '+esc(e.paciente||'pedido')+'">'+
       '<div class="kc-top"><b class="kc-pac">'+esc(e.paciente||'Sem nome')+'</b>'+(pz?'<span class="kc-pz kc-pz-'+pz.cls+'">'+(pz.cls==='par'?'':pz.cls==='atr'?'⚠️ ':'⏳ ')+esc(pz.t)+'</span>':'')+'</div>'+
       '<div class="kc-tr">'+(aj?'<span class="kc-aj">🔁 Ajuste</span> ':'')+esc(tr)+'</div>'+
       '<div class="kc-tags">'+(ds.length?'<span>🦷 '+ds.join(', ')+'</span>':'')+(e.cor?'<span>🎨 '+esc(e.cor)+'</span>':'')+(na?'<span>📎 '+na+'</span>':'')+(nl>1&&lab?'<span>🧪 '+esc(lab)+'</span>':'')+'</div>'+
       '<div class="kc-et">'+bar+'<small><b>'+esc(etTxt)+'</b>'+(pz&&pz.ate?' · até '+pz.ate:'')+' · enviado '+('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'</small></div>'+
     '</button>'+
-    (col==='pend'?'<div class="kc-pend"><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p>'+(e.resposta?'<small>Você respondeu: '+esc(e.resposta)+'</small>':'')+'</div>':'')+
-    '<div class="kc-pe">'+(col==='pend'?'<button class="btn sm pri" data-kc="'+esc(String(e.id))+'">Responder</button>':'')+chBotao(chChaveCli(e),true)+(e.status==='enviado'?'<button class="btn sm kc-can" data-act="pdgCancela" data-v="'+e.id+'">Cancelar</button>':'')+'</div></article>';}
+    (ab?kcDet(e,ds,tr,lab,pz,i,col):'')+(col==='pend'&&!ab?'<div class="kc-pend"><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p>'+(e.resposta?'<small>Você respondeu: '+esc(e.resposta)+'</small>':'')+'</div>':'')+
+    '<div class="kc-pe">'+(col==='pend'&&!ab?'<button class="btn sm pri" data-kc="'+esc(String(e.id))+'">Responder</button>':'')+chBotao(chChaveCli(e),true)+(e.status==='enviado'?'<button class="btn sm kc-can" data-act="pdgCancela" data-v="'+e.id+'">Cancelar</button>':'')+'<button type="button" class="kc-mais" data-kc="'+esc(String(e.id))+'">'+(ab?'▲ Menos':'▼ Detalhes')+'</button></div></article>';}
+function kcDet(e,ds,tr,lab,pz,i,col){var d=new Date(e.enviado_em||e.criado_em),L=function(r,v){return v?'<div><span>'+r+'</span><b>'+v+'</b></div>':'';};
+  var I=null;try{var o=pzDoEnvio(e);if(o.inicio&&!o.parado)I=pzInfo(o);}catch(x){}
+  var dm=function(x){return ('0'+x.getDate()).slice(-2)+'/'+('0'+(x.getMonth()+1)).slice(-2)+'/'+x.getFullYear();};
+  var step=col==='prod'?'<ol class="kc-step">'+PDG_ETAPAS_CLI.map(function(x,k){return '<li class="'+(k<i?'f':k===i?'a':'')+'"><i>'+(k<i?'✓':k+1)+'</i><span>'+x[1]+'</span></li>';}).join('')+'</ol>':'';
+  return '<div class="kc-det">'+step+
+    '<div class="kc-ficha">'+L('Paciente',esc(e.paciente||''))+L('Trabalho',esc(tr))+((e.itens||[]).some(function(it){return it.ajuste;})?L('Tipo','🔁 Ajuste / refação'):'')+L('Dentes',ds.join(', '))+L('Cor',esc(e.cor||''))+L('Enviado em',dm(d))+
+      (I?L('Previsão',(I.min.getTime()===I.max.getTime()?'':dm(I.min).slice(0,5)+' a ')+dm(I.max).slice(0,5)+' · '+(I.f[0]===I.f[1]?I.f[0]:I.f[0]+' a '+I.f[1])+' dias úteis'):'')+L('Laboratório',esc(lab))+'</div>'+
+    (ds.length?'<div class="kc-arco">'+cxMiniArco(ds)+'</div>':'')+
+    (e.status==='recusado'&&e.motivo?'<p class="kc-mot">Motivo: '+esc(e.motivo)+'</p>':'')+
+    pendHtml(e)+pdgArqsHtml(e)+'</div>';}
 var _pdgEnvKC=pdgEnviadosHtml;pdgEnviadosHtml=function(){var f=PDG.f;if(!f||f.feito!==false||!f.col||f.only)return _pdgEnvKC.apply(this,arguments);
   var M=pdgFiltra(pdgMeus());if(!M.length)return '';
   M=M.slice().sort(function(a,b){var x=kcPrazo(a),y=kcPrazo(b);return (x?x.ord:9e15)-(y?y.ord:9e15);});
-  return '<div class="kc-l">'+M.map(function(e){if(String(PDG.abre)!==String(e.id))return kcCard(e);
-    PDG.f=Object.assign({},f,{only:e.id});var full=_pdgEnvKC.apply(this,arguments)||'';PDG.f=f;
-    return '<div class="kc-open"><button type="button" class="kc-fecha" data-kc="'+esc(String(e.id))+'" aria-expanded="true">▲ Recolher ficha</button>'+full.replace('<h3 style="margin:22px 0 10px">📤 Pedidos enviados</h3>','')+'</div>';}).join('')+'</div>';};
+  return '<div class="kc-l">'+M.map(function(e){return kcCard(e,String(PDG.abre)===String(e.id));}).join('')+'</div>';};
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-kc]');if(!b)return;var id=b.getAttribute('data-kc');PDG.abre=String(PDG.abre)===id?null:id;
   if(PDG.abre&&b.textContent==='Responder'&&typeof PEND!=='undefined')PEND.aberto=isNaN(+id)?id:id;render();
-  setTimeout(function(){var el=document.querySelector('.kc-open');if(el&&PDG.abre){var r=el.getBoundingClientRect();if(r.top<70||r.top>innerHeight-120)el.scrollIntoView({block:'start',behavior:'smooth'});}},30);});
+  setTimeout(function(){var el=document.querySelector('.kc-det');if(el)el=el.closest('.kc');if(el&&PDG.abre){var r=el.getBoundingClientRect();if(r.top<70||r.top>innerHeight-120)el.scrollIntoView({block:'start',behavior:'smooth'});}},30);});
 
 ACT.temaTroca=function(){var n=temaEscuro()?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('io_tema',n);}catch(e){}render();};
 
