@@ -49,14 +49,16 @@ for(const [nm,opt,modo,dados] of [
    ok((await chip('and'))===7,nm+': 7 em andamento (5 lançados pelo laboratório + 2 enviados pelo sistema)');
    ok((await chip('atr'))===0,nm+': 0 atrasados → os 29 antigos arquivados NÃO aparecem mais como atrasados');
    ok((await chip('pend'))===1,nm+': 1 pendência');
-   ok((await chip('apr'))===1,nm+': 1 aguardando aprovação');
+   ok((await chip('rcb'))+(await chip('prd'))+(await chip('pto'))===7,nm+': Recebido + Produção + Pronto = 7 em andamento');
+   ok((await p.$$eval('.kb-col header b',x=>x.map(y=>y.innerText.trim()).join('|')))==='Recebido|Produção|Pronto',nm+': quadro com as 3 etapas: Recebido · Produção · Pronto');
+   ok((await p.$$eval('.kb-rcb .kc',x=>x.some(y=>/Aguardando o laboratório aceitar/.test(y.innerText)))),nm+': pedido esperando aprovação fica em Recebido');
    ok(+(await p.$eval('.lsub [data-v=ent] .lsub-n',x=>x.textContent))===179,nm+': aba Entregues com 179');
    ok((await chip('tudo'))===187,nm+': 187 no total (184 + 3 envios; o apagado ficou de fora)');
    await larg('Pedidos (quadro)');await p.screenshot({path:path.join(SAIDA,nm+'-1-quadro.png')});
    // botão Recebi: só em pedido que o laboratório já aceitou
-   const rc=await p.evaluate(()=>({n:document.querySelectorAll('.kb-prod .kc-rcb').length,prod:document.querySelectorAll('.kb-prod .kc').length,apr:document.querySelectorAll('.kb-apr .kc-rcb').length}));
+   const rc=await p.evaluate(()=>({n:document.querySelectorAll('.kb .kc-rcb').length,prod:document.querySelectorAll('.kb .kc').length-[...document.querySelectorAll('.kb .kc')].filter(y=>/Aguardando o laboratório aceitar/.test(y.innerText)).length,apr:[...document.querySelectorAll('.kb .kc')].filter(y=>/Aguardando o laboratório aceitar/.test(y.innerText)&&y.querySelector('.kc-rcb')).length}));
    ok(rc.n===rc.prod&&rc.n>0&&rc.apr===0,nm+': "Recebi" aparece nos '+rc.prod+' em produção e não aparece no que o laboratório ainda não aceitou');
-   p.once('dialog',d=>d.accept());const idR=await p.$eval('.kb-prod .kc-rcb',x=>x.getAttribute('data-v'));await p.click('.kb-prod .kc-rcb');await p.waitForTimeout(500);
+   p.once('dialog',d=>d.accept());const idR=await p.$eval('.kb .kc-rcb',x=>x.getAttribute('data-v'));await p.click('.kb .kc-rcb');await p.waitForTimeout(500);
    ok((await p.evaluate(i=>RECEBI.length===1&&RECEBI[0]===i,idR)),nm+': clicar em "Recebi" manda a confirmação desse pedido para o banco');
    // lista: prazo vem do banco
    await p.click('[data-plx=vis][data-v=lista]');await p.waitForTimeout(300);
