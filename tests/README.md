@@ -10,3 +10,14 @@ node tests/clinica-pedidos.teste.js     # clínica: filtros, busca, Por mês, de
 ```
 
 O que conferem: nenhum erro de JavaScript, a página não estoura a largura no celular, contagens dos filtros, busca, abrir/fechar o detalhe, responder pendência.
+
+## Fonte única (atualização 074)
+
+```bash
+# banco: regras de segurança, etapa, prazo (precisa de um Postgres de TESTE com as migrações e auth.uid() lendo t.uid)
+psql -v ON_ERROR_STOP=1 -f tests/sql/074_fonte_unica.teste.sql
+# gera de novo o exemplo usado nas telas (resposta real da função do banco)
+psql -v ON_ERROR_STOP=1 -f tests/sql/gera_exemplo_clinica.sql
+# telas: dona (computador e celular), funcionária e banco ainda sem a 074
+node tests/clinica-fonte-unica.teste.js
+```

@@ -1793,6 +1793,7 @@ body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
  .plx{gap:10px;margin-top:8px}}
 @media(hover:none){.plx-s:hover{border-color:var(--line)}.plx-s[aria-selected=true]:hover{border-color:var(--accent)}}
 .pdb-hb{align-content:start}.pdb-g2>.card{align-content:start}
+.kc-partes{display:grid;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.84rem}.kc-partes>b{padding:7px 10px;font-size:.76rem;color:var(--muted);font-weight:600;background:var(--soft)}.kc-partes>div{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;border-top:1px solid var(--line)}.kc-partes em{font-style:normal;font-weight:700;white-space:nowrap}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5925,7 +5926,12 @@ function cxMiniArco(ds){var f=function(L,y,dir){return L.map(function(n,i){var x
 
 /* ===== Clínica: aba Financeiro (trabalhos enviados aos laboratórios e quanto custou, pela tabela do laboratório) ===== */
 var DFL={d:null,carregando:false,erro:'',mes:null,lab:''};
-function dflCarrega(){if(!RL.user||DFL.carregando)return;DFL.carregando=true;SB.rpc('odo_clinica_fin').then(function(r){DFL.carregando=false;
+function dflCarrega(){if(!RL.user||DFL.carregando)return;
+  if(typeof UNI!=='undefined'&&UNI.ok===true){if(!DFL.d)pdgCarrega();return;}   /* 074: vem junto com os pedidos */
+  if(typeof UNI!=='undefined'&&UNI.ok===null){   /* ainda não sabe se o banco tem a 074: espera a carga dos pedidos responder */
+    if(!UNI.pedindo){UNI.pedindo=true;var fim=function(){UNI.pedindo=false;if(UNI.ok===true)return;if(UNI.ok===null)UNI.ok=false;if(!DFL.d&&!DFL.erro)dflCarrega();};Promise.resolve(UNI.voando||pdgCarrega()).then(fim,fim);}
+    return;}
+  DFL.carregando=true;SB.rpc('odo_clinica_fin').then(function(r){DFL.carregando=false;if(typeof UNI!=='undefined'&&UNI.ok===true)return;
   if(r.error){DFL.erro=/odo_clinica_fin|function|schema cache/.test(r.error.message||'')?'falta061':'erro';render();return;}DFL.erro='';DFL.d=r.data||{pedidos:[],meses:[]};render();});}
 function dflMesDe(p){return String(p.criado||'').slice(0,7);}
 var DFL_ET={desenho:'Desenho CAD',aguardando:'Aguardando',producao:'Em produção',finalizado:'Pronto',entregue:'Entregue',cancelado:'Cancelado'};
@@ -6218,11 +6224,38 @@ function plabLinhas(){var u=RL.user&&contaId();return PLAB.L.map(function(p){var
   return {id:'lab-'+p.id,user_id:u,lab_id:p.lab_id,lab_nome:p.lab_nome,paciente:p.paciente,itens:[{trabalho:tr+(mat&&semAc(tr).replace(/[^a-z0-9]/g,'').indexOf(semAc(mat).replace(/[^a-z0-9]/g,''))<0?' · '+mat:''),dentes:p.dentes||[],material:mat}],cor:p.cor,prazo:p.prazo,urgente:p.urgente,status:'aceito',etapa:p.etapa,criado_em:p.criado_em,enviado_em:p.criado_em,arquivos:[],importado:true};});}
 function plabJunta(){PDG.L=PDG.L.filter(function(e){return !e.importado;});if(!PLAB.L.length)return;PDG.labNome=PDG.labNome||{};PLAB.L.forEach(function(p){if(!PDG.labNome[p.lab_id])PDG.labNome[p.lab_id]=p.lab_nome;});
   PDG.L=PDG.L.concat(plabLinhas()).sort(function(a,b){return String(b.criado_em).localeCompare(String(a.criado_em));});}
-var _pdgCarregaPLAB=pdgCarrega;pdgCarrega=function(){var r0=_pdgCarregaPLAB.apply(this,arguments);if(!RL.user||PLAB.falta)return r0;
-  return Promise.resolve(r0).then(function(){return SB.rpc('odo_clinica_pedidos_lab');}).then(function(r){if(r.error){if(/odo_clinica_pedidos_lab|does not exist|schema cache/.test(r.error.message||''))PLAB.falta=true;return;}
-    var novo=!PLAB.L.length;PLAB.L=r.data||[];plabJunta();
-    try{var V=etVistos()||{},mudou=false;if(etVistos())plabLinhas().forEach(function(e){if(!(e.id in V)){V[e.id]=etChave(e);mudou=true;}});if(mudou)etGuarda(V);etConfere();}catch(x){}
-    render();});};
+/* ===== Fonte única (074): a clínica lê tudo numa chamada só; etapa, prazo e valor já vêm prontos do banco ===== */
+var UNI={ok:null,dono:true,n:0};
+function uniEtapaTxt(et){return et==='Enviado para fresagem'?'Na fresagem':et==='Desenho CAD'?'No desenho':et==='Aguardando informação'?'Pendência':(et||'—');}
+function uniTrab(p){var mat=p.material||'',tr=(p.trabalho||'Trabalho')+(p.sobre_implante&&!/implante/i.test(p.trabalho||'')?' sobre implante':'');
+  return tr+(mat&&semAc(tr).replace(/[^a-z0-9]/g,'').indexOf(semAc(mat).replace(/[^a-z0-9]/g,''))<0?' · '+mat:'');}
+function uniFin(p,envio,lab_id,lab){return {id:p.id,envio:envio,lab_id:lab_id,lab:lab,paciente:p.paciente,trabalho:p.trabalho,material:p.material,dentes:p.dentes||[],qtd:p.qtd,valor:p.valor==null?null:+p.valor,
+  status:p.etapa==='Entregue'?'entregue':p.etapa==='Pronto'?'finalizado':p.status,enviado_inove:p.enviado_inove,cor:p.cor,criado:p.criado_em,finalizado:p.finalizado_em,entregue:p.entregue_em,etapa:p.etapa,aberto:p.aberto};}
+function uniAplica(d){var u=RL.user&&contaId();UNI.dono=d.dono!==false;PDG.labNome=PDG.labNome||{};
+  var env=(d.envios||[]).map(function(e){e._uni=true;if(e.lab_nome)PDG.labNome[e.lab_id]=e.lab_nome;return e;});
+  var lab=(d.pedidos||[]).map(function(p){if(p.lab_nome)PDG.labNome[p.lab_id]=p.lab_nome;
+    return {id:'lab-'+p.id,user_id:u,lab_id:p.lab_id,lab_nome:p.lab_nome,numero:p.numero,paciente:p.paciente,itens:[{trabalho:uniTrab(p),dentes:p.dentes||[],material:p.material||''}],cor:p.cor,urgente:p.urgente,
+      status:'aceito',etapa:p.etapa,etapa_em:p.entregue_em||p.finalizado_em||p.atualizado_em,falta_info:p.falta_info,parado:p.parado,aberto:p.aberto,prazo_min:p.prazo_min,prazo_max:p.prazo_max,faixa:p.faixa,
+      criado_em:p.criado_em,enviado_em:p.criado_em,arquivos:[],importado:true,_uni:true};});
+  /* fica o que este usuário RECEBEU como laboratório; o que é dele como clínica vem todo da leitura única */
+  PDG.L=PDG.L.filter(function(e){return e.user_id!==u&&!e.importado;}).concat(env,lab).sort(function(a,b){return String(b.criado_em).localeCompare(String(a.criado_em));});
+  var flat=[];env.forEach(function(e){(e.partes||[]).forEach(function(p){flat.push(uniFin(p,e.id,e.lab_id,e.lab_nome));});});(d.pedidos||[]).forEach(function(p){flat.push(uniFin(p,null,p.lab_id,p.lab_nome));});
+  flat.sort(function(a,b){return String(b.criado).localeCompare(String(a.criado));});
+  DFL.d={pedidos:flat,meses:d.meses||[]};DFL.erro='';DFL.carregando=false;return lab;}
+function uniVistos(L){try{var V=etVistos()||{},mudou=false;if(etVistos())L.forEach(function(e){if(!(e.id in V)){V[e.id]=etChave(e);mudou=true;}});if(mudou)etGuarda(V);etConfere();}catch(x){}}
+var _pdgCarregaPLAB=pdgCarrega;pdgCarrega=function(){var r0=_pdgCarregaPLAB.apply(this,arguments);if(!RL.user)return r0;
+  var pr=Promise.resolve(r0).then(function(){
+    if(UNI.ok===false&&(++UNI.n%10))return null;                       /* banco sem a 074: tenta de novo de vez em quando */
+    return SB.rpc('odo_clinica_pedidos');
+  }).then(function(r){var d=r&&!r.error?r.data:null;
+    if(d&&typeof d==='object'&&Array.isArray(d.envios)&&Array.isArray(d.pedidos)){UNI.ok=true;uniVistos(uniAplica(d));render();return;}
+    if(r&&r.error){if(/odo_clinica_pedidos|PGRST202|schema cache|does not exist/i.test((r.error.code||'')+' '+(r.error.message||'')))UNI.ok=false;else if(UNI.ok===true)return;}  /* erro passageiro: fica com o que tinha */
+    else if(r&&UNI.ok!==true)UNI.ok=false;
+    /* caminho antigo (antes da 074) */
+    if(PLAB.falta)return;
+    return SB.rpc('odo_clinica_pedidos_lab').then(function(r){if(r.error){if(/odo_clinica_pedidos_lab|does not exist|schema cache/.test(r.error.message||''))PLAB.falta=true;return;}
+      PLAB.L=r.data||[];plabJunta();uniVistos(plabLinhas());render();});});
+  UNI.voando=pr;var solta=function(){if(UNI.voando===pr)UNI.voando=null;};pr.then(solta,solta);return pr;};
 /* laboratório: diz qual cliente seu é a clínica conectada */
 var _labVRecebidosPLAB=labVRecebidos;labVRecebidos=function(){var h=_labVRecebidosPLAB.apply(this,arguments);if(!h)return h;var C=(EMP.cli||[]).slice().sort(function(a,b){return a.nome.localeCompare(b.nome);});
   labVRec().filter(function(v){return v.status==='aceito';}).forEach(function(v){var sel='<label class="plab-cli"><span>É o seu cliente:</span><select data-plabv="'+v.id+'"><option value="">— escolha —</option>'+C.map(function(c){return '<option value="'+c.id+'"'+(v.cliente_id===c.id?' selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select>'+(v.cliente_id?'<small>✓ os pedidos desse cliente aparecem para a clínica</small>':'<small>Escolha para a clínica ver os pedidos que você já lançou para ela.</small>')+'</label>';
@@ -6365,7 +6398,9 @@ function pzUtil(d){var w=d.getDay();return w!==0&&w!==6&&PZ_FER.indexOf(pzK(d))<
 function pzFaixa(txt){txt=semAc(String(txt||'')).toLowerCase();if(/protocolo/.test(txt))return [10,10];if(/metalo|metal ?ceram|porcelana sobre metal/.test(txt))return [7,10];return [5,7];}
 function pzPrimeiroDia(ini){var d=new Date(ini);var conta=pzUtil(d)&&d.getHours()<13;d.setHours(0,0,0,0);if(!conta){do{d.setDate(d.getDate()+1);}while(!pzUtil(d));}return d;}
 function pzDia(ini,n){var d=pzPrimeiroDia(ini),k=1;while(k<n){d.setDate(d.getDate()+1);if(pzUtil(d))k++;}d.setHours(18,0,0,0);return d;}
-function pzInfo(o){/* o: {inicio, txt, etapa, parado, falta} */var F=pzFaixa(o.txt),min=pzDia(o.inicio,F[0]),max=pzDia(o.inicio,F[1]);return {f:F,min:min,max:max};}
+function pzInfo(o){/* o: {inicio, txt, etapa, parado, falta, db} · db = datas já calculadas pelo banco (074) */var F=pzFaixa(o.txt);
+  if(o.db&&o.db.max){var D=function(s){return new Date(String(s).slice(0,10)+'T18:00:00-03:00');};return {f:(o.db.f&&o.db.f.length===2)?o.db.f:F,min:D(o.db.min||o.db.max),max:D(o.db.max)};}
+  var min=pzDia(o.inicio,F[0]),max=pzDia(o.inicio,F[1]);return {f:F,min:min,max:max};}
 function pzFmt(ms){var neg=ms<0;ms=Math.abs(ms);var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),mi=Math.floor(ms%36e5/6e4);return {neg:neg,t:(d?d+'d ':'')+('0'+h).slice(-2)+'h'+(d?'':' '+('0'+mi).slice(-2)+'min')};}
 function pzHtml(o){if(!o||!o.inicio)return '';if(o.feito)return '';
   if(o.parado)return '<div class="pz pz-par"><b>⏸ Prazo parado</b><span>'+(o.falta?'Falta: '+esc(o.falta):'Aguardando informação')+'</span><small>O prazo recomeça do zero quando a informação chegar.</small></div>';
@@ -6375,7 +6410,7 @@ function pzHtml(o){if(!o||!o.inicio)return '';if(o.feito)return '';
 setInterval(function(){[].forEach.call(document.querySelectorAll('[data-pz]'),function(el){var r=pzFmt(+el.getAttribute('data-pz')-Date.now()),t=el.querySelector('.pz-t');if(t)t.textContent=r.neg?'⚠️ Atrasado '+r.t:'⏳ '+r.t;if(r.neg)el.classList.add('pz-atr');});},30000);
 /* clínica: na prancheta */
 function pzDoEnvio(e){var tr=(e.itens||[]).map(function(it){return [it.trabalho,it.material].filter(Boolean).join(' ');}).join(' ');var et=e.etapa||'';
-  return {inicio:e.prazo_inicio||e.enviado_em||e.criado_em,txt:tr,feito:pdgFeito(e),parado:et==='Aguardando informação',falta:e.falta_info};}
+  return {inicio:e.prazo_inicio||e.enviado_em||e.criado_em,txt:tr,feito:pdgFeito(e),parado:et==='Aguardando informação',falta:e.falta_info,db:e._uni&&e.prazo_max?{min:e.prazo_min,max:e.prazo_max,f:e.faixa}:null};}
 var _pdgEnvPZ=pdgEnviadosHtml;pdgEnviadosHtml=function(){var h=_pdgEnvPZ.apply(this,arguments);if(!h)return h;var M=pdgFiltra(pdgMeus()).slice(0,60),i=0;
   return h.replace(/<div class="cx-front">/g,function(x){var e=M[i++];return (e&&e.status!=='cancelado'&&e.status!=='recusado'?pzHtml(pzDoEnvio(e)):'')+x;});};
 /* laboratório: no cartão do pedido */
@@ -6642,6 +6677,7 @@ function kcDet(e,ds,tr,lab,pz,i,col){var d=new Date(e.enviado_em||e.criado_em),L
   return '<div class="kc-det">'+step+
     '<div class="kc-ficha">'+L('Paciente',esc(e.paciente||''))+L('Trabalho',esc(tr))+((e.itens||[]).some(function(it){return it.ajuste;})?L('Tipo','🔁 Ajuste / refação'):'')+L('Dentes',ds.join(', '))+L('Cor',esc(e.cor||''))+L('Enviado em',dm(d))+
       (I?L('Previsão',(I.min.getTime()===I.max.getTime()?'':dm(I.min).slice(0,5)+' a ')+dm(I.max).slice(0,5)+' · '+(I.f[0]===I.f[1]?I.f[0]:I.f[0]+' a '+I.f[1])+' dias úteis'):'')+L('Laboratório',esc(lab))+'</div>'+
+    (e.partes&&e.partes.length>1?'<div class="kc-partes"><b>Itens deste pedido</b>'+e.partes.map(function(p){return '<div><span>'+esc(uniTrab(p))+(p.dentes&&p.dentes.length?' · 🦷 '+p.dentes.join(', '):'')+'</span><em>'+esc(uniEtapaTxt(p.etapa))+'</em></div>';}).join('')+'</div>':'')+
     (ds.length?'<div class="kc-arco">'+cxMiniArco(ds)+'</div>':'')+
     (e.status==='recusado'&&e.motivo?'<p class="kc-mot">Motivo: '+esc(e.motivo)+'</p>':'')+
     pendHtml(e)+(col==='pend'&&String(e.id).indexOf('lab-')===0?'<div class="pend"><b>⚠️ Pendência do laboratório</b><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p><small>Responda pelo 💬 Conversar aqui embaixo (dá para colar print e anexar arquivo).</small></div>':'')+pdgArqsHtml(e)+'</div>';}
@@ -6679,8 +6715,8 @@ function pdbMat(p){var s=semAc((p.material||'')+' '+(p.trabalho||''));
   if(/zirc/.test(s))return 'Zircônia';if(/e[\.\-\s]?max|dissilicato/.test(s))return 'E.max';if(/metalo|sobre metal/.test(s))return 'Metalocerâmica';
   if(/pmma/.test(s))return 'PMMA';if(/resina/.test(s))return 'Resina';if(/acrilic/.test(s))return 'Acrílico';return 'Não informado';}
 function pdbEl(p){var d=Array.isArray(p.dentes)?p.dentes.length:0;return +p.qtd||d||1;}
-function pdbAnd(p){return ['desenho','aguardando','producao'].indexOf(p.status)>=0;}
-function pdbEtapa(p){return p.status==='producao'&&p.enviado_inove?'Na fresagem':(DFL_ET[p.status]||p.status||'—');}
+function pdbAnd(p){return p.aberto!=null?!!p.aberto:['desenho','aguardando','producao'].indexOf(p.status)>=0;}
+function pdbEtapa(p){if(p.etapa)return uniEtapaTxt(p.etapa);return p.status==='producao'&&p.enviado_inove?'Na fresagem':(DFL_ET[p.status]||p.status||'—');}
 function pdbIni(){var h=new Date(),y=h.getFullYear(),m=h.getMonth();
   return {mes:new Date(y,m,1),mesp:new Date(y,m-1,1),'3m':new Date(y,m-2,1),'12m':new Date(y,m-11,1),ano:new Date(y,0,1),tudo:new Date(2000,0,1)}[PDB.per];}
 function pdbNoPer(p){var d=new Date(p.criado),i=pdbIni();if(PDB.per==='mesp'){var h=new Date();return d>=i&&d<new Date(h.getFullYear(),h.getMonth(),1);}return d>=i;}
