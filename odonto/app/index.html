@@ -2014,6 +2014,10 @@ var INST_SEED=[
     reiv:{st:'pendente',emp:'Instituto Técnico Exemplo Ltda',cnpj:'11.444.777/0001-61',resp:'Marta Ribeiro',email:'contato@exemplo.com',quando:'hoje, 10:40'}}];
 function instCarrega(){try{var x=JSON.parse(localStorage.getItem('io_inst_v1')||'null');if(x&&x.length)return x;}catch(e){}return JSON.parse(JSON.stringify(INST_SEED));}
 function instSalva(){try{localStorage.setItem('io_inst_v1',JSON.stringify(S.inst));}catch(e){}}
+/* dados do painel guardados no navegador: SEMPRE separados por conta (computador compartilhado na recepção) */
+function lsU(k){var u=typeof RL!=='undefined'&&RL&&RL.user&&RL.user.id;if(!u)return k+'@visitante';var ku=k+'@'+u;
+  try{if(localStorage.getItem(ku)==null&&localStorage.getItem(k)!=null&&!localStorage.getItem('io_ls_migrado_'+k)){localStorage.setItem(ku,localStorage.getItem(k));localStorage.removeItem(k);localStorage.setItem('io_ls_migrado_'+k,u);}}catch(e){}
+  return ku;}
 function semAc(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
 function instGet(id){return (S.inst||[]).filter(function(i){return i.id===id;})[0];}
 function instNome(p){var i=instGet(p.inst);return i?i.nome:'';}
@@ -2424,8 +2428,8 @@ function dSeed(nome){var h=dHoje(),A=function(id,d,hr,dur,tit,proc,st,tipo){retu
     A('a14',dAdd(-1),'09:00',60,'B.C.','Extração','atendido'),A('a15',dAdd(-1),'14:00',60,'D.E.','Restauração','atendido')],
   tar:[{id:'t1',txt:'Pedir orçamento de scanner intraoral',feito:false,q:'hoje'},{id:'t2',txt:'Conferir a cor da faceta R.L. com o paciente',feito:false,q:'hoje'},{id:'t3',txt:'Renovar a anuidade do CRO',feito:true}],
   conv:[{de:'ana',t:'Oi! Pode me pedir para anotar qualquer coisa. Ex.: "anota ligar pro lab amanhã".'}]};}
-function dCarrega(){try{var x=JSON.parse(localStorage.getItem('io_dent_v2')||'null');if(x&&x.peds&&x.conv)return pedMig(x);}catch(e){}return null;}
-function dSalva(){try{localStorage.setItem('io_dent_v2',JSON.stringify(S.dent));}catch(e){}}
+function dCarrega(){try{var x=JSON.parse(localStorage.getItem(lsU('io_dent_v2'))||'null');if(x&&x.peds&&x.conv)return pedMig(x);}catch(e){}return null;}
+function dSalva(){try{localStorage.setItem(lsU('io_dent_v2'),JSON.stringify(S.dent));}catch(e){}}
 /* vagas fictícias (só para teste) */
 var DVAGAS=[{id:'v1',cargo:'Dentista clínico geral',emp:'Clínica Sorriso Pleno',lugar:'São Paulo / SP',det:'Seg a sex · manhã',novo:true},
   {id:'v2',cargo:'Implantodontista',emp:'Clínica Exemplo Norte',lugar:'Campinas / SP',det:'2x por semana · por produção',novo:true},
@@ -2607,8 +2611,8 @@ function pSeed(nome){var h=dHoje(),F=function(id,cli,pac,tipo,dentes,mat,cor,eta
   feitos:[14,18,21,12,23],
   tar:[{id:'t1',txt:'Pedir mais pó de cerâmica A2',feito:false,q:'hoje'},{id:'t2',txt:'Calibrar o forno',feito:false,q:''}],
   conv:[{de:'ana',t:'Oi! Pode me pedir para anotar qualquer coisa. Ex.: "anota calibrar o forno amanhã".'}]};}
-function pCarrega(){try{var x=JSON.parse(localStorage.getItem('io_prot_v1')||'null');if(x&&x.fila)return x;}catch(e){}return null;}
-function pSalva(){try{localStorage.setItem('io_prot_v1',JSON.stringify(S.prot));}catch(e){}}
+function pCarrega(){try{var x=JSON.parse(localStorage.getItem(lsU('io_prot_v1'))||'null');if(x&&x.fila)return x;}catch(e){}return null;}
+function pSalva(){try{localStorage.setItem(lsU('io_prot_v1'),JSON.stringify(S.prot));}catch(e){}}
 function pRisco(f){if(f.st==='pronto'||f.st==='entregue')return '';var n=dDif(f.prazo);return n<0?'atrasado':n===0?'hoje':n===1?'amanha':'';}
 function pFrases(D){var L=[],ab=D.fila.filter(function(f){return f.st==='fila'||f.st==='fazendo';}),hj=ab.filter(function(f){return dDif(f.prazo)<=0;}),am=ab.filter(function(f){return dDif(f.prazo)===1;}),ta=D.tar.filter(function(t){return !t.feito;}),F=festaHoje();
   L.push(dSaud()+', '+D.nome+'! Você tem '+ab.length+' trabalho'+(ab.length!==1?'s':'')+' na sua fila.');
@@ -2675,8 +2679,8 @@ function aSeed(nome){var d=dSeed('Carla'),h=dHoje(),A=function(id,dd,hr,dur,tit,
       {id:'e5',nome:'Sugador descartável',un:'pacote',qtd:6,min:3},{id:'e6',nome:'Algodão rolete',un:'pacote',qtd:0,min:2},{id:'e7',nome:'Envelope de esterilização',un:'caixa',qtd:2,min:2},{id:'e8',nome:'Filme PVC (barreira)',un:'rolo',qtd:4,min:2}],
     tar:[{id:'t1',txt:'Ligar para confirmar os pacientes de amanhã',feito:false,q:'hoje'},{id:'t2',txt:'Trocar o filtro do compressor',feito:false,q:''}],
     conv:[{de:'ana',t:'Oi! Pode me pedir para anotar qualquer coisa. Ex.: "anota pedir luvas amanhã".'}]};}
-function aCarrega(){try{var x=JSON.parse(localStorage.getItem('io_asb_v1')||'null');if(x&&x.chk)return pedMig(x);}catch(e){}return null;}
-function aSalva(){try{localStorage.setItem('io_asb_v1',JSON.stringify(S.asb));}catch(e){}}
+function aCarrega(){try{var x=JSON.parse(localStorage.getItem(lsU('io_asb_v1'))||'null');if(x&&x.chk)return pedMig(x);}catch(e){}return null;}
+function aSalva(){try{localStorage.setItem(lsU('io_asb_v1'),JSON.stringify(S.asb));}catch(e){}}
 function agLista(D){return D.agVer==='dent'&&D.agDent?D.agDent:D.ag;}
 function chkHoje(D){var h=dHoje();D.chk[h]=D.chk[h]||{};CHK.forEach(function(c){if(!D.chk[h][c.id])D.chk[h][c.id]=c.i.map(function(){return 0;});});return D.chk[h];}
 function chkFeitos(D){var H=chkHoje(D);return CHK.filter(function(c){return H[c.id].every(Boolean);}).length;}
@@ -2763,8 +2767,8 @@ function cSeed(nome,setor,cargo){var h=dHoje(),I=function(t,s,v,st){return {id:'
     equipe:[{id:'q1',nome:'Marcos',cargo:'CRC (call center)',st:'aceito',num:'7 confirmações · 3 leads hoje'},{id:'q2',nome:'Renata',cargo:'Recepção',st:'aceito',num:'5 confirmações · 1 lead hoje'},{id:'q3',nome:'Caio',cargo:'Leads',st:'pendente',num:''}],
     est:[{id:'e1',nome:'Luvas de procedimento M',un:'caixa',qtd:3,min:5},{id:'e2',nome:'Resina A2',un:'seringa',qtd:1,min:2},{id:'e3',nome:'Sugador descartável',un:'pacote',qtd:6,min:3},{id:'e4',nome:'Algodão rolete',un:'pacote',qtd:0,min:2}],
     tar:[{id:'t1',txt:'Retornar o lead do Instagram',feito:false,q:'hoje'}],conv:[{de:'ana',t:'Oi! Pode me pedir para anotar qualquer coisa. Ex.: "anota ligar para o fornecedor amanhã".'}]};}
-function cCarrega(){try{var x=JSON.parse(localStorage.getItem('io_corp_v1')||'null');if(x&&x.corp)return pedMig(x);}catch(e){}return null;}
-function cSalva(){try{localStorage.setItem('io_corp_v1',JSON.stringify(S.corp));}catch(e){}}
+function cCarrega(){try{var x=JSON.parse(localStorage.getItem(lsU('io_corp_v1'))||'null');if(x&&x.corp)return pedMig(x);}catch(e){}return null;}
+function cSalva(){try{localStorage.setItem(lsU('io_corp_v1'),JSON.stringify(S.corp));}catch(e){}}
 function cAbas(D){var A=[['inicio','Início','home']].concat(CTABS[D.setor]||[]);if(eGerente(D.cargo))A.push(['equipe','Equipe','eu']);return A.concat([['agentes','Agentes de IA','bot'],['rede','Rede','rede'],['perfil','Perfil','eu']]);}
 function cPend(D,k){var L=D.L[k]||[],c=CL[k];if(!c)return [];var ok={conf:['pendente'],leads:['novo'],contas:['aberta','atrasada'],orc:['aberto','neg'],clientes:['parado'],pedforn:['cotando','pedido'],camp:['pausada'],posts:['ideia','prod'],escala:['falta'],contrat:['aberta','entrev']}[k]||[];return L.filter(function(x){return ok.indexOf(x.st)>=0;});}
 function cFrases(D){var L=[],F=festaHoje(),ab=CTABS[D.setor]||[];L.push(dSaud()+', '+D.nome+'! '+setorNome(D.setor)+' · '+D.cargo+'.');
@@ -2838,8 +2842,8 @@ function iSeed(nome,setor,cargo){var D=cSeed(nome||'Lucas',setor||'dist',cargo||
   D.L.chamados=[I('Clínica Sorriso Pleno','Autoclave · não pressuriza · (11) 99999-0202','','aberto'),I('Consultório Exemplo','Cadeira · refletor piscando','','agendado'),I('Clínica Exemplo Norte','Compressor · barulho alto','','peca'),I('Laboratório Bela Arte','Impressora 3D · instalação','','resolvido')];
   D.equipe=[{id:'q1',nome:'Diego',cargo:CARGOS[D.setor][0],st:'aceito',num:'3 visitas · 2 pedidos hoje'},{id:'q2',nome:'Carol',cargo:CARGOS[D.setor][1]||CARGOS[D.setor][0],st:'pendente',num:''}];
   D.tar=[{id:'t1',txt:'Mandar a tabela nova para o Lab Bela Arte',feito:false,q:'hoje'}];D.conv=[{de:'ana',t:'Oi! Pode me pedir para anotar qualquer coisa. Ex.: "anota ligar para a clínica amanhã".'}];return D;}
-function iCarrega(){try{var x=JSON.parse(localStorage.getItem('io_ind_v1')||'null');if(x&&x.ind)return pedMig(x);}catch(e){}return null;}
-function iSalva(){try{localStorage.setItem('io_ind_v1',JSON.stringify(S.ind));}catch(e){}}
+function iCarrega(){try{var x=JSON.parse(localStorage.getItem(lsU('io_ind_v1'))||'null');if(x&&x.ind)return pedMig(x);}catch(e){}return null;}
+function iSalva(){try{localStorage.setItem(lsU('io_ind_v1'),JSON.stringify(S.ind));}catch(e){}}
 function iCatalogo(D){var L=ICAT[D.setor==='assist'?'assist':'venda'],f=D.catF||'',cats=[];L.forEach(function(x){if(cats.indexOf(x[1])<0)cats.push(x[1]);});
   return '<div class="dtop"><div><h2>Catálogo</h2><p class="small muted">Produtos que você trabalha, para consultar rápido no cliente. Mais para frente, ligado ao guia de componentes e implantes.</p></div><span class="pill warn">exemplo</span></div>'+
     '<div class="row wrap"><button class="chip" aria-pressed="'+(!f)+'" data-act="iCat" data-v="">Todos</button>'+cats.map(function(c){return '<button class="chip" aria-pressed="'+(f===c)+'" data-act="iCat" data-v="'+esc(c)+'">'+esc(c)+'</button>';}).join('')+'</div>'+
@@ -2861,8 +2865,8 @@ function sSeed(nome,ent){ent=ent||{};var h=dHoje(),E=function(id,d,t,tp,f){retur
   return {estud:true,nome:nome||'Bianca',curso:ent.curso||'odonto',fase:ent.fase||'meio',int:(ent.int&&ent.int.length?ent.int:['Implantodontia','Estética e lentes']),proc:(ent.proc&&ent.proc.length?ent.proc:['Estágio','Cursos e eventos']),inst:instNome(S.cad)||'Universidade de São Paulo (USP)',exemplo:true,agSel:'ana',anaAberta:false,anaI:0,
     estudos:(function(){var T={odonto:['Prova de prótese fixa','Entregar trabalho de oclusão','Aula prática de dentística','Seminário de periodontia','Prova de endodontia','Relatório da clínica'],pos:['Prova do módulo de implantes','Entregar caso clínico','Aula prática na clínica','Seminário de artigos','Prova de cirurgia','Relatório de atendimento'],protese:['Prova de anatomia dental','Entregar enceramento','Aula prática de cerâmica','Seminário de oclusão','Prova de prótese total','Relatório da bancada'],sb:['Prova de biossegurança','Entregar relatório de estágio','Aula de radiologia','Seminário de ergonomia','Prova de instrumentação','Relatório da clínica'],livre:['Exercício do módulo 2','Entregar projeto','Aula ao vivo','Exercício prático','Prova final','Módulo 1']}[ent.curso||'odonto']||[];return [E('s1',dAdd(2),T[0],'prova'),E('s2',dAdd(1),T[1],'trabalho'),E('s3',h,T[2],'aula'),E('s4',dAdd(6),T[3],'trabalho'),E('s5',dAdd(12),T[4],'prova'),E('s6',dAdd(-2),T[5],'trabalho',1)];})(),
     opInt:{},curSal:{},tar:[{id:'t1',txt:'Revisar anatomia dos molares',feito:false,q:'hoje'}],conv:[{de:'ana',t:'Oi! Posso anotar o que você precisa estudar. Ex.: "anota estudar oclusão amanhã".'}]};}
-function sCarrega(){try{var x=JSON.parse(localStorage.getItem('io_stu_v1')||'null');if(x&&x.estud)return x;}catch(e){}return null;}
-function sSalva(){try{localStorage.setItem('io_stu_v1',JSON.stringify(S.stu));}catch(e){}}
+function sCarrega(){try{var x=JSON.parse(localStorage.getItem(lsU('io_stu_v1'))||'null');if(x&&x.estud)return x;}catch(e){}return null;}
+function sSalva(){try{localStorage.setItem(lsU('io_stu_v1'),JSON.stringify(S.stu));}catch(e){}}
 function eLab(L,v){var x=L.filter(function(o){return o[0]===v;})[0];return x?x[1]:'';}
 function eConta(d){var n=dDif(d);return n<0?'passou':n===0?'hoje':n===1?'amanhã':'em '+n+' dias';}
 function eFrases(D){var L=[],F=festaHoje(),pr=D.estudos.filter(function(e){return !e.feito&&dDif(e.data)>=0;}).sort(function(a,b){return a.data<b.data?-1:1;}),prova=pr.filter(function(e){return e.tipo==='prova';})[0],trab=pr.filter(function(e){return e.tipo==='trabalho';});
@@ -5444,19 +5448,19 @@ ACT.pedCopia=function(){var raiz=document.querySelector('[data-act="pedCopia"]')
 function pedCopiaVelho(t){var x=document.createElement('textarea');x.value=t;x.style.position='fixed';x.style.opacity='0';document.body.appendChild(x);x.select();try{document.execCommand('copy');}catch(e){}x.remove();}
 
 /* ===== Ana confere se um comprovante já está anexado em algum lugar (arquivo igual, mesmo código, ou mesmo valor/dia/hora) ===== */
-var CHK={on:false,busy:false,msgs:[],res:null};
+var CHKC={on:false,busy:false,msgs:[],res:null};
 function chkCache(path,r){var k='io_ch_'+path;try{if(r){localStorage.setItem(k,JSON.stringify(r));return r;}var x=localStorage.getItem(k);return x?JSON.parse(x):null;}catch(e){return r||null;}}
 function chkLe(path){var c=chkCache(path);if(c&&c.hash)return Promise.resolve(c);return invLeArquivo(path).then(function(r){return chkCache(path,{hash:r.hash,cod:r.cod,hora:r.hora,valor:r.valor,data:r.data});});}
-function chkHtml(){return '<div class="pdg-ov chk-ov" role="dialog" aria-modal="true"><div class="pdg-box"><div class="pdg-h"><b>🔎 Esse comprovante já está anexado?</b><button class="btn sm" data-act="chkFecha"'+(CHK.busy?' disabled':'')+'>Fechar</button></div>'+
-  '<div class="pdg-b"><div class="pdg-ana"><img src="'+ANA_AV[0]+'" alt=""><div style="flex:1">'+(CHK.msgs.length?CHK.msgs.map(function(m){return '<div class="chk-m">'+m+'</div>';}).join(''):'<div class="chk-m">Me mande o comprovante (foto ou PDF). Eu vasculho <b>todos os meses de todos os clientes</b> e te digo se ele já foi anexado: arquivo igual, mesmo código da transação, ou mesmo valor no mesmo dia e hora.</div>')+
-  (CHK.busy?'<div class="chk-m muted">digitando…</div>':'')+'</div></div>'+
-  (CHK.busy?'':'<label class="btn pri" style="justify-self:start">📎 '+(CHK.msgs.length?'Conferir outro comprovante':'Escolher comprovante')+'<input type="file" id="chk-arq" accept="application/pdf,image/*" hidden></label>')+'</div></div></div>';}
-function chkDesenha(){var el=document.getElementById('chk-ov');if(!CHK.on){if(el)el.remove();document.body.style.overflow='';return;}if(!el){el=document.createElement('div');el.id='chk-ov';document.body.appendChild(el);}el.innerHTML=chkHtml();document.body.style.overflow='hidden';
+function chkHtml(){return '<div class="pdg-ov chk-ov" role="dialog" aria-modal="true"><div class="pdg-box"><div class="pdg-h"><b>🔎 Esse comprovante já está anexado?</b><button class="btn sm" data-act="chkFecha"'+(CHKC.busy?' disabled':'')+'>Fechar</button></div>'+
+  '<div class="pdg-b"><div class="pdg-ana"><img src="'+ANA_AV[0]+'" alt=""><div style="flex:1">'+(CHKC.msgs.length?CHKC.msgs.map(function(m){return '<div class="chk-m">'+m+'</div>';}).join(''):'<div class="chk-m">Me mande o comprovante (foto ou PDF). Eu vasculho <b>todos os meses de todos os clientes</b> e te digo se ele já foi anexado: arquivo igual, mesmo código da transação, ou mesmo valor no mesmo dia e hora.</div>')+
+  (CHKC.busy?'<div class="chk-m muted">digitando…</div>':'')+'</div></div>'+
+  (CHKC.busy?'':'<label class="btn pri" style="justify-self:start">📎 '+(CHKC.msgs.length?'Conferir outro comprovante':'Escolher comprovante')+'<input type="file" id="chk-arq" accept="application/pdf,image/*" hidden></label>')+'</div></div></div>';}
+function chkDesenha(){var el=document.getElementById('chk-ov');if(!CHKC.on){if(el)el.remove();document.body.style.overflow='';return;}if(!el){el=document.createElement('div');el.id='chk-ov';document.body.appendChild(el);}el.innerHTML=chkHtml();document.body.style.overflow='hidden';
   var b=el.querySelector('.pdg-b');if(b)b.scrollTop=b.scrollHeight;}
-function chkDiz(h){CHK.msgs.push(h);chkDesenha();}
+function chkDiz(h){CHKC.msgs.push(h);chkDesenha();}
 function chkLocal(x){return '<b>'+esc(finCliNome(x.m))+'</b> · '+MESES[x.m.mes-1]+'/'+x.m.ano+' · pago em '+invDt(x.p.data)+' · '+fmtR(x.p.valor)+(x.p.anulado_em?' <span class="labv-st recusado">anulado</span>':'')+
   ' <button class="ih-ver" data-act="finArqVer" data-v="'+esc(x.p.comprovante_path)+'">📎 abrir</button> <button class="ih-ver" data-act="chkMes" data-v="'+x.m.id+'">📂 ir ao mês</button>';}
-function chkConfere(f){CHK.msgs=[];CHK.busy=true;chkDiz('📎 <b>'+esc(f.name)+'</b>');
+function chkConfere(f){CHKC.msgs=[];CHKC.busy=true;chkDiz('📎 <b>'+esc(f.name)+'</b>');
   Promise.all([aiTextoArq(f).then(invDetalhes).catch(function(){return {valor:null,data:null,hora:null,cod:null};}),invHash(f)]).then(function(a){var L=a[0];L.hash=a[1];
     chkDiz('Li neste comprovante: '+(L.valor!=null?'<b>'+fmtR(L.valor)+'</b>':'<i>valor não identificado</i>')+(L.data?' em <b>'+invDt(L.data)+'</b>':'')+(L.hora?' às '+L.hora:'')+(L.cod?' · código <code>'+esc(invCodCurto(L.cod))+'</code>':'')+'.');
     var M={};FIN.M.forEach(function(m){M[m.id]=m;});
@@ -5467,7 +5471,7 @@ function chkConfere(f){CHK.msgs=[];CHK.busy=true;chkDiz('📎 <b>'+esc(f.name)+'
     return C.reduce(function(pr,x){return pr.then(function(){return chkLe(x.p.comprovante_path).then(function(r){x.r=r;n++;
       if(L.hash&&r.hash&&r.hash===L.hash)achou.igual.push(x);
       else if(L.cod&&r.cod&&String(L.cod).length>=8&&r.cod===L.cod)achou.cod.push(x);
-      else{var v=r.valor!=null?r.valor:+x.p.valor,d=r.data||x.p.data;if(L.valor!=null&&Math.abs(v-L.valor)<0.01&&L.data&&d===L.data){if(L.hora&&r.hora&&L.hora.slice(0,5)===r.hora.slice(0,5))achou.quase.push(x);else achou.parecido.push(x);}}}).catch(function(){});});},Promise.resolve()).then(function(){CHK.busy=false;
+      else{var v=r.valor!=null?r.valor:+x.p.valor,d=r.data||x.p.data;if(L.valor!=null&&Math.abs(v-L.valor)<0.01&&L.data&&d===L.data){if(L.hora&&r.hora&&L.hora.slice(0,5)===r.hora.slice(0,5))achou.quase.push(x);else achou.parecido.push(x);}}}).catch(function(){});});},Promise.resolve()).then(function(){CHKC.busy=false;
       if(achou.igual.length)chkDiz('🛑 <b>Já está anexado!</b> É exatamente o mesmo arquivo:<br>'+achou.igual.map(chkLocal).join('<br>'));
       if(achou.cod.length)chkDiz('🛑 <b>Já está anexado</b> (arquivo diferente, mas é o <b>mesmo código da transação</b>):<br>'+achou.cod.map(chkLocal).join('<br>'));
       if(achou.quase.length)chkDiz('⚠️ <b>Muito provável que já esteja anexado:</b> mesmo valor, mesmo dia e mesma hora:<br>'+achou.quase.map(chkLocal).join('<br>'));
@@ -5476,9 +5480,9 @@ function chkConfere(f){CHK.msgs=[];CHK.busy=true;chkDiz('📎 <b>'+esc(f.name)+'
       if(tot>1)chkDiz('❗ Ele aparece em <b>mais de um lugar</b>. Pode ter sido lançado em duplicidade: abra os meses e decida qual fica.');
       if(!tot&&!achou.parecido.length)chkDiz('✅ <b>Não está no sistema.</b> Conferi '+n+' comprovante'+(n===1?'':'s')+' e nenhum é igual a este. Pode anexar no cliente e mês certos.');
       else if(!tot)chkDiz('✅ Não achei este comprovante anexado. Só tem os parecidos acima; se forem outros pagamentos, pode anexar.');});
-  }).catch(function(){CHK.busy=false;chkDiz('❌ Não consegui ler esse arquivo. Tente uma foto mais nítida ou o PDF.');});}
-Object.assign(ACT,{chkAbre:function(){if(!FIN.carregado){toast('Abra o Financeiro primeiro.');return;}CHK.on=true;CHK.msgs=[];chkDesenha();},chkFecha:function(){if(CHK.busy)return;CHK.on=false;chkDesenha();},
-  chkMes:function(v){var m=FIN.M.filter(function(x){return x.id===v;})[0];if(!m)return;CHK.on=false;chkDesenha();if(typeof AI!=='undefined'&&AI.on&&typeof aiFecha==='function')aiFecha();FIN.ano=m.ano;FIN.mes=m.mes;FIN.aba='mes';FIN.ed=m.id;FIN.cob=null;ACT.dTab('financeiro');window.scrollTo(0,0);}});
+  }).catch(function(){CHKC.busy=false;chkDiz('❌ Não consegui ler esse arquivo. Tente uma foto mais nítida ou o PDF.');});}
+Object.assign(ACT,{chkAbre:function(){if(!FIN.carregado){toast('Abra o Financeiro primeiro.');return;}CHKC.on=true;CHKC.msgs=[];chkDesenha();},chkFecha:function(){if(CHKC.busy)return;CHKC.on=false;chkDesenha();},
+  chkMes:function(v){var m=FIN.M.filter(function(x){return x.id===v;})[0];if(!m)return;CHKC.on=false;chkDesenha();if(typeof AI!=='undefined'&&AI.on&&typeof aiFecha==='function')aiFecha();FIN.ano=m.ano;FIN.mes=m.mes;FIN.aba='mes';FIN.ed=m.id;FIN.cob=null;ACT.dTab('financeiro');window.scrollTo(0,0);}});
 document.addEventListener('change',function(e){if(e.target&&e.target.id==='chk-arq'&&e.target.files&&e.target.files[0])chkConfere(e.target.files[0]);});
 var _rFinChk=rFin;rFin=function(){var h=_rFinChk.apply(this,arguments);return h.replace('<div class="finabrow">','<div class="finabrow"><button class="btn chk-bt" data-act="chkAbre"><img src="'+ANA_AV[0]+'" alt=""> Comprovante já anexado?</button>');};
 
@@ -6591,7 +6595,7 @@ var _render0=render;render=function(){try{rlZera();rlZera2();}catch(e){}return _
 (function(){if(!SB){toast('Sem conexão com o servidor. Recarregue a página.');return;}
   SB.auth.onAuthStateChange(function(ev,ses){var u=ses&&ses.user;
     if(!u){RL.user=null;RL.perfil=null;RL.admin=false;rlBarra();return;}
-    if(RL.user&&RL.user.id===u.id)return;RL.user=u;
+    if(RL.user&&RL.user.id===u.id)return;RL.user=u;try{var nm0=(S.cad&&S.cad.nome||'').split(' ')[0];if(S.dent)S.dent=dCarrega()||dSeed(nm0);if(S.prot)S.prot=pCarrega()||pSeed(nm0);if(S.asb)S.asb=aCarrega()||aSeed(nm0);if(S.stu)S.stu=sCarrega()||sSeed(nm0);}catch(e){}
     Promise.all([SB.from('odo_perfis').select('*').eq('user_id',u.id).maybeSingle(),SB.rpc('sou_admin'),SB.from('perfis').select('nome,telefone').eq('user_id',u.id).maybeSingle()]).then(function(r){
       if(r[0].error)toast('O banco do Ideali Odonto precisa da atualização 040.');
       RL.perfil=r[0].data||null;RL.admin=!!r[1].data;var cp=r[2].data||{};RL.cadNome=cp.nome||'';RL.cadTel=cp.telefone||'';
