@@ -7188,7 +7188,7 @@ rDLabTab=function(D){return RL.user?rLabClinica(D):rDPedidos2(D);};
    - Laboratório vê quais pedidos os clientes confirmaram e pode devolver ao quadro.
    ===================================================================================== */
 var EXB={visto:null,fila:[],m:null,sel:null,busy:false,lendo:false,cache:{},R:null};
-var EXB_AB=['desenho','producao','finalizado','aguardando'];
+var EXB_AB=['desenho','producao','finalizado','aguardando','entregue']; /* entregue (enviado) sem baixa ainda conta: só sai com o extrato ou o Recebi */
 /* ---------- leitura das linhas do extrato (data = dia em que o trabalho ficou pronto) ---------- */
 function exbLinhasTx(tx){var out=[],cur=null,NUM='(-?\\s?[\\d.]+,\\d{2}-?)';
   var reS=new RegExp('^(\\d{2})\\/(\\d{2})\\/(\\d{4})\\s+(\\S+)\\s+(.*?)\\s*'+NUM+'\\s+'+NUM+'$'),reI=new RegExp('^(\\d{1,3})\\s+(.+?)\\s+'+NUM+'$');
