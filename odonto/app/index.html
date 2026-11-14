@@ -2667,7 +2667,7 @@ function anaFrases(D){if(D.estud)return eFrases(D);if(D.corp)return cFrases(D);i
   if(pr.length)L.push('Coleta agendada: '+pr[0].tipo+' do '+pr[0].pac+' vai para o '+dLab(pr[0].lab).nome.replace(/\.$/,'')+'.');
   if(rv.length)L.push(rv[0].tipo+' do '+rv[0].pac+' vence '+dFmt(dPrazo(rv[0]))+'. Quer que eu cobre o laboratório?');
   if(ta.length)L.push('Você tem '+ta.length+' tarefa'+(ta.length>1?'s':'')+' anotada'+(ta.length>1?'s':'')+'. Toque aqui para ver.');
-  var nv=DVAGAS.filter(function(v){return v.novo;}).length;if(nv)L.push('O agente de vagas achou '+nv+' vaga'+(nv>1?'s novas':' nova')+' para você.');
+  /* vagas só aparecem dentro da Rede (sistema separado): a Ana não fala delas aqui */
   if(F)L.push(F.txt+'! 🎉');return L;}
 function rAnaTopo(D){var L=anaFrases(D),i=(D.anaI||0)%L.length,ab=D.anaAberta,F=festaHoje();
   return '<div class="atopo'+(ab?' aberta':'')+'"><button class="atopo-b" data-act="anaAbre" aria-expanded="'+!!ab+'"><img src="'+ANA.av+'" alt="Ana"><span class="atopo-t"><b>Ana</b><span class="atopo-f" data-i="'+i+'">'+esc(L[i])+'</span></span>'+(F?'<span class="atopo-fe">'+esc(F.f.ic[0])+'</span>':'')+'<span class="atopo-s" aria-hidden="true">'+(ab?'▲':'▼')+'</span></button>'+
@@ -2836,7 +2836,7 @@ function pFrases(D){var L=[],ab=D.fila.filter(function(f){return f.st==='fila'||
   if(hj.length)L.push(hj.length+' trabalho'+(hj.length>1?'s vencem':' vence')+' hoje. Começa pel'+(hj[0].urg?'o urgente: ':'o ')+hj[0].tipo+' do '+hj[0].pac+'.');
   if(am.length)L.push(am[0].tipo+' do '+am[0].pac+' vence amanhã.');
   if(ta.length)L.push('Você tem '+ta.length+' tarefa'+(ta.length>1?'s':'')+' anotada'+(ta.length>1?'s':'')+'. Toque aqui para ver.');
-  var nv=PVAGAS.filter(function(v){return v.novo;}).length;if(nv)L.push('O agente de vagas achou '+nv+' vagas novas para protético.');
+  /* vagas só aparecem dentro da Rede (sistema separado): a Ana não fala delas aqui */
   if(F)L.push(F.txt+'! 🎉');return L;}
 function pCard(f){var r=pRisco(f),k=f.st,nx={fila:['pCom','▶ Começar'],fazendo:['pPronto','✓ Marcar pronto'],pronto:['pEntrega','Entregar p/ conferência']}[k];
   return '<article class="pcard'+(r?' '+r:'')+(f.urg?' urg':'')+'"><div class="pcard-h"><b>'+esc(f.tipo)+(f.dentes?' · '+esc(f.dentes):'')+'</b>'+(f.urg?'<span class="pill bad">Urgente</span>':'')+'</div>'+
@@ -3090,7 +3090,7 @@ function eFrases(D){var L=[],F=festaHoje(),pr=D.estudos.filter(function(e){retur
   L.push(dSaud()+', '+D.nome+'! '+eLab(ECURSOS,D.curso)+' · '+eLab(EFASES,D.fase).toLowerCase()+'.');
   if(prova)L.push(prova.t+' '+eConta(prova.data)+'. Quer que eu monte um plano de estudo?');
   if(trab.length)L.push(trab[0].t+' '+eConta(trab[0].data)+'.');
-  var nv=EOPS.filter(function(o){return o.novo;}).length;if(nv)L.push('O agente de vagas achou '+nv+' oportunidades novas de estágio.');
+  /* vagas só aparecem dentro da Rede (sistema separado): a Ana não fala delas aqui */
   if(F)L.push(F.txt+'! 🎉');return L;}
 function eCard(e){var n=dDif(e.data),cor={prova:'#C23B3B',trabalho:'#B7791F',aula:'#3A7BD5'}[e.tipo];
   return '<div class="dag'+(e.feito?' feito':'')+'" style="--k:'+cor+'"><span class="dag-h">'+esc(dFmt(e.data))+'</span><span class="dag-t"><b>'+esc(e.t)+'</b><small>'+esc({prova:'Prova',trabalho:'Trabalho',aula:'Aula'}[e.tipo])+(e.feito?'':' · '+eConta(e.data))+'</small></span>'+
