@@ -1918,6 +1918,13 @@ i.pzs-antes{background:#3B82F6}i.pzs-prazo{background:#22C55E}i.pzs-atraso{backg
   .pgc-r .n{text-align:left;display:grid}.pgc-r .n:before{content:attr(data-l);font-size:.7rem;color:var(--muted);font-weight:500}
   .pgc-cs{grid-column:1/-1}.pgc-r>span:last-child{grid-column:1/-1}}
 .kc-cd{font-weight:inherit;font-variant-numeric:tabular-nums}
+.fic-k.urge{animation:ficPisca 2s ease-in-out infinite}
+@keyframes ficPisca{0%,100%{background:color-mix(in srgb,#DC2626 6%,var(--surface));box-shadow:0 0 0 0 rgba(220,38,38,0)}50%{background:color-mix(in srgb,#DC2626 22%,var(--surface));box-shadow:0 0 0 4px rgba(220,38,38,.25)}}
+.fic-k.urge>span{color:#DC2626;font-weight:700;text-transform:uppercase;letter-spacing:.03em}[data-theme=dark] .fic-k.urge>span{color:#F87171}
+.fic-atr{font-style:normal;font-weight:800;color:#fff;background:#DC2626;border-radius:999px;padding:3px 10px;justify-self:start;font-size:.82rem}
+.fic-regra{opacity:.75}
+.fic-venc{display:block;font-size:.7rem;color:var(--muted);white-space:nowrap}.fic-venc.atr{color:#DC2626;font-weight:700}.fic-venc.hoje{color:#D97706;font-weight:700}[data-theme=dark] .fic-venc.atr{color:#F87171}
+@media (prefers-reduced-motion:reduce){.fic-k.urge{animation:none;background:color-mix(in srgb,#DC2626 14%,var(--surface))}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -7062,6 +7069,17 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='plx-q'){PLX.q=e.target.value;PLX.lim=50;plxRedesenha();}});
 document.addEventListener('change',function(e){if(!e.target)return;if(e.target.id==='plx-per'){PLX.per=e.target.value;render();}else if(e.target.id==='plx-ord'){PLX.ord=e.target.value;plxRedesenha();}});
 
+/* ---------- vencimento: 5º dia útil do mês seguinte ao mês do fechamento ---------- */
+function ficVenc(ano,mes){var d=new Date(ano,mes,1),n=0;while(true){if(pzUtil(d)){n++;if(n===5)return d;}d.setDate(d.getDate()+1);}}
+function ficAtraso(ano,mes){var v=ficVenc(ano,mes),h=new Date();h.setHours(0,0,0,0);return Math.round((h-v)/864e5);}
+function ficVencTxt(m){var a=ficAtraso(m.ano,m.mes),v=cliDia(ficVenc(m.ano,m.mes),false);return a>0?'<small class="fic-venc atr">Vencido há '+a+' dia'+(a===1?'':'s')+' (venceu '+v+')</small>':a===0?'<small class="fic-venc hoje">Vence hoje</small>':'<small class="fic-venc">Vence '+v+'</small>';}
+function ficDeve(M){var D=M.filter(function(m){return (+m.falta||0)>0.005;}),tot=D.reduce(function(s,m){return s+(+m.falta||0);},0);
+  if(!D.length)return '<div class="fic-k emdia"><span>'+ic('check')+'Em aberto com o laboratório</span><b>Tudo em dia</b><small>nenhum mês com valor pendente</small></div>';
+  var at=D.map(function(m){return {m:m,a:ficAtraso(m.ano,m.mes)};}).sort(function(x,y){return y.a-x.a;}),pior=at[0],venc=pior.a>0;
+  var lista=at.map(function(x){return PMES[x.m.mes-1]+': '+fmtR(x.m.falta)+(x.a>0?' · '+x.a+' dia'+(x.a===1?'':'s')+' de atraso':' · vence '+cliDia(ficVenc(x.m.ano,x.m.mes),false));}).join('<br>');
+  return '<div class="fic-k deve'+(venc?' urge':'')+'" role="alert"><span>'+ic('alerta')+(venc?'Você deve isto · pague urgente':'Em aberto com o laboratório')+'</span><b>'+fmtR(tot)+'</b>'+
+    (venc?'<em class="fic-atr">'+pior.a+' dia'+(pior.a===1?'':'s')+' em atraso</em>':'')+'<small>'+lista+'</small><small class="fic-regra">Vencimento: 5º dia útil do mês seguinte.</small></div>';}
+
 /* ---------- Financeiro: um extrato por mês (fechamento, pagamentos, comprovantes e os pedidos do mês) ---------- */
 var FIC={ano:null,lab:'',ab:null};
 var FIC_ST={pago:['ok','Pago'],parcial:['parc','Parcial'],aberto:['aberto','Em aberto'],zero:['zero','Sem valor']};
@@ -7086,7 +7104,7 @@ function rFinClinica(){
     pagoAno+=x.pago;gastoAno+=x.F.length?Math.max(x.valor,0):x.tab;});
   if(FIC.ab==null){FIC.ab={};var pri=L.filter(function(x){return x.falta>0.005;})[0]||L[0];if(pri)FIC.ab[pri.k]=1;}
   var h='<div class="fic">'+
-    '<div class="fic-top"><div class="fic-k '+(aberto>0.005?'deve':'emdia')+'"><span>'+ic(aberto>0.005?'alerta':'check')+'Em aberto com o laboratório</span><b>'+(aberto>0.005?fmtR(aberto):'Tudo em dia')+'</b><small>'+(aberto>0.005?'soma do que falta pagar, em todos os meses':'nenhum mês com valor pendente')+'</small></div>'+
+    '<div class="fic-top">'+ficDeve(M)+
       '<div class="fic-k"><span>'+ic('check')+'Pago em '+FIC.ano+'</span><b>'+fmtR(pagoAno)+'</b></div>'+
       '<div class="fic-k"><span>'+ic('moeda')+'Gasto em '+FIC.ano+'</span><b>'+fmtR(gastoAno)+'</b><small>fechamentos do laboratório'+(L.some(function(x){return !x.F.length&&x.tab;})?' + meses ainda sem fechamento':'')+'</small></div></div>'+
     '<div class="fic-f">'+(anos.length>1?'<div class="pdb-seg" role="group" aria-label="Ano">'+anos.map(function(a){return '<button data-fic="ano" data-v="'+a+'" aria-pressed="'+(a===FIC.ano)+'">'+a+'</button>';}).join('')+'</div>':'<b class="fic-ano">'+FIC.ano+'</b>')+
@@ -7095,7 +7113,7 @@ function rFinClinica(){
   h+=L.map(function(x){var ab=!!FIC.ab[x.k],st=x.sit?FIC_ST[x.sit]:(x.k===kHoje?['and','Mês em andamento']:['zero','Sem fechamento']),n=x.P.length;
     var cab='<button type="button" class="fic-h" data-fic="ab" data-v="'+x.k+'" aria-expanded="'+ab+'">'+
       '<span class="fic-mes"><b>'+PMES[x.mes-1]+'</b><small>'+n+' trabalho'+(n===1?'':'s')+(x.el&&x.el!==n?' · '+x.el+' elementos':'')+'</small></span>'+
-      (x.F.length?'<span class="fic-n"><small>Valor do mês</small><b>'+fmtR(x.valor)+'</b></span><span class="fic-n"><small>Pago</small><b>'+fmtR(x.pago)+'</b></span><span class="fic-n"><small>Falta</small><b class="'+(x.falta>0.005?'deve':'')+'">'+(x.falta>0.005?fmtR(x.falta):'—')+'</b></span>'
+      (x.F.length?'<span class="fic-n"><small>Valor do mês</small><b>'+fmtR(x.valor)+'</b></span><span class="fic-n"><small>Pago</small><b>'+fmtR(x.pago)+'</b></span><span class="fic-n"><small>Falta</small><b class="'+(x.falta>0.005?'deve':'')+'">'+(x.falta>0.005?fmtR(x.falta):'—')+'</b>'+(x.falta>0.005?ficVencTxt(x):'')+'</span>'
                :'<span class="fic-n fic-n3"><small>Pela tabela, até agora</small><b>'+(x.tab?fmtR(x.tab):'—')+'</b></span>')+
       '<span class="fic-st '+st[0]+'">'+st[1]+'</span>'+ic('seta','fic-seta')+'</button>';
     if(!ab)return '<section class="fic-m">'+cab+'</section>';
@@ -7152,7 +7170,7 @@ function rPagClinica(){
   var h='<div class="fic"><div class="fic-top pgc-top">'+
     '<div class="fic-k"><span>'+ic('moeda')+'Total dos meses</span><b>'+fmtR(tot)+'</b><small>'+L.length+' mes'+(L.length===1?'':'es')+'</small></div>'+
     '<div class="fic-k"><span>'+ic('check')+'Pago</span><b>'+fmtR(pg)+'</b><small>'+np+' pagamento'+(np===1?'':'s')+' · '+nc+' com comprovante</small></div>'+
-    '<div class="fic-k '+(fal>0.005?'deve':'emdia')+'"><span>'+ic(fal>0.005?'alerta':'check')+'Falta pagar</span><b>'+(fal>0.005?fmtR(fal):'Tudo em dia')+'</b></div></div>'+
+    ficDeve(M.filter(function(m){return !PGC.lab||m.lab_id===PGC.lab;}))+'</div>'+
     '<div class="fic-f">'+(anos.length>1?'<div class="pdb-seg" role="group" aria-label="Ano"><button data-pgc="ano" data-v="todos" aria-pressed="'+(PGC.ano==='todos')+'">Todos</button>'+anos.map(function(a){return '<button data-pgc="ano" data-v="'+a+'" aria-pressed="'+(String(PGC.ano)===String(a))+'">'+a+'</button>';}).join('')+'</div>':'')+
     (nl?'<select id="pgc-lab" aria-label="Laboratório"><option value="">Todos os laboratórios</option>'+Object.keys(labs).map(function(k){return '<option value="'+k+'"'+(k===PGC.lab?' selected':'')+'>'+esc(labs[k])+'</option>';}).join('')+'</select>':'')+'</div>';
   if(!L.length)return h+'<div class="card lsub-v">O laboratório ainda não lançou nenhum mês.</div></div>';
@@ -7160,7 +7178,7 @@ function rPagClinica(){
     L.map(function(m){var st=ST[m.situacao]||ST.aberto,P=(m.pagamentos||[]).slice().sort(function(a,b){return String(a.data)<String(b.data)?-1:1;}),f=+m.falta||0;
       return '<div class="pgc-r pgc-'+st[0]+'" role="row"><span class="pgc-mes"><b>'+PMES[m.mes-1]+'/'+m.ano+'</b>'+(nl?'<small>'+esc(m.lab||'')+'</small>':'')+'</span>'+
         '<span class="n" data-l="Valor">'+fmtR(+m.valor||0)+'</span><span class="n" data-l="Pago">'+fmtR(+m.pago||0)+(+m.credito>0.005?'<small class="pgc-cr">+ '+fmtR(m.credito)+' de crédito</small>':'')+'</span>'+
-        '<span class="n pgc-f'+(f>0.005?' deve':'')+'" data-l="Falta">'+(f>0.005?fmtR(f):'—')+'</span>'+
+        '<span class="n pgc-f'+(f>0.005?' deve':'')+'" data-l="Falta">'+(f>0.005?fmtR(f)+ficVencTxt(m):'—')+'</span>'+
         '<span><i class="fic-st '+st[0]+'">'+st[1]+'</i></span>'+
         '<span class="pgc-cs">'+(P.length?P.map(pgcChip).join(''):'<small class="muted">nenhum pagamento</small>')+'</span>'+
         '<span>'+(m.extrato?'<button class="pgc-ex" data-act="phArq" data-v="'+esc(m.extrato)+'">'+ic('doc')+'Extrato</button>':'<small class="muted">sem extrato</small>')+'</span></div>';}).join('')+'</div>';
