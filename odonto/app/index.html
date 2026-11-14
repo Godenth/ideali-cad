@@ -1857,6 +1857,24 @@ body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
 .rcb-l{display:grid;gap:6px}.rcb-i{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}.rcb-i>span{display:grid;min-width:0}.rcb-i small{color:var(--muted)}
 .kc-rcb{border-color:color-mix(in srgb,#16A34A 55%,var(--line))!important;color:#15803D!important}[data-theme=dark] .kc-rcb{color:#86EFAC!important}
 body.espelho .rcb-ban,body.espelho .exb-ban{display:none!important}
+.exb{width:min(720px,100%)}.exb .pfx-i{grid-template-columns:24px 56px 1fr auto}.exb .pfx-i>span:nth-child(3){display:grid;min-width:0}.exb .pfx-i>.pzs{justify-self:end}.exb .pfx-l{max-height:34vh}
+.exb-sec{display:grid;gap:4px}.exb-sec h4{margin:6px 0 0;font-size:.95rem;display:flex;align-items:center;gap:6px}.exb-sec h4 .ic{margin:0;color:var(--accent)}.exb-sec p{margin:0}
+.exb-n{font-size:.75rem;font-weight:700;background:var(--soft);border-radius:999px;padding:1px 8px;color:var(--muted)}
+.exb-fora .pfx-l{max-height:22vh}.exb-info{margin:0;font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:4px;flex-wrap:wrap}.exb-info .ic{margin:0;color:#16A34A}
+.exb-fraco{font-style:normal;font-weight:600;font-size:.74rem;color:#B45309;background:color-mix(in srgb,#F59E0B 16%,transparent);border-radius:6px;padding:1px 6px;margin-left:4px}
+.exb-lendo{margin:18px 0;color:var(--muted)}
+.pzs{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap;justify-self:end}
+.pzs.pzs-antes{background:color-mix(in srgb,#2563EB 14%,transparent);color:#1D4ED8}.pzs.pzs-prazo{background:color-mix(in srgb,#16A34A 15%,transparent);color:#15803D}.pzs.pzs-atraso{background:color-mix(in srgb,#DC2626 14%,transparent);color:#B91C1C}
+[data-theme=dark] .pzs.pzs-antes{color:#93C5FD}[data-theme=dark] .pzs.pzs-prazo{color:#86EFAC}[data-theme=dark] .pzs.pzs-atraso{color:#FCA5A5}
+.pzm-bar{display:flex;gap:2px;height:10px;border-radius:999px;overflow:hidden;background:var(--soft);min-width:80px;flex:1}.pzm-bar i{display:block;height:100%}.pzm-bar i[style*="width:0.0%"]{display:none}
+i.pzs-antes{background:#3B82F6}i.pzs-prazo{background:#22C55E}i.pzs-atraso{background:#EF4444}
+.pzm-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;flex:none}
+.pzm-geral{display:grid;gap:8px}.pzm-geral .pzm-bar{height:16px}.pzm-leg{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}.pzm-leg span{display:inline-flex;align-items:center}
+.pzm-k{grid-template-columns:repeat(4,minmax(0,1fr))}.pzm-f{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.pzm-f select{padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.88rem;max-width:260px}
+.pzm-bc{min-width:150px}td.pzm-bc{display:flex;align-items:center;gap:8px}td.pzm-bc small{width:36px;text-align:right;font-variant-numeric:tabular-nums}
+.pzm-ruim{color:#DC2626}[data-theme=dark] .pzm-ruim{color:#F87171}.pzm-r{cursor:pointer}.pzm-r:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+@media(max-width:760px){.pzm-k{grid-template-columns:repeat(2,minmax(0,1fr))}.exb .pfx-i{grid-template-columns:24px 1fr auto}.exb .pfx-i .pedn{display:none}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5301,7 +5319,7 @@ function aiVerifica(){var R=finDoMes(),comPdf=R.filter(function(m){return m.extr
   aiDiz('🔍 Verificar extratos anexados · '+MESES[FIN.mes-1]+'/'+FIN.ano,true);
   if(!comPdf.length){aiDiz('Não há extratos em PDF anexados neste mês para eu conferir.'+(antigos?' ('+antigos+' ainda estão no sistema antigo.)':''));return;}
   var suspeitos=[],semExpl=[];AI.suspeitos=suspeitos;aiDiz('Vou abrir e conferir <b>'+comPdf.length+' extrato'+(comPdf.length>1?'s':'')+'</b> anexado'+(comPdf.length>1?'s':'')+'…');AI.busy=true;aiRender();var ok=0,ruins=[];
-  comPdf.reduce(function(pr,m){return pr.then(function(){var nome=finCliNome(m);return finUrlAssinada(m.extrato_path).then(function(u){return fetch(u);}).then(function(r){if(!r.ok)throw 0;return r.blob();})
+  comPdf.reduce(function(pr,m){return pr.then(function(){var nome=finCliNome(m);return Promise.resolve().then(function(){return finUrlAssinada(m.extrato_path);}).then(function(u){return fetch(u);}).then(function(r){if(!r.ok)throw 0;return r.blob();})
     .then(function(b){return extTexto(new File([b],'extrato.pdf',{type:'application/pdf'}));}).then(function(tx){var d=extParse(tx),div=[],lnk='<button class="ih-ver" data-act="finArqVer" data-v="'+esc(m.extrato_path)+'">📄 abrir extrato</button>';
       if(!d.mes||d.debitos==null){div.push('não consegui ler o mês ou o total deste PDF');}
       else{if(d.ano!==m.ano||d.mes!==m.mes)div.push('o PDF é de <b>'+MESES[d.mes-1]+'/'+d.ano+'</b>, mas está anexado em '+MESES[m.mes-1]+'/'+m.ano);
@@ -7109,41 +7127,126 @@ rDLabTab=function(D){return RL.user?rLabClinica(D):rDPedidos2(D);};
    - Clínica: botão "Recebi" no pedido em andamento.
    - Laboratório vê quais pedidos os clientes confirmaram e pode devolver ao quadro.
    ===================================================================================== */
-var EXB={visto:null,fila:[],m:null,sel:null,busy:false};
+var EXB={visto:null,fila:[],m:null,sel:null,busy:false,lendo:false,cache:{},R:null};
 var EXB_AB=['desenho','producao','finalizado','aguardando'];
+/* ---------- leitura das linhas do extrato (data = dia em que o trabalho ficou pronto) ---------- */
+function exbLinhasTx(tx){var out=[],cur=null,NUM='(-?\\s?[\\d.]+,\\d{2}-?)';
+  var reS=new RegExp('^(\\d{2})\\/(\\d{2})\\/(\\d{4})\\s+(\\S+)\\s+(.*?)\\s*'+NUM+'\\s+'+NUM+'$'),reI=new RegExp('^(\\d{1,3})\\s+(.+?)\\s+'+NUM+'$');
+  String(tx||'').split('\n').forEach(function(l){l=l.trim();var m=l.match(reS);
+    if(m&&!/pagamento/i.test(m[4]+' '+m[5])){var v=extNum(m[6]);if(v==null||v>=0){cur=null;return;}var h=m[5].replace(/^Paciente:\s*/i,'').trim();
+      cur={data:m[3]+'-'+m[2]+'-'+m[1],ficha:m[4],paciente:/^Paciente:/i.test(m[5])?h:'',hist:h,valor:Math.abs(v),itens:[]};out.push(cur);return;}
+    if(m||/^\d{2}\/\d{2}\/\d{4}/.test(l)){cur=null;return;}
+    var i=cur&&l.match(reI);if(i){var vi=extNum(i[3]);cur.itens.push({qtd:+i[1],desc:i[2].trim(),valor:vi==null?null:Math.abs(vi)});}});
+  return out;}
+var _extParseEXB=extParse;extParse=function(tx){var d=_extParseEXB.apply(this,arguments);try{d.linhas=exbLinhasTx(tx);}catch(e){d.linhas=[];}return d;};
+var _extAnalisaEXB=extAnalisa;extAnalisa=function(it){var r=_extAnalisaEXB.apply(this,arguments);try{if(it.cliId&&it.d&&it.d.ano&&it.d.linhas)EXB.cache[it.cliId+'|'+it.d.ano+'-'+it.d.mes]=it.d.linhas;}catch(e){}return r;};
+/* extrato anexado antes (ou por outro caminho): baixa o PDF do armazenamento privado e lê */
+function exbLinhas(m){var k=m.cliente_id+'|'+m.ano+'-'+m.mes;if(EXB.cache[k])return Promise.resolve(EXB.cache[k]);if(!m.extrato_path)return Promise.resolve(null);
+  return Promise.resolve().then(function(){return finUrlAssinada(m.extrato_path);}).then(function(u){return fetch(u);}).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();})
+    .then(function(b){return extTexto({arrayBuffer:function(){return Promise.resolve(b);}});}).then(function(tx){var L=exbLinhasTx(tx);if(L.length)EXB.cache[k]=L;return L.length?L:null;}).catch(function(){return null;});}
+
+/* ---------- prazo: dias úteis gastos entre a entrada no sistema e o dia em que ficou pronto ---------- */
+function pzDiaLocal(iso){if(!iso)return null;var s=String(iso);var d=/^\d{4}-\d{2}-\d{2}$/.test(s)?new Date(s+'T12:00:00'):new Date(s);d.setHours(0,0,0,0);return d;}
+function pzGastos(entrada,pronto){var d=pzPrimeiroDia(entrada),p=pzDiaLocal(pronto),n=0;if(!p||p<d)return 0;while(d<=p){if(pzUtil(d))n++;d.setDate(d.getDate()+1);}return n;}
+function pzSituacao(entrada,pronto,txt){var F=pzFaixa(txt),g=pzGastos(entrada,pronto);return {g:g,F:F,st:g<F[0]?'antes':g<=F[1]?'prazo':'atraso',atraso:Math.max(0,g-F[1]),ate:pzDia(entrada,F[1])};}
+var PZ_ST={antes:['Antes do prazo','pzs-antes'],prazo:['No prazo','pzs-prazo'],atraso:['Atrasado','pzs-atraso']};
+function pzChip(s){return '<span class="pzs '+PZ_ST[s.st][1]+'">'+PZ_ST[s.st][0]+(s.st==='atraso'?' '+s.atraso+' dia'+(s.atraso===1?'':'s'):'')+'</span>';}
+
+/* ---------- casa cada linha do extrato com os pedidos do cliente ---------- */
+var EXB_STOP=['de','da','do','das','dos','e','sr','sra','dr','dra'];
+function exbTok(s){return semAc(s).replace(/[^a-z0-9 ]+/g,' ').split(' ').filter(function(w){return w.length>1&&EXB_STOP.indexOf(w)<0;});}
+function exbNome(a,b){var x=exbTok(a),y=exbTok(b);if(!x.length||!y.length)return 0;if(x.join(' ')===y.join(' '))return 3;if(x[0]!==y[0])return 0;
+  var c=x.length<=y.length?x:y,l=c===x?y:x;return c.every(function(w){return l.indexOf(w)>=0;})?2:1;}
+function exbPool(m){return PED.L.filter(function(p){return !p.apagado&&p.status!=='orcamento'&&p.status!=='cancelado'&&(m.cliente_id?p.cliente_id===m.cliente_id:(!!m.cliente_reg&&!p.cliente_id&&p.cliente_reg===m.cliente_reg));});}
 function exbPend(m){var fim=m.ano+'-'+('0'+m.mes).slice(-2)+'-31';
-  return PED.L.filter(function(p){return !p.arquivado&&!p.apagado&&EXB_AB.indexOf(p.status)>=0&&(m.cliente_id?p.cliente_id===m.cliente_id:(!!m.cliente_reg&&!p.cliente_id&&p.cliente_reg===m.cliente_reg))&&isoD(new Date(p.criado_em))<=fim;})
-    .sort(function(a,b){return a.criado_em<b.criado_em?-1:1;});}
+  return exbPool(m).filter(function(p){return !p.arquivado&&EXB_AB.indexOf(p.status)>=0&&isoD(new Date(p.criado_em))<=fim;}).sort(function(a,b){return a.criado_em<b.criado_em?-1:1;});}
+function exbEntrada(p){return (p.envio_id&&PZM.env[p.envio_id])||p.criado_em;}
+function exbCasa(m,L){var pool=exbPool(m),usado={},R={baixa:[],ja:[],novo:[],fora:[],semPac:[]};
+  L.slice().sort(function(a,b){return a.data<b.data?-1:1;}).forEach(function(l){
+    if(!l.paciente){R.semPac.push(l);return;}
+    var dl=new Date(l.data+'T23:59:59'),ini=new Date(dl.getTime()-150*864e5);
+    var ja=pool.filter(function(p){return !usado[p.id]&&p.origem==='extrato'&&(p.obs||'').indexOf('ficha '+l.ficha)>=0;});
+    var C=ja.length?ja.map(function(p){return {p:p,s:3};}):pool.filter(function(p){var d=new Date(p.criado_em);return !usado[p.id]&&d<=new Date(dl.getTime()+864e5)&&d>=ini;})
+      .map(function(p){return {p:p,s:exbNome(p.paciente,l.paciente)};}).filter(function(x){return x.s>0;});
+    var forte=C.filter(function(x){return x.s>=2;});if(!forte.length&&C.length===1)forte=C;
+    if(!forte.length){R.novo.push({l:l});return;}
+    forte.sort(function(a,b){var ab=(a.p.arquivado?1:0)-(b.p.arquivado?1:0);return ab||(b.s-a.s)||(a.p.criado_em<b.p.criado_em?-1:1);});
+    var p0=forte[0].p,G=[p0];
+    /* mesmo envio da clínica (vários itens) ou vários pedidos abertos do mesmo paciente no mesmo dia = uma linha do extrato */
+    pool.forEach(function(p){if(p===p0||usado[p.id])return;if((p0.envio_id&&p.envio_id===p0.envio_id)||(!p0.arquivado&&!p.arquivado&&exbNome(p.paciente,p0.paciente)>=2&&isoD(new Date(p.criado_em))===isoD(new Date(p0.criado_em))))G.push(p);});
+    G.forEach(function(p){usado[p.id]=1;});
+    var x={l:l,peds:G,fraco:forte[0].s<2};(G.some(function(p){return !p.arquivado;})?R.baixa:R.ja).push(x);});
+  R.fora=exbPend(m).filter(function(p){return !usado[p.id];});
+  return R;}
+
+/* ---------- janela de conferência ---------- */
 function exbDoMes(){if(typeof FIN==='undefined'||!FIN.carregado||!PED.carregado||ESP.dono)return [];return FIN.M.filter(function(m){return m.ano===FIN.ano&&m.mes===FIN.mes&&m.extrato_path&&exbPend(m).length;});}
-function exbAbre(m){EXB.m=m;EXB.sel={};exbPend(m).forEach(function(p){EXB.sel[p.id]=1;});EXB.busy=false;exbModal();}
+function exbAbre(m){EXB.m=m;EXB.R=null;EXB.sel={};EXB.busy=false;EXB.lendo=true;exbModal();
+  Promise.all([exbLinhas(m),pzmEnvios()]).then(function(r){if(EXB.m!==m)return;var L=r[0];EXB.lendo=false;
+    if(L&&L.length){EXB.R=exbCasa(m,L);EXB.R.baixa.forEach(function(x,i){if(!x.fraco)EXB.sel['b'+i]=1;});EXB.R.novo.forEach(function(x,i){EXB.sel['n'+i]=1;});}
+    else{EXB.R={semLeitura:true,fora:exbPend(m)};EXB.R.fora.forEach(function(p){EXB.sel['f'+p.id]=1;});}
+    exbModal();});}
 function exbProx(){if(EXB.m)return;while(EXB.fila.length){var id=EXB.fila.shift(),m=FIN.M.filter(function(x){return x.id===id;})[0];if(m&&m.extrato_path&&exbPend(m).length){exbAbre(m);return;}}}
-function exbFecha(){EXB.m=null;exbModal();setTimeout(exbProx,250);}
+function exbFecha(){EXB.m=null;EXB.R=null;exbModal();setTimeout(exbProx,250);}
+var EXB_STN={desenho:'Desenho',producao:'Em produção',finalizado:'Pronto',aguardando:'Aguardando informação',entregue:'Entregue'};
+function exbTrab(l){return l.itens.length?l.itens.map(function(i){return (i.qtd>1?i.qtd+'× ':'')+i.desc;}).join(' + '):l.hist;}
+function exbDia(iso){return iso.split('-').reverse().join('/');}
+function exbConta(){var R=EXB.R||{},n={b:0,n:0,f:0};Object.keys(EXB.sel).forEach(function(k){if(k[0]==='b'&&R.baixa)n.b+=R.baixa[+k.slice(1)].peds.filter(function(p){return !p.arquivado;}).length;else if(k[0]==='n')n.n++;else if(k[0]==='f')n.f++;});return n;}
 function exbModal(){var el=document.getElementById('exb-ov'),m=EXB.m;
   if(!m){if(el){el.remove();document.body.style.overflow='';}return;}
-  var L=exbPend(m),n=L.filter(function(p){return EXB.sel[p.id];}).length,ST={desenho:'Desenho',producao:'Em produção',finalizado:'Pronto',aguardando:'Aguardando informação'};
   if(!el){el=document.createElement('div');el.id='exb-ov';el.className='kc-ov';document.body.appendChild(el);}document.body.style.overflow='hidden';
-  el.innerHTML='<div class="kc-modal exb" role="dialog" aria-modal="true" aria-label="Dar baixa nos pedidos do extrato"><button type="button" class="kc-x" data-exb="fecha" aria-label="Fechar">'+ic('x')+'</button>'+
-    '<h3>'+ic('doc')+'Dar baixa nos pedidos do extrato</h3>'+
-    '<p class="exb-s"><b>'+esc(finCliNome(m))+'</b> · extrato de '+PMES[m.mes-1]+' de '+m.ano+'</p>'+
-    '<p class="small muted">Estes pedidos ainda estão abertos no seu quadro. Os marcados passam para <b>Entregue</b>, saem do quadro e o cliente passa a ver como finalizados. Desmarque o que ainda está sendo feito.</p>'+
-    '<div class="row wrap exb-r"><b>'+n+' de '+L.length+' marcados</b><span class="spacer"></span><button class="btn sm" data-exb="todos" data-v="1">Marcar todos</button><button class="btn sm" data-exb="todos" data-v="0">Desmarcar todos</button></div>'+
-    '<div class="pfx-l">'+L.map(function(p){return '<label class="pfx-i"><input type="checkbox" data-exbp="'+p.id+'"'+(EXB.sel[p.id]?' checked':'')+'><span class="pedn">#'+(p.numero||'—')+'</span><span><b>'+esc(p.paciente||'Sem paciente')+'</b><small>'+esc(p.trabalho||'Pedido')+' · '+ST[p.status]+' · criado em '+cliDia(p.criado_em,4)+'</small></span></label>';}).join('')+'</div>'+
-    '<div class="row exb-b"><button class="btn" data-exb="fecha">Agora não</button><span class="spacer"></span><button class="btn pri" data-exb="vai"'+(!n||EXB.busy?' disabled':'')+'>'+(EXB.busy?'Dando baixa…':'Dar baixa em '+n+' pedido'+(n===1?'':'s'))+'</button></div></div>';}
-function exbVai(){var m=EXB.m;if(!m||EXB.busy)return;var L=exbPend(m).filter(function(p){return EXB.sel[p.id];});if(!L.length)return;
-  var patch={status:'entregue',arquivado:true},antes={},agora=new Date().toISOString();L.forEach(function(p){var k=p.status+'|'+(p.arquivado?1:0)+'|'+(p.entregue_em||'');(antes[k]=antes[k]||[]).push(p.id);});
-  EXB.busy=true;exbModal();
-  pfxAplica(L.map(function(p){return p.id;}),patch).then(function(){L.forEach(function(p){Object.assign(p,patch);});
-    var lotes=pfxLotes().concat([{em:agora,n:L.length,desc:'baixados pelo extrato de '+PMES[m.mes-1].toLowerCase()+' ('+finCliNome(m)+')',antes:antes}]).slice(-3),d=Object.assign({},EMP.row.dados||{});d.lotes=lotes;
+  var R=EXB.R,cab='<button type="button" class="kc-x" data-exb="fecha" aria-label="Fechar">'+ic('x')+'</button><h3>'+ic('doc')+'Dar baixa pelo extrato</h3><p class="exb-s"><b>'+esc(finCliNome(m))+'</b> · extrato de '+PMES[m.mes-1]+' de '+m.ano+'</p>';
+  if(EXB.lendo||!R){el.innerHTML='<div class="kc-modal exb" role="dialog" aria-modal="true" aria-label="Dar baixa pelo extrato">'+cab+'<p class="exb-lendo">A Ana está lendo o extrato…</p></div>';return;}
+  var ck=function(k){return '<input type="checkbox" data-exbk="'+k+'"'+(EXB.sel[k]?' checked':'')+'>';},h='',n=exbConta();
+  var secao=function(t,sub,cls,itens){return itens?'<section class="exb-sec '+cls+'"><h4>'+t+'</h4>'+(sub?'<p class="small muted">'+sub+'</p>':'')+'<div class="pfx-l">'+itens+'</div></section>':'';};
+  if(R.semLeitura){
+    h+='<p class="small muted">Não consegui ler as linhas deste extrato. Mostro os pedidos deste cliente que ainda estão abertos até o fim do mês. Desmarque o que ainda está sendo feito.</p>';
+    h+=secao('Pedidos abertos no quadro','','',R.fora.map(function(p){return '<label class="pfx-i">'+ck('f'+p.id)+'<span class="pedn">#'+(p.numero||'—')+'</span><span><b>'+esc(p.paciente||'Sem paciente')+'</b><small>'+esc(p.trabalho||'Pedido')+' · '+(EXB_STN[p.status]||p.status)+' · entrou em '+cliDia(p.criado_em,4)+'</small></span></label>';}).join(''));
+  }else{
+    h+='<p class="small muted">A data de cada linha do extrato é o dia em que o trabalho ficou pronto. Confira e confirme.</p>';
+    h+=secao(ic('check')+'No extrato e abertos no seu quadro <span class="exb-n">'+R.baixa.length+'</span>','Recebem baixa com a data do extrato.','',R.baixa.map(function(x,i){var p=x.peds[0],s=pzSituacao(exbEntrada(p),x.l.data,(p.trabalho||'')+' '+(p.material||''));
+      return '<label class="pfx-i">'+ck('b'+i)+'<span class="pedn">#'+(p.numero||'—')+(x.peds.length>1?' +'+(x.peds.length-1):'')+'</span><span><b>'+esc(p.paciente||'')+(x.fraco?' <em class="exb-fraco">nome parecido: extrato diz '+esc(x.l.paciente)+'</em>':'')+'</b>'+
+        '<small>'+esc(p.trabalho||'Pedido')+' · entrou '+cliDia(exbEntrada(p),4)+' · pronto '+exbDia(x.l.data)+' · '+s.g+' dia'+(s.g===1?'':'s')+' úteis (prazo '+(s.F[0]===s.F[1]?s.F[0]:s.F[0]+' a '+s.F[1])+')</small></span>'+pzChip(s)+'</label>';}).join(''));
+    h+=secao(ic('enviar')+'No extrato e não cadastrados <span class="exb-n">'+R.novo.length+'</span>','A Ana cadastra com o trabalho e o preço do extrato, já com baixa. Eles não entram no mapa de prazos (não se sabe o dia em que entraram).','',R.novo.map(function(x,i){var l=x.l;
+      return '<label class="pfx-i">'+ck('n'+i)+'<span class="pedn">novo</span><span><b>'+esc(l.paciente)+'</b><small>'+esc(exbTrab(l))+' · '+fmtR(l.valor)+' · pronto '+exbDia(l.data)+' · ficha '+esc(l.ficha)+'</small></span></label>';}).join(''));
+    if(R.ja.length)h+='<p class="exb-info">'+ic('check')+R.ja.length+' linha'+(R.ja.length===1?' já tinha':'s já tinham')+' baixa no sistema. A data de pronto do extrato fica guardada para o mapa de prazos.</p>';
+    if(R.semPac.length)h+='<p class="exb-info">'+R.semPac.length+' lançamento'+(R.semPac.length===1?'':'s')+' sem paciente ('+R.semPac.map(function(l){return esc(l.hist)+' '+fmtR(l.valor);}).join(', ')+') ficam só no financeiro.</p>';
+    h+=secao(ic('relogio')+'Abertos que não aparecem neste extrato <span class="exb-n">'+R.fora.length+'</span>','Provavelmente ainda estão sendo feitos. Marque só se já ficaram prontos.','exb-fora',R.fora.map(function(p){return '<label class="pfx-i">'+ck('f'+p.id)+'<span class="pedn">#'+(p.numero||'—')+'</span><span><b>'+esc(p.paciente||'Sem paciente')+'</b><small>'+esc(p.trabalho||'Pedido')+' · '+(EXB_STN[p.status]||p.status)+' · entrou em '+cliDia(p.criado_em,4)+'</small></span></label>';}).join(''));}
+  var tot=n.b+n.f,txt=[tot?tot+' baixa'+(tot===1?'':'s'):'',n.n?n.n+' cadastro'+(n.n===1?'':'s'):''].filter(Boolean).join(' e ');
+  el.innerHTML='<div class="kc-modal exb" role="dialog" aria-modal="true" aria-label="Dar baixa pelo extrato">'+cab+h+
+    '<div class="row exb-b"><button class="btn" data-exb="fecha">Agora não</button><span class="spacer"></span><button class="btn pri" data-exb="vai"'+(!txt&&!(R.ja||[]).length||EXB.busy?' disabled':'')+'>'+(EXB.busy?'Gravando…':txt?'Confirmar '+txt:'Guardar as datas')+'</button></div></div>';}
+function exbIsoPronto(dia,atual){if(atual&&pzK(new Date(atual))===dia)return atual;return dia+'T12:00:00-03:00';}
+function exbVai(){var m=EXB.m,R=EXB.R;if(!m||!R||EXB.busy)return;
+  var grupos={},antes={},criar=[],agora=new Date().toISOString(),nb=0,num=PED.L.reduce(function(a,x){return Math.max(a,x.numero||0);},0);
+  var poe=function(p,patch){var k=JSON.stringify(patch);(grupos[k]=grupos[k]||{patch:patch,ids:[]}).ids.push(p.id);var ka=p.status+'|'+(p.arquivado?1:0)+'|'+(p.entregue_em||'')+'|'+(p.finalizado_em||'');(antes[ka]=antes[ka]||[]).push(p.id);};
+  Object.keys(EXB.sel).forEach(function(k){
+    if(k[0]==='b'){R.baixa[+k.slice(1)].peds.forEach(function(p){var l=R.baixa[+k.slice(1)].l;if(!p.arquivado)nb++;poe(p,{status:'entregue',arquivado:true,finalizado_em:exbIsoPronto(l.data,p.finalizado_em)});});}
+    else if(k[0]==='f'){var p=PED.L.filter(function(x){return x.id===k.slice(1);})[0];if(p){nb++;poe(p,{status:'entregue',arquivado:true});}}
+    else if(k[0]==='n'){var l=R.novo[+k.slice(1)].l,c=EMP.cli.filter(function(x){return x.id===m.cliente_id;})[0];
+      criar.push({numero:++num,cliente_id:m.cliente_id||null,cliente_reg:m.cliente_id?null:(m.cliente_reg||null),cliente_nome:c?c.nome:finCliNome(m),paciente:l.paciente,tipo:'cad',trabalho:exbTrab(l).slice(0,300),
+        descricao:l.itens.map(function(i){return i.qtd+'× '+i.desc+(i.valor!=null?' — '+fmtR(i.valor):'');}).join('\n').slice(0,2000),qtd:Math.max(1,l.itens.reduce(function(s,i){return s+(i.qtd||0);},0)),valor:l.valor,
+        status:'entregue',arquivado:true,finalizado_em:l.data+'T12:00:00-03:00',criado_em:l.data+'T12:00:00-03:00',origem:'extrato',obs:'Cadastrado pela Ana pelo extrato de '+PMES[m.mes-1].toLowerCase()+'/'+m.ano+' · ficha '+l.ficha});}});
+  (R.ja||[]).forEach(function(x){x.peds.forEach(function(p){if(!p.finalizado_em||pzK(new Date(p.finalizado_em))!==x.l.data)poe(p,{finalizado_em:exbIsoPronto(x.l.data,null)});});});
+  EXB.busy=true;exbModal();var criados=[];
+  Object.keys(grupos).reduce(function(pr,k){var g=grupos[k];return pr.then(function(){return pfxAplica(g.ids,g.patch).then(function(){g.ids.forEach(function(id){var p=PED.L.filter(function(x){return x.id===id;})[0];if(p)Object.assign(p,g.patch);});});});},Promise.resolve())
+  .then(function(){if(!criar.length)return;return SB.from('odo_pedidos').insert(criar).select('*').then(function(r){if(r.error)throw r.error;criados=r.data||[];PED.L=criados.concat(PED.L);});})
+  .then(function(){if(!nb&&!criados.length)return;var lotes=pfxLotes().concat([{em:agora,n:nb+criados.length,desc:'pelo extrato de '+PMES[m.mes-1].toLowerCase()+' ('+finCliNome(m)+')'+(criados.length?', '+criados.length+' cadastrado'+(criados.length===1?'':'s'):''),antes:antes,criados:criados.map(function(p){return p.id;})}]).slice(-3),d=Object.assign({},EMP.row.dados||{});d.lotes=lotes;
     return SB.from('odo_empresas').update({dados:d}).eq('id',EMP.row.id).select('*').single().then(function(r){if(!r.error)EMP.row=r.data;});})
-  .then(function(){EXB.busy=false;EXB.m=null;exbModal();render();toast(L.length+' pedido'+(L.length===1?'':'s')+' com baixa. Para voltar atrás, use "Desfazer" na tela de Pedidos.');setTimeout(exbProx,400);})
-  .catch(function(){EXB.busy=false;exbModal();toast('Não consegui dar baixa em todos. Recarregue a página e confira.');});}
+  .then(function(){EXB.busy=false;EXB.m=null;EXB.R=null;exbModal();render();toast((nb?nb+' baixa'+(nb===1?'':'s'):'Datas guardadas')+(criados.length?' e '+criados.length+' cadastrado'+(criados.length===1?'':'s'):'')+'. Para voltar atrás, use "Desfazer" em Pedidos.');setTimeout(exbProx,400);})
+  .catch(function(){EXB.busy=false;exbModal();toast('Não consegui gravar tudo. Recarregue a página e confira.');});}
+/* desfazer o último lote também desfaz data de pronto e apaga o que a Ana cadastrou */
+ACT.pfxDesfaz=function(){var L=pfxLotes();if(!L.length)return;var u=L[L.length-1];if(!confirm('Desfazer o último lote ('+u.n+' pedidos)? Eles voltam para a situação de antes'+(u.criados&&u.criados.length?' e os cadastrados pela Ana são apagados':'')+'.'))return;
+  var ks=Object.keys(u.antes||{});ks.reduce(function(pr,k){var a=k.split('|'),patch={status:a[0],arquivado:a[1]==='1',entregue_em:a[2]||null};if(a.length>3)patch.finalizado_em=a[3]||null;
+      return pr.then(function(){return pfxAplica(u.antes[k],patch).then(function(){u.antes[k].forEach(function(id){var p=PED.L.filter(function(x){return x.id===id;})[0];if(p)Object.assign(p,patch);});});});},Promise.resolve())
+    .then(function(){if(!u.criados||!u.criados.length)return;return pfxAplica(u.criados,{apagado:true}).then(function(){PED.L=PED.L.filter(function(p){return u.criados.indexOf(p.id)<0;});});})
+    .then(function(){var d=Object.assign({},EMP.row.dados||{});d.lotes=L.slice(0,-1);return SB.from('odo_empresas').update({dados:d}).eq('id',EMP.row.id).select('*').single().then(function(r){if(!r.error)EMP.row=r.data;});})
+    .then(function(){render();toast('Lote desfeito. Os pedidos voltaram como estavam.');}).catch(function(){toast('Não consegui desfazer tudo. Recarregue e confira.');});};
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;var b=t.closest('[data-exb]'),el=document.getElementById('exb-ov');
   if(!b){if(el&&t===el&&!EXB.busy)exbFecha();return;}var a=b.getAttribute('data-exb');
   if(a==='fecha'){if(!EXB.busy)exbFecha();}
-  else if(a==='todos'){exbPend(EXB.m).forEach(function(p){if(b.getAttribute('data-v')==='1')EXB.sel[p.id]=1;else delete EXB.sel[p.id];});exbModal();}
   else if(a==='vai')exbVai();
   else if(a==='abre'){var L=exbDoMes();if(L.length){EXB.fila=L.map(function(m){return m.id;});exbProx();}}});
-document.addEventListener('change',function(e){var t=e.target,id=t&&t.getAttribute&&t.getAttribute('data-exbp');if(!id)return;if(t.checked)EXB.sel[id]=1;else delete EXB.sel[id];exbModal();});
+document.addEventListener('change',function(e){var t=e.target,k=t&&t.getAttribute&&t.getAttribute('data-exbk');if(!k)return;if(t.checked)EXB.sel[k]=1;else delete EXB.sel[k];exbModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&EXB.m&&!EXB.busy)exbFecha();});
 /* aviso no Financeiro do laboratório: meses com extrato e pedido ainda aberto */
 var _rFinMesEXB=rFinMes;rFinMes=function(){var h=_rFinMesEXB.apply(this,arguments),L=exbDoMes();if(!L.length)return h;var n=L.reduce(function(s,m){return s+exbPend(m).length;},0);
@@ -7153,6 +7256,54 @@ function exbObserva(){if(typeof FIN==='undefined'||!FIN.carregado||!PED.carregad
   if(!EXB.visto){EXB.visto={};FIN.M.forEach(function(m){EXB.visto[m.id]=m.extrato_path||'';});return;}
   var novos=[];FIN.M.forEach(function(m){var a=EXB.visto[m.id]||'';if((m.extrato_path||'')!==a){EXB.visto[m.id]=m.extrato_path||'';if(m.extrato_path&&!a&&exbPend(m).length)novos.push(m.id);}});
   if(novos.length){EXB.fila=EXB.fila.concat(novos);setTimeout(exbProx,700);}}
+
+/* =====================================================================================
+   Mapa de prazos do laboratório: entrou no sistema (por você ou pelo cliente) → ficou pronto.
+   Antes do prazo · no prazo · atrasado, por cliente, tipo de trabalho e mês.
+   ===================================================================================== */
+var PZM={on:false,per:'3m',cli:'',env:{},envOk:{},lim:30};
+function pzmEnvios(){var ids=[];PED.L.forEach(function(p){if(p.envio_id&&!PZM.envOk[p.envio_id])ids.push(p.envio_id);});ids=ids.filter(function(x,i){return ids.indexOf(x)===i;});if(!ids.length)return Promise.resolve();
+  var ch=[];for(var i=0;i<ids.length;i+=100)ch.push(ids.slice(i,i+100));
+  return Promise.all(ch.map(function(c){return SB.from('odo_ped_env').select('id,enviado_em,criado_em').in('id',c).then(function(r){(r.data||[]).forEach(function(e){PZM.env[e.id]=e.enviado_em||e.criado_em;});c.forEach(function(id){PZM.envOk[id]=1;});});})).catch(function(){});}
+function pzmIni(per){var h=new Date(),y=h.getFullYear(),m=h.getMonth();return {mes:new Date(y,m,1),mesp:new Date(y,m-1,1),'3m':new Date(y,m-2,1),'12m':new Date(y,m-11,1),tudo:new Date(2000,0,1)}[per];}
+function pzmDados(){var ini=pzmIni(PZM.per),h=new Date(),fimMesp=new Date(h.getFullYear(),h.getMonth(),1),out=[];
+  PED.L.forEach(function(p){if(p.apagado||!p.finalizado_em||p.origem==='extrato'||p.status==='cancelado'||p.status==='orcamento')return;if(PZM.cli&&(p.cliente_id||'')!==PZM.cli)return;
+    var f=new Date(p.finalizado_em);if(f<ini||(PZM.per==='mesp'&&f>=fimMesp))return;var e=exbEntrada(p);if(new Date(e)>f)return;
+    var s=pzSituacao(e,pzK(f),(p.trabalho||'')+' '+(p.material||''));s.p=p;s.ent=e;s.pr=f;out.push(s);});
+  return out;}
+function pzmResumo(L){var r={n:L.length,antes:0,prazo:0,atraso:0,g:0};L.forEach(function(s){r[s.st]++;r.g+=s.g;});r.med=r.n?r.g/r.n:0;r.ok=r.n?(r.antes+r.prazo)/r.n:0;return r;}
+function pzmBarra(r){if(!r.n)return '';var w=function(k){return (r[k]/r.n*100).toFixed(1);};return '<span class="pzm-bar" role="img" aria-label="'+r.antes+' antes, '+r.prazo+' no prazo, '+r.atraso+' atrasados"><i class="pzs-antes" style="width:'+w('antes')+'%"></i><i class="pzs-prazo" style="width:'+w('prazo')+'%"></i><i class="pzs-atraso" style="width:'+w('atraso')+'%"></i></span>';}
+function pzmTabela(tit,G){var ks=Object.keys(G).sort(function(a,b){return G[b].length-G[a].length;});if(!ks.length)return '';
+  return '<div class="card"><h3>'+tit+'</h3><div class="pdb-tw"><table class="pdb-t pzm-t"><thead><tr><th>'+(tit.indexOf('cliente')>=0?'Cliente':tit.indexOf('mês')>=0?'Mês':'Trabalho')+'</th><th class="n">Pedidos</th><th class="n">Antes</th><th class="n">No prazo</th><th class="n">Atrasados</th><th class="n">Média</th><th class="pzm-bc">No prazo ou antes</th></tr></thead><tbody>'+
+    ks.map(function(k){var r=pzmResumo(G[k]);return '<tr><td><b>'+esc(k)+'</b></td><td class="n">'+r.n+'</td><td class="n">'+r.antes+'</td><td class="n">'+r.prazo+'</td><td class="n'+(r.atraso?' pzm-ruim':'')+'">'+r.atraso+'</td><td class="n">'+r.med.toFixed(1).replace('.',',')+' d</td><td class="pzm-bc">'+pzmBarra(r)+'<small>'+Math.round(r.ok*100)+'%</small></td></tr>';}).join('')+'</tbody></table></div></div>';}
+function rPrazosMapa(){if(!PZM.envCarregado){PZM.envCarregado=true;pzmEnvios().then(render);}
+  var L=pzmDados(),r=pzmResumo(L),pct=function(n){return r.n?Math.round(n/r.n*100)+'%':'—';};
+  var pers=[['mes','Este mês'],['mesp','Mês passado'],['3m','3 meses'],['12m','12 meses'],['tudo','Tudo']];
+  var h='<div class="dtop"><div><h2>'+ic('relogio')+'Mapa de prazos</h2><p class="small muted">Do dia em que o pedido entrou no sistema (por você ou pelo cliente) até o dia em que ficou pronto, em dias úteis. Prazo: coroas e demais 5 a 7 · metalocerâmica 7 a 10 · protocolo 10.</p></div><button class="btn" data-pzm="sai">Voltar aos pedidos</button></div>'+
+    '<div class="pdb-f pzm-f"><div class="pdb-seg" role="group" aria-label="Período">'+pers.map(function(x){return '<button data-pzm="per" data-v="'+x[0]+'" aria-pressed="'+(PZM.per===x[0])+'">'+x[1]+'</button>';}).join('')+'</div>'+
+    '<select id="pzm-cli" aria-label="Cliente"><option value="">Todos os clientes</option>'+EMP.cli.slice().sort(function(a,b){return String(a.nome).localeCompare(b.nome,'pt');}).map(function(c){return '<option value="'+c.id+'"'+(PZM.cli===c.id?' selected':'')+'>'+esc(c.nome)+'</option>';}).join('')+'</select>'+
+    (L.length?'<button class="btn sm" data-pzm="csv">'+ic('baixar')+'Planilha</button>':'')+'</div>';
+  if(!L.length)return h+'<div class="card lsub-v">Nenhum pedido pronto neste período. A data de pronto vem de quando você marca o pedido como pronto, ou do extrato quando a Ana dá a baixa.</div>';
+  h+='<div class="pdb-k pzm-k">'+[['pzs-antes','Antes do prazo',r.antes,pct(r.antes)],['pzs-prazo','No prazo',r.prazo,pct(r.prazo)],['pzs-atraso','Atrasados',r.atraso,pct(r.atraso)],['','Média',r.med.toFixed(1).replace('.',',')+' dias úteis',r.n+' pedidos prontos']].map(function(k){return '<div class="pdb-kc"><span>'+(k[0]?'<i class="pzm-dot '+k[0]+'"></i>':ic('relogio'))+k[1]+'</span><b>'+k[2]+'</b><small>'+k[3]+'</small></div>';}).join('')+'</div>';
+  h+='<div class="card pzm-geral">'+pzmBarra(r)+'<div class="pzm-leg"><span><i class="pzm-dot pzs-antes"></i>Antes</span><span><i class="pzm-dot pzs-prazo"></i>No prazo</span><span><i class="pzm-dot pzs-atraso"></i>Atrasado</span></div></div>';
+  var porC={},porT={},porM={};L.forEach(function(s){var c=pedCli(s.p),t=pdbTipo(s.p.trabalho,s.p.material),mk=s.pr.getFullYear()+'-'+('0'+(s.pr.getMonth()+1)).slice(-2);(porC[c]=porC[c]||[]).push(s);(porT[t]=porT[t]||[]).push(s);(porM[mk]=porM[mk]||[]).push(s);});
+  var porMN={};Object.keys(porM).sort().reverse().forEach(function(k){var a=k.split('-');porMN[PMES[+a[1]-1]+'/'+a[0].slice(2)]=porM[k];});
+  if(!PZM.cli)h+=pzmTabela('Por cliente',porC);
+  h+='<div class="pdb-g2">'+pzmTabela('Por tipo de trabalho',porT)+pzmTabela('Por mês (dia em que ficou pronto)',porMN)+'</div>';
+  var A=L.filter(function(s){return s.st==='atraso';}).sort(function(a,b){return b.atraso-a.atraso;});
+  h+='<div class="card"><h3>Atrasados <small>'+A.length+'</small></h3>'+(A.length?'<div class="pdb-tw"><table class="pdb-t"><thead><tr><th>Pedido</th><th>Paciente</th><th>Cliente</th><th>Trabalho</th><th>Entrou</th><th>Prazo até</th><th>Pronto</th><th class="n">Atraso</th></tr></thead><tbody>'+
+    A.slice(0,PZM.lim).map(function(s){var p=s.p;return '<tr class="pzm-r" data-act="pedAbre" data-v="'+p.id+'"><td>#'+(p.numero||'—')+'</td><td><b>'+esc(p.paciente||'—')+'</b></td><td>'+esc(pedCli(p))+'</td><td>'+esc(p.trabalho||'—')+'</td><td>'+cliDia(s.ent)+'</td><td>'+cliDia(s.ate)+'</td><td>'+cliDia(s.pr)+'</td><td class="n pzm-ruim"><b>'+s.atraso+' dia'+(s.atraso===1?'':'s')+'</b></td></tr>';}).join('')+'</tbody></table></div>'+
+    (A.length>PZM.lim?'<button class="btn sm pdb-mais" data-pzm="mais">Mostrar mais ('+(A.length-PZM.lim)+')</button>':''):'<p class="pdb-vz">Nenhum atraso neste período. 🎉</p>')+'</div>';
+  return h;}
+function pzmCSV(){cliCSV('mapa-de-prazos.csv',[['Pedido','Paciente','Cliente','Trabalho','Entrou','Pronto','Dias úteis','Prazo (dias úteis)','Situação','Dias de atraso']].concat(pzmDados().map(function(s){var p=s.p;
+  return ['#'+(p.numero||''),p.paciente,pedCli(p),p.trabalho,cliDia(s.ent,4),cliDia(s.pr,4),s.g,s.F[0]===s.F[1]?s.F[0]:s.F[0]+' a '+s.F[1],PZ_ST[s.st][0],s.atraso||''];})));}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-pzm]');if(!b)return;var a=b.getAttribute('data-pzm');
+  if(a==='abre'){PZM.on=true;PZM.envCarregado=false;window.scrollTo(0,0);render();}else if(a==='sai'){PZM.on=false;render();}
+  else if(a==='per'){PZM.per=b.getAttribute('data-v');PZM.lim=30;render();}else if(a==='mais'){PZM.lim+=50;render();}else if(a==='csv')pzmCSV();});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='pzm-cli'){PZM.cli=e.target.value;render();}});
+var _rPedidosPZM=rPedidos;rPedidos=function(){if(PZM.on&&PED.carregado&&!PED.ed)return rPrazosMapa();var h=_rPedidosPZM.apply(this,arguments);
+  return h.replace('<button class="btn" data-act="pedCadistas">','<button class="btn" data-pzm="abre">'+ic('relogio')+'Mapa de prazos</button><button class="btn" data-act="pedCadistas">');};
+var _pedAbrePZM=ACT.pedAbre;ACT.pedAbre=function(){PZM.on=false;return _pedAbrePZM.apply(this,arguments);};
 
 /* clínica: "Recebi" */
 var CLI_RCB=false;
