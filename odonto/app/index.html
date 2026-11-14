@@ -1875,7 +1875,7 @@ i.pzs-antes{background:#3B82F6}i.pzs-prazo{background:#22C55E}i.pzs-atraso{backg
 .pzm-bc{min-width:150px}td.pzm-bc{display:flex;align-items:center;gap:8px}td.pzm-bc small{width:36px;text-align:right;font-variant-numeric:tabular-nums}
 .pzm-ruim{color:#DC2626}[data-theme=dark] .pzm-ruim{color:#F87171}.pzm-r{cursor:pointer}.pzm-r:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
 @media(max-width:760px){.pzm-k{grid-template-columns:repeat(2,minmax(0,1fr))}.exb .pfx-i{grid-template-columns:24px 1fr auto}.exb .pfx-i .pedn{display:none}}
-.kc-tl{display:grid;grid-template-columns:3fr 2fr 1fr;gap:8px}.kc-fase{display:grid;gap:6px;padding:8px 6px 6px;border-radius:12px;background:var(--soft);min-width:0}
+.kc-tl{display:grid;grid-template-columns:3fr 1.2fr 1.2fr;gap:8px}.kc-fase{display:grid;gap:6px;padding:8px 6px 6px;border-radius:12px;background:var(--soft);min-width:0}
 .kc-fase>b{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:center}.kc-fase.a>b{color:var(--cx)}.kc-fase.f>b{color:#16A34A}
 .kc-tl .kc-step li span{font-size:.66rem;line-height:1.15}
 @media(max-width:600px){.kc-tl{grid-template-columns:1fr}.kc-fase{grid-template-columns:72px 1fr;align-items:center}.kc-fase>b{text-align:left}}
@@ -1886,6 +1886,16 @@ i.pzs-antes{background:#3B82F6}i.pzs-prazo{background:#22C55E}i.pzs-atraso{backg
 .ped-sub{display:inline-block;justify-self:start;font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:999px;background:color-mix(in srgb,var(--k,#7B3FE4) 14%,transparent);color:var(--ink)}
 .ped-sub.bad{background:color-mix(in srgb,#DC2626 16%,transparent);color:#B91C1C}[data-theme=dark] .ped-sub.bad{color:#FCA5A5}
 .plx-et-pronto{background:color-mix(in srgb,#16A34A 14%,transparent);color:#15803D}[data-theme=dark] .plx-et-pronto{color:#86EFAC}
+/* barrinha da etapa: enche devagar até a etapa atual e recomeça */
+.cbar{position:relative;grid-template-columns:repeat(5,1fr)!important;--g:3px}.plx-bar.cbar{--g:2px}
+.cbar i{background:var(--line)!important}
+.cbar:after{content:"";position:absolute;inset:0;background:var(--cx);border-radius:9px;
+  -webkit-mask:repeating-linear-gradient(90deg,#000 0 calc((100% - 4*var(--g))/5),transparent calc((100% - 4*var(--g))/5) calc((100% - 4*var(--g))/5 + var(--g)));
+  mask:repeating-linear-gradient(90deg,#000 0 calc((100% - 4*var(--g))/5),transparent calc((100% - 4*var(--g))/5) calc((100% - 4*var(--g))/5 + var(--g)));
+  clip-path:inset(0 calc(100% - var(--p)) 0 0);animation:cbarCarrega 3.2s ease-in-out infinite}
+.cbar.ok:after{animation:none}
+@keyframes cbarCarrega{0%{clip-path:inset(0 100% 0 0)}75%{clip-path:inset(0 calc(100% - var(--p)) 0 0)}92%{clip-path:inset(0 calc(100% - var(--p)) 0 0);opacity:1}100%{clip-path:inset(0 calc(100% - var(--p)) 0 0);opacity:.35}}
+@media (prefers-reduced-motion:reduce){.cbar:after{animation:none}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6768,11 +6778,11 @@ function ic(k,cl){return dIco(k,'ic'+(cl?' '+cl:''));}
 /* funcionário da clínica faz tudo, menos ver dinheiro */
 function cliDono(){if(typeof MEM!=='undefined'&&MEM.dono)return false;if(typeof UNI!=='undefined'&&UNI.ok===true&&UNI.dono===false)return false;return true;}
 /* linha do tempo: Recebido (aguardando aprovação → aprovado → desenhado) · Produção (fresagem → maquiagem) · Pronto (pronto/enviado) */
-var CLI_ET=[['Aguardando aprovação','Aguardando aprovação'],['Aprovado','Aprovado · em desenho'],['Desenhado','Desenhado'],['Fresagem','Na fresagem'],['Maquiagem','Na maquiagem'],['Pronto / enviado','Pronto / enviado']];
-var CLI_FASE=[['Recebido',0,2],['Produção',3,4],['Pronto',5,5]];
-var CLI_COR={apr:'#F59E0B',pend:'#DC2626',pronto:'#16A34A',rec:'#94A3B8',can:'#94A3B8',fin:'#16A34A',e0:'#F59E0B',e1:'#7C3AED',e2:'#6366F1',e3:'#2563EB',e4:'#DB2777',e5:'#16A34A'};
-function cliEtN(et){return et==='Desenhado'?2:(et==='Enviado para fresagem'||et==='Em produção')?3:et==='Maquiagem'?4:(et==='Pronto'||et==='Entregue')?5:1;}
-function cliEtI(e){var s=cliSt(e);return s==='apr'?0:s==='fin'?6:s==='pronto'?5:cliEtN(e.etapa);}
+var CLI_ET=[['Aguardando aprovação','Aguardando aprovação'],['Aprovado','Aprovado · em desenho'],['Desenhado','Desenhado'],['Fresagem e maquiagem','Fresagem e maquiagem'],['Pronto / enviado','Pronto / enviado']];
+var CLI_FASE=[['Recebido',0,2],['Produção',3,3],['Pronto',4,4]];
+var CLI_COR={apr:'#F59E0B',pend:'#DC2626',pronto:'#16A34A',rec:'#94A3B8',can:'#94A3B8',fin:'#16A34A',e0:'#F59E0B',e1:'#7C3AED',e2:'#6366F1',e3:'#2563EB',e4:'#16A34A'};
+function cliEtN(et){return et==='Desenhado'?2:(et==='Enviado para fresagem'||et==='Em produção'||et==='Maquiagem')?3:(et==='Pronto'||et==='Entregue')?4:1;}
+function cliEtI(e){var s=cliSt(e);return s==='apr'?0:s==='fin'?5:s==='pronto'?4:cliEtN(e.etapa);}
 /* situação de uma linha: apr (esperando o lab aceitar) · pend (pendência) · prod · fin (finalizado) · rec · can */
 function cliSt(e){if(pdgFeito(e))return e.status==='recusado'?'rec':(e.status==='cancelado'||e.etapa==='Cancelado')?'can':'fin';return e.status==='enviado'?'apr':e.etapa==='Aguardando informação'?'pend':e.etapa==='Pronto'?'pronto':'prod';}
 /* as 3 etapas: Recebido (aguardando aprovação, aprovado, desenhado) · Produção (fresagem, maquiagem) · Pronto (pronto/enviado) */
@@ -6780,7 +6790,7 @@ function cliFase(e){var s=cliSt(e);if(s==='apr'||s==='pend')return 'rcb';if(s===
 var CLI_FASES=[['rcb','caixa','Recebido','Nada recebido agora.'],['prd','chave','Produção','Nada em produção.'],['pto','check','Pronto','Nada pronto esperando.']];
 function cliCor(e){var s=cliSt(e);if(s==='pronto')return CLI_COR.pronto;return s==='prod'?CLI_COR['e'+cliEtN(e.etapa)]:CLI_COR[s];}
 function cliEtapaTxt(e){var s=cliSt(e);if(s==='apr')return 'Aguardando o laboratório aceitar';if(s==='pend')return 'O laboratório precisa de você';if(s==='rec')return 'Recusado';if(s==='can')return 'Cancelado';
-  if(s==='fin')return 'Pronto / enviado';if(s==='pronto')return 'Pronto / enviado · aguardando baixa';return e.etapa==='Em produção'?'Em produção':CLI_ET[cliEtN(e.etapa)][1];}
+  if(s==='fin')return 'Pronto / enviado';if(s==='pronto')return 'Pronto / enviado · aguardando baixa';return CLI_ET[cliEtN(e.etapa)][1];}
 function cliTrab(e){return (e.itens||[]).map(function(it){return it.trabalho;}).filter(Boolean).join(' + ')||'Pedido';}
 function cliAjuste(e){return (e.itens||[]).some(function(it){return it.ajuste;});}
 function cliLab(e){return (PDG.labNome&&PDG.labNome[e.lab_id])||e.lab_nome||'';}
@@ -6793,7 +6803,7 @@ function kcPrazo(e){if(pdgFeito(e)||e.etapa==='Pronto'||e.status==='cancelado'||
   return {cls:r.neg?'atr':ms<864e5?'quase':'ok',t:r.neg?'Atrasado '+t:t,ate:cliDia(I.max,false),ord:I.max.getTime(),I:I};}
 function cliAtrasado(e){var p=cliSt(e)==='pend'?null:kcPrazo(e);return !!(p&&p.cls==='atr');}
 function kcPill(p){return '<span class="kc-pz kc-pz-'+p.cls+'">'+ic(p.cls==='atr'?'alerta':p.cls==='par'?'pausa':'relogio')+esc(p.t)+'</span>';}
-function cliBarra(i,cl){return '<span class="'+cl+'" aria-hidden="true">'+[0,1,2,3,4,5].map(function(k){return '<i class="'+(k<i?'f':k===i?'a':'')+'"></i>';}).join('')+'</span>';}
+function cliBarra(i,cl){var n=CLI_ET.length,pc=Math.min(100,Math.round(Math.min(i+1,n)/n*1000)/10);return '<span class="cbar '+cl+(i>=n?' ok':'')+'" style="--p:'+pc+'%" aria-hidden="true">'+CLI_ET.map(function(){return '<i></i>';}).join('')+'</span>';}
 function cliChatBt(e){var k=chChaveCli(e),n=chNovas(k),tot=(CH.idx[chK(k)]||[]).length;
   return '<button class="btn sm ch-bt'+(n?' ch-novo':'')+'" data-ch="abre" data-k="'+esc(JSON.stringify(k))+'">'+ic('chat')+(tot?'Conversa':'Conversar')+(n?' <b>'+n+'</b>':'')+'</button>';}
 

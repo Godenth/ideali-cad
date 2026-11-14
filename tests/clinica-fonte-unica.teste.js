@@ -72,7 +72,7 @@ for(const [nm,opt,modo,dados] of [
    // pedido com 2 itens
    await p.fill('#plx-q','maria souza');await p.waitForTimeout(300);await p.click(linha);await p.waitForTimeout(400);
    const det=await p.$eval('#kc-ov',x=>x.innerText).catch(()=> '');
-   ok(/Itens deste pedido/.test(det)&&/Na fresagem/.test(det)&&/(No desenho|Aprovado)/.test(det)&&/Recebido/i.test(det)&&/Produção/i.test(det),nm+': pedido com 2 itens mostra a etapa de cada item'+(process.env.DBG?' >> '+det.replace(/\n/g,' / '):''));
+   ok(/Itens deste pedido/.test(det)&&/Fresagem e maquiagem/.test(det)&&/(No desenho|Aprovado)/.test(det)&&/Recebido/i.test(det)&&/Produção/i.test(det),nm+': pedido com 2 itens mostra a etapa de cada item'+(process.env.DBG?' >> '+det.replace(/\n/g,' / '):''));
    await p.screenshot({path:path.join(SAIDA,nm+'-3-itens.png')});await p.keyboard.press('Escape');await p.waitForTimeout(200);await p.fill('#plx-q','');
    // finalizados: os antigos estão aqui, como entregues
    await p.click('.lsub [data-v=ent]');await p.waitForTimeout(300);ok(!(await p.$('.plx-s')),nm+': Entregues é uma aba própria');await p.fill('#plx-q','leyliane');await p.waitForTimeout(300);
