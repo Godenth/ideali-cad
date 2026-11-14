@@ -1745,6 +1745,7 @@ body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
 .pdb>*,.pdb-g2>*{min-width:0}.pdb .card{min-width:0;max-width:100%}.fz-g{min-width:0;max-width:100%}
 .pdb .card,.fz-g{grid-template-columns:minmax(0,1fr)}.pdb .card>*,.fz-g>*{min-width:0}
 .fz-vis{width:fit-content;max-width:100%}
+.pdb-nota{margin:0;font-size:.8rem;color:var(--muted)}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6620,14 +6621,14 @@ ACT.temaTroca=function(){var n=temaEscuro()?'light':'dark';document.documentElem
 /* ===== Clínica · Painel dos trabalhos no Início: tudo o que foi feito nos laboratórios (fonte única: odo_clinica_fin) ===== */
 var PDB={per:'12m',lab:'',q:'',lim:40,pacTodos:false};
 var PDB_MC=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-function pdbTipo(t){var s=semAc(t||'');
+function pdbTipo(t,mat){var s=semAc((t||'')+' '+(mat||''));
   if(/protocolo/.test(s))return 'Protocolo';if(/total|dentadura/.test(s))return 'Prótese total';if(/\bppr\b|removivel/.test(s))return 'PPR';
   if(/faceta|lente|laminad/.test(s))return 'Faceta / lente';if(/onlay|inlay|overlay/.test(s))return 'Onlay / inlay';if(/provis/.test(s))return 'Provisório';
   if(/placa|bruxis|miorrelax/.test(s))return 'Placa';if(/modelo|enceramento|wax/.test(s))return 'Modelo / enceramento';
-  if(/coroa|unitari|elemento|zirc|e\.?\s?max|metalo|ceramic|dente/.test(s))return /implant/.test(s)&&!/sobre dente/.test(s)?'Coroa sobre implante':'Coroa';
-  if(/ponte|fixa/.test(s))return 'Prótese fixa';return 'Outro';}
+  if(/coroa|unitari|elemento|zirc|e[\.\-\s]?max|dissilic|metalo|ceramic|dente/.test(s))return /implant/.test(s)&&!/sobre dente/.test(s)?'Coroa sobre implante':'Coroa';
+  if(/ponte|fixa/.test(s))return 'Prótese fixa';var o=String(t||mat||'').trim();return o?o.charAt(0).toUpperCase()+o.slice(1,40):'Não informado';}
 function pdbMat(p){var s=semAc((p.material||'')+' '+(p.trabalho||''));
-  if(/zirc/.test(s))return 'Zircônia';if(/e\.?\s?max|dissilicato/.test(s))return 'E.max';if(/metalo|sobre metal/.test(s))return 'Metalocerâmica';
+  if(/zirc/.test(s))return 'Zircônia';if(/e[\.\-\s]?max|dissilicato/.test(s))return 'E.max';if(/metalo|sobre metal/.test(s))return 'Metalocerâmica';
   if(/pmma/.test(s))return 'PMMA';if(/resina/.test(s))return 'Resina';if(/acrilic/.test(s))return 'Acrílico';return 'Não informado';}
 function pdbEl(p){var d=Array.isArray(p.dentes)?p.dentes.length:0;return +p.qtd||d||1;}
 function pdbAnd(p){return ['desenho','aguardando','producao'].indexOf(p.status)>=0;}
@@ -6635,7 +6636,18 @@ function pdbEtapa(p){return p.status==='producao'&&p.enviado_inove?'Na fresagem'
 function pdbIni(){var h=new Date(),y=h.getFullYear(),m=h.getMonth();
   return {mes:new Date(y,m,1),mesp:new Date(y,m-1,1),'3m':new Date(y,m-2,1),'12m':new Date(y,m-11,1),ano:new Date(y,0,1),tudo:new Date(2000,0,1)}[PDB.per];}
 function pdbNoPer(p){var d=new Date(p.criado),i=pdbIni();if(PDB.per==='mesp'){var h=new Date();return d>=i&&d<new Date(h.getFullYear(),h.getMonth(),1);}return d>=i;}
-function pdbTodos(){var P=((DFL.d&&DFL.d.pedidos)||[]).filter(function(p){return p.status!=='cancelado'&&p.status!=='orcamento';});return PDB.lab?P.filter(function(p){return p.lab_id===PDB.lab;}):P;}
+function pdbMesK(d){d=new Date(d);return d.getFullYear()+'-'+(d.getMonth()+1);}
+/* O laboratório fecha o mês com um valor (extrato). Pedidos antigos vieram sem preço: o valor do fechamento
+   é dividido entre os pedidos sem preço daquele mês, por elemento (marcado com ≈). Assim o total bate com o extrato. */
+var PDB_C={d:null,L:null};
+function pdbBase(){if(PDB_C.d===DFL.d&&PDB_C.L)return PDB_C.L;var P=((DFL.d&&DFL.d.pedidos)||[]).filter(function(p){return p.status!=='cancelado'&&p.status!=='orcamento';}).map(function(p){var o={};for(var k in p)o[k]=p[k];o._est=false;return o;});
+  var F={};((DFL.d&&DFL.d.meses)||[]).forEach(function(m){var k=m.lab_id+'|'+m.ano+'-'+m.mes;F[k]=(F[k]||0)+(+m.valor||0);});
+  var G={};P.forEach(function(p){var k=p.lab_id+'|'+pdbMesK(p.criado);(G[k]=G[k]||[]).push(p);});
+  Object.keys(G).forEach(function(k){var fv=F[k];if(!fv)return;var L=G[k],con=L.reduce(function(s,p){return s+(p.valor==null?0:+p.valor);},0),sem=L.filter(function(p){return p.valor==null;}),el=sem.reduce(function(s,p){return s+pdbEl(p);},0),resto=fv-con;
+    if(!sem.length||resto<=0||!el)return;sem.forEach(function(p){p.valor=Math.round(resto*pdbEl(p)/el*100)/100;p._est=true;});});
+  PDB_C={d:DFL.d,L:P};return P;}
+function pdbFin(){var F={};((DFL.d&&DFL.d.meses)||[]).forEach(function(m){if(PDB.lab&&m.lab_id!==PDB.lab)return;var k=m.ano+'-'+m.mes,x=F[k]=F[k]||{v:0,pago:0};x.v+=+m.valor||0;x.pago+=+m.pago||0;});return F;}
+function pdbTodos(){var P=pdbBase();return PDB.lab?P.filter(function(p){return p.lab_id===PDB.lab;}):P;}
 function pdbAgrupa(L,fk){var G={};L.forEach(function(p){var k=fk(p);var g=G[k]=G[k]||{k:k,n:0,el:0,v:0,semV:0};g.n++;g.el+=pdbEl(p);if(p.valor!=null)g.v+=+p.valor;else g.semV++;});
   return Object.keys(G).map(function(k){return G[k];}).sort(function(a,b){return b.v-a.v||b.el-a.el;});}
 function pdbBarras(G,tot){var mx=G.reduce(function(m,g){return Math.max(m,g.v||0);},0)||1,me=G.reduce(function(m,g){return Math.max(m,g.el);},0)||1,porV=mx>1;
@@ -6643,7 +6655,7 @@ function pdbBarras(G,tot){var mx=G.reduce(function(m,g){return Math.max(m,g.v||0
     '<span class="pdb-hk">'+esc(g.k)+'</span><span class="pdb-hbar"><i style="width:'+Math.max(2,Math.round(w*100))+'%"></i></span><span class="pdb-hv"><b>'+(g.v?fmtR(g.v):g.el+' el.')+'</b><small>'+g.el+' el.'+(tot&&g.v?' · '+Math.round(g.v/tot*100)+'%':'')+'</small></span></div>';}).join('')+'</div>';}
 function pdbMeses(P){var h=new Date(),L=[];for(var i=11;i>=0;i--){var d=new Date(h.getFullYear(),h.getMonth()-i,1);L.push({y:d.getFullYear(),m:d.getMonth(),v:0,n:0,el:0});}
   P.forEach(function(p){var d=new Date(p.criado);L.forEach(function(x){if(x.y===d.getFullYear()&&x.m===d.getMonth()){x.n++;x.el+=pdbEl(p);if(p.valor!=null)x.v+=+p.valor;}});});
-  var mx=L.reduce(function(m,x){return Math.max(m,x.v);},0),porV=mx>0;if(!porV)mx=L.reduce(function(m,x){return Math.max(m,x.el);},0)||1;
+  var FM=pdbFin();L.forEach(function(x){var f=FM[x.y+'-'+(x.m+1)];if(f&&f.v>x.v)x.v=f.v;});var mx=L.reduce(function(m,x){return Math.max(m,x.v);},0),porV=mx>0;if(!porV)mx=L.reduce(function(m,x){return Math.max(m,x.el);},0)||1;
   var W=600,H=170,bw=W/12,top=mx;
   return '<svg class="pdb-col" viewBox="0 0 '+W+' '+(H+26)+'" role="img" aria-label="Gasto por mês nos últimos 12 meses">'+
     '<line x1="0" x2="'+W+'" y1="'+H+'" y2="'+H+'" class="pdb-base"/>'+
@@ -6660,7 +6672,7 @@ function pdbArco(P){var C={};P.forEach(function(p){(p.dentes||[]).forEach(functi
     return '<g><title>Dente '+n+': '+(c?c+' trabalho'+(c>1?'s':''):'nenhum')+'</title><rect x="'+x+'" y="'+yy.toFixed(1)+'" width="19" height="24" rx="7" class="pdb-d'+(c?' on':'')+'"'+(c?' style="fill-opacity:'+o.toFixed(2)+'"':'')+'/><text x="'+(x+9.5)+'" y="'+(yy+(dir>0?-5:36)).toFixed(1)+'" class="pdb-dn">'+n+'</text></g>';}).join('');};
   var top=Object.keys(C).sort(function(a,b){return C[b]-C[a];}).slice(0,3);
   return '<svg class="pdb-arco" viewBox="0 -4 400 160" role="img" aria-label="Dentes mais trabalhados">'+f(OA_UP,22,1)+f(OA_LO,94,-1)+'</svg><p class="pdb-leg">Mais trabalhados: '+top.map(function(k){return '<b>'+k+'</b> ('+C[k]+')';}).join(' · ')+'</p>';}
-function pdbLinhaTab(p){var d=new Date(p.criado);return '<tr><td>'+('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+String(d.getFullYear()).slice(2)+'</td><td><b>'+esc(p.paciente||'—')+'</b></td><td>'+esc(p.trabalho||'—')+'</td><td>'+esc(pdbMat(p))+'</td><td>'+esc((p.dentes||[]).join(', ')||'—')+'</td><td class="n">'+pdbEl(p)+'</td><td class="n">'+(p.valor==null?'<i class="muted">a definir</i>':fmtR(+p.valor))+'</td><td><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span></td></tr>';}
+function pdbLinhaTab(p){var d=new Date(p.criado);return '<tr><td>'+('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+String(d.getFullYear()).slice(2)+'</td><td><b>'+esc(p.paciente||'—')+'</b></td><td>'+esc(p.trabalho||'—')+'</td><td>'+esc(pdbMat(p))+'</td><td>'+esc((p.dentes||[]).join(', ')||'—')+'</td><td class="n">'+pdbEl(p)+'</td><td class="n">'+(p.valor==null?'<i class="muted">a definir</i>':(p._est?'<span title="Valor rateado do fechamento do mês do laboratório">≈ ':'')+fmtR(+p.valor)+(p._est?'</span>':''))+'</td><td><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span></td></tr>';}
 function pdbFiltraQ(L){var q=semAc(PDB.q).trim();if(!q)return L;return L.filter(function(p){return semAc([p.paciente,p.trabalho,p.material,(p.dentes||[]).join(' '),p.lab,pdbEtapa(p)].join(' ')).indexOf(q)>=0;});}
 function pdbTabela(L){var F=pdbFiltraQ(L).slice().sort(function(a,b){return new Date(b.criado)-new Date(a.criado);});
   return (F.length?'<div class="pdb-tw"><table class="pdb-t"><thead><tr><th>Data</th><th>Paciente</th><th>Trabalho</th><th>Material</th><th>Dentes</th><th class="n">Elem.</th><th class="n">Valor</th><th>Etapa</th></tr></thead><tbody>'+F.slice(0,PDB.lim).map(pdbLinhaTab).join('')+'</tbody></table></div>':'<p class="pdb-vz">Nada encontrado'+(PDB.q?' para "'+esc(PDB.q)+'"':'')+'.</p>')+
@@ -6670,7 +6682,7 @@ function rPainelClinica(){if(!RL.user)return '';
   if(!DFL.d&&!DFL.erro){dflCarrega();return '<section class="card pdb"><h2>📊 Painel dos trabalhos</h2><p class="pdb-vz">Carregando…</p></section>';}
   if(DFL.erro)return '<section class="card pdb"><h2>📊 Painel dos trabalhos</h2><p class="pdb-vz">'+(DFL.erro==='falta061'?'Falta rodar a atualização 061 no Supabase.':'Não consegui carregar agora.')+' <button class="btn sm" data-act="dflRecarrega">Tentar de novo</button></p></section>';
   var T=pdbTodos(),P=T.filter(pdbNoPer),labs={};((DFL.d&&DFL.d.pedidos)||[]).forEach(function(p){labs[p.lab_id]=p.lab;});
-  var tot=P.reduce(function(s,p){return s+(p.valor==null?0:+p.valor);},0),el=P.reduce(function(s,p){return s+pdbEl(p);},0),semV=P.filter(function(p){return p.valor==null;}).length;
+  var tot=(function(){var S0={},F0=pdbFin();P.forEach(function(p){var k=pdbMesK(p.criado);S0[k]=(S0[k]||0)+(p.valor==null?0:+p.valor);});Object.keys(F0).forEach(function(k){var a=k.split('-');if(pdbNoPer({criado:new Date(+a[0],+a[1]-1,15).toISOString()})&&F0[k].v>(S0[k]||0))S0[k]=F0[k].v;});return Object.keys(S0).reduce(function(s,k){return s+S0[k];},0);})(),el=P.reduce(function(s,p){return s+pdbEl(p);},0),semV=P.filter(function(p){return p.valor==null;}).length;
   var pacs={};P.forEach(function(p){var k=semAc(p.paciente||'').trim();if(k)pacs[k]=1;});var nPac=Object.keys(pacs).length,and=T.filter(pdbAnd).length;
   var elV=P.reduce(function(s,p){return s+(p.valor==null?0:pdbEl(p));},0);
   var pers=[['mes','Este mês'],['mesp','Mês passado'],['3m','3 meses'],['12m','12 meses'],['ano','Este ano'],['tudo','Tudo']];
@@ -6678,9 +6690,11 @@ function rPainelClinica(){if(!RL.user)return '';
     '<div class="pdb-f"><div class="pdb-seg" role="group" aria-label="Período">'+pers.map(function(x){return '<button data-pdb="per" data-v="'+x[0]+'" aria-pressed="'+(PDB.per===x[0])+'">'+x[1]+'</button>';}).join('')+'</div>'+
     (Object.keys(labs).length>1?'<select id="pdb-lab" aria-label="Laboratório"><option value="">Todos os laboratórios</option>'+Object.keys(labs).map(function(k){return '<option value="'+k+'"'+(k===PDB.lab?' selected':'')+'>'+esc(labs[k])+'</option>';}).join('')+'</select>':'')+'</div></div>';
   if(!T.length)return h+'<div class="card pdb-vz">Ainda não há trabalhos. Quando você mandar pedidos para o laboratório (ou ele lançar os seus), tudo aparece aqui. <button class="btn sm pri" data-act="pdgNovo">📤 Fazer um pedido</button></div></section>';
-  var K=[['💰','Gasto no período',fmtR(tot),semV?semV+' sem valor ainda':''],['🦷','Trabalhos',P.length,''],['🔢','Elementos',el,''],['🧑','Pacientes',nPac,''],['📐','Média por elemento',elV?fmtR(tot/elV):'—',''],['🛠️','Em andamento agora',and,'todos os períodos']];
+  var FM=pdbFin(),pg=0,fv=0;Object.keys(FM).forEach(function(k){var a=k.split('-'),d=new Date(+a[0],+a[1]-1,15);if(pdbNoPer({criado:d.toISOString()})){pg+=FM[k].pago;fv+=FM[k].v;}});var est=P.some(function(p){return p._est;});
+  var K=[['💰','Gasto no período',fmtR(tot),(semV?semV+' sem valor ainda':'')+(fv?(semV?' · ':'')+'pago '+fmtR(pg)+(fv-pg>0.009?' · em aberto '+fmtR(fv-pg):''):'')],['🦷','Trabalhos',P.length,''],['🔢','Elementos',el,''],['🧑','Pacientes',nPac,''],['📐','Média por elemento',elV?fmtR(tot/elV):'—',''],['🛠️','Em andamento agora',and,'todos os períodos']];
+  if(est)h+='<p class="pdb-nota">≈ Alguns pedidos antigos vieram sem preço. Para o total bater com o extrato do laboratório, o valor do fechamento do mês foi dividido entre eles por elemento.</p>';
   h+='<div class="pdb-k">'+K.map(function(k,i){return '<div class="pdb-kc'+(i===0?' hero':'')+'"><span>'+k[0]+' '+k[1]+'</span><b>'+k[2]+'</b>'+(k[3]?'<small>'+k[3]+'</small>':'')+'</div>';}).join('')+'</div>';
-  var GT=pdbAgrupa(P,function(p){return pdbTipo(p.trabalho);}),GM=pdbAgrupa(P,pdbMat);
+  var GT=pdbAgrupa(P,function(p){return pdbTipo(p.trabalho,p.material);}),GM=pdbAgrupa(P,pdbMat);
   var GP=pdbAgrupa(P,function(p){return (p.paciente||'Sem nome').trim();});
   var ult={};P.forEach(function(p){var k=(p.paciente||'Sem nome').trim();if(!ult[k]||p.criado>ult[k])ult[k]=p.criado;});
   h+='<div class="pdb-g2"><div class="card"><h3>Gasto por mês <small>últimos 12 meses</small></h3>'+pdbMeses(T)+'</div>'+
@@ -6711,7 +6725,7 @@ var _rDInicioPDB=rDInicio;rDInicio=function(D){var h=_rDInicioPDB.apply(this,arg
   return h.slice(0,i)+kp+rPainelClinica();};
 /* ===== Finalizados: escolher a visualização (pranchetas · planilha simples · planilha separada por mês) ===== */
 function fzVis(){try{return localStorage.getItem('io_fz_vis')||'cards';}catch(e){return 'cards';}}
-function fzValor(){var M={};((DFL.d&&DFL.d.pedidos)||[]).forEach(function(p){if(p.envio)M[p.envio]=(M[p.envio]||0)+(p.valor==null?0:+p.valor);else M['lab-'+p.id]=p.valor==null?null:+p.valor;});return M;}
+function fzValor(){var M={};pdbBase().forEach(function(p){if(p.envio)M[p.envio]=(M[p.envio]||0)+(p.valor==null?0:+p.valor);else M['lab-'+p.id]=p.valor==null?null:+p.valor;});return M;}
 function fzLinhas(){PDG.f={feito:true};var L=pdgFiltra(pdgMeus());PDG.f=null;return L.slice().sort(function(a,b){return new Date(b.enviado_em||b.criado_em)-new Date(a.enviado_em||a.criado_em);});}
 function fzTab(L,V,cab){var d2=function(x){var d=new Date(x);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+String(d.getFullYear()).slice(2);};
   return '<div class="pdb-tw"><table class="pdb-t">'+(cab?'<thead><tr><th>Data</th><th>Paciente</th><th>Trabalho</th><th>Dentes</th><th>Cor</th><th>Laboratório</th><th class="n">Valor</th><th>Situação</th><th></th></tr></thead>':'')+'<tbody>'+
