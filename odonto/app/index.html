@@ -1941,6 +1941,120 @@ i.pzs-antes{background:#3B82F6}i.pzs-prazo{background:#22C55E}i.pzs-atraso{backg
 .rtx-out body>*:not(.rtx-cv):not(.rtx-tx){transition:transform .9s cubic-bezier(.5,0,.9,.4),opacity .7s ease;transform:scale(.93);opacity:.5;transform-origin:50% 40vh}
 .rtx-in body>*:not(.rtx-cv):not(.rtx-tx){animation:rtxChega .9s cubic-bezier(.16,.84,.3,1) both;transform-origin:50% 40vh}
 @keyframes rtxChega{from{transform:scale(1.07);opacity:.2}to{transform:none;opacity:1}}
+/* ===== Rede Ideali · estilo rede social ===== */
+.redeamb.rsx{--rc:#4F7BFF;--rc2:#8B5CF6;--rbg:#F4F6FB;--rsf:#FFFFFF;--rln:#E3E8F2;--rtx:#0F172A;--rmu:#5B6782;--rsh:0 1px 2px rgba(15,23,42,.05),0 8px 24px -12px rgba(15,23,42,.12);
+  background:var(--rbg);color:var(--rtx);min-height:100vh;padding-bottom:20px}
+:root[data-theme=dark] .redeamb.rsx{--rbg:#0B1020;--rsf:#141A2E;--rln:#232B45;--rtx:#E8ECF8;--rmu:#97A2C3;--rsh:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .redeamb.rsx{--rbg:#0B1020;--rsf:#141A2E;--rln:#232B45;--rtx:#E8ECF8;--rmu:#97A2C3;--rsh:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6)}}
+.rsx .rfundo{display:none}
+/* topo */
+.rs-top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--rsf) 82%,transparent);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--rln)}
+.rs-top-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 20px}
+.rs-marca{all:unset;cursor:pointer;display:flex;align-items:center;gap:9px}
+.rs-logo{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.15rem;background:linear-gradient(135deg,#4F7BFF,#8B5CF6 55%,#EC4899);box-shadow:0 6px 18px -6px #8B5CF6aa}
+.rs-nm{font-weight:700;font-size:1.05rem;letter-spacing:-.01em}.rs-nm b{background:linear-gradient(90deg,#4F7BFF,#8B5CF6,#EC4899);-webkit-background-clip:text;background-clip:text;color:transparent}
+.rs-busca{flex:1;max-width:440px;display:flex;align-items:center;gap:8px;background:var(--rbg);border:1px solid var(--rln);border-radius:999px;padding:0 14px;height:40px;color:var(--rmu)}
+.rs-busca:focus-within{border-color:var(--rc);box-shadow:0 0 0 4px color-mix(in srgb,var(--rc) 18%,transparent)}
+.rs-busca input{all:unset;flex:1;color:var(--rtx);font-size:.92rem;min-width:0}.rs-busca .ic{margin:0}
+.rs-ico{display:flex;gap:2px;margin-left:auto}
+.rs-ib{all:unset;cursor:pointer;display:grid;justify-items:center;gap:1px;padding:4px 12px;border-radius:12px;color:var(--rmu);position:relative}
+.rs-ib span{font-size:1.2rem;line-height:1.2}.rs-ib small{font-size:.7rem;font-weight:600}
+.rs-ib:hover{background:color-mix(in srgb,var(--rc) 8%,transparent);color:var(--rtx)}
+.rs-ib.on{color:var(--rtx)}.rs-ib.on:after{content:"";position:absolute;left:18%;right:18%;bottom:-11px;height:3px;border-radius:3px 3px 0 0;background:linear-gradient(90deg,var(--rc),var(--rc2))}
+.rs-volta{all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:.84rem;font-weight:600;padding:8px 12px;border-radius:999px;border:1px solid var(--rln);color:var(--rtx)}
+.rs-volta:hover{border-color:var(--rc)}.ic.rs-seta{transform:rotate(90deg);margin:0}
+.rs-av{all:unset;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:linear-gradient(135deg,#4F7BFF,#8B5CF6);box-shadow:0 0 0 2px var(--rsf),0 0 0 4px color-mix(in srgb,var(--rc) 45%,transparent)}
+.rsx .rav-m{background:var(--rsf);border:1px solid var(--rln);color:var(--rtx);box-shadow:var(--rsh)}
+/* grade */
+.rs-grid{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:250px minmax(0,1fr) 300px;gap:22px;padding:22px 20px;align-items:start}
+.rs-esq,.rs-dir{position:sticky;top:84px;display:grid;gap:14px}
+/* meu cartão */
+.rs-eu{background:var(--rsf);border:1px solid var(--rln);border-radius:20px;overflow:hidden;box-shadow:var(--rsh);display:grid;justify-items:center;text-align:center;padding:0 16px 16px}
+.rs-capa{height:64px;width:calc(100% + 32px);background:linear-gradient(120deg,#4F7BFF,#8B5CF6 50%,#EC4899);position:relative}
+.rs-capa:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 120%,rgba(255,255,255,.35),transparent 40%),radial-gradient(circle at 85% -20%,rgba(255,255,255,.3),transparent 40%)}
+.rs-eu-av{width:68px;height:68px;margin-top:-34px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:1.4rem;color:#fff;background:linear-gradient(135deg,#4F7BFF,#8B5CF6);border:4px solid var(--rsf);position:relative}
+.rs-eu>b{margin-top:8px;font-size:1.02rem}.rs-eu>small{color:var(--rmu);font-size:.8rem;margin-top:2px}
+.rs-num{display:grid;grid-template-columns:repeat(3,1fr);width:100%;margin:14px 0 12px;border-top:1px solid var(--rln);border-bottom:1px solid var(--rln)}
+.rs-num button{all:unset;cursor:pointer;display:grid;padding:10px 0}.rs-num button:hover b{color:var(--rc)}.rs-num b{font-size:1.05rem}.rs-num span{font-size:.7rem;color:var(--rmu)}
+.rs-eu-bt{all:unset;cursor:pointer;box-sizing:border-box;width:100%;text-align:center;font-weight:600;font-size:.86rem;padding:9px;border-radius:12px;background:color-mix(in srgb,var(--rc) 10%,transparent);color:var(--rc)}
+.rs-eu-bt:hover{background:color-mix(in srgb,var(--rc) 18%,transparent)}
+/* menu */
+.rs-menu{background:var(--rsf);border:1px solid var(--rln);border-radius:20px;padding:10px;box-shadow:var(--rsh);display:grid;gap:2px}
+.rs-menu>small{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--rmu);font-weight:700;padding:8px 10px 4px}
+.rs-nv{all:unset;cursor:pointer;display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:12px;font-size:.9rem;font-weight:500;color:var(--rtx)}
+.rs-nv:hover{background:color-mix(in srgb,var(--rc) 7%,transparent)}
+.rs-nvi{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:1rem;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 22%,transparent),color-mix(in srgb,var(--b) 22%,transparent))}
+.rs-nv.on{font-weight:700;background:color-mix(in srgb,var(--a) 10%,transparent)}.rs-nv.on .rs-nvi{background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 6px 14px -6px var(--a)}
+/* stories */
+.rs-st{display:flex;gap:16px;overflow-x:auto;padding:14px 16px 12px;background:var(--rsf);border:1px solid var(--rln);border-radius:20px;box-shadow:var(--rsh);scrollbar-width:none;margin-bottom:14px}
+.rs-st::-webkit-scrollbar{display:none}
+.rs-sti{all:unset;cursor:pointer;display:grid;justify-items:center;gap:6px;flex:none;width:74px;animation:rsPop .5s cubic-bezier(.2,.9,.3,1.3) both;animation-delay:calc(var(--i)*45ms)}
+.rs-ring{width:64px;height:64px;border-radius:50%;padding:3px;background:conic-gradient(from 210deg,var(--a),var(--b),var(--a));display:grid;transition:transform .2s}
+.rs-ring>span{border-radius:50%;background:var(--rsf);display:grid;place-items:center;font-size:1.6rem;border:3px solid var(--rsf);box-shadow:inset 0 0 0 100px color-mix(in srgb,var(--a) 8%,transparent)}
+.rs-sti:hover .rs-ring{transform:scale(1.06)}
+.rs-sti small{font-size:.74rem;color:var(--rmu);font-weight:500;max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rs-sti.on small{color:var(--rtx);font-weight:700}
+.rs-sti.on .rs-ring{animation:rsGira 3s linear infinite;background:conic-gradient(from var(--rg,0deg),var(--a),var(--b),#fff0 70%,var(--a))}
+.rs-sti.on .rs-ring>span{animation:rsContra 3s linear infinite}
+@property --rg{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes rsGira{to{--rg:360deg}}@keyframes rsContra{to{transform:none}}
+@keyframes rsPop{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:none}}
+/* conteúdo */
+.rs-meio{min-width:0}
+.rs-loc{margin-bottom:12px}
+.rsx .rs-loc .rloc{background:var(--rsf);border:1px solid var(--rln);border-radius:16px;box-shadow:var(--rsh)}
+.rsx .rs-cont{display:grid;gap:14px}
+.rsx .rtit{background:none;padding:2px 2px 0}.rsx .rtit h2{font-size:1.4rem;letter-spacing:-.02em}.rsx .rtit p{color:var(--rmu)}
+/* cartões dentro da Rede: superfície limpa, cantos grandes, sombra macia */
+.rsx .rcard,.rsx .vcard2,.rsx .pcard.pfolha{background:var(--rsf)!important;border:1px solid var(--rln)!important;border-radius:20px!important;box-shadow:var(--rsh);color:var(--rtx);transition:transform .2s,box-shadow .2s}
+.rsx .rcard:hover,.rsx .vcard2:hover,.rsx .pcard.pfolha:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(15,23,42,.06),0 18px 40px -18px rgba(15,23,42,.28)}
+.rsx .rmuted,.rsx .rcard small,.rsx .vcard2 small{color:var(--rmu)}
+.rsx .rchip{background:var(--rsf);border:1px solid var(--rln);color:var(--rtx)}.rsx .rchip.on{background:linear-gradient(135deg,var(--rc),var(--rc2));border-color:transparent;color:#fff}
+.rsx .btn.rpri,.rsx .rpri{background:linear-gradient(135deg,var(--rc),var(--rc2));color:#fff;border:0}
+.rsx .btn{border-color:var(--rln)}
+.rsx .pbusca,.rsx .rvazio{background:var(--rsf);border-color:var(--rln);color:var(--rtx)}.rsx .pbusca input{color:var(--rtx)}
+/* coluna direita */
+.rs-box{background:var(--rsf);border:1px solid var(--rln);border-radius:20px;padding:14px;box-shadow:var(--rsh);display:grid;gap:4px}
+.rs-box h3{font-size:.95rem;margin:0 0 6px;letter-spacing:-.01em}
+.rs-li{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;padding:7px 6px;border-radius:12px}
+.rs-li:hover{background:color-mix(in srgb,var(--rc) 6%,transparent)}
+.rs-li>span:nth-child(2){display:grid;min-width:0}.rs-li b{font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rs-li small{font-size:.74rem;color:var(--rmu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rs-li-i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--k,#4F7BFF) 14%,transparent)}
+.rs-cal{background:linear-gradient(160deg,#EC4899,#8B5CF6);color:#fff;line-height:1;align-content:center;gap:1px}.rs-cal b{font-size:.95rem!important;color:#fff}.rs-cal small{font-size:.6rem!important;color:#fff!important;text-transform:uppercase;opacity:.9}
+.rs-pav .pc-av{width:40px!important;height:40px!important;font-size:.85rem}
+.rs-seg{all:unset;cursor:pointer;font-size:.78rem;font-weight:700;padding:6px 12px;border-radius:999px;color:var(--rc);background:color-mix(in srgb,var(--rc) 10%,transparent)}
+.rs-seg:hover{background:var(--rc);color:#fff}
+.rs-mais{all:unset;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--rc);padding:6px;margin-top:2px}
+.rs-vz{color:var(--rmu);font-size:.84rem;margin:0}.rs-rod{font-size:.72rem;color:var(--rmu);text-align:center;margin:4px 0 0}
+/* barra de abas (celular) */
+.rs-tab{display:none}
+@media (max-width:1100px){.rs-grid{grid-template-columns:230px minmax(0,1fr)}.rs-dir{display:none}}
+@media (max-width:820px){
+  .rs-grid{grid-template-columns:minmax(0,1fr);padding:12px 12px 90px;gap:0}.rs-esq{display:none}
+  .rs-top-in{flex-wrap:wrap;gap:10px;padding:10px 12px}.rs-busca{order:9;flex-basis:100%;max-width:none}.rs-ico{display:none}.rs-volta span{display:none}.rs-volta{padding:8px;margin-left:auto}
+  .rs-st{border-radius:0;margin:-12px -12px 12px;border-left:0;border-right:0;box-shadow:none;padding:12px}
+  .rs-tab{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:color-mix(in srgb,var(--rsf) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--rln);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .rs-tab button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:1px;padding:4px 0;color:var(--rmu);position:relative}
+  .rs-tab span{font-size:1.25rem}.rs-tab small{font-size:.66rem;font-weight:600}
+  .rs-tab button.on{color:var(--rtx)}.rs-tab button.on:before{content:"";position:absolute;top:-7px;width:26px;height:3px;border-radius:0 0 3px 3px;background:linear-gradient(90deg,var(--rc),var(--rc2))}}
+@media (prefers-reduced-motion:reduce){.rs-sti,.rs-sti.on .rs-ring{animation:none}}
+/* Rede no tema claro: ajusta o que foi desenhado para fundo escuro */
+.rs-claro .rtit h2,.rs-claro .rc-t,.rs-claro .rc-h b,.rs-claro .rraio-l b,.rs-claro .vc-emp.conf b{color:var(--rtx)}
+.rs-claro .rc-tags span,.rs-claro .vc-info span,.rs-claro .pc-tags span{background:var(--rbg);color:var(--rtx)}
+.rs-claro .rc-area{color:#2F5BD8;background:#4F7BFF18}.rs-claro .rnova,.rs-claro .rver{color:#15803D}
+.rs-claro .btn{background:var(--rsf);color:var(--rtx);border-color:var(--rln)}.rs-claro .btn.on{color:#15803D;border-color:#16A34A}
+.rs-claro .rseg{background:var(--rbg);border-color:var(--rln)}.rs-claro .rseg button{color:var(--rmu)}
+.rs-claro .vc-cargo{color:color-mix(in srgb,var(--k) 70%,#0F172A);text-shadow:none}.rs-claro .vc-emp{color:var(--rtx)}.rs-claro .vc-emp.conf{color:#B45309}.rs-claro .vc-dist{color:#0E7490}
+.rs-claro .pbusca{background:var(--rsf);border-color:var(--rln);color:var(--rtx)}.rs-claro .pb-ent span{color:var(--rtx)}
+.rs-claro .rloc{background:var(--rsf);border-color:var(--rln);color:var(--rtx)}.rs-claro .rloc select,.rs-claro .rloc input{background:var(--rbg);border-color:var(--rln);color:var(--rtx)}
+.rs-claro .pgrid .pg{background:var(--rsf);border-color:var(--rln);box-shadow:var(--rsh)}
+.rs-claro .rperfil{--surface:#fff;--ink:#0F172A;--muted:#5B6782;--line:#E3E8F2;--soft:#F4F6FB;--accent:#4F7BFF;--accent-ink:#fff;--accent-soft:#E8EEFF}
+.rs-claro .rperfil input,.rs-claro .rperfil select,.rs-claro .rperfil textarea{background:#fff;color:#0F172A;border-color:#DCE2EE}
+.rs-claro .rmuted{color:var(--rmu)}.rs-claro .rvazio{color:var(--rmu)}
+.rs-claro .pgrid .pg,.rs-claro .pl{color:var(--rtx);background:var(--rsf);border-color:var(--rln);box-shadow:var(--rsh)}.rs-claro .pl{border-left-color:var(--k)}
+.rs-claro .pg-id b,.rs-claro .pl-n b{color:var(--rtx)}.rs-claro .pg-meta,.rs-claro .pg-res,.rs-claro .pl-p,.rs-claro .pl-l{color:var(--rmu)}.rs-claro .pg-meta span{background:var(--rbg)}
+.rs-claro .pg-chip{color:color-mix(in srgb,var(--k) 70%,#0F172A)}.rs-claro .pg-pend{color:#B45309}
+.rsx .rseg button[aria-pressed="true"]{color:#fff!important}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -7517,6 +7631,50 @@ Object.assign(ACT,{
     SB.from('odo_pedidos').update(patch).eq('id',id).then(function(r){if(r.error){toast('Não consegui voltar o pedido.');return;}Object.assign(p,patch);render();toast('Pedido de volta ao quadro.');});}});
 var _rPedidosRCB=rPedidos;rPedidos=function(){var h=_rPedidosRCB.apply(this,arguments);if(!PED.carregado||PED.erro||PED.ed||PED.vcad||PFX.on)return h;var i=h.indexOf('<div class="cli-bar">');return i<0?h:h.slice(0,i)+rRcbBanner()+h.slice(i);};
 var _renderEXB=render;render=function(){var r=_renderEXB.apply(this,arguments);try{exbObserva();}catch(x){}return r;};
+
+/* =====================================================================================
+   Rede Ideali · casca no estilo das redes sociais (o conteúdo de cada seção continua o mesmo)
+   PC: 3 colunas · esquerda = meu cartão + menu · meio = "stories" das seções + conteúdo · direita = sugestões
+   Celular: topo com busca, stories, conteúdo e barra de abas embaixo.
+   ===================================================================================== */
+var RS_SEC={vagas:['💼','Vagas','#3D7BFF','#22D3EE'],profs:['🧑‍🔧','Profissionais','#7C5CFF','#EC4899'],clinicas:['🦷','Clínicas','#10B981','#3D7BFF'],labs:['🧪','Laboratórios','#F59E0B','#EF4444'],
+  comercio:['🏪','Comércio','#EC4899','#F59E0B'],cursos:['🎓','Cursos e eventos','#22D3EE','#7C5CFF'],agente:['🤖','Agente de vagas','#6366F1','#22D3EE'],perfil:['👤','Meu perfil','#3D7BFF','#7C5CFF'],config:['⚙️','Configurações','#64748B','#94A3B8']};
+function rsEu(){var D=PN()||{},P=PAPEL_PROF[S.role]?pfDe(S.role):null,nome=(RL.perfil&&RL.perfil.nome)||D.nome||(S.cad&&S.cad.nome)||'Você',prof=(RL.perfil&&RL.perfil.prof)||(P&&P.prof)||'',cid=(P&&P.cidade)||(S.cad&&S.cad.cidade)||'';
+  return {nome:nome,ini:nome.split(/\s+/).filter(Boolean).map(function(w){return w[0];}).slice(0,2).join('').toUpperCase(),prof:prof,cid:cid};}
+function rsConta(o){return Object.keys(o||{}).filter(function(k){return o[k];}).length;}
+function rsTopo(){var E=rsEu();
+  return '<header class="rs-top"><div class="rs-top-in">'+
+    '<button class="rs-marca" data-act="redeSec" data-v="vagas" aria-label="Rede Ideali, início"><span class="rs-logo">i</span><span class="rs-nm">Ideali <b>Rede</b></span></button>'+
+    '<label class="rs-busca"><span aria-hidden="true">'+ic('busca')+'</span><input id="rs-q" type="search" placeholder="Buscar profissionais, softwares, cidades…" value="'+esc(S.rede.sec==='profs'?(S.rede.q||''):'')+'" autocomplete="off" enterkeyhint="search"></label>'+
+    '<nav class="rs-ico" aria-label="Atalhos">'+['vagas','profs','labs','agente'].map(function(k){var x=RS_SEC[k];return '<button class="rs-ib'+(S.rede.sec===k?' on':'')+'" data-act="redeSec" data-v="'+k+'" title="'+x[1]+'"><span>'+x[0]+'</span><small>'+x[1].split(' ')[0]+'</small></button>';}).join('')+'</nav>'+
+    '<button class="rs-volta" data-act="redeSai">'+ic('seta','rs-seta')+'<span>Meu painel</span></button>'+
+    '<div class="rav-w"><button class="rs-av" data-act="rAvMenu" aria-label="Minha conta" aria-expanded="'+(!!S.rede.menu)+'">'+esc(E.ini)+'</button>'+(S.rede.menu?'<div class="rav-m" role="menu">'+
+      '<button role="menuitem" data-act="rAvVai" data-v="perfil">👤 Editar perfil (currículo)</button><button role="menuitem" data-act="rAvVai" data-v="config">⚙️ Configurações</button><button role="menuitem" data-act="rAvVai" data-v="agente">🤖 Agente de vagas</button>'+
+      '<button role="menuitem" data-act="redeSai">← Voltar ao meu painel</button>'+(RL.user?'<button role="menuitem" class="danger" data-rl="sair">Sair</button>':'')+'</div>':'')+'</div></div></header>';}
+function rsEsq(){var E=rsEu(),s=S.rede.sec;
+  var item=function(k){var x=RS_SEC[k];return '<button class="rs-nv'+(s===k?' on':'')+'" data-act="redeSec" data-v="'+k+'" style="--a:'+x[2]+';--b:'+x[3]+'"><span class="rs-nvi">'+x[0]+'</span>'+x[1]+'</button>';};
+  return '<aside class="rs-esq"><section class="rs-eu"><div class="rs-capa"></div><span class="rs-eu-av">'+esc(E.ini)+'</span><b>'+esc(E.nome)+'</b><small>'+esc([E.prof,E.cid].filter(Boolean).join(' · ')||'Complete seu perfil')+'</small>'+
+      '<div class="rs-num"><button data-act="redeSec" data-v="clinicas"><b>'+rsConta(S.rede.seg)+'</b><span>seguindo</span></button><button data-act="redeSec" data-v="profs"><b>'+rsConta(S.rede.cont)+'</b><span>contatos</span></button><button data-act="redeSec" data-v="vagas"><b>'+rsConta(S.rede.vint)+'</b><span>candidaturas</span></button></div>'+
+      '<button class="rs-eu-bt" data-act="redeSec" data-v="perfil">Ver e editar meu perfil</button></section>'+
+    '<nav class="rs-menu" aria-label="Seções da Rede"><small>Explorar</small>'+['vagas','profs','clinicas','labs','comercio','cursos'].map(item).join('')+'<small>Você</small>'+['agente','perfil','config'].map(item).join('')+'</nav></aside>';}
+function rsStories(){var s=S.rede.sec;
+  return '<div class="rs-st" role="tablist" aria-label="Seções">'+['vagas','profs','clinicas','labs','comercio','cursos','agente'].map(function(k,i){var x=RS_SEC[k];
+    return '<button role="tab" aria-selected="'+(s===k)+'" class="rs-sti'+(s===k?' on':'')+'" data-act="redeSec" data-v="'+k+'" style="--a:'+x[2]+';--b:'+x[3]+';--i:'+i+'"><span class="rs-ring"><span>'+x[0]+'</span></span><small>'+x[1].replace(' e eventos','')+'</small></button>';}).join('')+'</div>';}
+function rsDir(){var mc=minhaCidade(),V=[];try{V=todasVagas().filter(function(x){return !remoto(x.v.lugar);}).map(function(x){return {x:x,d:distKm(mc,cidadeDe(x.v.lugar))||9e4};}).sort(function(a,b){return a.d-b.d;}).slice(0,3);}catch(e){}
+  var Pf=REDE_PROFS.slice(0,3),C=(REDE_CURS||[]).slice(0,2);
+  return '<aside class="rs-dir">'+
+    '<section class="rs-box"><h3>Vagas perto de você</h3>'+(V.length?V.map(function(o){var v=o.x.v,cor=AREA_COR[o.x.a]||'#3D7BFF';return '<button class="rs-li" data-act="redeSec" data-v="vagas"><span class="rs-li-i" style="--k:'+cor+'">💼</span><span><b>'+esc(v.t||v.cargo||'Vaga')+'</b><small>'+esc(String(v.lugar||''))+(o.d<9e4?' · '+Math.round(o.d)+' km':'')+'</small></span></button>';}).join(''):'<p class="rs-vz">Nenhuma vaga por perto.</p>')+
+      '<button class="rs-mais" data-act="redeSec" data-v="vagas">Ver todas as vagas →</button></section>'+
+    '<section class="rs-box"><h3>Profissionais para conhecer</h3>'+Pf.map(function(p){return '<div class="rs-li"><span class="rs-pav">'+profAv(p)+'</span><span><b>'+esc(profNome(p))+'</b><small>'+esc(p.cargo)+' · '+esc(String(p.cid).split('/')[0].trim())+'</small></span><button class="rs-seg" data-act="profVer" data-v="'+p.id+'">Ver</button></div>';}).join('')+
+      '<button class="rs-mais" data-act="redeSec" data-v="profs">Ver profissionais →</button></section>'+
+    (C.length?'<section class="rs-box"><h3>Próximos eventos</h3>'+C.map(function(c){return '<button class="rs-li" data-act="redeSec" data-v="cursos"><span class="rs-li-i rs-cal"><b>'+esc(String(c.q).replace(/^[a-zçáé]{3}\s*/i,'').split('/')[0]||'•')+'</b><small>'+esc((String(c.q).split('/')[1]||'').slice(0,2)?PMES[(+String(c.q).split('/')[1]||1)-1].slice(0,3):'')+'</small></span><span><b>'+esc(c.t)+'</b><small>'+esc(c.m)+'</small></span></button>';}).join('')+'</section>':'')+
+    '<p class="rs-rod">Rede Ideali · odontologia conectada</p></aside>';}
+function rsAbas(){var s=S.rede.sec;return '<nav class="rs-tab" aria-label="Rede">'+[['vagas'],['profs'],['labs'],['agente'],['perfil']].map(function(a){var x=RS_SEC[a[0]];return '<button class="'+(s===a[0]?'on':'')+'" data-act="redeSec" data-v="'+a[0]+'"><span>'+x[0]+'</span><small>'+x[1].split(' ')[0]+'</small></button>';}).join('')+'</nav>';}
+rRedeTopo=rsTopo;
+rRede=function(){var anim=S.rede.anim;S.rede.anim=false;var s=S.rede.sec,naRede=['perfil','agente','config'].indexOf(s)<0;
+  return '<div class="redeamb rsx'+(typeof temaEscuro==='function'&&temaEscuro()?'':' rs-claro')+(anim?' entra':'')+'">'+rsTopo()+'<div class="rs-grid">'+rsEsq()+
+    '<main class="rs-meio">'+rsStories()+(naRede?'<div class="rs-loc">'+rLocBar()+'</div>':'')+'<div class="rconteudo rs-cont">'+rRedeSec()+'</div></main>'+rsDir()+'</div>'+rsAbas()+'</div>';};
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target&&e.target.id==='rs-q'){S.rede.q=e.target.value;S.rede.nmax=30;ACT.redeSec('profs');}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
