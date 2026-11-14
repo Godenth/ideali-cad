@@ -1699,6 +1699,16 @@ body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
 .kc-mot{margin:0;color:#DC2626;font-size:.84rem}
 .kc-det .pdg-arq{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0}.kc-det .pend{margin:0}
 .kc-det .pend{background:color-mix(in srgb,#DC2626 9%,var(--surface));color:var(--ink);border-width:1px}.kc-det .pend p{color:var(--ink)}.kc-det .pend textarea{background:var(--surface);color:var(--ink)}
+
+.kc-ov{position:fixed;inset:0;z-index:300;background:rgba(8,8,16,.55);backdrop-filter:blur(3px);display:grid;place-items:center;padding:20px;animation:kcIn .15s ease}
+.kc-modal{position:relative;width:min(560px,100%);max-height:calc(100vh - 40px);overflow:auto;border-radius:18px;background:var(--surface);box-shadow:0 24px 70px rgba(0,0,0,.45)}
+.kc-modal .kc{border:0;border-radius:18px;box-shadow:none;transform:none}.kc-modal .kc:hover{transform:none;box-shadow:none}
+.kc-modal .kc-main{cursor:default;padding:18px 52px 8px 20px}.kc-modal .kc-main .kc-pac{font-size:1.2rem}.kc-modal .kc-mais{display:none}
+.kc-modal .kc-det{margin:4px 18px 6px 20px}.kc-modal .kc-pe{padding:8px 18px 18px 20px}
+.kc-x{position:absolute;top:12px;right:12px;z-index:2;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-size:.95rem}.kc-x:hover{border-color:var(--accent)}
+@keyframes kcIn{from{opacity:0}to{opacity:1}}
+@media(max-width:600px){.kc-ov{padding:0;place-items:end stretch}.kc-modal{width:100%;max-height:92vh;border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom)}.kc-modal .kc{border-radius:20px 20px 0 0}}
+.kc-modal .kc-main{pointer-events:none}.kc-modal .kc-main *{pointer-events:none}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6549,10 +6559,21 @@ function kcDet(e,ds,tr,lab,pz,i,col){var d=new Date(e.enviado_em||e.criado_em),L
 var _pdgEnvKC=pdgEnviadosHtml;pdgEnviadosHtml=function(){var f=PDG.f;if(!f||f.feito!==false||!f.col||f.only)return _pdgEnvKC.apply(this,arguments);
   var M=pdgFiltra(pdgMeus());if(!M.length)return '';
   M=M.slice().sort(function(a,b){var x=kcPrazo(a),y=kcPrazo(b);return (x?x.ord:9e15)-(y?y.ord:9e15);});
-  return '<div class="kc-l">'+M.map(function(e){return kcCard(e,String(PDG.abre)===String(e.id));}).join('')+'</div>';};
+  return '<div class="kc-l">'+M.map(function(e){return kcCard(e,false);}).join('')+'</div>';};
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-kc]');if(!b)return;var id=b.getAttribute('data-kc');PDG.abre=String(PDG.abre)===id?null:id;
   if(PDG.abre&&b.textContent==='Responder'&&typeof PEND!=='undefined')PEND.aberto=isNaN(+id)?id:id;render();
-  setTimeout(function(){var el=document.querySelector('.kc-det');if(el)el=el.closest('.kc');if(el&&PDG.abre){var r=el.getBoundingClientRect();if(r.top<70||r.top>innerHeight-120)el.scrollIntoView({block:'start',behavior:'smooth'});}},30);});
+  });
+/* detalhes numa janela por cima (no celular, ocupa a tela) */
+function kcModal(){var el=document.getElementById('kc-ov'),id=PDG.abre,e=id&&S.role==='dent'?pdgMeus().filter(function(x){return String(x.id)===String(id);})[0]:null;
+  if(!e){if(el){el.remove();document.body.style.overflow='';}if(id&&!e)PDG.abre=null;return;}
+  var t=(document.getElementById('pend-t')||{}).value;
+  if(!el){el=document.createElement('div');el.id='kc-ov';el.className='kc-ov';document.body.appendChild(el);}document.body.style.overflow='hidden';
+  el.innerHTML='<div class="kc-modal" role="dialog" aria-modal="true" aria-label="Detalhes do pedido"><button type="button" class="kc-x" data-kcx="1" aria-label="Fechar">✕</button>'+kcCard(e,true)+'</div>';
+  var t2=document.getElementById('pend-t');if(t2&&t)t2.value=t;}
+function kcFecha(){PDG.abre=null;if(typeof PEND!=='undefined')PEND.aberto=null;kcModal();}
+var _renderKC=render;render=function(){var r=_renderKC.apply(this,arguments);try{kcModal();}catch(x){}return r;};
+document.addEventListener('click',function(ev){var el=document.getElementById('kc-ov');if(!el)return;if(ev.target===el||(ev.target.closest&&ev.target.closest('[data-kcx]'))){ev.preventDefault();kcFecha();}});
+document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&document.getElementById('kc-ov')&&!(typeof CH!=='undefined'&&CH.on))kcFecha();});
 
 ACT.temaTroca=function(){var n=temaEscuro()?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('io_tema',n);}catch(e){}render();};
 
