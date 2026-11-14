@@ -2067,6 +2067,87 @@ i.pzs-antes{background:#3B82F6}i.pzs-prazo{background:#22C55E}i.pzs-atraso{backg
   .rs-mm .rs-esq .rs-menu{box-shadow:none;border:0}}
 @keyframes rsSobe{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
 @media (max-width:820px){body:has(.rsx) #lmb{bottom:78px}}
+/* ===== Rede · Cursos e lives ===== */
+.cu{display:grid;gap:18px;min-width:0}.rsx .rs-cont>*,.cu>*{min-width:0}.rsx .rs-cont{grid-template-columns:minmax(0,1fr)}
+.cu-abas{display:flex;gap:4px;border-bottom:1px solid var(--rln);overflow-x:auto;scrollbar-width:none}
+.cu-abas button{all:unset;cursor:pointer;padding:10px 14px;font-weight:600;font-size:.92rem;color:var(--rmu);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.cu-abas button[aria-selected=true]{color:var(--rtx);border-bottom-color:var(--rc)}.cu-abas b{background:#DC2626;color:#fff;border-radius:999px;font-size:.7rem;padding:1px 7px;margin-left:4px}
+.cu-busca{display:flex;align-items:center;gap:10px;background:var(--rsf);border:1px solid var(--rln);border-radius:14px;padding:0 14px;height:46px;color:var(--rmu)}.cu-busca input{all:unset;flex:1;color:var(--rtx)}.cu-busca .ic{margin:0}
+.cu-esp{display:flex;gap:6px;flex-wrap:wrap}
+.cu-prat{display:grid;gap:10px;min-width:0}.cu-ph{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.cu-ph h3{margin:0;font-size:1.15rem;letter-spacing:-.01em}
+.cu-ver{all:unset;cursor:pointer;color:var(--rc);font-weight:600;font-size:.86rem}
+.cu-fila{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(200px,230px);gap:14px;overflow-x:auto;padding:2px 2px 10px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.cu-fila>*{scroll-snap-align:start}
+.cu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+/* cartão do curso (capa em pé) */
+.cu-card{all:unset;box-sizing:border-box;cursor:pointer;display:grid;align-content:start;gap:0;background:var(--rsf);border:1px solid var(--rln);border-radius:16px;overflow:hidden;position:relative;box-shadow:var(--rsh);transition:transform .2s,box-shadow .2s}
+.cu-card:hover{transform:translateY(-3px);box-shadow:0 20px 40px -20px rgba(15,23,42,.35)}.cu-card:focus-visible{outline:3px solid var(--rc);outline-offset:2px}
+.cu-capa{aspect-ratio:3/4;background:linear-gradient(160deg,var(--a),var(--b));position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:#fff;overflow:hidden}
+.cu-capa:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 10%,rgba(255,255,255,.28),transparent 45%),linear-gradient(180deg,transparent 40%,rgba(0,0,0,.35))}
+.cu-capa img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cu-capa-t{position:relative;font-weight:800;font-size:1.25rem;line-height:1.15;letter-spacing:-.01em;text-shadow:0 2px 12px rgba(0,0,0,.25)}
+.cu-capa-p{position:relative;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:8px;opacity:.92}
+.cu-capa.lg{width:220px;flex:none;border-radius:16px}.cu-capa.sm{width:54px;aspect-ratio:3/4;padding:0;border-radius:8px;flex:none}.cu-capa.sm span{display:none}
+.cu-sel{position:absolute;top:10px;right:10px;left:10px;display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
+.cu-sel i,.cu-ex{font-style:normal;font-size:.62rem;font-weight:800;letter-spacing:.04em;padding:3px 7px;border-radius:6px}
+.cu-nv{background:#7C3AED;color:#fff}.cu-gr{background:#22C55E;color:#fff}.cu-ex{background:rgba(255,255,255,.9);color:#334155}
+.cu-ci{display:grid;gap:3px;padding:12px 14px 14px}.cu-ci small{font-size:.7rem;color:var(--rmu);font-weight:600;text-transform:uppercase;letter-spacing:.04em}.cu-ci b{font-size:.95rem;line-height:1.25;color:var(--rtx)}
+.cu-ci>span{font-size:.8rem;color:var(--rmu)}.cu-ci em{font-style:normal;font-size:.76rem;color:var(--rmu)}
+.cu-pg{height:5px;border-radius:9px;background:var(--rln);overflow:hidden;margin-top:6px}.cu-pg i{display:block;height:100%;background:linear-gradient(90deg,var(--rc),var(--rc2))}.cu-pgt{font-size:.7rem!important;text-transform:none!important}
+/* lives */
+.cu-live{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--rsf);border:1px solid var(--rln);border-radius:16px;padding:12px;box-shadow:var(--rsh)}
+.cu-ld{display:grid;justify-items:center;align-content:center;border-radius:12px;padding:8px 0;color:#fff;background:linear-gradient(160deg,var(--a),var(--b))}.cu-ld b{font-size:1.5rem;line-height:1}.cu-ld small{font-size:.7rem;text-transform:uppercase;font-weight:700}.cu-ld em{font-style:normal;font-size:.75rem;margin-top:3px;opacity:.9}
+.cu-li{display:grid;gap:2px;min-width:0}.cu-li>span{display:flex;gap:6px}.cu-li b{font-size:1rem}.cu-li small{color:var(--rmu);font-size:.8rem}.cu-li p{margin:2px 0 0;font-size:.84rem;color:var(--rmu)}
+.cu-ao{font-style:normal;font-size:.7rem;font-weight:800;color:#DC2626;animation:cuPisca 1.4s infinite}.cu-pas{font-style:normal;font-size:.7rem;color:var(--rmu)}@keyframes cuPisca{50%{opacity:.35}}
+/* página do curso */
+.cu-volta{all:unset;cursor:pointer;color:var(--rc);font-weight:600;font-size:.88rem;justify-self:start}
+.cu-top{display:flex;gap:22px;background:var(--rsf);border:1px solid var(--rln);border-radius:20px;padding:18px;box-shadow:var(--rsh)}
+.cu-ti{display:grid;gap:8px;align-content:start;min-width:0}.cu-ti small{color:var(--rmu);font-weight:700;text-transform:uppercase;font-size:.72rem;letter-spacing:.05em}.cu-ti h2{margin:0;font-size:1.7rem;letter-spacing:-.02em;line-height:1.15}
+.cu-aut{color:var(--rmu)}.cu-ti p{margin:0;color:var(--rtx);line-height:1.5}
+.cu-meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--rmu);font-size:.86rem}.cu-meta span{display:inline-flex;align-items:center}
+.cu-acao{display:flex;gap:8px;flex-wrap:wrap}
+.cu-prog{display:flex;gap:14px;align-items:center}.cu-ring{--p:0;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--rc) calc(var(--p)*1%),var(--rln) 0)}
+.cu-ring b{width:50px;height:50px;border-radius:50%;background:var(--rsf);display:grid;place-items:center;font-size:.9rem}
+.cu-player{background:#000;border-radius:18px;overflow:hidden;box-shadow:var(--rsh)}.cu-player video{width:100%;max-height:70vh;display:block;background:#000}
+.cu-semv{aspect-ratio:16/9;display:grid;place-items:center;align-content:center;gap:8px;color:#CBD5E1;text-align:center;padding:24px;background:radial-gradient(circle at 50% 40%,#1E293B,#020617)}.cu-semv b{color:#fff;font-size:1.2rem}.cu-semv small{max-width:520px}.cu-semv .ic{width:34px;height:34px;margin:0}
+.cu-pl-b{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;background:var(--rsf);color:var(--rtx)}
+.cu-dois{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
+.cu-aulas,.cu-perg,.cu-edf,.cu-est{background:var(--rsf);border:1px solid var(--rln);border-radius:20px;padding:16px;box-shadow:var(--rsh);display:grid;gap:10px;min-width:0}
+.cu-aulas h3,.cu-perg h3,.cu-edf h3,.cu-est h3{margin:0;font-size:1.05rem}
+.cu-aulas ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.cu-aulas li button{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:12px}
+.cu-aulas li button:hover:not([disabled]){background:color-mix(in srgb,var(--rc) 7%,transparent)}.cu-aulas li button[disabled]{cursor:default;opacity:.7}
+.cu-aulas li.on button{background:color-mix(in srgb,var(--rc) 12%,transparent)}
+.cu-n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.82rem;background:var(--rbg);border:1px solid var(--rln)}
+.cu-aulas li.ok .cu-n{background:#16A34A;border-color:#16A34A;color:#fff}
+.cu-at{display:grid;min-width:0}.cu-at b{font-size:.9rem;font-weight:600}.cu-at small{font-size:.74rem;color:var(--rmu)}.cu-play{color:var(--rc)}.cu-lock{opacity:.7}
+.cu-pf{display:flex;gap:8px;align-items:flex-start}.cu-pf textarea,.cu-pf input{flex:1;background:var(--rbg);border:1px solid var(--rln);border-radius:10px;color:var(--rtx);font:inherit;padding:8px 10px}
+.cu-q{border-top:1px solid var(--rln);padding-top:10px;display:grid;gap:2px}.cu-q small{color:var(--rmu);font-size:.72rem}.cu-q p{margin:2px 0 0}.cu-r{margin:6px 0 0 14px;padding:8px 10px;border-left:3px solid var(--rc);background:color-mix(in srgb,var(--rc) 6%,transparent);border-radius:0 10px 10px 0}.cu-r p{margin:0}
+/* professor */
+.cu-est{grid-template-columns:1fr auto;align-items:center}.cu-est p{margin:4px 0 0}
+.cu-proto{font-size:.84rem;text-align:left}
+.cu-tab{display:grid;gap:8px}.cu-tr{display:flex;align-items:center;gap:12px;background:var(--rsf);border:1px solid var(--rln);border-radius:14px;padding:10px 12px}
+.cu-trt{display:grid;flex:1;min-width:0}.cu-trt small{color:var(--rmu);font-size:.78rem}.cu-mot{color:#DC2626!important}
+.cu-st{font-style:normal;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.cu-st-rasc{background:var(--rbg);color:var(--rmu);border:1px solid var(--rln)}.cu-st-ana{background:#F59E0B22;color:#B45309}.cu-st-pub{background:#16A34A22;color:#15803D}.cu-st-rec{background:#DC262622;color:#B91C1C}
+.cu-edg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px;align-items:start}
+.cu-edf .fld{display:grid;gap:5px}.cu-edf .fld>span{font-size:.78rem;font-weight:600;color:var(--rmu)}
+.cu-edf input,.cu-edf select,.cu-edf textarea{background:var(--rbg);border:1px solid var(--rln);border-radius:10px;color:var(--rtx);font:inherit;padding:9px 11px;width:100%;box-sizing:border-box}
+.cu-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cu-capa-ed{display:flex;gap:12px;align-items:flex-end}.cu-capa-ed .cu-capa{width:120px;border-radius:12px;padding:10px}.cu-capa-ed .cu-capa-t{font-size:.85rem}.cu-capa-ed .cu-capa-p{font-size:.6rem}
+.cu-ela{list-style:none;margin:0;padding:0;display:grid;gap:10px}.cu-ela li{border:1px solid var(--rln);border-radius:14px;padding:10px;display:grid;gap:8px;background:var(--rbg)}
+.cu-el1{display:flex;gap:6px;align-items:center}.cu-el1 input{flex:1}.cu-el2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.8rem}
+.cu-ib{all:unset;cursor:pointer;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;border:1px solid var(--rln);background:var(--rsf)}.cu-ib[disabled]{opacity:.35;cursor:default}
+.cu-del{color:#DC2626!important}.cu-vinfo{color:#15803D;font-weight:600}.cu-chk{display:inline-flex;gap:6px;align-items:center}.cu-chk input{width:auto}
+.cu-edb{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cu-edb .spacer{flex:1}
+.cu-lved{max-width:640px}
+/* certificado */
+.cu-cert{background:#fff;color:#0F172A;border:10px double #4F7BFF;border-radius:6px;padding:48px 32px;text-align:center;display:grid;gap:8px;font-family:Georgia,serif;position:relative}
+.cu-cert small{font:700 .75rem system-ui;letter-spacing:.2em;color:#4F7BFF}.cu-cert h2{margin:6px 0;font-size:2.2rem}.cu-cert h3{margin:0;font-size:1.4rem}.cu-cert p{margin:0}.cu-cert em{margin-top:20px;color:#475569}.cu-cert .cu-ex{position:absolute;top:10px;right:10px;background:#F1F5F9}
+@media(max-width:900px){.cu-dois,.cu-edg{grid-template-columns:1fr}.cu-top{flex-direction:column}.cu-capa.lg{width:100%;aspect-ratio:16/9}.cu-est{grid-template-columns:1fr}}
+@media(max-width:560px){.cu-live{grid-template-columns:64px 1fr}.cu-la{grid-column:1/-1}.cu-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.cu-2{grid-template-columns:1fr}.cu-tr{flex-wrap:wrap}}
+
+body:has(.rsx.rs-claro){background:#F4F6FB}body:has(.rsx:not(.rs-claro)){background:#0B1020}.cu-capa-ed .btn{white-space:nowrap}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -7678,10 +7759,189 @@ function rsAbas(){var s=S.rede.sec,fora=['vagas','profs','agente','perfil'].inde
 ACT.rsMenu=function(){S.rede.mm=!S.rede.mm;render();};
 var _redeSecRS=ACT.redeSec;ACT.redeSec=function(v){S.rede.mm=false;return _redeSecRS.apply(this,arguments);};
 rRedeTopo=rsTopo;
-rRede=function(){var anim=S.rede.anim;S.rede.anim=false;var s=S.rede.sec,naRede=['perfil','agente','config'].indexOf(s)<0;
+rRede=function(){var anim=S.rede.anim;S.rede.anim=false;var s=S.rede.sec,naRede=['perfil','agente','config','cursos'].indexOf(s)<0;
   return '<div class="redeamb rsx'+(typeof temaEscuro==='function'&&temaEscuro()?'':' rs-claro')+(S.rede.mm?' rs-mm':'')+(anim?' entra':'')+'">'+rsTopo()+'<div class="rs-grid">'+rsEsq()+
     '<main class="rs-meio">'+(naRede?'<div class="rs-loc">'+rLocBar()+'</div>':'')+'<div class="rconteudo rs-cont">'+rRedeSec()+'</div></main>'+rsDir()+'</div>'+rsAbas()+'</div>';};
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target&&e.target.id==='rs-q'){S.rede.q=e.target.value;S.rede.nmax=30;ACT.redeSec('profs');}});
+
+/* =====================================================================================
+   Rede · Cursos e lives (PROTÓTIPO sem banco: tudo fica neste navegador, por usuário)
+   Professor: cria curso (capa, aulas com vídeo em alta definição, material), envia para análise, marca lives.
+   Aluno: explora, se inscreve, assiste, marca aulas concluídas, pergunta, ganha certificado.
+   Dono do Ideali (conta master): aprova ou recusa o que foi enviado.
+   Quando aprovado o desenho, os dados passam para o banco (tabelas + Storage privado / serviço de vídeo).
+   ===================================================================================== */
+var CUR_ESP=['Prótese','CAD/CAM','Implantodontia','Dentística','Endodontia','Periodontia','Ortodontia','Cirurgia','Estética','Gestão','ASB / TSB','Fotografia','Outros'];
+var CUR_NIV={ini:'Iniciante',int:'Intermediário',ava:'Avançado'};
+var CUR_COR={'Prótese':['#7C3AED','#EC4899'],'CAD/CAM':['#2563EB','#22D3EE'],'Implantodontia':['#0EA5E9','#6366F1'],'Dentística':['#DB2777','#F59E0B'],'Endodontia':['#DC2626','#7C3AED'],'Periodontia':['#16A34A','#0EA5E9'],
+  'Ortodontia':['#9333EA','#2563EB'],'Cirurgia':['#B91C1C','#EA580C'],'Estética':['#EC4899','#A855F7'],'Gestão':['#0F766E','#22C55E'],'ASB / TSB':['#0284C7','#14B8A6'],'Fotografia':['#F59E0B','#EF4444'],'Outros':['#475569','#6366F1']};
+var CUR={v:'explorar',id:null,aula:null,ed:null,lv:null,q:'',esp:'',urls:{},d:null};
+function curId(){return 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function curEu(){var E=typeof rsEu==='function'?rsEu():{nome:'Você'};return {id:(RL.user&&RL.user.id)||'visitante',nome:E.nome,prof:E.prof||''};}
+function curExemplos(){var hoje=new Date(),d=function(n,h){var x=new Date(hoje);x.setDate(x.getDate()+n);x.setHours(h,0,0,0);return x.toISOString();};
+  return {cursos:[
+    {id:'ex1',ex:1,autor:'ex',autorNome:'Professor exemplo',titulo:'Exocad do zero: coroas e pontes',esp:'CAD/CAM',niv:'ini',desc:'Curso de exemplo para ver como a área fica. Do cadastro do caso ao desenho final, passo a passo.',st:'pub',criado:d(-20,10),
+     aulas:[{id:'a1',t:'Apresentação e instalação',min:8,livre:1},{id:'a2',t:'Criando o caso e importando o escaneamento',min:15},{id:'a3',t:'Desenhando uma coroa',min:22},{id:'a4',t:'Pontes e conectores',min:19},{id:'a5',t:'Exportando para fresagem',min:10}]},
+    {id:'ex2',ex:1,autor:'ex',autorNome:'Professor exemplo',titulo:'Maquiagem em zircônia',esp:'Prótese',niv:'int',desc:'Curso de exemplo. Cores, glaze e caracterização de coroas em zircônia.',st:'pub',criado:d(-6,10),
+     aulas:[{id:'b1',t:'Materiais e preparo',min:12,livre:1},{id:'b2',t:'Escolha de cor',min:18},{id:'b3',t:'Caracterização',min:25}]},
+    {id:'ex3',ex:1,autor:'ex',autorNome:'Professor exemplo',titulo:'Fotografia odontológica com celular',esp:'Fotografia',niv:'ini',desc:'Curso de exemplo. Luz, ângulos e fotos que ajudam o laboratório.',st:'pub',criado:d(-2,10),
+     aulas:[{id:'f1',t:'Equipamento mínimo',min:7,livre:1},{id:'f2',t:'Protocolo de fotos',min:16}]}],
+   lives:[{id:'lx1',ex:1,autor:'ex',autorNome:'Professor exemplo',titulo:'Tira-dúvidas de Exocad',esp:'CAD/CAM',quando:d(3,19),dur:60,link:'',desc:'Live de exemplo.',st:'pub'},
+          {id:'lx2',ex:1,autor:'ex',autorNome:'Professor exemplo',titulo:'Prótese sobre implante: casos reais',esp:'Implantodontia',quando:d(9,20),dur:90,link:'',desc:'Live de exemplo.',st:'pub'}],
+   insc:{},prog:{},perg:{},lvi:{}};}
+function curCarrega(){if(CUR.d)return CUR.d;var d=null;try{d=JSON.parse(localStorage.getItem(lsU('io_cursos_proto'))||'null');}catch(e){}CUR.d=d||curExemplos();return CUR.d;}
+function curSalva(){try{localStorage.setItem(lsU('io_cursos_proto'),JSON.stringify(CUR.d));}catch(e){toast('Não deu para guardar neste navegador (espaço cheio). Tente uma capa menor.');}}
+function curMin(c){return (c.aulas||[]).reduce(function(s,a){return s+(+a.min||0);},0);}
+function curHoras(m){return m>=60?Math.floor(m/60)+'h'+(m%60?(' '+('0'+m%60).slice(-2)+'min'):''):m+' min';}
+function curPct(c){var D=curCarrega(),P=D.prog[c.id]||{},n=(c.aulas||[]).length;return n?Math.round((c.aulas.filter(function(a){return P[a.id];}).length)/n*100):0;}
+function curCapa(c,cl){var k=CUR_COR[c.esp]||CUR_COR.Outros;
+  return '<div class="cu-capa '+(cl||'')+'" style="--a:'+k[0]+';--b:'+k[1]+'">'+(c.capa?'<img src="'+c.capa+'" alt="">':'<span class="cu-capa-t">'+esc(c.titulo||'Sem título')+'</span><span class="cu-capa-p">'+esc(c.autorNome||'')+'</span>')+'</div>';}
+function curCard(c){var D=curCarrega(),ins=D.insc[c.id],p=curPct(c),nova=Date.now()-new Date(c.criado).getTime()<14*864e5;
+  return '<button class="cu-card" data-cu="abre" data-v="'+c.id+'">'+curCapa(c)+'<span class="cu-sel">'+(c.ex?'<i class="cu-ex">exemplo</i>':'')+(nova?'<i class="cu-nv">NOVO</i>':'')+'<i class="cu-gr">GRÁTIS</i></span>'+
+    '<span class="cu-ci"><small>'+esc(c.esp)+' · '+CUR_NIV[c.niv||'ini']+'</small><b>'+esc(c.titulo)+'</b><span>'+esc(c.autorNome)+'</span><em>'+(c.aulas||[]).length+' aula'+((c.aulas||[]).length===1?'':'s')+' · '+curHoras(curMin(c))+'</em>'+
+    (ins?'<span class="cu-pg"><i style="width:'+p+'%"></i></span><small class="cu-pgt">'+(p===100?'Concluído ✓':p+'% concluído')+'</small>':'')+'</span></button>';}
+function curPublicos(){return curCarrega().cursos.filter(function(c){return c.st==='pub';});}
+function curLiveQuando(l){var d=new Date(l.quando),fim=d.getTime()+(+l.dur||60)*6e4,n=Date.now();return {d:d,ao:n>=d.getTime()&&n<=fim,pas:n>fim};}
+function curLiveCard(l,dono){var D=curCarrega(),q=curLiveQuando(l),ins=D.lvi[l.id],k=CUR_COR[l.esp]||CUR_COR.Outros;
+  return '<article class="cu-live" style="--a:'+k[0]+';--b:'+k[1]+'"><div class="cu-ld"><b>'+('0'+q.d.getDate()).slice(-2)+'</b><small>'+PMES[q.d.getMonth()].slice(0,3)+'</small><em>'+('0'+q.d.getHours()).slice(-2)+':'+('0'+q.d.getMinutes()).slice(-2)+'</em></div>'+
+    '<div class="cu-li"><span>'+(q.ao?'<i class="cu-ao">● AO VIVO AGORA</i>':q.pas?'<i class="cu-pas">encerrada</i>':'')+(l.ex?'<i class="cu-ex">exemplo</i>':'')+(dono&&l.st!=='pub'?'<i class="cu-st cu-st-'+l.st+'">'+curStNome(l.st)+'</i>':'')+'</span><b>'+esc(l.titulo)+'</b><small>'+esc(l.autorNome)+' · '+esc(l.esp)+' · '+(+l.dur||60)+' min</small>'+(l.desc?'<p>'+esc(l.desc)+'</p>':'')+(dono&&l.st==='rec'&&l.motivo?'<small class="cu-mot">Motivo: '+esc(l.motivo)+'</small>':'')+'</div>'+
+    '<div class="cu-la">'+(dono?'<button class="btn sm" data-cu="lv-ed" data-v="'+l.id+'">Editar</button>':
+      q.ao&&l.link?'<a class="btn sm rpri" href="'+esc(l.link)+'" target="_blank" rel="noopener">Entrar na live</a>':q.pas?'':'<button class="btn sm'+(ins?'':' rpri')+'" data-cu="lv-ins" data-v="'+l.id+'">'+(ins?'✓ Inscrito':'Quero participar')+'</button>')+'</div></article>';}
+function curStNome(s){return {rasc:'Rascunho',ana:'Em análise',pub:'Publicado',rec:'Recusado'}[s]||s;}
+/* ---------- telas ---------- */
+function curAbas(){var A=[['explorar','Explorar'],['lives','Lives'],['meus','Meus cursos'],['ensinar','Ensinar']].concat(RL.admin?[['aprovar','Aprovar']]:[]),D=curCarrega(),na=D.cursos.concat(D.lives).filter(function(x){return x.st==='ana';}).length;
+  var v=CUR.v==='curso'||CUR.v==='cert'?'explorar':CUR.v==='editor'||CUR.v==='lv-editor'?'ensinar':CUR.v;
+  return '<div class="cu-abas" role="tablist">'+A.map(function(a){return '<button role="tab" aria-selected="'+(v===a[0])+'" data-cu="aba" data-v="'+a[0]+'">'+a[1]+(a[0]==='aprovar'&&na?' <b>'+na+'</b>':'')+'</button>';}).join('')+'</div>';}
+function curExplorar(){var L=curPublicos(),q=semAc(CUR.q).trim(),e=CUR.esp;
+  var F=L.filter(function(c){return (!e||c.esp===e)&&(!q||semAc([c.titulo,c.desc,c.autorNome,c.esp].concat((c.aulas||[]).map(function(a){return a.t;})).join(' ')).indexOf(q)>=0);});
+  var esp=CUR_ESP.filter(function(x){return L.some(function(c){return c.esp===x;});});
+  var h='<label class="cu-busca">'+ic('busca')+'<input id="cu-q" type="search" placeholder="Buscar curso, técnica, professor…" value="'+esc(CUR.q)+'" autocomplete="off"></label>'+
+    '<div class="cu-esp"><button class="rchip'+(!e?' on':'')+'" data-cu="esp" data-v="">Todas</button>'+esp.map(function(x){return '<button class="rchip'+(e===x?' on':'')+'" data-cu="esp" data-v="'+esc(x)+'">'+esc(x)+'</button>';}).join('')+'</div>';
+  if(!F.length)return h+'<div class="rvazio">Nenhum curso encontrado.</div>';
+  if(q||e)return h+'<div class="cu-grid">'+F.map(curCard).join('')+'</div>';
+  var D=curCarrega(),cont=L.filter(function(c){return D.insc[c.id]&&curPct(c)<100;}),nov=L.slice().sort(function(a,b){return a.criado<b.criado?1:-1;}),lv=D.lives.filter(function(l){return l.st==='pub'&&!curLiveQuando(l).pas;}).sort(function(a,b){return a.quando<b.quando?-1:1;});
+  var pr=function(t,arr,ver){return arr.length?'<section class="cu-prat"><div class="cu-ph"><h3>'+t+'</h3>'+(ver?'<button class="cu-ver" data-cu="aba" data-v="'+ver+'">Ver tudo →</button>':'')+'</div><div class="cu-fila">'+arr.map(curCard).join('')+'</div></section>':'';};
+  h+=pr('Continuar assistindo',cont,'meus')+(lv.length?'<section class="cu-prat"><div class="cu-ph"><h3>Próximas lives</h3><button class="cu-ver" data-cu="aba" data-v="lives">Ver todas →</button></div>'+lv.slice(0,2).map(function(l){return curLiveCard(l);}).join('')+'</section>':'')+pr('Lançamentos',nov.slice(0,8));
+  esp.forEach(function(x){h+=pr(x,L.filter(function(c){return c.esp===x;}));});
+  return h;}
+function curPagina(){var D=curCarrega(),c=D.cursos.filter(function(x){return x.id===CUR.id;})[0];if(!c){CUR.v='explorar';return curExplorar();}
+  var ins=D.insc[c.id],P=D.prog[c.id]||{},p=curPct(c),aula=(c.aulas||[]).filter(function(a){return a.id===CUR.aula;})[0],eu=curEu(),meu=c.autor===eu.id,Q=D.perg[c.id]||[];
+  var pode=function(a){return ins||a.livre||meu;};
+  var player=aula?'<div class="cu-player">'+(CUR.urls[aula.id]?'<video src="'+CUR.urls[aula.id]+'" controls playsinline autoplay></video>':'<div class="cu-semv">'+ic('relogio')+'<b>'+esc(aula.t)+'</b><small>'+(aula.vid?'Vídeo: '+esc(aula.vid.nome)+' · '+esc(aula.vid.res||'')+'. No protótipo o vídeo fica só na sessão de quem enviou; com o banco ligado ele vai tocar aqui para todos.':'Esta aula ainda não tem vídeo.')+'</small></div>')+
+    '<div class="cu-pl-b"><b>'+esc(aula.t)+'</b>'+(ins?'<button class="btn sm'+(P[aula.id]?'':' rpri')+'" data-cu="feito" data-v="'+aula.id+'">'+(P[aula.id]?'✓ Concluída':'Marcar como concluída')+'</button>':'')+'</div></div>':'';
+  return '<button class="cu-volta" data-cu="aba" data-v="explorar">← Voltar</button>'+
+    '<section class="cu-top">'+curCapa(c,'lg')+'<div class="cu-ti"><small>'+esc(c.esp)+' · '+CUR_NIV[c.niv||'ini']+(c.ex?' · <i class="cu-ex">exemplo</i>':'')+'</small><h2>'+esc(c.titulo)+'</h2><span class="cu-aut">por <b>'+esc(c.autorNome)+'</b></span><p>'+esc(c.desc||'')+'</p>'+
+      '<div class="cu-meta"><span>'+ic('lista')+(c.aulas||[]).length+' aulas</span><span>'+ic('relogio')+curHoras(curMin(c))+'</span><span>'+ic('doc')+'Certificado</span></div>'+
+      (ins?'<div class="cu-prog"><span class="cu-ring" style="--p:'+p+'"><b>'+p+'%</b></span><span>'+(p===100?'Você concluiu! <button class="btn sm rpri" data-cu="cert" data-v="'+c.id+'">Ver certificado</button>':'concluído')+'</span></div>':
+        '<div class="cu-acao"><button class="btn rpri" data-cu="insc" data-v="'+c.id+'">Começar curso grátis</button>'+((c.aulas||[]).some(function(a){return a.livre;})?'<button class="btn" data-cu="aula" data-v="'+(c.aulas.filter(function(a){return a.livre;})[0].id)+'">▶ Ver aula grátis</button>':'')+'</div>')+'</div></section>'+
+    player+
+    '<div class="cu-dois"><section class="cu-aulas"><h3>Conteúdo</h3><ol>'+(c.aulas||[]).map(function(a,i){var ok=P[a.id],lib=pode(a);
+      return '<li class="'+(ok?'ok':'')+(CUR.aula===a.id?' on':'')+'"><button '+(lib?'data-cu="aula" data-v="'+a.id+'"':'disabled')+'><span class="cu-n">'+(ok?'✓':i+1)+'</span><span class="cu-at"><b>'+esc(a.t)+'</b><small>'+(+a.min||0)+' min'+(a.livre?' · grátis':'')+(a.mat?' · material':'')+'</small></span>'+(lib?'<span class="cu-play">▶</span>':'<span class="cu-lock">🔒</span>')+'</button></li>';}).join('')+'</ol></section>'+
+    '<section class="cu-perg"><h3>Perguntas ao professor</h3>'+(ins||meu?'<div class="cu-pf"><textarea id="cu-pt" rows="2" placeholder="Escreva sua dúvida…"></textarea><button class="btn sm rpri" data-cu="perg" data-v="'+c.id+'">Enviar</button></div>':'<p class="rmuted">Inscreva-se para perguntar.</p>')+
+      (Q.length?Q.slice().reverse().map(function(x){return '<div class="cu-q"><b>'+esc(x.nome)+'</b><small>'+cliHa(x.em)+'</small><p>'+esc(x.t)+'</p>'+(x.r?'<div class="cu-r"><b>Professor</b><p>'+esc(x.r)+'</p></div>':meu?'<div class="cu-pf"><input data-cur="'+x.id+'" placeholder="Responder…"><button class="btn sm" data-cu="resp" data-v="'+c.id+'|'+x.id+'">Responder</button></div>':'')+'</div>';}).join(''):'<p class="rmuted">Nenhuma pergunta ainda.</p>')+'</section></div>';}
+function curMeus(){var D=curCarrega(),L=curPublicos().filter(function(c){return D.insc[c.id];}),lv=D.lives.filter(function(l){return D.lvi[l.id];});
+  return (L.length?'<div class="cu-grid">'+L.map(curCard).join('')+'</div>':'<div class="rvazio">Você ainda não começou nenhum curso. <button class="btn sm rpri" data-cu="aba" data-v="explorar">Explorar cursos</button></div>')+
+    (lv.length?'<section class="cu-prat"><div class="cu-ph"><h3>Lives em que você se inscreveu</h3></div>'+lv.map(function(l){return curLiveCard(l);}).join('')+'</section>':'');}
+function curLives(){var L=curCarrega().lives.filter(function(l){return l.st==='pub';}).sort(function(a,b){return a.quando<b.quando?-1:1;}),fut=L.filter(function(l){return !curLiveQuando(l).pas;}),pas=L.filter(function(l){return curLiveQuando(l).pas;});
+  return (fut.length?fut.map(function(l){return curLiveCard(l);}).join(''):'<div class="rvazio">Nenhuma live marcada.</div>')+(pas.length?'<section class="cu-prat"><div class="cu-ph"><h3>Já aconteceram</h3></div>'+pas.map(function(l){return curLiveCard(l);}).join('')+'</section>':'');}
+function curEnsinar(){var D=curCarrega(),eu=curEu(),C=D.cursos.filter(function(c){return c.autor===eu.id;}),L=D.lives.filter(function(l){return l.autor===eu.id;});
+  var alunos=function(c){return D.insc[c.id]?1:0;};
+  return '<section class="cu-est"><div><h3>Seu espaço de professor</h3><p class="rmuted">Monte seus cursos com os vídeos que você gravou, em alta definição, e marque lives. Tudo passa por uma análise antes de aparecer na Rede.</p></div>'+
+    '<div class="cu-acao"><button class="btn rpri" data-cu="novo">+ Novo curso</button><button class="btn" data-cu="lv-novo">+ Marcar live</button></div></section>'+
+    '<div class="rvazio cu-proto">🧪 Protótipo: o que você criar aqui fica só neste navegador, para testar o fluxo. Depois de aprovado o desenho, ligamos no banco.</div>'+
+    '<section class="cu-prat"><div class="cu-ph"><h3>Meus cursos</h3></div>'+(C.length?'<div class="cu-tab">'+C.map(function(c){return '<div class="cu-tr">'+curCapa(c,'sm')+'<span class="cu-trt"><b>'+esc(c.titulo||'Sem título')+'</b><small>'+(c.aulas||[]).length+' aulas · '+curHoras(curMin(c))+' · '+esc(c.esp)+'</small>'+(c.st==='rec'&&c.motivo?'<small class="cu-mot">Motivo: '+esc(c.motivo)+'</small>':'')+'</span><i class="cu-st cu-st-'+c.st+'">'+curStNome(c.st)+'</i><button class="btn sm" data-cu="edita" data-v="'+c.id+'">Editar</button>'+(c.st==='pub'?'<button class="btn sm" data-cu="abre" data-v="'+c.id+'">Ver</button>':'')+'</div>';}).join('')+'</div>':'<p class="rmuted">Nenhum curso ainda.</p>')+'</section>'+
+    '<section class="cu-prat"><div class="cu-ph"><h3>Minhas lives</h3></div>'+(L.length?L.map(function(l){return curLiveCard(l,1);}).join(''):'<p class="rmuted">Nenhuma live marcada.</p>')+'</section>';}
+function curEditor(){var c=CUR.ed;if(!c){CUR.v='ensinar';return curEnsinar();}
+  var f=function(k,lab,v,tipo,extra){return '<label class="fld"><span>'+lab+'</span>'+(tipo==='area'?'<textarea data-cuf="'+k+'" rows="4">'+esc(v||'')+'</textarea>':'<input data-cuf="'+k+'" value="'+esc(v||'')+'"'+(extra||'')+'>')+'</label>';};
+  return '<button class="cu-volta" data-cu="aba" data-v="ensinar">← Voltar</button><div class="cu-edg"><section class="cu-edf"><h3>'+(c._novo?'Novo curso':'Editar curso')+'</h3>'+
+    f('titulo','Título do curso',c.titulo,'',' maxlength="90" placeholder="Ex.: Exocad do zero"')+
+    '<div class="cu-2"><label class="fld"><span>Especialidade</span><select data-cuf="esp">'+CUR_ESP.map(function(x){return '<option'+(c.esp===x?' selected':'')+'>'+esc(x)+'</option>';}).join('')+'</select></label>'+
+    '<label class="fld"><span>Nível</span><select data-cuf="niv">'+Object.keys(CUR_NIV).map(function(k){return '<option value="'+k+'"'+(c.niv===k?' selected':'')+'>'+CUR_NIV[k]+'</option>';}).join('')+'</select></label></div>'+
+    f('desc','Descrição (o que o aluno vai aprender)',c.desc,'area')+
+    '<label class="fld"><span>Preço</span><select disabled><option>Grátis (venda chega na próxima etapa)</option></select></label>'+
+    '<div class="fld"><span>Capa</span><div class="cu-capa-ed">'+curCapa(c)+'<label class="btn sm">'+(c.capa?'Trocar imagem':'Enviar imagem')+'<input type="file" accept="image/*" data-cu-capa hidden></label>'+(c.capa?'<button class="btn sm" data-cu="capa-x">Tirar</button>':'')+'</div><small class="rmuted">Sem imagem, a capa usa o título com as cores da especialidade.</small></div>'+
+    '</section><section class="cu-edf"><h3>Aulas <small class="rmuted">'+c.aulas.length+' · '+curHoras(curMin(c))+'</small></h3>'+
+    (c.aulas.length?'<ol class="cu-ela">'+c.aulas.map(function(a,i){var v=a.vid;return '<li><div class="cu-el1"><span class="cu-n">'+(i+1)+'</span><input data-cua="'+a.id+'|t" value="'+esc(a.t||'')+'" placeholder="Título da aula"><button class="cu-ib" data-cu="a-sobe" data-v="'+a.id+'" title="Subir"'+(i?'':' disabled')+'>↑</button><button class="cu-ib" data-cu="a-desce" data-v="'+a.id+'" title="Descer"'+(i<c.aulas.length-1?'':' disabled')+'>↓</button><button class="cu-ib cu-del" data-cu="a-tira" data-v="'+a.id+'" title="Excluir aula">✕</button></div>'+
+      '<div class="cu-el2"><label class="btn sm">'+(v?'Trocar vídeo':'🎬 Enviar vídeo')+'<input type="file" accept="video/*" data-cu-vid="'+a.id+'" hidden></label>'+(v?'<span class="cu-vinfo">'+esc(v.nome)+' · '+esc(v.res||'?')+' · '+(+a.min||0)+' min · '+esc(v.tam)+'</span>':'<span class="rmuted">MP4 ou MOV, até 4K. A duração é lida do arquivo.</span>')+
+      '<label class="btn sm">'+(a.mat?'📎 '+esc(a.mat):'📎 Material (PDF)')+'<input type="file" accept="application/pdf" data-cu-mat="'+a.id+'" hidden></label>'+
+      '<label class="cu-chk"><input type="checkbox" data-cua="'+a.id+'|livre"'+(a.livre?' checked':'')+'> Aula grátis (prévia)</label></div></li>';}).join('')+'</ol>':'<p class="rmuted">Nenhuma aula ainda.</p>')+
+    '<button class="btn" data-cu="a-nova">+ Adicionar aula</button></section></div>'+
+    '<div class="cu-edb"><button class="btn" data-cu="ed-salva">Salvar rascunho</button>'+(c._novo?'':'<button class="btn cu-del" data-cu="ed-apaga">Excluir curso</button>')+'<span class="spacer"></span><button class="btn rpri" data-cu="ed-envia">Enviar para análise</button></div>';}
+function curLvEditor(){var l=CUR.lv;if(!l){CUR.v='ensinar';return curEnsinar();}var q=l.quando?new Date(l.quando):null,loc=q?new Date(q.getTime()-q.getTimezoneOffset()*6e4).toISOString().slice(0,16):'';
+  return '<button class="cu-volta" data-cu="aba" data-v="ensinar">← Voltar</button><section class="cu-edf cu-lved"><h3>'+(l._novo?'Marcar live':'Editar live')+'</h3>'+
+    '<label class="fld"><span>Título</span><input data-cul="titulo" value="'+esc(l.titulo||'')+'" maxlength="90"></label>'+
+    '<div class="cu-2"><label class="fld"><span>Data e hora</span><input type="datetime-local" data-cul="quando" value="'+loc+'"></label><label class="fld"><span>Duração (min)</span><input type="number" min="15" step="15" data-cul="dur" value="'+(l.dur||60)+'"></label></div>'+
+    '<label class="fld"><span>Especialidade</span><select data-cul="esp">'+CUR_ESP.map(function(x){return '<option'+(l.esp===x?' selected':'')+'>'+esc(x)+'</option>';}).join('')+'</select></label>'+
+    '<label class="fld"><span>Link da transmissão (YouTube, Zoom ou Meet)</span><input data-cul="link" value="'+esc(l.link||'')+'" placeholder="https://"></label>'+
+    '<label class="fld"><span>Descrição</span><textarea data-cul="desc" rows="3">'+esc(l.desc||'')+'</textarea></label>'+
+    '<div class="cu-edb"><button class="btn" data-cu="lv-salva">Salvar rascunho</button>'+(l._novo?'':'<button class="btn cu-del" data-cu="lv-apaga">Excluir</button>')+'<span class="spacer"></span><button class="btn rpri" data-cu="lv-envia">Enviar para análise</button></div></section>';}
+function curAprovar(){var D=curCarrega(),C=D.cursos.filter(function(c){return c.st==='ana';}),L=D.lives.filter(function(l){return l.st==='ana';});
+  if(!C.length&&!L.length)return '<div class="rvazio">Nada esperando aprovação.</div>';
+  return C.map(function(c){return '<div class="cu-tr">'+curCapa(c,'sm')+'<span class="cu-trt"><b>'+esc(c.titulo)+'</b><small>'+esc(c.autorNome)+' · '+c.aulas.length+' aulas · '+curHoras(curMin(c))+' · '+esc(c.esp)+'</small></span><button class="btn sm" data-cu="abre-ana" data-v="'+c.id+'">Ver</button><button class="btn sm cu-del" data-cu="recusa" data-v="c|'+c.id+'">Recusar</button><button class="btn sm rpri" data-cu="aprova" data-v="c|'+c.id+'">Aprovar</button></div>';}).join('')+
+    L.map(function(l){return '<div class="cu-tr"><span class="cu-trt"><b>🔴 Live: '+esc(l.titulo)+'</b><small>'+esc(l.autorNome)+' · '+new Date(l.quando).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</small></span><button class="btn sm cu-del" data-cu="recusa" data-v="l|'+l.id+'">Recusar</button><button class="btn sm rpri" data-cu="aprova" data-v="l|'+l.id+'">Aprovar</button></div>';}).join('');}
+function curCert(){var D=curCarrega(),c=D.cursos.filter(function(x){return x.id===CUR.id;})[0],eu=curEu();if(!c){CUR.v='explorar';return curExplorar();}
+  return '<button class="cu-volta" data-cu="abre" data-v="'+c.id+'">← Voltar ao curso</button><div class="cu-cert" id="cu-cert"><small>REDE IDEALI · CERTIFICADO DE CONCLUSÃO</small><p>Certificamos que</p><h2>'+esc(eu.nome)+'</h2><p>concluiu o curso</p><h3>'+esc(c.titulo)+'</h3><p>ministrado por <b>'+esc(c.autorNome)+'</b>, com carga horária de <b>'+curHoras(curMin(c))+'</b>.</p><em>'+new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})+'</em>'+(c.ex?'<i class="cu-ex">exemplo</i>':'')+'</div><div class="cu-edb"><span class="spacer"></span><button class="btn rpri" data-cu="imprime">Imprimir ou salvar em PDF</button></div>';}
+function rCursosRede(){var v=CUR.v;
+  var corpo=v==='curso'?curPagina():v==='lives'?curLives():v==='meus'?curMeus():v==='ensinar'?curEnsinar():v==='editor'?curEditor():v==='lv-editor'?curLvEditor():v==='aprovar'&&RL.admin?curAprovar():v==='cert'?curCert():curExplorar();
+  return '<div class="rtit"><h2>Cursos e lives</h2><p>Cursos, treinamentos e lives feitos por profissionais da Rede.</p></div>'+curAbas()+'<div class="cu">'+corpo+'</div>';}
+var _rRedeSecCU=rRedeSec;rRedeSec=function(){if(S.rede.sec==='cursos')return rCursosRede();return _rRedeSecCU.apply(this,arguments);};
+if(typeof RS_SEC!=='undefined')RS_SEC.cursos=['🎓','Cursos e lives','#22D3EE','#7C5CFF'];
+/* ---------- ações ---------- */
+function curAula(){return {id:curId(),t:'',min:0};}
+function curLeVideo(file,a){return new Promise(function(ok){var u=URL.createObjectURL(file),v=document.createElement('video');v.preload='metadata';
+  var fim=function(){var h=v.videoHeight||0;a.vid={nome:file.name,tam:file.size>=1e9?(file.size/1e9).toFixed(1).replace('.',',')+' GB':Math.round(file.size/1e6)+' MB',res:h>=2100?'4K':h>=1400?'1440p':h>=1060?'1080p (Full HD)':h>=700?'720p (HD)':h?h+'p':'?'};if(v.duration&&isFinite(v.duration))a.min=Math.max(1,Math.round(v.duration/60));CUR.urls[a.id]=u;ok();};
+  v.onloadedmetadata=fim;v.onerror=function(){a.vid={nome:file.name,tam:Math.round(file.size/1e6)+' MB',res:'?'};CUR.urls[a.id]=u;ok();};v.src=u;});}
+function curLeCapa(file){return new Promise(function(ok,no){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var W=640,H=Math.round(W*4/3),cv=document.createElement('canvas');cv.width=W;cv.height=H;var g=cv.getContext('2d'),s=Math.max(W/im.width,H/im.height);
+  g.drawImage(im,(W-im.width*s)/2,(H-im.height*s)/2,im.width*s,im.height*s);ok(cv.toDataURL('image/jpeg',.78));};im.onerror=no;im.src=r.result;};r.onerror=no;r.readAsDataURL(file);});}
+function curGuardaEd(st){var D=curCarrega(),c=CUR.ed,eu=curEu();if(!c)return false;
+  if(st==='ana'){if(!String(c.titulo||'').trim()){toast('Dê um título ao curso.');return false;}if(!c.aulas.length){toast('Adicione pelo menos uma aula.');return false;}if(c.aulas.some(function(a){return !String(a.t||'').trim();})){toast('Toda aula precisa de título.');return false;}}
+  var o=JSON.parse(JSON.stringify(c));delete o._novo;o.st=st||(o.st==='pub'?'ana':o.st||'rasc');o.autor=eu.id;o.autorNome=eu.nome;o.criado=o.criado||new Date().toISOString();delete o.motivo;
+  var i=D.cursos.map(function(x){return x.id;}).indexOf(o.id);if(i>=0)D.cursos[i]=o;else D.cursos.push(o);curSalva();return true;}
+function curGuardaLv(st){var D=curCarrega(),l=CUR.lv,eu=curEu();if(!l)return false;
+  if(st==='ana'){if(!String(l.titulo||'').trim()||!l.quando){toast('Preencha título, data e hora.');return false;}if(l.link&&!/^https:\/\//.test(l.link)){toast('O link precisa começar com https://');return false;}}
+  var o=JSON.parse(JSON.stringify(l));delete o._novo;o.st=st||'rasc';o.autor=eu.id;o.autorNome=eu.nome;var i=D.lives.map(function(x){return x.id;}).indexOf(o.id);if(i>=0)D.lives[i]=o;else D.lives.push(o);curSalva();return true;}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-cu]');if(!b||b.disabled)return;var a=b.getAttribute('data-cu'),v=b.getAttribute('data-v'),D=curCarrega(),c=CUR.ed;
+  var vai=function(x){CUR.v=x;window.scrollTo(0,0);render();};
+  if(a==='aba'){CUR.aula=null;vai(v);}
+  else if(a==='esp'){CUR.esp=v;render();}
+  else if(a==='abre'||a==='abre-ana'){CUR.id=v;CUR.aula=null;vai('curso');}
+  else if(a==='insc'){D.insc[v]=new Date().toISOString();curSalva();var cc=D.cursos.filter(function(x){return x.id===v;})[0];CUR.aula=cc&&cc.aulas[0]?cc.aulas[0].id:null;render();toast('Inscrição feita. Bom curso!');}
+  else if(a==='aula'){CUR.aula=v;render();var pl=document.querySelector('.cu-player');if(pl)pl.scrollIntoView({behavior:'smooth',block:'start'});}
+  else if(a==='feito'){var P=D.prog[CUR.id]=D.prog[CUR.id]||{};if(P[v])delete P[v];else P[v]=1;curSalva();var cc2=D.cursos.filter(function(x){return x.id===CUR.id;})[0];
+    if(P[v]&&cc2){var i=cc2.aulas.map(function(x){return x.id;}).indexOf(v);if(cc2.aulas[i+1])CUR.aula=cc2.aulas[i+1].id;if(curPct(cc2)===100)toast('Parabéns! Curso concluído. Seu certificado está pronto.');}render();}
+  else if(a==='perg'){var t=(document.getElementById('cu-pt')||{}).value||'';if(!t.trim())return;(D.perg[v]=D.perg[v]||[]).push({id:curId(),nome:curEu().nome,t:t.trim().slice(0,1000),em:new Date().toISOString()});curSalva();render();}
+  else if(a==='resp'){var p2=v.split('|'),inp=document.querySelector('[data-cur="'+p2[1]+'"]'),q=(D.perg[p2[0]]||[]).filter(function(x){return x.id===p2[1];})[0];if(q&&inp&&inp.value.trim()){q.r=inp.value.trim().slice(0,1000);curSalva();render();}}
+  else if(a==='cert'){CUR.id=v;vai('cert');}
+  else if(a==='imprime'){var el=document.getElementById('cu-cert');if(!el)return;var w=window.open('','_blank');if(!w){toast('Libere a janela para imprimir.');return;}
+    w.document.write('<!doctype html><meta charset="utf-8"><title>Certificado</title><style>body{margin:0;font-family:Georgia,serif;display:grid;place-items:center;min-height:100vh}.c{width:900px;max-width:94vw;border:10px double #4F7BFF;padding:60px;text-align:center}small{letter-spacing:.2em;color:#4F7BFF;font:700 12px sans-serif}h2{font-size:40px;margin:10px 0}h3{font-size:26px;margin:8px 0}em{display:block;margin-top:30px;color:#555}i{display:none}<\/style><div class="c">'+el.innerHTML+'</div><script>setTimeout(function(){print()},300)<\/script>');w.document.close();}
+  else if(a==='lv-ins'){if(D.lvi[v])delete D.lvi[v];else D.lvi[v]=1;curSalva();render();if(D.lvi[v])toast('Inscrito. Você recebe o lembrete quando a live estiver para começar.');}
+  else if(a==='novo'){CUR.ed={id:curId(),_novo:1,titulo:'',esp:'Prótese',niv:'ini',desc:'',aulas:[curAula()],st:'rasc'};vai('editor');}
+  else if(a==='edita'){var o=D.cursos.filter(function(x){return x.id===v;})[0];if(!o)return;CUR.ed=JSON.parse(JSON.stringify(o));vai('editor');}
+  else if(a==='a-nova'&&c){c.aulas.push(curAula());render();var ins2=document.querySelectorAll('.cu-ela input[data-cua$="|t"]');if(ins2.length)ins2[ins2.length-1].focus();}
+  else if((a==='a-sobe'||a==='a-desce')&&c){var k=c.aulas.map(function(x){return x.id;}).indexOf(v),j=a==='a-sobe'?k-1:k+1;if(k<0||j<0||j>=c.aulas.length)return;var t2=c.aulas[k];c.aulas[k]=c.aulas[j];c.aulas[j]=t2;render();}
+  else if(a==='a-tira'&&c){if(!confirm('Excluir esta aula?'))return;c.aulas=c.aulas.filter(function(x){return x.id!==v;});render();}
+  else if(a==='capa-x'&&c){delete c.capa;render();}
+  else if(a==='ed-salva'){if(curGuardaEd(c&&c.st==='pub'?'pub':'rasc')){toast('Rascunho salvo.');CUR.ed=null;vai('ensinar');}}
+  else if(a==='ed-envia'){if(curGuardaEd('ana')){toast('Enviado para análise. Você vê o resultado em "Meus cursos".');CUR.ed=null;vai('ensinar');}}
+  else if(a==='ed-apaga'&&c){if(!confirm('Excluir este curso? Não dá para desfazer.'))return;D.cursos=D.cursos.filter(function(x){return x.id!==c.id;});curSalva();CUR.ed=null;vai('ensinar');}
+  else if(a==='lv-novo'){CUR.lv={id:curId(),_novo:1,titulo:'',esp:'Prótese',dur:60,link:'',desc:''};vai('lv-editor');}
+  else if(a==='lv-ed'){var lo=D.lives.filter(function(x){return x.id===v;})[0];if(!lo)return;CUR.lv=JSON.parse(JSON.stringify(lo));vai('lv-editor');}
+  else if(a==='lv-salva'){if(curGuardaLv('rasc')){toast('Live salva como rascunho.');CUR.lv=null;vai('ensinar');}}
+  else if(a==='lv-envia'){if(curGuardaLv('ana')){toast('Live enviada para análise.');CUR.lv=null;vai('ensinar');}}
+  else if(a==='lv-apaga'&&CUR.lv){if(!confirm('Excluir esta live?'))return;D.lives=D.lives.filter(function(x){return x.id!==CUR.lv.id;});curSalva();CUR.lv=null;vai('ensinar');}
+  else if(a==='aprova'||a==='recusa'){if(!RL.admin)return;var p3=v.split('|'),arr=p3[0]==='c'?D.cursos:D.lives,it=arr.filter(function(x){return x.id===p3[1];})[0];if(!it)return;
+    if(a==='recusa'){var m=prompt('Motivo da recusa (o professor vai ver):','');if(m===null)return;it.st='rec';it.motivo=m.slice(0,300);}else{it.st='pub';it.criado=new Date().toISOString();}curSalva();render();toast(a==='aprova'?'Aprovado e publicado na Rede.':'Recusado.');}});
+document.addEventListener('input',function(e){var t=e.target;if(!t||!t.getAttribute)return;
+  if(t.id==='cu-q'){CUR.q=t.value;var g=document.querySelector('.cu');if(g){var pos=t.selectionStart;g.innerHTML=curExplorar();var n=document.getElementById('cu-q');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(x){}}}return;}
+  var k=t.getAttribute('data-cuf');if(k&&CUR.ed){CUR.ed[k]=t.value;return;}
+  var l=t.getAttribute('data-cul');if(l&&CUR.lv){CUR.lv[l]=l==='quando'?(t.value?new Date(t.value).toISOString():''):l==='dur'?+t.value:t.value;return;}
+  var a=t.getAttribute('data-cua');if(a&&CUR.ed){var p=a.split('|'),au=CUR.ed.aulas.filter(function(x){return x.id===p[0];})[0];if(au)au[p[1]]=t.type==='checkbox'?t.checked:t.value;}},true);
+document.addEventListener('change',function(e){var t=e.target;if(!t||!t.getAttribute)return;var c=CUR.ed;
+  if(t.getAttribute('data-cuf')&&c){c[t.getAttribute('data-cuf')]=t.value;if(t.tagName==='SELECT')render();return;}
+  if(t.getAttribute('data-cua')&&t.type==='checkbox'&&c){var p=t.getAttribute('data-cua').split('|'),au=c.aulas.filter(function(x){return x.id===p[0];})[0];if(au)au.livre=t.checked;return;}
+  if(t.hasAttribute('data-cu-capa')&&c&&t.files[0]){curLeCapa(t.files[0]).then(function(u){c.capa=u;render();},function(){toast('Não consegui ler essa imagem.');});return;}
+  var vid=t.getAttribute('data-cu-vid');if(vid&&c&&t.files[0]){var au2=c.aulas.filter(function(x){return x.id===vid;})[0];if(!au2)return;toast('Lendo o vídeo…');curLeVideo(t.files[0],au2).then(render);return;}
+  var mat=t.getAttribute('data-cu-mat');if(mat&&c&&t.files[0]){var au3=c.aulas.filter(function(x){return x.id===mat;})[0];if(au3){au3.mat=t.files[0].name;render();}}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
