@@ -2149,6 +2149,39 @@ i.pzs-antes{background:#3B82F6}i.pzs-prazo{background:#22C55E}i.pzs-atraso{backg
 
 body:has(.rsx.rs-claro){background:#F4F6FB}body:has(.rsx:not(.rs-claro)){background:#0B1020}.cu-capa-ed .btn{white-space:nowrap}
 .redeamb.rsx>.rs-top{position:sticky;top:0;z-index:40}.redeamb.rsx>.rs-tab{position:fixed;z-index:45}.rsx .rav-m{z-index:50}
+/* ===== Rede sóbria ===== */
+.redeamb.rsx{--rc:#2563EB;--rc2:#2563EB;--rbg:#F3F4F6;--rsf:#FFFFFF;--rln:#E5E7EB;--rtx:#111827;--rmu:#6B7280;--rsh:0 1px 2px rgba(17,24,39,.04)}
+:root[data-theme=dark] .redeamb.rsx{--rc:#3B82F6;--rc2:#3B82F6;--rbg:#0E1116;--rsf:#161A21;--rln:#262C36;--rtx:#E6E8EC;--rmu:#9AA3AF;--rsh:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .redeamb.rsx{--rc:#3B82F6;--rc2:#3B82F6;--rbg:#0E1116;--rsf:#161A21;--rln:#262C36;--rtx:#E6E8EC;--rmu:#9AA3AF;--rsh:none}}
+body:has(.rsx.rs-claro){background:#F3F4F6}body:has(.rsx:not(.rs-claro)){background:#0E1116}
+.rsx .rs-logo{background:var(--rc);border-radius:8px;box-shadow:none}.rsx .rs-nm b{color:var(--rc)}
+.rsx .rs-av{background:var(--rc);box-shadow:none}
+.rsx .rs-busca{border-radius:8px}
+.rsx .rs-menu,.rsx .rs-box,.rsx .rs-loc .rloc,.rsx .rcard,.rsx .vcard2,.rsx .pcard.pfolha,.rsx .pgrid .pg,.rsx .cu-aulas,.rsx .cu-perg,.rsx .cu-edf,.rsx .cu-est,.rsx .cu-top,.rsx .cu-live,.rsx .cu-card,.rsx .cu-tr{border-radius:10px!important;box-shadow:var(--rsh)!important}
+.rsx .rcard:hover,.rsx .vcard2:hover,.rsx .pcard.pfolha:hover,.rsx .cu-card:hover{transform:none;box-shadow:0 2px 8px rgba(17,24,39,.08)!important}
+.rsx .rs-nv{border-radius:8px;font-weight:500}.rsx .rs-nvi{background:none!important;box-shadow:none!important;width:22px;height:22px;color:var(--rmu)}.rsx .rs-nvi .ic{width:20px;height:20px;margin:0}
+.rsx .rs-nv.on{background:color-mix(in srgb,var(--rc) 10%,transparent);color:var(--rc);font-weight:600;box-shadow:inset 3px 0 0 var(--rc)}.rsx .rs-nv.on .rs-nvi{color:var(--rc)}
+.rsx .btn.rpri,.rsx .rpri{background:var(--rc)!important;border-color:var(--rc)!important;color:#fff!important;box-shadow:none!important;border-radius:999px}
+.rsx .btn.rpri:hover{filter:brightness(1.08)}
+.rsx .rchip{border-radius:999px;background:var(--rsf);border-color:var(--rln);color:var(--rtx);font-weight:500}.rsx .rchip .rdot{display:none}
+.rsx .rchip.on{background:var(--rtx)!important;border-color:var(--rtx)!important;color:var(--rsf)!important}
+.rsx .rseg{border-radius:8px}.rsx .rseg button[aria-pressed="true"]{background:var(--rtx)!important;color:var(--rsf)!important}
+.rsx .rtit h2{font-size:1.3rem;font-weight:700;letter-spacing:-.01em}.rsx .rtit p{font-size:.9rem}
+.rsx .rs-ini{background:var(--rbg)!important;color:var(--rmu);font-weight:700;border-radius:8px;border:1px solid var(--rln)}
+.rsx .rs-li b{font-weight:600}
+/* vagas em lista */
+.rsx .rgrid.vgrid{display:block;background:var(--rsf);border:1px solid var(--rln);border-radius:10px;overflow:hidden}
+.vrow{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:14px;align-items:center;padding:16px 18px;border-top:1px solid var(--rln);color:var(--rtx)}
+.vrow:first-child{border-top:0}.vrow:hover{background:color-mix(in srgb,var(--rtx) 3%,transparent)}
+.vr-av{width:48px;height:48px;border-radius:8px;display:grid;place-items:center;font-weight:700;font-size:1.1rem;background:var(--rbg);border:1px solid var(--rln);color:var(--rmu)}.vr-av.conf{font-size:1rem}
+.vr-c{display:grid;gap:2px;min-width:0}.vr-c h3{margin:0;font-size:1rem;font-weight:600;color:var(--rtx);letter-spacing:-.005em}
+.vr-nova{font-size:.68rem;font-weight:600;color:#15803D;background:color-mix(in srgb,#16A34A 12%,transparent);border-radius:4px;padding:1px 6px;vertical-align:2px}
+.vr-emp{margin:0;font-size:.88rem;color:var(--rtx)}
+.vr-meta{margin:2px 0 0;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.8rem;color:var(--rmu)}
+.vr-area{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--rtx)}.vr-area:before{content:"";width:3px;height:12px;border-radius:2px;background:var(--k)}
+.vr-dist{font-weight:600;color:var(--rc)}
+.vr-ok{font-size:.82rem;font-weight:600;color:#15803D}[data-theme=dark] .vr-ok{color:#4ADE80}
+@media(max-width:560px){.vrow{grid-template-columns:40px minmax(0,1fr);padding:14px}.vr-av{width:40px;height:40px}.vr-a{grid-column:2}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -7746,13 +7779,13 @@ function rsTopo(){var E=rsEu();
       '<button role="menuitem" data-act="rAvVai" data-v="perfil">👤 Editar perfil (currículo)</button><button role="menuitem" data-act="rAvVai" data-v="config">⚙️ Configurações</button><button role="menuitem" data-act="rAvVai" data-v="agente">🤖 Agente de vagas</button>'+
       '<button role="menuitem" data-act="redeSai">← Voltar ao meu painel</button>'+(RL.user?'<button role="menuitem" class="danger" data-rl="sair">Sair</button>':'')+'</div>':'')+'</div></div></header>';}
 function rsEsq(){var E=rsEu(),s=S.rede.sec;
-  var item=function(k){var x=RS_SEC[k];return '<button class="rs-nv'+(s===k?' on':'')+'" data-act="redeSec" data-v="'+k+'" style="--a:'+x[2]+';--b:'+x[3]+'"><span class="rs-nvi">'+x[0]+'</span>'+x[1]+'</button>';};
+  var item=function(k){var x=RS_SEC[k];return '<button class="rs-nv'+(s===k?' on':'')+'" data-act="redeSec" data-v="'+k+'" style="--a:'+x[2]+';--b:'+x[3]+'"><span class="rs-nvi">'+(RS_IC[k]?dIco(RS_IC[k],'ic'):x[0])+'</span>'+x[1]+'</button>';};
   return '<aside class="rs-esq">'+
     '<nav class="rs-menu" aria-label="Seções da Rede"><small>Explorar</small>'+['vagas','profs','clinicas','labs','comercio','cursos'].map(item).join('')+'<small>Você</small>'+['agente','perfil','config'].map(item).join('')+'</nav></aside>';}
 function rsDir(){var mc=minhaCidade(),V=[];try{V=todasVagas().filter(function(x){return !remoto(x.v.lugar);}).map(function(x){return {x:x,d:distKm(mc,cidadeDe(x.v.lugar))||9e4};}).sort(function(a,b){return a.d-b.d;}).slice(0,3);}catch(e){}
   var Pf=REDE_PROFS.slice(0,3),C=(REDE_CURS||[]).slice(0,2);
   return '<aside class="rs-dir">'+
-    '<section class="rs-box"><h3>Vagas perto de você</h3>'+(V.length?V.map(function(o){var v=o.x.v,cor=AREA_COR[o.x.a]||'#3D7BFF';return '<button class="rs-li" data-act="redeSec" data-v="vagas"><span class="rs-li-i" style="--k:'+cor+'">💼</span><span><b>'+esc(v.t||v.cargo||'Vaga')+'</b><small>'+esc(String(v.lugar||''))+(o.d<9e4?' · '+Math.round(o.d)+' km':'')+'</small></span></button>';}).join(''):'<p class="rs-vz">Nenhuma vaga por perto.</p>')+
+    '<section class="rs-box"><h3>Vagas perto de você</h3>'+(V.length?V.map(function(o){var v=o.x.v,cor=AREA_COR[o.x.a]||'#3D7BFF';return '<button class="rs-li" data-act="redeSec" data-v="vagas"><span class="rs-li-i rs-ini">'+(v.conf?'🔒':esc(String(v.emp||v.cargo||'?').replace(/^(clínica|laboratório|loja|marca)\s+/i,'').charAt(0).toUpperCase()))+'</span><span><b>'+esc(v.t||v.cargo||'Vaga')+'</b><small>'+esc(String(v.lugar||''))+(o.d<9e4?' · '+Math.round(o.d)+' km':'')+'</small></span></button>';}).join(''):'<p class="rs-vz">Nenhuma vaga por perto.</p>')+
       '<button class="rs-mais" data-act="redeSec" data-v="vagas">Ver todas as vagas →</button></section>'+
     '<p class="rs-rod">Rede Ideali · odontologia conectada</p></aside>';}
 function rsAbas(){var s=S.rede.sec,fora=['vagas','profs','agente','perfil'].indexOf(s)<0;return '<nav class="rs-tab" aria-label="Rede">'+[['vagas'],['profs'],['agente'],['perfil']].map(function(a){var x=RS_SEC[a[0]];return '<button class="'+(s===a[0]&&!S.rede.mm?'on':'')+'" data-act="redeSec" data-v="'+a[0]+'"><span>'+x[0]+'</span><small>'+x[1].split(' ')[0]+'</small></button>';}).join('')+
@@ -7943,6 +7976,25 @@ document.addEventListener('change',function(e){var t=e.target;if(!t||!t.getAttri
   if(t.hasAttribute('data-cu-capa')&&c&&t.files[0]){curLeCapa(t.files[0]).then(function(u){c.capa=u;render();},function(){toast('Não consegui ler essa imagem.');});return;}
   var vid=t.getAttribute('data-cu-vid');if(vid&&c&&t.files[0]){var au2=c.aulas.filter(function(x){return x.id===vid;})[0];if(!au2)return;toast('Lendo o vídeo…');curLeVideo(t.files[0],au2).then(render);return;}
   var mat=t.getAttribute('data-cu-mat');if(mat&&c&&t.files[0]){var au3=c.aulas.filter(function(x){return x.id===mat;})[0];if(au3){au3.mat=t.files[0].name;render();}}});
+
+
+/* ===== Rede sóbria: ícones de linha, vaga em lista (estilo profissional), uma cor de destaque ===== */
+Object.assign(DIC,{
+  rmal:'<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5M3.5 13h17"/>',
+  rloja:'<path d="M4 9.5V20h16V9.5M3 9.5 5 4h14l2 5.5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M10 20v-5h4v5"/>',
+  rcap:'<path d="M2.5 9 12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v5c1.500 1.500 3.500 2.300 5.500 2.300s4-.8 5.500-2.300v-5M21.5 9v5"/>',
+  rrobo:'<rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 8V4.5M9.500 13h.01M14.500 13h.01M9.500 16.500h5M3 12.500v3M21 12.500v3"/>',
+  rusr:'<circle cx="12" cy="8.500" r="4"/><path d="M4.500 20.500c1-4 4-6 7.500-6s6.500 2 7.500 6"/>',
+  rcfg:'<circle cx="12" cy="12" r="3"/><path d="M12 2.500v2.500M12 19v2.500M4.600 4.600l1.800 1.800M17.600 17.600l1.800 1.800M2.500 12H5M19 12h2.500M4.600 19.400l1.800-1.800M17.600 6.400l1.800-1.800"/>'});
+var RS_IC={vagas:'rmal',profs:'pessoas',clinicas:'dente',labs:'frasco',comercio:'rloja',cursos:'rcap',agente:'rrobo',perfil:'rusr',config:'rcfg'};
+vagaCard=function(x){var v=x.v,cor=AREA_COR[x.a]||'#64748B',it=(S.rede.vint||{})[v.id],cid=String(v.lugar||''),tipo=/lab|prótese/i.test(v.emp)?'Laboratório':/loja|distrib|marca|assist/i.test(v.emp)?'Empresa':'Clínica';
+  var ini=v.conf?'🔒':esc(String(v.emp||'?').replace(/^(clínica|laboratório|loja|marca|prótese|consultório)\s+/i,'').charAt(0).toUpperCase());
+  var d=String(distTxt(cid)||'').replace('📍 ','');
+  return '<article class="vrow"><span class="vr-av'+(v.conf?' conf':'')+'">'+ini+'</span>'+
+    '<div class="vr-c"><h3>'+esc(v.cargo)+(v.novo?' <span class="vr-nova">Nova</span>':'')+'</h3>'+
+      '<p class="vr-emp">'+(v.conf?tipo+' confidencial':esc(v.emp))+'</p>'+
+      '<p class="vr-meta"><span class="vr-area" style="--k:'+cor+'">'+esc(x.a)+'</span><span>'+esc(cid)+'</span>'+(v.det?'<span>'+esc(v.det)+'</span>':'')+(d?'<span class="vr-dist">'+esc(d)+'</span>':'')+'</p></div>'+
+    '<div class="vr-a">'+(it?'<span class="vr-ok">✓ Interesse enviado</span>':'<button class="btn sm rpri" data-act="redeVaga" data-v="'+v.id+'">Tenho interesse</button>')+'</div></article>';};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
