@@ -108,6 +108,14 @@ Total de Débitos (D): -1.975,00
  await p.evaluate(()=>{S.tab.prot='financeiro';render();finAtual(Object.assign({},FIN.M[1],{extrato_path:'u-lab/extratos/2026-07/y.pdf'}));render();});await p.waitForTimeout(1800);
  ok(/Não consegui ler as linhas/.test(await p.$eval('#exb-ov',x=>x.innerText).catch(()=>''))&&(await p.$$eval('#exb-ov .pfx-i b',x=>x.map(y=>y.textContent).join('|')))==='Silvia','extrato sem leitura (Clínica B): mostra só os abertos da Clínica B');
  await p.click('#exb-ov [data-exb=fecha]');await p.waitForTimeout(400);
+ // 6b. conferir todos os extratos já anexados, em fila
+ await p.evaluate(()=>{FIN.M.push({id:'m0',cliente_id:'cA',ano:2026,mes:6,valor_mes:100,valor_componente:0,extrato_path:'u-lab/extratos/2026-06/z.pdf'});EXB.visto.m0=FIN.M[FIN.M.length-1].extrato_path;S.tab.prot='producao';render();});await p.waitForTimeout(300);
+ const bt2=await p.$eval('[data-exb=todos]',x=>x.closest('.exb-ban').innerText).catch(()=>'');
+ ok(/pedidos em aberto/.test(bt2)&&/2 clientes/.test(bt2),'tela de Pedidos avisa: pedidos abertos de clientes que já têm extrato → '+bt2.split('\n')[0]);
+ await p.click('[data-exb=todos]');await p.waitForTimeout(1600);
+ const cab=await p.$eval('#exb-ov .exb-s',x=>x.innerText).catch(()=>'');
+ ok(/Clínica A/.test(cab)&&/Junho/.test(cab)&&/1 de 3/.test(cab),'fila começa pelo extrato mais antigo de cada cliente, com contador → '+cab);
+ await p.click('#exb-ov [data-exb=para]');await p.waitForTimeout(500);ok(!(await p.$('#exb-ov')),'"Parar" fecha a fila');
  // 7. pedidos confirmados pelo cliente
  await p.evaluate(()=>{S.tab.prot='producao';render();});await p.waitForTimeout(300);
  let bn=await p.$eval('.rcb-ban',x=>x.innerText).catch(()=>'');

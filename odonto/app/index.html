@@ -7180,14 +7180,20 @@ function exbCasa(m,L){var pool=exbPool(m),usado={},R={baixa:[],ja:[],novo:[],for
   return R;}
 
 /* ---------- janela de conferência ---------- */
+function exbTodos(){if(typeof FIN==='undefined'||!FIN.carregado||!PED.carregado||ESP.dono)return {M:[],n:0,c:0};var ids={},cl={};
+  var M=FIN.M.filter(function(m){if(!m.extrato_path)return false;var L=exbPend(m);L.forEach(function(p){ids[p.id]=1;});if(L.length)cl[m.cliente_id||m.cliente_reg]=1;return L.length>0;})
+    .sort(function(a,b){return String(finCliNome(a)).localeCompare(finCliNome(b),'pt')||(a.ano*100+a.mes)-(b.ano*100+b.mes);});
+  return {M:M,n:Object.keys(ids).length,c:Object.keys(cl).length};}
+function exbTodosBanner(){var T=exbTodos();if(!T.n)return '';
+  return '<div class="banner pfx-ban exb-ban"><span>'+ic('doc')+'<b>'+T.n+' pedido'+(T.n===1?'':'s')+' em aberto</b> de '+T.c+' cliente'+(T.c===1?'':'s')+' que já '+(T.c===1?'tem':'têm')+' extrato anexado. A Ana confere extrato por extrato e você confirma.</span><button class="btn sm pri" data-exb="todos">Conferir pelos extratos</button></div>';}
 function exbDoMes(){if(typeof FIN==='undefined'||!FIN.carregado||!PED.carregado||ESP.dono)return [];return FIN.M.filter(function(m){return m.ano===FIN.ano&&m.mes===FIN.mes&&m.extrato_path&&exbPend(m).length;});}
-function exbAbre(m){EXB.m=m;EXB.R=null;EXB.sel={};EXB.busy=false;EXB.lendo=true;exbModal();
+function exbAbre(m){EXB.feitos=(EXB.feitos||0)+1;EXB.m=m;EXB.R=null;EXB.sel={};EXB.busy=false;EXB.lendo=true;exbModal();
   Promise.all([exbLinhas(m),pzmEnvios()]).then(function(r){if(EXB.m!==m)return;var L=r[0];EXB.lendo=false;
     if(L&&L.length){EXB.R=exbCasa(m,L);EXB.R.baixa.forEach(function(x,i){if(!x.fraco)EXB.sel['b'+i]=1;});EXB.R.novo.forEach(function(x,i){EXB.sel['n'+i]=1;});}
     else{EXB.R={semLeitura:true,fora:exbPend(m)};EXB.R.fora.forEach(function(p){EXB.sel['f'+p.id]=1;});}
     exbModal();});}
 function exbProx(){if(EXB.m)return;while(EXB.fila.length){var id=EXB.fila.shift(),m=FIN.M.filter(function(x){return x.id===id;})[0];if(m&&m.extrato_path&&exbPend(m).length){exbAbre(m);return;}}}
-function exbFecha(){EXB.m=null;EXB.R=null;exbModal();setTimeout(exbProx,250);}
+function exbFecha(){if(!EXB.fila.length){EXB.tot=0;EXB.feitos=0;}EXB.m=null;EXB.R=null;exbModal();setTimeout(exbProx,250);}
 var EXB_STN={desenho:'Desenho',producao:'Em produção',finalizado:'Pronto',aguardando:'Aguardando informação',entregue:'Entregue'};
 function exbTrab(l){return l.itens.length?l.itens.map(function(i){return (i.qtd>1?i.qtd+'× ':'')+i.desc;}).join(' + '):l.hist;}
 function exbDia(iso){return iso.split('-').reverse().join('/');}
@@ -7195,7 +7201,7 @@ function exbConta(){var R=EXB.R||{},n={b:0,n:0,f:0};Object.keys(EXB.sel).forEach
 function exbModal(){var el=document.getElementById('exb-ov'),m=EXB.m;
   if(!m){if(el){el.remove();document.body.style.overflow='';}return;}
   if(!el){el=document.createElement('div');el.id='exb-ov';el.className='kc-ov';document.body.appendChild(el);}document.body.style.overflow='hidden';
-  var R=EXB.R,cab='<button type="button" class="kc-x" data-exb="fecha" aria-label="Fechar">'+ic('x')+'</button><h3>'+ic('doc')+'Dar baixa pelo extrato</h3><p class="exb-s"><b>'+esc(finCliNome(m))+'</b> · extrato de '+PMES[m.mes-1]+' de '+m.ano+'</p>';
+  var R=EXB.R,cab='<button type="button" class="kc-x" data-exb="fecha" aria-label="Fechar">'+ic('x')+'</button><h3>'+ic('doc')+'Dar baixa pelo extrato</h3><p class="exb-s"><b>'+esc(finCliNome(m))+'</b> · extrato de '+PMES[m.mes-1]+' de '+m.ano+(EXB.tot>1?' <span class="exb-n">'+Math.min(EXB.feitos,EXB.tot)+' de '+EXB.tot+'</span>':'')+'</p>';
   if(EXB.lendo||!R){el.innerHTML='<div class="kc-modal exb" role="dialog" aria-modal="true" aria-label="Dar baixa pelo extrato">'+cab+'<p class="exb-lendo">A Ana está lendo o extrato…</p></div>';return;}
   var ck=function(k){return '<input type="checkbox" data-exbk="'+k+'"'+(EXB.sel[k]?' checked':'')+'>';},h='',n=exbConta();
   var secao=function(t,sub,cls,itens){return itens?'<section class="exb-sec '+cls+'"><h4>'+t+'</h4>'+(sub?'<p class="small muted">'+sub+'</p>':'')+'<div class="pfx-l">'+itens+'</div></section>':'';};
@@ -7214,7 +7220,7 @@ function exbModal(){var el=document.getElementById('exb-ov'),m=EXB.m;
     h+=secao(ic('relogio')+'Abertos que não aparecem neste extrato <span class="exb-n">'+R.fora.length+'</span>','Provavelmente ainda estão sendo feitos. Marque só se já ficaram prontos.','exb-fora',R.fora.map(function(p){return '<label class="pfx-i">'+ck('f'+p.id)+'<span class="pedn">#'+(p.numero||'—')+'</span><span><b>'+esc(p.paciente||'Sem paciente')+'</b><small>'+esc(p.trabalho||'Pedido')+' · '+(EXB_STN[p.status]||p.status)+' · entrou em '+cliDia(p.criado_em,4)+'</small></span></label>';}).join(''));}
   var tot=n.b+n.f,txt=[tot?tot+' baixa'+(tot===1?'':'s'):'',n.n?n.n+' cadastro'+(n.n===1?'':'s'):''].filter(Boolean).join(' e ');
   el.innerHTML='<div class="kc-modal exb" role="dialog" aria-modal="true" aria-label="Dar baixa pelo extrato">'+cab+h+
-    '<div class="row exb-b"><button class="btn" data-exb="fecha">Agora não</button><span class="spacer"></span><button class="btn pri" data-exb="vai"'+(!txt&&!(R.ja||[]).length||EXB.busy?' disabled':'')+'>'+(EXB.busy?'Gravando…':txt?'Confirmar '+txt:'Guardar as datas')+'</button></div></div>';}
+    '<div class="row exb-b"><button class="btn" data-exb="fecha">'+(EXB.fila.length?'Pular este':'Agora não')+'</button>'+(EXB.fila.length?'<button class="btn" data-exb="para">Parar</button>':'')+'<span class="spacer"></span><button class="btn pri" data-exb="vai"'+(!txt&&!(R.ja||[]).length||EXB.busy?' disabled':'')+'>'+(EXB.busy?'Gravando…':txt?'Confirmar '+txt:'Guardar as datas')+'</button></div></div>';}
 function exbIsoPronto(dia,atual){if(atual&&pzK(new Date(atual))===dia)return atual;return dia+'T12:00:00-03:00';}
 function exbVai(){var m=EXB.m,R=EXB.R;if(!m||!R||EXB.busy)return;
   var grupos={},antes={},criar=[],agora=new Date().toISOString(),nb=0,num=PED.L.reduce(function(a,x){return Math.max(a,x.numero||0);},0);
@@ -7245,11 +7251,13 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
   if(!b){if(el&&t===el&&!EXB.busy)exbFecha();return;}var a=b.getAttribute('data-exb');
   if(a==='fecha'){if(!EXB.busy)exbFecha();}
   else if(a==='vai')exbVai();
-  else if(a==='abre'){var L=exbDoMes();if(L.length){EXB.fila=L.map(function(m){return m.id;});exbProx();}}});
+  else if(a==='abre'){var L=exbDoMes();if(L.length){EXB.fila=L.map(function(m){return m.id;});EXB.tot=L.length;EXB.feitos=0;exbProx();}}
+  else if(a==='todos'){var T=exbTodos();if(T.M.length){EXB.fila=T.M.map(function(m){return m.id;});EXB.tot=T.M.length;EXB.feitos=0;exbProx();}}
+  else if(a==='para'){EXB.fila=[];exbFecha();}});
 document.addEventListener('change',function(e){var t=e.target,k=t&&t.getAttribute&&t.getAttribute('data-exbk');if(!k)return;if(t.checked)EXB.sel[k]=1;else delete EXB.sel[k];exbModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&EXB.m&&!EXB.busy)exbFecha();});
 /* aviso no Financeiro do laboratório: meses com extrato e pedido ainda aberto */
-var _rFinMesEXB=rFinMes;rFinMes=function(){var h=_rFinMesEXB.apply(this,arguments),L=exbDoMes();if(!L.length)return h;var n=L.reduce(function(s,m){return s+exbPend(m).length;},0);
+var _rFinMesEXB=rFinMes;rFinMes=function(){var h=_rFinMesEXB.apply(this,arguments),L=exbDoMes();if(!L.length)return exbTodosBanner()+h;var n=L.reduce(function(s,m){return s+exbPend(m).length;},0);
   return '<div class="banner pfx-ban exb-ban"><span>'+ic('doc')+'<b>'+n+' pedido'+(n===1?'':'s')+'</b> ainda em aberto de '+(L.length===1?'<b>'+esc(finCliNome(L[0]))+'</b>, que já tem':L.length+' clientes que já têm')+' extrato neste mês.</span><button class="btn sm pri" data-exb="abre">Conferir e dar baixa</button></div>'+h;};
 /* percebe o extrato recém-anexado (por qualquer caminho: tela, Ana, arrastar) e abre a conferência */
 function exbObserva(){if(typeof FIN==='undefined'||!FIN.carregado||!PED.carregado||!RL.user||ESP.dono)return;
@@ -7319,8 +7327,8 @@ ACT.cliRecebi=function(id){var e=pdgMeus().filter(function(x){return String(x.id
 var RCB={ab:false};
 function rcbLista(){var lim=Date.now()-14*864e5,visto=0;try{visto=+localStorage.getItem(lsU('io_rcb_visto'))||0;}catch(e){}
   return PED.L.filter(function(p){var t=p.recebido_em&&new Date(p.recebido_em).getTime();return t&&t>lim&&t>visto;}).sort(function(a,b){return a.recebido_em<b.recebido_em?1:-1;});}
-function rRcbBanner(){if(ESP.dono)return '';var L=rcbLista();if(!L.length)return '';
-  return '<div class="banner rcb-ban"><div class="pfx-ban" style="margin:0"><span>'+ic('check')+'<b>'+L.length+' pedido'+(L.length===1?'':'s')+'</b> '+(L.length===1?'foi confirmado como recebido pelo cliente':'foram confirmados como recebidos pelos clientes')+' e '+(L.length===1?'saiu':'saíram')+' do quadro.</span>'+
+function rRcbBanner(){if(ESP.dono)return '';if(typeof FIN!=='undefined'&&!FIN.carregado&&!FIN.pedindoEXB){FIN.pedindoEXB=true;Promise.resolve(finCarrega()).then(render,function(){});}var L=rcbLista(),ex=exbTodosBanner();if(!L.length)return ex;
+  return ex+'<div class="banner rcb-ban"><div class="pfx-ban" style="margin:0"><span>'+ic('check')+'<b>'+L.length+' pedido'+(L.length===1?'':'s')+'</b> '+(L.length===1?'foi confirmado como recebido pelo cliente':'foram confirmados como recebidos pelos clientes')+' e '+(L.length===1?'saiu':'saíram')+' do quadro.</span>'+
     '<span><button class="btn sm" data-act="rcbAbre">'+(RCB.ab?'Esconder':'Ver quais')+'</button> <button class="btn sm" data-act="rcbCiente">OK, ciente</button></span></div>'+
     (RCB.ab?'<div class="rcb-l">'+L.map(function(p){return '<div class="rcb-i"><span><b>#'+(p.numero||'—')+' · '+esc(p.paciente||'Sem paciente')+'</b><small>'+esc(pedCli(p))+(p.trabalho?' · '+esc(p.trabalho):'')+' · recebido '+cliHa(p.recebido_em)+'</small></span><button class="btn sm" data-act="rcbVolta" data-v="'+p.id+'">Ainda não entreguei · voltar ao quadro</button></div>';}).join('')+'</div>':'')+'</div>';}
 Object.assign(ACT,{
