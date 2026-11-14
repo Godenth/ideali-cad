@@ -12,7 +12,7 @@ function seed(modo,dados){return `(function(){var D=${JSON.stringify(dados)},mod
  var envSimples=D.envios.map(function(e){var o={};for(var k in e)if(['partes','aberto','parado','prazo_min','prazo_max','faixa','lab_nome'].indexOf(k)<0)o[k]=e[k];return o;});
  window.CHAMADAS=[];
  window.SB={from:function(t){return ch(t==='odo_ped_env'?{data:envSimples}:{data:[]});},
-  rpc:function(n){CHAMADAS.push(n);
+  rpc:function(n,arg){CHAMADAS.push(n);if(n==='odo_clinica_recebi'){(window.RECEBI=window.RECEBI||[]).push(arg&&arg.p_id);return ch({data:{ok:true,n:1}});}
    if(n==='odo_clinica_pedidos')return ch(modo==='sem074'?{data:null,error:{code:'PGRST202',message:'Could not find the function public.odo_clinica_pedidos without parameters in the schema cache'}}:{data:D});
    if(n==='odo_clinica_pedidos_lab')return ch({data:D.pedidos.map(function(p){return {id:p.id,lab_id:p.lab_id,lab_nome:p.lab_nome,numero:p.numero,paciente:p.paciente,trabalho:p.trabalho,dentes:p.dentes,material:p.material,cor:p.cor,sobre_implante:p.sobre_implante,urgente:p.urgente,criado_em:p.criado_em,etapa:p.etapa};})});
    if(n==='odo_clinica_fin')return ch({data:{pedidos:D.pedidos.map(function(p){return {id:p.id,envio:null,lab_id:p.lab_id,lab:p.lab_nome,paciente:p.paciente,trabalho:p.trabalho,dentes:p.dentes,qtd:p.qtd,valor:p.valor==null?null:p.valor,status:p.status,enviado_inove:p.enviado_inove,cor:p.cor,material:p.material,criado:p.criado_em};}),meses:D.meses}});
@@ -53,6 +53,11 @@ for(const [nm,opt,modo,dados] of [
    ok((await chip('fin'))===180,nm+': 180 finalizados (179 entregues + 1 recusado)');
    ok((await chip('tudo'))===187,nm+': 187 no total (184 + 3 envios; o apagado ficou de fora)');
    await larg('Pedidos (quadro)');await p.screenshot({path:path.join(SAIDA,nm+'-1-quadro.png')});
+   // botão Recebi: só em pedido que o laboratório já aceitou
+   const rc=await p.evaluate(()=>({n:document.querySelectorAll('.kb-prod .kc-rcb').length,prod:document.querySelectorAll('.kb-prod .kc').length,apr:document.querySelectorAll('.kb-apr .kc-rcb').length}));
+   ok(rc.n===rc.prod&&rc.n>0&&rc.apr===0,nm+': "Recebi" aparece nos '+rc.prod+' em produção e não aparece no que o laboratório ainda não aceitou');
+   p.once('dialog',d=>d.accept());const idR=await p.$eval('.kb-prod .kc-rcb',x=>x.getAttribute('data-v'));await p.click('.kb-prod .kc-rcb');await p.waitForTimeout(500);
+   ok((await p.evaluate(i=>RECEBI.length===1&&RECEBI[0]===i,idR)),nm+': clicar em "Recebi" manda a confirmação desse pedido para o banco');
    // lista: prazo vem do banco
    await p.click('[data-plx=vis][data-v=lista]');await p.waitForTimeout(300);
    const txt=await p.$eval('#plx-corpo',x=>x.innerText);

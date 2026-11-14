@@ -164,5 +164,27 @@ select pg_temp.ok((select public.odo_clinica_pedidos_lab()::text) not like '%APA
 select pg_temp.ok((select x->>'etapa' from jsonb_array_elements(public.odo_clinica_pedidos_lab()) x where x->>'paciente'='PACIENTE-A-ANTIGO') = 'Entregue', 'Leitura antiga também mostra arquivado como Entregue');
 select pg_temp.ok((select public.odo_clinica_fin()::text) not like '%APAGADO%' and (select public.odo_clinica_fin()::text) not like '%PACIENTE-B%', 'Financeiro antigo: sem apagado e sem dado de outra clínica');
 
+-- ---------- 7. (076) a clínica confirma "Recebi" ----------
+create or replace function pg_temp.falha(q text) returns boolean language plpgsql as $$ begin execute q; return false; exception when others then return true; end $$;
+update public.odo_pedidos set status='producao', arquivado=false, entregue_em=null where id in ('60000000-0000-0000-0000-000000000001','60000000-0000-0000-0000-000000000007','60000000-0000-0000-0000-000000000008');
+select pg_temp.como('10000000-0000-0000-0000-000000000004');   -- clínica B tenta fechar pedido da A
+select pg_temp.ok(pg_temp.falha($q$select public.odo_clinica_recebi('lab-60000000-0000-0000-0000-000000000001')$q$), 'Recebi: clínica B NÃO consegue dar baixa em pedido da clínica A');
+select pg_temp.ok(pg_temp.falha($q$select public.odo_clinica_recebi('50000000-0000-0000-0000-0000000000a1')$q$), 'Recebi: clínica B NÃO consegue dar baixa em envio da clínica A');
+select pg_temp.ok((select status from public.odo_pedidos where id='60000000-0000-0000-0000-000000000001')='producao' and (select count(*) from public.odo_pedidos where recebido_em is not null)=0, 'Recebi: nada mudou depois das tentativas da clínica B');
+select pg_temp.como('10000000-0000-0000-0000-000000000002');
+select pg_temp.ok(pg_temp.falha($q$select public.odo_clinica_recebi('lab-60000000-0000-0000-0000-000000000006')$q$), 'Recebi: não fecha pedido de cliente sem conta');
+select pg_temp.ok(pg_temp.falha($q$select public.odo_clinica_recebi('lab-60000000-0000-0000-0000-000000000004')$q$), 'Recebi: não fecha orçamento');
+select pg_temp.ok(pg_temp.falha($q$select public.odo_clinica_recebi('50000000-0000-0000-0000-0000000000a2')$q$), 'Recebi: envio que o laboratório ainda não aceitou não pode ser recebido');
+select pg_temp.ok(pg_temp.falha($q$select public.odo_clinica_recebi('abc')$q$), 'Recebi: código inválido é recusado');
+select pg_temp.ok((public.odo_clinica_recebi('lab-60000000-0000-0000-0000-000000000001')->>'n')::int = 1, 'Recebi: dona da clínica A confirma o pedido dela');
+select pg_temp.ok((select status='entregue' and arquivado and recebido_antes='producao' and recebido_por='10000000-0000-0000-0000-000000000002' and entregue_em is not null from public.odo_pedidos where id='60000000-0000-0000-0000-000000000001'), 'Recebi: fica entregue, arquivado, com quem confirmou e como estava antes');
+select pg_temp.ok((select x->>'etapa' from jsonb_array_elements(public.odo_clinica_pedidos()->'pedidos') x where x->>'paciente'='PACIENTE-A-LAB')='Entregue', 'Recebi: a clínica passa a ver como Entregue');
+select pg_temp.ok(pg_temp.falha($q$select public.odo_clinica_recebi('lab-60000000-0000-0000-0000-000000000001')$q$), 'Recebi: não dá para confirmar duas vezes');
+select pg_temp.como('10000000-0000-0000-0000-000000000003');   -- funcionária também pode confirmar
+select pg_temp.ok((public.odo_clinica_recebi('50000000-0000-0000-0000-0000000000a1')->>'n')::int = 2, 'Recebi: funcionária confirma o envio (os 2 itens)');
+select pg_temp.ok((select (x->>'aberto')::boolean = false and x->>'etapa'='Entregue' from jsonb_array_elements(public.odo_clinica_pedidos()->'envios') x where x->>'paciente'='PACIENTE-A-ENVIO'), 'Recebi: o envio sai de em andamento');
+select pg_temp.ok((select count(*) from public.odo_pedidos where recebido_em is not null and cliente_id<>'30000000-0000-0000-0000-00000000000a')=0, 'Recebi: nenhum pedido de outro cliente foi tocado');
+select pg_temp.ok(not has_function_privilege('anon', 'public.odo_clinica_recebi(text)', 'execute'), 'Recebi: sem login não chama');
+
 rollback;
-\echo TODOS OS TESTES DA 074 E 075 PASSARAM
+\echo TODOS OS TESTES DA 074, 075 E 076 PASSARAM
