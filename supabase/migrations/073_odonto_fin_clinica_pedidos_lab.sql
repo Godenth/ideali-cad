@@ -9,6 +9,7 @@
 --   * Só os pedidos do cliente que o laboratório ligou a essa clínica (vínculo ACEITO).
 --   * Só campos do pedido (paciente, trabalho, dentes, qtd, valor, etapa, datas). Nada de
 --     anotações internas do laboratório.
+-- Também devolve o material (para o Painel dos trabalhos no Início).
 -- Rode DEPOIS da 067. Pode rodar de novo.
 -- =====================================================================
 create or replace function public.odo_clinica_fin() returns jsonb
@@ -18,7 +19,7 @@ language sql stable security definer set search_path = '' as $$
         -- pedidos que a clínica mandou pelo sistema
         select p.criado_em as criado, jsonb_build_object(
           'id', p.id, 'envio', e.id, 'lab_id', e.lab_id, 'lab', l.nome, 'paciente', p.paciente, 'trabalho', p.trabalho, 'dentes', p.dentes,
-          'qtd', p.qtd, 'valor', p.valor, 'status', p.status, 'enviado_inove', p.enviado_inove, 'cor', p.cor,
+          'qtd', p.qtd, 'valor', p.valor, 'status', p.status, 'enviado_inove', p.enviado_inove, 'cor', p.cor, 'material', p.material,
           'criado', p.criado_em, 'finalizado', p.finalizado_em, 'entregue', p.entregue_em) as j
         from public.odo_pedidos p join public.odo_ped_env e on e.id = p.envio_id join public.odo_empresas l on l.id = e.lab_id
         where e.user_id = auth.uid() and p.user_id = l.user_id
@@ -26,7 +27,7 @@ language sql stable security definer set search_path = '' as $$
         -- pedidos que o laboratório lançou para o cliente ligado a esta clínica
         select p.criado_em, jsonb_build_object(
           'id', p.id, 'envio', null, 'lab_id', l.id, 'lab', l.nome, 'paciente', p.paciente, 'trabalho', p.trabalho, 'dentes', p.dentes,
-          'qtd', p.qtd, 'valor', p.valor, 'status', p.status, 'enviado_inove', p.enviado_inove, 'cor', p.cor,
+          'qtd', p.qtd, 'valor', p.valor, 'status', p.status, 'enviado_inove', p.enviado_inove, 'cor', p.cor, 'material', p.material,
           'criado', p.criado_em, 'finalizado', p.finalizado_em, 'entregue', p.entregue_em)
         from public.odo_lab_vinculos v
         join public.odo_empresas l on l.id = v.lab_id

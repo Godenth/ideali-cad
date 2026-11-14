@@ -1709,6 +1709,42 @@ body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
 @keyframes kcIn{from{opacity:0}to{opacity:1}}
 @media(max-width:600px){.kc-ov{padding:0;place-items:end stretch}.kc-modal{width:100%;max-height:92vh;border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom)}.kc-modal .kc{border-radius:20px 20px 0 0}}
 .kc-modal .kc-main{pointer-events:none}.kc-modal .kc-main *{pointer-events:none}
+
+/* painel dos trabalhos (clínica) */
+.pdb{display:grid;gap:14px;margin-top:16px}.pdb h2{margin:0}.pdb h3{margin:0 0 10px;font-size:1rem}.pdb h3 small{color:var(--muted);font-weight:500;font-size:.78rem;margin-left:6px}
+.pdb-top{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end;justify-content:space-between}.pdb-top p{margin:4px 0 0}
+.pdb-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.pdb-f select{font:inherit;padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.pdb-seg,.fz-vis{display:inline-flex;flex-wrap:wrap;gap:2px;padding:3px;border-radius:12px;background:var(--soft);border:1px solid var(--line)}
+.pdb-seg button,.fz-vis button{all:unset;cursor:pointer;padding:6px 11px;border-radius:9px;font-size:.82rem;font-weight:600;color:var(--muted)}
+.pdb-seg button[aria-pressed=true],.fz-vis button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.pdb-k{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.pdb-kc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:3px;min-width:0}
+.pdb-kc span{font-size:.78rem;color:var(--muted)}.pdb-kc b{font-size:1.35rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.pdb-kc small{font-size:.72rem;color:var(--muted)}
+.pdb-kc.hero{background:color-mix(in srgb,var(--accent) 12%,var(--surface));border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.pdb-g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.pdb .card{margin:0}
+.pdb-col{width:100%;height:auto;display:block}.pdb-base{stroke:var(--line);stroke-width:1}.pdb-bar{fill:color-mix(in srgb,var(--accent) 55%,transparent)}.pdb-bar.ult{fill:var(--accent)}
+.pdb-hit{fill:transparent}.pdb-cb:hover .pdb-bar{fill:var(--accent)}.pdb-vl{font-size:12px;font-weight:700;fill:var(--ink);text-anchor:middle}.pdb-xl{font-size:12px;fill:var(--muted);text-anchor:middle}
+.pdb-hb{display:grid;gap:8px}.pdb-hr{display:grid;grid-template-columns:minmax(90px,1.1fr) 2fr auto;gap:10px;align-items:center;font-size:.86rem}
+.pdb-hk{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pdb-hbar{height:10px;border-radius:6px;background:var(--soft);overflow:hidden}.pdb-hbar i{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--accent)}
+.pdb-hv{text-align:right;display:grid;line-height:1.15}.pdb-hv b{font-variant-numeric:tabular-nums}.pdb-hv small{color:var(--muted);font-size:.72rem}
+.pdb-arco{width:100%;max-width:460px;height:auto;display:block;margin:0 auto}.pdb-d{fill:var(--soft);stroke:var(--line);stroke-width:1}.pdb-d.on{fill:var(--accent);stroke:var(--accent)}.pdb-dn{font-size:8.5px;fill:var(--muted);text-anchor:middle}
+.pdb-leg{margin:6px 0 0;text-align:center;font-size:.82rem;color:var(--muted)}.pdb-leg b{color:var(--ink)}
+.pdb-h3{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}.pdb-h3 h3{margin:0}.pdb-h3 input{font:inherit;font-size:.88rem;padding:7px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:220px}
+.pdb-tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.pdb-t{width:100%;border-collapse:collapse;font-size:.85rem}.pdb-t th{text-align:left;font-size:.74rem;font-weight:600;color:var(--muted);background:var(--soft);padding:8px 10px;white-space:nowrap;position:sticky;top:0}
+.pdb-t td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:middle}.pdb-t tr:hover td{background:color-mix(in srgb,var(--accent) 5%,transparent)}.pdb-t .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pdb-t td .btn.sm{padding:4px 9px;font-size:.76rem;white-space:nowrap}
+.pdb-et{font-size:.74rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--soft);white-space:nowrap}.pdb-et.and{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--ink)}
+.pdb-et.ok{background:color-mix(in srgb,#16A34A 15%,transparent)}.pdb-et.no{background:color-mix(in srgb,#DC2626 14%,transparent)}
+.pdb-lk{all:unset;cursor:pointer;font-weight:700;color:var(--ink)}.pdb-lk:hover{text-decoration:underline}
+.pdb-mais{margin-top:10px}.pdb-cont{display:block;margin-top:6px;color:var(--muted);font-size:.76rem}.pdb-vz{color:var(--muted);text-align:center;padding:14px 6px;margin:0}
+.fz-vis{margin:10px 0 14px}.fz-g{margin:0 0 14px}.fz-gh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}.fz-gh h3{margin:0}.fz-gh span{color:var(--muted);font-size:.85rem}.fz-gh span b{color:var(--ink)}
+.fz-tot{color:var(--muted);font-size:.85rem;text-align:right}.fz-tot b{color:var(--ink)}
+@media(max-width:1100px){.pdb-k{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.pdb-g2{grid-template-columns:1fr}.pdb-k{grid-template-columns:repeat(2,minmax(0,1fr))}.pdb-h3 input{min-width:0;flex:1}}
+.pdb>*,.pdb-g2>*{min-width:0}.pdb .card{min-width:0;max-width:100%}.fz-g{min-width:0;max-width:100%}
+.pdb .card,.fz-g{grid-template-columns:minmax(0,1fr)}.pdb .card>*,.fz-g>*{min-width:0}
+.fz-vis{width:fit-content;max-width:100%}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6580,6 +6616,118 @@ document.addEventListener('click',function(ev){var el=document.getElementById('k
 document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&document.getElementById('kc-ov')&&!(typeof CH!=='undefined'&&CH.on))kcFecha();});
 
 ACT.temaTroca=function(){var n=temaEscuro()?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('io_tema',n);}catch(e){}render();};
+
+/* ===== Clínica · Painel dos trabalhos no Início: tudo o que foi feito nos laboratórios (fonte única: odo_clinica_fin) ===== */
+var PDB={per:'12m',lab:'',q:'',lim:40,pacTodos:false};
+var PDB_MC=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+function pdbTipo(t){var s=semAc(t||'');
+  if(/protocolo/.test(s))return 'Protocolo';if(/total|dentadura/.test(s))return 'Prótese total';if(/\bppr\b|removivel/.test(s))return 'PPR';
+  if(/faceta|lente|laminad/.test(s))return 'Faceta / lente';if(/onlay|inlay|overlay/.test(s))return 'Onlay / inlay';if(/provis/.test(s))return 'Provisório';
+  if(/placa|bruxis|miorrelax/.test(s))return 'Placa';if(/modelo|enceramento|wax/.test(s))return 'Modelo / enceramento';
+  if(/coroa|unitari|elemento|zirc|e\.?\s?max|metalo|ceramic|dente/.test(s))return /implant/.test(s)&&!/sobre dente/.test(s)?'Coroa sobre implante':'Coroa';
+  if(/ponte|fixa/.test(s))return 'Prótese fixa';return 'Outro';}
+function pdbMat(p){var s=semAc((p.material||'')+' '+(p.trabalho||''));
+  if(/zirc/.test(s))return 'Zircônia';if(/e\.?\s?max|dissilicato/.test(s))return 'E.max';if(/metalo|sobre metal/.test(s))return 'Metalocerâmica';
+  if(/pmma/.test(s))return 'PMMA';if(/resina/.test(s))return 'Resina';if(/acrilic/.test(s))return 'Acrílico';return 'Não informado';}
+function pdbEl(p){var d=Array.isArray(p.dentes)?p.dentes.length:0;return +p.qtd||d||1;}
+function pdbAnd(p){return ['desenho','aguardando','producao'].indexOf(p.status)>=0;}
+function pdbEtapa(p){return p.status==='producao'&&p.enviado_inove?'Na fresagem':(DFL_ET[p.status]||p.status||'—');}
+function pdbIni(){var h=new Date(),y=h.getFullYear(),m=h.getMonth();
+  return {mes:new Date(y,m,1),mesp:new Date(y,m-1,1),'3m':new Date(y,m-2,1),'12m':new Date(y,m-11,1),ano:new Date(y,0,1),tudo:new Date(2000,0,1)}[PDB.per];}
+function pdbNoPer(p){var d=new Date(p.criado),i=pdbIni();if(PDB.per==='mesp'){var h=new Date();return d>=i&&d<new Date(h.getFullYear(),h.getMonth(),1);}return d>=i;}
+function pdbTodos(){var P=((DFL.d&&DFL.d.pedidos)||[]).filter(function(p){return p.status!=='cancelado'&&p.status!=='orcamento';});return PDB.lab?P.filter(function(p){return p.lab_id===PDB.lab;}):P;}
+function pdbAgrupa(L,fk){var G={};L.forEach(function(p){var k=fk(p);var g=G[k]=G[k]||{k:k,n:0,el:0,v:0,semV:0};g.n++;g.el+=pdbEl(p);if(p.valor!=null)g.v+=+p.valor;else g.semV++;});
+  return Object.keys(G).map(function(k){return G[k];}).sort(function(a,b){return b.v-a.v||b.el-a.el;});}
+function pdbBarras(G,tot){var mx=G.reduce(function(m,g){return Math.max(m,g.v||0);},0)||1,me=G.reduce(function(m,g){return Math.max(m,g.el);},0)||1,porV=mx>1;
+  return '<div class="pdb-hb">'+G.map(function(g){var w=porV?g.v/mx:g.el/me;return '<div class="pdb-hr" title="'+esc(g.k)+': '+g.n+' trabalho'+(g.n>1?'s':'')+' · '+g.el+' elemento'+(g.el>1?'s':'')+(g.v?' · '+fmtR(g.v):'')+'">'+
+    '<span class="pdb-hk">'+esc(g.k)+'</span><span class="pdb-hbar"><i style="width:'+Math.max(2,Math.round(w*100))+'%"></i></span><span class="pdb-hv"><b>'+(g.v?fmtR(g.v):g.el+' el.')+'</b><small>'+g.el+' el.'+(tot&&g.v?' · '+Math.round(g.v/tot*100)+'%':'')+'</small></span></div>';}).join('')+'</div>';}
+function pdbMeses(P){var h=new Date(),L=[];for(var i=11;i>=0;i--){var d=new Date(h.getFullYear(),h.getMonth()-i,1);L.push({y:d.getFullYear(),m:d.getMonth(),v:0,n:0,el:0});}
+  P.forEach(function(p){var d=new Date(p.criado);L.forEach(function(x){if(x.y===d.getFullYear()&&x.m===d.getMonth()){x.n++;x.el+=pdbEl(p);if(p.valor!=null)x.v+=+p.valor;}});});
+  var mx=L.reduce(function(m,x){return Math.max(m,x.v);},0),porV=mx>0;if(!porV)mx=L.reduce(function(m,x){return Math.max(m,x.el);},0)||1;
+  var W=600,H=170,bw=W/12,top=mx;
+  return '<svg class="pdb-col" viewBox="0 0 '+W+' '+(H+26)+'" role="img" aria-label="Gasto por mês nos últimos 12 meses">'+
+    '<line x1="0" x2="'+W+'" y1="'+H+'" y2="'+H+'" class="pdb-base"/>'+
+    L.map(function(x,i){var val=porV?x.v:x.el,hh=val?Math.max(3,val/top*(H-22)):0,X=i*bw+bw*.2,ult=i===11;
+      return '<g class="pdb-cb"><title>'+PDB_MC[x.m]+'/'+String(x.y).slice(2)+': '+(porV?fmtR(x.v)+' · ':'')+x.n+' trabalho'+(x.n===1?'':'s')+' · '+x.el+' elementos</title>'+
+        '<rect class="pdb-hit" x="'+(i*bw)+'" y="0" width="'+bw+'" height="'+H+'"/>'+
+        (hh?'<path class="pdb-bar'+(ult?' ult':'')+'" d="M'+X+' '+H+' V'+(H-hh+4)+' q0 -4 4 -4 h'+(bw*.6-8)+' q4 0 4 4 V'+H+' Z"/>':'')+
+        (val&&(val===top||ult)?'<text class="pdb-vl" x="'+(X+bw*.3)+'" y="'+(H-hh-6)+'">'+(porV?brlK(x.v):x.el)+'</text>':'')+
+        '<text class="pdb-xl" x="'+(i*bw+bw/2)+'" y="'+(H+18)+'">'+PDB_MC[x.m]+'</text></g>';}).join('')+'</svg>';}
+function brlK(v){return v>=1000?'R$ '+(v/1000).toFixed(v>=10000?0:1).replace('.',',')+' mil':'R$ '+Math.round(v);}
+function pdbArco(P){var C={};P.forEach(function(p){(p.dentes||[]).forEach(function(d){C[d]=(C[d]||0)+1;});});var mx=Object.keys(C).reduce(function(m,k){return Math.max(m,C[k]);},0);
+  if(!mx)return '<p class="pdb-vz">Os pedidos deste período não têm dentes marcados.</p>';
+  var f=function(L,y,dir){return L.map(function(n,i){var x=8+i*24,yy=y+dir*Math.pow(Math.abs(i-7.5)/7.5,2)*-22,c=C[n]||0,o=c?(.25+.75*c/mx):0;
+    return '<g><title>Dente '+n+': '+(c?c+' trabalho'+(c>1?'s':''):'nenhum')+'</title><rect x="'+x+'" y="'+yy.toFixed(1)+'" width="19" height="24" rx="7" class="pdb-d'+(c?' on':'')+'"'+(c?' style="fill-opacity:'+o.toFixed(2)+'"':'')+'/><text x="'+(x+9.5)+'" y="'+(yy+(dir>0?-5:36)).toFixed(1)+'" class="pdb-dn">'+n+'</text></g>';}).join('');};
+  var top=Object.keys(C).sort(function(a,b){return C[b]-C[a];}).slice(0,3);
+  return '<svg class="pdb-arco" viewBox="0 -4 400 160" role="img" aria-label="Dentes mais trabalhados">'+f(OA_UP,22,1)+f(OA_LO,94,-1)+'</svg><p class="pdb-leg">Mais trabalhados: '+top.map(function(k){return '<b>'+k+'</b> ('+C[k]+')';}).join(' · ')+'</p>';}
+function pdbLinhaTab(p){var d=new Date(p.criado);return '<tr><td>'+('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+String(d.getFullYear()).slice(2)+'</td><td><b>'+esc(p.paciente||'—')+'</b></td><td>'+esc(p.trabalho||'—')+'</td><td>'+esc(pdbMat(p))+'</td><td>'+esc((p.dentes||[]).join(', ')||'—')+'</td><td class="n">'+pdbEl(p)+'</td><td class="n">'+(p.valor==null?'<i class="muted">a definir</i>':fmtR(+p.valor))+'</td><td><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span></td></tr>';}
+function pdbFiltraQ(L){var q=semAc(PDB.q).trim();if(!q)return L;return L.filter(function(p){return semAc([p.paciente,p.trabalho,p.material,(p.dentes||[]).join(' '),p.lab,pdbEtapa(p)].join(' ')).indexOf(q)>=0;});}
+function pdbTabela(L){var F=pdbFiltraQ(L).slice().sort(function(a,b){return new Date(b.criado)-new Date(a.criado);});
+  return (F.length?'<div class="pdb-tw"><table class="pdb-t"><thead><tr><th>Data</th><th>Paciente</th><th>Trabalho</th><th>Material</th><th>Dentes</th><th class="n">Elem.</th><th class="n">Valor</th><th>Etapa</th></tr></thead><tbody>'+F.slice(0,PDB.lim).map(pdbLinhaTab).join('')+'</tbody></table></div>':'<p class="pdb-vz">Nada encontrado'+(PDB.q?' para "'+esc(PDB.q)+'"':'')+'.</p>')+
+    (F.length>PDB.lim?'<button class="btn sm pdb-mais" data-pdb="mais">Mostrar mais ('+(F.length-PDB.lim)+')</button>':'')+'<small class="pdb-cont">'+F.length+' trabalho'+(F.length===1?'':'s')+'</small>';}
+function rPainelClinica(){if(!RL.user)return '';
+  if(typeof MEM!=='undefined'&&MEM.ativo)return '';
+  if(!DFL.d&&!DFL.erro){dflCarrega();return '<section class="card pdb"><h2>📊 Painel dos trabalhos</h2><p class="pdb-vz">Carregando…</p></section>';}
+  if(DFL.erro)return '<section class="card pdb"><h2>📊 Painel dos trabalhos</h2><p class="pdb-vz">'+(DFL.erro==='falta061'?'Falta rodar a atualização 061 no Supabase.':'Não consegui carregar agora.')+' <button class="btn sm" data-act="dflRecarrega">Tentar de novo</button></p></section>';
+  var T=pdbTodos(),P=T.filter(pdbNoPer),labs={};((DFL.d&&DFL.d.pedidos)||[]).forEach(function(p){labs[p.lab_id]=p.lab;});
+  var tot=P.reduce(function(s,p){return s+(p.valor==null?0:+p.valor);},0),el=P.reduce(function(s,p){return s+pdbEl(p);},0),semV=P.filter(function(p){return p.valor==null;}).length;
+  var pacs={};P.forEach(function(p){var k=semAc(p.paciente||'').trim();if(k)pacs[k]=1;});var nPac=Object.keys(pacs).length,and=T.filter(pdbAnd).length;
+  var elV=P.reduce(function(s,p){return s+(p.valor==null?0:pdbEl(p));},0);
+  var pers=[['mes','Este mês'],['mesp','Mês passado'],['3m','3 meses'],['12m','12 meses'],['ano','Este ano'],['tudo','Tudo']];
+  var h='<section class="pdb"><div class="pdb-top"><div><h2>📊 Painel dos trabalhos</h2><p class="small muted">Tudo o que você mandou para os laboratórios: pacientes, tipos de prótese, materiais e quanto foi gasto.</p></div>'+
+    '<div class="pdb-f"><div class="pdb-seg" role="group" aria-label="Período">'+pers.map(function(x){return '<button data-pdb="per" data-v="'+x[0]+'" aria-pressed="'+(PDB.per===x[0])+'">'+x[1]+'</button>';}).join('')+'</div>'+
+    (Object.keys(labs).length>1?'<select id="pdb-lab" aria-label="Laboratório"><option value="">Todos os laboratórios</option>'+Object.keys(labs).map(function(k){return '<option value="'+k+'"'+(k===PDB.lab?' selected':'')+'>'+esc(labs[k])+'</option>';}).join('')+'</select>':'')+'</div></div>';
+  if(!T.length)return h+'<div class="card pdb-vz">Ainda não há trabalhos. Quando você mandar pedidos para o laboratório (ou ele lançar os seus), tudo aparece aqui. <button class="btn sm pri" data-act="pdgNovo">📤 Fazer um pedido</button></div></section>';
+  var K=[['💰','Gasto no período',fmtR(tot),semV?semV+' sem valor ainda':''],['🦷','Trabalhos',P.length,''],['🔢','Elementos',el,''],['🧑','Pacientes',nPac,''],['📐','Média por elemento',elV?fmtR(tot/elV):'—',''],['🛠️','Em andamento agora',and,'todos os períodos']];
+  h+='<div class="pdb-k">'+K.map(function(k,i){return '<div class="pdb-kc'+(i===0?' hero':'')+'"><span>'+k[0]+' '+k[1]+'</span><b>'+k[2]+'</b>'+(k[3]?'<small>'+k[3]+'</small>':'')+'</div>';}).join('')+'</div>';
+  var GT=pdbAgrupa(P,function(p){return pdbTipo(p.trabalho);}),GM=pdbAgrupa(P,pdbMat);
+  var GP=pdbAgrupa(P,function(p){return (p.paciente||'Sem nome').trim();});
+  var ult={};P.forEach(function(p){var k=(p.paciente||'Sem nome').trim();if(!ult[k]||p.criado>ult[k])ult[k]=p.criado;});
+  h+='<div class="pdb-g2"><div class="card"><h3>Gasto por mês <small>últimos 12 meses</small></h3>'+pdbMeses(T)+'</div>'+
+     '<div class="card"><h3>Por tipo de prótese</h3>'+(GT.length?pdbBarras(GT,tot):'<p class="pdb-vz">Nada neste período.</p>')+'</div></div>';
+  h+='<div class="pdb-g2"><div class="card"><h3>Por material</h3>'+(GM.length?pdbBarras(GM,tot):'<p class="pdb-vz">Nada neste período.</p>')+'</div>'+
+     '<div class="card"><h3>Mapa dos dentes</h3>'+pdbArco(P)+'</div></div>';
+  h+='<div class="card"><div class="pdb-h3"><h3>Pacientes <small>'+GP.length+'</small></h3></div>'+(GP.length?'<div class="pdb-tw"><table class="pdb-t"><thead><tr><th>Paciente</th><th class="n">Trabalhos</th><th class="n">Elementos</th><th class="n">Total</th><th>Último pedido</th></tr></thead><tbody>'+
+     GP.slice(0,PDB.pacTodos?999:8).map(function(g){var d=new Date(ult[g.k]);return '<tr><td><button class="pdb-lk" data-pdb="pac" data-v="'+esc(g.k)+'">'+esc(g.k)+'</button></td><td class="n">'+g.n+'</td><td class="n">'+g.el+'</td><td class="n"><b>'+(g.v?fmtR(g.v):'—')+'</b></td><td>'+d.toLocaleDateString('pt-BR')+'</td></tr>';}).join('')+'</tbody></table></div>'+
+     (GP.length>8?'<button class="btn sm pdb-mais" data-pdb="pacs">'+(PDB.pacTodos?'Mostrar menos':'Ver todos os '+GP.length+' pacientes')+'</button>':''):'<p class="pdb-vz">Nada neste período.</p>')+'</div>';
+  h+='<div class="card"><div class="pdb-h3"><h3>Todos os trabalhos</h3><span class="spacer"></span><input type="search" id="pdb-q" placeholder="Buscar paciente, trabalho, dente…" value="'+esc(PDB.q)+'" autocomplete="off"><button class="btn sm" data-pdb="csv">⬇️ Planilha (CSV)</button></div><div id="pdb-tab">'+pdbTabela(P)+'</div></div>';
+  return h+'</section>';}
+function pdbCSV(){var P=pdbFiltraQ(pdbTodos().filter(pdbNoPer)),q=function(v){v=String(v==null?'':v);return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  var L=[['Data','Paciente','Trabalho','Tipo','Material','Dentes','Elementos','Valor','Etapa','Laboratório']].concat(P.map(function(p){return [new Date(p.criado).toLocaleDateString('pt-BR'),p.paciente,p.trabalho,pdbTipo(p.trabalho),pdbMat(p),(p.dentes||[]).join(' '),pdbEl(p),p.valor==null?'':String(p.valor).replace('.',','),pdbEtapa(p),p.lab];}));
+  var b=new Blob(['﻿'+L.map(function(r){return r.map(q).join(';');}).join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='trabalhos-laboratorio.csv';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-pdb]');if(!b)return;var a=b.getAttribute('data-pdb');
+  if(a==='per'){PDB.per=b.getAttribute('data-v');PDB.lim=40;render();}
+  else if(a==='mais'){PDB.lim+=60;var el=document.getElementById('pdb-tab');if(el)el.innerHTML=pdbTabela(pdbTodos().filter(pdbNoPer));}
+  else if(a==='pacs'){PDB.pacTodos=!PDB.pacTodos;render();}
+  else if(a==='csv')pdbCSV();
+  else if(a==='pac'){PDB.q=b.getAttribute('data-v');var q=document.getElementById('pdb-q');if(q){q.value=PDB.q;var t=document.getElementById('pdb-tab');if(t)t.innerHTML=pdbTabela(pdbTodos().filter(pdbNoPer));q.scrollIntoView({block:'center',behavior:'smooth'});}}});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='pdb-q'){PDB.q=e.target.value;PDB.lim=40;var t=document.getElementById('pdb-tab');if(t)t.innerHTML=pdbTabela(pdbTodos().filter(pdbNoPer));}});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='pdb-lab'){PDB.lab=e.target.value;render();}});
+/* Início da clínica (conta real): números verdadeiros + painel no lugar dos cartões de exemplo */
+var _rDInicioPDB=rDInicio;rDInicio=function(D){var h=_rDInicioPDB.apply(this,arguments);if(!RL.user||S.role!=='dent'||(typeof tutAba==='function'&&tutAba()))return h;
+  var i=h.indexOf('<div class="dkpis">');if(i<0)return h;
+  var and=pdgMeus().filter(function(e){return !pdgFeito(e);}),pend=and.filter(function(e){return pdgCol(e)==='pend';}).length,hj=D.ag.filter(function(a){return a.data===dHoje()&&a.tipo==='consulta';}).length,tar=D.tar.filter(function(t){return !t.feito;}).length;
+  var kp='<div class="dkpis">'+[[hj,'pacientes hoje','agenda','ag'],[and.length,'trabalhos nos labs','pedidos','ped'],[pend,'pedem atenção','pedidos','lab'],[tar,'tarefas da Ana','ana','tar']].map(function(x,k){return '<button class="dkpi'+(k===2&&x[0]?' alerta':'')+'" data-act="'+(x[2]==='ana'?'anaAbre':'dTab')+'" data-v="'+x[2]+'" style="--d:'+(k*70)+'ms">'+dIco(x[3])+'<b>'+x[0]+'</b><span>'+x[1]+'</span></button>';}).join('')+'</div>';
+  return h.slice(0,i)+kp+rPainelClinica();};
+/* ===== Finalizados: escolher a visualização (pranchetas · planilha simples · planilha separada por mês) ===== */
+function fzVis(){try{return localStorage.getItem('io_fz_vis')||'cards';}catch(e){return 'cards';}}
+function fzValor(){var M={};((DFL.d&&DFL.d.pedidos)||[]).forEach(function(p){if(p.envio)M[p.envio]=(M[p.envio]||0)+(p.valor==null?0:+p.valor);else M['lab-'+p.id]=p.valor==null?null:+p.valor;});return M;}
+function fzLinhas(){PDG.f={feito:true};var L=pdgFiltra(pdgMeus());PDG.f=null;return L.slice().sort(function(a,b){return new Date(b.enviado_em||b.criado_em)-new Date(a.enviado_em||a.criado_em);});}
+function fzTab(L,V,cab){var d2=function(x){var d=new Date(x);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+String(d.getFullYear()).slice(2);};
+  return '<div class="pdb-tw"><table class="pdb-t">'+(cab?'<thead><tr><th>Data</th><th>Paciente</th><th>Trabalho</th><th>Dentes</th><th>Cor</th><th>Laboratório</th><th class="n">Valor</th><th>Situação</th><th></th></tr></thead>':'')+'<tbody>'+
+    L.map(function(e){var tr=(e.itens||[]).map(function(it){return it.trabalho;}).filter(Boolean).join(' + ')||'—',v=V[e.id],st=e.status==='recusado'?'Recusado':e.status==='cancelado'||e.etapa==='Cancelado'?'Cancelado':e.etapa==='Pronto'?'Pronto':'Entregue';
+      return '<tr><td>'+d2(e.enviado_em||e.criado_em)+'</td><td><b>'+esc(e.paciente||'—')+'</b></td><td>'+esc(tr)+'</td><td>'+esc(cxDentes(e).join(', ')||'—')+'</td><td>'+esc(e.cor||'—')+'</td><td>'+esc((PDG.labNome&&PDG.labNome[e.lab_id])||e.lab_nome||'')+'</td><td class="n">'+(v==null?'<i class="muted">—</i>':fmtR(v))+'</td><td><span class="pdb-et'+(st==='Entregue'||st==='Pronto'?' ok':' no')+'">'+st+'</span></td><td>'+chBotao(chChaveCli(e),true)+'</td></tr>';}).join('')+'</tbody></table></div>';}
+function fzHtml(){var L=fzLinhas(),V=fzValor(),vis=fzVis();if(!DFL.d&&!DFL.erro)dflCarrega();
+  if(!L.length)return '';
+  if(vis==='simples'){var t=L.reduce(function(s,e){return s+(V[e.id]||0);},0);return fzTab(L,V,true)+'<p class="fz-tot">'+L.length+' trabalho'+(L.length>1?'s':'')+(t?' · total <b>'+fmtR(t)+'</b>':'')+'</p>';}
+  var G=[],ix={};L.forEach(function(e){var d=new Date(e.enviado_em||e.criado_em),k=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);if(ix[k]==null){ix[k]=G.length;G.push({k:k,L:[]});}G[ix[k]].L.push(e);});
+  return G.map(function(g){var t=g.L.reduce(function(s,e){return s+(V[e.id]||0);},0),p=g.k.split('-');
+    return '<div class="card fz-g"><div class="fz-gh"><h3>'+PMES[+p[1]-1]+' de '+p[0]+'</h3><span>'+g.L.length+' trabalho'+(g.L.length>1?'s':'')+(t?' · <b>'+fmtR(t)+'</b>':'')+'</span></div>'+fzTab(g.L,V,true)+'</div>';}).join('');}
+function fzBarra(){var v=fzVis();return '<div class="fz-vis" role="group" aria-label="Visualização">'+[['cards','🗂️ Pranchetas'],['simples','📋 Planilha simples'],['mes','📅 Planilha por mês']].map(function(x){return '<button data-fzv="'+x[0]+'" aria-pressed="'+(v===x[0])+'">'+x[1]+'</button>';}).join('')+'</div>';}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-fzv]');if(!b)return;try{localStorage.setItem('io_fz_vis',b.getAttribute('data-fzv'));}catch(x){}render();});
+var _rDLabTabFZ=rDLabTab;rDLabTab=function(D){var h=_rDLabTabFZ.apply(this,arguments);if(!RL.user||(S.labSub||'')!=='feitos')return h;
+  var mb=pdgMesBar(true),i=h.indexOf(mb);if(i<0)return h;var antes=h.slice(0,i+mb.length),resto=h.slice(i+mb.length);
+  if(fzVis()==='cards')return antes+fzBarra()+resto;var t=fzHtml();return antes+fzBarra()+(t||resto);};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
