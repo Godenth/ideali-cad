@@ -19,7 +19,7 @@ function seed(modo,dados){return `(function(){var D=${JSON.stringify(dados)},mod
    return ch({data:[]});},
   storage:{from:function(){var o=ch();o.createSignedUrls=function(){return Promise.resolve({data:[]});};return o;}},channel:function(){return {on:function(){return this;},subscribe:function(){return this;}};}};
  RL.user={id:'10000000-0000-0000-0000-000000000002'};RL.perfil={nome:'Fernando',prof:'Dentista'};S.role='dent';S.cad=Object.assign(S.cad||{},{nome:'Fernando',prof:'Dentista',ok:true});S.redeOn=false;document.body.classList.add('rl-in');
- if(modo==='func'&&typeof MEM!=='undefined'){MEM.ativo=true;MEM.dono='10000000-0000-0000-0000-000000000002';}
+ if(modo==='func'&&typeof MEM!=='undefined'){MEM.dono='10000000-0000-0000-0000-000000000002';}
  labVMeus=function(){return [{id:'v1',status:'aceito',lab_id:'20000000-0000-0000-0000-000000000001',lab_nome:'Ideali Lab'}];};
  S.tab.dent='pedidos';S.labSub='ped';return Promise.resolve(pdgCarrega()).then(function(){render();});})()`;}
 
@@ -41,6 +41,8 @@ for(const [nm,opt,modo,dados] of [
    ok((await p.evaluate(()=>CHAMADAS.indexOf('odo_clinica_pedidos_lab')>=0)),nm+': chamou a leitura antiga');
    await p.evaluate(()=>{S.tab.dent='inicio';render();});await p.waitForTimeout(900);
    ok(/Painel dos trabalhos/.test(await p.$eval('body',x=>x.innerText))&&(await p.evaluate(()=>CHAMADAS.indexOf('odo_clinica_fin')>=0&&!!DFL.d)),nm+': painel carrega pelo financeiro antigo');
+   await p.evaluate(()=>{S.tab.dent='pedidos';ACT.labSub('fin');});await p.waitForTimeout(900);
+   ok(/Em aberto com o laboratório|Tudo em dia/.test(await p.$eval('body',x=>x.innerText))&&(await p.$$eval('.fic-m',x=>x.length))>0,nm+': Financeiro abre pelo caminho antigo');
  }else{
    ok(uni===true,nm+': leitura única ativa');
    ok((await p.evaluate(()=>CHAMADAS.indexOf('odo_clinica_pedidos_lab')<0&&CHAMADAS.indexOf('odo_clinica_fin')<0)),nm+': não precisou das leituras antigas (uma chamada só)');
@@ -75,6 +77,27 @@ for(const [nm,opt,modo,dados] of [
    if(modo==='dona'){ok(/Painel dos trabalhos/.test(ini),nm+': painel aparece para a dona');ok(/R\$\s?4\.534/.test(ini)||/4,5 mil/.test(ini),nm+': painel usa o fechamento de outubro (R$ 4.534)');}
    if(modo==='func'){ok(!/Painel dos trabalhos/.test(ini),nm+': funcionária não vê o painel de gastos');}
    await larg('Início');await p.screenshot({path:path.join(SAIDA,nm+'-4-inicio.png')});
+   ok(/Agenda de hoje/.test(ini)&&/Tarefas da Ana/.test(ini)&&/No laboratório agora/.test(ini)&&/Novidades do laboratório/.test(ini),nm+': Início tem agenda, laboratório, tarefas da Ana e novidades');
+   ok((await p.$$eval('.ini-p',x=>x.length))===4,nm+': Início mostra os 4 pedidos de prazo mais apertado');
+   // Financeiro: um extrato por mês, com a conta que vem do banco
+   await p.evaluate(()=>{S.tab.dent='pedidos';S.labSub='ped';render();});await p.waitForTimeout(300);
+   const abas=await p.$$eval('.lsub button',x=>x.map(y=>y.getAttribute('data-v')).join(','));
+   if(modo==='func'){ok(abas==='ped,labs',nm+': funcionária não tem a aba Financeiro');
+     await p.evaluate(()=>{S.labSub='fin';render();});await p.waitForTimeout(300);ok(!/R\$/.test(await p.$eval('body',x=>x.innerText)),nm+': forçar o Financeiro não mostra nenhum valor');}
+   else{ok(abas==='ped,fin,labs',nm+': abas Pedidos · Financeiro · Laboratórios');
+     await p.click('.lsub [data-v=fin]');await p.waitForTimeout(500);
+     const F=await p.$eval('.fic',x=>x.innerText),br=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2}).replace(/\s/g,' ');
+     const M=dados.meses,falta=M.reduce((s,m)=>s+m.falta,0),pago=M.filter(m=>m.ano===2026).reduce((s,m)=>s+m.pago,0);
+     const nrm=t=>t.replace(/\u00a0/g,' ');
+     ok(nrm(F).includes(br(falta)),nm+': Financeiro · em aberto = soma do que falta no banco ('+br(falta)+')');
+     ok(nrm(F).includes(br(pago)),nm+': Financeiro · pago no ano = soma dos pagamentos ('+br(pago)+')');
+     ok((await p.$$eval('.fic-m.ab',x=>x.length))===1&&/Outubro/.test(await p.$eval('.fic-m.ab',x=>x.innerText)),nm+': o mês em aberto (outubro) já vem aberto');
+     ok((await p.$$eval('.fic-st.aberto',x=>x.length))===1&&(await p.$$eval('.fic-st.ok',x=>x.length))===3,nm+': situação de cada mês igual à do laboratório (1 em aberto, 3 pagos)');
+     await larg('Financeiro');await p.screenshot({path:path.join(SAIDA,nm+'-5-financeiro.png'),fullPage:true});
+     await p.click('.fic-h[data-v="2026-08"]');await p.waitForTimeout(300);const ago=nrm(await p.$eval('.fic-m.ab:last-of-type, .fic-m.ab',x=>x.parentElement.innerText));
+     ok(/Crédito de R\$ 228,00/.test(ago)&&/Comprovante/.test(ago),nm+': agosto mostra o crédito abatido e os comprovantes');
+     await p.click('.fic-m.ab '+linha);await p.waitForTimeout(300);ok(!!(await p.$('#kc-ov')),nm+': tocar num pedido do extrato abre o detalhe');await p.keyboard.press('Escape');
+     await p.screenshot({path:path.join(SAIDA,nm+'-6-financeiro-agosto.png'),fullPage:true});}
  }
  ok(errs.length===0,nm+': nenhum erro de JavaScript'+(errs.length?' → '+errs.join(' ; '):''));
  await c.close();}

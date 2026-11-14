@@ -1,4 +1,4 @@
--- Teste da 074 (fonte única). Roda tudo dentro de uma transação e desfaz no fim: não deixa nada no banco.
+-- Teste da 074 + 075 (fonte única de pedidos e de financeiro). Roda tudo dentro de uma transação e desfaz no fim: não deixa nada no banco.
 -- Uso (banco de TESTE com as migrações aplicadas e auth.uid() lendo a config t.uid):
 --   psql -v ON_ERROR_STOP=1 -f tests/sql/074_fonte_unica.teste.sql
 begin;
@@ -138,6 +138,26 @@ create temp table rr2 on commit drop as select count(*) n from public.odo_pedido
 reset role;
 select pg_temp.ok((select n from rr2) = 0, 'Clínica A logada não lê a tabela de pedidos do laboratório direto (só pela leitura única)');
 
+-- ---------- 5c. financeiro com uma conta só (075) ----------
+update public.odo_fin_meses set valor_componente = 250 where id = '70000000-0000-0000-0000-00000000000a';
+insert into public.odo_fin_meses (id, user_id, cliente_id, ano, mes, valor_mes) values
+ ('70000000-0000-0000-0000-0000000000a9','10000000-0000-0000-0000-000000000001','30000000-0000-0000-0000-00000000000a',2026,9,500);
+insert into public.odo_fin_pagamentos (user_id, mes_id, valor, data) values
+ ('10000000-0000-0000-0000-000000000001','70000000-0000-0000-0000-0000000000a9',620,'2026-10-05');   -- pagou 120 a mais em setembro
+select pg_temp.como('10000000-0000-0000-0000-000000000002');
+create temp table rm on commit drop as select public.odo_clinica_pedidos()->'meses' as j;
+select pg_temp.ok((select jsonb_array_length(j) from rm) = 2, 'Financeiro: A vê os 2 meses dela');
+select pg_temp.ok((select (x->>'valor')::numeric from rm, jsonb_array_elements(j) x where (x->>'mes')::int = 10) = 1000, 'Financeiro: valor do mês é 1000 (NÃO soma os 250 de componentes)');
+select pg_temp.ok((select (x->>'credito')::numeric = 120 and (x->>'falta')::numeric = 480 and x->>'situacao' = 'parcial' from rm, jsonb_array_elements(j) x where (x->>'mes')::int = 10), 'Financeiro: outubro = 1000 - 400 pago - 120 de crédito de setembro = falta 480 (igual à tela do laboratório)');
+select pg_temp.ok((select x->>'situacao' = 'pago' and (x->>'falta')::numeric = 0 from rm, jsonb_array_elements(j) x where (x->>'mes')::int = 9), 'Financeiro: setembro pago');
+select pg_temp.ok((select jsonb_array_length(x->'pagamentos') from rm, jsonb_array_elements(j) x where (x->>'mes')::int = 10) = 1, 'Financeiro: traz os pagamentos do mês');
+select pg_temp.ok((select public.odo_clinica_pagamentos()) = (select j from rm), 'Histórico antigo devolve exatamente os mesmos números');
+select pg_temp.como('10000000-0000-0000-0000-000000000004');
+select pg_temp.ok((select jsonb_array_length(public.odo_clinica_pedidos()->'meses')) = 1 and (select (public.odo_clinica_pedidos()->'meses'->0->>'valor')::numeric) = 777, 'Financeiro: B vê só o mês dela');
+select pg_temp.como('10000000-0000-0000-0000-000000000003');
+select pg_temp.ok((select jsonb_array_length(public.odo_clinica_pedidos()->'meses')) = 0 and (select jsonb_array_length(public.odo_clinica_pagamentos())) = 0, 'Financeiro: funcionária não recebe nenhum mês');
+select pg_temp.ok(not has_function_privilege('authenticated', 'public.odo_clinica_meses(uuid)', 'execute'), 'Função interna dos meses não é chamável de fora (ninguém consulta o mês de outra conta)');
+
 -- ---------- 6. leituras antigas seguem a mesma regra ----------
 select pg_temp.como('10000000-0000-0000-0000-000000000002');
 select pg_temp.ok((select public.odo_clinica_pedidos_lab()::text) not like '%APAGADO%', 'Leitura antiga também esconde pedido apagado');
@@ -145,4 +165,4 @@ select pg_temp.ok((select x->>'etapa' from jsonb_array_elements(public.odo_clini
 select pg_temp.ok((select public.odo_clinica_fin()::text) not like '%APAGADO%' and (select public.odo_clinica_fin()::text) not like '%PACIENTE-B%', 'Financeiro antigo: sem apagado e sem dado de outra clínica');
 
 rollback;
-\echo TODOS OS TESTES DA 074 PASSARAM
+\echo TODOS OS TESTES DA 074 E 075 PASSARAM
