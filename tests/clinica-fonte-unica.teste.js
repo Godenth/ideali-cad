@@ -81,11 +81,12 @@ for(const [nm,opt,modo,dados] of [
    // Início
    await p.evaluate(()=>{S.tab.dent='inicio';render();});await p.waitForTimeout(600);
    const ini=await p.$eval('main, body',x=>x.innerText);
-   if(modo==='dona'){ok(/Painel dos trabalhos/.test(ini),nm+': painel aparece para a dona');ok(/R\$\s?4\.534/.test(ini)||/4,5 mil/.test(ini),nm+': painel usa o fechamento de outubro (R$ 4.534)');}
+   if(cel){ok(!!(await p.$('.dhero.cel-hero'))&&!/Painel dos trabalhos/.test(ini),nm+': no celular o Início é só a previsão do tempo (limpo)');}
+   else if(modo==='dona'){ok(/Painel dos trabalhos/.test(ini),nm+': painel aparece para a dona');ok(/R\$\s?4\.534/.test(ini)||/4,5 mil/.test(ini),nm+': painel usa o fechamento de outubro (R$ 4.534)');}
    if(modo==='func'){ok(!/Painel dos trabalhos/.test(ini),nm+': funcionária não vê o painel de gastos');}
    await larg('Início');await p.screenshot({path:path.join(SAIDA,nm+'-4-inicio.png')});
-   ok(/Agenda de hoje/.test(ini)&&/Tarefas da Ana/.test(ini)&&/No laboratório agora/.test(ini)&&/Novidades do laboratório/.test(ini),nm+': Início tem agenda, laboratório, tarefas da Ana e novidades');
-   ok((await p.$$eval('.ini-p',x=>x.length))===4,nm+': Início mostra os 4 pedidos de prazo mais apertado');
+   if(!cel){ok(/Agenda de hoje/.test(ini)&&/Tarefas da Ana/.test(ini)&&/No laboratório agora/.test(ini)&&/Novidades do laboratório/.test(ini),nm+': Início tem agenda, laboratório, tarefas da Ana e novidades');
+   ok((await p.$$eval('.ini-p',x=>x.length))===4,nm+': Início mostra os 4 pedidos de prazo mais apertado');}
    // Financeiro: um extrato por mês, com a conta que vem do banco
    await p.evaluate(()=>{S.tab.dent='pedidos';S.labSub='ped';render();});await p.waitForTimeout(300);
    const abas=await p.$$eval('.lsub button',x=>x.map(y=>y.getAttribute('data-v')).join(','));
