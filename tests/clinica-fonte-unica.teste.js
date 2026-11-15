@@ -85,7 +85,7 @@ for(const [nm,opt,modo,dados] of [
    else if(modo==='dona'){ok(/Painel dos trabalhos/.test(ini),nm+': painel aparece para a dona');ok(/R\$\s?4\.534/.test(ini)||/4,5 mil/.test(ini),nm+': painel usa o fechamento de outubro (R$ 4.534)');}
    if(modo==='func'){ok(!/Painel dos trabalhos/.test(ini),nm+': funcionária não vê o painel de gastos');}
    await larg('Início');await p.screenshot({path:path.join(SAIDA,nm+'-4-inicio.png')});
-   if(!cel){ok(/Agenda de hoje/.test(ini)&&/Tarefas da Ana/.test(ini)&&/No laboratório agora/.test(ini)&&/Novidades do laboratório/.test(ini),nm+': Início tem agenda, laboratório, tarefas da Ana e novidades');
+   if(!cel){ok(/Agenda de hoje/.test(ini)&&/Tarefas do Pedro/.test(ini)&&/No laboratório agora/.test(ini)&&/Novidades do laboratório/.test(ini),nm+': Início tem agenda, laboratório, tarefas do Pedro e novidades');
    ok((await p.$$eval('.ini-p',x=>x.length))===4,nm+': Início mostra os 4 pedidos de prazo mais apertado');}
    // Financeiro: um extrato por mês, com a conta que vem do banco
    await p.evaluate(()=>{S.tab.dent='pedidos';S.labSub='ped';render();});await p.waitForTimeout(300);

@@ -2540,6 +2540,7 @@ body.pv-trava{overflow:hidden}
 .pv-acs{display:flex;flex-wrap:wrap;gap:8px}.pv-acs button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:12px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer}.pv-acs button:hover{background:var(--line)}
 .pv-del{color:#DC2626!important;border-color:color-mix(in srgb,#DC2626 45%,transparent)!important}
 @media(max-width:860px){.pv-g{grid-template-columns:1fr}.pv-ln{grid-template-columns:96px 1fr auto}.pv-ov{padding:0;place-items:stretch}.pv{border-radius:0;max-height:100vh}.pv-arqs{grid-template-columns:1fr}}
+.pd-minil{display:grid;gap:6px}.pd-mini{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--ink);font:inherit;font-size:.88rem;text-align:left;cursor:pointer}.pd-mini small{color:var(--muted)}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -8793,6 +8794,42 @@ document.addEventListener('change',function(ev){if(ev.target.id!=='pv-st')return
   pedMuda(p.id,patch,'Movido para '+PEDST[v][0]+'.');setTimeout(pvPinta,30);});
 document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&document.getElementById('pv-raiz')&&!document.getElementById('exo-mail'))pvFecha();});
 (function(){var _rPV=render;render=function(){var x=_rPV.apply(this,arguments);try{if(PED.ver){if(PED.ed)pvFecha();else pvPinta();}}catch(e){}return x;};})();
+
+/* ===== Ana não cuida mais de lembretes: o Pedro (estagiário) é o responsável por recados e tarefas.
+   Os lembretes que estavam pendentes com a Ana viram tarefas do Pedro uma única vez. ===== */
+lmbDesenha=function(){var w=document.getElementById('lmb');if(w)w.remove();};lmbChecar=function(){};lmbCarrega=function(){LMB.L=LMB.L||[];};
+lmbDesenha();
+function pdMigraLmb(){if(!pdOn()||!PD.ok||PD.erro||PD._migrando)return;var uid=RL.user.id,k='io_lmb_migrou_'+uid;try{if(localStorage.getItem(k))return;}catch(e){}
+  PD._migrando=true;var marca=function(){try{localStorage.setItem(k,'1');}catch(e){}PD._migrando=false;};
+  SB.from('lembretes').select('*').eq('feito',false).then(function(r){if(r.error||!r.data||!r.data.length){marca();return;}
+    var rows=r.data.map(function(x){var d=x.quando?new Date(x.quando):null;return {user_id:uid,titulo:String(x.texto||'Lembrete').slice(0,300),tipo:'Outro',coluna:'fazer',ordem:-1,
+      vence:d?pdIso(d):null,hora:d?pdDois(d.getHours())+':'+pdDois(d.getMinutes()):null,obs:'Veio dos lembretes da Ana'+(x.repetir_min?' (repetia a cada '+x.repetir_min+' min)':'')};});
+    SB.from('odo_tarefas').insert(rows).select('*').then(function(t){if(t.error){PD._migrando=false;return;}
+      (t.data||[]).forEach(function(x){PD.L.unshift(x);});pdPinta();
+      SB.from('lembretes').update({feito:true,feito_em:new Date().toISOString()}).in('id',r.data.map(function(x){return x.id;})).then(function(){marca();});
+      toast(PD.nome+' assumiu '+rows.length+' lembrete'+(rows.length>1?'s':'')+' que estavam com a Ana. 👍');});},function(){PD._migrando=false;});}
+setInterval(function(){try{pdMigraLmb();}catch(e){}},5000);
+
+/* tudo que era "Tarefas da Ana / Falar com a Ana" agora abre o Pedro */
+ACT.anaAbre=function(){PD.pop=false;PD.pg=true;pdCarrega();pdPinta();};
+function pdListaMini(){var L=PD.L.filter(function(t){return t.coluna!=='feito';}).sort(function(a,b){return (b.urgente?1:0)-(a.urgente?1:0)||(pdQuando(a)||9e15)-(pdQuando(b)||9e15);}).slice(0,5);
+  if(!L.length)return '<div class="empty">Nenhuma tarefa. Clique no Pedro (no topo) para anotar.</div>';
+  return L.map(function(t){var q=pdQuando(t);return '<button class="pd-mini" data-pd="ed" data-v="'+t.id+'"><span>'+(t.urgente?'🔥 ':'')+esc(t.titulo)+(t.cliente?' <small>· '+esc(t.cliente)+'</small>':'')+'</span>'+(q?'<span class="pd-cd mini '+pdCdCls(q.getTime())+'" data-pdq="'+q.getTime()+'">'+pdCdTxt(q.getTime())+'</span>':'')+'</button>';}).join('');}
+function pdTrocaAna(){if(!pdOn())return;
+  [].forEach.call(document.querySelectorAll('[data-act="anaAbre"]'),function(b){if(b.dataset.pdok)return;b.dataset.pdok=1;
+    if(b.classList.contains('dkpi')){var n=b.querySelector('b'),s=b.querySelector('span');if(n)n.textContent=PD.L.filter(function(t){return t.coluna!=='feito';}).length;if(s)s.textContent='tarefas do Pedro';return;}
+    if(/Falar com a Ana/.test(b.textContent))b.textContent='Tarefas do Pedro';
+    var sec=b.closest('section.card'),h=sec&&sec.querySelector('h2');if(h&&/Tarefas da Ana/.test(h.textContent)){h.textContent='Tarefas do Pedro';var row=h.closest('.row');while(row&&row.nextSibling)row.parentNode.removeChild(row.nextSibling);
+      var d=document.createElement('div');d.className='pd-minil';d.innerHTML=pdListaMini();sec.appendChild(d);}});
+  [].forEach.call(document.querySelectorAll('.dkpi'),function(b){var sp=b.querySelector('span'),n=b.querySelector('b');if(sp&&/tarefas da Ana|tarefas do Pedro/.test(sp.textContent)){sp.textContent='tarefas do Pedro';b.classList.add('pd-kpi');if(n)n.textContent=PD.L.filter(function(t){return t.coluna!=='feito';}).length;}});
+  [].forEach.call(document.querySelectorAll('.atopo-b[data-act="anaAbre"]'),function(b){b.closest('.atopo')&&(b.closest('.atopo').style.display='none');});}
+(function(){var _rPA=render;render=function(){var x=_rPA.apply(this,arguments);try{pdTrocaAna();}catch(e){}return x;};})();
+var _pdPintaA=pdPinta;pdPinta=function(){_pdPintaA();try{[].forEach.call(document.querySelectorAll('.pd-minil'),function(d){d.innerHTML=pdListaMini();});
+  [].forEach.call(document.querySelectorAll('.dkpi.pd-kpi b'),function(n){n.textContent=PD.L.filter(function(t){return t.coluna!=='feito';}).length;});bn3Pedro();}catch(e){}};
+/* barra de baixo do celular: o primeiro botão passa a ser o Pedro */
+function bn3Pedro(){var b=document.querySelector('#bn3 .bn3-ana');if(!b||!pdOn())return;var n=pdAtrasadas().length;
+  b.removeAttribute('data-lmb');b.setAttribute('data-pd','pop');b.setAttribute('aria-label',PD.nome+' · tarefas');b.innerHTML='<span class="bn3-av"><img src="'+PD.rosto+'" alt="">'+(n?'<b>'+n+'</b>':'')+'</span>';b.classList.toggle('on',!!PD.pop);}
+(function(){var _rPB=render;render=function(){var x=_rPB.apply(this,arguments);try{setTimeout(bn3Pedro,0);}catch(e){}return x;};})();
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';

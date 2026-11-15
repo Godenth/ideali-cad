@@ -8638,6 +8638,21 @@ setInterval(function(){try{pdLembra();var b=document.querySelector('.pd-n'),n=PD
 document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(pdLembra,1500);});
 (function(){var _rPd=render;render=function(){var x=_rPd.apply(this,arguments);try{if(pdOn()){pdCarrega();if(PD.ok)setTimeout(pdLembra,2500);}}catch(e){}return x;};})();
 
+/* ===== Ana não cuida mais de lembretes: o Pedro (estagiário) é o responsável por recados e tarefas.
+   Os lembretes que estavam pendentes com a Ana viram tarefas do Pedro uma única vez. ===== */
+lmbDesenha=function(){var w=document.getElementById('lmb');if(w)w.remove();};lmbChecar=function(){};lmbCarrega=function(){LMB.L=LMB.L||[];};
+lmbDesenha();
+function pdMigraLmb(){if(!pdOn()||!PD.ok||PD.erro||PD._migrando)return;var uid=S.sessao.id,k='io_lmb_migrou_'+uid;try{if(localStorage.getItem(k))return;}catch(e){}
+  PD._migrando=true;var marca=function(){try{localStorage.setItem(k,'1');}catch(e){}PD._migrando=false;};
+  sb.from('lembretes').select('*').eq('feito',false).then(function(r){if(r.error||!r.data||!r.data.length){marca();return;}
+    var rows=r.data.map(function(x){var d=x.quando?new Date(x.quando):null;return {user_id:uid,titulo:String(x.texto||'Lembrete').slice(0,300),tipo:'Outro',coluna:'fazer',ordem:-1,
+      vence:d?pdIso(d):null,hora:d?pdDois(d.getHours())+':'+pdDois(d.getMinutes()):null,obs:'Veio dos lembretes da Ana'+(x.repetir_min?' (repetia a cada '+x.repetir_min+' min)':'')};});
+    sb.from('odo_tarefas').insert(rows).select('*').then(function(t){if(t.error){PD._migrando=false;return;}
+      (t.data||[]).forEach(function(x){PD.L.unshift(x);});pdPinta();
+      sb.from('lembretes').update({feito:true,feito_em:new Date().toISOString()}).in('id',r.data.map(function(x){return x.id;})).then(function(){marca();});
+      toast(PD.nome+' assumiu '+rows.length+' lembrete'+(rows.length>1?'s':'')+' que estavam com a Ana. 👍');});},function(){PD._migrando=false;});}
+setInterval(function(){try{pdMigraLmb();}catch(e){}},5000);
+
 boot();
 </script>
 <script src="../pixel.js" defer></script>
