@@ -2192,6 +2192,7 @@ body:has(.rsx.rs-claro){background:#F3F4F6}body:has(.rsx:not(.rs-claro)){backgro
 .rct-t b{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;letter-spacing:-.02em}.rct-t em{font-style:normal;color:#60A5FA}
 .rct-t small{font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:#9AA3AF}
 .rct-t u{width:56px;height:3px;border-radius:3px;background:#2563EB;text-decoration:none}
+.rct-bg{position:absolute;inset:0;background:#0E1116}.rct-t{z-index:2}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5034,25 +5035,25 @@ Object.assign(ACT,{bmSel:function(v){S.rede.msel=S.rede.msel===v?'':v;var el=$('
    Clique ou Esc pula. Respeita "reduzir movimento". */
 function redeAnim(entrar,troca){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches||document.querySelector('.rct')||!document.body.animate){troca();return;}
-  var w=document.createElement('div');w.className='rct';w.setAttribute('role','status');
-  var lados=entrar?['e','d','e']:['d','e','d'],cores=['#2563EB','#1E40AF','#0E1116'];
-  w.innerHTML=lados.map(function(l,i){return '<i class="rct-p rct-'+l+'" style="background:'+cores[i]+'"></i>';}).join('')+
+  /* cortinas diagonais: entram rápido, desaceleram e PARAM na tela formando faixas; o nome aparece; tudo some devagar */
+  var esp=entrar?1:-1,w=document.createElement('div');w.className='rct';w.setAttribute('role','status');
+  var C=[{c:'#60A5FA',l:entrar?'e':'d',fim:-88},{c:'#2563EB',l:entrar?'e':'d',fim:-95},{c:'#1E3A8A',l:entrar?'d':'e',fim:97}];
+  w.innerHTML='<i class="rct-bg"></i>'+C.map(function(x){return '<i class="rct-p rct-'+x.l+'" style="background:'+x.c+'"></i>';}).join('')+
     '<div class="rct-t"><span class="rct-logo">i</span><b>'+(entrar?'Ideali <em>Rede</em>':'Ideali <em>Odonto</em>')+'</b><small>'+(entrar?'odontologia conectada':'voltando ao seu painel')+'</small><u></u></div>';
   document.body.appendChild(w);
-  var P=w.querySelectorAll('.rct-p'),T=w.querySelector('.rct-t'),FREIA='cubic-bezier(.08,.82,.17,1)',ACEL='cubic-bezier(.6,0,.9,.35)',D=760,GAP=90,fim=false,trocou=false,timers=[];
-  var de=function(l){return l==='e'?'translateX(-112%)':'translateX(112%)';},para=function(l){return l==='e'?'translateX(112%)':'translateX(-112%)';};
+  var P=w.querySelectorAll('.rct-p'),T=w.querySelector('.rct-t'),BG=w.querySelector('.rct-bg'),FREIA='cubic-bezier(.08,.82,.17,1)',D=900,GAP=110,fim=false,trocou=false,timers=[];
   function faz(){if(trocou)return;trocou=true;try{troca();}catch(e){}}
   function acaba(){if(fim)return;fim=true;timers.forEach(clearTimeout);faz();w.remove();removeEventListener('keydown',tecla,true);}
   function tecla(e){if(e.key==='Escape')acaba();}
   w.addEventListener('pointerdown',acaba);addEventListener('keydown',tecla,true);
-  /* 1) entram rápido e vão desacelerando até parar */
-  for(var i=0;i<P.length;i++)P[i].animate([{transform:de(lados[i])},{transform:'translateX(0)'}],{duration:D,delay:i*GAP,easing:FREIA,fill:'both'});
-  var parou=D+(P.length-1)*GAP;
-  /* 2) paradas: aparece o logo */
-  T.animate([{opacity:0,transform:'translate(-50%,-46%) scale(.96)'},{opacity:1,transform:'translate(-50%,-50%) scale(1)'}],{duration:420,delay:parou,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
-  timers.push(setTimeout(faz,parou+60));
-  /* 3) tudo (cortinas + logo) some devagar em fade, revelando a tela nova; as cortinas não saem do lugar */
-  var some=parou+420+700,DF=900;
+  BG.animate([{opacity:0},{opacity:1}],{duration:260,fill:'both'});
+  C.forEach(function(x,i){var f=x.l==='d'?Math.abs(x.fim):-Math.abs(x.fim),ini=x.l==='e'?-190:190;
+    if(!entrar)f=-f;
+    P[i].animate([{transform:'translateX('+ini+'vw)'},{transform:'translateX('+f+'vw)'}],{duration:D,delay:i*GAP,easing:FREIA,fill:'both'});});
+  var parou=D+(C.length-1)*GAP-120;
+  T.animate([{opacity:0,transform:'translate(-50%,-46%)'},{opacity:1,transform:'translate(-50%,-50%)'}],{duration:500,delay:parou,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+  timers.push(setTimeout(faz,parou+100));
+  var some=parou+500+900,DF=1300;
   timers.push(setTimeout(function(){if(!fim)w.animate([{opacity:1},{opacity:0}],{duration:DF,easing:'ease-in-out',fill:'forwards'});},some));
   timers.push(setTimeout(acaba,some+DF+40));}
 redeTransicao=function(entrar,sec){redeAnim(entrar,function(){if(entrar){S.redeOn=true;S.rede.sec=sec||'vagas';S.rede.anim=true;}else{if(typeof cvAtivo==='function'&&cvAtivo())lerCv();S.redeOn=false;S.painelVolta=true;}render();window.scrollTo(0,0);});};
