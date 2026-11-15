@@ -2429,6 +2429,21 @@ body.h3d-on .h3d .h2-mapa{visibility:hidden}
 #rl-conf .rc-ag{color:var(--muted);font-size:.8rem}
 @media(max-width:640px){#rl-conf{top:auto;bottom:calc(84px + env(safe-area-inset-bottom));flex-wrap:wrap}#rl-conf .rc-ac{width:100%}#rl-conf .rc-ac button{flex:1}}
 .rl-ov-sn{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(5,10,22,.6);backdrop-filter:blur(4px)}
+
+.esc-box2{max-width:760px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+.esc-avc{position:relative;min-height:440px;overflow:hidden;background:radial-gradient(120% 70% at 50% 100%,color-mix(in srgb,var(--c1) 70%,#000),#05080f 70%)}
+.esc-avc:after{content:"";position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(transparent,color-mix(in srgb,var(--c2) 45%,transparent));pointer-events:none;mix-blend-mode:screen}
+.esc-av{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;animation:escAv .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes escAv{from{opacity:0;transform:translateY(24px) scale(1.04);filter:brightness(2) blur(6px)}to{opacity:1;transform:none;filter:none}}
+.esc-avv{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:10px;color:rgba(255,255,255,.75);font-size:.82rem}.esc-avv svg{width:96px;height:96px;opacity:.85}
+.esc-vert{position:absolute;left:12px;top:16px;writing-mode:vertical-rl;transform:rotate(180deg);color:#fff;font-size:.8rem;letter-spacing:.24em;text-transform:uppercase;opacity:.8;z-index:1;text-shadow:0 1px 6px #0009}
+.esc-dir{display:grid;align-content:start}
+.esc-sxs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.esc-sx{padding:12px;border-radius:12px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-weight:700;cursor:pointer;transition:.15s}
+.esc-sx:hover{border-color:var(--c1)}.esc-sx.on{background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;border-color:transparent}
+.esc-sxn{justify-self:start;border:0;background:none;color:var(--muted);font:inherit;font-size:.82rem;text-decoration:underline;cursor:pointer;padding:0}.esc-sxn.on{color:var(--ink);font-weight:700}
+.esc-box2 .btn.pri[disabled]{opacity:.45;cursor:not-allowed}
+@media(max-width:700px){.esc-box2{grid-template-columns:1fr;max-height:calc(100vh - 32px);overflow:auto}.esc-avc{min-height:300px}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -3019,9 +3034,13 @@ function rCadastro(){var c=S.cad,P=c.passo,tot=5;
     '<div class="esc-grid">'+PROFS.map(function(x,i){var m=PCARD[x];return '<button type="button" class="esc-c'+(c.prof===x?' on':'')+'" style="--c1:'+m.c1+';--c2:'+m.c2+';--d:'+(i*90)+'ms" data-act="cadVer" data-v="'+esc(x)+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+m.ic+'</svg><b>'+esc(m.t)+'</b><span>'+esc(m.s)+'</span></button>';}).join('')+'</div>'+
     '<div class="esc-faixa"><span>🔗 <b>Conecte</b> com profissionais</span><span>🏢 <b>Encontre</b> empresas e serviços</span><span>💼 <b>Descubra</b> oportunidades</span><span>📈 <b>Faça parte</b> desse ecossistema</span></div>'+
     (c.erro?'<p class="err">'+esc(c.erro)+'</p>':'')+'<div class="row"><button class="btn" data-act="cadIr" data-v="0">← Voltar ao login</button></div></section>'+
-    (sel?(function(){var m=PCARD[sel];return '<div class="esc-modal" role="dialog" aria-modal="true" aria-label="'+esc(m.t)+'"><div class="esc-box" style="--c1:'+m.c1+';--c2:'+m.c2+'"><div class="esc-top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+m.ic+'</svg><small>Profissão principal</small><h2>'+esc(m.t)+'</h2></div>'+
-      '<div class="esc-body"><p>'+esc(m.d)+'</p><p class="small muted">O que você vai marcar depois: '+AREAS[sel].slice(0,5).map(esc).join(', ')+'…</p><b>Deseja se cadastrar como '+esc(m.t)+'?</b>'+
-      '<div class="row"><button class="btn" data-act="cadVer" data-v="">Escolher outra</button><span class="spacer"></span><button class="btn pri" data-act="cadEsc" data-v="'+esc(sel)+'">Sim, continuar →</button></div></div></div></div>';})():'');}
+    (sel?(function(){var m=PCARD[sel],sx=c.sexo,av=avDe(sel,sx),sb=function(v,t){return '<button type="button" class="esc-sx'+(sx===v?' on':'')+'" data-act="cadSexo" data-v="'+v+'">'+t+'</button>';};
+      return '<div class="esc-modal" role="dialog" aria-modal="true" aria-label="'+esc(m.t)+'"><div class="esc-box esc-box2" style="--c1:'+m.c1+';--c2:'+m.c2+'">'+
+      '<div class="esc-avc">'+(av?'<img class="esc-av" src="'+av+'" alt="">':'<div class="esc-avv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+m.ic+'</svg><span>'+(sx?'':'Escolha ao lado')+'</span></div>')+'<b class="esc-vert">'+esc(m.t)+'</b></div>'+
+      '<div class="esc-dir"><div class="esc-top"><small>Profissão principal</small><h2>'+esc(m.t)+'</h2></div>'+
+      '<div class="esc-body"><p>'+esc(m.d)+'</p><b>Você é…</b><div class="esc-sxs">'+sb('Feminino','Mulher')+sb('Masculino','Homem')+'</div><button type="button" class="esc-sxn'+(sx==='Prefiro não informar'?' on':'')+'" data-act="cadSexo" data-v="Prefiro não informar">Prefiro não informar</button>'+
+      '<p class="small muted">O que você vai marcar depois: '+AREAS[sel].slice(0,5).map(esc).join(', ')+'…</p>'+
+      '<div class="row"><button class="btn" data-act="cadVer" data-v="">Escolher outra</button><span class="spacer"></span><button class="btn pri" data-act="cadEsc" data-v="'+esc(sel)+'"'+(sx?'':' disabled title="Escolha uma opção acima"')+'>Sim, continuar →</button></div></div></div></div></div>';})():'');}
   else if(P===3&&profList(c).length&&!c.entOk)h=rEntrevista(c,barra);
   else if(P===3&&profList(c).length)h=rEntFim(c,barra,nav());
   else if(P===3){var prot=false;
@@ -4048,6 +4067,7 @@ var ACT={
     S.cad.erro='';render();},
   cadIr:function(v){var c=S.cad,n=+v;if(n>c.passo){var e=cadValida(c.passo);if(e){c.erro=e;render();return;}if(n===6&&c.passo===5){c.erro='';grandeFinal();return;}if(c.passo===2&&n===3&&!c.maisVisto){c.erro='';c.mais=true;render();return;}}c.erro='';c.passo=Math.max(0,n);render();window.scrollTo(0,0);},
   cadVer:function(v){S.cad.ver=v||null;S.cad.erro='';render();},
+  cadSexo:function(v){S.cad.sexo=v;render();},
   entNv:function(v,b){entCur(S.cad).nv[b.dataset.k]=v;S.cad.erro='';render();},
   entComeca:function(){var c=S.cad;c.entIntro=false;c.entQ=0;c.entAnim=true;render();window.scrollTo(0,0);},
   entProx:function(){var c=S.cad,L=profList(c),pf=L[c.entP||0],Q=qsDe(c,pf),i=Math.min(c.entQ||0,Q.length-1),e=faltaDe(c,pf,Q[i]);if(e){c.erro=e;render();return;}c.erro='';
@@ -8468,6 +8488,10 @@ document.addEventListener('submit',function(ev){if(ev.target.id!=='rl-snf')retur
     if(r.data&&r.data.user)RL.user=r.data.user;try{localStorage.removeItem('io_prov');}catch(e){}var o=document.getElementById('rl-sn');if(o)o.remove();toast('Pronto! Sua senha foi criada.');
     if(typeof redeRealCarrega==='function')redeRealCarrega();});},true);
 (function(){var _rC=render;render=function(){var x=_rC.apply(this,arguments);try{rlProvConf();}catch(e){}return x;};})();
+
+/* avatares da escolha de profissão (estilo menu de personagens); falta a imagem → mostra o ícone */
+var AVT={'Dentista':{Feminino:'av/dentista-f.webp'}};
+function avDe(prof,sx){var a=AVT[prof];return a&&sx&&a[sx]||'';}
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
