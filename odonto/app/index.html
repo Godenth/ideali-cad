@@ -7372,8 +7372,15 @@ function pclAbre(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espe
 /* escreveu tudo de uma vez: aproveita o que der e pergunta só o que faltou */
 function pclSemCli(txt,cl){if(!cl)return txt;var nw=semAc(cl.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}),ws=String(txt).split(/\s+/),out=[];
   ws.forEach(function(w){var k=semAc(w).replace(/[^a-z0-9]/g,'');if(nw.indexOf(k)>=0){if(out.length&&/^dra?\.?$/i.test(out[out.length-1]))out.pop();return;}out.push(w);});return out.join(' ');}
-function pclTudo(v){var seg=v.split(/[,;]/),a1=pclAcha(seg[0]),cl=a1.length===1?a1[0]:null,r=anaEntende(cl?[pclSemCli(seg[0],cl)].concat(seg.slice(1)).join(','):v);if(!r||!r.itens.length)return false;var E=PC.ed;cl=cl||r.cliente;if(!cl)return false;
+function pclSoPaciente(cl,pac){/* o cliente "achado" é só o nome do paciente? então não é cliente */if(!cl||!pac)return false;var pw=semAc(pac).split(/[^a-z0-9]+/);return semAc(cl.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).some(function(w){return pw.indexOf(w)>=0;});}
+function pclTudo(v){var seg=v.split(/[,;]/),r0=anaEntende(v),pac0=r0&&r0.paciente||'',ehPac=/^\s*(?:paciente|pac\.?)\b/i.test(seg[0]),a1=ehPac?pclAcha(seg[0]).filter(function(c){var t=' '+semAc(seg[0]).replace(/[^a-z0-9]+/g,' ')+' ';return semAc(c.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).every(function(w){return t.indexOf(' '+w+' ')>=0;});}):pclAcha(seg[0]),cl=a1.length===1?a1[0]:null;
+  var r=cl?anaEntende([pclSemCli(seg[0],cl)].concat(seg.slice(1)).join(',')):r0;if(!r||!r.itens.length)return false;var E=PC.ed;
+  if(!cl&&r.cliente&&!(r.paciente&&pclSoPaciente(r.cliente,r.paciente)))cl=r.cliente;
   if(r.paciente)r.paciente=pclSemCli(r.paciente,cl).trim();
+  if(!cl){/* escreveu o pedido inteiro sem o cliente: guarda tudo e pergunta só o cliente */
+    E.paciente=r.paciente||'';E.trabalho=r.itens[0].trabalho;E.dentes=r.itens[0].dentes||[];E.cor=r.cor||'';E.prazo=r.prazo||null;E.urgente=!!r.urgente;E._tudo=r;
+    pcEu(esc(v));pcAna('Anotei 📝 '+(E.paciente?'<b>'+esc(E.paciente)+'</b> · ':'')+esc(E.trabalho)+(E.dentes.length?' · 🦷 '+E.dentes.join(', '):'')+(E.cor?' · 🎨 '+esc(E.cor):''));
+    E._opc=null;pcAna('Falta só o <b>cliente</b>: para quem é? Toque num nome ou digite.');PC.passo='cliente';return true;}
   E.cli=cl;E.paciente=r.paciente||'';E.trabalho=r.itens[0].trabalho;E.dentes=r.itens[0].dentes||[];E.cor=r.cor||'';E.prazo=r.prazo||(/\b(pra|para|ate|dia|em)\b/.test(semAc(v))?pclData(semAc(v)):null);E.urgente=!!r.urgente;E._tudo=r;
   pcEu(esc(v));pcAna('Anotei 📝 <b>'+esc(cl.nome)+'</b>'+(E.paciente?' · '+esc(E.paciente):'')+' · '+esc(E.trabalho)+(E.dentes.length?' · 🦷 '+E.dentes.join(', '):'')+(E.cor?' · 🎨 '+esc(E.cor):''));
   var falta=['paciente','cor','prazo'].filter(function(k){return k==='paciente'?!E.paciente:k==='cor'?!E.cor:!E.prazo&&!E.urgente;});
@@ -7388,7 +7395,7 @@ var _pcRespL=pcResposta;pcResposta=function(v,txt){if(PC.modo!=='lab')return _pc
   if(k==='cliente'){var s=String(v||'').trim();if(!s)return;
     if(s.indexOf('id:')===0){var c=pclClis().filter(function(x){return x.id===s.slice(3);})[0];if(!c)return;E.cli=c;E._opc=null;pcEu(esc(c.nome));pcProx();return;}
     if(s.indexOf('sem:')===0){E.cli=null;E.cliTxt=s.slice(4);E._opc=null;pcEu(esc(E.cliTxt)+' <small>(sem cadastro)</small>');pcAna('Tudo bem, vou anotar o nome na observação. Depois você cadastra o cliente em <b>Clientes</b>.');pcProx();return;}
-    if(s.length>18&&/[,;]/.test(s)&&pclTudo(s))return;
+    if(!E._tudo&&s.length>18&&(/[,;]/.test(s)||/\b(paciente|coroa|dente|faceta|cor\b)/i.test(semAc(s)))&&pclTudo(s))return;
     var A=pclAcha(s);pcEu(esc(s));
     if(A.length===1){E.cli=A[0];E._opc=null;if(semAc(A[0].nome).indexOf(semAc(s))<0)pcAna('Entendi: <b>'+esc(A[0].nome)+'</b> 👍');pcProx();return;}
     if(A.length>1){E._opc=A.map(function(c){return [c.nome,'id:'+c.id];});pcAna('Achei mais de um. Qual deles?');return;}
