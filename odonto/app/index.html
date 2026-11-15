@@ -2411,14 +2411,14 @@ body:has(.pmod-ov) .rs-top{z-index:1!important}
 .site{overflow-x:clip}
 body:has(.site:not([hidden])){margin:0}
 /* home no computador: mapa de partículas e voo pela rede */
-.h3d{position:relative;height:260vh;margin:0 calc(50% - 50vw)}
-.h3d-fixo{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center;padding:0 max(16px,4vw)}
+.h3d{position:relative;margin:0 calc(50% - 50vw)}
+.h3d-fixo{position:relative;min-height:calc(100vh - 80px);overflow:hidden;background:radial-gradient(120% 90% at 72% 50%,#0b1730,#050a16 70%);color:#E6EDF7;--ink:#E6EDF7;--muted:#94A3B8;--line:rgba(148,163,184,.18);--accent:#2DD4BF;--accent-2:#60A5FA;--card:#0f172a;--bg:#050a16;display:flex;align-items:center;padding:0 max(16px,4vw)}
 .h3d-cv{position:absolute;inset:0;pointer-events:none}
-.h3d .hero2{position:relative;z-index:2;width:100%;grid-template-columns:minmax(0,1fr) minmax(0,1fr);transition:opacity .1s linear}
+.h3d-fixo:before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(5,10,22,.6),rgba(5,10,22,.2) 40%,transparent 55%)}
+.h3d .hero2 h1,.h3d .hero2 p,.h3d .h2-nums{color:#E6EDF7}.h3d .selo{background:rgba(255,255,255,.06)!important;border-color:rgba(148,163,184,.25)!important;color:#CBD5E1!important}.h3d .sbtn.vid{background:rgba(255,255,255,.06)!important;border-color:rgba(148,163,184,.3)!important;color:#E6EDF7!important}.h3d .hero2 p{color:rgba(230,237,247,.78)}
+.h3d .hero2{position:relative;z-index:2;width:100%;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 body.h3d-on .h3d .h2-mapa{visibility:hidden}
-.h3d-rot{position:absolute;left:max(16px,4vw);bottom:6vh;z-index:3;font-family:'Sora',ui-sans-serif,system-ui,sans-serif;font-size:clamp(1.6rem,3vw,2.6rem);font-weight:700;letter-spacing:-.02em;color:var(--ink);opacity:0;transition:opacity .3s}
-.h3d-dica{position:absolute;left:50%;bottom:4vh;transform:translateX(-50%);z-index:3;display:grid;justify-items:center;gap:8px;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);opacity:0}
-.h3d-dica span{width:22px;height:34px;border:2px solid currentColor;border-radius:12px;position:relative}.h3d-dica span:after{content:"";position:absolute;left:50%;top:6px;width:4px;height:7px;margin-left:-2px;border-radius:2px;background:currentColor;animation:h3dRoda 1.6s ease-in-out infinite}
+.h3d-rot{position:absolute;right:max(16px,4vw);bottom:5vh;z-index:3;font-family:'Sora',ui-sans-serif,system-ui,sans-serif;font-size:clamp(1.2rem,2vw,1.8rem);font-weight:700;letter-spacing:-.02em;color:#E6EDF7;opacity:0;transition:opacity .5s}
 @keyframes h3dRoda{50%{transform:translateY(8px);opacity:.3}}
 </style>
 
@@ -8300,74 +8300,85 @@ var _profModalCV=profModal;profModal=function(p){if(!p)return '';var h=_profModa
   h=h.replace(/<div class="pm-s"><h3>[^<]*<\/h3><div class="pc-tags"><\/div><\/div>/g,'').replace(/<div class="pm-s"><h3>Resumo<\/h3><p><\/p><\/div>/,'');
   return rsLocks(h.replace('<div class="pmod" ','<div class="pmod cvfolha" '));};
 
-/* ===== Home no computador: o mapa do Brasil feito de partículas; ao rolar, elas se soltam e você "voa" pela rede ===== */
+/* ===== Home no computador: o mapa do Brasil feito de partículas; sozinho, ele se desfaz numa viagem pela rede com nebulosa e volta a ser mapa ===== */
 var H3D={on:false};
 function h3dPode(){return window.matchMedia&&matchMedia('(min-width:1024px)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&!!document.getElementById('mp-svg');}
 function h3dIni(){if(H3D.on||!h3dPode())return;var hero=document.querySelector('.site .hero2'),sv=document.getElementById('mp-svg');if(!hero||!sv)return;
   var site=document.querySelector('.site');if(!site||site.offsetParent===null)return;
   H3D.on=true;
-  /* palco: a seção fica presa na tela enquanto você rola 2,6 telas */
   var palco=document.createElement('div');palco.className='h3d';hero.parentNode.insertBefore(palco,hero);
   var fixo=document.createElement('div');fixo.className='h3d-fixo';palco.appendChild(fixo);fixo.appendChild(hero);
   var cv=document.createElement('canvas');cv.className='h3d-cv';fixo.insertBefore(cv,hero);
   var rot=document.createElement('div');rot.className='h3d-rot';fixo.appendChild(rot);
-  var dica=document.createElement('div');dica.className='h3d-dica';dica.innerHTML='<span></span>role para entrar na rede';fixo.appendChild(dica);
   document.body.classList.add('h3d-on');
   var g=cv.getContext('2d'),dpr=Math.min(2,devicePixelRatio||1),W=0,H=0;
-  /* amostra pontos dentro de cada estado (mapa 613x639) */
+  /* pontos dentro de cada estado (mapa 613x639) */
   var P=[],paths=[].map.call(sv.querySelectorAll('.mp-est path'),function(p){return {uf:p.getAttribute('data-uf'),p:new Path2D(p.getAttribute('d'))};});
   var oc=document.createElement('canvas').getContext('2d'),passo=7;
   for(var y=0;y<639;y+=passo)for(var x=0;x<613;x+=passo){var jx=x+(Math.random()-.5)*passo*.7,jy=y+(Math.random()-.5)*passo*.7;
     for(var k=0;k<paths.length;k++)if(oc.isPointInPath(paths[k].p,jx,jy)){P.push({mx:jx,my:jy,uf:paths[k].uf});break;}}
   var TIPOS=['Dentista','Protético','Cadista','Laboratório','Clínica','ASB / TSB','Ceramista','Implantodontista','Ortodontista','Empresa'];
   var CORES=['#2DD4BF','#60A5FA','#A78BFA','#F59E0B','#34D399','#F472B6','#22D3EE','#818CF8','#FB7185','#FBBF24'];
+  var PROF=4;
   P.forEach(function(p,i){var a=Math.random()*Math.PI*2,r=Math.pow(Math.random(),.6);
-    p.x=Math.cos(a)*r*1.9;p.y=(Math.random()-.5)*1.5;p.z=.25+Math.random()*3.4;p.s=.6+Math.random()*1.2;
+    p.x=Math.cos(a)*r*1.5;p.y=(Math.random()-.5)*1.6;p.z=.2+Math.random()*PROF;p.s=.6+Math.random()*1.2;
     p.card=i%26===0;if(p.card){var t=(i/26)%TIPOS.length|0;p.t=TIPOS[t];p.c=CORES[t];p.w=72+Math.random()*60;p.h=p.w*.62;}
     p.d=Math.random();});
+  /* fumaça: nuvens macias pintadas uma vez e reaproveitadas */
+  function nuvem(cor){var c=document.createElement('canvas');c.width=c.height=256;var x=c.getContext('2d');
+    for(var n=0;n<7;n++){var px=128+(Math.random()-.5)*90,py=128+(Math.random()-.5)*90,rr=50+Math.random()*60,gr=x.createRadialGradient(px,py,0,px,py,rr);
+      gr.addColorStop(0,cor.replace('A','.10'));gr.addColorStop(.5,cor.replace('A','.04'));gr.addColorStop(1,cor.replace('A','0'));x.fillStyle=gr;x.fillRect(0,0,256,256);}
+    return c;}
+  var NC=['rgba(45,212,191,A)','rgba(59,130,246,A)','rgba(99,102,241,A)','rgba(37,99,235,A)','rgba(168,85,247,A)','rgba(34,211,238,A)'].map(nuvem);
+  var F=[];for(var f=0;f<30;f++)F.push({x:(Math.random()-.5)*3,y:(Math.random()-.5)*2.4,z:.3+Math.random()*PROF,img:NC[f%NC.length],s:1.4+Math.random()*2.2,rot:Math.random()*6.3,vr:(Math.random()-.5)*.08});
   function tam(){W=fixo.clientWidth;H=fixo.clientHeight;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';}
   tam();addEventListener('resize',function(){if(!h3dPode()){location.reload();return;}tam();});
   var ufs={};function ufsAt(){ufs={};((MPB.d&&MPB.d.ufs)||[]).forEach(function(u){ufs[u]=1;});}
   var ease=function(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;},cl=function(t){return t<0?0:t>1?1:t;};
-  var t0=performance.now(),ult='';
+  /* ciclo automático: mapa (6s) → solta (3s) → viagem (12s) → volta ao mapa (4s) */
+  var C_MAPA=6,C_SOLTA=3,C_VOO=12,C_VOLTA=4,CICLO=C_MAPA+C_SOLTA+C_VOO+C_VOLTA;
+  var t0=performance.now(),ult='',camZ=0,tAnt=0;
   function quadro(now){if(!document.body.contains(cv))return;requestAnimationFrame(quadro);
     if(site.offsetParent===null)return;
-    var r=palco.getBoundingClientRect(),prog=cl(-r.top/(r.height-H)),tempo=(now-t0)/1000,nasce=ease(cl(tempo/1.6));
-    ufsAt();
-    var solta=ease(cl(prog/.45)),voo=cl((prog-.25)/.75),camZ=voo*2.6;
-    /* onde o mapa fica: metade direita */
-    var esc=Math.min(W*.42/613,H*.82/639),ox=W*.73-613*esc/2,oy=H*.53-639*esc/2,cx=W*.6,cy=H*.5,F=Math.min(W,H)*.9;
+    var rb=palco.getBoundingClientRect();if(rb.bottom<0||rb.top>innerHeight)return;
+    var tempo=(now-t0)/1000,dt=Math.min(.05,tempo-tAnt);tAnt=tempo;ufsAt();
+    var nasce=ease(cl(tempo/1.8)),c=(tempo-1.8)%CICLO,solta;
+    if(tempo<1.8||c<C_MAPA)solta=0;else if(c<C_MAPA+C_SOLTA)solta=ease((c-C_MAPA)/C_SOLTA);else if(c<C_MAPA+C_SOLTA+C_VOO)solta=1;else solta=1-ease((c-C_MAPA-C_SOLTA-C_VOO)/C_VOLTA);
+    camZ+=dt*(.05+solta*.42);
+    var esc=Math.min(W*.42/613,H*.84/639),ox=W*.73-613*esc/2,oy=H*.52-639*esc/2,cx=W*.66,cy=H*.5,FO=Math.min(W,H)*.9;
     g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+    /* nebulosa: atrás de tudo, sempre se movendo devagar; mais forte na viagem */
+    g.globalCompositeOperation='lighter';
+    var fumA=(.3+.7*solta)*cl(tempo/2.5),lado=function(x){return cl((x-W*.36)/(W*.2));};
+    for(var j=0;j<F.length;j++){var q=F[j],z=q.z-camZ*.8;z=((z%PROF)+PROF)%PROF+.25;
+      var sx=cx+q.x*FO/z,sy=cy+q.y*FO/z,sz=q.s*FO/z*.55;if(sz>W*2.2)continue;
+      var fade=cl((PROF-z)/1.2)*cl((z-.25)/.5);g.globalAlpha=fumA*fade*.8*(.25+.75*lado(sx));
+      q.rot+=q.vr*dt;g.save();g.translate(sx,sy);g.rotate(q.rot);g.drawImage(q.img,-sz/2,-sz/2,sz,sz);g.restore();}
+    g.globalCompositeOperation='source-over';
     var cards=[],perto=null;
     for(var i=0;i<P.length;i++){var p=P[i],on=!!ufs[p.uf];
-      /* posição no mapa (com uma respiração leve) */
       var bx=ox+p.mx*esc+Math.sin(tempo*1.3+p.d*9)*.8,by=oy+p.my*esc+Math.cos(tempo*1.1+p.d*7)*.8;
-      /* posição no espaço, vista pela câmera que avança */
-      var z=p.z-camZ;while(z<.12)z+=3.4;var sx=cx+p.x*F/z,sy=cy+p.y*F/z,pr=1/z;
-      var ax=bx+(sx-bx)*solta,ay=by+(sy-by)*solta;
-      /* chegada: os pontos vêm de longe e pousam no mapa */
-      if(nasce<1){var k=ease(cl(nasce*1.25-p.d*.25));ax=cx+(Math.cos(p.d*40)*W*.7)*(1-k)+(ax-cx)*k;ay=cy+(Math.sin(p.d*40)*H*.7)*(1-k)+(ay-cy)*k;}
-      var alfa=(on?.95:.32)*(1-solta)+solta*Math.min(1,pr*.9);if(nasce<1)alfa*=cl(nasce*1.4-p.d*.3);
+      var z2=p.z-camZ;z2=((z2%PROF)+PROF)%PROF+.15;var sx2=cx+p.x*FO/z2,sy2=cy+p.y*FO/z2,pr=1/z2;
+      var ax=bx+(sx2-bx)*solta,ay=by+(sy2-by)*solta;
+      if(nasce<1){var k2=ease(cl(nasce*1.25-p.d*.25));ax=cx+(Math.cos(p.d*40)*W*.7)*(1-k2)+(ax-cx)*k2;ay=cy+(Math.sin(p.d*40)*H*.7)*(1-k2)+(ay-cy)*k2;}
+      var longe=cl((PROF-z2)/1);
+      var alfa=(on?.95:.32)*(1-solta)+solta*Math.min(1,pr*.9)*longe;if(nasce<1)alfa*=cl(nasce*1.4-p.d*.3);
       if(ax<-200||ax>W+200||ay<-200||ay>H+200)continue;
+      alfa*=1-solta+solta*lado(ax);if(alfa<.01)continue;
       if(p.card&&solta>.35){cards.push({p:p,x:ax,y:ay,pr:pr,a:alfa*cl((solta-.35)/.4)});continue;}
       var rr=(on?1.9:1.3)*(1-solta)+solta*Math.min(5,p.s*pr*1.6);
-      g.globalAlpha=alfa;g.fillStyle=on||solta>.5?(solta>.5?CORES[(i*7)%CORES.length]:'#2DD4BF'):'#8FA3B8';
+      g.globalAlpha=alfa;g.fillStyle=solta>.5?CORES[(i*7)%CORES.length]:(on?'#2DD4BF':'#8FA3B8');
       g.beginPath();g.arc(ax,ay,rr,0,6.283);g.fill();}
-    /* cartões, do mais longe para o mais perto */
-    cards.sort(function(a,b){return a.pr-b.pr;});
-    g.font='600 12px "DM Sans",system-ui,sans-serif';g.textBaseline='middle';
-    cards.forEach(function(c){var s=Math.min(2.6,c.pr*.55),w=c.p.w*s,h=c.p.h*s;if(w<6)return;g.globalAlpha=Math.min(1,c.a);
-      var x=c.x-w/2,y=c.y-h/2,rad=Math.min(10,w*.08);
+    cards.sort(function(a,b){return a.pr-b.pr;});g.textBaseline='middle';
+    cards.forEach(function(c2){var s=Math.min(2.6,c2.pr*.55),w=c2.p.w*s,h=c2.p.h*s;if(w<6)return;g.globalAlpha=Math.min(1,c2.a);
+      var x=c2.x-w/2,y=c2.y-h/2,rad=Math.min(10,w*.08);
       g.fillStyle='rgba(15,23,42,.88)';g.beginPath();g.roundRect?g.roundRect(x,y,w,h,rad):g.rect(x,y,w,h);g.fill();
-      g.fillStyle=c.p.c;g.fillRect(x,y,w,Math.max(2,h*.08));
-      if(w>60){g.fillStyle=c.p.c;g.beginPath();g.arc(x+h*.32,y+h*.55,h*.17,0,6.283);g.fill();g.fillStyle='#E6EDF7';g.font='600 '+Math.max(9,Math.min(22,h*.2))+'px "DM Sans",system-ui,sans-serif';g.fillText(c.p.t,x+h*.6,y+h*.48);
-        g.fillStyle='rgba(230,237,247,.55)';g.font='500 '+Math.max(8,Math.min(16,h*.14))+'px "DM Sans",system-ui,sans-serif';g.fillText(ufs[c.p.uf]?c.p.uf:'Rede Ideali',x+h*.6,y+h*.72);}
-      if(!perto||c.pr>perto.pr)perto=c;});
+      g.fillStyle=c2.p.c;g.fillRect(x,y,w,Math.max(2,h*.08));
+      if(w>60){g.beginPath();g.arc(x+h*.32,y+h*.55,h*.17,0,6.283);g.fill();g.fillStyle='#E6EDF7';g.font='600 '+Math.max(9,Math.min(22,h*.2))+'px "DM Sans",system-ui,sans-serif';g.fillText(c2.p.t,x+h*.6,y+h*.48);
+        g.fillStyle='rgba(230,237,247,.55)';g.font='500 '+Math.max(8,Math.min(16,h*.14))+'px "DM Sans",system-ui,sans-serif';g.fillText(ufs[c2.p.uf]?c2.p.uf:'Rede Ideali',x+h*.6,y+h*.72);}
+      if(c2.x>W*.42&&(!perto||c2.pr>perto.pr))perto=c2;});
     g.globalAlpha=1;
-    /* texto do herói some conforme você entra; nome do mais perto aparece no canto */
-    hero.style.opacity=String(1-cl(prog/.22));hero.style.transform='translateY('+(-prog*60)+'px)';hero.style.pointerEvents=prog>.2?'none':'';
-    dica.style.opacity=String((1-cl(prog/.08))*cl((tempo-1.6)/.6));
-    var txt=perto&&prog>.3?perto.p.t+(ufs[perto.p.uf]?' · '+perto.p.uf:''):'';if(txt!==ult){ult=txt;rot.textContent=txt;}rot.style.opacity=prog>.3&&prog<.98?'1':'0';}
+    var txt=perto&&solta>.8?perto.p.t+(ufs[perto.p.uf]?' · '+perto.p.uf:''):'';if(txt&&txt!==ult){ult=txt;rot.textContent=txt;}rot.style.opacity=txt?'1':'0';}
   requestAnimationFrame(quadro);}
 (function(){var tenta=function(){try{h3dIni();}catch(e){}};setTimeout(tenta,400);addEventListener('load',tenta);
   var _rH3=render;render=function(){var x=_rH3.apply(this,arguments);setTimeout(tenta,0);return x;};})();
