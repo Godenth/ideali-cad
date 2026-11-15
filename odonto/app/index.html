@@ -2553,6 +2553,14 @@ body.pv-trava{overflow:hidden}
 .pvf-ld{font-size:.85rem;color:var(--muted)}.pvf-er{font-size:.84rem;color:#DC2626;font-weight:600}
 .pvf-cf{display:grid;gap:4px;font-size:.82rem}.pvf-im{border-radius:9px;padding:8px 10px;font-weight:600}.pvf-im.ok{background:color-mix(in srgb,#10B981 14%,transparent)}.pvf-im.r{background:color-mix(in srgb,#DC2626 14%,transparent);color:#DC2626}
 @media(max-width:860px){.pvfs{grid-template-columns:1fr}.pvf-mail,.pvf-zip,.pvf-stl,.pvf-html{grid-column:auto;grid-row:auto}}
+
+.pvf2{display:grid;gap:10px}
+.pvf-up{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;border:2px dashed color-mix(in srgb,#F59E0B 55%,var(--line));border-radius:14px;font-weight:800;cursor:pointer;color:var(--ink)}.pvf-up:hover{background:color-mix(in srgb,#F59E0B 8%,transparent)}
+.pvf-up.tem{padding:9px;border-width:1px;font-weight:700;font-size:.86rem;color:var(--muted)}
+.pvf-oks{display:flex;flex-wrap:wrap;gap:8px}.pvf-ok{border:1px solid color-mix(in srgb,#10B981 45%,transparent);background:color-mix(in srgb,#10B981 12%,transparent);color:var(--ink);border-radius:999px;padding:8px 13px;font:inherit;font-size:.86rem;font-weight:700;cursor:default}.pvf-ok[data-pvf]{cursor:pointer}
+.pvf-dif{font-size:.85rem;padding:6px 10px;border-radius:9px;background:color-mix(in srgb,#F59E0B 12%,transparent)}
+.pvf-lk{justify-self:start;border:0;background:none;color:#00A6E6;font:inherit;font-weight:700;cursor:pointer;padding:2px}
+.pvf-env{border:0;border-radius:14px;padding:14px;background:linear-gradient(135deg,#0EA5E9,#2563EB);color:#fff;font:inherit;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 10px 24px color-mix(in srgb,#2563EB 30%,transparent)}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -8864,22 +8872,16 @@ function pvfImplante(p,R){var imp=R.dentes.filter(function(t){return t.imp;});if
   var nomes=imp.map(function(t){return t.imp;}).filter(function(v,i,a){return a.indexOf(v)===i;}),sb=imp.some(function(t){return t.sb;}),comp=String(p.componente||'');
   var bate=!comp||nomes.some(function(n){var a=semAc(n).replace(/[^a-z0-9]/g,''),b=semAc(comp).replace(/[^a-z0-9]/g,'');return a&&b&&(a.indexOf(b)>=0||b.indexOf(a)>=0);});
   return {ok:bate&&!!p.sobre_implante,txt:'Implante no projeto: '+nomes.join(', ')+' · dentes '+imp.map(function(t){return t.n;}).join(', ')+(sb?' · com scanbody':' · sem scanbody')+'. No pedido: '+(p.sobre_implante?(comp||'sobre implante, sem componente anotado'):'não está marcado como sobre implante')+'.'};}
-function pvfCards(p){var F=pvfDe(p.id),R=F.exo;
-  var card=function(cls,ic,tit,sub,corpo,bt){return '<div class="pvf '+cls+'"><div class="pvf-h"><span class="pv-ai">'+ic+'</span><div><b>'+tit+'</b><small>'+sub+'</small></div></div>'+(corpo||'')+(bt||'')+'</div>';};
-  var conf='';if(R){var L=[];try{L=exoConfere(p,R);}catch(e){}var im=pvfImplante(p,R);
-    conf='<div class="pvf-cf">'+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+L.map(function(x){return '<div class="exo-i '+(x[0]==='❌'?'r':x[0]==='⚠️'?'a':'')+'"><span>'+x[0]+'</span><b>'+x[1]+'</b><span>'+esc(x[2])+'</span></div>';}).join('')+'</div>';}
-  var zipC=F.lendo?'<div class="pvf-ld">Abrindo o zip e lendo tudo…</div>':F.zip?'<div class="pvf-f">🗜️ '+esc(F.zip.nome)+' <small>'+pdgMB(F.zip.tam)+'</small></div>'+(F.exoNome?'<div class="pvf-f">📄 '+esc(F.exoNome)+'</div>':'')+
-    '<label class="pvf-chk"><input type="checkbox" data-pvf="mandazip"'+(F.mandaZip?' checked':'')+'> Enviar também o Dental CAD no e-mail</label>':'';
-  return '<div class="pvfs">'+
-    card('pvf-mail','✉️','E-mail do caso','Dados do pedido'+(R?' e do projeto':'')+(F.stls.length||F.html?' + STL e HTML anexados':''),'','<button data-pv="mail">Montar e-mail</button>')+
-    card('pvf-zip','🗜️','Dental CAD zipado com tudo dentro','O sistema abre, lê o projeto e separa os arquivos',zipC+(F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':''),
-      '<label class="pvf-bt">'+(F.zip?'Trocar .zip':'Anexar .zip')+'<input type="file" data-pvf="zip" accept=".zip,application/zip" hidden></label>'+(R?'<button data-pvf="aplica">Usar dados do projeto no pedido</button>':''))+
-    card('pvf-stl','🦷','STL de fresagem',F.stls.length?'Marque o que vai para a fresadora':'Sai do zip automaticamente',
-      F.stls.length?'<div class="pvf-l">'+F.stls.map(function(s,i){return '<label class="pvf-chk"><input type="checkbox" data-pvf="stl" data-i="'+i+'"'+(s.ok?' checked':'')+'> '+esc(s.nome)+' <small>'+pdgMB(s.tam)+'</small></label>';}).join('')+'</div>':'',
-      '<label class="pvf-bt">+ Enviar STL<input type="file" data-pvf="stlmao" accept=".stl" multiple hidden></label>')+
-    card('pvf-html','🌐','HTML do exocad','Projeto para ver no navegador',F.html?'<div class="pvf-f">🌐 '+esc(F.html.nome)+' <small>'+pdgMB(F.html.tam)+'</small></div>':'',
-      (F.html?'<button data-pvf="verhtml">Abrir</button>':'')+'<label class="pvf-bt">'+(F.html?'Trocar':'+ Enviar HTML')+'<input type="file" data-pvf="htmlmao" accept=".html,.htm" hidden></label>')+
-  '</div>'+(conf?'<div class="pvf-conf"><b>🔎 A Ana conferiu o projeto com o pedido</b>'+conf+'</div>':'');}
+function pvfCards(p){var F=pvfDe(p.id),R=F.exo,stl=F.stls.some(function(s){return s.ok;});
+  var conf='';if(R){var L=[];try{L=exoConfere(p,R);}catch(e){}var im=pvfImplante(p,R),ruins=L.filter(function(x){return x[0]!=='✅'&&!(im&&/implante/i.test(x[1]));});
+    conf='<div class="pvf-conf">'+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+
+      (ruins.length?ruins.map(function(x){return '<div class="pvf-dif">'+x[0]+' <b>'+x[1]+':</b> '+esc(x[2])+'</div>';}).join('')+'<button class="pvf-lk" data-pvf="aplica">Usar dados do projeto no pedido</button>':(im&&!im.ok?'':'<div class="pvf-im ok">✅ O projeto confere com o pedido.</div>'))+'</div>';}
+  var chip=function(on,txt,act){return on?'<button class="pvf-ok"'+(act?' data-pvf="'+act+'"':' tabindex="-1"')+'>✅ '+txt+'</button>':'';};
+  return '<div class="pvf2">'+
+    (F.lendo?'<div class="pvf-ld">Abrindo o Dental CAD…</div>':'<label class="pvf-up'+(F.zip?' tem':'')+'">🗜️ '+(F.zip?'Trocar Dental CAD':'Anexar Dental CAD (.zip)')+'<input type="file" data-pvf="zip" accept=".zip,application/zip" hidden></label>')+
+    (F.zip?'<div class="pvf-oks">'+chip(true,'Dental CAD anexado')+chip(stl,'STL anexada')+chip(!!F.html,'HTML anexado','verhtml')+'</div>':'')+
+    (F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':'')+conf+
+    '<button class="pvf-env" data-pv="mail">✉️ Enviar pedido por e-mail</button></div>';}
 document.addEventListener('change',function(ev){var t=ev.target,k=t&&t.getAttribute&&t.getAttribute('data-pvf');if(!k)return;var p=pvP();if(!p)return;var F=pvfDe(p.id);
   if(k==='zip'&&t.files[0])pvfLe(p,t.files[0]);
   else if(k==='mandazip')F.mandaZip=t.checked;
