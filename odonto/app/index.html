@@ -6667,7 +6667,7 @@ function gmRedesenha(){var l=document.getElementById('gm-l');if(l)l.innerHTML=gm
 document.addEventListener('change',function(e){var t=e.target;if(!t)return;if(t.id==='gm-arq'){[].forEach.call(t.files||[],function(f){GM.arqs.push({nome:f.name,tam:f.size,f:f,ok:true});});gmRedesenha();}
   else if(t.getAttribute&&t.getAttribute('data-gma')!=null){var a=GM.arqs[+t.getAttribute('data-gma')];if(a)a.ok=t.checked;}});
 function gmPrepara(){var sel=GM.arqs.filter(function(a){return a.ok;});return sel.reduce(function(pr,a){return pr.then(function(out){
-  if(a.path)return SB.storage.from('odonto-ped').download(a.path).then(function(r){if(r.error||!r.data)throw 'Não consegui pegar o arquivo '+a.nome+' (pode ter sido apagado).';return r.data.arrayBuffer().then(function(b){out.push({nome:a.nome,tipo:/\.jpe?g$/i.test(a.nome)?'image/jpeg':/\.zip$/i.test(a.nome)?'application/zip':'application/octet-stream',u8:new Uint8Array(b)});return out;});});
+  if(a.path)return SB.storage.from(a.bucket||'odonto-ped').download(a.path).then(function(r){if(r.error||!r.data)throw 'Não consegui pegar o arquivo '+a.nome+' (pode ter sido apagado).';return r.data.arrayBuffer().then(function(b){out.push({nome:a.nome,tipo:/\.jpe?g$/i.test(a.nome)?'image/jpeg':/\.zip$/i.test(a.nome)?'application/zip':'application/octet-stream',u8:new Uint8Array(b)});return out;});});
   var zipa=!/\.(zip|jpe?g|png|webp|pdf)$/i.test(a.nome);return (zipa?pdgZip(a.f):Promise.resolve(a.f)).then(function(b){return b.arrayBuffer().then(function(buf){out.push({nome:zipa?a.nome+'.zip':a.nome,tipo:zipa?'application/zip':(a.f.type||'application/octet-stream'),u8:new Uint8Array(buf)});return out;});});});},Promise.resolve([]));}
 function gmEnvia(btn){if(GM.busy)return;var para=document.getElementById('exm-para').value.trim(),as=document.getElementById('exm-as').value,co=document.getElementById('exm-co').value;
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(para)){toast('Coloque o e-mail da Inove no campo Para.');return;}
@@ -8815,7 +8815,7 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
   else if(k==='mail'){try{pvfMail(p);}catch(e){toast('Não consegui abrir o e-mail agora.');}}
   else if(k==='urg'){pedMuda(p.id,{urgente:!p.urgente});setTimeout(pvPinta,30);}
   else if(k==='arq'){pedMuda(p.id,{arquivado:!p.arquivado},p.arquivado?'Pedido de volta ao quadro.':'Pedido arquivado.');pvFecha();}
-  else if(k==='apaga'){PED.ed=Object.assign({},p);pvFecha();ACT.pedApaga();if(PED.L.some(function(x){return x.id===p.id;}))PED.ed=null;render();}},true);
+  else if(k==='apaga'){PED.ed=Object.assign({},p);pvFecha();ACT.pedApaga();setTimeout(function(){if(!PED.L.some(function(x){return x.id===p.id;}))pvfApagaArqs(p);},2500);if(PED.L.some(function(x){return x.id===p.id;}))PED.ed=null;render();}},true);
 document.addEventListener('change',function(ev){if(ev.target.id!=='pv-st')return;var p=pvP();if(!p)return;var v=ev.target.value,patch={status:v};
   if(v==='finalizado'&&!p.finalizado_em)patch.finalizado_em=new Date().toISOString();if(v==='entregue'&&!p.entregue_em)patch.entregue_em=new Date().toISOString();
   pedMuda(p.id,patch,'Movido para '+PEDST[v][0]+'.');setTimeout(pvPinta,30);});
@@ -8874,13 +8874,13 @@ function pvfLe(p,file){var F=pvfDe(p.id);F.lendo=true;F.erro='';pvPinta();
     F.html=h?{nome:pvfBase(h),tam:arq[h].length,f:new File([arq[h]],pvfBase(h),{type:'text/html'})}:null;
     F.exo=null;F.exoNome='';if(dp){try{F.exo=exoLeProjeto(new TextDecoder('utf-8').decode(arq[dp]));F.exoNome=pvfBase(dp);}catch(e){F.erro='Achei o projeto, mas não consegui ler.';}}
     else F.erro='Não achei o arquivo .dentalProject dentro do zip.';
-    F.lendo=false;pvPinta();toast('Li o Dental CAD: '+F.stls.filter(function(s){return s.ok;}).length+' STL de fresagem'+(F.html?', HTML':'')+(F.exo?' e o projeto do exocad':'')+'.');
+    F.lendo=false;F._hid=true;pvPinta();pvfSalva(p);toast('Li o Dental CAD: '+F.stls.filter(function(s){return s.ok;}).length+' STL de fresagem'+(F.html?', HTML':'')+(F.exo?' e o projeto do exocad':'')+'.');
   }).catch(function(){F.lendo=false;F.erro='Não consegui abrir esse arquivo. Envie o .zip do caso.';pvPinta();});}
 function pvfImplante(p,R){var imp=R.dentes.filter(function(t){return t.imp;});if(!imp.length)return p.sobre_implante?{ok:false,txt:'O pedido diz sobre implante, mas o projeto não tem implante.'}:null;
   var nomes=imp.map(function(t){return t.imp;}).filter(function(v,i,a){return a.indexOf(v)===i;}),sb=imp.some(function(t){return t.sb;}),comp=String(p.componente||'');
   var bate=!comp||nomes.some(function(n){var a=semAc(n).replace(/[^a-z0-9]/g,''),b=semAc(comp).replace(/[^a-z0-9]/g,'');return a&&b&&(a.indexOf(b)>=0||b.indexOf(a)>=0);});
   return {ok:bate&&!!p.sobre_implante,txt:'Implante no projeto: '+nomes.join(', ')+' · dentes '+imp.map(function(t){return t.n;}).join(', ')+(sb?' · com scanbody':' · sem scanbody')+'. No pedido: '+(p.sobre_implante?(comp||'sobre implante, sem componente anotado'):'não está marcado como sobre implante')+'.'};}
-function pvfCards(p){var F=pvfDe(p.id),R=F.exo,stl=F.stls.some(function(s){return s.ok;});
+function pvfCards(p){var F=pvfHidrata(p),R=F.exo,stl=F.stls.some(function(s){return s.ok;});
   var conf='';if(R){var L=[];try{L=exoConfere(p,R);}catch(e){}var im=pvfImplante(p,R),ruins=L.filter(function(x){return x[0]!=='✅'&&!(im&&/implante/i.test(x[1]));});
     conf='<div class="pvf-conf">'+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+
       (ruins.length?ruins.map(function(x){return '<div class="pvf-dif">'+x[0]+' <b>'+x[1]+':</b> '+esc(x[2])+'</div>';}).join('')+'<button class="pvf-lk" data-pvf="aplica">Usar dados do projeto no pedido</button>':(im&&!im.ok?'':'<div class="pvf-im ok">✅ O projeto confere com o pedido.</div>'))+'</div>';}
@@ -8889,14 +8889,14 @@ function pvfCards(p){var F=pvfDe(p.id),R=F.exo,stl=F.stls.some(function(s){retur
     (F.lendo?'<div class="pvf-ld">Abrindo o Dental CAD…</div>':'<label class="pvf-up'+(F.zip?' tem':'')+'">🗜️ '+(F.zip?'Trocar Dental CAD':'Anexar Dental CAD (.zip)')+'<input type="file" data-pvf="zip" accept=".zip,application/zip" hidden></label>')+
     '<div class="pvf-oks">'+(F.zip?chip(true,'Dental CAD anexado','zip'):'')+chip(stl,'STL anexada','stl','verstl')+chip(!!F.html,'HTML anexado','html','verhtml')+
       ((!stl||!F.html)?'<div class="pvf-mais">'+(!stl?'<label class="pvf-up2">＋ Anexar STL<input type="file" data-pvf="stlmao" accept=".stl" multiple hidden></label>':'')+(!F.html?'<label class="pvf-up2">＋ Anexar HTML<input type="file" data-pvf="htmlmao" accept=".html,.htm" hidden></label>':'')+'</div>':'')+'</div>'+
-    (F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':'')+conf+
+    (F.salvando?'<div class="pvf-ld">⏳ '+esc(F.salvando)+'</div>':'')+(F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':'')+conf+
     '<button class="pvf-env" data-pv="mail">✉️ Enviar pedido por e-mail</button></div>';}
 document.addEventListener('change',function(ev){var t=ev.target,k=t&&t.getAttribute&&t.getAttribute('data-pvf');if(!k)return;var p=pvP();if(!p)return;var F=pvfDe(p.id);
   if(k==='zip'&&t.files[0])pvfLe(p,t.files[0]);
   else if(k==='mandazip')F.mandaZip=t.checked;
   else if(k==='stl'){var s=F.stls[+t.getAttribute('data-i')];if(s)s.ok=t.checked;}
-  else if(k==='stlmao'){[].forEach.call(t.files,function(f){F.stls.push({nome:f.name,tam:f.size,f:f,ok:true});});pvPinta();}
-  else if(k==='htmlmao'&&t.files[0]){F.html={nome:t.files[0].name,tam:t.files[0].size,f:t.files[0]};pvPinta();}},true);
+  else if(k==='stlmao'){F._hid=true;[].forEach.call(t.files,function(f){F.stls.push({nome:f.name,tam:f.size,f:f,ok:true});});pvPinta();pvfSalva(p);}
+  else if(k==='htmlmao'&&t.files[0]){F._hid=true;F.html={nome:t.files[0].name,tam:t.files[0].size,f:t.files[0]};pvPinta();pvfSalva(p);}},true);
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('button[data-pvf]');if(!b)return;var p=pvP();if(!p)return;var F=pvfDe(p.id),k=b.getAttribute('data-pvf');ev.preventDefault();ev.stopPropagation();
   if(k==='verhtml'&&F.html){var u=URL.createObjectURL(F.html.f);window.open(u,'_blank');setTimeout(function(){URL.revokeObjectURL(u);},60000);}
   if(k==='aplica'&&F.exo){var R=F.exo,A=exoArcada(R),pt={dentes:A.map(function(x){return x.d;}),qtd:A.length,arcada:A},mats=R.dentes.map(function(t){return t.mat;}).filter(Boolean);if(mats[0])pt.material=mats[0].slice(0,60);if(R.cor)pt.cor=R.cor.slice(0,20);if(!p.paciente&&R.paciente)pt.paciente=R.paciente.slice(0,120);
@@ -8904,8 +8904,8 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
     pedMuda(p.id,pt,'Dados do projeto aplicados no pedido #'+(p.numero||'')+'.');setTimeout(pvPinta,40);}},true);
 /* o e-mail leva o projeto lido e os arquivos */
 function pvfMail(p){var F=pvfDe(p.id),q=Object.assign({},p);if(F.exo){q._exo=F.exo;q._exoNome=F.exoNome;}exoMailAbre(q);
-  F.stls.forEach(function(s){if(s.ok)GM.arqs.push({nome:s.nome,tam:s.tam,f:s.f,ok:true});});if(F.html)GM.arqs.push({nome:F.html.nome,tam:F.html.tam,f:F.html.f,ok:true});
-  if(F.zip)GM.arqs.push({nome:F.zip.nome,tam:F.zip.tam,f:F.zip.f,ok:!!F.mandaZip});if(F.exo){var im=pvfImplante(p,F.exo),co=document.getElementById('exm-co');if(im&&co&&!im.ok)co.value=co.value.replace('\n\nOs arquivos','\n\n⚠️ Conferir: '+im.txt+'\n\nOs arquivos');}
+  var poe=function(it,ok){GM.arqs.push(it.f?{nome:it.nome,tam:it.tam,f:it.f,ok:ok}:{nome:it.nome,tam:it.tam,path:it.path,bucket:PVF_BK,ok:ok});};
+  F.stls.forEach(function(s){if(s.ok)poe(s,true);});if(F.html)poe(F.html,true);if(F.zip)poe(F.zip,!!F.mandaZip);if(F.exo){var im=pvfImplante(p,F.exo),co=document.getElementById('exm-co');if(im&&co&&!im.ok)co.value=co.value.replace('\n\nOs arquivos','\n\n⚠️ Conferir: '+im.txt+'\n\nOs arquivos');}
   gmRedesenha();}
 
 /* ===== Baixar e visualizar os arquivos do Dental CAD (STL em 3D, HTML do exocad) ===== */
@@ -8918,7 +8918,7 @@ function stlvLe(buf){var dv=new DataView(buf),n=buf.byteLength>=84?dv.getUint32(
 function stlvAbre(arqs){var ov=document.createElement('div');ov.id='stlv';ov.className='stlv';ov.innerHTML='<div class="stlv-h"><b>🦷 '+esc(arqs.map(function(a){return a.nome;}).join(' · '))+'</b><span class="stlv-d">Arraste para girar · role para aproximar</span><button class="pv-x" data-stlv="fecha" aria-label="Fechar">✕</button></div><div class="stlv-c"><p class="stlv-ld">Carregando o 3D…</p></div>';
   document.body.appendChild(ov);var parar=false,fecha=function(){parar=true;ov.remove();document.removeEventListener('keydown',esc1,true);},esc1=function(e){if(e.key==='Escape'){e.stopPropagation();fecha();}};
   ov.querySelector('[data-stlv=fecha]').onclick=fecha;document.addEventListener('keydown',esc1,true);
-  Promise.all([stlvThree()].concat(arqs.map(function(a){return a.f.arrayBuffer();}))).then(function(r){var T=r[0],box=ov.querySelector('.stlv-c');box.innerHTML='';
+  Promise.all([stlvThree()].concat(arqs.map(function(a){return pvfArq(a).then(function(f){return f.arrayBuffer();});}))).then(function(r){var T=r[0],box=ov.querySelector('.stlv-c');box.innerHTML='';
     var W=box.clientWidth,H=box.clientHeight,ren=new T.WebGLRenderer({antialias:true,alpha:true});ren.setPixelRatio(Math.min(2,devicePixelRatio||1));ren.setSize(W,H);box.appendChild(ren.domElement);
     var cena=new T.Scene(),cam=new T.PerspectiveCamera(35,W/H,.1,5000),grp=new T.Group();cena.add(grp);
     cena.add(new T.HemisphereLight(0xffffff,0x1e293b,.55));var dl=new T.DirectionalLight(0xffffff,.75);dl.position.set(1,2,3);cam.add(dl);cena.add(cam);
@@ -8934,11 +8934,31 @@ function stlvAbre(arqs){var ov=document.createElement('div');ov.id='stlv';ov.cla
   }).catch(function(){var b=ov.querySelector('.stlv-c');if(b)b.innerHTML='<p class="stlv-ld">Não consegui abrir o 3D agora. Use Baixar.</p>';});}
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-pvb]');if(!b)return;var p=pvP();if(!p)return;var F=pvfDe(p.id),k=b.getAttribute('data-pvb');ev.preventDefault();ev.stopPropagation();
   var S2=F.stls.filter(function(s){return s.ok;});
-  if(k==='zip'&&F.zip)pvfBaixa(F.zip.f,F.zip.nome);
-  else if(k==='stl')S2.forEach(function(s,i){setTimeout(function(){pvfBaixa(s.f,s.nome);},i*400);});
+  var falha=function(){toast('Não consegui pegar o arquivo agora.');},baixa=function(it){toast('Baixando '+it.nome+'…');pvfArq(it).then(function(f){pvfBaixa(f,it.nome);},falha);};
+  if(k==='zip'&&F.zip)baixa(F.zip);
+  else if(k==='stl')S2.forEach(function(s,i){setTimeout(function(){baixa(s);},i*400);});
   else if(k==='verstl'&&S2.length)stlvAbre(S2);
-  else if(k==='html'&&F.html)pvfBaixa(F.html.f,F.html.nome);
-  else if(k==='verhtml'&&F.html){var u=URL.createObjectURL(F.html.f);window.open(u,'_blank');setTimeout(function(){URL.revokeObjectURL(u);},120000);}},true);
+  else if(k==='html'&&F.html)baixa(F.html);
+  else if(k==='verhtml'&&F.html){var w=window.open('','_blank');pvfArq(F.html).then(function(f){var u=URL.createObjectURL(f);if(w)w.location.href=u;else window.open(u,'_blank');setTimeout(function(){URL.revokeObjectURL(u);},120000);},function(){if(w)w.close();falha();});}},true);
+
+/* ===== Arquivos do caso guardados no banco (bucket privado odonto-casos + coluna caso do pedido; ver 086) ===== */
+var PVF_BK='odonto-casos';
+function pvfHidrata(p){var F=pvfDe(p.id);if(F._hid||F.lendo||F.zip||F.stls.length)return F;F._hid=true;var c=p.caso;if(!c)return F;
+  F.zip=c.zip||null;F.stls=(c.stls||[]).map(function(x){return Object.assign({ok:true},x);});F.html=c.html||null;F.exo=c.exo||null;F.exoNome=c.exoNome||'';return F;}
+function pvfArq(it){if(it.f)return Promise.resolve(it.f);if(!it.path)return Promise.reject('sem');
+  return SB.storage.from(PVF_BK).download(it.path).then(function(r){if(r.error||!r.data)throw 'baixar';it.f=new File([r.data],it.nome);return it.f;});}
+function pvfNomeOk(n){return String(n||'arquivo').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._-]+/g,'_').slice(-90);}
+function pvfSalva(p){var F=pvfDe(p.id),conta=contaId();if(!conta||!p.id)return;var itens=[].concat(F.zip?[F.zip]:[],F.stls.filter(function(s){return s.ok;}),F.html?[F.html]:[]).filter(function(i){return i.f&&!i.path;});
+  var antes=(p.caso&&[].concat(p.caso.zip?[p.caso.zip]:[],p.caso.stls||[],p.caso.html?[p.caso.html]:[]).map(function(i){return i.path;}).filter(Boolean))||[];
+  F.salvando=itens.length?'Guardando os arquivos no sistema…':'';pvPinta();var n=0;
+  itens.reduce(function(pr,it){return pr.then(function(){var path=conta+'/'+p.id+'/'+Date.now()+'-'+pvfNomeOk(it.nome);F.salvando='Guardando '+(++n)+' de '+itens.length+'…';pvPinta();
+      return SB.storage.from(PVF_BK).upload(path,it.f,{upsert:false,contentType:it.f.type||'application/octet-stream'}).then(function(r){if(r.error)throw r.error;it.path=path;});});},Promise.resolve())
+  .then(function(){var lim=function(i){return i?{nome:i.nome,tam:i.tam,path:i.path}:null;},caso={zip:lim(F.zip),stls:F.stls.filter(function(s){return s.ok&&s.path;}).map(lim),html:lim(F.html),exo:F.exo,exoNome:F.exoNome,em:new Date().toISOString()};
+    return SB.from('odo_pedidos').update({caso:caso}).eq('id',p.id).then(function(r){if(r.error)throw r.error;p.caso=caso;var q=PED.L.filter(function(x){return x.id===p.id;})[0];if(q)q.caso=caso;
+      var agora=[].concat(caso.zip?[caso.zip.path]:[],caso.stls.map(function(s){return s.path;}),caso.html?[caso.html.path]:[]),velhos=antes.filter(function(x){return agora.indexOf(x)<0;});
+      if(velhos.length)SB.storage.from(PVF_BK).remove(velhos).then(function(){});F.salvando='';pvPinta();toast('Arquivos guardados no pedido #'+(p.numero||'')+'. ✅');});})
+  .catch(function(e){var m=String((e&&e.message)||e||'');F.salvando='';F.erro=/bucket|not found|odonto-casos/i.test(m)||/caso/.test(m)?'Falta rodar a atualização 086 no banco para guardar os arquivos.':/size|large|exceed|payload/i.test(m)?'Arquivo grande demais para o limite do servidor.':'Não consegui guardar os arquivos agora. ('+m.slice(0,80)+')';pvPinta();});}
+function pvfApagaArqs(p){var c=p&&p.caso;if(!c)return;var L=[].concat(c.zip?[c.zip.path]:[],(c.stls||[]).map(function(s){return s.path;}),c.html?[c.html.path]:[]).filter(Boolean);if(L.length)SB.storage.from(PVF_BK).remove(L).then(function(){});}
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
