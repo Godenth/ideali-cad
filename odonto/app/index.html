@@ -1,6 +1,7 @@
 <meta charset="utf-8">
 <script>try{var _t=localStorage.getItem('io_tema');if(_t==="dark"||_t==="light")document.documentElement.setAttribute("data-theme",_t);}catch(e){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
 <title>Ideali Odonto</title>
 <meta name="robots" content="noindex">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -2390,6 +2391,20 @@ body.bn3-on .toast{bottom:calc(74px + env(safe-area-inset-bottom))!important}
 }
 @media (prefers-reduced-motion:reduce){.pmod.cvfolha{animation:none}}
 .cvfolha .pm-s>*:not(h3){grid-column:2}.cvfolha .pm-exp+.pm-exp{margin-top:10px}@media (max-width:640px){.cvfolha .pm-s>*:not(h3){grid-column:1}}
+/* folha do currículo: acima do topo, fechar sempre visível, nome ao lado da foto, sem escurecimento automático do navegador */
+body:has(.pmod-ov) .rs-top{z-index:1!important}
+.pmod-ov:has(.cvfolha){z-index:300!important}
+.pmod.cvfolha{color-scheme:light;forced-color-adjust:none}
+.cvfolha .pmod-x{position:sticky!important;top:0;display:block;margin:-18px -14px -22px auto;z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.08)}.cvfolha .pm-h{padding-right:40px}
+@media (max-width:640px){
+  .pmod.cvfolha{max-height:calc(100vh - 70px);max-height:calc(100dvh - 70px)}
+  .cvfolha .pm-h{grid-template-columns:72px 1fr!important;justify-items:stretch!important;align-items:center;gap:14px!important}
+  .cvfolha .pm-h>:first-child{width:72px!important;height:72px!important;font-size:1.4rem}
+  .cvfolha .pm-h>:first-child svg{width:40px;height:40px}
+  .cvfolha h2{font-size:1.3rem!important;margin-bottom:2px}
+  .cvfolha .pc-cargo{font-size:.92rem;margin-bottom:6px}
+  .cvfolha .pm-h .pc-tags{grid-column:1/-1}
+}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
