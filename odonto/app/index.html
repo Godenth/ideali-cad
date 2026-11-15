@@ -7392,7 +7392,9 @@ var _rPInicioBN3=rPInicio;rPInicio=function(D){var h=_rPInicioBN3.apply(this,arg
 var _rDInicioBN3=rDInicio;rDInicio=function(D){var h=_rDInicioBN3.apply(this,arguments);return tutAba&&tutAba()?h:bn3Oi()+h;};
 
 /* ===== Laboratório: novo pedido conversando com a Ana (tela cheia, uma pergunta por vez) ===== */
-var PCL_ORD=['cliente','paciente','trabalho','dentes','cor','prazo','obs','fim'];
+var PCL_ORD=['cliente','paciente','trabalho','dentes','material','cor','prazo','obs','fim'];
+function pclMat(E){if(!E)return '';if(E.material)return E.material;var it=E._tudo&&E._tudo.itens&&E._tudo.itens[0];if(it&&it.material)return it.material;var t=semAc(E.trabalho||''),m='';ANA_MAT.forEach(function(x){if(!m&&x[0].test(t))m=x[1];});return m;}
+PC_P.material={q:'Qual o <b>material</b>?',ph:'Ou digite o material',pula:true,chips:function(){return ['Zircônia','E.max','Resina','PMMA','Resina com carga cerâmica','Metalocerâmica','Cerâmica'].map(function(m){return [m,m];});}};
 function pclLev(a,b){if(a===b)return 0;var m=a.length,n=b.length;if(!m||!n)return m||n;var p=[],i,j;for(j=0;j<=n;j++)p[j]=j;
   for(i=1;i<=m;i++){var q=[i];for(j=1;j<=n;j++)q[j]=Math.min(p[j]+1,q[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=q;}return p[n];}
 function pclClis(){return (EMP.cli||[]).filter(function(c){return c.ativo!==false;});}
@@ -7436,15 +7438,17 @@ function pclTudo(v){v=String(v).replace(/\bspbre\b/gi,'sobre').replace(/\bsorbe\
     E._opc=null;pcAna('Falta só o <b>cliente</b>: para quem é? Toque num nome ou digite.');PC.passo='cliente';return true;}
   E.cli=cl;E.paciente=r.paciente||'';E.trabalho=r.itens[0].trabalho;E.dentes=r.itens[0].dentes||[];E.cor=r.cor||'';E.prazo=r.prazo||(/\b(pra|para|ate|dia|em)\b/.test(semAc(v))?pclData(semAc(v)):null);E.urgente=!!r.urgente;E._tudo=r;
   pcEu(esc(v));pcAna('Anotei 📝 <b>'+esc(cl.nome)+'</b>'+(E.paciente?' · '+esc(E.paciente):'')+' · '+esc(E.trabalho)+(E.dentes.length?' · 🦷 '+E.dentes.join(', '):'')+(E.cor?' · 🎨 '+esc(E.cor):''));
-  var falta=['paciente','cor','prazo'].filter(function(k){return k==='paciente'?!E.paciente:k==='cor'?!E.cor:!E.prazo&&!E.urgente;});
+  var falta=['paciente','material','cor','prazo'].filter(function(k){return k==='paciente'?!E.paciente:k==='material'?!pclMat(E):k==='cor'?!E.cor:!E.prazo&&!E.urgente;});
   PC.passo=falta.length?PCL_ORD[PCL_ORD.indexOf(falta[0])-1]:'obs';if(!falta.length)pcPergunta('obs');else pcPergunta(falta[0]);return true;}
 var _pcProxL=pcProx;pcProx=function(){if(PC.modo!=='lab')return _pcProxL.apply(this,arguments);var E=PC.ed,i=PCL_ORD.indexOf(PC.passo),nx=PCL_ORD[i+1];
-  if(E._tudo){while(nx&&nx!=='obs'&&nx!=='fim'&&((nx==='paciente'&&E.paciente)||(nx==='trabalho'&&E.trabalho)||(nx==='dentes'&&E.trabalho)||(nx==='cor'&&E.cor)||(nx==='prazo'&&(E.prazo||E.urgente))))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];}
+  if(nx==='material'&&pclMat(E))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];
+  if(E._tudo){while(nx&&nx!=='obs'&&nx!=='fim'&&((nx==='material'&&pclMat(E))||(nx==='paciente'&&E.paciente)||(nx==='trabalho'&&E.trabalho)||(nx==='dentes'&&E.trabalho)||(nx==='cor'&&E.cor)||(nx==='prazo'&&(E.prazo||E.urgente))))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];}
   pcPergunta(nx||'fim');};
 function pclData(t){var d=anaPrazo(t);if(d)return d;var W=[/\bdom/,/\bseg/,/\bter/,/\bqua(?!n)/,/\bqui/,/\bsex/,/\bsab/],h=new Date(dHoje()+'T12:00:00'),w=-1;W.forEach(function(r,i){if(w<0&&r.test(t))w=i;});
   if(w>=0){var n=(w-h.getDay()+7)%7||7;if(/\b(proxima|que vem)\b/.test(t)&&n<7)n+=7;h.setDate(h.getDate()+n);return h.toISOString().slice(0,10);}
   var m=t.match(/\b(\d{1,2})\s+dias?\s*uteis\b/);if(m)return pedUteis(+m[1]);m=t.match(/\bem\s+(\d{1,2})\s+dias?\b/);if(m){h.setDate(h.getDate()+(+m[1]));return h.toISOString().slice(0,10);}return null;}
 var _pcRespL=pcResposta;pcResposta=function(v,txt){if(PC.modo!=='lab')return _pcRespL.apply(this,arguments);var k=PC.passo,E=PC.ed;if(PC.digitando||!E)return;
+  if(k==='material'){if(v===null){pcEu('<i>Pular</i>');pcProx();return;}var mt=String(v).trim().slice(0,60);if(!mt)return;E.material=mt;pcEu(esc(mt));pcProx();return;}
   if(k==='cliente'){var s=String(v||'').trim();if(!s)return;
     if(s.indexOf('id:')===0){var c=pclClis().filter(function(x){return x.id===s.slice(3);})[0];if(!c)return;E.cli=c;E._opc=null;pcEu(esc(c.nome));pcProx();return;}
     if(s.indexOf('sem:')===0){E.cli=null;E.cliTxt=s.slice(4);E._opc=null;pcEu(esc(E.cliTxt)+' <small>(sem cadastro)</small>');pcAna('Tudo bem, vou anotar o nome na observação. Depois você cadastra o cliente em <b>Clientes</b>.');pcProx();return;}
@@ -7468,13 +7472,13 @@ function pclMonta(){var E=PC.ed,s=pedServ(E.trabalho),res;
   else res={itens:E._tudo.itens,tipo:E._tudo.tipo};
   res.cliente=E.cli;res.paciente=E.paciente;res.cor=E.cor;res.prazo=E.prazo;res.urgente=E.urgente;
   res.texto=[E.cli?E.cli.nome:E.cliTxt,E.paciente,E.trabalho,E.dentes.join(', '),E.cor].filter(Boolean).join(' · ');
-  var L=anaPedidos(res);L.forEach(function(p){p.descricao=('Pedido montado com a Ana: '+res.texto).slice(0,4000);var o=[];if(!E.cli&&E.cliTxt)o.push('Cliente: '+E.cliTxt+' (sem cadastro)');if(E.obs)o.push(E.obs);p.obs=o.join('\n')||null;});
+  var L=anaPedidos(res),mt=pclMat(E);L.forEach(function(p){if(mt&&!p.material)p.material=mt.slice(0,60);p.descricao=('Pedido montado com a Ana: '+res.texto).slice(0,4000);var o=[];if(!E.cli&&E.cliTxt)o.push('Cliente: '+E.cliTxt+' (sem cadastro)');if(E.obs)o.push(E.obs);p.obs=o.join('\n')||null;});
   return L;}
 var _pcResumoL=pcResumo;pcResumo=function(){if(PC.modo!=='lab')return _pcResumoL.apply(this,arguments);var E=PC.ed,L=pclMonta(),tot=0,sem=false;
   L.forEach(function(p){if(p.valor!=null)tot+=p.valor;else sem=true;});var pz=L[0].prazo;
   pcAna('Pronto! Confira o pedido 👇<div class="pc-res"><div><span>Cliente</span><b>'+esc(E.cli?E.cli.nome:E.cliTxt+' (sem cadastro)')+'</b></div>'+(E.paciente?'<div><span>Paciente</span><b>'+esc(E.paciente)+'</b></div>':'')+
     L.map(function(p){return '<div><span>Trabalho</span><b>'+esc(p.trabalho)+'</b></div>'+(p.dentes&&p.dentes.length?'<div><span>Dentes</span><b>'+p.dentes.join(', ')+' ('+p.qtd+')</b></div>':'');}).join('')+
-    (E.cor?'<div><span>Cor</span><b>'+esc(E.cor)+'</b></div>':'')+'<div><span>Tipo</span><b>'+(L[0].tipo==='cad'?'🟣 CAD':'🧪 Analógico')+'</b></div>'+
+    (L[0].material?'<div><span>Material</span><b>'+esc(L[0].material)+'</b></div>':'')+(E.cor?'<div><span>Cor</span><b>'+esc(E.cor)+'</b></div>':'')+'<div><span>Tipo</span><b>'+(L[0].tipo==='cad'?'🟣 CAD':'🧪 Analógico')+'</b></div>'+
     '<div><span>Prazo</span><b>'+(E.urgente?'⚡ Urgente · ':'')+(pz?esc(anaFmtData(pz)):'—')+'</b></div>'+
     '<div><span>Valor</span><b>'+(tot?fmtR(tot)+(sem?' + itens sem preço':''):'sem preço na tabela')+'</b></div>'+(E.obs?'<div><span>Observação</span><b>'+esc(E.obs)+'</b></div>':'')+'</div>');};
 var _pcBarraL=pcBarra;pcBarra=function(){var h=_pcBarraL.apply(this,arguments);if(PC.modo!=='lab')return h;
