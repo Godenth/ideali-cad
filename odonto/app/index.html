@@ -5039,22 +5039,26 @@ function redeAnim(entrar,troca){
   w.innerHTML=lados.map(function(l,i){return '<i class="rct-p rct-'+l+'" style="background:'+cores[i]+'"></i>';}).join('')+
     '<div class="rct-t"><span class="rct-logo">i</span><b>'+(entrar?'Ideali <em>Rede</em>':'Ideali <em>Odonto</em>')+'</b><small>'+(entrar?'odontologia conectada':'voltando ao seu painel')+'</small><u></u></div>';
   document.body.appendChild(w);
-  var P=w.querySelectorAll('.rct-p'),T=w.querySelector('.rct-t'),EASE='cubic-bezier(.76,0,.24,1)',D=520,GAP=110,HOLD=420,fim=false,trocou=false,timers=[];
+  var P=w.querySelectorAll('.rct-p'),T=w.querySelector('.rct-t'),FREIA='cubic-bezier(.08,.82,.17,1)',ACEL='cubic-bezier(.6,0,.9,.35)',D=760,GAP=90,fim=false,trocou=false,timers=[];
   var de=function(l){return l==='e'?'translateX(-112%)':'translateX(112%)';},para=function(l){return l==='e'?'translateX(112%)':'translateX(-112%)';};
   function faz(){if(trocou)return;trocou=true;try{troca();}catch(e){}}
   function acaba(){if(fim)return;fim=true;timers.forEach(clearTimeout);faz();w.remove();removeEventListener('keydown',tecla,true);}
   function tecla(e){if(e.key==='Escape')acaba();}
   w.addEventListener('pointerdown',acaba);addEventListener('keydown',tecla,true);
-  /* entrada */
-  for(var i=0;i<P.length;i++)P[i].animate([{transform:de(lados[i])},{transform:'translateX(0)'}],{duration:D,delay:i*GAP,easing:EASE,fill:'both'});
-  var coberto=D+(P.length-1)*GAP;
-  T.animate([{opacity:0,transform:'translate(-50%,-40%)'},{opacity:1,transform:'translate(-50%,-50%)'}],{duration:380,delay:coberto-140,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
-  timers.push(setTimeout(faz,coberto+40));
-  /* saída: na ordem inversa, cada painel continua no mesmo sentido em que entrou */
-  var sai=coberto+HOLD;
-  timers.push(setTimeout(function(){if(fim)return;T.animate([{opacity:1},{opacity:0}],{duration:200,fill:'forwards'});
-    for(var k=P.length-1;k>=0;k--)P[k].animate([{transform:'translateX(0)'},{transform:para(lados[k])}],{duration:D,delay:(P.length-1-k)*GAP,easing:EASE,fill:'forwards'});},sai));
-  timers.push(setTimeout(acaba,sai+D+(P.length-1)*GAP+60));}
+  /* 1) entram rápido e vão desacelerando até parar */
+  for(var i=0;i<P.length;i++)P[i].animate([{transform:de(lados[i])},{transform:'translateX(0)'}],{duration:D,delay:i*GAP,easing:FREIA,fill:'both'});
+  var parou=D+(P.length-1)*GAP;
+  /* 2) paradas: aparece o logo */
+  T.animate([{opacity:0,transform:'translate(-50%,-46%) scale(.96)'},{opacity:1,transform:'translate(-50%,-50%) scale(1)'}],{duration:420,delay:parou,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+  timers.push(setTimeout(faz,parou+60));
+  /* 3) o logo some em fade */
+  var some=parou+420+520;
+  timers.push(setTimeout(function(){if(!fim)T.animate([{opacity:1},{opacity:0}],{duration:260,fill:'forwards'});},some));
+  /* 4) as cortinas saem (na ordem inversa, acelerando e esmaecendo) */
+  var sai=some+240,DS=560;
+  timers.push(setTimeout(function(){if(fim)return;
+    for(var k=P.length-1;k>=0;k--)P[k].animate([{transform:'translateX(0)',opacity:1},{transform:para(lados[k]),opacity:.25}],{duration:DS,delay:(P.length-1-k)*GAP,easing:ACEL,fill:'forwards'});},sai));
+  timers.push(setTimeout(acaba,sai+DS+(P.length-1)*GAP+60));}
 redeTransicao=function(entrar,sec){redeAnim(entrar,function(){if(entrar){S.redeOn=true;S.rede.sec=sec||'vagas';S.rede.anim=true;}else{if(typeof cvAtivo==='function'&&cvAtivo())lerCv();S.redeOn=false;S.painelVolta=true;}render();window.scrollTo(0,0);});};
 
 /* ===== Mapa 2D: zoom com a rodinha, arrastar com o mouse/dedo, botões + − e "Brasil inteiro" ===== */
