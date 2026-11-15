@@ -696,7 +696,7 @@ body.redem{background:#0A1430;color:#E8EEFF}
 .cvsec>.btn,.cvsec .btn.sm{justify-self:start}
 .cvlado{background:radial-gradient(120% 60% at 30% 0%,color-mix(in srgb,var(--c1) 70%,#fff) 0%,var(--c1) 40%,var(--c2) 100%);color:#fff;padding:28px 24px;display:grid;gap:14px;align-content:start;justify-items:center;text-align:center}
 .cvfoto{position:relative;width:148px;height:148px;border-radius:50%;border:4px solid #ffffffcc;background:#ffffff26;display:grid;place-items:center;cursor:pointer;overflow:visible;box-shadow:0 14px 30px -12px #0008}
-.cvfoto img{width:100%;height:100%;object-fit:cover;border-radius:50%}.cvfoto span{font:700 3rem var(--f-display)}
+.cvfoto img{width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;border-radius:50%;display:block}.cvfoto span{font:700 3rem var(--f-display)}
 .cvfoto i{position:absolute;right:4px;bottom:4px;width:38px;height:38px;border-radius:50%;background:#fff;display:grid;place-items:center;font-style:normal;box-shadow:0 4px 10px #0004}
 .cvnome{font:700 clamp(1.6rem,2.6vw,2.2rem)/1.08 var(--f-display);color:#fff;margin:0}
 .cvprof{display:inline-flex;align-items:center;gap:6px;background:#ffffff2a;border-radius:99px;padding:5px 14px 5px 6px;font-weight:700}.cvprof svg{width:24px;height:24px}
@@ -2615,6 +2615,14 @@ body.pe-trava{overflow:hidden}
 .pe-ts{display:grid;gap:5px;max-height:38vh;overflow:auto}.pe-ts button{text-align:left;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit;font-size:.9rem;cursor:pointer}.pe-ts button:hover{border-color:#00A6E6}.pe-ts button.on{background:color-mix(in srgb,#00A6E6 16%,transparent);border-color:#00A6E6;font-weight:700}
 .pe-tira{justify-self:start;border:0;background:none;color:#DC2626;font:inherit;font-weight:700;cursor:pointer;padding:4px}
 @media(max-width:900px){.pe-g{grid-template-columns:1fr}.pe-esq{position:static}.pe-ov{padding:0;place-items:stretch}.pe{border-radius:0;max-height:100vh}}
+
+/* Configurações dentro da Rede: texto legível nos dois temas */
+.rsx .cfg-c{background:var(--rsf)!important;border:1px solid var(--rln)!important;color:var(--rtx)!important}
+.rsx .cfg-c h2,.rsx .cfg-c b,.rsx .cfg-c .cfg-l b,.rsx .rtit h2{color:var(--rtx)!important}
+.rsx .cfg-c .cfg-l span,.rsx .cfg-c .small,.rsx .cfg-c .muted,.rsx .rtit p{color:color-mix(in srgb,var(--rtx) 65%,transparent)!important}
+.rsx .cfg-c .btn{background:transparent!important;color:var(--rtx)!important;border:1px solid var(--rln)!important}.rsx .cfg-c .btn.pri{background:#3B82F6!important;color:#fff!important;border-color:transparent!important}.rsx .cfg-c .btn.danger{color:#F87171!important}
+.rsx .cfg-c input{background:transparent!important;color:var(--rtx)!important;border:1px solid var(--rln)!important}
+.rsx .cfg-l{border-color:var(--rln)!important}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4412,7 +4420,7 @@ document.addEventListener('input',function(ev){var t=ev.target;
   if(t.id==='em-cnpj'){var p=t.value;t.value=cnpjFmt(p);}
   if(cvAtivo()&&(t.dataset.f||t.dataset.exp)&&t.type!=='checkbox'){lerCv();var a=document.querySelector('aside.card');if(a)a.innerHTML='<h2>Como as empresas veem você</h2>'+(S.eu.aberto?cardCV(S.eu,{preview:1}):'<div class="empty">Você está <b>invisível</b>. Ligue "Estou aberto a oportunidades" para aparecer.</div>');}});
 document.addEventListener('change',function(ev){var t=ev.target;
-  if(t.id==='pf-foto'&&t.files&&t.files[0]){var P0=pfDe(S.role);pfLerCampos(P0);var fr0=new FileReader();fr0.onload=function(){P0.foto=fr0.result;render();};fr0.readAsDataURL(t.files[0]);return;}
+  if(t.id==='pf-foto'&&t.files&&t.files[0]){var P0=pfDe(S.role);pfLerCampos(P0);pfFotoSobe(P0,t.files[0]);t.value='';return;}
   if(t.id==='cd-foto'&&t.files&&t.files[0]){var fr=new FileReader();fr.onload=function(){S.cad.foto=fr.result;render();};fr.readAsDataURL(t.files[0]);return;}
   if(t.id==='emp-sel'){S.empAtual=t.value;S.erroEmp='';render();return;}
   if(t.dataset.ins){var k=t.dataset.ins.split('|'),it=instGet(k[0]);if(it){it[k[1]]=t.value;instSalva();}return;}
@@ -8227,7 +8235,7 @@ function rsTopo(){var E=rsEu();
 function rsEsq(){var E=rsEu(),s=S.rede.sec;
   var item=function(k){var x=RS_SEC[k];return '<button class="rs-nv'+(s===k?' on':'')+'" data-act="redeSec" data-v="'+k+'" style="--a:'+x[2]+';--b:'+x[3]+'"><span class="rs-nvi">'+(RS_IC[k]?dIco(RS_IC[k],'ic'):x[0])+'</span>'+x[1]+'</button>';};
   return '<aside class="rs-esq">'+
-    '<nav class="rs-menu" aria-label="Seções da Rede"><small>Explorar</small>'+['vagas','profs','clinicas','labs','comercio','cursos'].map(item).join('')+'<small>Você</small>'+['agente','perfil','config'].map(item).join('')+'</nav></aside>';}
+    '<nav class="rs-menu" aria-label="Seções da Rede"><small>Explorar</small>'+['vagas','profs','clinicas','labs','comercio','cursos'].map(item).join('')+'<small>Você</small>'+['agente','perfil'].map(item).join('')+'</nav></aside>';}
 function rsDir(){var mc=minhaCidade(),V=[];try{V=todasVagas().filter(function(x){return !remoto(x.v.lugar);}).map(function(x){return {x:x,d:distKm(mc,cidadeDe(x.v.lugar))||9e4};}).sort(function(a,b){return a.d-b.d;}).slice(0,3);}catch(e){}
   var Pf=REDE_PROFS.slice(0,3),C=(REDE_CURS||[]).slice(0,2);
   return '<aside class="rs-dir">'+
@@ -9086,6 +9094,20 @@ document.addEventListener('input',function(e){if(e.target.id!=='pe-q')return;PE.
 document.addEventListener('keydown',function(e){if(e.target.id==='pe-q'&&e.key==='Enter'){e.preventDefault();var v=e.target.value.trim();if(v)ACT.pePickT(v);}
   else if(e.key==='Escape'&&PED.ed&&document.querySelector('.pe-ov')){if(PE.pick!=null){PE.pick=null;render();}else{PED.ed=null;render();}}},true);
 (function(){var _rPE=render;render=function(){var x=_rPE.apply(this,arguments);try{var velho=document.getElementById('pe-raiz');if(velho)velho.remove();var ov=document.querySelector('.pe-ov');if(ov&&ov.parentNode!==document.body){var r=document.createElement('div');r.id='pe-raiz';document.body.appendChild(r);r.appendChild(ov);}document.body.classList.toggle('pe-trava',!!(PED&&PED.ed&&document.querySelector('.pe-ov')));PE._ab=!!(PED&&PED.ed);}catch(e){}return x;};})();
+
+/* ===== Foto do perfil: recorta quadrada (512px), guarda no bucket privado odonto-fotos/<conta>/perfil.jpg e abre por URL assinada ===== */
+function pfFotoRecorta(file){return new Promise(function(ok,no){var u=URL.createObjectURL(file),im=new Image();im.onload=function(){var L=Math.min(im.naturalWidth,im.naturalHeight),c=document.createElement('canvas');c.width=c.height=512;
+    var sx=(im.naturalWidth-L)/2,sy=Math.max(0,(im.naturalHeight-L)*0.15);c.getContext('2d').drawImage(im,sx,sy,L,L,0,0,512,512);URL.revokeObjectURL(u);c.toBlob(function(b){b?ok({b:b,url:c.toDataURL('image/jpeg',.85)}):no();},'image/jpeg',.85);};
+    im.onerror=function(){URL.revokeObjectURL(u);no();};im.src=u;});}
+function pfFotoSobe(P,file){pfFotoRecorta(file).then(function(r){P.foto=r.url;render();if(!RL||!RL.user||!RL.perfil){toast('Foto trocada.');return;}
+    var path=RL.user.id+'/perfil.jpg';toast('Guardando a foto…');
+    SB.storage.from('odonto-fotos').upload(path,r.b,{upsert:true,contentType:'image/jpeg'}).then(function(u){if(u.error)throw u.error;
+      return SB.from('odo_perfis').update({foto:path}).eq('user_id',RL.user.id).then(function(x){if(x.error)throw x.error;RL.perfil.foto=path;toast('Foto salva. ✅');});})
+    .catch(function(e){toast('Não consegui guardar a foto agora. ('+String((e&&e.message)||e).slice(0,80)+')');});},function(){toast('Não consegui abrir essa imagem.');});}
+function pfFotoCarrega(){if(!RL||!RL.user||!RL.perfil||!RL.perfil.foto||pfFotoCarrega.ok===RL.perfil.foto)return;var path=RL.perfil.foto;pfFotoCarrega.ok=path;
+  SB.storage.from('odonto-fotos').createSignedUrl(path,86400).then(function(r){if(r.error||!r.data)return;var u=r.data.signedUrl;
+    ['dent','prot','asb','corp','ind','stu'].forEach(function(k){if(S.pf&&S.pf[k])S.pf[k].foto=u;});render();});}
+(function(){var _rPF=render;render=function(){var x=_rPF.apply(this,arguments);try{pfFotoCarrega();}catch(e){}return x;};})();
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
