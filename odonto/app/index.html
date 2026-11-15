@@ -2326,6 +2326,33 @@ body.bn3-on .toast{bottom:calc(74px + env(safe-area-inset-bottom))!important}
   .rsx .rraio-l{display:none}
   body:has(.rsx){padding-bottom:0!important}
 }
+/* Rede no celular · profissionais: uma linha de ferramentas e itens de uma linha */
+@media (max-width:820px){
+  .rsx .rs-cont:has(#rprofs){display:flex!important;flex-wrap:wrap;gap:8px;align-items:center}
+  .rsx .rs-cont:has(#rprofs)>*{flex:1 1 100%}
+  .rsx .rs-meio:has(#rprofs) .rs-loct,.rsx .rs-meio:has(#rprofs) .rs-loc{display:none!important}
+  .rsx .rs-cont:has(#rprofs) .rtit{display:none}
+  .rsx .rs-cont:has(#rprofs)>.pbusca{flex:1 1 0;min-width:0;margin:0;height:44px;padding:0 12px;border-radius:12px}
+  .rsx .rs-cont:has(#rprofs)>.pbusca input{font-size:.95rem}
+  .rsx .rs-cont:has(#rprofs)>.pfbar{flex:0 0 auto;margin:0;display:contents}
+  .rsx .rs-icb{width:44px;height:44px;padding:0!important;display:grid!important;place-items:center;border-radius:12px;position:relative}
+  .rsx .rs-icb b{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:999px;background:var(--rc);color:#fff;font-size:.66rem;line-height:18px}
+  .rsx .pfbar .pativos{flex:1 1 100%;order:5;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.rsx .pfbar .pativos:empty{display:none}
+  .rsx .rs-cont:has(#rprofs) .pvis{flex:0 0 auto;margin:0}
+  .rsx .rs-cont:has(#rprofs) .pvis .rseg{height:44px;padding:3px;gap:2px}
+  .rsx .rs-cont:has(#rprofs) .pvis .rseg button{font-size:1.05rem;width:38px;padding:0;display:grid;place-items:center}
+  .rsx .rs-cont:has(#rprofs) #rprofs>p.small{margin:2px 0 6px;font-size:.78rem}
+  .rsx .pl{grid-template-columns:38px minmax(0,1fr) auto!important;gap:10px;padding:10px 12px;border-left-width:3px}
+  .rsx .pl-av{width:38px;height:38px;font-size:.9rem}
+  .rsx .pl-n{grid-column:2;grid-row:1;align-self:end}.rsx .pl-n b{font-size:.95rem}
+  .rsx .pl-p{grid-column:2;grid-row:2;font-size:.78rem;gap:6px;flex-wrap:nowrap}
+  .rsx .pl-p .pg-chip{padding:1px 7px;font-size:.7rem;flex:none}
+  .rsx .pl-l{display:none}
+  .rsx .pl .btn{grid-column:3;grid-row:1/3;font-size:.8rem;padding:7px 12px}
+  .rsx .pl .pl-av{grid-row:1/3}
+}
+@media (max-width:820px){.rsx .rs-cont:has(#rprofs)>.pbusca{display:flex;align-items:center;gap:8px;overflow:hidden}.rsx .rs-cont:has(#rprofs)>.pbusca input{flex:1;min-width:0;width:100%}
+.rsx .rs-cont:has(#rprofs) .pvis .rseg button{width:34px;font-size:.95rem}.rsx .rs-cont:has(#rprofs) .pvis .rseg{height:44px;align-items:stretch}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -8185,6 +8212,16 @@ ACT.pedFer=function(){S.pedFer=!S.pedFer;render();};ACT.pedAv=function(){S.pedAv
 ACT.rsLupa=function(){S.rede.lupa=!S.rede.lupa;S.rede.menu=false;render();if(S.rede.lupa)setTimeout(function(){var q=document.getElementById('rs-q');if(q)q.focus();},30);};
 ACT.rsLoc=function(){S.rede.locAb=!S.rede.locAb;render();};
 document.addEventListener('click',function(e){if(!S.redeOn||!S.rede.menu)return;if(e.target.closest&&e.target.closest('.rav-w'))return;S.rede.menu=false;render();},true);
+
+
+/* Rede no celular: busca, local, filtros e visualização numa linha só (ícones) */
+function rsCel(){return !!(window.matchMedia&&matchMedia('(max-width:820px)').matches);}
+var _rProfsCel=rProfs;rProfs=function(){var h=_rProfsCel.apply(this,arguments);if(!rsCel())return h;
+  var n=profsNFil();
+  h=h.replace(/<button class="btn pfilb" data-act="filAbre">[^<]*(<b>\d+<\/b>)?<\/button>/,'<button class="btn pfilb rs-icb" data-act="filAbre" aria-label="Filtros"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>'+(n?'<b>'+n+'</b>':'')+'</button>');
+  h=h.replace('placeholder="Ex.: Exocad São Paulo"','placeholder="Buscar: Exocad, cidade…"');
+  h=h.replace('data-v="cards">▦ Cartões','data-v="cards" aria-label="Cartões">▦').replace('data-v="linhas">☰ Lista','data-v="linhas" aria-label="Lista">☰').replace('data-v="mapa">🗺 Mapa','data-v="mapa" aria-label="Mapa">🗺');
+  return h;};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
