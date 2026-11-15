@@ -2490,6 +2490,7 @@ body.pd-trava{overflow:hidden}
 .pd-cd{justify-self:start;font:700 .8rem/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;color:var(--muted);background:color-mix(in srgb,var(--line) 70%,transparent);border-radius:8px;padding:4px 8px}
 .pd-cd.hoje{color:#B45309;background:color-mix(in srgb,#F59E0B 16%,transparent)}.pd-cd.perto{color:#fff;background:#F59E0B;animation:pdPulso 1.6s ease-in-out infinite}.pd-cd.atr{color:#fff;background:#DC2626}
 .pd-cd.mini{font-size:.72rem;padding:2px 6px}
+.pd-ped{justify-self:start;border:1px solid color-mix(in srgb,#7C3AED 40%,var(--line));background:color-mix(in srgb,#7C3AED 10%,transparent);color:var(--ink);border-radius:8px;padding:3px 9px;font:inherit;font-size:.76rem;font-weight:700;cursor:pointer;text-align:left;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pd-edf label small{font-weight:500;display:inline}
 .pd-cli{justify-self:start;font-size:.76rem;font-weight:600;color:var(--ink);background:var(--line);border-radius:999px;padding:2px 9px}.pd-dt{font-size:.75rem;color:var(--muted);font-weight:600}
 .pd-c.perto .pd-dt{color:#D97706}.pd-c.atr{border-color:#FCA5A5;background:color-mix(in srgb,#EF4444 7%,var(--bg,#fff))}.pd-c.atr .pd-dt,.pd-at{color:#DC2626;font-weight:700}.pd-at{font-size:.75rem}
 .pd-add{border:1px dashed var(--line);background:none;color:var(--muted);border-radius:10px;padding:9px;font:inherit;font-size:.86rem;cursor:pointer;text-align:left}.pd-add:hover{color:var(--ink);border-color:var(--muted)}
@@ -8643,6 +8644,13 @@ var PD_TIPOS=[['Pedido','#8B5CF6','🦷'],['Cliente','#3B82F6','👤'],['Prazo',
 var PD_COLS=[['fazer','A fazer','#94A3B8'],['fazendo','Fazendo','#F59E0B'],['aguardando','Aguardando','#A78BFA'],['feito','Feito','#10B981']];
 function pdTipo(t){for(var i=0;i<PD_TIPOS.length;i++)if(PD_TIPOS[i][0]===t)return PD_TIPOS[i];return PD_TIPOS[5];}
 function pdClientes(){return ((typeof EMP!=='undefined'&&EMP.cli)||[]).filter(function(c){return c&&c.nome&&c.ativo!==false;}).map(function(c){return String(c.nome).trim();});}
+function pdPedsDo(cliNome){if(typeof PED==='undefined'||!PED.L)return [];var k=pdSemAc(cliNome||'').trim();if(!k)return [];
+  var cid=((typeof EMP!=='undefined'&&EMP.cli)||[]).filter(function(c){return pdSemAc(c.nome).trim()===k;}).map(function(c){return c.id;})[0];
+  return PED.L.filter(function(p){return !p.arquivado&&p.status!=='cancelado'&&((cid&&p.cliente_id===cid)||pdSemAc(p.cliente_nome||'').trim()===k);})
+    .sort(function(a,b){return (b.numero||0)-(a.numero||0);}).slice(0,60);}
+function pdPedTxt(p){return ('#'+(p.numero||'—')+' '+(p.paciente||'Sem paciente')+(p.trabalho?' · '+p.trabalho:'')).slice(0,160);}
+function pdPedOps(cli,sel){var L=pdPedsDo(cli),st=function(p){return typeof PEDST!=='undefined'&&PEDST[p.status]?' ('+PEDST[p.status][0]+')':'';};
+  return '<option value="">'+(cli?(L.length?'— nenhum pedido —':'Esse cliente não tem pedidos'):'Escolha o cliente primeiro')+'</option>'+L.map(function(p){return '<option value="'+p.id+'"'+(p.id===sel?' selected':'')+'>'+esc(pdPedTxt(p)+st(p))+'</option>';}).join('');}
 function pdOn(){return typeof RL!=='undefined'&&RL.user&&RL.perfil;}
 function pdCarrega(){if(!pdOn()||PD.carregando)return;if(PD.ok&&PD.uid===RL.user.id)return;PD.carregando=true;
   SB.from('odo_tarefas').select('*').order('ordem').then(function(r){PD.carregando=false;PD.uid=RL.user.id;
@@ -8681,10 +8689,10 @@ function pdNova(txt,extra){txt=String(txt||'').trim();if(!txt)return;if(!pdOn())
   var x=pdLe(txt),min=PD.L.filter(function(t){return t.coluna==='fazer';}).reduce(function(m,t){return Math.min(m,t.ordem);},0);
   var cl=pdClienteNa(txt),urg=/urgent/i.test(txt);if(cl&&x.tipo==='Outro')x.tipo='Cliente';
   var row=Object.assign({user_id:RL.user.id,titulo:txt.slice(0,300),tipo:x.tipo,coluna:'fazer',vence:x.vence,hora:x.hora,ordem:min-1},cl?{cliente:cl}:{},urg?{urgente:true}:{},extra||{});
-  SB.from('odo_tarefas').insert(row).select('*').single().then(function(r){if(r.error){toast(/urgente/.test(r.error.message||'')?'Falta rodar a atualização 085 no banco.':/cliente/.test(r.error.message||'')?'Falta rodar a atualização 084 no banco.':/odo_tarefas/.test(r.error.message||'')?'Falta rodar a atualização 083 no banco.':'Não consegui anotar agora.');return;}
+  SB.from('odo_tarefas').insert(row).select('*').single().then(function(r){if(r.error){toast(/pedido_/.test(r.error.message||'')?'Falta rodar a atualização 087 no banco.':/urgente/.test(r.error.message||'')?'Falta rodar a atualização 085 no banco.':/cliente/.test(r.error.message||'')?'Falta rodar a atualização 084 no banco.':/odo_tarefas/.test(r.error.message||'')?'Falta rodar a atualização 083 no banco.':'Não consegui anotar agora.');return;}
     PD.L.unshift(r.data);pdPinta();toast(PD.nome+' anotou'+(r.data.vence?' para '+pdVenceTxt(r.data).toLowerCase():'')+'. 👍');});}
 function pdMuda(id,patch){var t=PD.L.filter(function(x){return x.id===id;})[0];if(!t)return;Object.assign(t,patch);if(patch.coluna==='feito')t.feito_em=new Date().toISOString();pdPinta();
-  SB.from('odo_tarefas').update(patch).eq('id',id).then(function(r){if(r.error)toast(/urgente/.test(r.error.message||'')?'Falta rodar a atualização 085 no banco.':/cliente/.test(r.error.message||'')?'Falta rodar a atualização 084 no banco.':'Não consegui salvar a tarefa agora.');});}
+  SB.from('odo_tarefas').update(patch).eq('id',id).then(function(r){if(r.error)toast(/pedido_/.test(r.error.message||'')?'Falta rodar a atualização 087 no banco.':/urgente/.test(r.error.message||'')?'Falta rodar a atualização 085 no banco.':/cliente/.test(r.error.message||'')?'Falta rodar a atualização 084 no banco.':'Não consegui salvar a tarefa agora.');});}
 function pdApaga(id){PD.L=PD.L.filter(function(x){return x.id!==id;});pdPinta();SB.from('odo_tarefas').delete().eq('id',id).then(function(r){if(r.error)toast('Não consegui excluir agora.');});}
 function pdAtrasadas(){return PD.L.filter(function(t){return t.coluna!=='feito'&&pdAtraso(t)>0;});}
 
@@ -8698,11 +8706,11 @@ function pdPopHtml(){var abertas=PD.L.filter(function(t){return t.coluna!=='feit
     '<button class="pd-tudo" data-pd="pg">Ver tudo com o '+PD.nome+' ›</button></div>';}
 
 /* página de tarefas (quadro) */
-function pdFiltra(t){if(PD.tipo&&t.tipo!==PD.tipo)return false;if(PD.q&&(t.titulo+' '+(t.obs||'')+' '+(t.cliente||'')).toLowerCase().indexOf(PD.q.toLowerCase())<0)return false;
+function pdFiltra(t){if(PD.tipo&&t.tipo!==PD.tipo)return false;if(PD.q&&(t.titulo+' '+(t.obs||'')+' '+(t.cliente||'')+' '+(t.pedido_txt||'')).toLowerCase().indexOf(PD.q.toLowerCase())<0)return false;
   if(PD.filtro==='7d'){var a=pdAtraso(t);return a!==null&&a>-7*1440&&t.coluna!=='feito';}if(PD.filtro==='atr')return t.coluna!=='feito'&&pdAtraso(t)>0;if(PD.filtro==='urg')return t.coluna!=='feito'&&!!t.urgente;return true;}
 function pdCard(t){var tp=pdTipo(t.tipo),e=pdEstado(t);
   return '<div class="pd-c '+e+(t.urgente?' urg':'')+'" draggable="true" data-pdid="'+t.id+'" style="--tc:'+tp[1]+'"><div class="pd-ct"><span class="pd-tags">'+(t.urgente?'<span class="pd-urg">🔥 Urgente</span>':'')+'<span class="pd-tag">'+tp[2]+' '+esc(tp[0])+'</span></span>'+(t.vence?'<span class="pd-dt">'+esc(pdVenceTxt(t))+'</span>':'')+'</div>'+
-    '<p>'+esc(t.titulo)+'</p>'+(t.cliente?'<span class="pd-cli">👤 '+esc(t.cliente)+'</span>':'')+(t.vence&&t.coluna!=='feito'?'<span class="pd-cd '+pdCdCls(pdQuando(t).getTime())+'" data-pdq="'+pdQuando(t).getTime()+'">'+pdCdTxt(pdQuando(t).getTime())+'</span>':'')+'</div>';}
+    '<p>'+esc(t.titulo)+'</p>'+(t.cliente?'<span class="pd-cli">👤 '+esc(t.cliente)+'</span>':'')+(t.pedido_id?'<button class="pd-ped" data-pd="abreped" data-v="'+t.pedido_id+'">📋 '+esc(t.pedido_txt||'Pedido')+'</button>':'')+(t.vence&&t.coluna!=='feito'?'<span class="pd-cd '+pdCdCls(pdQuando(t).getTime())+'" data-pdq="'+pdQuando(t).getTime()+'">'+pdCdTxt(pdQuando(t).getTime())+'</span>':'')+'</div>';}
 function pdPgHtml(){var cols=PD_COLS.map(function(c){var L=PD.L.filter(function(t){return t.coluna===c[0]&&pdFiltra(t);}).sort(function(a,b){return (b.urgente?1:0)-(a.urgente?1:0)||a.ordem-b.ordem;});
     return '<section class="pd-col" data-col="'+c[0]+'" style="--cc:'+c[2]+'"><h3><i></i>'+c[1]+'<span>'+L.length+'</span></h3><div class="pd-lista">'+(L.length?L.map(pdCard).join(''):'<p class="pd-vz">Nada aqui.</p>')+'</div>'+
       '<button class="pd-add" data-pd="add" data-v="'+c[0]+'">+ Adicionar tarefa</button></section>';}).join('');
@@ -8717,6 +8725,7 @@ function pdPgHtml(){var cols=PD_COLS.map(function(c){var L=PD.L.filter(function(
 function pdEdHtml(){var t=PD.ed,ent=PD._edAb!==t;PD._edAb=t;return '<div class="pd-ed"><form class="pd-edf'+(ent?' ent':'')+'" id="pd-edf"><h3>'+(t.id?'Editar tarefa':'Nova tarefa')+'</h3>'+
   '<label>O que fazer<textarea id="pde-t" rows="3" maxlength="300">'+esc(t.titulo||'')+'</textarea></label>'+
   '<label>Cliente<input id="pde-cl" list="pd-cls" placeholder="'+(pdClientes().length?'Comece a digitar o nome do cliente':'Você ainda não tem clientes cadastrados')+'" maxlength="120" autocomplete="off" value="'+esc(t.cliente||'')+'"><datalist id="pd-cls">'+pdClientes().map(function(n){return '<option value="'+esc(n)+'">';}).join('')+'</datalist></label>'+
+  '<label><span>Pedido do cliente <small>(opcional)</small></span><select id="pde-pd">'+pdPedOps(t.cliente,t.pedido_id)+'</select></label>'+
   '<button type="button" class="pd-urgb'+(t.urgente?' on':'')+'" data-pd="edurg" aria-pressed="'+!!t.urgente+'">🔥 '+(t.urgente?'Urgente — marcado':'Marcar como urgente')+'</button>'+
   '<div class="pd-edt">'+PD_TIPOS.map(function(x){return '<button type="button" class="'+(t.tipo===x[0]?'on':'')+'" style="--tc:'+x[1]+'" data-pd="edtipo" data-v="'+x[0]+'">'+x[2]+' '+x[0]+'</button>';}).join('')+'</div>'+
   '<div class="pd-edr"><label>Data<input id="pde-d" type="date" value="'+esc(t.vence||'')+'"></label><label>Hora<input id="pde-h" type="time" value="'+esc(t.hora?String(t.hora).slice(0,5):'')+'"></label>'+
@@ -8737,23 +8746,24 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
   else if(k==='pgx'){PD.pg=false;PD.ed=null;pdPinta();}
   else if(k==='filtro'){PD.filtro=v;pdPinta();}
   else if(k==='tipo'){PD.tipo=PD.tipo===v?'':v;pdPinta();}
-  else if(k==='add'){PD.ed={titulo:'',tipo:'Outro',coluna:v||'fazer',vence:'',hora:'',obs:'',cliente:'',urgente:false};pdPinta();setTimeout(function(){var i=document.getElementById('pde-t');if(i)i.focus();},30);}
+  else if(k==='add'){PD.ed={titulo:'',tipo:'Outro',coluna:v||'fazer',vence:'',hora:'',obs:'',cliente:'',urgente:false,pedido_id:null};pdPinta();setTimeout(function(){var i=document.getElementById('pde-t');if(i)i.focus();},30);}
   else if(k==='ed'){var t=PD.L.filter(function(x){return x.id===v;})[0];if(t){PD.pop=false;PD.pg=true;PD.ed=Object.assign({},t);pdPinta();}}
   else if(k==='edtipo'){pdEdLe();PD.ed.tipo=v;pdPinta();}
   else if(k==='edurg'){pdEdLe();PD.ed.urgente=!PD.ed.urgente;pdPinta();}
+  else if(k==='abreped'){var q=PED.L.filter(function(x){return x.id===v;})[0];if(!q){toast('Esse pedido não está mais na lista.');return;}PD.pg=false;PD.ed=null;pdPinta();ACT.pedAbre(v);}
   else if(k==='edx'){PD.ed=null;pdPinta();}
   else if(k==='del'){if(confirm('Excluir esta tarefa?')){pdApaga(PD.ed.id);PD.ed=null;pdPinta();}}
   else if(k==='lfeito'){pdMuda(v,{coluna:'feito'});pdLembFecha();toast('Boa! Marquei como feita. ✅');}
   else if(k==='ldepois'){pdLembFecha(true);}
   else if(k==='labre'){pdLembFecha();PD.pg=true;PD.filtro='atr';pdCarrega();pdPinta();}},true);
-function pdEdLe(){var e=PD.ed;if(!e)return;var g=function(i){var x=document.getElementById(i);return x?x.value:'';};e.titulo=g('pde-t');e.vence=g('pde-d');e.hora=g('pde-h');e.coluna=g('pde-c')||e.coluna;e.obs=g('pde-o');e.cliente=g('pde-cl');}
+function pdEdLe(){var e=PD.ed;if(!e)return;var g=function(i){var x=document.getElementById(i);return x?x.value:'';};e.titulo=g('pde-t');e.vence=g('pde-d');e.hora=g('pde-h');e.coluna=g('pde-c')||e.coluna;e.obs=g('pde-o');e.cliente=g('pde-cl');e.pedido_id=g('pde-pd')||null;}
 document.addEventListener('submit',function(ev){var f=ev.target;if(f.id==='pd-f'){ev.preventDefault();var i=document.getElementById('pd-in');pdNova(i.value);i.value='';return;}
   if(f.id==='pd-edf'){ev.preventDefault();pdEdLe();var e=PD.ed,tt=String(e.titulo||'').trim();if(!tt){toast('Escreva o que precisa ser feito.');return;}
-    var patch={titulo:tt.slice(0,300),tipo:e.tipo,coluna:e.coluna,vence:e.vence||null,hora:e.hora||null,obs:(e.obs||'').trim().slice(0,1000)||null,cliente:(e.cliente||'').trim().slice(0,120)||null,urgente:!!e.urgente};
+    var patch={titulo:tt.slice(0,300),tipo:e.tipo,coluna:e.coluna,vence:e.vence||null,hora:e.hora||null,obs:(e.obs||'').trim().slice(0,1000)||null,cliente:(e.cliente||'').trim().slice(0,120)||null,urgente:!!e.urgente,pedido_id:e.pedido_id||null,pedido_txt:(function(){var q=e.pedido_id&&PED.L.filter(function(x){return x.id===e.pedido_id;})[0];return q?pdPedTxt(q):null;})()};
     if(e.id){pdMuda(e.id,patch);PD.ed=null;pdPinta();}
     else{PD.ed=null;var min=PD.L.filter(function(t){return t.coluna===patch.coluna;}).reduce(function(m,t){return Math.min(m,t.ordem);},0);
-      SB.from('odo_tarefas').insert(Object.assign({user_id:RL.user.id,ordem:min-1},patch)).select('*').single().then(function(r){if(r.error){toast(/urgente/.test(r.error.message||'')?'Falta rodar a atualização 085 no banco.':/cliente/.test(r.error.message||'')?'Falta rodar a atualização 084 no banco.':/odo_tarefas/.test(r.error.message||'')?'Falta rodar a atualização 083 no banco.':'Não consegui salvar agora.');return;}PD.L.unshift(r.data);pdPinta();});pdPinta();}}},true);
-document.addEventListener('input',function(ev){if(ev.target.id==='pd-q'){PD.q=ev.target.value;pdPinta();}});
+      SB.from('odo_tarefas').insert(Object.assign({user_id:RL.user.id,ordem:min-1},patch)).select('*').single().then(function(r){if(r.error){toast(/pedido_/.test(r.error.message||'')?'Falta rodar a atualização 087 no banco.':/urgente/.test(r.error.message||'')?'Falta rodar a atualização 085 no banco.':/cliente/.test(r.error.message||'')?'Falta rodar a atualização 084 no banco.':/odo_tarefas/.test(r.error.message||'')?'Falta rodar a atualização 083 no banco.':'Não consegui salvar agora.');return;}PD.L.unshift(r.data);pdPinta();});pdPinta();}}},true);
+document.addEventListener('input',function(ev){if(ev.target.id==='pde-cl'){var sl=document.getElementById('pde-pd');if(sl)sl.innerHTML=pdPedOps(ev.target.value,null);return;}if(ev.target.id==='pd-q'){PD.q=ev.target.value;pdPinta();}});
 document.addEventListener('keydown',function(ev){if(ev.key==='Escape'){if(PD.ed){PD.ed=null;pdPinta();}else if(PD.pg){PD.pg=false;pdPinta();}else if(PD.pop){PD.pop=false;pdPinta();}}});
 /* arrastar entre colunas */
 document.addEventListener('dragstart',function(ev){var c=ev.target.closest&&ev.target.closest('.pd-c');if(!c)return;PD.arr=c.dataset.pdid;c.classList.add('arr');try{ev.dataTransfer.setData('text/plain',PD.arr);ev.dataTransfer.effectAllowed='move';}catch(e){}});
