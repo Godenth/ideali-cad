@@ -2578,6 +2578,36 @@ body.pv-trava{overflow:hidden}
 .pkan3 .pcol-h span{min-width:30px;height:30px;display:grid;place-items:center;border-radius:999px;background:color-mix(in srgb,var(--k) 30%,transparent);color:var(--ink)!important;font-size:.85rem}
 .pkan3 .pcol[data-pst] .pedc{border-left:4px solid var(--k)!important;background:color-mix(in srgb,var(--k) 6%,var(--surface))!important;box-shadow:0 6px 18px rgba(0,0,0,.18)!important}
 .pkan3 .pcol[data-pst] .pedc.urg{border-left-color:#DC2626!important}
+
+body.pe-trava{overflow:hidden}
+.pe-fundo{pointer-events:none;filter:blur(1px)}
+.pe-ov{position:fixed;inset:0;z-index:185;background:rgba(5,8,20,.62);backdrop-filter:blur(3px);display:grid;place-items:center;padding:18px}.pe-ov.ent{animation:pdFade .2s ease both}
+.pe{position:relative;width:min(1280px,100%);max-height:calc(100vh - 36px);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:22px;box-shadow:0 40px 100px rgba(0,0,0,.45);padding:clamp(14px,2vw,24px)}
+.pe-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}.pe-h h2{margin:0}
+.pe-g{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+.pe-esq{display:grid;gap:12px;position:sticky;top:0}
+.pe-sec{display:grid;gap:8px}.pe-rot{font-size:.85rem;font-weight:700;color:var(--muted)}
+.pe-esq .oa-box{padding:8px;border-radius:16px;background:color-mix(in srgb,var(--bg) 55%,var(--surface))}.pe-esq .oa-svg{max-width:none;max-height:56vh}
+.pe-esq .oa-t{cursor:pointer}.pe-esq .oa-t:hover .oa-hit{fill:color-mix(in srgb,#00A6E6 18%,transparent)}
+.pe-els{display:grid;gap:6px}.pe-el{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:12px;padding:4px 6px 4px 4px}
+.pe-elb{flex:1;text-align:left;border:0;background:none;color:var(--ink);font:inherit;font-size:.95rem;padding:8px;cursor:pointer;border-radius:9px}.pe-elb:hover{background:var(--line)}
+.pe-x{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;flex:none}
+.pe-calc{border-radius:14px;padding:12px 14px;background:color-mix(in srgb,#3B82F6 10%,var(--surface));border:1px solid color-mix(in srgb,#3B82F6 30%,var(--line));display:grid;gap:6px}
+.pe-cl{display:flex;justify-content:space-between;gap:10px;font-size:.88rem}.pe-cl small{color:var(--muted)}.pe-cl b{font-family:ui-monospace,Menlo,monospace}
+.pe-ct{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);padding-top:6px}.pe-ct b{font-size:1.3rem;font-family:ui-monospace,Menlo,monospace}
+.pe-calc .btn{justify-self:end}
+.pe-dir .dtop{margin:0 0 8px}.pe-dir .dtop h2,.pe-dir .dtop .small{display:none}
+.pe-dir .pedform{grid-template-columns:1fr 1fr!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important}
+.pe-dir .ped-dentes,.pe-dir .ped-qtd{display:none!important}
+.pe .seg button[aria-pressed="true"]{background:var(--dc1,#3A7BD5)!important;color:#fff!important}
+.pe-pk-ov{position:absolute;inset:0;z-index:5;background:rgba(5,8,20,.45);display:grid;place-items:center;padding:16px;border-radius:22px}
+.pe-pk{width:min(460px,100%);max-height:80vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:10px;box-shadow:0 30px 70px rgba(0,0,0,.45);animation:escIn .18s ease both}
+.pe-pkh{display:flex;align-items:center;justify-content:space-between}.pe-pkh b{font-size:1.15rem}
+.pe-ks{display:flex;flex-wrap:wrap;gap:6px}.pe-ks button{border:1.5px solid var(--k);background:transparent;color:var(--ink);border-radius:999px;padding:6px 11px;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}.pe-ks button.on{background:var(--k);color:#fff}
+#pe-q{padding:11px 12px;border-radius:11px;border:1.5px solid var(--line);background:transparent;color:inherit;font:inherit}
+.pe-ts{display:grid;gap:5px;max-height:38vh;overflow:auto}.pe-ts button{text-align:left;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit;font-size:.9rem;cursor:pointer}.pe-ts button:hover{border-color:#00A6E6}.pe-ts button.on{background:color-mix(in srgb,#00A6E6 16%,transparent);border-color:#00A6E6;font-weight:700}
+.pe-tira{justify-self:start;border:0;background:none;color:#DC2626;font:inherit;font-weight:700;cursor:pointer;padding:4px}
+@media(max-width:900px){.pe-g{grid-template-columns:1fr}.pe-esq{position:static}.pe-ov{padding:0;place-items:stretch}.pe{border-radius:0;max-height:100vh}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -8985,6 +9015,47 @@ function pvfSalva(p){var F=pvfDe(p.id),conta=contaId();if(!conta||!p.id)return;v
       if(velhos.length)SB.storage.from(PVF_BK).remove(velhos).then(function(){});F.salvando='';pvPinta();toast('Arquivos guardados no pedido #'+(p.numero||'')+'. ✅');});})
   .catch(function(e){var m=String((e&&e.message)||e||'');F.salvando='';F.erro=/bucket|not found|odonto-casos/i.test(m)||/caso/.test(m)?'Falta rodar a atualização 086 no banco para guardar os arquivos.':/size|large|exceed|payload/i.test(m)?'Arquivo grande demais para o limite do servidor.':'Não consegui guardar os arquivos agora. ('+m.slice(0,80)+')';pvPinta();});}
 function pvfApagaArqs(p){var c=p&&p.caso;if(!c)return;var L=[].concat(c.zip?[c.zip.path]:[],(c.stls||[]).map(function(s){return s.path;}),c.html?[c.html.path]:[]).filter(Boolean);if(L.length)SB.storage.from(PVF_BK).remove(L).then(function(){});}
+
+/* ===== Editar pedido no padrão do Ideali CAD: janela com a arcada grande à esquerda (cada dente com o seu trabalho) e os dados à direita ===== */
+var PE={pick:null,q:''};
+function peServs(){var N=S.neg&&S.neg.servs||[],L=N.map(function(s){return s[0];}).filter(Boolean);return L.length?L:PC_TRAB.filter(function(t){return t!=='Outro';});}
+function peKDe(t){t=semAc(t||'');return /implant|parafus/.test(t)?'imp':/facet|lente|lamin/.test(t)?'fac':/pontic/.test(t)?'pon':/modelo|guia|placa|enceram/.test(t)?'out':'prep';}
+function peDeriva(p){var A=p.arcada||[];p.dentes=A.map(function(x){return x.d;});if(A.length)p.qtd=A.length;
+  var ts=[];A.forEach(function(x){if(x.t&&ts.indexOf(x.t)<0)ts.push(x.t);});if(ts.length)p.trabalho=ts.join(' + ').slice(0,120);p.sobre_implante=A.some(function(x){return x.k==='imp';});}
+function peCalc(p){var A=p.arcada||[],G={},ord=[];A.forEach(function(x){var t=x.t||p.trabalho||'';if(!t)return;if(!G[t]){G[t]=[];ord.push(t);}G[t].push(x.d);});
+  var tot=0,falta=false,L=ord.map(function(t){var s=pedServ(t),v=s&&s.valor!=null?s.valor:null;if(v==null)falta=true;else tot+=v*G[t].length;
+    return '<div class="pe-cl"><span>'+esc(t)+' · '+G[t].length+' × '+(v==null?'sem preço na tabela':'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2}))+' <small>('+G[t].join(', ')+')</small></span><b>'+(v==null?'—':'R$ '+(v*G[t].length).toLocaleString('pt-BR',{minimumFractionDigits:2}))+'</b></div>';});
+  if(!L.length)return '';return '<div class="pe-calc">'+L.join('')+'<div class="pe-ct"><span>Valor pela tabela'+(falta?' (parcial)':'')+'</span><b>R$ '+tot.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</b></div>'+(tot?'<button type="button" class="btn sm" data-act="peValor" data-v="'+tot+'">Usar este valor</button>':'')+'</div>';}
+function peEsq(p){var A=p.arcada||[];
+  return '<div class="pe-sec"><span class="pe-rot">Elementos ('+A.length+')</span>'+oaSVG(A,{ed:true})+'<small class="muted">Toque no dente e escolha o trabalho. Para unir dentes vizinhos (fixa / ponte), toque na bolinha entre eles.</small></div>'+
+    (A.length?'<div class="pe-els">'+A.map(function(x){return '<div class="pe-el"><button type="button" class="pe-elb" data-act="peAbre" data-v="'+x.d+'"><b>'+x.d+'</b> · '+esc(x.t||p.trabalho||'Escolher trabalho')+' · <span style="color:'+OA_K[x.k][1]+'">'+(x.u?'unida · ':'')+OA_K[x.k][0].toLowerCase()+'</span></button><button type="button" class="pe-x" data-act="peTira" data-v="'+x.d+'" aria-label="Tirar dente '+x.d+'">✕</button></div>';}).join('')+'</div>':'')+peCalc(p);}
+function pePicker(p){var d=PE.pick;if(d==null)return '';var x=(p.arcada||[]).filter(function(a){return a.d===d;})[0]||{k:'prep'},q=semAc(PE.q||''),L=peServs().filter(function(t){return !q||semAc(t).indexOf(q)>=0;});
+  return '<div class="pe-pk-ov" data-act="pePickX"><div class="pe-pk" role="dialog" aria-label="Trabalho do dente '+d+'"><div class="pe-pkh"><b>Dente '+d+'</b><button type="button" class="pe-x" data-act="pePickX" aria-label="Fechar">✕</button></div>'+
+    '<div class="pe-ks">'+OA_ORD.map(function(k){return '<button type="button" class="'+(x.k===k?'on':'')+'" style="--k:'+OA_K[k][1]+'" data-act="pePickK" data-v="'+k+'">'+OA_K[k][0]+'</button>';}).join('')+'</div>'+
+    '<input id="pe-q" placeholder="Buscar trabalho da tabela…" value="'+esc(PE.q||'')+'" autocomplete="off">'+
+    '<div class="pe-ts">'+L.map(function(t){return '<button type="button" class="'+(x.t===t?'on':'')+'" data-act="pePickT" data-v="'+esc(t)+'">'+esc(t)+'</button>';}).join('')+(L.length?'':'<small class="muted">Nada com esse nome. Aperte Enter para usar o que escreveu.</small>')+'</div>'+
+    '<button type="button" class="pe-tira" data-act="peTira" data-v="'+d+'">Tirar este dente do pedido</button></div></div>';}
+var _rPedFormPE=rPedForm;
+rPedForm=function(p){oaSync(p);var h=_rPedFormPE(p),i=h.indexOf('<section class="oa-form">');if(i>=0){var j=h.indexOf('</section>',i);h=h.slice(0,i)+h.slice(j+10);}
+  return '<div class="pe-ov'+(PE._ab?'':' ent')+'"><div class="pe" role="dialog" aria-modal="true"><header class="pe-h"><h2>'+(p.id?'Editar pedido #'+(p.numero||'—'):'Novo pedido')+'</h2><span class="spacer"></span><button type="button" class="pv-x" data-act="pedVolta" aria-label="Fechar">✕</button></header>'+
+    '<div class="pe-g"><div class="pe-esq">'+peEsq(p)+'</div><div class="pe-dir">'+h+'</div></div>'+pePicker(p)+'</div></div>';};
+var _rPedidosPE=rPedidos;
+rPedidos=function(){if(!PED.ed)return _rPedidosPE.apply(this,arguments);var e=PED.ed;PED.ed=null;var fundo='';try{fundo=_rPedidosPE.apply(this,arguments);}catch(x){}PED.ed=e;
+  return '<div class="pe-fundo" aria-hidden="true">'+fundo.replace(/data-pf=/g,'data-x=').replace(/ id="/g,' data-id="')+'</div>'+rPedForm(e);};
+function peX(d){var p=PED.ed;return p&&(p.arcada||[]).filter(function(a){return a.d===+d;})[0];}
+Object.assign(ACT,{
+  oaDente:function(v){pedLe();var p=PED.ed;if(!p)return;p.arcada=p.arcada||[];var d=+v;if(!peX(d)){p.arcada.push({d:d,k:peKDe(p.trabalho),u:false,t:''});p.arcada=oaOrdena(p.arcada.map(function(a){return a.d;})).map(function(n){return p.arcada.filter(function(a){return a.d===n;})[0];});peDeriva(p);}
+    PE.pick=d;PE.q='';render();setTimeout(function(){var i=document.getElementById('pe-q');if(i)i.focus();},30);},
+  peAbre:function(v){pedLe();PE.pick=+v;PE.q='';render();},
+  pePickX:function(){PE.pick=null;render();},
+  pePickK:function(v){var x=peX(PE.pick);if(!x)return;x.k=v;peDeriva(PED.ed);render();},
+  pePickT:function(v){var x=peX(PE.pick);if(!x)return;x.t=String(v).slice(0,120);var nk=peKDe(v);x.k=nk==='prep'&&(x.k==='pon'||x.k==='imp')?x.k:nk;PE.pick=null;peDeriva(PED.ed);render();},
+  peTira:function(v){pedLe();var p=PED.ed;if(!p)return;p.arcada=(p.arcada||[]).filter(function(a){return a.d!==+v;});if(p.arcada.length){var A=p.arcada;A.forEach(function(a,i){var nx=A[i+1];if(a.u&&!(nx&&oaVizinho(a.d,nx.d)))a.u=false;});}PE.pick=null;peDeriva(p);render();},
+  peValor:function(v){pedLe();PED.ed.valor=Math.round(+v*100)/100;render();toast('Valor pela tabela aplicado.');}});
+document.addEventListener('input',function(e){if(e.target.id!=='pe-q')return;PE.q=e.target.value;var p=PED.ed;if(!p)return;var box=document.querySelector('.pe-ts');if(!box)return;var t=document.createElement('div');t.innerHTML=pePicker(p);var nb=t.querySelector('.pe-ts');if(nb)box.replaceWith(nb);});
+document.addEventListener('keydown',function(e){if(e.target.id==='pe-q'&&e.key==='Enter'){e.preventDefault();var v=e.target.value.trim();if(v)ACT.pePickT(v);}
+  else if(e.key==='Escape'&&PED.ed&&document.querySelector('.pe-ov')){if(PE.pick!=null){PE.pick=null;render();}else{PED.ed=null;render();}}},true);
+(function(){var _rPE=render;render=function(){var x=_rPE.apply(this,arguments);try{var velho=document.getElementById('pe-raiz');if(velho)velho.remove();var ov=document.querySelector('.pe-ov');if(ov&&ov.parentNode!==document.body){var r=document.createElement('div');r.id='pe-raiz';document.body.appendChild(r);r.appendChild(ov);}document.body.classList.toggle('pe-trava',!!(PED&&PED.ed&&document.querySelector('.pe-ov')));PE._ab=!!(PED&&PED.ed);}catch(e){}return x;};})();
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
