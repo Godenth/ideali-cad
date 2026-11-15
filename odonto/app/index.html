@@ -2243,6 +2243,31 @@ body:has(.rsx.rs-claro){background:#F3F4F6}body:has(.rsx:not(.rs-claro)){backgro
 .rl-h .ilogo{font-size:1.4rem}
 .rct-marca .ilogo{font-size:clamp(3rem,8vw,5.2rem);color:#fff}.rct-marca{align-items:baseline!important}
 .rct-marca em{font-family:'Outfit',ui-sans-serif,system-ui,sans-serif;font-weight:300}
+/* celular: topo limpo + menu ☰ */
+.ab-burg{display:none}
+@media (max-width:760px){
+  body.bn3-on .dabas,body.bn3-on .appbar .ab-busca,body.bn3-on .appbar .ab-tema,body.bn3-on .appbar [data-act=abAjuda],body.bn3-on .appbar .ab-novo,body.bn3-on .appbar .cfg-w,body.bn3-on #rl-bar{display:none!important}
+  body.bn3-on .appbar .ab-burg{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);margin-left:auto;cursor:pointer}
+  body.bn3-on .appbar{gap:10px}
+  body.bn3-on .bn3-oi{display:none!important}
+  body.bn3-on .dhero.cel-hero{display:grid!important;min-height:calc(100vh - 330px);align-content:end;border-radius:24px}
+  body.bn3-on .dhero.cel-hero h2{font-size:2rem}
+}
+#cmenu{position:fixed;inset:0;z-index:200}
+.cm-fundo{position:absolute;inset:0;background:rgba(5,8,15,.5);backdrop-filter:blur(2px);animation:cmF .2s ease}
+.cm-pn{position:absolute;top:0;right:0;bottom:0;width:min(86vw,340px);background:var(--surface);color:var(--ink);box-shadow:-20px 0 50px -20px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:10px;padding:14px 14px calc(14px + env(safe-area-inset-bottom));overflow-y:auto;animation:cmE .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes cmF{from{opacity:0}}@keyframes cmE{from{transform:translateX(100%)}}
+.cm-top{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 6px}.cm-top .ilogo{font-size:1.6rem}
+.cm-x{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--ink);font-size:1rem;cursor:pointer}
+.cm-eu{display:flex;gap:12px;align-items:center;padding:10px;border-radius:14px;background:var(--soft)}.cm-eu>span:last-child{display:grid}.cm-eu small{color:var(--muted);font-size:.78rem}
+.cm-av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--accent);color:var(--accent-ink,#fff)}
+.cm-busca input{width:100%;box-sizing:border-box;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.cm-nb .btn{width:100%;justify-content:center}
+.cm-lista,.cm-rod{display:grid;gap:2px}.cm-rod{margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+.cm-it{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;font-weight:600;font-size:.98rem;color:var(--ink)}
+.cm-it:hover{background:var(--soft)}.cm-it.on{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+.cm-it i{margin-left:auto;font-style:normal;font-size:.72rem;font-weight:700;background:#DC2626;color:#fff;border-radius:999px;padding:1px 7px}
+.cm-it svg{width:20px;height:20px}.cm-sair{color:#DC2626}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -8050,6 +8075,37 @@ function mpbCarrega(){if(MPB.d||MPB.pedindo||!window.SB||!SB.rpc)return;MPB.pedi
   SB.rpc('odo_mapa_publico').then(function(r){MPB.pedindo=false;if(r.error||!r.data)return;MPB.d=r.data;mpbPinta();},function(){MPB.pedindo=false;});}
 (function(){var tenta=function(){if(document.getElementById('mp-svg')){mpbCarrega();mpbPinta();}};tenta();setTimeout(tenta,600);document.addEventListener('visibilitychange',tenta);
   var _r=render;render=function(){var x=_r.apply(this,arguments);try{var sv=document.getElementById('mp-svg');if(sv&&!sv.getAttribute('data-ok')){mpbCarrega();mpbPinta();}}catch(e){}return x;};})();
+
+
+/* ===== Celular: menu ☰ no lugar das abas, topo limpo e Início só com a previsão do tempo ===== */
+function celOn(){return !!(window.matchMedia&&matchMedia('(max-width:760px)').matches)&&!S.redeOn&&lmbVisivel();}
+function celHero(){var n=((RL.perfil&&RL.perfil.nome)||(PN()||{}).nome||'').split(' ')[0];
+  return '<section class="dhero cel-hero '+ceuClasse()+'">'+ceuCamadas()+'<div class="dhero-t">'+climaChip()+'<h2>'+dSaud()+(n?', '+esc(n):'')+'!</h2></div></section>';}
+['rDInicio','rPInicio','rAInicio','rCInicio','rSInicio'].forEach(function(f){var o=window[f];if(typeof o!=='function')return;
+  window[f]=function(){if(celOn()&&!(typeof tutAba==='function'&&tutAba()))return celHero();return o.apply(this,arguments);};});
+var _rTopoAppCM=rTopoApp;rTopoApp=function(){var h=_rTopoAppCM.apply(this,arguments);if(!h)return h;
+  return h.replace(/<\/header>$/,'<button class="ab-burg" data-act="cmAbre" aria-label="Abrir menu" aria-expanded="'+!!S.cm+'"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></header>');};
+function cmDesenha(){var el=document.getElementById('cmenu');if(!S.cm||!celOn()){if(el)el.remove();document.body.classList.remove('cm-on');S.cm=false;return;}
+  if(!el){el=document.createElement('div');el.id='cmenu';document.body.appendChild(el);}document.body.classList.add('cm-on');
+  var D=PN()||{},abas=document.querySelector('.dabas'),nb=document.querySelector('.appbar .ab-novo'),r=S.role,mestre=document.body.classList.contains('rl-master');
+  var itens=abas?[].map.call(abas.querySelectorAll('button[data-act]'),function(b){var c=b.cloneNode(true);c.removeAttribute('role');c.className='cm-it'+(b.getAttribute('aria-selected')==='true'?' on':'');c.removeAttribute('aria-selected');return c.outerHTML;}).join(''):'';
+  el.innerHTML='<div class="cm-fundo" data-cm="fecha"></div><aside class="cm-pn" role="dialog" aria-modal="true" aria-label="Menu">'+
+    '<div class="cm-top">'+ILOGO+'<button class="cm-x" data-cm="fecha" aria-label="Fechar menu">✕</button></div>'+
+    '<div class="cm-eu"><span class="cm-av">'+esc((D.nome||'?')[0])+'</span><span><b>'+esc(D.nome||'')+'</b><small>'+esc(PAPEL_NOME[r]||'')+(mestre?' · 👑 Conta master':'')+'</small></span></div>'+
+    '<label class="cm-busca"><input type="search" id="cm-q" placeholder="Buscar paciente, pedido, pessoa…" autocomplete="off"></label>'+
+    (nb?'<div class="cm-nb">'+nb.outerHTML+'</div>':'')+
+    '<nav class="cm-lista">'+itens+'</nav>'+
+    '<div class="cm-rod"><button class="cm-it" data-act="temaTroca">'+(temaEscuro()?'☀️ Tema claro':'🌙 Tema escuro')+'</button><button class="cm-it" data-act="abAjuda">❓ Ajuda</button><button class="cm-it" data-act="cfgMenu">⚙️ Minha conta</button>'+(RL.user?'<button class="cm-it cm-sair" data-rl="sair">Sair</button>':'')+'</div></aside>';}
+ACT.cmAbre=function(){S.cm=true;S.cfgMenu=false;cmDesenha();};
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;var m=document.getElementById('cmenu');if(!m)return;
+  if(t.closest('[data-cm="fecha"]')){S.cm=false;cmDesenha();return;}
+  var b=t.closest('#cmenu button');if(!b)return;var a=b.getAttribute('data-act');
+  if(a==='cfgMenu'){S.cm=false;cmDesenha();S.tab[S.role]=S.tab[S.role];ACT.cfgMenu&&ACT.cfgMenu();return;}
+  if(a==='temaTroca'){setTimeout(cmDesenha,0);return;}
+  setTimeout(function(){S.cm=false;cmDesenha();},0);},true);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&S.cm){S.cm=false;cmDesenha();}if(e.key==='Enter'&&e.target&&e.target.id==='cm-q'){var q=document.getElementById('ab-q');if(q){q.value=e.target.value;q.dispatchEvent(new Event('input',{bubbles:true}));q.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));}S.cm=false;cmDesenha();}});
+var _renderCM=render;render=function(){var x=_renderCM.apply(this,arguments);try{if(S.cm)cmDesenha();}catch(e){}return x;};
+addEventListener('resize',function(){if(S.cm&&!celOn()){S.cm=false;cmDesenha();}});
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
