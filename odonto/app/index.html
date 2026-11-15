@@ -8336,14 +8336,14 @@ function h3dIni(){if(H3D.on||!h3dPode())return;var hero=document.querySelector('
   var ufs={};function ufsAt(){ufs={};((MPB.d&&MPB.d.ufs)||[]).forEach(function(u){ufs[u]=1;});}
   var ease=function(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;},cl=function(t){return t<0?0:t>1?1:t;};
   /* ciclo automático: mapa (6s) → solta (3s) → viagem (12s) → volta ao mapa (4s) */
-  var C_MAPA=6,C_SOLTA=3,C_VOO=12,C_VOLTA=4,CICLO=C_MAPA+C_SOLTA+C_VOO+C_VOLTA;
+  var C_MAPA=6,C_SOLTA=2.2,C_VOO=12,C_VOLTA=4,CICLO=C_MAPA+C_SOLTA+C_VOO+C_VOLTA;
   var t0=performance.now(),ult='',camZ=0,tAnt=0;
   function quadro(now){if(!document.body.contains(cv))return;requestAnimationFrame(quadro);
     if(site.offsetParent===null)return;
     var rb=palco.getBoundingClientRect();if(rb.bottom<0||rb.top>innerHeight)return;
     var tempo=(now-t0)/1000,dt=Math.min(.05,tempo-tAnt);tAnt=tempo;ufsAt();
-    var nasce=ease(cl(tempo/1.8)),c=(tempo-1.8)%CICLO,solta;
-    if(tempo<1.8||c<C_MAPA)solta=0;else if(c<C_MAPA+C_SOLTA)solta=ease((c-C_MAPA)/C_SOLTA);else if(c<C_MAPA+C_SOLTA+C_VOO)solta=1;else solta=1-ease((c-C_MAPA-C_SOLTA-C_VOO)/C_VOLTA);
+    var nasce=ease(cl(tempo/1)),c=(tempo-1+C_MAPA)%CICLO,solta;
+    if(tempo<1||c<C_MAPA)solta=0;else if(c<C_MAPA+C_SOLTA)solta=ease((c-C_MAPA)/C_SOLTA);else if(c<C_MAPA+C_SOLTA+C_VOO)solta=1;else solta=1-ease((c-C_MAPA-C_SOLTA-C_VOO)/C_VOLTA);
     camZ+=dt*(.05+solta*.42);
     var esc=Math.min(W*.42/613,H*.84/639),ox=W*.73-613*esc/2,oy=H*.52-639*esc/2,cx=W*.66,cy=H*.5,FO=Math.min(W,H)*.9;
     g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
@@ -8380,7 +8380,7 @@ function h3dIni(){if(H3D.on||!h3dPode())return;var hero=document.querySelector('
     g.globalAlpha=1;
     var txt=perto&&solta>.8?perto.p.t+(ufs[perto.p.uf]?' · '+perto.p.uf:''):'';if(txt&&txt!==ult){ult=txt;rot.textContent=txt;}rot.style.opacity=txt?'1':'0';}
   requestAnimationFrame(quadro);}
-(function(){var tenta=function(){try{h3dIni();}catch(e){}};setTimeout(tenta,400);addEventListener('load',tenta);
+(function(){var tenta=function(){try{h3dIni();}catch(e){}};setTimeout(tenta,60);addEventListener('load',tenta);
   var _rH3=render;render=function(){var x=_rH3.apply(this,arguments);setTimeout(tenta,0);return x;};})();
 
 /* conta real: nada de dados de exemplo no painel */
