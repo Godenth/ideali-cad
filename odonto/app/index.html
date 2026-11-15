@@ -2567,6 +2567,7 @@ body.pv-trava{overflow:hidden}
 .stlv{position:fixed;inset:0;z-index:260;background:radial-gradient(120% 90% at 50% 40%,#16213a,#05080f);display:grid;grid-template-rows:auto 1fr;color:#E6EDF7;animation:pdFade .2s ease both}
 .stlv-h{display:flex;align-items:center;gap:12px;padding:12px 16px}.stlv-h b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stlv-d{color:#94A3B8;font-size:.82rem;margin-left:auto}.stlv .pv-x{color:#E6EDF7;border-color:rgba(255,255,255,.2)}
 .stlv-c{position:relative;min-height:0}.stlv-c canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}.stlv-ld{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#94A3B8}
+.pvf-mais{display:flex;flex-wrap:wrap;gap:8px}.pvf-up2{flex:1;display:flex;justify-content:center;padding:10px;border:1.5px dashed var(--line);border-radius:12px;font-weight:700;font-size:.88rem;cursor:pointer;color:var(--ink)}.pvf-up2:hover{border-color:#00A6E6}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -8885,7 +8886,8 @@ function pvfCards(p){var F=pvfDe(p.id),R=F.exo,stl=F.stls.some(function(s){retur
   var chip=function(on,txt,baixa,ver){return on?'<span class="pvf-ok">✅ '+txt+(ver?'<button data-pvb="'+ver+'" title="Visualizar">👁 Ver</button>':'')+'<button data-pvb="'+baixa+'" title="Baixar">⬇ Baixar</button></span>':'';};
   return '<div class="pvf2">'+
     (F.lendo?'<div class="pvf-ld">Abrindo o Dental CAD…</div>':'<label class="pvf-up'+(F.zip?' tem':'')+'">🗜️ '+(F.zip?'Trocar Dental CAD':'Anexar Dental CAD (.zip)')+'<input type="file" data-pvf="zip" accept=".zip,application/zip" hidden></label>')+
-    (F.zip?'<div class="pvf-oks">'+chip(true,'Dental CAD anexado','zip')+chip(stl,'STL anexada','stl','verstl')+chip(!!F.html,'HTML anexado','html','verhtml')+'</div>':'')+
+    '<div class="pvf-oks">'+(F.zip?chip(true,'Dental CAD anexado','zip'):'')+chip(stl,'STL anexada','stl','verstl')+chip(!!F.html,'HTML anexado','html','verhtml')+
+      ((!stl||!F.html)?'<div class="pvf-mais">'+(!stl?'<label class="pvf-up2">＋ Anexar STL<input type="file" data-pvf="stlmao" accept=".stl" multiple hidden></label>':'')+(!F.html?'<label class="pvf-up2">＋ Anexar HTML<input type="file" data-pvf="htmlmao" accept=".html,.htm" hidden></label>':'')+'</div>':'')+'</div>'+
     (F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':'')+conf+
     '<button class="pvf-env" data-pv="mail">✉️ Enviar pedido por e-mail</button></div>';}
 document.addEventListener('change',function(ev){var t=ev.target,k=t&&t.getAttribute&&t.getAttribute('data-pvf');if(!k)return;var p=pvP();if(!p)return;var F=pvfDe(p.id);
