@@ -5051,14 +5051,10 @@ function redeAnim(entrar,troca){
   /* 2) paradas: aparece o logo */
   T.animate([{opacity:0,transform:'translate(-50%,-46%) scale(.96)'},{opacity:1,transform:'translate(-50%,-50%) scale(1)'}],{duration:420,delay:parou,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
   timers.push(setTimeout(faz,parou+60));
-  /* 3) o logo some em fade */
-  var some=parou+420+520;
-  timers.push(setTimeout(function(){if(!fim)T.animate([{opacity:1},{opacity:0}],{duration:260,fill:'forwards'});},some));
-  /* 4) as cortinas saem (na ordem inversa, acelerando e esmaecendo) */
-  var sai=some+240,DS=560;
-  timers.push(setTimeout(function(){if(fim)return;
-    for(var k=P.length-1;k>=0;k--)P[k].animate([{transform:'translateX(0)',opacity:1},{transform:para(lados[k]),opacity:.25}],{duration:DS,delay:(P.length-1-k)*GAP,easing:ACEL,fill:'forwards'});},sai));
-  timers.push(setTimeout(acaba,sai+DS+(P.length-1)*GAP+60));}
+  /* 3) tudo (cortinas + logo) some devagar em fade, revelando a tela nova; as cortinas não saem do lugar */
+  var some=parou+420+700,DF=900;
+  timers.push(setTimeout(function(){if(!fim)w.animate([{opacity:1},{opacity:0}],{duration:DF,easing:'ease-in-out',fill:'forwards'});},some));
+  timers.push(setTimeout(acaba,some+DF+40));}
 redeTransicao=function(entrar,sec){redeAnim(entrar,function(){if(entrar){S.redeOn=true;S.rede.sec=sec||'vagas';S.rede.anim=true;}else{if(typeof cvAtivo==='function'&&cvAtivo())lerCv();S.redeOn=false;S.painelVolta=true;}render();window.scrollTo(0,0);});};
 
 /* ===== Mapa 2D: zoom com a rodinha, arrastar com o mouse/dedo, botões + − e "Brasil inteiro" ===== */
