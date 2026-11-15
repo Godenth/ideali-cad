@@ -2420,6 +2420,15 @@ body:has(.site:not([hidden])){margin:0}
 body.h3d-on .h3d .h2-mapa{visibility:hidden}
 .h3d-rot{position:absolute;right:max(16px,4vw);bottom:5vh;z-index:3;font-family:'Sora',ui-sans-serif,system-ui,sans-serif;font-size:clamp(1.2rem,2vw,1.8rem);font-weight:700;letter-spacing:-.02em;color:#E6EDF7;opacity:0;transition:opacity .5s}
 @keyframes h3dRoda{50%{transform:translateY(8px);opacity:.3}}
+#rl-conf{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:130;width:min(640px,calc(100vw - 24px));display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--surface,#fff);color:var(--ink);border:1px solid var(--line);box-shadow:0 12px 32px rgba(15,23,42,.18);font-size:.86rem}
+#rl-conf .rc-ic{flex:none;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,#00A6E6 14%,transparent);color:#00A6E6}
+#rl-conf .rc-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+#rl-conf .rc-tx{flex:1;display:grid;gap:2px;min-width:0}#rl-conf .rc-tx>span{color:var(--muted)}#rl-conf .rc-er{color:#DC2626!important}
+#rl-conf .rc-ac{display:flex;gap:6px;flex:none}#rl-conf .rc-ac button,#rl-conf .rc-b{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:9px;padding:7px 10px;font:inherit;font-weight:600;cursor:pointer}
+#rl-conf .rc-f{display:flex;gap:6px;margin-top:6px}#rl-conf .rc-f input{flex:1;min-width:0;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:transparent;color:inherit}
+#rl-conf .rc-ag{color:var(--muted);font-size:.8rem}
+@media(max-width:640px){#rl-conf{top:auto;bottom:calc(84px + env(safe-area-inset-bottom));flex-wrap:wrap}#rl-conf .rc-ac{width:100%}#rl-conf .rc-ac button{flex:1}}
+.rl-ov-sn{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(5,10,22,.6);backdrop-filter:blur(4px)}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4456,16 +4465,18 @@ function rlDesenha(){var o=document.getElementById('rl-ov');if(!o){o=document.cr
   o.innerHTML='<form class="rl-c" id="rl-f" novalidate><div class="rl-h">'+ILOGO+'<span class="spacer"></span><button type="button" class="rl-x" data-rl="fecha" aria-label="Fechar">✕</button></div>'+
     '<div class="rl-ana"><img src="'+((typeof ANA!=='undefined'&&ANA.feliz)||'')+'" alt=""><p>'+(cr?'Vamos criar a sua conta. Depois eu monto o seu currículo com você. 💜':'Que bom te ver! Entre com o seu e-mail e senha.')+'</p></div>'+
     '<div class="rl-seg"><button type="button" class="'+(!cr?'on':'')+'" data-rl="entrar">Entrar</button><button type="button" class="'+(cr?'on':'')+'" data-rl="criar">Criar conta</button></div>'+
-    '<label>E-mail<input id="rl-e" type="email" autocomplete="email" value="'+esc(RL.email)+'"></label><label>Senha<input id="rl-s" type="password" autocomplete="'+(cr?'new-password':'current-password')+'"></label>'+
-    (cr?'<p class="rl-n">Já usa o Ideali CAD? É a mesma conta: é só entrar.</p>':'')+(RL.erro?'<p class="rl-er">'+esc(RL.erro)+'</p>':'')+(RL.msg?'<p class="rl-ok">'+esc(RL.msg)+'</p>':'')+
-    '<button class="rl-b" type="submit"'+(RL.busy?' disabled':'')+'>'+(RL.busy?'Aguarde…':cr?'Criar conta':'Entrar')+'</button>'+(!cr?'<button type="button" class="rl-l" data-rl="esqueci">Esqueci a senha</button>':'')+'</form>';}
+    '<label>E-mail<input id="rl-e" type="email" autocomplete="email" value="'+esc(RL.email)+'"></label>'+(cr?'':'<label>Senha<input id="rl-s" type="password" autocomplete="current-password"></label>')+
+    (cr?'<p class="rl-n">Você cria a senha no fim, quando confirmar o e-mail. Já usa o Ideali CAD? É a mesma conta: é só entrar.</p>':'')+(RL.erro?'<p class="rl-er">'+esc(RL.erro)+'</p>':'')+(RL.msg?'<p class="rl-ok">'+esc(RL.msg)+'</p>':'')+
+    '<button class="rl-b" type="submit"'+(RL.busy?' disabled':'')+'>'+(RL.busy?'Aguarde…':cr?'Continuar':'Entrar')+'</button>'+(!cr?'<button type="button" class="rl-l" data-rl="esqueci">Esqueci a senha</button>':'')+'</form>';}
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-rl]');if(!b)return;ev.preventDefault();ev.stopPropagation();var k=b.dataset.rl;
   if(k==='fecha'){rlFecha();return;}if(k==='entrar'||k==='criar'){RL.email=(document.getElementById('rl-e')||{}).value||RL.email;rlAbre(k);return;}
   if(k==='esqueci'){var e=((document.getElementById('rl-e')||{}).value||'').trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){RL.erro='Digite o seu e-mail e toque de novo em "Esqueci a senha".';rlDesenha();return;}
     SB.auth.resetPasswordForEmail(e,{redirectTo:location.href.split('#')[0].split('?')[0]}).then(function(r){RL.email=e;RL.erro=r.error?rlMsg(r.error):'';RL.msg=r.error?'':'Enviamos um link para criar uma nova senha. Veja o seu e-mail.';rlDesenha();});return;}
-  if(k==='sair'){SB.auth.signOut().then(function(){location.href=location.pathname;});}},true);
-document.addEventListener('submit',function(ev){if(ev.target.id!=='rl-f')return;ev.preventDefault();var em=document.getElementById('rl-e').value.trim(),se=document.getElementById('rl-s').value,cr=RL.modo==='criar';RL.email=em;RL.erro='';RL.msg='';
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){RL.erro='Digite um e-mail válido.';rlDesenha();return;}if(se.length<8){RL.erro='A senha precisa ter pelo menos 8 caracteres.';rlDesenha();return;}
+  if(k==='sair'){if(RL.user&&RL.user.is_anonymous&&!confirm('Você ainda não confirmou o seu e-mail. Se sair agora, o cadastro feito até aqui se perde. Sair mesmo?'))return;SB.auth.signOut().then(function(){location.href=location.pathname;});}},true);
+document.addEventListener('submit',function(ev){if(ev.target.id!=='rl-f')return;ev.preventDefault();var em=document.getElementById('rl-e').value.trim(),cr=RL.modo==='criar',se=cr?'':document.getElementById('rl-s').value;RL.email=em;RL.erro='';RL.msg='';
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){RL.erro='Digite um e-mail válido.';rlDesenha();return;}
+  if(cr){RL.busy=true;rlDesenha();rlProvSet(em,'');SB.auth.signInAnonymously({options:{data:{prov:1}}}).then(function(r){RL.busy=false;if(r.error){RL.erro=/anonymous/i.test(r.error.message||'')?'O cadastro novo ainda não foi liberado no servidor. Avise o suporte.':rlMsg(r.error);rlDesenha();}});return;}
+  if(se.length<8){RL.erro='A senha precisa ter pelo menos 8 caracteres.';rlDesenha();return;}
   RL.busy=true;rlDesenha();var fim=function(m){RL.busy=false;RL.erro=m||'';rlDesenha();};
   if(cr)SB.auth.signUp({email:em,password:se,options:{emailRedirectTo:location.href.split('#')[0].split('?')[0]}}).then(function(r){if(r.error)return fim(rlMsg(r.error));RL.busy=false;if(!r.data.session){RL.modo='entrar';RL.msg='Conta criada! Confirme pelo link que enviamos no seu e-mail e depois entre.';rlDesenha();}});
   else SB.auth.signInWithPassword({email:em,password:se}).then(function(r){if(r.error)return fim(rlMsg(r.error));RL.busy=false;});},true);
@@ -4473,7 +4484,7 @@ document.addEventListener('submit',function(ev){if(ev.target.id!=='rl-f')return;
 /* site → login; logado → cadastro (se ainda não tem perfil) ou painel */
 ACT.siteCad=function(){if(!RL.user){rlAbre('criar');return;}rlEntra();};
 ACT.siteEntrar=function(){if(!RL.user){rlAbre('entrar');return;}rlEntra();};
-function rlEntra(){rlFecha();if(RL.perfil){rlPainel();return;}ACT.cadReset();var c=S.cad;c.email=RL.user.email||'';if(RL.cadNome)c.nome=RL.cadNome;if(RL.cadTel)c.whats=rlTel(RL.cadTel);c.passo=1;S.role='novo';render();window.scrollTo(0,0);}
+function rlEntra(){rlFecha();if(RL.perfil){rlPainel();return;}ACT.cadReset();var c=S.cad;c.email=RL.user.email||rlProv().em||'';if(RL.cadNome)c.nome=RL.cadNome;if(RL.cadTel)c.whats=rlTel(RL.cadTel);c.passo=1;S.role='novo';render();window.scrollTo(0,0);}
 function rlPainel(){var p=RL.perfil,r=ROLE_DE[p.prof]||'dent';rlParaCad(p);S.pf={};S.redeOn=false;S.role=r;S.tab[r]=S.tab[r]||'inicio';var P=pfDe(r);rlParaPf(P,p);render();window.scrollTo(0,0);}
 function rlParaCad(p){ACT.cadReset();var c=S.cad,k=p.cadastro||{};Object.assign(c,{nome:p.nome,email:RL.user.email||'',whats:rlTel(p.whats),prof:p.prof,cargo:p.cargo||'',idade:String(p.idade),sexo:p.sexo,uf:p.uf,cidade:p.cidade,passo:6,anaOi:true,maisVisto:true});CAD_KEYS.forEach(function(x){if(k[x]!==undefined)c[x]=k[x];});c.entOk=true;}
 function rlParaPf(P,p){P.nome=p.nome;P.cargo=p.cargo||P.cargo;P.resumo=p.resumo||'';P.softs=(p.softs||[]).slice();P.pos=(p.pos||[]).slice();P.cursos=(p.cursos||[]).slice();
@@ -8334,6 +8345,14 @@ function h3dIni(){if(H3D.on||!h3dPode())return;var hero=document.querySelector('
       else{p.l1=p.t;p.l2='Rede Ideali';}});cartMede();}
   cartPoe(null);
   var pediu=false;function cartPede(){if(pediu||!window.SB||!SB.rpc)return;pediu=true;SB.rpc('odo_home_cartoes').then(function(r){if(!r.error&&r.data&&r.data.length)cartPoe(r.data);},function(){});}
+  /* estrelas: um ponto brilhante que irradia (núcleo branco, halo colorido e quatro raios finos) */
+  function estrela(cor){var c=document.createElement('canvas'),T=64,m=T/2;c.width=c.height=T;var x=c.getContext('2d');
+    var gr=x.createRadialGradient(m,m,0,m,m,m);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.07,'rgba(255,255,255,.95)');gr.addColorStop(.14,cor);gr.addColorStop(.32,cor.replace('rgb','rgba').replace(')',',.22)'));gr.addColorStop(1,'rgba(0,0,0,0)');
+    x.fillStyle=gr;x.fillRect(0,0,T,T);x.globalCompositeOperation='lighter';
+    [[0,1],[1,0]].forEach(function(d){var lg=d[0]?x.createLinearGradient(0,m,T,m):x.createLinearGradient(m,0,m,T);lg.addColorStop(0,'rgba(255,255,255,0)');lg.addColorStop(.5,'rgba(255,255,255,.75)');lg.addColorStop(1,'rgba(255,255,255,0)');
+      x.fillStyle=lg;if(d[0])x.fillRect(0,m-.6,T,1.2);else x.fillRect(m-.6,0,1.2,T);});return c;}
+  function rgbDe(h){var n=parseInt(h.slice(1),16);return 'rgb('+(n>>16)+','+((n>>8)&255)+','+(n&255)+')';}
+  var EST=CORES.map(function(h){return estrela(rgbDe(h));}),EST_ON=estrela('rgb(45,212,191)');
   /* fumaça: nuvens macias pintadas uma vez e reaproveitadas */
   function nuvem(cor){var c=document.createElement('canvas');c.width=c.height=256;var x=c.getContext('2d');
     for(var n=0;n<7;n++){var px=128+(Math.random()-.5)*90,py=128+(Math.random()-.5)*90,rr=50+Math.random()*60,gr=x.createRadialGradient(px,py,0,px,py,rr);
@@ -8346,7 +8365,7 @@ function h3dIni(){if(H3D.on||!h3dPode())return;var hero=document.querySelector('
   var ufs={};function ufsAt(){ufs={};((MPB.d&&MPB.d.ufs)||[]).forEach(function(u){ufs[u]=1;});}
   var ease=function(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;},cl=function(t){return t<0?0:t>1?1:t;};
   /* ciclo automático: mapa (6s) → solta (3s) → viagem (12s) → volta ao mapa (4s) */
-  var C_MAPA=6,C_SOLTA=2.2,C_VOO=12,C_VOLTA=4,CICLO=C_MAPA+C_SOLTA+C_VOO+C_VOLTA;
+  var C_MAPA=6,C_SOLTA=2.2,C_VOO=120,C_VOLTA=4,CICLO=C_MAPA+C_SOLTA+C_VOO+C_VOLTA;
   var t0=performance.now(),ult='',camZ=0,tAnt=0;
   function quadro(now){if(!document.body.contains(cv))return;requestAnimationFrame(quadro);
     if(site.offsetParent===null)return;
@@ -8377,8 +8396,9 @@ function h3dIni(){if(H3D.on||!h3dPode())return;var hero=document.querySelector('
       alfa*=1-solta+solta*lado(ax);if(alfa<.01)continue;
       if(p.card&&solta>.35){cards.push({p:p,x:ax,y:ay,pr:pr,a:alfa*cl((solta-.35)/.4)});continue;}
       var rr=(on?1.9:1.3)*(1-solta)+solta*Math.min(5,p.s*pr*1.6);
-      g.globalAlpha=alfa;g.fillStyle=solta>.5?CORES[(i*7)%CORES.length]:(on?'#2DD4BF':'#8FA3B8');
-      g.beginPath();g.arc(ax,ay,rr,0,6.283);g.fill();}
+      if(on||solta>.15){var pis=.72+.28*Math.sin(tempo*(1.5+p.d*2.5)+p.d*60),tam2=rr*(5+3*solta)*pis;
+        g.globalCompositeOperation='lighter';g.globalAlpha=Math.min(1,alfa*(.6+.4*pis));g.drawImage(solta>.5?EST[(i*7)%EST.length]:EST_ON,ax-tam2/2,ay-tam2/2,tam2,tam2);g.globalCompositeOperation='source-over';}
+      else{g.globalAlpha=alfa;g.fillStyle='#8FA3B8';g.beginPath();g.arc(ax,ay,rr,0,6.283);g.fill();}}
     cards.sort(function(a,b){return a.pr-b.pr;});g.textBaseline='middle';
     cards.forEach(function(c2){var s=Math.min(3.4,c2.pr*.8),w=c2.p.w*s,h=c2.p.h*s;if(w<6)return;g.globalAlpha=Math.min(1,c2.a);
       var x=c2.x-w/2,y=c2.y-h/2,rad=Math.min(10,w*.08);
@@ -8392,6 +8412,44 @@ function h3dIni(){if(H3D.on||!h3dPode())return;var hero=document.querySelector('
   requestAnimationFrame(quadro);}
 (function(){var tenta=function(){try{h3dIni();}catch(e){}};setTimeout(tenta,60);addEventListener('load',tenta);
   var _rH3=render;render=function(){var x=_rH3.apply(this,arguments);setTimeout(tenta,0);return x;};})();
+
+/* ===== Conta provisória: cadastro só com e-mail; no fim confirma o e-mail e cria a senha (ver 081) ===== */
+function rlProv(){try{return JSON.parse(localStorage.getItem('io_prov')||'{}')||{};}catch(e){return {};}}
+function rlProvSet(em,env){try{localStorage.setItem('io_prov',JSON.stringify({em:em,env:env||''}));}catch(e){}}
+function rlVolta(){return location.href.split('#')[0].split('?')[0];}
+function rlProvEnvia(em,forca){var P=rlProv();em=em||P.em;if(!em||!RL.user||!RL.user.is_anonymous)return;if(!forca&&P.env===em)return;
+  RL.provErro='';RL.provBusy=true;rlProvConf();
+  SB.auth.updateUser({email:em},{emailRedirectTo:rlVolta()}).then(function(r){RL.provBusy=false;
+    if(r.error){RL.provErro=/already|registered|exists/i.test(r.error.message||'')?'Esse e-mail já tem uma conta no Ideali. Troque o e-mail aqui ou saia e entre na conta que já existe.':rlMsg(r.error);rlProvSet(em,'');}
+    else{rlProvSet(em,em);if(forca)toast('Link enviado de novo para '+em+'.');}
+    rlProvConf();});}
+function rlProvConf(){var b=document.getElementById('rl-conf'),u=RL.user;
+  if(!u){if(b)b.remove();return;}
+  /* voltou pelo link do e-mail: falta só criar a senha */
+  if(!u.is_anonymous&&u.user_metadata&&u.user_metadata.prov&&!u.user_metadata.senha_ok){if(b)b.remove();rlSenhaNova();return;}
+  if(!u.is_anonymous||!RL.perfil){if(b)b.remove();return;}
+  var P=rlProv();if(P.em&&P.env!==P.em&&!RL.provBusy&&!RL.provErro){rlProvEnvia(P.em);return;}
+  if(!b){b=document.createElement('div');b.id='rl-conf';document.body.appendChild(b);}
+  b.innerHTML='<div class="rc-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg></div><div class="rc-tx"><b>Confirme o seu e-mail</b>'+
+    (RL.provErro?'<span class="rc-er">'+esc(RL.provErro)+'</span>':'<span>Enviamos um link para <b>'+esc(P.em||'')+'</b>. Abra o link para criar a sua senha. Olhe também o spam.</span>')+
+    (RL.provTroca?'<form class="rc-f" id="rc-f"><input id="rc-e" type="email" placeholder="seu@email.com" value="'+esc(P.em||'')+'"><button class="rc-b">Enviar</button></form>':'')+'</div>'+
+    '<div class="rc-ac">'+(RL.provBusy?'<span class="rc-ag">Enviando…</span>':'<button data-rc="reenvia">Reenviar</button><button data-rc="troca">Trocar e-mail</button>')+'</div>';}
+document.addEventListener('click',function(ev){var x=ev.target.closest&&ev.target.closest('[data-rc]');if(!x)return;ev.preventDefault();
+  if(x.dataset.rc==='reenvia'){RL.provErro='';rlProvEnvia(null,true);}
+  if(x.dataset.rc==='troca'){RL.provTroca=!RL.provTroca;rlProvConf();}},true);
+document.addEventListener('submit',function(ev){if(ev.target.id!=='rc-f')return;ev.preventDefault();var e=(document.getElementById('rc-e').value||'').trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast('Digite um e-mail válido.');return;}RL.provTroca=false;rlProvSet(e,'');rlProvEnvia(e,true);},true);
+function rlSenhaNova(){if(document.getElementById('rl-sn'))return;var o=document.createElement('div');o.id='rl-sn';o.className='rl-ov-sn';
+  o.innerHTML='<form class="rl-c" id="rl-snf" novalidate><div class="rl-h">'+ILOGO+'</div><div class="rl-ana"><img src="'+((typeof ANA!=='undefined'&&ANA.feliz)||'')+'" alt=""><p>E-mail confirmado! Agora crie a sua senha para entrar nas próximas vezes.</p></div>'+
+    '<label>Senha<input id="sn-1" type="password" autocomplete="new-password"></label><label>Confirmar senha<input id="sn-2" type="password" autocomplete="new-password"></label><p class="rl-er" id="sn-er" hidden></p>'+
+    '<button class="rl-b" type="submit">Criar senha</button></form>';document.body.appendChild(o);setTimeout(function(){var i=document.getElementById('sn-1');if(i)i.focus();},50);}
+document.addEventListener('submit',function(ev){if(ev.target.id!=='rl-snf')return;ev.preventDefault();var a=document.getElementById('sn-1').value,b=document.getElementById('sn-2').value,er=document.getElementById('sn-er'),bt=ev.target.querySelector('.rl-b');
+  var m=a.length<8?'A senha precisa ter pelo menos 8 caracteres.':a!==b?'As duas senhas não são iguais.':'';if(m){er.textContent=m;er.hidden=false;return;}
+  bt.disabled=true;bt.textContent='Aguarde…';
+  SB.auth.updateUser({password:a,data:{prov:null,senha_ok:1}}).then(function(r){if(r.error){er.textContent=rlMsg(r.error);er.hidden=false;bt.disabled=false;bt.textContent='Criar senha';return;}
+    if(r.data&&r.data.user)RL.user=r.data.user;try{localStorage.removeItem('io_prov');}catch(e){}var o=document.getElementById('rl-sn');if(o)o.remove();toast('Pronto! Sua senha foi criada.');
+    if(typeof redeRealCarrega==='function')redeRealCarrega();});},true);
+(function(){var _rC=render;render=function(){var x=_rC.apply(this,arguments);try{rlProvConf();}catch(e){}return x;};})();
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
@@ -8407,7 +8465,7 @@ var _render0=render;render=function(){try{rlZera();rlZera2();}catch(e){}return _
 (function(){if(!SB){toast('Sem conexão com o servidor. Recarregue a página.');return;}
   SB.auth.onAuthStateChange(function(ev,ses){var u=ses&&ses.user;
     if(!u){RL.user=null;RL.perfil=null;RL.admin=false;rlBarra();return;}
-    if(RL.user&&RL.user.id===u.id)return;RL.user=u;try{var nm0=(S.cad&&S.cad.nome||'').split(' ')[0];if(S.dent)S.dent=dCarrega()||dSeed(nm0);if(S.prot)S.prot=pCarrega()||pSeed(nm0);if(S.asb)S.asb=aCarrega()||aSeed(nm0);if(S.stu)S.stu=sCarrega()||sSeed(nm0);}catch(e){}
+    if(RL.user&&RL.user.id===u.id){RL.user=u;rlProvConf();return;}RL.user=u;try{var nm0=(S.cad&&S.cad.nome||'').split(' ')[0];if(S.dent)S.dent=dCarrega()||dSeed(nm0);if(S.prot)S.prot=pCarrega()||pSeed(nm0);if(S.asb)S.asb=aCarrega()||aSeed(nm0);if(S.stu)S.stu=sCarrega()||sSeed(nm0);}catch(e){}
     Promise.all([SB.from('odo_perfis').select('*').eq('user_id',u.id).maybeSingle(),SB.rpc('sou_admin'),SB.from('perfis').select('nome,telefone').eq('user_id',u.id).maybeSingle()]).then(function(r){
       if(r[0].error)toast('O banco do Ideali Odonto precisa da atualização 040.');
       RL.perfil=r[0].data||null;RL.admin=!!r[1].data;var cp=r[2].data||{};RL.cadNome=cp.nome||'';RL.cadTel=cp.telefone||'';
