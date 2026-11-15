@@ -2302,6 +2302,30 @@ body.bn3-on #lmb .lmb-fab{display:none!important}
 body.bn3-on #lmb{bottom:calc(68px + env(safe-area-inset-bottom))!important}
 body.bn3-on{padding-bottom:calc(80px + env(safe-area-inset-bottom))!important}
 body.bn3-on .toast{bottom:calc(74px + env(safe-area-inset-bottom))!important}
+/* Rede no celular: topo estilo Facebook (logo à esquerda, lupa e foto à direita), sem barras extras */
+.rs-lupa,.rs-loct,.rav-sec{display:none}
+@media (max-width:820px){
+  .rsx .rs-top-in{flex-wrap:nowrap!important;padding:10px 14px}
+  .rsx .rs-marca .ilogo{font-size:1.75rem}.rsx .rs-nm,.rsx .rs-volta{display:none!important}
+  .rsx .rs-busca{display:none!important}
+  .rsx.rs-lupa-on .rs-top-in{flex-wrap:wrap!important}.rsx.rs-lupa-on .rs-busca{display:flex!important;order:9;flex-basis:100%}
+  .rsx .rs-lupa{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:0;background:color-mix(in srgb,var(--rtx) 8%,transparent);color:var(--rtx);margin-left:auto;cursor:pointer}
+  .rsx .rs-lupa .ic{width:20px;height:20px;margin:0}.rsx.rs-lupa-on .rs-lupa{background:var(--rc);color:#fff}
+  .rsx .rav-w{margin-left:8px}.rsx .rs-av{width:40px;height:40px}
+  .rsx .rav-m{right:0;width:min(86vw,300px);max-height:75vh;overflow:auto}
+  .rsx .rav-sec{display:grid;border-bottom:1px solid var(--rln);padding-bottom:6px;margin-bottom:6px}
+  .rsx .rav-sec button{display:flex;align-items:center;gap:10px}.rsx .rav-sec .ic{width:18px;height:18px;margin:0;color:var(--rmu)}.rsx .rav-sec button.on{color:var(--rc);font-weight:700}.rsx .rav-sec button.on .ic{color:var(--rc)}
+  .rsx .rs-tab,body:has(.rsx) #rl-bar,body:has(.rsx) #lmb{display:none!important}
+  .rsx .rs-grid{padding:12px 12px 40px!important}
+  .rsx .rtit p{display:none}.rsx .rtit h2{font-size:1.25rem}
+  .rsx .rs-loct{display:flex;align-items:center;gap:6px;width:100%;box-sizing:border-box;margin:0 0 10px;padding:10px 14px;border-radius:10px;border:1px solid var(--rln);background:var(--rsf);color:var(--rtx);font:inherit;font-size:.9rem;font-weight:600;cursor:pointer;text-align:left}
+  .rsx .rs-loct span{margin-left:auto;color:var(--rc);font-size:.82rem}
+  .rsx .rs-loc{display:none}.rsx .rs-loc.ab{display:block}
+  .rsx .rraio,.rsx .rfil{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;gap:6px;max-width:100%}.rsx .rraio::-webkit-scrollbar,.rsx .rfil::-webkit-scrollbar{display:none}
+  .rsx .rraio .rchip,.rsx .rfil .rchip{flex:none;white-space:nowrap;font-size:.84rem;padding:6px 12px}
+  .rsx .rraio-l{display:none}
+  body:has(.rsx){padding-bottom:0!important}
+}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -7880,7 +7904,8 @@ function rsTopo(){var E=rsEu();
     '<label class="rs-busca"><span aria-hidden="true">'+ic('busca')+'</span><input id="rs-q" type="search" placeholder="Buscar profissionais, softwares, cidades…" value="'+esc(S.rede.sec==='profs'?(S.rede.q||''):'')+'" autocomplete="off" enterkeyhint="search"></label>'+
 
     '<button class="rs-volta" data-act="redeSai">'+ic('seta','rs-seta')+'<span>Meu painel</span></button>'+
-    '<div class="rav-w"><button class="rs-av" data-act="rAvMenu" aria-label="Minha conta" aria-expanded="'+(!!S.rede.menu)+'">'+esc(E.ini)+'</button>'+(S.rede.menu?'<div class="rav-m" role="menu">'+
+    '<button class="rs-lupa" data-act="rsLupa" aria-label="Buscar" aria-expanded="'+!!S.rede.lupa+'">'+ic('busca')+'</button>'+
+    '<div class="rav-w"><button class="rs-av" data-act="rAvMenu" aria-label="Minha conta" aria-expanded="'+(!!S.rede.menu)+'">'+esc(E.ini)+'</button>'+(S.rede.menu?'<div class="rav-m" role="menu">'+'<div class="rav-sec">'+['vagas','profs','clinicas','labs','comercio','cursos'].map(function(k){var x=RS_SEC[k];return '<button role="menuitem" data-act="rAvVai" data-v="'+k+'" class="'+(S.rede.sec===k?'on':'')+'">'+(RS_IC[k]?dIco(RS_IC[k],'ic'):x[0])+x[1]+'</button>';}).join('')+'</div>'+
       '<button role="menuitem" data-act="rAvVai" data-v="perfil">👤 Editar perfil (currículo)</button><button role="menuitem" data-act="rAvVai" data-v="config">⚙️ Configurações</button><button role="menuitem" data-act="rAvVai" data-v="agente">🤖 Agente de vagas</button>'+
       '<button role="menuitem" data-act="redeSai">← Voltar ao meu painel</button>'+(RL.user?'<button role="menuitem" class="danger" data-rl="sair">Sair</button>':'')+'</div>':'')+'</div></div></header>';}
 function rsEsq(){var E=rsEu(),s=S.rede.sec;
@@ -7899,8 +7924,8 @@ ACT.rsMenu=function(){S.rede.mm=!S.rede.mm;render();};
 var _redeSecRS=ACT.redeSec;ACT.redeSec=function(v){S.rede.mm=false;return _redeSecRS.apply(this,arguments);};
 rRedeTopo=rsTopo;
 rRede=function(){var anim=S.rede.anim;S.rede.anim=false;var s=S.rede.sec,naRede=['perfil','agente','config','cursos'].indexOf(s)<0;
-  return '<div class="redeamb rsx'+(typeof temaEscuro==='function'&&temaEscuro()?'':' rs-claro')+(S.rede.mm?' rs-mm':'')+(anim?' entra':'')+'">'+rsTopo()+'<div class="rs-grid">'+rsEsq()+
-    '<main class="rs-meio">'+(naRede?'<div class="rs-loc">'+rLocBar()+'</div>':'')+'<div class="rconteudo rs-cont">'+rRedeSec()+'</div></main>'+rsDir()+'</div>'+rsAbas()+'</div>';};
+  return '<div class="redeamb rsx'+(typeof temaEscuro==='function'&&temaEscuro()?'':' rs-claro')+(S.rede.mm?' rs-mm':'')+(S.rede.lupa?' rs-lupa-on':'')+(anim?' entra':'')+'">'+rsTopo()+'<div class="rs-grid">'+rsEsq()+
+    '<main class="rs-meio">'+(naRede?'<button class="rs-loct" data-act="rsLoc" aria-expanded="'+!!S.rede.locAb+'">📍 '+esc(S.rede.fuf||'Todos os estados')+(S.rede.fcid?' · '+esc(S.rede.fcid):'')+'<span>'+(S.rede.locAb?'fechar':'trocar')+'</span></button><div class="rs-loc'+(S.rede.locAb?' ab':'')+'">'+rLocBar()+'</div>':'')+'<div class="rconteudo rs-cont">'+rRedeSec()+'</div></main>'+rsDir()+'</div>'+rsAbas()+'</div>';};
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target&&e.target.id==='rs-q'){S.rede.q=e.target.value;S.rede.nmax=30;ACT.redeSec('profs');}});
 
 /* =====================================================================================
@@ -8156,6 +8181,10 @@ var _rPedidosCel=rPedidos;rPedidos=function(){var h=_rPedidosCel.apply(this,argu
   i=h.indexOf('<div class="cli-bar">');if(i>=0){var j=h.indexOf('<div class="banner');if(j>=0&&j<i)i=j;h=h.slice(0,i)+tg+h.slice(i);}
   return '<div class="ped-cel'+(S.pedAv?' av':'')+(S.pedFer?' fer':'')+'">'+h+'</div>';};
 ACT.pedFer=function(){S.pedFer=!S.pedFer;render();};ACT.pedAv=function(){S.pedAv=!S.pedAv;render();};
+
+ACT.rsLupa=function(){S.rede.lupa=!S.rede.lupa;S.rede.menu=false;render();if(S.rede.lupa)setTimeout(function(){var q=document.getElementById('rs-q');if(q)q.focus();},30);};
+ACT.rsLoc=function(){S.rede.locAb=!S.rede.locAb;render();};
+document.addEventListener('click',function(e){if(!S.redeOn||!S.rede.menu)return;if(e.target.closest&&e.target.closest('.rav-w'))return;S.rede.menu=false;render();},true);
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
