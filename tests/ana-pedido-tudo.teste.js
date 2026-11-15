@@ -11,6 +11,10 @@ const casos=[
 {const r=await p.evaluate(()=>{RL.user={id:'u'};EMP.cli=[{id:'c1',nome:'JOSE RICARDO',ativo:true},{id:'c2',nome:'Mario Andrade',ativo:true}];pclAbre();var E=PC.ed;PC.digitando=false;PC.fila=[];
   pcResposta('Paciente: Mario, coroa sobre dente unidade 12, em zirconia, cor: A3,5');var o={passo:PC.passo,cli:E.cli&&E.cli.nome,pac:E.paciente,trab:E.trabalho,d:E.dentes};PC.digitando=false;PC.fila=[];pcResposta('id:c1');o.depois=E.cli&&E.cli.nome;o.passo2=PC.passo;PC.busy=false;pcFecha();return o;});
  const ok=r.passo==='cliente'&&!r.cli&&r.pac==='Mario'&&r.trab==='Coroa de Zircônia'&&r.d.join()==='12'&&r.depois==='JOSE RICARDO'&&r.passo2==='prazo';if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU','sem cliente na frase',ok?'':JSON.stringify(r));}
+// nome do paciente sem a palavra "paciente", antes do nome do cliente
+{const r=await p.evaluate(()=>{RL.user={id:'u'};EMP.cli=[{id:'c9',nome:'Luiz Carlos Moreira (Prime Medicina e Odontologia)',ativo:true},{id:'c2',nome:'Orallis',ativo:true}];pclAbre();var E=PC.ed;PC.digitando=false;PC.fila=[];
+  pcResposta('luizmar schroeder DR LUIZ MOREIRA DENTE 11 SPBRE IMPLANTE Gran morse 3.5x8 cor a1');var o={cli:E.cli&&E.cli.nome,pac:E.paciente,d:E.dentes,cor:E.cor,passo:PC.passo};PC.busy=false;pcFecha();return o;});
+ const ok=/Luiz Carlos Moreira/.test(r.cli||'')&&r.pac==='Luizmar Schroeder'&&r.d.join()==='11'&&r.cor==='A1'&&r.passo!=='paciente';if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU','paciente sem a palavra paciente',ok?'':JSON.stringify(r));}
 for(const [v,esp] of casos){const r=await p.evaluate(v=>{RL.user={id:'u'};EMP.cli=[{id:'c1',nome:'Paulo Pagano',ativo:true},{id:'c2',nome:'Orallis',ativo:true}];pclAbre();pclTudo(v);var E=PC.ed,o={cli:E.cli&&E.cli.nome,pac:E.paciente,trab:E.trabalho,d:E.dentes,cor:E.cor};PC.busy=false;pcFecha();return o;},v);
  const ok=JSON.stringify(r)===JSON.stringify(esp);if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU',v,ok?'':'\n   veio '+JSON.stringify(r));}
 console.log(falhas?falhas+' falha(s)':'tudo certo');await b.close();process.exit(falhas?1:0);})();

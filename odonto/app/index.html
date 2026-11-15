@@ -7420,10 +7420,16 @@ function pclAbre(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espe
 function pclSemCli(txt,cl){if(!cl)return txt;var nw=semAc(cl.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}),ws=String(txt).split(/\s+/),out=[];
   ws.forEach(function(w){var k=semAc(w).replace(/[^a-z0-9]/g,'');if(nw.indexOf(k)>=0){if(out.length&&/^dra?\.?$/i.test(out[out.length-1]))out.pop();return;}out.push(w);});return out.join(' ');}
 function pclSoPaciente(cl,pac){/* o cliente "achado" é só o nome do paciente? então não é cliente */if(!cl||!pac)return false;var pw=semAc(pac).split(/[^a-z0-9]+/);return semAc(cl.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).some(function(w){return pw.indexOf(w)>=0;});}
-function pclTudo(v){var seg=v.split(/[,;]/),r0=anaEntende(v),pac0=r0&&r0.paciente||'',ehPac=/^\s*(?:paciente|pac\.?)\b/i.test(seg[0]),a1=ehPac?pclAcha(seg[0]).filter(function(c){var t=' '+semAc(seg[0]).replace(/[^a-z0-9]+/g,' ')+' ';return semAc(c.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).every(function(w){return t.indexOf(' '+w+' ')>=0;});}):pclAcha(seg[0]),cl=a1.length===1?a1[0]:null;
+function pclTudo(v){v=String(v).replace(/\bspbre\b/gi,'sobre').replace(/\bsorbe\b/gi,'sobre');var seg=v.split(/[,;]/),r0=anaEntende(v),pac0=r0&&r0.paciente||'',ehPac=/^\s*(?:paciente|pac\.?)\b/i.test(seg[0]),a1=ehPac?pclAcha(seg[0]).filter(function(c){var t=' '+semAc(seg[0]).replace(/[^a-z0-9]+/g,' ')+' ';return semAc(c.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).every(function(w){return t.indexOf(' '+w+' ')>=0;});}):pclAcha(seg[0]),cl=a1.length===1?a1[0]:null;
   var r=cl?anaEntende([pclSemCli(seg[0],cl)].concat(seg.slice(1)).join(',')):r0;if(!r||!r.itens.length)return false;var E=PC.ed;
   if(!cl&&r.cliente&&!(r.paciente&&pclSoPaciente(r.cliente,r.paciente)))cl=r.cliente;
   if(r.paciente)r.paciente=pclSemCli(r.paciente,cl).trim();
+  if(!r.paciente&&cl){/* sem a palavra "paciente": o nome que sobra antes do trabalho/dente é o paciente (ex.: "luizmar schroeder DR LUIZ MOREIRA dente 11…") */
+    var resto=pclSemCli(v,cl).replace(/^[\s,;:-]+/,'').split(/[\s,;]+/),nm=[];
+    for(var ii=0;ii<resto.length;ii++){var w=resto[ii],ws=semAc(w);if(!ws)continue;if(/^(dra?\.?|doutora?|cliente|pedido|para|pra|pro)$/.test(ws)){if(nm.length)break;continue;}
+      if(/\d/.test(ws)||/^(dente|dentes|elemento|elementos|coroa|coroas|faceta|lente|inlay|onlay|ponte|ppf|ppr|protese|portese|protocolo|placa|nucleo|provisorio|guia|modelo|cor|sobre|spbre|sob|implante|em|de|do|da|e|com|zirconia|emax|resina|pmma|urgente|unidade|unitaria)$/.test(ws))break;
+      if(!/^[a-z']+$/.test(ws))break;nm.push(w);if(nm.length>=4)break;}
+    if(nm.length&&nm.join('').length>=3)r.paciente=anaCap(nm.join(' '));}
   if(!cl){/* escreveu o pedido inteiro sem o cliente: guarda tudo e pergunta só o cliente */
     E.paciente=r.paciente||'';E.trabalho=r.itens[0].trabalho;E.dentes=r.itens[0].dentes||[];E.cor=r.cor||'';E.prazo=r.prazo||null;E.urgente=!!r.urgente;E._tudo=r;
     pcEu(esc(v));pcAna('Anotei 📝 '+(E.paciente?'<b>'+esc(E.paciente)+'</b> · ':'')+esc(E.trabalho)+(E.dentes.length?' · 🦷 '+E.dentes.join(', '):'')+(E.cor?' · 🎨 '+esc(E.cor):''));
