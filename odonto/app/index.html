@@ -2193,6 +2193,7 @@ body:has(.rsx.rs-claro){background:#F3F4F6}body:has(.rsx:not(.rs-claro)){backgro
 .rct-t small{font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:#9AA3AF}
 .rct-t u{width:56px;height:3px;border-radius:3px;background:#2563EB;text-decoration:none}
 .rct-bg{position:absolute;inset:0;background:#0E1116}.rct-t{z-index:2}
+.rct-t{background:rgba(14,17,22,.94);padding:30px 44px 26px;border-radius:18px;box-shadow:0 24px 60px -20px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.06)}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5037,7 +5038,7 @@ function redeAnim(entrar,troca){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches||document.querySelector('.rct')||!document.body.animate){troca();return;}
   /* cortinas diagonais: entram rápido, desaceleram e PARAM na tela formando faixas; o nome aparece; tudo some devagar */
   var esp=entrar?1:-1,w=document.createElement('div');w.className='rct';w.setAttribute('role','status');
-  var C=[{c:'#60A5FA',l:entrar?'e':'d',fim:-88},{c:'#2563EB',l:entrar?'e':'d',fim:-95},{c:'#1E3A8A',l:entrar?'d':'e',fim:97}];
+  var C=[{c:'#60A5FA',l:'e',fim:-88},{c:'#2563EB',l:'e',fim:-95},{c:'#1E3A8A',l:'d',fim:97}];
   w.innerHTML='<i class="rct-bg"></i>'+C.map(function(x){return '<i class="rct-p rct-'+x.l+'" style="background:'+x.c+'"></i>';}).join('')+
     '<div class="rct-t"><span class="rct-logo">i</span><b>'+(entrar?'Ideali <em>Rede</em>':'Ideali <em>Odonto</em>')+'</b><small>'+(entrar?'odontologia conectada':'voltando ao seu painel')+'</small><u></u></div>';
   document.body.appendChild(w);
@@ -5048,7 +5049,6 @@ function redeAnim(entrar,troca){
   w.addEventListener('pointerdown',acaba);addEventListener('keydown',tecla,true);
   BG.animate([{opacity:0},{opacity:1}],{duration:260,fill:'both'});
   C.forEach(function(x,i){var f=x.l==='d'?Math.abs(x.fim):-Math.abs(x.fim),ini=x.l==='e'?-190:190;
-    if(!entrar)f=-f;
     P[i].animate([{transform:'translateX('+ini+'vw)'},{transform:'translateX('+f+'vw)'}],{duration:D,delay:i*GAP,easing:FREIA,fill:'both'});});
   var parou=D+(C.length-1)*GAP-120;
   T.animate([{opacity:0,transform:'translate(-50%,-46%)'},{opacity:1,transform:'translate(-50%,-50%)'}],{duration:500,delay:parou,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
