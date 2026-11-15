@@ -2541,6 +2541,18 @@ body.pv-trava{overflow:hidden}
 .pv-del{color:#DC2626!important;border-color:color-mix(in srgb,#DC2626 45%,transparent)!important}
 @media(max-width:860px){.pv-g{grid-template-columns:1fr}.pv-ln{grid-template-columns:96px 1fr auto}.pv-ov{padding:0;place-items:stretch}.pv{border-radius:0;max-height:100vh}.pv-arqs{grid-template-columns:1fr}}
 .pd-minil{display:grid;gap:6px}.pd-mini{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--ink);font:inherit;font-size:.88rem;text-align:left;cursor:pointer}.pd-mini small{color:var(--muted)}
+
+.pvfs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.pvf-mail{grid-column:1;grid-row:1}.pvf-zip{grid-column:2;grid-row:1/span 2}.pvf-stl{grid-column:3;grid-row:1/span 2}.pvf-html{grid-column:1;grid-row:2}
+.pvf-conf{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:8px}
+.pvf{border:1px dashed var(--line);border-radius:14px;padding:13px;display:grid;gap:8px;align-content:start;min-width:0}
+.pvf-mail{border-color:color-mix(in srgb,#3B82F6 45%,var(--line))}.pvf-zip{border-color:color-mix(in srgb,#F59E0B 50%,var(--line))}.pvf-stl{border-color:color-mix(in srgb,#10B981 45%,var(--line))}.pvf-html{border-color:color-mix(in srgb,#EC4899 40%,var(--line))}
+.pvf-h{display:grid;gap:6px;justify-items:start}.pvf-h b{display:block}.pvf-h small{color:var(--muted);font-size:.8rem}
+.pvf>button,.pvf-bt{justify-self:start;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 13px;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer}
+.pvf-f{font-size:.85rem;font-weight:600;overflow-wrap:anywhere}.pvf-f small,.pvf-chk small{color:var(--muted);font-weight:500}
+.pvf-chk{display:flex;gap:7px;align-items:flex-start;font-size:.84rem;overflow-wrap:anywhere}.pvf-l{display:grid;gap:5px;max-height:150px;overflow:auto}
+.pvf-ld{font-size:.85rem;color:var(--muted)}.pvf-er{font-size:.84rem;color:#DC2626;font-weight:600}
+.pvf-cf{display:grid;gap:4px;font-size:.82rem}.pvf-im{border-radius:9px;padding:8px 10px;font-weight:600}.pvf-im.ok{background:color-mix(in srgb,#10B981 14%,transparent)}.pvf-im.r{background:color-mix(in srgb,#DC2626 14%,transparent);color:#DC2626}
+@media(max-width:860px){.pvfs{grid-template-columns:1fr}.pvf-mail,.pvf-zip,.pvf-stl,.pvf-html{grid-column:auto;grid-row:auto}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -8769,8 +8781,7 @@ function pvHtml(p){var st=PEDST[p.status]||['—','#888'],r=pedRisco(p),q=Object
     '</div><div class="pv-dir">'+
       (nx?'<div class="pv-pills"><button class="pv-pri" data-act="'+nx[0]+'" data-v="'+p.id+'">'+nx[1]+'</button></div>':'')+
       '<label class="pv-mv"><span>Mover para</span><select id="pv-st">'+stOps.map(function(k){return '<option value="'+k+'"'+(p.status===k?' selected':'')+'>'+esc(PEDST[k][0])+'</option>';}).join('')+'</select></label>'+
-      '<div class="pv-arqs"><div class="pv-arq"><span class="pv-ai">✉️</span><b>E-mail do caso</b><small>A Ana monta o e-mail com os dados do pedido</small><button data-pv="mail">Abrir</button></div>'+
-        '<div class="pv-arq"><span class="pv-ai">🦷</span><b>Projeto do exocad</b><small>Anexe o .dentalProject e a Ana confere</small><button data-pv="edita">Anexar</button></div></div>'+
+      pvfCards(p)+
       '<div class="pv-acs"><button data-pv="edita">✏️ Editar</button><button data-pv="copiatudo">📋 Copiar tudo</button><button data-pv="urg">'+(p.urgente?'Tirar urgência':'🔥 Urgente')+'</button><button data-pv="arq">'+(p.arquivado?'Desarquivar':'Arquivar')+'</button><button class="pv-del" data-pv="apaga">Excluir</button></div>'+
     '</div></div></div></div>';}
 function pvPinta(){var el=document.getElementById('pv-raiz'),p=pvP();if(!p){if(el)el.remove();document.body.classList.remove('pv-trava');return;}
@@ -8785,7 +8796,7 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
   else if(k==='copia')pvCopia(b.dataset.v);
   else if(k==='copiatudo')pvCopia(pvTexto(p),'Pedido copiado.');
   else if(k==='edita')ACT.pedEdita(p.id);
-  else if(k==='mail'){try{exoMailAbre(p);}catch(e){toast('Não consegui abrir o e-mail agora.');}}
+  else if(k==='mail'){try{pvfMail(p);}catch(e){toast('Não consegui abrir o e-mail agora.');}}
   else if(k==='urg'){pedMuda(p.id,{urgente:!p.urgente});setTimeout(pvPinta,30);}
   else if(k==='arq'){pedMuda(p.id,{arquivado:!p.arquivado},p.arquivado?'Pedido de volta ao quadro.':'Pedido arquivado.');pvFecha();}
   else if(k==='apaga'){PED.ed=Object.assign({},p);pvFecha();ACT.pedApaga();if(PED.L.some(function(x){return x.id===p.id;}))PED.ed=null;render();}},true);
@@ -8830,6 +8841,61 @@ var _pdPintaA=pdPinta;pdPinta=function(){_pdPintaA();try{[].forEach.call(documen
 function bn3Pedro(){var b=document.querySelector('#bn3 .bn3-ana');if(!b||!pdOn())return;var n=pdAtrasadas().length;
   b.removeAttribute('data-lmb');b.setAttribute('data-pd','pop');b.setAttribute('aria-label',PD.nome+' · tarefas');b.innerHTML='<span class="bn3-av"><img src="'+PD.rosto+'" alt="">'+(n?'<b>'+n+'</b>':'')+'</span>';b.classList.toggle('on',!!PD.pop);}
 (function(){var _rPB=render;render=function(){var x=_rPB.apply(this,arguments);try{setTimeout(bn3Pedro,0);}catch(e){}return x;};})();
+
+/* ===== Ficha do pedido: anexar o Dental CAD (.zip). O sistema abre o zip, lê o projeto do exocad, separa o STL de fresagem e o HTML,
+   confere implante/scanbody com o pedido e manda tudo para o e-mail. Os arquivos ficam só neste navegador (não sobem para o servidor). ===== */
+var PVF={};
+function pvfDe(id){return PVF[id]||(PVF[id]={stls:[],html:null,zip:null,exo:null,exoNome:'',mandaZip:false,lendo:false,erro:''});}
+function pvfBase(n){return String(n).split('/').pop();}
+function pvfLe(p,file){var F=pvfDe(p.id);F.lendo=true;F.erro='';pvPinta();
+  pdgFflate().then(function(ff){return file.arrayBuffer().then(function(buf){return new Promise(function(ok,no){ff.unzip(new Uint8Array(buf),function(e,arq){e?no(e):ok(arq);});});});}).then(function(arq){
+    var nomes=Object.keys(arq).filter(function(n){return !/\/$/.test(n)&&!/__MACOSX|\/\._/.test(n);}),dp=nomes.filter(function(n){return /\.dentalproject$/i.test(n);})[0];
+    var stl=nomes.filter(function(n){return /\.stl$/i.test(n);}),ruim=/scan|antag|raw|prep|ging|gum|model|upper|lower|maxil|mandib|jaw|bite|situat|preop|pre-op/i;
+    var boas=stl.filter(function(n){return !ruim.test(n);});if(!boas.length)boas=stl;
+    F.zip={nome:file.name,tam:file.size,f:file};
+    F.stls=stl.map(function(n){var u=arq[n];return {nome:pvfBase(n),tam:u.length,f:new File([u],pvfBase(n),{type:'model/stl'}),ok:boas.indexOf(n)>=0};});
+    var h=nomes.filter(function(n){return /\.html?$/i.test(n);}).sort(function(a,b){return arq[b].length-arq[a].length;})[0];
+    F.html=h?{nome:pvfBase(h),tam:arq[h].length,f:new File([arq[h]],pvfBase(h),{type:'text/html'})}:null;
+    F.exo=null;F.exoNome='';if(dp){try{F.exo=exoLeProjeto(new TextDecoder('utf-8').decode(arq[dp]));F.exoNome=pvfBase(dp);}catch(e){F.erro='Achei o projeto, mas não consegui ler.';}}
+    else F.erro='Não achei o arquivo .dentalProject dentro do zip.';
+    F.lendo=false;pvPinta();toast('Li o Dental CAD: '+F.stls.filter(function(s){return s.ok;}).length+' STL de fresagem'+(F.html?', HTML':'')+(F.exo?' e o projeto do exocad':'')+'.');
+  }).catch(function(){F.lendo=false;F.erro='Não consegui abrir esse arquivo. Envie o .zip do caso.';pvPinta();});}
+function pvfImplante(p,R){var imp=R.dentes.filter(function(t){return t.imp;});if(!imp.length)return p.sobre_implante?{ok:false,txt:'O pedido diz sobre implante, mas o projeto não tem implante.'}:null;
+  var nomes=imp.map(function(t){return t.imp;}).filter(function(v,i,a){return a.indexOf(v)===i;}),sb=imp.some(function(t){return t.sb;}),comp=String(p.componente||'');
+  var bate=!comp||nomes.some(function(n){var a=semAc(n).replace(/[^a-z0-9]/g,''),b=semAc(comp).replace(/[^a-z0-9]/g,'');return a&&b&&(a.indexOf(b)>=0||b.indexOf(a)>=0);});
+  return {ok:bate&&!!p.sobre_implante,txt:'Implante no projeto: '+nomes.join(', ')+' · dentes '+imp.map(function(t){return t.n;}).join(', ')+(sb?' · com scanbody':' · sem scanbody')+'. No pedido: '+(p.sobre_implante?(comp||'sobre implante, sem componente anotado'):'não está marcado como sobre implante')+'.'};}
+function pvfCards(p){var F=pvfDe(p.id),R=F.exo;
+  var card=function(cls,ic,tit,sub,corpo,bt){return '<div class="pvf '+cls+'"><div class="pvf-h"><span class="pv-ai">'+ic+'</span><div><b>'+tit+'</b><small>'+sub+'</small></div></div>'+(corpo||'')+(bt||'')+'</div>';};
+  var conf='';if(R){var L=[];try{L=exoConfere(p,R);}catch(e){}var im=pvfImplante(p,R);
+    conf='<div class="pvf-cf">'+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+L.map(function(x){return '<div class="exo-i '+(x[0]==='❌'?'r':x[0]==='⚠️'?'a':'')+'"><span>'+x[0]+'</span><b>'+x[1]+'</b><span>'+esc(x[2])+'</span></div>';}).join('')+'</div>';}
+  var zipC=F.lendo?'<div class="pvf-ld">Abrindo o zip e lendo tudo…</div>':F.zip?'<div class="pvf-f">🗜️ '+esc(F.zip.nome)+' <small>'+pdgMB(F.zip.tam)+'</small></div>'+(F.exoNome?'<div class="pvf-f">📄 '+esc(F.exoNome)+'</div>':'')+
+    '<label class="pvf-chk"><input type="checkbox" data-pvf="mandazip"'+(F.mandaZip?' checked':'')+'> Enviar também o Dental CAD no e-mail</label>':'';
+  return '<div class="pvfs">'+
+    card('pvf-mail','✉️','E-mail do caso','Dados do pedido'+(R?' e do projeto':'')+(F.stls.length||F.html?' + STL e HTML anexados':''),'','<button data-pv="mail">Montar e-mail</button>')+
+    card('pvf-zip','🗜️','Dental CAD zipado com tudo dentro','O sistema abre, lê o projeto e separa os arquivos',zipC+(F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':''),
+      '<label class="pvf-bt">'+(F.zip?'Trocar .zip':'Anexar .zip')+'<input type="file" data-pvf="zip" accept=".zip,application/zip" hidden></label>'+(R?'<button data-pvf="aplica">Usar dados do projeto no pedido</button>':''))+
+    card('pvf-stl','🦷','STL de fresagem',F.stls.length?'Marque o que vai para a fresadora':'Sai do zip automaticamente',
+      F.stls.length?'<div class="pvf-l">'+F.stls.map(function(s,i){return '<label class="pvf-chk"><input type="checkbox" data-pvf="stl" data-i="'+i+'"'+(s.ok?' checked':'')+'> '+esc(s.nome)+' <small>'+pdgMB(s.tam)+'</small></label>';}).join('')+'</div>':'',
+      '<label class="pvf-bt">+ Enviar STL<input type="file" data-pvf="stlmao" accept=".stl" multiple hidden></label>')+
+    card('pvf-html','🌐','HTML do exocad','Projeto para ver no navegador',F.html?'<div class="pvf-f">🌐 '+esc(F.html.nome)+' <small>'+pdgMB(F.html.tam)+'</small></div>':'',
+      (F.html?'<button data-pvf="verhtml">Abrir</button>':'')+'<label class="pvf-bt">'+(F.html?'Trocar':'+ Enviar HTML')+'<input type="file" data-pvf="htmlmao" accept=".html,.htm" hidden></label>')+
+  '</div>'+(conf?'<div class="pvf-conf"><b>🔎 A Ana conferiu o projeto com o pedido</b>'+conf+'</div>':'');}
+document.addEventListener('change',function(ev){var t=ev.target,k=t&&t.getAttribute&&t.getAttribute('data-pvf');if(!k)return;var p=pvP();if(!p)return;var F=pvfDe(p.id);
+  if(k==='zip'&&t.files[0])pvfLe(p,t.files[0]);
+  else if(k==='mandazip')F.mandaZip=t.checked;
+  else if(k==='stl'){var s=F.stls[+t.getAttribute('data-i')];if(s)s.ok=t.checked;}
+  else if(k==='stlmao'){[].forEach.call(t.files,function(f){F.stls.push({nome:f.name,tam:f.size,f:f,ok:true});});pvPinta();}
+  else if(k==='htmlmao'&&t.files[0]){F.html={nome:t.files[0].name,tam:t.files[0].size,f:t.files[0]};pvPinta();}},true);
+document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('button[data-pvf]');if(!b)return;var p=pvP();if(!p)return;var F=pvfDe(p.id),k=b.getAttribute('data-pvf');ev.preventDefault();ev.stopPropagation();
+  if(k==='verhtml'&&F.html){var u=URL.createObjectURL(F.html.f);window.open(u,'_blank');setTimeout(function(){URL.revokeObjectURL(u);},60000);}
+  if(k==='aplica'&&F.exo){var R=F.exo,A=exoArcada(R),pt={dentes:A.map(function(x){return x.d;}),qtd:A.length,arcada:A},mats=R.dentes.map(function(t){return t.mat;}).filter(Boolean);if(mats[0])pt.material=mats[0].slice(0,60);if(R.cor)pt.cor=R.cor.slice(0,20);if(!p.paciente&&R.paciente)pt.paciente=R.paciente.slice(0,120);
+    var imp=R.dentes.filter(function(t){return t.imp;});pt.sobre_implante=imp.length>0;if(imp.length)pt.componente=(imp.map(function(t){return t.imp;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(', ')+(imp.some(function(t){return t.sb;})?' · com scanbody':'')).slice(0,120);
+    pedMuda(p.id,pt,'Dados do projeto aplicados no pedido #'+(p.numero||'')+'.');setTimeout(pvPinta,40);}},true);
+/* o e-mail leva o projeto lido e os arquivos */
+function pvfMail(p){var F=pvfDe(p.id),q=Object.assign({},p);if(F.exo){q._exo=F.exo;q._exoNome=F.exoNome;}exoMailAbre(q);
+  F.stls.forEach(function(s){if(s.ok)GM.arqs.push({nome:s.nome,tam:s.tam,f:s.f,ok:true});});if(F.html)GM.arqs.push({nome:F.html.nome,tam:F.html.tam,f:F.html.f,ok:true});
+  if(F.zip)GM.arqs.push({nome:F.zip.nome,tam:F.zip.tam,f:F.zip.f,ok:!!F.mandaZip});if(F.exo){var im=pvfImplante(p,F.exo),co=document.getElementById('exm-co');if(im&&co&&!im.ok)co.value=co.value.replace('\n\nOs arquivos','\n\n⚠️ Conferir: '+im.txt+'\n\nOs arquivos');}
+  gmRedesenha();}
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
