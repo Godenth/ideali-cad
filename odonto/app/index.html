@@ -5464,9 +5464,9 @@ function anaDentes(t){var out=[],s=String(t).replace(/(\d{2})\s*(?:a|ao|al|à|at
   (s.match(/\b\d{2}\b/g)||[]).forEach(function(x){x=+x;if(anaDenteOk(x))out.push(x);});
   var u=[];out.forEach(function(n){if(u.indexOf(n)<0)u.push(n);});return u;}
 var ANA_TRAB=[[/coroa|coroinha/,'Coroa'],[/faceta|laminado|lente(s)? de contato/,'Faceta'],[/onlay|inlay|overlay|endocrown/,'Onlay / inlay'],[/protocolo/,'Protocolo'],[/provis[oó]ri/,'Provisório'],
-  [/ponte|pr[oó]tese fixa/,'Ponte fixa'],[/n[uú]cleo|pino/,'Núcleo'],[/enceramento|wax ?up/,'Enceramento'],[/mock ?up/,'Mock-up'],[/guia/,'Guia cirúrgica'],[/placa|miorrelax|bruxismo/,'Placa'],
+  [/p(?:r[oó]|or)tese parcial fixa|parcial fixa|\bppf\b/,'Prótese parcial fixa'],[/ponte|p(?:r[oó]|or)tese fixa/,'Ponte fixa'],[/n[uú]cleo|pino/,'Núcleo'],[/enceramento|wax ?up/,'Enceramento'],[/mock ?up/,'Mock-up'],[/guia/,'Guia cirúrgica'],[/placa|miorrelax|bruxismo/,'Placa'],
   [/\bppr\b|remov[ií]vel/,'PPR'],[/total|dentadura/,'Prótese total'],[/barra/,'Barra'],[/coping|casquete/,'Coping'],[/modelo/,'Modelo']];
-var ANA_MAT=[[/zirc/,'Zircônia'],[/e\.? ?max|dissilicato/,'E.max'],[/pmma/,'PMMA'],[/metalo ?cer/,'Metalocerâmica'],[/cromo|co ?cr|cobalto/,'Metal (CoCr)'],[/resina/,'Resina'],[/acr[ií]lic/,'Acrílico'],[/ceramica|porcelana/,'Cerâmica']];
+var ANA_MAT=[[/zirc/,'Zircônia'],[/e\.? ?max|dissilicato/,'E.max'],[/pmma/,'PMMA'],[/metalo ?cer/,'Metalocerâmica'],[/cromo|co ?cr|cobalto/,'Metal (CoCr)'],[/resina (?:com |c\/ ?)?carga (?:de )?ceramica|resina ceramica|ceromero/,'Resina com carga cerâmica'],[/resina/,'Resina'],[/acr[ií]lic/,'Acrílico'],[/ceramica|porcelana/,'Cerâmica']];
 function anaTrabTipo(seg){for(var i=0;i<ANA_TRAB.length;i++)if(ANA_TRAB[i][0].test(seg))return ANA_TRAB[i][1];return '';}
 /* Acha o serviço da tabela de preços que mais combina com o trecho */
 function anaServ(seg,base,mat,impl){var N=S.neg;if(!N||!N.servs||!N.servs.length)return null;var best=null,bp=0;
@@ -5502,7 +5502,7 @@ function anaNomesDentes(t){t=String(t||'');
   return t;}
 function anaEntende(txt){var raw=String(txt||'').trim();if(!raw)return null;var t=semAc(raw).replace(/\s+/g,' '),tl=raw.replace(/\s+/g,' ');t=anaNomesDentes(t);
   var res={cliente:anaCliente(t),paciente:'',cor:'',prazo:anaPrazo(t),urgente:/urgent|correndo|prioridade/.test(t),tipo:/analogic|bancada/.test(t)?'analogico':null,itens:[]};
-  var mp=tl.match(/\b(?:paciente|pac\.?)\s*:?\s+([A-Za-zÀ-ÿ']+(?:\s+(?!coroa|faceta|elemento|dente|cor\b|sobre|em\b|dia\b|pra\b|para\b|ate\b|até\b|urgente|protocolo|onlay|provis|de\s+(?:zirc|e\.?max|resina))[A-Za-zÀ-ÿ']+){0,3})/i);if(mp)res.paciente=anaCap(mp[1].replace(/\s+(e|com|para|pra|do|da)$/i,''));
+  var mp=tl.match(/\b(?:paciente|pac\.?)\s*:?\s+([A-Za-zÀ-ÿ']+(?:\s+(?!coroa|faceta|elemento|dente|cor\b|côr\b|sobre|em\b|dia\b|pra\b|para\b|ate\b|até\b|urgente|protocolo|onlay|inlay|provis|pr[oó]tese|portese|parcial|ppf\b|ppr\b|ponte|placa|n[uú]cleo|guia|barra|coping|modelo|enceramento|total\b|de\s+(?:zirc|e\.?max|resina))[A-Za-zÀ-ÿ']+){0,3})/i);if(mp)res.paciente=anaCap(mp[1].replace(/\s+(e|com|para|pra|do|da)$/i,''));
   var mc=t.match(/\bcor\s*:?\s*([a-d]\s?[1-4](?:[.,]5)?|bl\s?[1-4]|\d\s?m\s?\d(?:[.,]5)?)/)||t.match(/\b([a-d][1-4](?:[.,]5)?)\b/);if(mc)res.cor=mc[1].replace(/\s/g,'').toUpperCase().replace(',','.');
   var comp=(t.match(/\b(ti ?base|tibase|multi ?unit|mini ?pilar|munh[aã]o|ucla|link)\b[^,;.]{0,30}/)||[''])[0];
   /* separa os trabalhos: cada palavra de trabalho abre um item */
@@ -7313,7 +7313,10 @@ function pclAbre(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espe
   pcAna((h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+'! 👋 Vamos cadastrar um pedido. Eu pergunto, você responde.');
   pcAna('<small>Dica: se preferir, escreva tudo de uma vez, tipo <i>"Orallis, paciente Maria, coroa do 11, A2"</i>.</small>');pcPergunta('cliente');}
 /* escreveu tudo de uma vez: aproveita o que der e pergunta só o que faltou */
-function pclTudo(v){var seg=v.split(/[,;]/),a1=pclAcha(seg[0]),cl=a1.length===1?a1[0]:null,r=anaEntende(cl?seg.slice(1).join(','):v);if(!r||!r.itens.length)return false;var E=PC.ed;cl=cl||r.cliente;if(!cl)return false;
+function pclSemCli(txt,cl){if(!cl)return txt;var nw=semAc(cl.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}),ws=String(txt).split(/\s+/),out=[];
+  ws.forEach(function(w){var k=semAc(w).replace(/[^a-z0-9]/g,'');if(nw.indexOf(k)>=0){if(out.length&&/^dra?\.?$/i.test(out[out.length-1]))out.pop();return;}out.push(w);});return out.join(' ');}
+function pclTudo(v){var seg=v.split(/[,;]/),a1=pclAcha(seg[0]),cl=a1.length===1?a1[0]:null,r=anaEntende(cl?[pclSemCli(seg[0],cl)].concat(seg.slice(1)).join(','):v);if(!r||!r.itens.length)return false;var E=PC.ed;cl=cl||r.cliente;if(!cl)return false;
+  if(r.paciente)r.paciente=pclSemCli(r.paciente,cl).trim();
   E.cli=cl;E.paciente=r.paciente||'';E.trabalho=r.itens[0].trabalho;E.dentes=r.itens[0].dentes||[];E.cor=r.cor||'';E.prazo=r.prazo||(/\b(pra|para|ate|dia|em)\b/.test(semAc(v))?pclData(semAc(v)):null);E.urgente=!!r.urgente;E._tudo=r;
   pcEu(esc(v));pcAna('Anotei 📝 <b>'+esc(cl.nome)+'</b>'+(E.paciente?' · '+esc(E.paciente):'')+' · '+esc(E.trabalho)+(E.dentes.length?' · 🦷 '+E.dentes.join(', '):'')+(E.cor?' · 🎨 '+esc(E.cor):''));
   var falta=['paciente','cor','prazo'].filter(function(k){return k==='paciente'?!E.paciente:k==='cor'?!E.cor:!E.prazo&&!E.urgente;});
