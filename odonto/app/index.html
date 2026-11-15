@@ -8678,7 +8678,7 @@ function pdLembra(){if(!pdOn()||!PD.ok||PD.pg||document.getElementById('pd-lem')
   for(var i=0;i<cand.length;i++){var t=cand[i],a=pdAtraso(t),iv=pdIntervalo(Math.max(0,a));if(!V[t.id]||agora-V[t.id]>=iv*60000){V[t.id]=agora;pdVistosGrava(V);pdLembMostra(t,a);return;}}}
 function pdLembMostra(t,a){var d=Math.floor(Math.max(0,a)/1440),nivel=a<=0?0:d<1?1:d<3?2:3;
   var fala=a<=0?'Daqui a pouco: <b>'+esc(t.titulo)+'</b>'+(t.hora?' às '+String(t.hora).slice(0,5):'')+'.':
-    nivel===1?'Ei, lembra disso? <b>'+esc(t.titulo)+'</b> venceu '+(t.hora?'hoje às '+String(t.hora).slice(0,5):'hoje')+'.':
+    nivel===1?'Ei, lembra disso? <b>'+esc(t.titulo)+'</b> venceu '+esc(pdVenceTxt(t).toLowerCase().replace(/ (\d\d:\d\d)$/,' às $1'))+'.':
     nivel===2?'Chefe, <b>'+esc(t.titulo)+'</b> está '+esc(pdAtrasoTxt(a))+'. Bora resolver? 😬':
     'Chefe!! <b>'+esc(t.titulo)+'</b> está '+esc(pdAtrasoTxt(a))+'! Não esquece de mim… 😱';
   var o=document.createElement('div');o.id='pd-lem';o.className='pd-lem n'+nivel;o.setAttribute('role','alert');
