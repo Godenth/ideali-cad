@@ -4523,7 +4523,7 @@ var NEG_AREA={'Dentista':DVAGAS,'Protético':PVAGAS,'ASB / TSB':AVAGAS,'Corporat
 /* coloca o negócio e as vagas dele na Rede (perfil novo entra "em conferência") */
 function negRede(){var N=S.neg;if(!N)return;var T=NEG_TIPOS[N.tipo],cid=N.cid+' / '+N.uf;
   ['clinicas','labs','comercio'].forEach(function(k){REDE_EMP[k]=REDE_EMP[k].filter(function(e){return e.id!=='rneg';});});
-  if(T.rede)REDE_EMP[T.rede].unshift({id:'rneg',nome:N.nome,cid:cid,tags:N.servs.slice(0,3).map(function(s){return s[0];}),ok:0});
+  if(T.rede)REDE_EMP[T.rede].unshift({id:'rneg',nome:N.nome,cid:cid,tags:((typeof EMP!=='undefined'&&EMP.row&&EMP.row.perfil&&EMP.row.perfil.esp&&EMP.row.perfil.esp.length)?EMP.row.perfil.esp:N.servs.map(function(s){return s[0];})).slice(0,4),ok:0});
   if(N.tipo==='escola'&&S.inst&&!S.inst.some(function(i){return i.id==='i_neg';})){S.inst.push({id:'i_neg',nome:N.nome,tipo:'Escola / curso',cidade:N.cid,uf:N.uf,site:'',status:'nova',por:N.dono||'Você',quando:new Date().toLocaleDateString('pt-BR'),usos:0});instSalva();}
   Object.keys(NEG_AREA).forEach(function(a){var L=NEG_AREA[a];for(var i=L.length-1;i>=0;i--)if(String(L[i].id).indexOf('nv_')===0)L.splice(i,1);});
   (N.vagas||[]).forEach(function(v){(NEG_AREA[v.area]||PVAGAS).unshift({id:v.id,cargo:v.cargo,emp:N.nome,lugar:cid,det:v.det,novo:true,conf:!!v.conf});});}
@@ -9202,7 +9202,7 @@ function epfSalva(){epfLe();var P=EPF.p;EPF.busy=true;epfPinta();
     whats:P.whats.trim(),whats_ab:!!P.whats_ab,insta:P.insta.trim(),insta_ab:!!P.insta_ab,logo:P.logo||null,capa:P.capa||null,fotos:P.fotos.filter(function(c){return (c.cat||'').trim()||c.f.length;}).map(function(c){return {cat:(c.cat||'Fotos').trim(),f:c.f.slice(0,EPF_MAXF)};})};
   SB.from('odo_empresas').update({perfil:limpo}).eq('id',EMP.row.id).then(function(r){EPF.busy=false;if(r.error){epfPinta();epfErro(r.error);return;}
     var velhos=epfPaths(EMP.row.perfil||{}).filter(function(x){return epfPaths(limpo).indexOf(x)<0;});if(velhos.length)SB.storage.from(EPF_BK).remove(velhos).then(function(){});
-    EMP.row.perfil=limpo;EPF.p=epfNorm(limpo);EPF.msg='Salvo às '+new Date().toTimeString().slice(0,5);epfPinta();toast('Perfil da empresa salvo. ✅');});}
+    EMP.row.perfil=limpo;try{negRede();}catch(e){}EPF.p=epfNorm(limpo);EPF.msg='Salvo às '+new Date().toTimeString().slice(0,5);epfPinta();toast('Perfil da empresa salvo. ✅');});}
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-epf]');if(!b)return;ev.preventDefault();ev.stopPropagation();var k=b.getAttribute('data-epf'),P=EPF.p;
   if(k==='fecha'){EPF.on=false;epfPinta();return;}
   if(!P)return;epfLe();
@@ -9249,7 +9249,7 @@ function epvPinta(){var el=document.getElementById('epv-raiz');if(EPF.ver){if(!e
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-epv]');if(!b)return;if(b.getAttribute('data-epv')==='fora'&&ev.target!==b)return;ev.preventDefault();EPF.ver=null;epvPinta();},true);
 document.addEventListener('keydown',function(ev){if(ev.key!=='Escape')return;if(EPF.ver){EPF.ver=null;epvPinta();}else if(EPF.on){EPF.on=false;epfPinta();}});
 /* "Ver perfil" de empresa real (id E…) abre o perfil */
-var _redeVerEP=ACT.redeVer;ACT.redeVer=function(v){if(/^E\d{5}$/.test(String(v))){epvAbre(v);return;}return _redeVerEP.apply(this,arguments);};
+var _redeVerEP=ACT.redeVer;ACT.redeVer=function(v){if(v==='rneg'){epvAbre('eu');return;}if(/^E\d{5}$/.test(String(v))){epvAbre(v);return;}return _redeVerEP.apply(this,arguments);};
 ACT.epfAbre=epfAbre;
 /* item no menu do avatar da Rede */
 var _rsTopoEP=rsTopo;rsTopo=function(){var h=_rsTopoEP.apply(this,arguments);if(!epfTem())return h;
