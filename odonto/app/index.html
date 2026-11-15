@@ -2285,6 +2285,23 @@ body:has(.rsx.rs-claro){background:#F3F4F6}body:has(.rsx:not(.rs-claro)){backgro
   .ped-cel .cli-bar .seg{display:none}.ped-cel.fer .cli-bar .seg{display:inline-flex}
   .ped-cel .pedfil{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;max-width:calc(100vw - 24px)}.ped-cel,.ped-cel>*{min-width:0;max-width:100%}.ped-cel .pedfil::-webkit-scrollbar{display:none}.ped-cel .pedfil .chip{flex:none;white-space:nowrap}
 }
+/* barra de baixo delicada (estilo Instagram): 5 ícones, Ana redonda à esquerda, + no meio */
+#bn3{grid-template-columns:repeat(5,1fr)!important;left:0!important;right:0!important;bottom:0!important;height:calc(58px + env(safe-area-inset-bottom))!important;padding:0 6px env(safe-area-inset-bottom)!important;border-radius:0!important;border:0!important;border-top:1px solid var(--line)!important;background:color-mix(in srgb,var(--surface) 94%,transparent)!important;box-shadow:none!important;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+#bn3 button{height:58px;display:grid;place-items:center;padding:0;gap:0;color:var(--ink)}
+#bn3 button i,#bn3 button span:not(.bn3-av){display:none}
+#bn3 .bn3-ic{width:26px;height:26px;stroke-width:1.7}
+#bn3 button.on{color:var(--ink)}#bn3 button.on .bn3-ic{stroke-width:2.3}#bn3 button.on .bn3-ic .f{fill:color-mix(in srgb,currentColor 22%,transparent)}
+#bn3 button:active .bn3-ic{transform:scale(.88)}
+#bn3 .bn3-mais{margin:0!important;align-self:center}
+#bn3 .bn3-mais .bn3-ic{width:28px;height:28px;padding:3px;stroke-width:2;border:1.8px solid currentColor;border-radius:9px;box-sizing:content-box}
+.bn3-av{position:relative;width:30px;height:30px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#7C5CFF,#22C3F5);display:block}
+.bn3-av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:2px solid var(--surface);box-sizing:border-box;background:var(--surface)}
+.bn3-av b{position:absolute;top:-4px;right:-7px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#EF4444;color:#fff;font:700 .62rem/16px var(--f-body);text-align:center;border:2px solid var(--surface)}
+#bn3 .bn3-ana.on .bn3-av{box-shadow:0 0 0 2px var(--ink)}
+body.bn3-on #lmb .lmb-fab{display:none!important}
+body.bn3-on #lmb{bottom:calc(68px + env(safe-area-inset-bottom))!important}
+body.bn3-on{padding-bottom:calc(80px + env(safe-area-inset-bottom))!important}
+body.bn3-on .toast{bottom:calc(74px + env(safe-area-inset-bottom))!important}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -7024,6 +7041,7 @@ ACT.pedMaq=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!
 
 /* ===== Celular: tela simples + rodapé com 3 botões (Pedidos · + novo pedido · Financeiro) ===== */
 var BN3_IC={
+  ia:'<rect class="f" x="4.5" y="8" width="15" height="11.5" rx="3.5"/><rect x="4.5" y="8" width="15" height="11.5" rx="3.5"/><path d="M12 8V4.8M9.3 13.2h.01M14.7 13.2h.01M9.8 16.3h4.4"/><circle cx="12" cy="4" r="1"/>',
   ped:'<path class="f" d="M7 5.5h10a1.5 1.5 0 0 1 1.5 1.5v12.5A1.5 1.5 0 0 1 17 21H7a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 7 5.5z"/><path d="M7 5.5h10a1.5 1.5 0 0 1 1.5 1.5v12.5A1.5 1.5 0 0 1 17 21H7a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 7 5.5z"/><rect x="9" y="3" width="6" height="4" rx="1.3"/><path d="M9 12.2l1.6 1.6 3.4-3.4M9 17h6"/>',
   mais:'<path d="M12 5v14M5 12h14"/>',
   fin:'<path class="f" d="M4 8.5A2.5 2.5 0 0 1 6.5 6H18a2 2 0 0 1 2 2v9.5A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H18a2 2 0 0 1 2 2v9.5A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5z"/><path d="M16 6V4.8a1 1 0 0 0-1.3-.95L6.5 6.2"/><path d="M20 11h-3.5a2 2 0 0 0 0 4H20"/><circle cx="16.6" cy="13" r=".6"/>',
@@ -7033,13 +7051,17 @@ function bn3Desenha(){var el=document.getElementById('bn3');if(!bn3Visivel()){if
   if(!el){el=document.createElement('nav');el.id='bn3';el.setAttribute('aria-label','Atalhos');document.body.appendChild(el);}document.body.classList.add('bn3-on');
   var t=S.tab&&S.tab[S.role],dent=S.role==='dent',fin=dent?(t==='pedidos'&&S.labSub==='fin'):(t==='financeiro'),ped=(t==='pedidos'||(S.role==='prot'&&t==='producao'))&&!fin,semFin=!!MEM.dono;
   var I=function(n){return '<svg class="bn3-ic" viewBox="0 0 24 24" aria-hidden="true">'+BN3_IC[n]+'</svg>';};
-  el.innerHTML='<button data-bn3="ped" class="'+(ped?'on':'')+'"'+(ped?' aria-current="page"':'')+'><i>'+I('ped')+'</i><span>Pedidos</span></button>'+
-    '<button data-bn3="novo" class="bn3-mais" aria-label="Novo pedido"><i>'+I('mais')+'</i></button>'+
-    (semFin?'<button data-bn3="ini" class="'+(t==='inicio'?'on':'')+'"><i>'+I('ini')+'</i><span>Início</span></button>':'<button data-bn3="fin" class="'+(fin?'on':'')+'"'+(fin?' aria-current="page"':'')+'><i>'+I('fin')+'</i><span>Financeiro</span></button>');}
+  var ag=t==='agentes',P=(typeof lmbPend==='function'?lmbPend():[]).length;
+  el.innerHTML='<button data-lmb="abre" class="bn3-ana'+(LMB&&LMB.aberto?' on':'')+'" aria-label="Ana · lembretes"><span class="bn3-av"><img src="'+lmbAv()+'" alt="">'+(P?'<b>'+P+'</b>':'')+'</span></button>'+
+    '<button data-bn3="ped" class="'+(ped?'on':'')+'"'+(ped?' aria-current="page"':'')+' aria-label="Pedidos">'+I('ped')+'</button>'+
+    '<button data-bn3="novo" class="bn3-mais" aria-label="Novo pedido">'+I('mais')+'</button>'+
+    (semFin?'<button data-bn3="ini" class="'+(t==='inicio'?'on':'')+'" aria-label="Início">'+I('ini')+'</button>':'<button data-bn3="fin" class="'+(fin?'on':'')+'"'+(fin?' aria-current="page"':'')+' aria-label="Financeiro">'+I('fin')+'</button>')+
+    '<button data-bn3="ia" class="'+(ag?'on':'')+'"'+(ag?' aria-current="page"':'')+' aria-label="Agentes de IA">'+I('ia')+'</button>';}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-bn3]');if(!b)return;var k=b.getAttribute('data-bn3'),dent=S.role==='dent';e.preventDefault();
   if(k==='ped'){if(dent)S.labSub='ped';ACT.dTab(S.role==='prot'?'producao':'pedidos');}
   else if(k==='fin'){if(dent){S.labSub='fin';if(typeof DFL!=='undefined'&&!DFL.carregando){DFL.d=null;DFL.erro='';}ACT.dTab('pedidos');}else ACT.dTab('financeiro');}
   else if(k==='ini')ACT.dTab('inicio');
+  else if(k==='ia')ACT.dTab('agentes');
   else if(k==='novo'){if(S.role==='prot')pclAbre();else pcAbre();}
   bn3Desenha();});
 var _renderBN3=render;render=function(){var r=_renderBN3.apply(this,arguments);setTimeout(bn3Desenha,0);return r;};
