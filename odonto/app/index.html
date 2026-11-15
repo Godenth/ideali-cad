@@ -2444,6 +2444,18 @@ body.h3d-on .h3d .h2-mapa{display:none}.h3d .hero2{padding:clamp(24px,5vh,64px) 
 .esc-sxn{justify-self:start;border:0;background:none;color:var(--muted);font:inherit;font-size:.82rem;text-decoration:underline;cursor:pointer;padding:0}.esc-sxn.on{color:var(--ink);font-weight:700}
 .esc-box2 .btn.pri[disabled]{opacity:.45;cursor:not-allowed}
 @media(max-width:700px){.esc-box2{grid-template-columns:1fr;max-height:calc(100vh - 32px);overflow:auto}.esc-avc{min-height:300px}}
+
+@media(min-width:701px){
+.esc-modal:has(.esc-box2){padding:0;place-items:stretch;background:#05080f}
+.esc-box2{max-width:none;width:100%;height:100vh;border-radius:0;box-shadow:none;background:radial-gradient(70% 90% at 30% 60%,color-mix(in srgb,var(--c1) 38%,transparent),transparent 70%),radial-gradient(60% 60% at 85% 20%,color-mix(in srgb,var(--c2) 30%,transparent),transparent 70%),#05080f;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:center;animation:none}
+.esc-box2 .esc-avc{height:100vh;min-height:0;background:none}
+.esc-box2 .esc-avc:after{display:none}
+.esc-box2 .esc-av{width:auto;height:100%;max-width:none;left:0;right:0;margin:0 auto;object-fit:contain;-webkit-mask-image:linear-gradient(90deg,transparent,#000 24%,#000 76%,transparent),linear-gradient(180deg,transparent,#000 12%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 24%,#000 76%,transparent),linear-gradient(180deg,transparent,#000 12%);mask-composite:intersect;animation:escAvL .8s cubic-bezier(.2,.8,.2,1) both}
+.esc-box2 .esc-avv svg{width:160px;height:160px;opacity:.5}
+.esc-box2 .esc-vert{left:clamp(16px,3vw,48px);top:50%;transform:translateY(-50%) rotate(180deg);font-size:clamp(2.6rem,6vw,5.6rem);font-weight:800;letter-spacing:.06em;opacity:.12;text-shadow:none;white-space:nowrap}
+.esc-box2 .esc-dir{justify-self:start;width:min(520px,calc(100% - 6vw));margin-right:6vw;background:var(--surface);border-radius:22px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.08);animation:escIn .45s .1s ease both}
+}
+@keyframes escAvL{from{opacity:0;transform:translateX(-60px);filter:brightness(2.2) blur(8px)}to{opacity:1;transform:none;filter:none}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
