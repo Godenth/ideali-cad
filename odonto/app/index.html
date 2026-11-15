@@ -8219,7 +8219,7 @@ function rsCel(){return !!(window.matchMedia&&matchMedia('(max-width:820px)').ma
 var _rProfsCel=rProfs;rProfs=function(){var h=_rProfsCel.apply(this,arguments);if(!rsCel())return h;
   var n=profsNFil();
   h=h.replace(/<button class="btn pfilb" data-act="filAbre">[^<]*(<b>\d+<\/b>)?<\/button>/,'<button class="btn pfilb rs-icb" data-act="filAbre" aria-label="Filtros"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>'+(n?'<b>'+n+'</b>':'')+'</button>');
-  h=h.replace('placeholder="Ex.: Exocad São Paulo"','placeholder="Buscar: Exocad, cidade…"');
+  h=h.replace('placeholder="Ex.: Exocad São Paulo"','placeholder="Buscar…"');
   h=h.replace('data-v="cards">▦ Cartões','data-v="cards" aria-label="Cartões">▦').replace('data-v="linhas">☰ Lista','data-v="linhas" aria-label="Lista">☰').replace('data-v="mapa">🗺 Mapa','data-v="mapa" aria-label="Mapa">🗺');
   return h;};
 
