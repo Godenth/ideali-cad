@@ -2561,6 +2561,12 @@ body.pv-trava{overflow:hidden}
 .pvf-dif{font-size:.85rem;padding:6px 10px;border-radius:9px;background:color-mix(in srgb,#F59E0B 12%,transparent)}
 .pvf-lk{justify-self:start;border:0;background:none;color:#00A6E6;font:inherit;font-weight:700;cursor:pointer;padding:2px}
 .pvf-env{border:0;border-radius:14px;padding:14px;background:linear-gradient(135deg,#0EA5E9,#2563EB);color:#fff;font:inherit;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 10px 24px color-mix(in srgb,#2563EB 30%,transparent)}
+
+.pvf-oks{display:grid;gap:6px}.pvf-ok{display:flex;align-items:center;gap:6px;cursor:default;border-radius:12px!important;padding:6px 6px 6px 12px!important}
+.pvf-ok button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:6px 10px;font:inherit;font-size:.8rem;font-weight:700;cursor:pointer}.pvf-ok button:first-of-type{margin-left:auto}
+.stlv{position:fixed;inset:0;z-index:260;background:radial-gradient(120% 90% at 50% 40%,#16213a,#05080f);display:grid;grid-template-rows:auto 1fr;color:#E6EDF7;animation:pdFade .2s ease both}
+.stlv-h{display:flex;align-items:center;gap:12px;padding:12px 16px}.stlv-h b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stlv-d{color:#94A3B8;font-size:.82rem;margin-left:auto}.stlv .pv-x{color:#E6EDF7;border-color:rgba(255,255,255,.2)}
+.stlv-c{position:relative;min-height:0}.stlv-c canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}.stlv-ld{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#94A3B8}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -8876,10 +8882,10 @@ function pvfCards(p){var F=pvfDe(p.id),R=F.exo,stl=F.stls.some(function(s){retur
   var conf='';if(R){var L=[];try{L=exoConfere(p,R);}catch(e){}var im=pvfImplante(p,R),ruins=L.filter(function(x){return x[0]!=='✅'&&!(im&&/implante/i.test(x[1]));});
     conf='<div class="pvf-conf">'+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+
       (ruins.length?ruins.map(function(x){return '<div class="pvf-dif">'+x[0]+' <b>'+x[1]+':</b> '+esc(x[2])+'</div>';}).join('')+'<button class="pvf-lk" data-pvf="aplica">Usar dados do projeto no pedido</button>':(im&&!im.ok?'':'<div class="pvf-im ok">✅ O projeto confere com o pedido.</div>'))+'</div>';}
-  var chip=function(on,txt,act){return on?'<button class="pvf-ok"'+(act?' data-pvf="'+act+'"':' tabindex="-1"')+'>✅ '+txt+'</button>':'';};
+  var chip=function(on,txt,baixa,ver){return on?'<span class="pvf-ok">✅ '+txt+(ver?'<button data-pvb="'+ver+'" title="Visualizar">👁 Ver</button>':'')+'<button data-pvb="'+baixa+'" title="Baixar">⬇ Baixar</button></span>':'';};
   return '<div class="pvf2">'+
     (F.lendo?'<div class="pvf-ld">Abrindo o Dental CAD…</div>':'<label class="pvf-up'+(F.zip?' tem':'')+'">🗜️ '+(F.zip?'Trocar Dental CAD':'Anexar Dental CAD (.zip)')+'<input type="file" data-pvf="zip" accept=".zip,application/zip" hidden></label>')+
-    (F.zip?'<div class="pvf-oks">'+chip(true,'Dental CAD anexado')+chip(stl,'STL anexada')+chip(!!F.html,'HTML anexado','verhtml')+'</div>':'')+
+    (F.zip?'<div class="pvf-oks">'+chip(true,'Dental CAD anexado','zip')+chip(stl,'STL anexada','stl','verstl')+chip(!!F.html,'HTML anexado','html','verhtml')+'</div>':'')+
     (F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':'')+conf+
     '<button class="pvf-env" data-pv="mail">✉️ Enviar pedido por e-mail</button></div>';}
 document.addEventListener('change',function(ev){var t=ev.target,k=t&&t.getAttribute&&t.getAttribute('data-pvf');if(!k)return;var p=pvP();if(!p)return;var F=pvfDe(p.id);
@@ -8898,6 +8904,38 @@ function pvfMail(p){var F=pvfDe(p.id),q=Object.assign({},p);if(F.exo){q._exo=F.e
   F.stls.forEach(function(s){if(s.ok)GM.arqs.push({nome:s.nome,tam:s.tam,f:s.f,ok:true});});if(F.html)GM.arqs.push({nome:F.html.nome,tam:F.html.tam,f:F.html.f,ok:true});
   if(F.zip)GM.arqs.push({nome:F.zip.nome,tam:F.zip.tam,f:F.zip.f,ok:!!F.mandaZip});if(F.exo){var im=pvfImplante(p,F.exo),co=document.getElementById('exm-co');if(im&&co&&!im.ok)co.value=co.value.replace('\n\nOs arquivos','\n\n⚠️ Conferir: '+im.txt+'\n\nOs arquivos');}
   gmRedesenha();}
+
+/* ===== Baixar e visualizar os arquivos do Dental CAD (STL em 3D, HTML do exocad) ===== */
+function pvfBaixa(f,nome){var u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=nome||f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},60000);}
+var STLV_THREE=null;function stlvThree(){if(window.THREE)return Promise.resolve(window.THREE);if(STLV_THREE)return STLV_THREE;
+  STLV_THREE=new Promise(function(ok,no){var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';s.onload=function(){window.THREE?ok(window.THREE):no();};s.onerror=function(){STLV_THREE=null;no();};document.head.appendChild(s);});return STLV_THREE;}
+function stlvLe(buf){var dv=new DataView(buf),n=buf.byteLength>=84?dv.getUint32(80,true):0,pos;
+  if(buf.byteLength===84+n*50){pos=new Float32Array(n*9);for(var i=0;i<n;i++){var o=84+i*50+12;for(var k=0;k<9;k++)pos[i*9+k]=dv.getFloat32(o+k*4,true);}return pos;}
+  var t=new TextDecoder().decode(buf),re=/vertex\s+([-+\d.eE]+)\s+([-+\d.eE]+)\s+([-+\d.eE]+)/g,m,L=[];while((m=re.exec(t)))L.push(+m[1],+m[2],+m[3]);return new Float32Array(L);}
+function stlvAbre(arqs){var ov=document.createElement('div');ov.id='stlv';ov.className='stlv';ov.innerHTML='<div class="stlv-h"><b>🦷 '+esc(arqs.map(function(a){return a.nome;}).join(' · '))+'</b><span class="stlv-d">Arraste para girar · role para aproximar</span><button class="pv-x" data-stlv="fecha" aria-label="Fechar">✕</button></div><div class="stlv-c"><p class="stlv-ld">Carregando o 3D…</p></div>';
+  document.body.appendChild(ov);var parar=false,fecha=function(){parar=true;ov.remove();document.removeEventListener('keydown',esc1,true);},esc1=function(e){if(e.key==='Escape'){e.stopPropagation();fecha();}};
+  ov.querySelector('[data-stlv=fecha]').onclick=fecha;document.addEventListener('keydown',esc1,true);
+  Promise.all([stlvThree()].concat(arqs.map(function(a){return a.f.arrayBuffer();}))).then(function(r){var T=r[0],box=ov.querySelector('.stlv-c');box.innerHTML='';
+    var W=box.clientWidth,H=box.clientHeight,ren=new T.WebGLRenderer({antialias:true,alpha:true});ren.setPixelRatio(Math.min(2,devicePixelRatio||1));ren.setSize(W,H);box.appendChild(ren.domElement);
+    var cena=new T.Scene(),cam=new T.PerspectiveCamera(35,W/H,.1,5000),grp=new T.Group();cena.add(grp);
+    cena.add(new T.HemisphereLight(0xffffff,0x1e293b,.55));var dl=new T.DirectionalLight(0xffffff,.75);dl.position.set(1,2,3);cam.add(dl);cena.add(cam);
+    var cores=[0xE8DFCC,0x93C5FD,0xFCA5A5,0xA7F3D0];
+    r.slice(1).forEach(function(buf,i){var g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(stlvLe(buf),3));g.computeVertexNormals();grp.add(new T.Mesh(g,new T.MeshStandardMaterial({color:cores[i%cores.length],roughness:.45,metalness:.05})));});
+    var bb=new T.Box3().setFromObject(grp),c=bb.getCenter(new T.Vector3()),tam=bb.getSize(new T.Vector3()).length()||10;grp.position.sub(c);var dist=tam*1.6;
+    var rx=-.4,ry=.5,arr=null;function pos(){cam.position.set(dist*Math.sin(ry)*Math.cos(rx),dist*Math.sin(-rx),dist*Math.cos(ry)*Math.cos(rx));cam.lookAt(0,0,0);}pos();
+    var cv=ren.domElement;cv.addEventListener('pointerdown',function(e){arr=[e.clientX,e.clientY];cv.setPointerCapture(e.pointerId);});
+    cv.addEventListener('pointermove',function(e){if(!arr)return;ry-=(e.clientX-arr[0])*.01;rx=Math.max(-1.5,Math.min(1.5,rx-(e.clientY-arr[1])*.01));arr=[e.clientX,e.clientY];pos();});
+    cv.addEventListener('pointerup',function(){arr=null;});cv.addEventListener('wheel',function(e){e.preventDefault();dist=Math.max(tam*.3,Math.min(tam*6,dist*(e.deltaY>0?1.1:.9)));pos();},{passive:false});
+    addEventListener('resize',function(){if(parar)return;W=box.clientWidth;H=box.clientHeight;ren.setSize(W,H);cam.aspect=W/H;cam.updateProjectionMatrix();});
+    (function loop(){if(parar){ren.dispose();return;}ren.render(cena,cam);requestAnimationFrame(loop);})();
+  }).catch(function(){var b=ov.querySelector('.stlv-c');if(b)b.innerHTML='<p class="stlv-ld">Não consegui abrir o 3D agora. Use Baixar.</p>';});}
+document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-pvb]');if(!b)return;var p=pvP();if(!p)return;var F=pvfDe(p.id),k=b.getAttribute('data-pvb');ev.preventDefault();ev.stopPropagation();
+  var S2=F.stls.filter(function(s){return s.ok;});
+  if(k==='zip'&&F.zip)pvfBaixa(F.zip.f,F.zip.nome);
+  else if(k==='stl')S2.forEach(function(s,i){setTimeout(function(){pvfBaixa(s.f,s.nome);},i*400);});
+  else if(k==='verstl'&&S2.length)stlvAbre(S2);
+  else if(k==='html'&&F.html)pvfBaixa(F.html.f,F.html.nome);
+  else if(k==='verhtml'&&F.html){var u=URL.createObjectURL(F.html.f);window.open(u,'_blank');setTimeout(function(){URL.revokeObjectURL(u);},120000);}},true);
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
