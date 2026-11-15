@@ -2182,6 +2182,16 @@ body:has(.rsx.rs-claro){background:#F3F4F6}body:has(.rsx:not(.rs-claro)){backgro
 .vr-dist{font-weight:600;color:var(--rc)}
 .vr-ok{font-size:.82rem;font-weight:600;color:#15803D}[data-theme=dark] .vr-ok{color:#4ADE80}
 @media(max-width:560px){.vrow{grid-template-columns:40px minmax(0,1fr);padding:14px}.vr-av{width:40px;height:40px}.vr-a{grid-column:2}}
+/* transição painel ⇄ Rede: cortinas diagonais */
+.rct{position:fixed;inset:0;z-index:9998;overflow:hidden;cursor:pointer}
+.rct-p{position:absolute;top:0;bottom:0;left:-40vw;width:180vw;will-change:transform}
+.rct-e{clip-path:polygon(0 0,100% 0,calc(100% - 38vw) 100%,0 100%)}
+.rct-d{clip-path:polygon(38vw 0,100% 0,100% 100%,0 100%)}
+.rct-t{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0;display:grid;justify-items:center;gap:10px;color:#fff;text-align:center;white-space:nowrap}
+.rct-logo{width:54px;height:54px;border-radius:14px;background:#2563EB;display:grid;place-items:center;font-weight:800;font-size:1.7rem}
+.rct-t b{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;letter-spacing:-.02em}.rct-t em{font-style:normal;color:#60A5FA}
+.rct-t small{font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:#9AA3AF}
+.rct-t u{width:56px;height:3px;border-radius:3px;background:#2563EB;text-decoration:none}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -5018,76 +5028,33 @@ montaMapa=function(){var el=$('rmapa');if(!el)return;if(LF.map){try{LF.map.remov
 Object.assign(ACT,{bmSel:function(v){S.rede.msel=S.rede.msel===v?'':v;var el=$('rmapa');if(el)brDesenha(el);}});
 
 /* ===== Transição da Rede: blocos diagonais em camadas + "Conectando à Rede" / "Saindo da Rede" ===== */
-/* Transição painel ⇄ Rede: "mergulho na rede".
-   1) o painel recua e uma constelação de pontos ligados nasce sobre ele; pacotes de luz correm pelas ligações
-   2) a câmera acelera para dentro da rede (as luzes viram riscos), até um clarão no centro
-   3) a tela nova aparece por uma íris de luz que se abre, com a rede passando para trás
-   Sair da Rede é o caminho inverso (a rede se recolhe num ponto). Clique ou Esc pula. Respeita "reduzir movimento". */
-var RTX_P={x:null,y:null};document.addEventListener('pointerdown',function(e){RTX_P.x=e.clientX;RTX_P.y=e.clientY;},true);
+/* Transição painel ⇄ Rede: cortinas retas em diagonal.
+   Três painéis de borda inclinada entram um por cima do outro (alternando os lados), a tela para com
+   "Ideali Rede" no centro, a troca acontece escondida, e os painéis saem na ordem inversa.
+   Clique ou Esc pula. Respeita "reduzir movimento". */
 function redeAnim(entrar,troca){
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches||document.querySelector('.rtx-cv')){troca();return;}
-  var W=innerWidth,H=innerHeight,dpr=Math.min(1.5,devicePixelRatio||1),cv=document.createElement('canvas'),g=cv.getContext('2d'),root=document.documentElement;
-  cv.className='rtx-cv';cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
-  var tx=document.createElement('div');tx.className='rtx-tx';tx.setAttribute('role','status');
-  tx.innerHTML='<small>'+(entrar?'conectando':'saindo da rede')+'</small><b>'+(entrar?'Rede Ideali':'Seu painel')+'</b><i></i>';
-  document.body.appendChild(cv);document.body.appendChild(tx);root.classList.add('rtx-out');
-  var CX=W/2,CY=H/2,ox=RTX_P.x==null?CX:RTX_P.x,oy=RTX_P.y==null?CY:RTX_P.y,F=Math.max(W,H)*.62,DIAG=Math.sqrt(W*W+H*H);
-  var rnd=function(a,b){return a+Math.random()*(b-a);},cl=function(x){return x<0?0:x>1?1:x;},eio=function(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;},eo=function(x){return 1-Math.pow(1-x,3);},ei=function(x){return x*x*x;};
-  var COR=entrar?[[92,140,255],[124,92,255],[56,225,255]]:[[124,92,255],[92,140,255],[255,120,220]];
-  var N=Math.round(Math.min(170,Math.max(80,W*H/9000))),P=[],i,j;
-  for(i=0;i<N;i++)P.push({x:rnd(-1.5,1.5),y:rnd(-1.1,1.1),z:rnd(.08,1),c:COR[i%7===0?2:i%3===0?1:0],r:rnd(.9,2.3),px:0,py:0,ok:false});
-  /* ligações: cada ponto aos 2 vizinhos mais próximos */
-  var LK=[],visto={};for(i=0;i<N;i++){var a=P[i],best=[];for(j=0;j<N;j++){if(j===i)continue;var b=P[j],d=(a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)+(a.z-b.z)*(a.z-b.z)*6;best.push([d,j]);}
-    best.sort(function(m,n){return m[0]-n[0];});for(j=0;j<2;j++){var k=Math.min(i,best[j][1])+'-'+Math.max(i,best[j][1]);if(!visto[k]){visto[k]=1;LK.push({a:i,b:best[j][1],p:Math.random(),v:rnd(.5,1.3),on:Math.random()<.45});}}}
-  var T_SWAP=1180,T_END=2250,t0=performance.now(),ult=t0,trocou=false,pulou=false,fim=false;
-  function proj(p,vx,vy){var s=F/(p.z*F*1.15);return [vx+p.x*F*.9/p.z*.42,vy+p.y*F*.9/p.z*.42,Math.min(7,p.r*.45/p.z)];}
-  function acaba(){if(fim)return;fim=true;cv.remove();tx.remove();root.classList.remove('rtx-out','rtx-in');removeEventListener('keydown',tecla,true);}
-  function tecla(e){if(e.key==='Escape')pula();}
-  function pula(){if(pulou)return;pulou=true;if(!trocou){trocou=true;try{troca();}catch(e){}}t0=performance.now()-Math.max(performance.now()-t0,T_END-320);}
-  cv.addEventListener('pointerdown',pula);addEventListener('keydown',tecla,true);
-  function quadro(now){if(fim)return;var t=now-t0,dt=Math.min(50,now-ult);ult=now;
-    var a1=cl(t/T_SWAP),a2=cl((t-T_SWAP)/(T_END-T_SWAP));
-    /* ponto de fuga: sai de onde a pessoa clicou e vai para o centro */
-    var m=eo(cl(t/700)),vx=ox+(CX-ox)*m,vy=oy+(CY-oy)*m;
-    /* velocidade da câmera: devagar → dispara → freia depois da troca */
-    var sp=(t<T_SWAP?.04+ei(a1)*2.6:2.6*(1-eo(a2))+.05)*(entrar?1:-1),warp=cl(Math.abs(sp)/1.2);
-    g.setTransform(dpr,0,0,dpr,0,0);g.globalCompositeOperation='source-over';g.clearRect(0,0,W,H);
-    /* fundo: escurece sobre o painel; depois da troca fica sólido e some pela íris */
-    var bg=t<T_SWAP?eo(cl(t/520)):1;
-    var gr=g.createRadialGradient(vx,vy,0,vx,vy,DIAG*.75);gr.addColorStop(0,'rgba(18,22,64,'+bg+')');gr.addColorStop(.55,'rgba(8,10,34,'+bg+')');gr.addColorStop(1,'rgba(3,4,16,'+bg+')');
-    g.fillStyle=gr;g.fillRect(0,0,W,H);
-    g.globalCompositeOperation='lighter';g.lineCap='round';
-    /* move e projeta */
-    for(i=0;i<N;i++){var p=P[i],q0=proj(p,vx,vy);p.z-=sp*dt/1000;var volta=false;if(p.z<.035){p.z+=1;volta=true;}else if(p.z>1.05){p.z-=1;volta=true;}
-      var q=proj(p,vx,vy);p.sx=q[0];p.sy=q[1];p.sr=q[2];p.px=volta?q[0]:q0[0];p.py=volta?q[1]:q0[1];p.al=cl((1.02-p.z)*2.2)*cl((p.z-.035)*30);}
-    /* ligações da rede (somem quando a câmera dispara) */
-    var la=(1-warp)*cl(t/420)*(1-a2);
-    if(la>.02){g.lineWidth=.8;for(i=0;i<LK.length;i++){var L=LK[i],A=P[L.a],B=P[L.b],al=Math.min(A.al,B.al)*la*.5;if(al<.02)continue;
-        g.strokeStyle='rgba(120,150,255,'+al+')';g.beginPath();g.moveTo(A.sx,A.sy);g.lineTo(B.sx,B.sy);g.stroke();
-        if(L.on){L.p+=L.v*dt/900;if(L.p>1)L.p-=1;var ux=A.sx+(B.sx-A.sx)*L.p,uy=A.sy+(B.sy-A.sy)*L.p;g.fillStyle='rgba(200,235,255,'+Math.min(1,al*2.4)+')';g.beginPath();g.arc(ux,uy,1.6,0,6.283);g.fill();}}}
-    /* pontos: brilho + risco de velocidade */
-    for(i=0;i<N;i++){var p2=P[i];if(p2.al<.02)continue;var c=p2.c,al2=p2.al*(t<T_SWAP?cl(t/300+p2.z-.6):1-a2*.75);
-      if(warp>.08){g.strokeStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+al2*.9+')';g.lineWidth=Math.max(1,p2.sr*1.2);g.beginPath();g.moveTo(p2.px,p2.py);
-        var ex=p2.sx+(p2.sx-p2.px)*warp*2.2,ey=p2.sy+(p2.sy-p2.py)*warp*2.2;g.lineTo(ex,ey);g.stroke();}
-      g.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+al2*.28+')';g.beginPath();g.arc(p2.sx,p2.sy,p2.sr*3.2,0,6.283);g.fill();
-      g.fillStyle='rgba(235,242,255,'+al2+')';g.beginPath();g.arc(p2.sx,p2.sy,p2.sr,0,6.283);g.fill();}
-    /* clarão no centro: cresce até a troca */
-    var bl=t<T_SWAP?ei(cl((t-T_SWAP*.45)/(T_SWAP*.55))):1-eo(cl(a2*2.2));
-    if(bl>.01){var rb=DIAG*(.08+bl*.75),gb=g.createRadialGradient(vx,vy,0,vx,vy,rb);gb.addColorStop(0,'rgba(255,255,255,'+Math.min(1,bl*1.25)+')');gb.addColorStop(.25,'rgba('+COR[2][0]+','+COR[2][1]+','+COR[2][2]+','+bl*.85+')');gb.addColorStop(.6,'rgba('+COR[1][0]+','+COR[1][1]+','+COR[1][2]+','+bl*.45+')');gb.addColorStop(1,'rgba(0,0,0,0)');
-      g.fillStyle=gb;g.fillRect(0,0,W,H);}
-    /* troca de tela escondida no auge do clarão */
-    if(!trocou&&t>=T_SWAP){trocou=true;try{troca();}catch(e){}root.classList.remove('rtx-out');root.classList.add('rtx-in');var gasto=performance.now()-t0-T_SWAP;if(gasto>30)t0+=gasto;}
-    if(pulou&&root.classList.contains('rtx-out')){root.classList.remove('rtx-out');root.classList.add('rtx-in');}
-    /* íris: abre um círculo de luz que revela a tela nova */
-    if(t>T_SWAP){var ir=eio(cl((t-T_SWAP-60)/(T_END-T_SWAP-160))),R=ir*DIAG*.62;
-      if(R>1){g.globalCompositeOperation='destination-out';var gi=g.createRadialGradient(CX,CY,Math.max(0,R-70),CX,CY,R+2);gi.addColorStop(0,'rgba(0,0,0,1)');gi.addColorStop(1,'rgba(0,0,0,0)');
-        g.fillStyle='#000';g.beginPath();g.arc(CX,CY,Math.max(0,R-70),0,6.283);g.fill();g.fillStyle=gi;g.beginPath();g.arc(CX,CY,R+2,0,6.283);g.fill();
-        g.globalCompositeOperation='lighter';var ra=(1-ir)*.9;if(ra>.02){g.lineWidth=2+8*(1-ir);g.strokeStyle='rgba(190,225,255,'+ra+')';g.beginPath();g.arc(CX,CY,R,0,6.283);g.stroke();
-          g.lineWidth=22*(1-ir)+2;g.strokeStyle='rgba('+COR[1][0]+','+COR[1][1]+','+COR[1][2]+','+ra*.3+')';g.beginPath();g.arc(CX,CY,R+6,0,6.283);g.stroke();}}}
-    /* palavra no centro */
-    var on=t>300&&t<T_SWAP+120;if(on!==tx.classList.contains('on'))tx.classList.toggle('on',on);if(t>T_SWAP-260)tx.classList.add('vai');
-    if(t<T_END+40)requestAnimationFrame(quadro);else acaba();}
-  requestAnimationFrame(quadro);setTimeout(acaba,T_END+2500);}
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches||document.querySelector('.rct')||!document.body.animate){troca();return;}
+  var w=document.createElement('div');w.className='rct';w.setAttribute('role','status');
+  var lados=entrar?['e','d','e']:['d','e','d'],cores=['#2563EB','#1E40AF','#0E1116'];
+  w.innerHTML=lados.map(function(l,i){return '<i class="rct-p rct-'+l+'" style="background:'+cores[i]+'"></i>';}).join('')+
+    '<div class="rct-t"><span class="rct-logo">i</span><b>'+(entrar?'Ideali <em>Rede</em>':'Ideali <em>Odonto</em>')+'</b><small>'+(entrar?'odontologia conectada':'voltando ao seu painel')+'</small><u></u></div>';
+  document.body.appendChild(w);
+  var P=w.querySelectorAll('.rct-p'),T=w.querySelector('.rct-t'),EASE='cubic-bezier(.76,0,.24,1)',D=520,GAP=110,HOLD=420,fim=false,trocou=false,timers=[];
+  var de=function(l){return l==='e'?'translateX(-112%)':'translateX(112%)';},para=function(l){return l==='e'?'translateX(112%)':'translateX(-112%)';};
+  function faz(){if(trocou)return;trocou=true;try{troca();}catch(e){}}
+  function acaba(){if(fim)return;fim=true;timers.forEach(clearTimeout);faz();w.remove();removeEventListener('keydown',tecla,true);}
+  function tecla(e){if(e.key==='Escape')acaba();}
+  w.addEventListener('pointerdown',acaba);addEventListener('keydown',tecla,true);
+  /* entrada */
+  for(var i=0;i<P.length;i++)P[i].animate([{transform:de(lados[i])},{transform:'translateX(0)'}],{duration:D,delay:i*GAP,easing:EASE,fill:'both'});
+  var coberto=D+(P.length-1)*GAP;
+  T.animate([{opacity:0,transform:'translate(-50%,-40%)'},{opacity:1,transform:'translate(-50%,-50%)'}],{duration:380,delay:coberto-140,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+  timers.push(setTimeout(faz,coberto+40));
+  /* saída: na ordem inversa, cada painel continua no mesmo sentido em que entrou */
+  var sai=coberto+HOLD;
+  timers.push(setTimeout(function(){if(fim)return;T.animate([{opacity:1},{opacity:0}],{duration:200,fill:'forwards'});
+    for(var k=P.length-1;k>=0;k--)P[k].animate([{transform:'translateX(0)'},{transform:para(lados[k])}],{duration:D,delay:(P.length-1-k)*GAP,easing:EASE,fill:'forwards'});},sai));
+  timers.push(setTimeout(acaba,sai+D+(P.length-1)*GAP+60));}
 redeTransicao=function(entrar,sec){redeAnim(entrar,function(){if(entrar){S.redeOn=true;S.rede.sec=sec||'vagas';S.rede.anim=true;}else{if(typeof cvAtivo==='function'&&cvAtivo())lerCv();S.redeOn=false;S.painelVolta=true;}render();window.scrollTo(0,0);});};
 
 /* ===== Mapa 2D: zoom com a rodinha, arrastar com o mouse/dedo, botões + − e "Brasil inteiro" ===== */
