@@ -8683,7 +8683,7 @@ function pdTipo(t){for(var i=0;i<PD_TIPOS.length;i++)if(PD_TIPOS[i][0]===t)retur
 function pdClientes(){return ((typeof EMP!=='undefined'&&EMP.cli)||[]).filter(function(c){return c&&c.nome&&c.ativo!==false;}).map(function(c){return String(c.nome).trim();});}
 function pdPedsDo(cliNome){if(typeof PED==='undefined'||!PED.L)return [];var k=pdSemAc(cliNome||'').trim();if(!k)return [];
   var cid=((typeof EMP!=='undefined'&&EMP.cli)||[]).filter(function(c){return pdSemAc(c.nome).trim()===k;}).map(function(c){return c.id;})[0];
-  return PED.L.filter(function(p){return !p.arquivado&&p.status!=='cancelado'&&((cid&&p.cliente_id===cid)||pdSemAc(p.cliente_nome||'').trim()===k);})
+  return PED.L.filter(function(p){return !p.arquivado&&p.status!=='cancelado'&&(p.cliente_id?(cid&&p.cliente_id===cid):pdSemAc(pedCli(p)).trim()===k);})
     .sort(function(a,b){var fa=/entregue|finalizado/.test(a.status)?1:0,fb=/entregue|finalizado/.test(b.status)?1:0;return fa-fb||(b.numero||0)-(a.numero||0);}).slice(0,60);}
 function pdPedTxt(p){var t=p.trabalho||'';if(t.length>45)t=t.slice(0,44)+'…';return ('#'+(p.numero||'—')+' '+(p.paciente||'Sem paciente')+(t?' · '+t:'')).slice(0,160);}
 function pdPedOps(cli,sel){var L=pdPedsDo(cli),st=function(p){return typeof PEDST!=='undefined'&&PEDST[p.status]?' ('+PEDST[p.status][0]+')':'';};
