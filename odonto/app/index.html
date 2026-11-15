@@ -2268,6 +2268,23 @@ body:has(.rsx.rs-claro){background:#F3F4F6}body:has(.rsx:not(.rs-claro)){backgro
 .cm-it:hover{background:var(--soft)}.cm-it.on{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
 .cm-it i{margin-left:auto;font-style:normal;font-size:.72rem;font-weight:700;background:#DC2626;color:#fff;border-radius:999px;padding:1px 7px}
 .cm-it svg{width:20px;height:20px}.cm-sair{color:#DC2626}
+/* celular · pedidos limpos */
+.ped-mais,.ped-avt{display:none}
+@media (max-width:760px){
+  .ped-cel .dtop{flex-wrap:wrap;align-items:center}
+  .ped-cel .dtop .btn{display:none!important}
+  .ped-cel.fer .dtop .btn:not(.pri){display:inline-flex!important;flex:1 1 calc(50% - 8px);justify-content:center}
+  .ped-cel .ped-mais{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1.4rem;line-height:1;cursor:pointer}
+  .ped-cel.fer .ped-mais{background:var(--soft)}
+  .ped-cel .banner{display:none!important}
+  .ped-cel.av .banner{display:flex!important}.ped-cel.av .rcb-ban{display:grid!important}
+  .ped-cel .ped-avt{display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;margin:4px 0 10px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.92rem;cursor:pointer;text-align:left}
+  .ped-cel .ped-avt span{margin-left:auto;color:var(--accent);font-weight:600;font-size:.85rem}
+}
+@media (max-width:760px){
+  .ped-cel .cli-bar .seg{display:none}.ped-cel.fer .cli-bar .seg{display:inline-flex}
+  .ped-cel .pedfil{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;max-width:calc(100vw - 24px)}.ped-cel,.ped-cel>*{min-width:0;max-width:100%}.ped-cel .pedfil::-webkit-scrollbar{display:none}.ped-cel .pedfil .chip{flex:none;white-space:nowrap}
+}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4440,7 +4457,7 @@ function rPedidos(){if(!PED.carregado)return '<div class="empty">Carregando os p
   if(PED.erro)return '<section class="ptrava neg-vz"><div class="neg-vz-ic">⚠️</div><h2>Não consegui carregar os pedidos</h2><button class="btn pri" data-act="pedRecarrega">Tentar de novo</button></section>';
   if(PED.ed)return rPedForm(PED.ed);if(PED.vcad)return rPedCadistas();
   var A=pedAtivos(),nOrc=A.filter(function(p){return p.status==='orcamento';}).length,nCad=A.filter(function(p){return p.tipo==='cad';}).length,nAna=A.length-nCad;
-  var topo='<div class="dtop"><div><h2>Pedidos</h2><p class="small muted">'+A.filter(function(p){return p.status==='desenho';}).length+' desenhos CAD a fazer · '+A.filter(function(p){return p.status==='producao';}).length+' em produção</p></div><span class="spacer"></span><button class="btn" data-act="pedCadistas">✏️ Cadistas</button><button class="btn pri" data-act="pedNovo">+ Novo pedido</button></div>'+
+  var topo='<div class="dtop"><div><h2>Pedidos</h2><p class="small muted">'+(function(n){return n+(n===1?' desenho CAD a fazer':' desenhos CAD a fazer');})(A.filter(function(p){return p.status==='desenho';}).length)+' · '+A.filter(function(p){return p.status==='producao';}).length+' em produção</p></div><span class="spacer"></span><button class="btn" data-act="pedCadistas">✏️ Cadistas</button><button class="btn pri" data-act="pedNovo">+ Novo pedido</button></div>'+
     '<div class="cli-bar"><label class="cli-q"><span aria-hidden="true">🔎</span><input id="ped-q" type="search" placeholder="Buscar paciente, cliente, nº ou dente" value="'+esc(PED.busca||'')+'" autocomplete="off"></label>'+
     '<div class="seg">'+[['quadro','Quadro'],['lista','Lista']].map(function(o){return '<button aria-pressed="'+(PED.vista===o[0])+'" data-act="pedVista" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
     '<div class="row wrap pedfil">'+[['todos','Todos'],['cad','🟣 Ordens CAD ('+nCad+')'],['analogico','🧪 Analógico ('+nAna+')'],['urg','Urgentes']].map(function(o){return '<button class="chip" aria-pressed="'+(PED.f===o[0])+'" data-act="pedFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+
@@ -8106,6 +8123,17 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&S.cm){S.cm=false;cmDesenha();}if(e.key==='Enter'&&e.target&&e.target.id==='cm-q'){var q=document.getElementById('ab-q');if(q){q.value=e.target.value;q.dispatchEvent(new Event('input',{bubbles:true}));q.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));}S.cm=false;cmDesenha();}});
 var _renderCM=render;render=function(){var x=_renderCM.apply(this,arguments);try{if(S.cm)cmDesenha();}catch(e){}return x;};
 addEventListener('resize',function(){if(S.cm&&!celOn()){S.cm=false;cmDesenha();}});
+
+
+/* ===== Celular · Pedidos do laboratório: só o básico (título, busca e lista). Ferramentas no "⋯" e avisos recolhidos ===== */
+var _rPedidosCel=rPedidos;rPedidos=function(){var h=_rPedidosCel.apply(this,arguments);
+  if(!celOn()||(typeof PZM!=='undefined'&&PZM.on)||(typeof PFX!=='undefined'&&PFX.on)||PED.ed||PED.vcad||h.indexOf('<div class="dtop">')<0)return h;
+  var n=(h.match(/class="banner/g)||[]).length,i=h.indexOf('<div class="cli-bar">');
+  h=h.replace('<span class="spacer"></span>','<span class="spacer"></span><button class="ped-mais" data-act="pedFer" aria-label="Ferramentas" aria-expanded="'+!!S.pedFer+'">⋯</button>');
+  var tg=n?'<button class="ped-avt" data-act="pedAv" aria-expanded="'+!!S.pedAv+'">🔔 <b>'+n+' aviso'+(n>1?'s':'')+'</b><span>'+(S.pedAv?'esconder':'ver')+'</span></button>':'';
+  i=h.indexOf('<div class="cli-bar">');if(i>=0){var j=h.indexOf('<div class="banner');if(j>=0&&j<i)i=j;h=h.slice(0,i)+tg+h.slice(i);}
+  return '<div class="ped-cel'+(S.pedAv?' av':'')+(S.pedFer?' fer':'')+'">'+h+'</div>';};
+ACT.pedFer=function(){S.pedFer=!S.pedFer;render();};ACT.pedAv=function(){S.pedAv=!S.pedAv;render();};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
