@@ -2490,6 +2490,7 @@ body.pd-trava{overflow:hidden}
 .pd-cd{justify-self:start;font:700 .8rem/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;color:var(--muted);background:color-mix(in srgb,var(--line) 70%,transparent);border-radius:8px;padding:4px 8px}
 .pd-cd.hoje{color:#B45309;background:color-mix(in srgb,#F59E0B 16%,transparent)}.pd-cd.perto{color:#fff;background:#F59E0B;animation:pdPulso 1.6s ease-in-out infinite}.pd-cd.atr{color:#fff;background:#DC2626}
 .pd-cd.mini{font-size:.72rem;padding:2px 6px}
+.pd-edf select option{background:var(--surface,#fff);color:var(--ink,#111)}
 .pd-ped{justify-self:start;border:1px solid color-mix(in srgb,#7C3AED 40%,var(--line));background:color-mix(in srgb,#7C3AED 10%,transparent);color:var(--ink);border-radius:8px;padding:3px 9px;font:inherit;font-size:.76rem;font-weight:700;cursor:pointer;text-align:left;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pd-edf label small{font-weight:500;display:inline}
 .pd-cli{justify-self:start;font-size:.76rem;font-weight:600;color:var(--ink);background:var(--line);border-radius:999px;padding:2px 9px}.pd-dt{font-size:.75rem;color:var(--muted);font-weight:600}
 .pd-c.perto .pd-dt{color:#D97706}.pd-c.atr{border-color:#FCA5A5;background:color-mix(in srgb,#EF4444 7%,var(--bg,#fff))}.pd-c.atr .pd-dt,.pd-at{color:#DC2626;font-weight:700}.pd-at{font-size:.75rem}
@@ -8677,8 +8678,8 @@ function pdClientes(){return ((typeof EMP!=='undefined'&&EMP.cli)||[]).filter(fu
 function pdPedsDo(cliNome){if(typeof PED==='undefined'||!PED.L)return [];var k=pdSemAc(cliNome||'').trim();if(!k)return [];
   var cid=((typeof EMP!=='undefined'&&EMP.cli)||[]).filter(function(c){return pdSemAc(c.nome).trim()===k;}).map(function(c){return c.id;})[0];
   return PED.L.filter(function(p){return !p.arquivado&&p.status!=='cancelado'&&((cid&&p.cliente_id===cid)||pdSemAc(p.cliente_nome||'').trim()===k);})
-    .sort(function(a,b){return (b.numero||0)-(a.numero||0);}).slice(0,60);}
-function pdPedTxt(p){return ('#'+(p.numero||'—')+' '+(p.paciente||'Sem paciente')+(p.trabalho?' · '+p.trabalho:'')).slice(0,160);}
+    .sort(function(a,b){var fa=/entregue|finalizado/.test(a.status)?1:0,fb=/entregue|finalizado/.test(b.status)?1:0;return fa-fb||(b.numero||0)-(a.numero||0);}).slice(0,60);}
+function pdPedTxt(p){var t=p.trabalho||'';if(t.length>45)t=t.slice(0,44)+'…';return ('#'+(p.numero||'—')+' '+(p.paciente||'Sem paciente')+(t?' · '+t:'')).slice(0,160);}
 function pdPedOps(cli,sel){var L=pdPedsDo(cli),st=function(p){return typeof PEDST!=='undefined'&&PEDST[p.status]?' ('+PEDST[p.status][0]+')':'';};
   return '<option value="">'+(cli?(L.length?'— nenhum pedido —':'Esse cliente não tem pedidos'):'Escolha o cliente primeiro')+'</option>'+L.map(function(p){return '<option value="'+p.id+'"'+(p.id===sel?' selected':'')+'>'+esc(pdPedTxt(p)+st(p))+'</option>';}).join('');}
 function pdOn(){return typeof RL!=='undefined'&&RL.user&&RL.perfil;}
