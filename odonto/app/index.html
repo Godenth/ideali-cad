@@ -7496,11 +7496,16 @@ function pclTudo(v){v=String(v).replace(/\bspbre\b/gi,'sobre').replace(/\bsorbe\
     E._opc=null;pcAna('Falta só o <b>cliente</b>: para quem é? Toque num nome ou digite.');PC.passo='cliente';return true;}
   E.cli=cl;E.paciente=r.paciente||'';E.trabalho=r.itens[0].trabalho;E.dentes=r.itens[0].dentes||[];E.cor=r.cor||'';E.prazo=r.prazo||(/\b(pra|para|ate|dia|em)\b/.test(semAc(v))?pclData(semAc(v)):null);E.urgente=!!r.urgente;E._tudo=r;
   pcEu(esc(v));pcAna('Anotei 📝 <b>'+esc(cl.nome)+'</b>'+(E.paciente?' · '+esc(E.paciente):'')+' · '+esc(E.trabalho)+(E.dentes.length?' · 🦷 '+E.dentes.join(', '):'')+(E.cor?' · 🎨 '+esc(E.cor):''));
-  var falta=['paciente','material','cor','prazo'].filter(function(k){return k==='paciente'?!E.paciente:k==='material'?!pclMat(E):k==='cor'?!E.cor:!E.prazo&&!E.urgente;});
+  var falta=['paciente','material','cor','prazo'].filter(function(k){return k==='paciente'?!E.paciente:k==='material'?!pclMat(E):k==='cor'?!E.cor&&!/placa|bruxismo|miorrelax|guia|modelo|barra|enceramento|moldeira|jig/i.test(E.trabalho||''):!E.prazo&&!E.urgente;});
   PC.passo=falta.length?PCL_ORD[PCL_ORD.indexOf(falta[0])-1]:'obs';if(!falta.length)pcPergunta('obs');else pcPergunta(falta[0]);return true;}
 var _pcProxL=pcProx;pcProx=function(){if(PC.modo!=='lab')return _pcProxL.apply(this,arguments);var E=PC.ed,i=PCL_ORD.indexOf(PC.passo),nx=PCL_ORD[i+1];
   if(nx==='material'&&pclMat(E))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];
-  if(E._tudo){while(nx&&nx!=='obs'&&nx!=='fim'&&((nx==='material'&&pclMat(E))||(nx==='paciente'&&E.paciente)||(nx==='trabalho'&&E.trabalho)||(nx==='dentes'&&E.trabalho)||(nx==='cor'&&E.cor)||(nx==='prazo'&&(E.prazo||E.urgente))))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];}
+  /* trabalhos sem cor (placa, guia, modelo, barra, núcleo metálico, enceramento): não pergunta cor; placa e modelo também não pedem dentes */
+  var semCor=/placa|bruxismo|miorrelax|guia|modelo|barra|enceramento|n[uú]cleo met|moldeira|jig/i.test(E.trabalho||'');
+  if(nx==='dentes'&&/placa|bruxismo|miorrelax|modelo|moldeira/i.test(E.trabalho||''))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];
+  if(nx==='material'&&pclMat(E))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];
+  if(nx==='cor'&&semCor)nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];
+  if(E._tudo){while(nx&&nx!=='obs'&&nx!=='fim'&&((nx==='material'&&pclMat(E))||(nx==='paciente'&&E.paciente)||(nx==='trabalho'&&E.trabalho)||(nx==='dentes'&&E.trabalho)||(nx==='cor'&&(E.cor||semCor))||(nx==='prazo'&&(E.prazo||E.urgente))))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];}
   pcPergunta(nx||'fim');};
 function pclData(t){var d=anaPrazo(t);if(d)return d;var W=[/\bdom/,/\bseg/,/\bter/,/\bqua(?!n)/,/\bqui/,/\bsex/,/\bsab/],h=new Date(dHoje()+'T12:00:00'),w=-1;W.forEach(function(r,i){if(w<0&&r.test(t))w=i;});
   if(w>=0){var n=(w-h.getDay()+7)%7||7;if(/\b(proxima|que vem)\b/.test(t)&&n<7)n+=7;h.setDate(h.getDate()+n);return h.toISOString().slice(0,10);}
