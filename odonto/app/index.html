@@ -6714,7 +6714,7 @@ function exoSaudacao(){var h=new Date().getHours();return h<12?'Bom dia':h<18?'B
 function exoEmailTxt(p){var R=p._exo,ds=(String(Array.isArray(p.dentes)?p.dentes.join(', '):p.dentes||'')).trim(),L=[];
   L.push(exoSaudacao()+', Mari! Tudo bem?','','Segue mais um pedido:','');
   L.push('Cliente: '+pedCli(p));if(p.paciente)L.push('Paciente: '+p.paciente);
-  if(R){oaResumo(exoArcada(R)).forEach(function(r){var t=R.dentes.filter(function(z){return z.n===r.ds[0];})[0];L.push('Elemento'+(r.u?'s ':' ')+r.txt+(r.u?' (unidos)':'')+': '+(EXO_REC[t.rec]||t.rec)+(t.mat?' em '+t.mat:'')+(t.imp?' sobre implante '+t.imp+(t.sb?' (com scanbody)':''):''));});}
+  if(R){oaResumo(exoArcada(R)).forEach(function(r){var t=R.dentes.filter(function(z){return z.n===r.ds[0];})[0];L.push('Elemento'+(r.u?'s ':' ')+r.txt+(r.u?' (unidos)':'')+': '+(EXO_REC[t.rec]||t.rec)+(t.mat?' em '+t.mat:'')+(t.imp?' sobre implante':''));if(t.imp){L.push('   Implante / base: '+t.imp.replace(/^implante \(|\)$/g,''));L.push('   Scanbody: '+(t.sb?'sim, escaneado no caso':'não veio escaneamento de scanbody'));}});}
   else{if(p.trabalho)L.push('Trabalho: '+p.trabalho);if(ds)L.push('Elemento'+(ds.indexOf(',')>=0?'s':'')+': '+ds);if(p.material)L.push('Material: '+p.material);if(p.sobre_implante===true||p.sobre_implante==='true')L.push('Sobre implante'+(p.componente?': '+p.componente:''));}
   var cor=(R&&R.cor)||p.cor;if(cor)L.push('Cor: '+cor);if(p.componente&&R)L.push('Componente: '+p.componente);if(p.prazo)L.push('Prazo: '+String(p.prazo).split('-').reverse().join('/'));if(p.urgente===true||p.urgente==='true')L.push('⚠️ URGENTE');if(p.obs)L.push('Observações: '+p.obs);
   L.push('','Os arquivos do caso seguem em anexo.','Qualquer dúvida, estou à disposição.','','Att.,','Ana · Agente de Inteligência Artificial','Ideali Lab');
@@ -9024,6 +9024,14 @@ function bn3Pedro(){var b=document.querySelector('#bn3 .bn3-ana');if(!b||!pdOn()
 var PVF={};
 function pvfDe(id){return PVF[id]||(PVF[id]={scans:[],stls:[],html:null,zip:null,exo:null,exoNome:'',mandaZip:false,lendo:false,erro:''});}
 function pvfBase(n){return String(n).split('/').pop();}
+/* .constructionInfo do exocad: nome do implante/base da biblioteca e se teve escaneamento do scanbody ("Localizador de implantes") */
+function exoConstr(txt){var x=new DOMParser().parseFromString(txt,'text/xml'),M={};
+  [].forEach.call(x.getElementsByTagName('Tooth'),function(t){var n=+((t.getElementsByTagName('Number')[0]||{}).textContent||0);if(!n)return;
+    var g=function(k){var e=t.getElementsByTagName(k)[0];return e?String(e.textContent||'').trim():'';},lib=g('ImplantLibraryEntryDisplayInformation')||g('ImplantLibraryEntryDescriptor');
+    if(lib)M[n]={lib:lib.replace(/®|™/g,'').replace(/\s*\((?:local milling|central milling)\)/i,'').split(/\s*:\s*/).filter(Boolean).join(' · '),paraf:g('IsScrewRetained')==='true'};});
+  [].forEach.call(x.getElementsByTagName('PartType'),function(e){if(String(e.textContent).trim()!=='ScanAbutmentScan')return;var nm=(e.parentNode.getElementsByTagName('PartName')[0]||{}).textContent||'',m=nm.match(/Dente\s+(\d{2})|Tooth\s+(\d{2})/i);
+    var n=m?+(m[1]||m[2]):0;if(n){M[n]=M[n]||{};M[n].sb=true;}else Object.keys(M).forEach(function(k){M[k].sb=true;});});
+  return M;}
 function pvfLe(p,file){var F=pvfDe(p.id);F.lendo=true;F.erro='';pvPinta();
   pdgFflate().then(function(ff){return file.arrayBuffer().then(function(buf){return new Promise(function(ok,no){ff.unzip(new Uint8Array(buf),function(e,arq){e?no(e):ok(arq);});});});}).then(function(arq){
     var nomes=Object.keys(arq).filter(function(n){return !/\/$/.test(n)&&!/__MACOSX|\/\._/.test(n);}),dp=nomes.filter(function(n){return /\.dentalproject$/i.test(n);})[0];
@@ -9034,12 +9042,20 @@ function pvfLe(p,file){var F=pvfDe(p.id);F.lendo=true;F.erro='';pvPinta();
     var h=nomes.filter(function(n){return /\.html?$/i.test(n);}).sort(function(a,b){return arq[b].length-arq[a].length;})[0];
     F.html=h?{nome:pvfBase(h),tam:arq[h].length,f:new File([arq[h]],pvfBase(h),{type:'text/html'})}:null;
     F.exo=null;F.exoNome='';if(dp){try{F.exo=exoLeProjeto(new TextDecoder('utf-8').decode(arq[dp]));F.exoNome=pvfBase(dp);}catch(e){F.erro='Achei o projeto, mas não consegui ler.';}}
+    var ci=nomes.filter(function(n){return /\.constructioninfo$/i.test(n);})[0];
+    if(F.exo&&ci){try{var CM=exoConstr(new TextDecoder('utf-8').decode(arq[ci]));F.exo.dentes.forEach(function(t){var c=CM[t.n];if(!c)return;if(c.lib)t.imp=c.lib+(c.paraf?' (parafusada)':'');if(c.sb)t.sb=true;});}catch(e){}}
     else F.erro='Não achei o arquivo .dentalProject dentro do zip.';
     F.lendo=false;F._hid=true;pvPinta();pvfSalva(p);toast('Li o Dental CAD: '+F.stls.filter(function(s){return s.ok;}).length+' STL de fresagem'+(F.html?', HTML':'')+(F.exo?' e o projeto do exocad':'')+'.');
   }).catch(function(){F.lendo=false;F.erro='Não consegui abrir esse arquivo. Envie o .zip do caso.';pvPinta();});}
 function pvfImplante(p,R){var imp=R.dentes.filter(function(t){return t.imp;});if(!imp.length)return p.sobre_implante?{ok:false,txt:'O pedido diz sobre implante, mas o projeto não tem implante.'}:null;
   var nomes=imp.map(function(t){return t.imp;}).filter(function(v,i,a){return a.indexOf(v)===i;}),sb=imp.some(function(t){return t.sb;}),comp=String(p.componente||'');
-  var bate=!comp||nomes.some(function(n){var a=semAc(n).replace(/[^a-z0-9]/g,''),b=semAc(comp).replace(/[^a-z0-9]/g,'');return a&&b&&(a.indexOf(b)>=0||b.indexOf(a)>=0);});
+  /* compara pela linha (ex.: Grand Morse, HE, HI, cone morse) e pelo diâmetro (ex.: 3.5) */
+  var fam=function(t){t=semAc(t).replace(/gran\s*morse/g,'grandmorse').replace(/cone\s*morse/g,'conemorse').replace(/hexagono\s*externo/g,' he ').replace(/hexagono\s*interno/g,' hi ');
+      var F2=['grandmorse','conemorse','he','hi','gm','cm','helix','titamax','drive','alvim','facility','unitite','strong','implacil','neodent','straumann','nobel','sin','conexao','dentoflex','emfils'];return F2.filter(function(f){return new RegExp('(^|[^a-z])'+f+'([^a-z]|$)').test(t.replace(/[^a-z0-9]+/g,' '));});},
+    num=function(t){return (String(t).replace(/,/g,'.').match(/\d+(?:\.\d+)?/g)||[]);};
+  var bate=!comp||nomes.some(function(n){var a=semAc(n).replace(/[^a-z0-9]/g,''),b=semAc(comp).replace(/[^a-z0-9]/g,'');if(a&&b&&(a.indexOf(b)>=0||b.indexOf(a)>=0))return true;
+    var fa=fam(n),fb=fam(comp),famOk=fb.length?fb.some(function(f){return fa.indexOf(f)>=0||(f==='gm'&&fa.indexOf('grandmorse')>=0)||(f==='grandmorse'&&fa.indexOf('gm')>=0);}):false;
+    var nb=num(comp)[0],diaOk=!nb||num(n).indexOf(nb)>=0;return famOk&&diaOk;});
   return {ok:bate&&!!p.sobre_implante,txt:'Implante no projeto: '+nomes.join(', ')+' · dentes '+imp.map(function(t){return t.n;}).join(', ')+(sb?' · com scanbody':' · sem scanbody')+'. No pedido: '+(p.sobre_implante?(comp||'sobre implante, sem componente anotado'):'não está marcado como sobre implante')+'.'};}
 function pvfCards(p){var F=pvfHidrata(p),R=F.exo,stl=F.stls.some(function(s){return s.ok;});
   var conf='';if(R){var L=[];try{L=exoConfere(p,R);}catch(e){}var im=pvfImplante(p,R),ruins=L.filter(function(x){return x[0]!=='✅'&&!(im&&/implante/i.test(x[1]));});
