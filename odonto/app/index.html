@@ -6674,7 +6674,7 @@ var EXO_REC={AnatomicCrown:'Coroa anatômica',ReducedCrown:'Coroa reduzida (copi
   Telescope:'Telescópica',Bar:'Barra',BarSegment:'Barra',Waxup:'Enceramento',Coping:'Coping',Abutment:'Pilar',Mockup:'Mock-up',PartialCrown:'Coroa parcial',Splint:'Placa'};
 function exoLeProjeto(txt){var x=new DOMParser().parseFromString(txt,'application/xml');if(x.getElementsByTagName('parsererror').length||!x.getElementsByTagName('Treatment').length)throw 'arquivo';
   var g=function(el,t){var e=el.getElementsByTagName(t)[0];return e?String(e.textContent||'').trim():'';},ok=function(v){return v&&v!=='---'&&v!=='None'?v:'';};
-  var D=[].map.call(x.getElementsByTagName('Tooth'),function(t){return {n:+g(t,'Number'),rec:g(t,'ReconstructionType'),prep:g(t,'PreparationType'),mat:g(t,'MaterialName')||g(t,'Material'),imp:ok(g(t,'ImplantType')),sb:g(t,'ScanAbutmentScan')==='true',mes:g(t,'MesialConnector')==='true',cor:ok(g(t,'Color'))};})
+  var D=[].map.call(x.getElementsByTagName('Tooth'),function(t){return {n:+g(t,'Number'),rec:g(t,'ReconstructionType'),prep:g(t,'PreparationType'),mat:g(t,'MaterialName')||g(t,'Material'),imp:(function(v){v=ok(v);return !v?'':({WithoutAbutment:'implante (parafusado, sem abutment)',WithAbutment:'implante (com abutment)',Abutment:'implante (abutment)'})[v]||v;})(g(t,'ImplantType')),sb:g(t,'ScanAbutmentScan')==='true',mes:g(t,'MesialConnector')==='true',cor:ok(g(t,'Color'))};})
     .filter(function(t){return t.n&&!/antagon|healthy|saud/i.test(t.rec+' '+t.mat);});
   var pac=[g(x,'PatientFirstName'),g(x,'PatientName')].filter(Boolean).join(' ').trim();
   var cores=D.map(function(t){return t.cor;}).filter(Boolean);var cor=cores[0]||ok(g(x,'ToothColor'));
