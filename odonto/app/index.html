@@ -2426,6 +2426,7 @@ body.h3d-on .h3d .h2-mapa{display:none}.h3d .hero2{padding:clamp(24px,5vh,64px) 
 #rl-conf .rc-tx{flex:1;display:grid;gap:2px;min-width:0}#rl-conf .rc-tx>span{color:var(--muted)}#rl-conf .rc-er{color:#DC2626!important}
 #rl-conf .rc-ac{display:flex;gap:6px;flex:none}#rl-conf .rc-ac button,#rl-conf .rc-b{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:9px;padding:7px 10px;font:inherit;font-weight:600;cursor:pointer}
 #rl-conf .rc-f{display:flex;gap:6px;margin-top:6px}#rl-conf .rc-f input{flex:1;min-width:0;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:transparent;color:inherit}
+.rc-cod{display:flex;gap:6px;margin-top:6px}.rc-cod input{width:130px;letter-spacing:.3em;font-weight:800;text-align:center;border:1.5px solid var(--line);border-radius:9px;padding:7px 10px;font:inherit;background:transparent;color:inherit}
 #rl-conf .rc-ag{color:var(--muted);font-size:.8rem}
 @media(max-width:640px){#rl-conf{top:auto;bottom:calc(84px + env(safe-area-inset-bottom));flex-wrap:wrap}#rl-conf .rc-ac{width:100%}#rl-conf .rc-ac button{flex:1}}
 .rl-ov-sn{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(5,10,22,.6);backdrop-filter:blur(4px)}
@@ -8713,12 +8714,18 @@ function rlProvConf(){var b=document.getElementById('rl-conf'),u=RL.user;
   var P=rlProv();if(P.em&&P.env!==P.em&&!RL.provBusy&&!RL.provErro){rlProvEnvia(P.em);return;}
   if(!b){b=document.createElement('div');b.id='rl-conf';document.body.appendChild(b);}
   b.innerHTML='<div class="rc-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg></div><div class="rc-tx"><b>Confirme o seu e-mail</b>'+
-    (RL.provErro?'<span class="rc-er">'+esc(RL.provErro)+'</span>':'<span>Enviamos um link para <b>'+esc(P.em||'')+'</b>. Abra o link para criar a sua senha. Olhe também o spam.</span>')+
+    (RL.provErro?'<span class="rc-er">'+esc(RL.provErro)+'</span>':'<span>Enviamos um <b>código</b> para <b>'+esc(P.em||'')+'</b>. Digite aqui (ou toque no link do e-mail). Olhe também o spam.</span>')+
+    (RL.provErro?'':'<form class="rc-cod" id="rc-cod"><input id="rc-c" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Código" aria-label="Código do e-mail"><button class="rc-b"'+(RL.provConf?' disabled':'')+'>'+(RL.provConf?'Conferindo…':'Confirmar')+'</button></form>')+
     (RL.provTroca?'<form class="rc-f" id="rc-f"><input id="rc-e" type="email" placeholder="seu@email.com" value="'+esc(P.em||'')+'"><button class="rc-b">Enviar</button></form>':'')+'</div>'+
     '<div class="rc-ac">'+(RL.provBusy?'<span class="rc-ag">Enviando…</span>':'<button data-rc="reenvia">Reenviar</button><button data-rc="troca">Trocar e-mail</button>')+'</div>';}
 document.addEventListener('click',function(ev){var x=ev.target.closest&&ev.target.closest('[data-rc]');if(!x)return;ev.preventDefault();
   if(x.dataset.rc==='reenvia'){RL.provErro='';rlProvEnvia(null,true);}
   if(x.dataset.rc==='troca'){RL.provTroca=!RL.provTroca;rlProvConf();}},true);
+document.addEventListener('submit',function(ev){if(ev.target.id!=='rc-cod')return;ev.preventDefault();var c=(document.getElementById('rc-c').value||'').replace(/\D/g,''),P=rlProv();
+  if(c.length<6){toast('Digite o código que chegou no e-mail.');return;}RL.provConf=true;rlProvConf();
+  SB.auth.verifyOtp({email:P.em,token:c,type:'email_change'}).then(function(r){RL.provConf=false;
+    if(r.error){toast(/expired|invalid/i.test(r.error.message||'')?'Código errado ou vencido. Confira ou toque em Reenviar.':rlMsg(r.error));rlProvConf();return;}
+    if(r.data&&r.data.user)RL.user=r.data.user;var b=document.getElementById('rl-conf');if(b)b.remove();rlProvConf();});},true);
 document.addEventListener('submit',function(ev){if(ev.target.id!=='rc-f')return;ev.preventDefault();var e=(document.getElementById('rc-e').value||'').trim();
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast('Digite um e-mail válido.');return;}RL.provTroca=false;rlProvSet(e,'');rlProvEnvia(e,true);},true);
 function rlSenhaNova(){if(document.getElementById('rl-sn'))return;var o=document.createElement('div');o.id='rl-sn';o.className='rl-ov-sn';
