@@ -2656,6 +2656,18 @@ body.pe-trava{overflow:hidden}
 .epv-pz{display:flex;justify-content:space-between;gap:8px;font-size:.88rem}.epv-ct{color:#2563EB;font-weight:700;text-decoration:none}.epv-lk{display:inline-flex;gap:6px;align-items:center;color:var(--muted);font-size:.86rem}.epv-lk .lk-ic{width:15px;height:15px}
 .epv-vg{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 @media(max-width:800px){.epf-g{grid-template-columns:1fr}#epf-raiz .epf-ov,#epv-raiz .epf-ov{padding:0;place-items:stretch}.epf,.epv{border-radius:0;max-height:100vh}.epf-capa{margin:0 12px}.epv-gal img{width:calc(50vw - 36px);height:calc(50vw - 36px)}}
+
+.epv-albs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.epv-alb{display:grid;gap:4px;text-align:left;border:0;background:none;color:var(--ink);font:inherit;cursor:pointer;padding:0}
+.epv-albc{position:relative;display:block;aspect-ratio:1;border-radius:14px}
+.epv-albc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:14px;box-shadow:0 6px 16px rgba(0,0,0,.3);transition:transform .2s}
+.epv-albc img.b{transform:rotate(5deg) translate(6px,-4px);filter:brightness(.7)}
+.epv-alb:hover .epv-albc img:not(.b){transform:translateY(-3px)}.epv-alb small{color:var(--muted)}
+.epa{position:fixed;inset:0;z-index:260;background:rgba(3,6,14,.94);display:grid;grid-template-rows:auto 1fr auto;place-items:center;padding:14px;color:#fff}
+.epa-h{width:100%;display:flex;align-items:center;gap:12px}.epa-h span{color:#94A3B8;margin-right:auto}.epa .pv-x{color:#fff;border-color:rgba(255,255,255,.25)}
+.epa>img{max-width:min(1100px,100%);max-height:calc(100vh - 190px);object-fit:contain;border-radius:12px}
+.epa-n{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:2rem;cursor:pointer}.epa-n.p{left:16px}.epa-n.n{right:16px}
+.epa-th{display:flex;gap:8px;overflow:auto;max-width:100%}.epa-th button{width:64px;height:64px;border-radius:10px;border:2px solid transparent;padding:0;overflow:hidden;background:#111;cursor:pointer;opacity:.6}.epa-th button.on{border-color:#3B82F6;opacity:1}.epa-th img{width:100%;height:100%;object-fit:cover}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -9235,7 +9247,7 @@ function epvHtml(){var V=EPF.ver,d=V.d;if(!d)return '<div class="epf-ov" data-ep
    '<div class="epf-capa epv-capa"'+(cap?' style="background-image:url(\''+cap+'\')"':'')+'><span class="epf-logo">'+(lg?'<img src="'+lg+'" alt="">':'<span>'+esc((d.nome||'?')[0])+'</span>')+'</span></div>'+
    '<div class="epv-c"><div class="epv-t"><h2>'+esc(d.nome)+'</h2><span class="muted">'+esc(({lab:'Laboratório',clinica:'Clínica',dental:'Loja',centro:'Centro radiológico'})[d.tipo]||'Empresa')+' · '+esc((d.cidade||'')+(d.uf?' / '+d.uf:''))+'</span>'+(d.eu?'<span class="epv-eu">Prévia: é assim que os outros veem</span>':'')+'</div>'+
    (d.sobre?'<p class="epv-sobre">'+esc(d.sobre)+'</p>':'')+ch(d.esp)+
-   (fotos.length?'<h3>Trabalhos</h3>'+fotos.map(function(c){return '<div class="epv-cat"><b>'+esc(c.cat)+'</b><div class="epv-gal">'+c.f.map(function(x){var u=epfImg(x);return u?'<a href="'+u+'" target="_blank" rel="noopener"><img src="'+u+'" alt="" loading="lazy"></a>':'<span class="epf-ld"></span>';}).join('')+'</div></div>';}).join(''):'')+
+   (fotos.length?'<h3>Trabalhos</h3><div class="epv-albs">'+fotos.map(function(c,i){var u=epfImg(c.f[0]),u2=c.f[1]&&epfImg(c.f[1]);return '<button type="button" class="epv-alb" data-epa="'+i+'"><span class="epv-albc">'+(u2?'<img class="b" src="'+u2+'" alt="">':'')+(u?'<img src="'+u+'" alt="" loading="lazy">':'<span class="epf-ld"></span>')+'</span><b>'+esc(c.cat)+'</b><small>'+c.f.length+' foto'+(c.f.length>1?'s':'')+'</small></button>';}).join('')+'</div>':'')+
    '<div class="epv-g">'+((d.softs||[]).length||(d.maqs||[]).length?'<div><h3>Softwares e máquinas</h3>'+ch((d.softs||[]).concat(d.maqs||[]))+'</div>':'')+
      ((d.prazos||[]).length?'<div><h3>Prazo médio</h3>'+d.prazos.map(function(x){return '<div class="epv-pz"><span>'+esc(x.t)+'</span><b>'+(x.d==null?'—':x.d+' dias úteis')+'</b></div>';}).join('')+'</div>':'')+
      ((d.entrega||[]).length||d.horario?'<div><h3>Entrega e horário</h3>'+ch(d.entrega)+(d.horario?'<p class="small">🕒 '+esc(d.horario)+'</p>':'')+'</div>':'')+
@@ -9244,8 +9256,18 @@ function epvHtml(){var V=EPF.ver,d=V.d;if(!d)return '<div class="epf-ov" data-ep
        (d.eu?'':'<button class="btn rpri" data-act="redeCont" data-v="'+esc(d.id)+'">Pedir contato</button>')+'</div></div>'+
    ((d.vagas||[]).length?'<h3>Vagas abertas</h3>'+d.vagas.map(function(v){return '<div class="epv-vg"><b>'+esc(v.cargo||'Vaga')+'</b><span class="muted small">'+esc([v.area,v.det].filter(Boolean).join(' · '))+'</span></div>';}).join(''):'')+
    '</div></div></div>';}
-function epvPinta(){var el=document.getElementById('epv-raiz');if(EPF.ver){if(!el){el=document.createElement('div');el.id='epv-raiz';document.body.appendChild(el);}el.innerHTML=epvHtml();document.body.classList.add('pe-trava');}
+function epaHtml(){var V=EPF.ver,a=V&&V.alb;if(!a)return '';var c=(V.d.fotos||[]).filter(function(c){return c.f&&c.f.length;})[a.c];if(!c)return '';var u=epfImg(c.f[a.i]);
+  return '<div class="epa" data-epa2="fora"><div class="epa-h"><b>'+esc(c.cat)+'</b><span>'+(a.i+1)+' / '+c.f.length+'</span><button class="pv-x" data-epa2="fecha" aria-label="Fechar">✕</button></div>'+
+    '<button class="epa-n p" data-epa2="ant" aria-label="Anterior">‹</button>'+(u?'<img src="'+u+'" alt="">':'<span class="epf-ld"></span>')+'<button class="epa-n n" data-epa2="prox" aria-label="Próxima">›</button>'+
+    '<div class="epa-th">'+c.f.map(function(x,j){var t=epfImg(x);return '<button class="'+(j===a.i?'on':'')+'" data-epa2="vai" data-v="'+j+'">'+(t?'<img src="'+t+'" alt="">':'')+'</button>';}).join('')+'</div></div>';}
+function epvPinta(){var el=document.getElementById('epv-raiz');if(EPF.ver){if(!el){el=document.createElement('div');el.id='epv-raiz';document.body.appendChild(el);}el.innerHTML=epvHtml()+epaHtml();document.body.classList.add('pe-trava');}
   else if(el){el.remove();if(!EPF.on)document.body.classList.remove('pe-trava');}}
+document.addEventListener('click',function(ev){var a=ev.target.closest&&ev.target.closest('[data-epa]');if(a&&EPF.ver){ev.preventDefault();ev.stopPropagation();EPF.ver.alb={c:+a.getAttribute('data-epa'),i:0};epvPinta();return;}
+  var b2=ev.target.closest&&ev.target.closest('[data-epa2]');if(!b2||!EPF.ver||!EPF.ver.alb)return;var k=b2.getAttribute('data-epa2');if(k==='fora'&&ev.target!==b2)return;ev.preventDefault();ev.stopPropagation();
+  var A=EPF.ver.alb,n=(EPF.ver.d.fotos||[]).filter(function(c){return c.f&&c.f.length;})[A.c].f.length;
+  if(k==='fecha'||k==='fora')EPF.ver.alb=null;else if(k==='ant')A.i=(A.i-1+n)%n;else if(k==='prox')A.i=(A.i+1)%n;else if(k==='vai')A.i=+b2.getAttribute('data-v');epvPinta();},true);
+document.addEventListener('keydown',function(ev){if(!EPF.ver||!EPF.ver.alb)return;var A=EPF.ver.alb,n=(EPF.ver.d.fotos||[]).filter(function(c){return c.f&&c.f.length;})[A.c].f.length;
+  if(ev.key==='ArrowLeft'){A.i=(A.i-1+n)%n;epvPinta();}else if(ev.key==='ArrowRight'){A.i=(A.i+1)%n;epvPinta();}else if(ev.key==='Escape'){ev.stopImmediatePropagation();EPF.ver.alb=null;epvPinta();}},true);
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-epv]');if(!b)return;if(b.getAttribute('data-epv')==='fora'&&ev.target!==b)return;ev.preventDefault();EPF.ver=null;epvPinta();},true);
 document.addEventListener('keydown',function(ev){if(ev.key!=='Escape')return;if(EPF.ver){EPF.ver=null;epvPinta();}else if(EPF.on){EPF.on=false;epfPinta();}});
 /* "Ver perfil" de empresa real (id E…) abre o perfil */
