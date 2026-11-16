@@ -2576,6 +2576,7 @@ body.pv-trava{overflow:hidden}
 .stlv{position:fixed;inset:0;z-index:260;background:radial-gradient(120% 90% at 50% 40%,#16213a,#05080f);display:grid;grid-template-rows:auto 1fr;color:#E6EDF7;animation:pdFade .2s ease both}
 .stlv-h{display:flex;align-items:center;gap:12px;padding:12px 16px}.stlv-h b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stlv-d{color:#94A3B8;font-size:.82rem;margin-left:auto}.stlv .pv-x{color:#E6EDF7;border-color:rgba(255,255,255,.2)}
 .stlv-c{position:relative;min-height:0}.stlv-c canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}.stlv-ld{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#94A3B8}
+.pvf-scan{border-color:color-mix(in srgb,#10B981 55%,var(--line))}.pvf-scan:hover{background:color-mix(in srgb,#10B981 8%,transparent)}.pvf-mais1{flex:none;padding:6px 10px;font-size:.8rem}
 .pvf-mais{display:flex;flex-wrap:wrap;gap:8px}.pvf-up2{flex:1;display:flex;justify-content:center;padding:10px;border:1.5px dashed var(--line);border-radius:12px;font-weight:700;font-size:.88rem;cursor:pointer;color:var(--ink)}.pvf-up2:hover{border-color:#00A6E6}
 
 /* quadro do laboratório: cada etapa com a sua cor (padrão do Ideali CAD) */
@@ -9021,7 +9022,7 @@ function bn3Pedro(){var b=document.querySelector('#bn3 .bn3-ana');if(!b||!pdOn()
 /* ===== Ficha do pedido: anexar o Dental CAD (.zip). O sistema abre o zip, lê o projeto do exocad, separa o STL de fresagem e o HTML,
    confere implante/scanbody com o pedido e manda tudo para o e-mail. Os arquivos ficam só neste navegador (não sobem para o servidor). ===== */
 var PVF={};
-function pvfDe(id){return PVF[id]||(PVF[id]={stls:[],html:null,zip:null,exo:null,exoNome:'',mandaZip:false,lendo:false,erro:''});}
+function pvfDe(id){return PVF[id]||(PVF[id]={scans:[],stls:[],html:null,zip:null,exo:null,exoNome:'',mandaZip:false,lendo:false,erro:''});}
 function pvfBase(n){return String(n).split('/').pop();}
 function pvfLe(p,file){var F=pvfDe(p.id);F.lendo=true;F.erro='';pvPinta();
   pdgFflate().then(function(ff){return file.arrayBuffer().then(function(buf){return new Promise(function(ok,no){ff.unzip(new Uint8Array(buf),function(e,arq){e?no(e):ok(arq);});});});}).then(function(arq){
@@ -9047,11 +9048,13 @@ function pvfCards(p){var F=pvfHidrata(p),R=F.exo,stl=F.stls.some(function(s){ret
   var chip=function(on,txt,baixa,ver){return on?'<span class="pvf-ok">✅ '+txt+(ver?'<button data-pvb="'+ver+'" title="Visualizar">👁 Ver</button>':'')+'<button data-pvb="'+baixa+'" title="Baixar">⬇ Baixar</button></span>':'';};
   return '<div class="pvf2">'+
     (F.lendo?'<div class="pvf-ld">Abrindo o Dental CAD…</div>':'<label class="pvf-up'+(F.zip?' tem':'')+'">🗜️ '+(F.zip?'Trocar Dental CAD':'Anexar Dental CAD (.zip)')+'<input type="file" data-pvf="zip" accept=".zip,application/zip" hidden></label>')+
-    '<div class="pvf-oks">'+(F.zip?chip(true,'Dental CAD anexado','zip'):'')+chip(stl,'STL anexada','stl','verstl')+chip(!!F.html,'HTML anexado','html','verhtml')+
+    (F.scans.length?'':'<label class="pvf-up pvf-scan">🦷 Anexar escaneamento<input type="file" data-pvf="scan" accept=".stl,.ply,.obj,.zip,.dcm" multiple hidden></label>')+
+    '<div class="pvf-oks">'+(F.scans.length?chip(true,'Escaneamento anexado'+(F.scans.length>1?' ('+F.scans.length+' arquivos)':''),'scan',F.scans.some(function(x){return /\.stl$/i.test(x.nome);})?'verscan':'')+'<label class="pvf-up2 pvf-mais1">＋ escaneamento<input type="file" data-pvf="scan" accept=".stl,.ply,.obj,.zip,.dcm" multiple hidden></label>':'')+(F.zip?chip(true,'Dental CAD anexado','zip'):'')+chip(stl,'STL anexada','stl','verstl')+chip(!!F.html,'HTML anexado','html','verhtml')+
       ((!stl||!F.html)?'<div class="pvf-mais">'+(!stl?'<label class="pvf-up2">＋ Anexar STL<input type="file" data-pvf="stlmao" accept=".stl" multiple hidden></label>':'')+(!F.html?'<label class="pvf-up2">＋ Anexar HTML<input type="file" data-pvf="htmlmao" accept=".html,.htm" hidden></label>':'')+'</div>':'')+'</div>'+
     (F.salvando?'<div class="pvf-ld">⏳ '+esc(F.salvando)+'</div>':'')+(F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':'')+conf+
     '<button class="pvf-env" data-pv="mail">✉️ Enviar pedido por e-mail</button></div>';}
 document.addEventListener('change',function(ev){var t=ev.target,k=t&&t.getAttribute&&t.getAttribute('data-pvf');if(!k)return;var p=pvP();if(!p)return;var F=pvfDe(p.id);
+  if(k==='scan'&&t.files.length){F._hid=true;[].forEach.call(t.files,function(f){F.scans.push({nome:f.name,tam:f.size,f:f,ok:true});});pvPinta();pvfSalva(p);t.value='';return;}
   if(k==='zip'&&t.files[0])pvfLe(p,t.files[0]);
   else if(k==='mandazip')F.mandaZip=t.checked;
   else if(k==='stl'){var s=F.stls[+t.getAttribute('data-i')];if(s)s.ok=t.checked;}
@@ -9065,7 +9068,7 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
 /* o e-mail leva o projeto lido e os arquivos */
 function pvfMail(p){var F=pvfDe(p.id),q=Object.assign({},p);if(F.exo){q._exo=F.exo;q._exoNome=F.exoNome;}exoMailAbre(q);
   var poe=function(it,ok){GM.arqs.push(it.f?{nome:it.nome,tam:it.tam,f:it.f,ok:ok}:{nome:it.nome,tam:it.tam,path:it.path,bucket:PVF_BK,ok:ok});};
-  F.stls.forEach(function(s){if(s.ok)poe(s,true);});if(F.html)poe(F.html,true);if(F.zip)poe(F.zip,!!F.mandaZip);if(F.exo){var im=pvfImplante(p,F.exo),co=document.getElementById('exm-co');if(im&&co&&!im.ok)co.value=co.value.replace('\n\nOs arquivos','\n\n⚠️ Conferir: '+im.txt+'\n\nOs arquivos');}
+  F.scans.forEach(function(s){poe(s,false);});F.stls.forEach(function(s){if(s.ok)poe(s,true);});if(F.html)poe(F.html,true);if(F.zip)poe(F.zip,!!F.mandaZip);if(F.exo){var im=pvfImplante(p,F.exo),co=document.getElementById('exm-co');if(im&&co&&!im.ok)co.value=co.value.replace('\n\nOs arquivos','\n\n⚠️ Conferir: '+im.txt+'\n\nOs arquivos');}
   gmRedesenha();}
 
 /* ===== Baixar e visualizar os arquivos do Dental CAD (STL em 3D, HTML do exocad) ===== */
@@ -9095,7 +9098,9 @@ function stlvAbre(arqs){var ov=document.createElement('div');ov.id='stlv';ov.cla
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-pvb]');if(!b)return;var p=pvP();if(!p)return;var F=pvfDe(p.id),k=b.getAttribute('data-pvb');ev.preventDefault();ev.stopPropagation();
   var S2=F.stls.filter(function(s){return s.ok;});
   var falha=function(){toast('Não consegui pegar o arquivo agora.');},baixa=function(it){toast('Baixando '+it.nome+'…');pvfArq(it).then(function(f){pvfBaixa(f,it.nome);},falha);};
-  if(k==='zip'&&F.zip)baixa(F.zip);
+  if(k==='scan')F.scans.forEach(function(s,i){setTimeout(function(){baixa(s);},i*400);});
+  else if(k==='verscan'){var SS=F.scans.filter(function(x){return /\.stl$/i.test(x.nome);});if(SS.length)stlvAbre(SS);}
+  else if(k==='zip'&&F.zip)baixa(F.zip);
   else if(k==='stl')S2.forEach(function(s,i){setTimeout(function(){baixa(s);},i*400);});
   else if(k==='verstl'&&S2.length)stlvAbre(S2);
   else if(k==='html'&&F.html)baixa(F.html);
@@ -9104,21 +9109,21 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
 /* ===== Arquivos do caso guardados no banco (bucket privado odonto-casos + coluna caso do pedido; ver 086) ===== */
 var PVF_BK='odonto-casos';
 function pvfHidrata(p){var F=pvfDe(p.id);if(F._hid||F.lendo||F.zip||F.stls.length)return F;F._hid=true;var c=p.caso;if(!c)return F;
-  F.zip=c.zip||null;F.stls=(c.stls||[]).map(function(x){return Object.assign({ok:true},x);});F.html=c.html||null;F.exo=c.exo||null;F.exoNome=c.exoNome||'';return F;}
+  F.scans=(c.scans||[]).slice();F.zip=c.zip||null;F.stls=(c.stls||[]).map(function(x){return Object.assign({ok:true},x);});F.html=c.html||null;F.exo=c.exo||null;F.exoNome=c.exoNome||'';return F;}
 function pvfArq(it){if(it.f)return Promise.resolve(it.f);if(!it.path)return Promise.reject('sem');
   return SB.storage.from(PVF_BK).download(it.path).then(function(r){if(r.error||!r.data)throw 'baixar';it.f=new File([r.data],it.nome);return it.f;});}
 function pvfNomeOk(n){return String(n||'arquivo').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._-]+/g,'_').slice(-90);}
-function pvfSalva(p){var F=pvfDe(p.id),conta=contaId();if(!conta||!p.id)return;var itens=[].concat(F.zip?[F.zip]:[],F.stls.filter(function(s){return s.ok;}),F.html?[F.html]:[]).filter(function(i){return i.f&&!i.path;});
-  var antes=(p.caso&&[].concat(p.caso.zip?[p.caso.zip]:[],p.caso.stls||[],p.caso.html?[p.caso.html]:[]).map(function(i){return i.path;}).filter(Boolean))||[];
+function pvfSalva(p){var F=pvfDe(p.id),conta=contaId();if(!conta||!p.id)return;var itens=[].concat(F.scans,F.zip?[F.zip]:[],F.stls.filter(function(s){return s.ok;}),F.html?[F.html]:[]).filter(function(i){return i.f&&!i.path;});
+  var antes=(p.caso&&[].concat(p.caso.scans||[],p.caso.zip?[p.caso.zip]:[],p.caso.stls||[],p.caso.html?[p.caso.html]:[]).map(function(i){return i.path;}).filter(Boolean))||[];
   F.salvando=itens.length?'Guardando os arquivos no sistema…':'';pvPinta();var n=0;
   itens.reduce(function(pr,it){return pr.then(function(){var path=conta+'/'+p.id+'/'+Date.now()+'-'+pvfNomeOk(it.nome);F.salvando='Guardando '+(++n)+' de '+itens.length+'…';pvPinta();
       return SB.storage.from(PVF_BK).upload(path,it.f,{upsert:false,contentType:it.f.type||'application/octet-stream'}).then(function(r){if(r.error)throw r.error;it.path=path;});});},Promise.resolve())
-  .then(function(){var lim=function(i){return i?{nome:i.nome,tam:i.tam,path:i.path}:null;},caso={zip:lim(F.zip),stls:F.stls.filter(function(s){return s.ok&&s.path;}).map(lim),html:lim(F.html),exo:F.exo,exoNome:F.exoNome,em:new Date().toISOString()};
+  .then(function(){var lim=function(i){return i?{nome:i.nome,tam:i.tam,path:i.path}:null;},caso={scans:F.scans.filter(function(x){return x.path;}).map(lim),zip:lim(F.zip),stls:F.stls.filter(function(s){return s.ok&&s.path;}).map(lim),html:lim(F.html),exo:F.exo,exoNome:F.exoNome,em:new Date().toISOString()};
     return SB.from('odo_pedidos').update({caso:caso}).eq('id',p.id).then(function(r){if(r.error)throw r.error;p.caso=caso;var q=PED.L.filter(function(x){return x.id===p.id;})[0];if(q)q.caso=caso;
-      var agora=[].concat(caso.zip?[caso.zip.path]:[],caso.stls.map(function(s){return s.path;}),caso.html?[caso.html.path]:[]),velhos=antes.filter(function(x){return agora.indexOf(x)<0;});
+      var agora=[].concat(caso.scans.map(function(x){return x.path;}),caso.zip?[caso.zip.path]:[],caso.stls.map(function(s){return s.path;}),caso.html?[caso.html.path]:[]),velhos=antes.filter(function(x){return agora.indexOf(x)<0;});
       if(velhos.length)SB.storage.from(PVF_BK).remove(velhos).then(function(){});F.salvando='';pvPinta();toast('Arquivos guardados no pedido #'+(p.numero||'')+'. ✅');});})
   .catch(function(e){var m=String((e&&e.message)||e||'');F.salvando='';F.erro=/bucket|not found|odonto-casos/i.test(m)||/caso/.test(m)?'Falta rodar a atualização 086 no banco para guardar os arquivos.':/size|large|exceed|payload/i.test(m)?'Arquivo grande demais para o limite do servidor.':'Não consegui guardar os arquivos agora. ('+m.slice(0,80)+')';pvPinta();});}
-function pvfApagaArqs(p){var c=p&&p.caso;if(!c)return;var L=[].concat(c.zip?[c.zip.path]:[],(c.stls||[]).map(function(s){return s.path;}),c.html?[c.html.path]:[]).filter(Boolean);if(L.length)SB.storage.from(PVF_BK).remove(L).then(function(){});}
+function pvfApagaArqs(p){var c=p&&p.caso;if(!c)return;var L=[].concat((c.scans||[]).map(function(x){return x.path;}),c.zip?[c.zip.path]:[],(c.stls||[]).map(function(s){return s.path;}),c.html?[c.html.path]:[]).filter(Boolean);if(L.length)SB.storage.from(PVF_BK).remove(L).then(function(){});}
 
 /* ===== Editar pedido no padrão do Ideali CAD: janela com a arcada grande à esquerda (cada dente com o seu trabalho) e os dados à direita ===== */
 var PE={pick:null,q:''};
