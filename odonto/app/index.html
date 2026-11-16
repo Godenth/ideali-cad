@@ -7513,8 +7513,11 @@ var _pcRespL=pcResposta;pcResposta=function(v,txt){if(PC.modo!=='lab')return _pc
     var ehTrab=/\b(paciente|coroa|dente|faceta|cor|placa|bruxismo|protese|portese|protocolo|guia|nucleo|ponte|inlay|onlay|modelo|provisori\w*|zirconia|emax|resina|implante|ppr|ppf|enceramento|confeccao)\b/i.test(semAc(s));
     if(!E._tudo&&s.length>18&&(/[,;]/.test(s)||ehTrab)&&pclTudo(s))return;
     if(ehTrab&&s.split(/\s+/).length>3&&!anaCliente(semAc(s))){pcEu(esc(s));pcAna('Isso parece o <b>trabalho</b>, não o cliente 🙂 Para qual <b>cliente</b> é? Toque num nome ou digite.');return;}
-    var A=pclAcha(s);pcEu(esc(s));
-    if(A.length===1){E.cli=A[0];E._opc=null;if(semAc(A[0].nome).indexOf(semAc(s))<0)pcAna('Entendi: <b>'+esc(A[0].nome)+'</b> 👍');pcProx();return;}
+    /* todos os clientes que têm as palavras digitadas (ex.: "eduardo" → todos os Eduardos) */
+    var pw=semAc(s).split(/[^a-z0-9]+/).filter(function(w){return w.length>=2&&!/^(dra?|de|da|do|dos|das|e)$/.test(w);}),
+      cont=pw.length?pclClis().filter(function(c){var cw=semAc(c.nome).split(/[^a-z0-9]+/);return pw.every(function(w){return cw.some(function(x){return x.indexOf(w)===0;});});}):[];
+    var A=cont.length?cont:pclAcha(s);pcEu(esc(s));
+    if(A.length===1){E.cli=A[0];E._opc=null;if(semAc(A[0].nome).trim()!==semAc(s).trim())pcAna('Entendi: <b>'+esc(A[0].nome)+'</b> 👍');pcProx();return;}
     if(A.length>1){E._opc=A.map(function(c){return [c.nome,'id:'+c.id];});pcAna('Achei mais de um. Qual deles?');return;}
     E._opc=pclTop().map(function(c){return [c.nome,'id:'+c.id];}).concat([['➕ Seguir com "'+s.slice(0,30)+'"','sem:'+s.slice(0,80)]]);
     pcAna('Não achei <b>'+esc(s)+'</b> nos seus clientes. Escolha um da lista ou siga assim mesmo.');return;}

@@ -19,6 +19,9 @@ const casos=[
 {const r=await p.evaluate(()=>{RL.user={id:'u'};EMP.cli=[{id:'l',nome:'LUCAS RODRIGUES',ativo:true},{id:'p',nome:'Paulo Pagano',ativo:true}];pclAbre();var E=PC.ed;PC.digitando=false;PC.fila=[];
   pcResposta('confecção de placa de bruxismo acrílica com guias canina e incisiva superior');var o={passo:PC.passo,cli:E.cli&&E.cli.nome,trab:E.trabalho};PC.busy=false;pcFecha();return o;});
  const ok=r.passo==='cliente'&&!r.cli&&/Placa de bruxismo/.test(r.trab);if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU','placa de bruxismo sem cliente',ok?'':JSON.stringify(r));}
+// nome que serve para mais de um cliente: pergunta qual
+{const r=await p.evaluate(()=>{RL.user={id:'u'};EMP.cli=[{id:'a',nome:'Dr. Eduardo de Mello Caprio',ativo:true},{id:'b',nome:'Eduardo Santos',ativo:true}];pclAbre();PC.digitando=false;PC.fila=[];pcResposta('eduardo');var o={passo:PC.passo,n:(PC.ed._opc||[]).length};PC.busy=false;pcFecha();return o;});
+ const ok=r.passo==='cliente'&&r.n===2;if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU','dois Eduardos',ok?'':JSON.stringify(r));}
 for(const [v,esp] of casos){const r=await p.evaluate(v=>{RL.user={id:'u'};EMP.cli=[{id:'c1',nome:'Paulo Pagano',ativo:true},{id:'c2',nome:'Orallis',ativo:true}];pclAbre();pclTudo(v);var E=PC.ed,o={cli:E.cli&&E.cli.nome,pac:E.paciente,trab:E.trabalho,d:E.dentes,cor:E.cor};PC.busy=false;pcFecha();return o;},v);
  const ok=JSON.stringify(r)===JSON.stringify(esp);if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU',v,ok?'':'\n   veio '+JSON.stringify(r));}
 console.log(falhas?falhas+' falha(s)':'tudo certo');await b.close();process.exit(falhas?1:0);})();
