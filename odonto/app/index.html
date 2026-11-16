@@ -5622,7 +5622,7 @@ function anaDentes(t){var out=[],s=String(t).replace(/(\d{2})\s*(?:a|ao|al|à|at
   (s.match(/\b\d{2}\b/g)||[]).forEach(function(x){x=+x;if(anaDenteOk(x))out.push(x);});
   var u=[];out.forEach(function(n){if(u.indexOf(n)<0)u.push(n);});return u;}
 var ANA_TRAB=[[/coroa|coroinha/,'Coroa'],[/faceta|laminado|lente(s)? de contato/,'Faceta'],[/onlay|inlay|overlay|endocrown/,'Onlay / inlay'],[/protocolo/,'Protocolo'],[/provis[oó]ri/,'Provisório'],
-  [/p(?:r[oó]|or)tese parcial fixa|parcial fixa|\bppf\b/,'Prótese parcial fixa'],[/ponte|p(?:r[oó]|or)tese fixa/,'Ponte fixa'],[/n[uú]cleo|pino/,'Núcleo'],[/enceramento|wax ?up/,'Enceramento'],[/mock ?up/,'Mock-up'],[/guia/,'Guia cirúrgica'],[/placa|miorrelax|bruxismo/,'Placa'],
+  [/p(?:r[oó]|or)tese parcial fixa|parcial fixa|\bppf\b/,'Prótese parcial fixa'],[/ponte|p(?:r[oó]|or)tese fixa/,'Ponte fixa'],[/n[uú]cleo|pino/,'Núcleo'],[/enceramento|wax ?up/,'Enceramento'],[/mock ?up/,'Mock-up'],[/placa (?:de |para )?(?:bruxismo|miorrelax\w*)|placa miorrelax\w*|placa de mordida|bruxismo|miorrelax\w*/,'Placa de bruxismo'],[/guia(?!s?\s+(?:de\s+)?(?:canin|incis|anterior|lateral|desocl))/,'Guia cirúrgica'],[/placa/,'Placa'],
   [/\bppr\b|remov[ií]vel/,'PPR'],[/total|dentadura/,'Prótese total'],[/barra/,'Barra'],[/coping|casquete/,'Coping'],[/modelo/,'Modelo']];
 var ANA_MAT=[[/zirc/,'Zircônia'],[/e\.? ?max|dissilicato/,'E.max'],[/pmma/,'PMMA'],[/metalo ?cer/,'Metalocerâmica'],[/cromo|co ?cr|cobalto/,'Metal (CoCr)'],[/resina (?:com |c\/ ?)?carga (?:de )?ceramica|resina ceramica|ceromero/,'Resina com carga cerâmica'],[/resina/,'Resina'],[/acr[ií]lic/,'Acrílico'],[/ceramica|porcelana/,'Cerâmica']];
 function anaTrabTipo(seg){for(var i=0;i<ANA_TRAB.length;i++)if(ANA_TRAB[i][0].test(seg))return ANA_TRAB[i][1];return '';}
@@ -5674,6 +5674,9 @@ function anaEntende(txt){var raw=String(txt||'').trim();if(!raw)return null;var 
     var serv=anaServ(sg,base,mat,impl),trab=serv||[base||'Trabalho',mat?'de '+mat:'',impl?'sobre implante':''].filter(Boolean).join(' ');
     var it={trabalho:trab,daTabela:!!serv,dentes:ds,qtd:ds.length||(qn?+qn:1),material:mat||'',sobre_implante:impl,componente:impl&&comp?anaCap(comp):''};
     var s=pedServ(it.trabalho);it.valor=s&&s.valor!=null?Math.round(s.valor*it.qtd*100)/100:null;it.prazoTab=s&&s.prazo!=null?pedUteis(s.prazo):null;res.itens.push(it);});
+  /* mesmo trabalho repetido sem dentes (ex.: "placa de bruxismo") vira um item só; detalhes como "guias canina e incisiva" ficam na observação */
+  res.itens=res.itens.filter(function(a,i){return !(a.dentes.length===0&&res.itens.slice(0,i).some(function(b){return b.trabalho===a.trabalho;}));});
+  if(/guias?\s+(?:de\s+)?(?:canin|incis|desocl)/.test(t))res.detalhe=(raw.match(/guias?\s+[^,;.]*/i)||[''])[0];
   /* dente que aparece em dois trabalhos fica só no trabalho mais específico (ex.: 11 ao 25 sobre dente + 23 sobre implante) */
   res.itens.forEach(function(a){a.dentes=a.dentes.filter(function(n){return !res.itens.some(function(b){return b!==a&&b.dentes.indexOf(n)>=0&&b.dentes.length<a.dentes.length;});});});
   res.itens.forEach(function(it){if(it.dentes.length){it.qtd=it.dentes.length;var s2=pedServ(it.trabalho);it.valor=s2&&s2.valor!=null?Math.round(s2.valor*it.qtd*100)/100:null;}});
@@ -7476,10 +7479,11 @@ function pclAbre(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espe
 function pclSemCli(txt,cl){if(!cl)return txt;var nw=semAc(cl.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}),ws=String(txt).split(/\s+/),out=[];
   ws.forEach(function(w){var k=semAc(w).replace(/[^a-z0-9]/g,'');if(nw.indexOf(k)>=0){if(out.length&&/^dra?\.?$/i.test(out[out.length-1]))out.pop();return;}out.push(w);});return out.join(' ');}
 function pclSoPaciente(cl,pac){/* o cliente "achado" é só o nome do paciente? então não é cliente */if(!cl||!pac)return false;var pw=semAc(pac).split(/[^a-z0-9]+/);return semAc(cl.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).some(function(w){return pw.indexOf(w)>=0;});}
-function pclTudo(v){v=String(v).replace(/\bspbre\b/gi,'sobre').replace(/\bsorbe\b/gi,'sobre');var seg=v.split(/[,;]/),r0=anaEntende(v),pac0=r0&&r0.paciente||'',ehPac=/^\s*(?:paciente|pac\.?)\b/i.test(seg[0]),a1=ehPac?pclAcha(seg[0]).filter(function(c){var t=' '+semAc(seg[0]).replace(/[^a-z0-9]+/g,' ')+' ';return semAc(c.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).every(function(w){return t.indexOf(' '+w+' ')>=0;});}):pclAcha(seg[0]),cl=a1.length===1?a1[0]:null;
+function pclTudo(v){v=String(v).replace(/\bspbre\b/gi,'sobre').replace(/\bsorbe\b/gi,'sobre');var seg=v.split(/[,;]/),r0=anaEntende(v),pac0=r0&&r0.paciente||'',ehPac=/^\s*(?:paciente|pac\.?)\b/i.test(seg[0]),a1=pclAcha(seg[0]).filter(function(c){var t=' '+semAc(seg[0]).replace(/[^a-z0-9]+/g,' ')+' ';return semAc(c.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).every(function(w){return t.indexOf(' '+w+' ')>=0;});}),cl=a1.length===1?a1[0]:null;
   var r=cl?anaEntende([pclSemCli(seg[0],cl)].concat(seg.slice(1)).join(',')):r0;if(!r||!r.itens.length)return false;var E=PC.ed;
   if(!cl&&r.cliente&&!(r.paciente&&pclSoPaciente(r.cliente,r.paciente)))cl=r.cliente;
   if(r.paciente)r.paciente=pclSemCli(r.paciente,cl).trim();
+  if(r.detalhe){var E0=PC.ed;E0.obs=((E0.obs?E0.obs+' · ':'')+anaCap(r.detalhe)).slice(0,500);}
   if(!r.paciente&&cl){/* sem a palavra "paciente": o nome que sobra antes do trabalho/dente é o paciente (ex.: "luizmar schroeder DR LUIZ MOREIRA dente 11…") */
     var resto=pclSemCli(v,cl).replace(/^[\s,;:-]+/,'').split(/[\s,;]+/),nm=[];
     for(var ii=0;ii<resto.length;ii++){var w=resto[ii],ws=semAc(w);if(!ws)continue;if(/^(dra?\.?|doutora?|cliente|pedido|para|pra|pro)$/.test(ws)){if(nm.length)break;continue;}
@@ -7506,7 +7510,9 @@ var _pcRespL=pcResposta;pcResposta=function(v,txt){if(PC.modo!=='lab')return _pc
   if(k==='cliente'){var s=String(v||'').trim();if(!s)return;
     if(s.indexOf('id:')===0){var c=pclClis().filter(function(x){return x.id===s.slice(3);})[0];if(!c)return;E.cli=c;E._opc=null;pcEu(esc(c.nome));pcProx();return;}
     if(s.indexOf('sem:')===0){E.cli=null;E.cliTxt=s.slice(4);E._opc=null;pcEu(esc(E.cliTxt)+' <small>(sem cadastro)</small>');pcAna('Tudo bem, vou anotar o nome na observação. Depois você cadastra o cliente em <b>Clientes</b>.');pcProx();return;}
-    if(!E._tudo&&s.length>18&&(/[,;]/.test(s)||/\b(paciente|coroa|dente|faceta|cor\b)/i.test(semAc(s)))&&pclTudo(s))return;
+    var ehTrab=/\b(paciente|coroa|dente|faceta|cor|placa|bruxismo|protese|portese|protocolo|guia|nucleo|ponte|inlay|onlay|modelo|provisori\w*|zirconia|emax|resina|implante|ppr|ppf|enceramento|confeccao)\b/i.test(semAc(s));
+    if(!E._tudo&&s.length>18&&(/[,;]/.test(s)||ehTrab)&&pclTudo(s))return;
+    if(ehTrab&&s.split(/\s+/).length>3&&!anaCliente(semAc(s))){pcEu(esc(s));pcAna('Isso parece o <b>trabalho</b>, não o cliente 🙂 Para qual <b>cliente</b> é? Toque num nome ou digite.');return;}
     var A=pclAcha(s);pcEu(esc(s));
     if(A.length===1){E.cli=A[0];E._opc=null;if(semAc(A[0].nome).indexOf(semAc(s))<0)pcAna('Entendi: <b>'+esc(A[0].nome)+'</b> 👍');pcProx();return;}
     if(A.length>1){E._opc=A.map(function(c){return [c.nome,'id:'+c.id];});pcAna('Achei mais de um. Qual deles?');return;}
