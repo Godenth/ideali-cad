@@ -7526,10 +7526,24 @@ var _pcProxL=pcProx;pcProx=function(){if(PC.modo!=='lab')return _pcProxL.apply(t
   if(nx==='cor'&&semCor)nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];
   if(E._tudo){while(nx&&nx!=='obs'&&nx!=='fim'&&((nx==='material'&&pclMat(E))||(nx==='paciente'&&E.paciente)||(nx==='trabalho'&&E.trabalho)||(nx==='dentes'&&E.trabalho)||(nx==='cor'&&(E.cor||semCor))||(nx==='prazo'&&(E.prazo||E.urgente))))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];}
   pcPergunta(nx||'fim');};
+/* correção no meio da conversa: "mude pra zircônia", "troca a cor pra A2", "o dente é 24", "na verdade é emax" */
+function pclCorrige(v){var E=PC.ed,t=semAc(String(v)).trim();if(!E||!(E.trabalho||E.paciente||E.cor))return false;
+  var m=t.match(/^(?:(?:mud[aeo]r?|troc[aeo]r?|troque|alter[aeo]r?|corrig[aei]r?|corrija|na verdade|e|eh|é)\b[\s\w]*?\b(?:pra|para|por|p\/|e|eh|é)\s+|(?:na verdade|na real)\s+(?:e|eh|é)?\s*)(.+)$/);
+  var m2=t.match(/^(?:o\s+)?(dente|dentes|elemento|cor|material|paciente)\s+(?:e|eh|é|:)\s+(.+)$/);
+  if(!m&&!m2)return false;var x=m2?m2[2]:m[1],qual=m2?m2[1]:(t.match(/\b(cor|material|dente|dentes|paciente)\b/)||[])[1]||'',feito=[];
+  var cor=x.match(/^\s*([a-d]\s?[1-4](?:[.,]5)?|bl\s?[1-4])\b/);
+  var mat='';ANA_MAT.forEach(function(z){if(!mat&&z[0].test(x))mat=z[1];});
+  if((qual==='cor'||!qual)&&cor){E.cor=cor[1].replace(/\s/g,'').toUpperCase().replace(',','.');feito.push('🎨 cor '+E.cor);}
+  else if((qual==='material'||!qual)&&mat){var tr=E.trabalho||'',old=pclMat(E);if(old&&tr.indexOf(old)>=0)tr=tr.replace(old,mat);else tr=(tr||'Coroa')+' de '+mat;E.trabalho=tr;E.material=mat;if(E._tudo&&E._tudo.itens&&E._tudo.itens[0]){E._tudo.itens[0].material=mat;E._tudo.itens[0].trabalho=tr;}feito.push('material '+mat+' → '+tr);}
+  else if(/dente|elemento/.test(qual)||(!qual&&/^\s*\d{2}\b/.test(x))){var ds=anaDentes(x);if(!ds.length)return false;E.dentes=ds;feito.push('🦷 '+ds.join(', '));}
+  else if(qual==='paciente'){E.paciente=anaCap(String(v).replace(/^.*?\b(?:paciente)\b\s*(?:e|eh|é|:|pra|para|por)?\s*/i,'').trim()).slice(0,80);feito.push('paciente '+E.paciente);}
+  else return false;
+  pcEu(esc(v));pcAna('Pronto, mudei: <b>'+esc(feito.join(' · '))+'</b> ✅');var k=PC.passo;if(k&&PC_P[k])pcPergunta(k);return true;}
 function pclData(t){var d=anaPrazo(t);if(d)return d;var W=[/\bdom/,/\bseg/,/\bter/,/\bqua(?!n)/,/\bqui/,/\bsex/,/\bsab/],h=new Date(dHoje()+'T12:00:00'),w=-1;W.forEach(function(r,i){if(w<0&&r.test(t))w=i;});
   if(w>=0){var n=(w-h.getDay()+7)%7||7;if(/\b(proxima|que vem)\b/.test(t)&&n<7)n+=7;h.setDate(h.getDate()+n);return h.toISOString().slice(0,10);}
   var m=t.match(/\b(\d{1,2})\s+dias?\s*uteis\b/);if(m)return pedUteis(+m[1]);m=t.match(/\bem\s+(\d{1,2})\s+dias?\b/);if(m){h.setDate(h.getDate()+(+m[1]));return h.toISOString().slice(0,10);}return null;}
 var _pcRespL=pcResposta;pcResposta=function(v,txt){if(PC.modo!=='lab')return _pcRespL.apply(this,arguments);var k=PC.passo,E=PC.ed;if(PC.digitando||!E)return;
+  if(typeof v==='string'&&!/^(id|sem):/.test(v)&&pclCorrige(v))return;
   if(k==='material'){if(v===null){pcEu('<i>Pular</i>');pcProx();return;}var mt=String(v).trim().slice(0,60);if(!mt)return;E.material=mt;pcEu(esc(mt));pcProx();return;}
   if(k==='cliente'){var s=String(v||'').trim();if(!s)return;
     if(s.indexOf('id:')===0){var c=pclClis().filter(function(x){return x.id===s.slice(3);})[0];if(!c)return;E.cli=c;E._opc=null;pcEu(esc(c.nome));pcProx();return;}
@@ -7540,6 +7554,7 @@ var _pcRespL=pcResposta;pcResposta=function(v,txt){if(PC.modo!=='lab')return _pc
     /* todos os clientes que têm as palavras digitadas (ex.: "eduardo" → todos os Eduardos) */
     var pw=semAc(s).split(/[^a-z0-9]+/).filter(function(w){return w.length>=2&&!/^(dra?|de|da|do|dos|das|e)$/.test(w);}),
       cont=pw.length?pclClis().filter(function(c){var cw=semAc(c.nome).split(/[^a-z0-9]+/);return pw.every(function(w){return cw.some(function(x){return x.indexOf(w)===0;});});}):[];
+    if(!cont.length&&ehTrab){pcEu(esc(s));pcAna('Isso parece o <b>trabalho</b>, não o cliente 🙂 Para qual <b>cliente</b> é? Toque num nome ou digite.');return;}
     var A=cont.length?cont:pclAcha(s);pcEu(esc(s));
     if(A.length===1){E.cli=A[0];E._opc=null;if(semAc(A[0].nome).trim()!==semAc(s).trim())pcAna('Entendi: <b>'+esc(A[0].nome)+'</b> 👍');pcProx();return;}
     if(A.length>1){E._opc=A.map(function(c){return [c.nome,'id:'+c.id];});pcAna('Achei mais de um. Qual deles?');return;}

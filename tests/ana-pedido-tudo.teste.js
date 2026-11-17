@@ -26,6 +26,11 @@ const casos=[
 {const r=await p.evaluate(()=>{RL.user={id:'u'};EMP.cli=[{id:'a',nome:'Alexandre Miranda Souza',ativo:true},{id:'p',nome:'Paulo Pagano',ativo:true}];pclAbre();PC.digitando=false;PC.fila=[];
   pcResposta('Nome: Antonio Claudio De Souza Mendes cor – BL1 coroa emax 23 barra square');var E=PC.ed,o={passo:PC.passo,cli:E.cli&&E.cli.nome,pac:E.paciente,trab:E.trabalho,d:E.dentes,cor:E.cor,obs:E.obs};PC.busy=false;pcFecha();return o;});
  const ok=r.passo==='cliente'&&!r.cli&&r.pac==='Antonio Claudio de Souza Mendes'&&r.trab==='Coroa de E.max'&&r.d.join()==='23'&&r.cor==='BL1'&&r.obs==='Square';if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU','Nome: … BL1 … barra square',ok?'':JSON.stringify(r));}
+// correção no meio: "mude pra zirconia" não pode virar cliente (Dra. Monik Savannah); muda o material, a cor e o dente
+{const r=await p.evaluate(()=>{RL.user={id:'u'};EMP.cli=[{id:'m',nome:'Dra. Monik Savannah',ativo:true},{id:'p',nome:'Paulo Pagano',ativo:true}];pclAbre();
+  var d=function(x){PC.digitando=false;PC.fila=[];pcResposta(x);};d('paciente Antonio Claudio De Souza Mendes cor – BL1 coroa emax 23');d('mude pra zirconia');d('troca a cor pra A2');d('o dente é 24');
+  var E=PC.ed,o={passo:PC.passo,cli:E.cli&&E.cli.nome,trab:E.trabalho,cor:E.cor,d:E.dentes};PC.busy=false;pcFecha();return o;});
+ const ok=r.passo==='cliente'&&!r.cli&&r.trab==='Coroa de Zircônia'&&r.cor==='A2'&&r.d.join()==='24';if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU','mude pra zirconia',ok?'':JSON.stringify(r));}
 for(const [v,esp] of casos){const r=await p.evaluate(v=>{RL.user={id:'u'};EMP.cli=[{id:'c1',nome:'Paulo Pagano',ativo:true},{id:'c2',nome:'Orallis',ativo:true}];pclAbre();pclTudo(v);var E=PC.ed,o={cli:E.cli&&E.cli.nome,pac:E.paciente,trab:E.trabalho,d:E.dentes,cor:E.cor};PC.busy=false;pcFecha();return o;},v);
  const ok=JSON.stringify(r)===JSON.stringify(esp);if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU',v,ok?'':'\n   veio '+JSON.stringify(r));}
 console.log(falhas?falhas+' falha(s)':'tudo certo');await b.close();process.exit(falhas?1:0);})();
