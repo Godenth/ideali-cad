@@ -9071,13 +9071,8 @@ function pvfImplante(p,R){var imp=R.dentes.filter(function(t){return t.imp;});if
   return {ok:bate&&!!p.sobre_implante,txt:'Implante no projeto: '+nomes.join(', ')+' · dentes '+imp.map(function(t){return t.n;}).join(', ')+(sb?' · com scanbody':' · sem scanbody')+'. No pedido: '+(p.sobre_implante?(comp||'sobre implante, sem componente anotado'):'não está marcado como sobre implante')+'.'};}
 function pvfCards(p){var F=pvfHidrata(p),R=F.exo,stl=F.stls.some(function(s){return s.ok;});
   var conf='';if(R){var L=[];try{L=exoConfere(p,R);}catch(e){}var im=pvfImplante(p,R),ruins=L.filter(function(x){return x[0]!=='✅'&&!(im&&/implante/i.test(x[1]));});
-    try{catCarrega();}catch(e){}
     var catL=R.dentes.filter(function(t){return t.imp;}).map(function(t){var A=catAcha(t),q=A.q;if(!q.linha||q.dia==null)return '';
-      var qt=esc(q.linha+' Ø'+catFmt(q.dia)+(q.alt!=null?' · '+catFmt(q.alt)+' mm':''));
-      if(!CAT.ok)return '<div class="pvf-im">📦 Dente '+t.n+': '+qt+' · procurando no catálogo…</div>';
-      if(CAT.erro)return '<div class="pvf-dif">📦 Dente '+t.n+': '+esc(CAT.erro)+'</div>';
-      if(!CAT.L.length)return '<div class="pvf-dif">📦 Dente '+t.n+': '+qt+'. Seu catálogo ainda está vazio. <button class="pvf-lk" data-act="catAbre">Abrir catálogo e adicionar as tabelas</button></div>';
-      return A.L.length?'<div class="pvf-im ok">📦 Dente '+t.n+': '+A.L.map(function(r){return esc(catTxt(r))+' → <b>cód. '+esc(r.codigo)+'</b>';}).join('<br>')+'</div>':'<div class="pvf-dif">📦 Dente '+t.n+': '+esc(q.linha+' Ø'+catFmt(q.dia)+(q.alt!=null?' · '+catFmt(q.alt)+' mm':''))+' não está no seu catálogo. <button class="pvf-lk" data-act="catAbre">Abrir catálogo</button></div>';}).join('');
+      return A.L.length?'<div class="pvf-im ok">📦 Dente '+t.n+': '+A.L.map(function(r){return esc(catTxt(r))+' → <b>cód. '+esc(r.codigo)+'</b>';}).join('<br>')+'</div>':'<div class="pvf-dif">📦 Dente '+t.n+': '+esc(q.linha+' Ø'+catFmt(q.dia)+(q.alt!=null?' · '+catFmt(q.alt)+' mm':''))+': código do fabricante não encontrado.</div>';}).join('');
     conf='<div class="pvf-conf">'+catL+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+
       (ruins.length?ruins.map(function(x){return '<div class="pvf-dif">'+x[0]+' <b>'+x[1]+':</b> '+esc(x[2])+'</div>';}).join('')+'<button class="pvf-lk" data-pvf="aplica">Usar dados do projeto no pedido</button>':(im&&!im.ok?'':'<div class="pvf-im ok">✅ O projeto confere com o pedido.</div>'))+'</div>';}
   var chip=function(on,txt,baixa,ver){return on?'<span class="pvf-ok">✅ '+txt+(ver?'<button data-pvb="'+ver+'" title="Visualizar">👁 Ver</button>':'')+'<button data-pvb="'+baixa+'" title="Baixar">⬇ Baixar</button></span>':'';};
@@ -9356,8 +9351,9 @@ function catLe(t){var s=String((t&&(t.libRaw||''))+' '+(t&&t.imp||'')),u=s.toUpp
   if(o.dia==null){var d=u.match(/-D(\d)(\d)\b/);if(d)o.dia=+(d[1]+'.'+d[2]);}
   if(o.alt==null){var g=u.match(/GH(\d)(\d)\b/);if(g)o.alt=+(g[1]+'.'+g[2]);}
   return o;}
+function catBase(){if(CAT.base)return CAT.base;var L=[];CAT_SEED.forEach(function(g){g.dias.forEach(function(d,i){(g.alts.length?g.alts:[null]).forEach(function(a,j){var c=(g.cod[i]||[])[j];if(c)L.push({marca:g.marca,linha:g.linha,peca:g.peca,detalhe:g.detalhe,diametro:d,altura:a,codigo:c});});});});return CAT.base=L;}
 function catAcha(t){var q=catLe(t);if(!q.linha||q.dia==null)return {q:q,L:[]};
-  return {q:q,L:CAT.L.filter(function(r){return String(r.linha).toUpperCase()===q.linha&&Math.abs(+r.diametro-q.dia)<.06&&(r.altura==null||q.alt==null||Math.abs(+r.altura-q.alt)<.06);})};}
+  return {q:q,L:catBase().filter(function(r){return String(r.linha).toUpperCase()===q.linha&&Math.abs(+r.diametro-q.dia)<.06&&(r.altura==null||q.alt==null||Math.abs(+r.altura-q.alt)<.06);})};}
 function catTxt(r){return r.peca+(r.detalhe?' '+r.detalhe:'')+(r.marca?' ('+r.marca+')':'')+' Ø'+catFmt(r.diametro)+(r.altura!=null?' · '+catFmt(r.altura)+' mm':'');}
 /* tela do catálogo */
 function catGrupos(){var G={},ord=[];CAT.L.forEach(function(r){var k=[r.marca,r.linha,r.peca,r.detalhe].join('|');if(!G[k]){G[k]={marca:r.marca,linha:r.linha,peca:r.peca,detalhe:r.detalhe,rows:[]};ord.push(k);}G[k].rows.push(r);});return ord.map(function(k){return G[k];});}
@@ -9400,7 +9396,7 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
   else if(k==='seed'){CAT_SEED.reduce(function(p,g){return p.then(function(){return catGrava(g);});},Promise.resolve()).then(function(){toast('Tabelas adicionadas. ✅');catCarrega(true);},function(e){toast(/odo_catalogo/.test((e&&e.message)||'')?'Falta rodar a atualização 090 no banco.':'Não consegui salvar agora.');});return;}
   catPinta();},true);
 ACT.catAbre=function(){CAT.on=true;catCarrega(true);catPinta();};
-var _rPedidosCat=rPedidos;rPedidos=function(){var h=_rPedidosCat.apply(this,arguments);try{catCarrega();}catch(e){}return h.replace('<button class="btn" data-act="pedCadistas">','<button class="btn" data-act="catAbre">📚 Catálogo</button><button class="btn" data-act="pedCadistas">');};
+/* catálogo é mantido no código (CAT_SEED) pelo desenvolvedor; o usuário não edita */
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
