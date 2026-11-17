@@ -1761,8 +1761,11 @@ body.pd-trava{overflow:hidden}
 @keyframes pdEntra{from{opacity:0;transform:translateY(120px)}to{opacity:1;transform:none}}
 @keyframes pdSai{to{opacity:0;transform:translateY(120px)}}
 @keyframes pdChama{25%{transform:rotate(-4deg) translateY(-6px)}75%{transform:rotate(3deg)}}
-@media(max-width:640px){.pd-lem{right:8px;left:8px;bottom:calc(84px + env(safe-area-inset-bottom))}.pd-lc{width:96px;margin-right:-18px}.pd-lb{margin-bottom:20px;width:auto;flex:1}
+@media(max-width:640px){.pd-lem{right:8px;left:8px;bottom:calc(84px + env(safe-area-inset-bottom))}.pd-lc{width:96px;margin-right:-18px}.pd-lb{margin-bottom:20px;width:auto;flex:1}}
 @keyframes escIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.ph{display:grid;gap:8px;padding:10px 12px;border-radius:12px;border:1.5px solid color-mix(in srgb,#F59E0B 55%,var(--line));background:color-mix(in srgb,#F59E0B 8%,var(--surface));font-size:.88rem}.ph.ok{border-color:color-mix(in srgb,#10B981 55%,var(--line));background:color-mix(in srgb,#10B981 7%,var(--surface))}.ph-det{grid-column:1/-1}
+.ph-h{line-height:1.4}.ph-h img{border-radius:50%;vertical-align:middle;margin-right:6px}.ph-b{display:flex;gap:8px;flex-wrap:wrap}.ph-l{display:grid;gap:4px}
+.ph-it{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;text-align:left;padding:6px 9px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:.82rem;cursor:pointer}.ph-it:hover{border-color:var(--accent)}.ph-it small{color:var(--muted)}.ph-dica{margin:0;font-size:.82rem;color:var(--muted)}
 </style>
 
 <div id="app"></div>
@@ -6324,7 +6327,7 @@ function fPedido(id,preCli){
     '<div class="pdf"><div class="pdf-b1">'+
     '<label class="fld"><span>Cliente</span><select id="pd-cli" name="clienteId" required><option value="">Escolha…</option>'+(function(){var ld=p?[]:leadsDe().filter(function(l){return l.st==='seq'||l.st==='resp';}).sort(function(a,b){return String(a.nome).localeCompare(String(b.nome));}),op=function(c){return '<option value="'+c.id+'" '+(c.id===cid?'selected':'')+'>'+esc(c.nome)+'</option>';};
       return ld.length?'<optgroup label="Clientes">'+cs.map(op).join('')+'</optgroup><optgroup label="Leads (viram clientes ao salvar)">'+ld.map(function(l){var v='lead:'+l.id;return '<option value="'+v+'" '+(v===cid?'selected':'')+'>🌱 '+esc(l.nome||telFmt(l.tel))+(l.cidade?' · '+esc(l.cidade):'')+'</option>';}).join('')+'</optgroup>':cs.map(op).join('');})()+'</select>'+(cs.length?'':'<small>Cadastre um cliente primeiro ou escolha um lead.</small>')+'</label>'+
-    '<label class="fld"><span>Paciente</span><input id="pd-pac" class="nome-p" name="paciente" required maxlength="80" placeholder="Nome do paciente" value="'+esc(p?p.paciente:(pre.pac||''))+'"></label>'+
+    '<label class="fld"><span>Paciente</span><input id="pd-pac" class="nome-p" name="paciente" required maxlength="80" placeholder="Nome do paciente" value="'+esc(p?p.paciente:(pre.pac||''))+'"></label>'+'<div id="pac-hist" data-ed="'+(p?p.id:'')+'"></div>'+
     '</div><div class="pdf-a">'+
     '<div class="fld"><span>Elementos <b id="pd-qtd" class="mono"></b></span><div id="pd-odo" class="pd-odo"></div><small>Toque no dente e escolha o trabalho. Para unir dentes vizinhos (fixo / ponte), toque na bolinha entre eles.</small></div>'+
     '<div id="pd-ed"></div>'+
@@ -6572,7 +6575,7 @@ function fPedidoDet(id){
     '<div class="pdet"><div class="pdet-a">'+
     '<div class="pd-quem">'+
       '<div class="pq pac"><span class="pq-l">'+ICO_PAC+' Paciente</span><b>'+esc(p.paciente)+'</b><button class="btn sm pq-cp" data-a="copiaTxt" data-v="'+esc(p.paciente)+'" aria-label="Copiar nome do paciente">Copiar</button></div>'+
-      '<div class="pq cli"><span class="pq-l">'+ICO_CLI+' Cliente</span><b>'+esc(c?c.nome:'(cliente excluído)')+'</b>'+(c?'<button class="btn sm pq-cp" data-a="copiaTxt" data-v="'+esc(c.nome)+'" aria-label="Copiar nome do cliente">Copiar</button>':'')+'</div>'+
+      '<div class="pq cli"><span class="pq-l">'+ICO_CLI+' Cliente</span><b>'+esc(c?c.nome:'(cliente excluído)')+'</b>'+(c?'<button class="btn sm pq-cp" data-a="copiaTxt" data-v="'+esc(c.nome)+'" aria-label="Copiar nome do cliente">Copiar</button>':'')+'</div>'+pacHistDet(p)+
       '<div class="pq trab"><span class="pq-l">Trabalho</span><b>'+esc(t?t.nome:'—')+'</b></div>'+
     '</div>'+
     odontoSVG(p)+
@@ -8661,6 +8664,29 @@ function pdMigraLmb(){if(!pdOn()||!PD.ok||PD.erro||PD._migrando)return;var uid=S
 setInterval(function(){try{pdMigraLmb();}catch(e){}},5000);
 
 boot();
+
+/* ===== Histórico do paciente: mesmo cliente + mesmo nome = mesmo paciente. No novo pedido, a Ana pergunta se é o mesmo e atrela. ===== */
+function pacKey(v){return ppNorm(String(v||'')).replace(/[^a-z ]/g,' ').replace(/\b(sr|sra|dr|dra|de|da|do|das|dos|e)\b/g,' ').replace(/\s+/g,' ').trim();}
+function pacParece(a,b){a=pacKey(a);b=pacKey(b);if(!a||!b)return false;if(a===b)return true;var A=a.split(' '),B=b.split(' ');
+  if(A.length===B.length&&A.every(function(w,i){return w===B[i]||(w.length>=5&&anaDist1(anaColapsa(w),anaColapsa(B[i])));}))return true;
+  var c=A.length<=B.length?A:B,l=A.length<=B.length?B:A;return c.length>=2&&c.every(function(w){return l.indexOf(w)>=0;});}
+function pacHist(cid,nome,fora){if(!cid||!pacKey(nome))return [];return alive(S.pedidos).filter(function(x){return x.id!==fora&&x.clienteId===cid&&pacParece(x.paciente,nome);}).sort(function(a,b){return String(b.recebido||'').localeCompare(String(a.recebido||''))||b.num-a.num;});}
+function pacLinha(x,so){return '<'+(so?'div':'button type="button"')+' class="ph-it"'+(so?'':' data-a="verPedido" data-id="'+x.id+'"')+'><b class="mono">#'+x.num+'</b><span>'+esc(nomeTrab(x)||'Pedido')+((x.elementos||[]).length?' · '+x.elementos.join(', '):'')+'</span><small>'+(x.recebido?dmy(x.recebido):'')+' · '+esc(stLabel(x.status))+'</small></'+(so?'div':'button')+'>';}
+var PH={nao:{},sim:{}};
+function pacHistPinta(){var box=document.getElementById('pac-hist'),ip=document.getElementById('pd-pac'),cl=document.getElementById('pd-cli');if(!box||!ip)return;
+  var cid=cl?cl.value:'',nome=ip.value,ed=box.getAttribute('data-ed')||'',L=pacHist(cid,nome,ed),k=cid+'|'+pacKey(nome);
+  var sig=k+'|'+L.length+'|'+(PH.nao[k]?1:0)+(PH.sim[k]?1:0);if(box._sig===sig)return;box._sig=sig;
+  if(!L.length||PH.nao[k]){box.innerHTML=PH.nao[k]&&L.length?'<p class="ph-dica">Ok, é outro paciente. Para não misturar o histórico, coloque o sobrenome completo.</p>':'';return;}
+  var ex=L[0].paciente,igual=pacKey(ex)===pacKey(nome);
+  if(PH.sim[k]||(igual&&ed)){box.innerHTML='<div class="ph ok"><div class="ph-h">🔗 <b>'+esc(ex)+'</b> · histórico com este cliente ('+L.length+' pedido'+(L.length>1?'s':'')+')</div><div class="ph-l">'+L.slice(0,6).map(function(x){return pacLinha(x,1);}).join('')+'</div></div>';return;}
+  box.innerHTML='<div class="ph"><div class="ph-h">'+'<img src="equipe/ana-av-feliz.webp" alt="" width="28" height="28"> Já existe <b>'+esc(ex)+'</b> deste cliente: '+L.length+' pedido'+(L.length>1?'s':'')+' (último #'+L[0].num+(L[0].recebido?' em '+dmy(L[0].recebido):'')+(nomeTrab(L[0])?' · '+esc(nomeTrab(L[0])):'')+'). <b>É o mesmo paciente?</b></div>'+
+    '<div class="ph-b"><button type="button" class="btn pri sm" data-a="pacSim" data-k="'+esc(k)+'" data-v="'+esc(ex)+'">Sim, é o mesmo</button><button type="button" class="btn sm" data-a="pacNao" data-k="'+esc(k)+'">Não, é outro</button></div>'+
+    '<div class="ph-l">'+L.slice(0,3).map(function(x){return pacLinha(x,1);}).join('')+'</div></div>';}
+A.pacSim=function(d){var ip=document.getElementById('pd-pac'),cl=document.getElementById('pd-cli');if(ip)ip.value=d.v;PH.sim[(cl?cl.value:'')+'|'+pacKey(d.v)]=1;PH.sim[d.k]=1;pacHistPinta();toast('Atrelado ao histórico de '+d.v+'. ✅');};
+A.pacNao=function(d){PH.nao[d.k]=1;pacHistPinta();};
+setInterval(function(){try{pacHistPinta();}catch(e){}},700);
+function pacHistDet(p){var L=pacHist(p.clienteId,p.paciente,p.id).filter(function(x){return pacKey(x.paciente)===pacKey(p.paciente);});if(!L.length)return '';
+  return '<div class="ph ok ph-det"><div class="ph-h">🔗 Histórico de <b>'+esc(p.paciente)+'</b> com este cliente · '+L.length+' outro'+(L.length>1?'s':'')+' pedido'+(L.length>1?'s':'')+'</div><div class="ph-l">'+L.slice(0,8).map(pacLinha).join('')+'</div></div>';}
 </script>
 <script src="../pixel.js" defer></script>
 <script src="../visita.js" defer></script>
