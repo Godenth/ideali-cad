@@ -2682,6 +2682,7 @@ body.pe-trava{overflow:hidden}
 .cat-seed{display:grid;gap:6px;justify-items:start;border:1px dashed var(--line);border-radius:14px;padding:14px}
 #cat-raiz .epf-ov{position:fixed;inset:0;z-index:200;background:rgba(5,8,20,.62);backdrop-filter:blur(3px);display:grid;place-items:center;padding:18px}
 @media(max-width:700px){.cat-ef{grid-template-columns:1fr}.cat-ef .cat-w{grid-column:auto}#cat-raiz .epf-ov{padding:0;place-items:stretch}}
+.pvf-drop{outline:2px dashed #38bdf8!important;outline-offset:3px;background:rgba(56,189,248,.12)!important}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -9083,6 +9084,24 @@ function pvfCards(p){var F=pvfHidrata(p),R=F.exo,stl=F.stls.some(function(s){ret
       ((!stl||!F.html)?'<div class="pvf-mais">'+(!stl?'<label class="pvf-up2">＋ Anexar STL<input type="file" data-pvf="stlmao" accept=".stl" multiple hidden></label>':'')+(!F.html?'<label class="pvf-up2">＋ Anexar HTML<input type="file" data-pvf="htmlmao" accept=".html,.htm" hidden></label>':'')+'</div>':'')+'</div>'+
     (F.salvando?'<div class="pvf-ld">⏳ '+esc(F.salvando)+'</div>':'')+(F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':'')+conf+
     '<button class="pvf-env" data-pv="mail">✉️ Enviar pedido por e-mail</button></div>';}
+/* arrastar e soltar arquivos na ficha: solto em cima de um botão vai pra ele; solto em qualquer lugar da ficha, decide pela extensão */
+function pvfSolta(k,files,p){var F=pvfDe(p.id),fs=[].slice.call(files||[]);if(!fs.length)return;
+  if(!k){var html=fs.filter(function(f){return /\.html?$/i.test(f.name);}),zip=fs.filter(function(f){return /\.zip$/i.test(f.name);}),m3=fs.filter(function(f){return /\.(stl|ply|obj|dcm|3mf)$/i.test(f.name);});
+    if(html.length)pvfSolta('htmlmao',html,p);if(zip.length)pvfSolta(F.zip||zip.length>1?'scan':'zip',F.zip?zip:zip.slice(0,1),p);if(!F.zip&&zip.length>1)pvfSolta('scan',zip.slice(1),p);
+    if(m3.length)pvfSolta(F.zip?'stlmao':'scan',m3,p);if(!html.length&&!zip.length&&!m3.length)toast('Esse tipo de arquivo não dá pra anexar aqui.');return;}
+  F._hid=true;
+  if(k==='scan'){fs.forEach(function(f){F.scans.push({nome:f.name,tam:f.size,f:f,ok:true});});pvPinta();pvfSalva(p);}
+  else if(k==='zip'){var z=fs.filter(function(f){return /\.zip$/i.test(f.name);})[0];if(z)pvfLe(p,z);else toast('O Dental CAD precisa ser o arquivo .zip.');}
+  else if(k==='stlmao'){fs.forEach(function(f){F.stls.push({nome:f.name,tam:f.size,f:f,ok:true});});pvPinta();pvfSalva(p);}
+  else if(k==='htmlmao'){F.html={nome:fs[0].name,tam:fs[0].size,f:fs[0]};pvPinta();pvfSalva(p);}}
+(function(){var alvo=function(ev){var r=document.getElementById('pv-raiz');return r&&ev.target&&r.contains(ev.target)&&ev.dataTransfer&&[].indexOf.call(ev.dataTransfer.types||[],'Files')>=0;};
+  var marca=function(el){[].forEach.call(document.querySelectorAll('.pvf-drop'),function(x){if(x!==el)x.classList.remove('pvf-drop');});if(el)el.classList.add('pvf-drop');};
+  var lab=function(ev){var l=ev.target.closest&&ev.target.closest('label');return l&&l.querySelector('input[type=file][data-pvf]')?l:null;};
+  document.addEventListener('dragover',function(ev){if(!alvo(ev))return;ev.preventDefault();ev.dataTransfer.dropEffect='copy';var l=lab(ev);marca(l||document.querySelector('#pv-raiz .pvf2'));},true);
+  document.addEventListener('dragleave',function(ev){if(!ev.relatedTarget)marca(null);},true);
+  document.addEventListener('drop',function(ev){if(!alvo(ev))return;ev.preventDefault();marca(null);var p=pvP();if(!p)return;var l=lab(ev);pvfSolta(l?l.querySelector('input').getAttribute('data-pvf'):'',ev.dataTransfer.files,p);},true);
+  /* soltar fora da ficha não abre o arquivo no navegador */
+  window.addEventListener('dragover',function(ev){if(document.getElementById('pv-raiz'))ev.preventDefault();});window.addEventListener('drop',function(ev){if(document.getElementById('pv-raiz'))ev.preventDefault();});})();
 document.addEventListener('change',function(ev){var t=ev.target,k=t&&t.getAttribute&&t.getAttribute('data-pvf');if(!k)return;var p=pvP();if(!p)return;var F=pvfDe(p.id);
   if(k==='scan'&&t.files.length){F._hid=true;[].forEach.call(t.files,function(f){F.scans.push({nome:f.name,tam:f.size,f:f,ok:true});});pvPinta();pvfSalva(p);t.value='';return;}
   if(k==='zip'&&t.files[0])pvfLe(p,t.files[0]);
