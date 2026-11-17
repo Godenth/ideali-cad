@@ -3767,7 +3767,7 @@ function cSeed(nome,setor,cargo){var h=dHoje(),I=function(t,s,v,st){return {id:'
     tar:[{id:'t1',txt:'Retornar o lead do Instagram',feito:false,q:'hoje'}],conv:[{de:'ana',t:'Oi! Pode me pedir para anotar qualquer coisa. Ex.: "anota ligar para o fornecedor amanhã".'}]};}
 function cCarrega(){try{var x=JSON.parse(localStorage.getItem(lsU('io_corp_v1'))||'null');if(x&&x.corp)return pedMig(x);}catch(e){}return null;}
 function cSalva(){try{localStorage.setItem(lsU('io_corp_v1'),JSON.stringify(S.corp));}catch(e){}}
-function cAbas(D){var A=[['inicio','Início','home']].concat(CTABS[D.setor]||[]);if(eGerente(D.cargo))A.push(['equipe','Equipe','eu']);return A.concat([['agentes','Agentes de IA','bot'],['rede','Rede','rede'],['perfil','Perfil','eu']]);}
+function cAbas(D){var A=[['inicio','Início','home']].concat(CTABS[D.setor]||[]);if(eGerente(D.cargo))A.push(['equipe','Equipe','eu']);if(ESP.ino)A.push(['inove','Inove','fin']);return A.concat([['agentes','Agentes de IA','bot'],['rede','Rede','rede'],['perfil','Perfil','eu']]);}
 function cPend(D,k){var L=D.L[k]||[],c=CL[k];if(!c)return [];var ok={conf:['pendente'],leads:['novo'],contas:['aberta','atrasada'],orc:['aberto','neg'],clientes:['parado'],pedforn:['cotando','pedido'],camp:['pausada'],posts:['ideia','prod'],escala:['falta'],contrat:['aberta','entrev']}[k]||[];return L.filter(function(x){return ok.indexOf(x.st)>=0;});}
 function cFrases(D){var L=[],F=festaHoje(),ab=CTABS[D.setor]||[];L.push(dSaud()+', '+D.nome+'! '+setorNome(D.setor)+' · '+D.cargo+'.');
   ab.forEach(function(t){var p=cPend(D,t[0]);if(p.length)L.push(p.length+' '+(PEND_TXT[t[0]]||'pendentes')+'. Ex.: '+p[0].t+'.');});
@@ -3804,7 +3804,8 @@ var CVAGAS=[{id:'cv1',cargo:'Recepcionista',emp:'Clínica Exemplo Centro',lugar:
 var AGS_SET={adm:'Agente financeiro',atend:'Agente de confirmações',com:'Agente de orçamentos',compras:'Agente de compras',mkt:'Agente de conteúdo',rh:'Agente de RH'};
 function agCorp(D){var G=[{id:'ana',nome:'Ana',papel:'Assistente · tarefas e lembretes',on:true},{id:'vagas',nome:'Agente de vagas',papel:'Busca vagas na Rede Ideali',on:true},{id:'set',nome:AGS_SET[D.setor]||'Agente do setor',papel:'Vai trabalhar junto com você no setor de '+setorNome(D.setor).toLowerCase(),on:false}];if(D.ind)G.push({id:'guia',nome:'Guia de componentes e implantes',papel:'Tira dúvidas de componentes, conexões e medidas',on:false});return G;}
 function rCorp(k){k=k||'corp';var D=S[k];if(!D){D=S[k]=k==='ind'?(iCarrega()||iSeed((S.cad.nome||'').split(' ')[0])):(cCarrega()||cSeed((S.cad.nome||'').split(' ')[0]));}var A=cAbas(D),t=S.tab[k]||'inicio';if(!A.some(function(x){return x[0]===t;}))t='inicio';
-  var corpo=t==='inicio'?rCInicio(D):t==='catalogo'?iCatalogo(D):CL[t]?cLista(D,t):t==='agenda'?rAAgenda(D):t==='estoque'?rAEstoque(D):t==='metas'?cMetas(D):t==='relatorios'?cRelat(D):t==='equipe'?cEquipe(D):t==='agentes'?rDAgentes(D):t==='rede'?rDRede(D):rDPerfil(D);
+  espInoTab(t==='inove');
+  var corpo=t==='inove'&&ESP.ino?rInoParc():t==='inicio'?rCInicio(D):t==='catalogo'?iCatalogo(D):CL[t]?cLista(D,t):t==='agenda'?rAAgenda(D):t==='estoque'?rAEstoque(D):t==='metas'?cMetas(D):t==='relatorios'?cRelat(D):t==='equipe'?cEquipe(D):t==='agentes'?rDAgentes(D):t==='rede'?rDRede(D):rDPerfil(D);
   var badge={};A.forEach(function(x){if(CL[x[0]])badge[x[0]]=cPend(D,x[0]).length;});if(D.setor==='compras')badge.estoque=D.est.filter(function(e){return estSt(e)!=='ok';}).length;badge.equipe=D.equipe.filter(function(q){return q.st!=='aceito';}).length;
   return rFestaDecor()+'<div class="dp2 cp'+(k==='ind'?' ip':'')+'">'+rAnaTopo(D)+
     '<nav class="dabas" role="tablist" aria-label="'+(k==='ind'?'Painel indústria e comércio':'Painel corporativo')+'">'+A.map(function(x){return '<button role="tab" aria-selected="'+(t===x[0])+'" data-act="dTab" data-v="'+x[0]+'">'+dIco(x[2],'di sm')+'<span>'+x[1]+'</span>'+(badge[x[0]]?'<i>'+badge[x[0]]+'</i>':'')+'</button>';}).join('')+'</nav>'+
@@ -5205,7 +5206,9 @@ function espLS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===n
   setTimeout(function(){toast('Convite de conta espelho: entre ou crie o seu login para aceitar.');},600);}})();
 function espPrepara(){var u=RL.user;if(!u)return Promise.resolve();var tk=espLS('io_esp_token');
   var p=tk?SB.rpc('odo_parceiro_aceita',{p_token:tk}).then(function(r){espLS('io_esp_token',null);if(r.error)toast(/inv[aá]lido|vencido|cancelado/i.test(r.error.message||'')?'Este convite não vale mais. Peça um novo.':'Não consegui aceitar o convite.');else{espLS('io_esp_dono',r.data);toast('Convite aceito! Você está vendo a conta espelho.');}}):Promise.resolve();
-  return p.then(function(){return SB.from('odo_parceiros').select('dono_id,nome,aceito_em').eq('parceiro_id',u.id).eq('ativo',true);}).then(function(r){
+  var pq=function(c){return SB.from('odo_parceiros').select(c).eq('parceiro_id',u.id).eq('ativo',true);};
+  return p.then(function(){return pq('dono_id,nome,aceito_em,escopo').then(function(r){return r&&r.error&&/escopo/.test(r.error.message||'')?pq('dono_id,nome,aceito_em'):r;});}).then(function(r){
+    if(r&&!r.error){var ino=(r.data||[]).filter(function(x){return x.escopo==='inove';})[0];if(ino)espInoPrepara(ino);r.data=(r.data||[]).filter(function(x){return x.escopo!=='inove';});}
     if(!r||r.error||!(r.data||[]).length){ESP.lista=[];ESP.dono=null;return;}ESP.lista=r.data;
     return SB.from('odo_empresas').select('user_id,nome').in('user_id',r.data.map(function(x){return x.dono_id;})).then(function(e){(e.data||[]).forEach(function(x){ESP.lista.forEach(function(l){if(l.dono_id===x.user_id)l.emp=x.nome;});});
       var esc0=espLS('io_esp_dono'),ok=ESP.lista.filter(function(l){return l.dono_id===esc0;})[0];if(!ok&&esc0==='eu')return;if(!ok&&RL.perfil)return;ok=ok||ESP.lista[0];
@@ -5229,15 +5232,16 @@ function rCfgEspelho(){if(!RL.user)return '';if(ESPO.L===null){ESPO.L=false;espC
   if(ESPO.erro==='falta046')return '<section class="card"><h2>🪞 Conta espelho</h2><p>Falta rodar a atualização 046 no Supabase.</p></section>';
   return '<section class="card cfg-c"><h2>🪞 Conta espelho</h2><p class="small muted">Um parceiro (por exemplo, a Inove) entra com o login dele e <b>vê tudo</b> da sua conta: clientes, pedidos, Ordens CAD, financeiro, comprovantes e comissão. <b>Ele não consegue editar nada</b>: o banco recusa. Você corta o acesso quando quiser.</p>'+
     (ESPO.L.length?ESPO.L.map(function(p){var venc=!p.parceiro_id&&new Date(p.expira_em)<new Date(),st=!p.ativo?'⛔ acesso cortado':p.parceiro_id?'✅ conectado desde '+new Date(p.aceito_em).toLocaleDateString('pt-BR'):venc?'⌛ convite vencido':'⏳ esperando aceitar (vale até '+new Date(p.expira_em).toLocaleDateString('pt-BR')+')';
-      return '<div class="esp-li"><div><b>'+esc(p.nome)+'</b><small>'+st+'</small></div><div class="row wrap">'+(!p.parceiro_id&&p.ativo&&!venc?'<button class="btn sm" data-act="espCopia" data-v="'+p.id+'">Copiar link</button><a class="btn sm" href="https://wa.me/?text='+encodeURIComponent('Convite para acompanhar a conta do '+((S.neg&&S.neg.nome)||'laboratório')+' no Ideali Odonto (só leitura). Abra e entre ou crie o seu login: '+espLink(p.token))+'" target="_blank" rel="noopener">WhatsApp</a>':'')+
+      return '<div class="esp-li"><div><b>'+esc(p.nome)+'</b> <span class="tag">'+(p.escopo==='inove'?'só aba Inove':'vê tudo')+'</span><small>'+st+'</small></div><div class="row wrap">'+(!p.parceiro_id&&p.ativo&&!venc?'<button class="btn sm" data-act="espCopia" data-v="'+p.id+'">Copiar link</button><a class="btn sm" href="https://wa.me/?text='+encodeURIComponent('Convite para acompanhar a conta do '+((S.neg&&S.neg.nome)||'laboratório')+' no Ideali Odonto (só leitura). Abra e entre ou crie o seu login: '+espLink(p.token))+'" target="_blank" rel="noopener">WhatsApp</a>':'')+
         (p.ativo&&p.parceiro_id?'<button class="btn sm danger" data-act="espCorta" data-v="'+p.id+'">Cortar acesso</button>':'')+(!p.ativo&&p.parceiro_id?'<button class="btn sm" data-act="espVolta" data-v="'+p.id+'">Devolver acesso</button>':'')+'<button class="btn sm" data-act="espApaga" data-v="'+p.id+'" aria-label="Apagar">🗑</button></div></div>';}).join(''):'<p class="small muted">Nenhum parceiro ainda.</p>')+
-    '<div class="row wrap" style="margin-top:12px;gap:8px"><input id="esp-nome" maxlength="80" placeholder="Nome do parceiro (ex.: Inove)" style="flex:1 1 200px"><button class="btn pri" data-act="espNovo">+ Criar convite</button></div>'+
+    '<div class="row wrap" style="margin-top:12px;gap:8px"><input id="esp-nome" maxlength="80" placeholder="Nome do parceiro (ex.: Inove)" style="flex:1 1 200px"><select id="esp-esc" aria-label="O que ele vê"><option value="inove">Vê só a aba Inove</option><option value="tudo">Vê tudo (só leitura)</option></select><button class="btn pri" data-act="espNovo">+ Criar convite</button></div>'+
     '<p class="small muted">O link vale por 7 dias e só pode ser usado por uma pessoa.</p></section>';}
 function espAch(v){return (ESPO.L||[]).filter(function(x){return x.id===v;})[0];}
 Object.assign(ACT,{
   espTroca:function(v){espLS('io_esp_dono',v);location.reload();},
   espNovo:function(){var i=document.getElementById('esp-nome'),n=i?i.value.trim():'';if(n.length<2){toast('Digite o nome do parceiro.');return;}
-    SB.from('odo_parceiros').insert({dono_id:RL.user.id,nome:n}).select('*').single().then(function(r){if(r.error){toast('Não consegui criar o convite.');return;}ESPO.L.push(r.data);render();ACT.espCopia(r.data.id);});},
+    var es=(document.getElementById('esp-esc')||{}).value||'tudo',row={dono_id:RL.user.id,nome:n};if(es!=='tudo')row.escopo=es;
+    SB.from('odo_parceiros').insert(row).select('*').single().then(function(r){if(r.error){toast(/escopo/.test(r.error.message||'')?'Para o convite “só Inove”, rode antes a atualização 091 no Supabase.':'Não consegui criar o convite.');return;}ESPO.L.push(r.data);render();ACT.espCopia(r.data.id);});},
   espCopia:function(v){var p=espAch(v);if(!p)return;try{navigator.clipboard.writeText(espLink(p.token)).then(function(){toast('Link do convite copiado. Mande para o parceiro.');});}catch(e){prompt('Copie o link:',espLink(p.token));}},
   espCorta:function(v){var p=espAch(v);if(!p||!confirm('Cortar o acesso de '+p.nome+'? Ele deixa de ver a sua conta na hora.'))return;SB.from('odo_parceiros').update({ativo:false}).eq('id',v).select('*').single().then(function(r){if(r.error){toast('Não consegui.');return;}Object.assign(p,r.data);render();toast('Acesso cortado.');});},
   espVolta:function(v){var p=espAch(v);if(!p)return;SB.from('odo_parceiros').update({ativo:true}).eq('id',v).select('*').single().then(function(r){if(r.error){toast('Não consegui.');return;}Object.assign(p,r.data);render();toast('Acesso devolvido.');});},
@@ -9436,6 +9440,17 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
   catPinta();},true);
 ACT.catAbre=function(){CAT.on=true;catCarrega(true);catPinta();};
 /* catálogo é mantido no código (CAT_SEED) pelo desenvolvedor; o usuário não edita */
+
+/* ===== Parceiro "só a aba Inove": usa o próprio painel e ganha a aba Inove com os dados do laboratório que o convidou (só leitura). ===== */
+function espInoPrepara(x){ESP.ino={dono:x.dono_id,nome:x.nome||'Inove',emp:null,cli:[],ok:false};
+  Promise.all([SB.from('odo_empresas').select('*').eq('user_id',x.dono_id).limit(1),SB.from('odo_clientes').select('*').eq('user_id',x.dono_id).order('nome')]).then(function(r){
+    if(!ESP.ino)return;ESP.ino.emp=(r[0].data||[])[0]||null;ESP.ino.cli=r[1].data||[];ESP.ino.ok=true;if(ESP.ino.emp)ESP.ino.lab=ESP.ino.emp.nome;render();});}
+function espInoTab(on){var I=ESP.ino;if(!I)return;var dentro=ESP.dono===I.dono&&ESP.inoAtivo;
+  if(on&&!dentro){ESP.dono=I.dono;ESP.inoAtivo=true;document.body.classList.add('espelho');FIN.carregado=false;FIN.erro='';FIN.ano=0;FIN.mes=0;INO.hist=null;setTimeout(function(){finCarrega();if(typeof leitCarrega==='function')leitCarrega();},0);}
+  else if(!on&&dentro){ESP.dono=null;ESP.inoAtivo=false;document.body.classList.remove('espelho');FIN.carregado=false;FIN.M=[];FIN.P=[];FIN.C=[];INO.hist=null;}}
+function rInoParc(){var I=ESP.ino;if(!I.ok||!FIN.carregado)return '<div class="empty">Carregando a conferência da Inove…</div>';
+  var e=EMP.row,c=EMP.cli;EMP.row=I.emp;EMP.cli=I.cli;
+  try{return '<p class="small muted" style="margin:0 0 10px">🪞 Conta de <b>'+esc(I.lab||'laboratório')+'</b> · só leitura</p>'+rInove();}finally{EMP.row=e;EMP.cli=c;}}
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
