@@ -1745,7 +1745,7 @@ body.pd-trava{overflow:hidden}
 .pd-cli{justify-self:start;font-size:.76rem;font-weight:600;color:var(--ink);background:var(--line);border-radius:999px;padding:2px 9px}.pd-dt{font-size:.75rem;color:var(--muted);font-weight:600}
 .pd-c.perto .pd-dt{color:#D97706}.pd-c.atr{border-color:#FCA5A5;background:color-mix(in srgb,#EF4444 7%,var(--bg,#fff))}.pd-c.atr .pd-dt,.pd-at{color:#DC2626;font-weight:700}.pd-at{font-size:.75rem}
 .pd-add{border:1px dashed var(--line);background:none;color:var(--muted);border-radius:10px;padding:9px;font:inherit;font-size:.86rem;cursor:pointer;text-align:left}.pd-add:hover{color:var(--ink);border-color:var(--muted)}
-.pd-ed{position:fixed;inset:0;z-index:190;background:rgba(5,10,22,.55);display:grid;place-items:center;padding:16px}
+.pdt-ov{position:fixed;inset:0;z-index:190;background:rgba(5,10,22,.55);display:grid;place-items:center;padding:16px}
 .pd-edf{width:min(520px,100%);background:var(--surface);border-radius:18px;padding:18px;display:grid;gap:12px;box-shadow:0 30px 70px rgba(0,0,0,.35)}.pd-edf.ent{animation:escIn .2s ease both}.pd-edf h3{margin:0}
 .pd-edf label{display:grid;gap:5px;font-size:.82rem;font-weight:600;color:var(--muted)}.pd-edf textarea,.pd-edf input,.pd-edf select{padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-weight:500}
 .pd-edr{display:grid;grid-template-columns:1.2fr .8fr 1fr;gap:8px}
@@ -8573,7 +8573,7 @@ function pdPgHtml(){var cols=PD_COLS.map(function(c){var L=PD.L.filter(function(
     '<button class="pd-nv" data-pd="add" data-v="fazer">+ Nova tarefa</button><button class="pd-x" data-pd="pgx" aria-label="Fechar">✕</button></header>'+
     '<div class="pd-tipos">'+PD_TIPOS.map(function(t){return '<button class="'+(PD.tipo===t[0]?'on':'')+'" style="--tc:'+t[1]+'" data-pd="tipo" data-v="'+t[0]+'">'+t[2]+' '+t[0]+'</button>';}).join('')+'</div>'+
     (PD.erro?'<p class="pd-er">'+esc(PD.erro)+'</p>':'')+'<div class="pd-cols">'+cols+'</div></div>'+(PD.ed?pdEdHtml():'')+'</div>';}
-function pdEdHtml(){var t=PD.ed,ent=PD._edAb!==t;PD._edAb=t;return '<div class="pd-ed"><form class="pd-edf'+(ent?' ent':'')+'" id="pd-edf"><h3>'+(t.id?'Editar tarefa':'Nova tarefa')+'</h3>'+
+function pdEdHtml(){var t=PD.ed,ent=PD._edAb!==t;PD._edAb=t;return '<div class="pdt-ov"><form class="pd-edf'+(ent?' ent':'')+'" id="pd-edf"><h3>'+(t.id?'Editar tarefa':'Nova tarefa')+'</h3>'+
   '<label>O que fazer<textarea id="pde-t" rows="3" maxlength="300">'+esc(t.titulo||'')+'</textarea></label>'+
   '<label>Cliente<input id="pde-cl" list="pd-cls" placeholder="'+(pdClientes().length?'Comece a digitar o nome do cliente':'Você ainda não tem clientes cadastrados')+'" maxlength="120" autocomplete="off" value="'+esc(t.cliente||'')+'"><datalist id="pd-cls">'+pdClientes().map(function(n){return '<option value="'+esc(n)+'">';}).join('')+'</datalist></label>'+
   '<button type="button" class="pd-urgb'+(t.urgente?' on':'')+'" data-pd="edurg" aria-pressed="'+!!t.urgente+'">🔥 '+(t.urgente?'Urgente — marcado':'Marcar como urgente')+'</button>'+
