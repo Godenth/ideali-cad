@@ -5684,7 +5684,7 @@ function anaEntende(txt){var raw=String(txt||'').trim();if(!raw)return null;var 
   var matG=null;ANA_MAT.forEach(function(x){if(!matG&&x[0].test(t))matG=x[1];});
   segs.forEach(function(sg){var base=anaTrabTipo(sg),ds=anaDentes(sg.replace(/\bcor\b\s*\S+/,'').replace(/\b\d{1,2}\/\d{1,2}(\/\d{2,4})?\b/g,'').replace(/\bdia\s+\d{1,2}\b/,'').replace(/\bem\s+\d{1,2}\s+dias?\b/,''));
     if(!base&&!ds.length)return;var mat=null;ANA_MAT.forEach(function(x){if(!mat&&x[0].test(sg))mat=x[1];});mat=mat||matG;
-    var impl=/implant/.test(sg)&&!/sobre dente/.test(sg),qn=(sg.match(/\b(\d{1,2})\s+(coroas|facetas|laminados|onlays|elementos|provisorios|unidades)\b/)||[])[1];
+    var impl=/implant|\bpilar\b|\bideale\b|grand? ?morse/.test(sg)&&!/sobre dente/.test(sg),qn=(sg.match(/\b(\d{1,2})\s+(coroas|facetas|laminados|onlays|elementos|provisorios|unidades)\b/)||[])[1];
     var serv=anaServ(sg,base,mat,impl),trab=serv||[base||'Trabalho',mat?'de '+mat:'',impl?'sobre implante':''].filter(Boolean).join(' ');
     var it={trabalho:trab,daTabela:!!serv,dentes:ds,qtd:ds.length||(qn?+qn:1),material:mat||'',sobre_implante:impl,componente:impl&&comp?anaCap(comp):''};
     var s=pedServ(it.trabalho);it.valor=s&&s.valor!=null?Math.round(s.valor*it.qtd*100)/100:null;it.prazoTab=s&&s.prazo!=null?pedUteis(s.prazo):null;res.itens.push(it);});
