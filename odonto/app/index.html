@@ -2670,6 +2670,18 @@ body.pe-trava{overflow:hidden}
 .epa>img{max-width:min(1100px,100%);max-height:calc(100vh - 190px);object-fit:contain;border-radius:12px}
 .epa-n{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:2rem;cursor:pointer}.epa-n.p{left:16px}.epa-n.n{right:16px}
 .epa-th{display:flex;gap:8px;overflow:auto;max-width:100%}.epa-th button{width:64px;height:64px;border-radius:10px;border:2px solid transparent;padding:0;overflow:hidden;background:#111;cursor:pointer;opacity:.6}.epa-th button.on{border-color:#3B82F6;opacity:1}.epa-th img{width:100%;height:100%;object-fit:cover}
+
+.cat{width:min(1000px,100%)}.cat-c{padding:0 22px 22px;display:grid;gap:14px}
+.cat-g{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:10px;overflow-x:auto}.cat-gh{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cat-t{border-collapse:separate;border-spacing:6px;font-size:.88rem}.cat-t th{font-weight:700;color:var(--muted);text-align:left;white-space:nowrap}
+.cat-t td span{display:inline-block;background:color-mix(in srgb,#64748B 18%,transparent);border-radius:999px;padding:5px 11px;font-family:ui-monospace,Menlo,monospace;font-weight:700}
+.cat-in input{width:96px;padding:7px 9px;border-radius:9px;border:1.5px solid var(--line);background:transparent;color:inherit;font:600 .85rem ui-monospace,Menlo,monospace}
+.cat-ed{border:2px solid #2563EB;border-radius:16px;padding:14px;display:grid;gap:10px}.cat-ed h3{margin:0}
+.cat-ef{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cat-ef label{display:grid;gap:4px;font-size:.8rem;font-weight:600;color:var(--muted)}.cat-ef .cat-w{grid-column:span 3}
+.cat-ef input{padding:9px 11px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-weight:500}
+.cat-seed{display:grid;gap:6px;justify-items:start;border:1px dashed var(--line);border-radius:14px;padding:14px}
+#cat-raiz .epf-ov{position:fixed;inset:0;z-index:200;background:rgba(5,8,20,.62);backdrop-filter:blur(3px);display:grid;place-items:center;padding:18px}
+@media(max-width:700px){.cat-ef{grid-template-columns:1fr}.cat-ef .cat-w{grid-column:auto}#cat-raiz .epf-ov{padding:0;place-items:stretch}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -6714,7 +6726,7 @@ function exoSaudacao(){var h=new Date().getHours();return h<12?'Bom dia':h<18?'B
 function exoEmailTxt(p){var R=p._exo,ds=(String(Array.isArray(p.dentes)?p.dentes.join(', '):p.dentes||'')).trim(),L=[];
   L.push(exoSaudacao()+', Mari! Tudo bem?','','Segue mais um pedido:','');
   L.push('Cliente: '+pedCli(p));if(p.paciente)L.push('Paciente: '+p.paciente);
-  if(R){oaResumo(exoArcada(R)).forEach(function(r){var t=R.dentes.filter(function(z){return z.n===r.ds[0];})[0];L.push('Elemento'+(r.u?'s ':' ')+r.txt+(r.u?' (unidos)':'')+': '+(EXO_REC[t.rec]||t.rec)+(t.mat?' em '+t.mat:'')+(t.imp?' sobre implante':''));if(t.imp){L.push('   Implante / base: '+t.imp.replace(/^implante \(|\)$/g,''));L.push('   Scanbody: '+(t.sb?'sim, escaneado no caso':'não veio escaneamento de scanbody'));}});}
+  if(R){oaResumo(exoArcada(R)).forEach(function(r){var t=R.dentes.filter(function(z){return z.n===r.ds[0];})[0];L.push('Elemento'+(r.u?'s ':' ')+r.txt+(r.u?' (unidos)':'')+': '+(EXO_REC[t.rec]||t.rec)+(t.mat?' em '+t.mat:'')+(t.imp?' sobre implante':''));if(t.imp){L.push('   Implante / base: '+t.imp.replace(/^implante \(|\)$/g,''));L.push('   Scanbody: '+(t.sb?'sim, escaneado no caso':'não veio escaneamento de scanbody'));try{catAcha(t).L.forEach(function(r){L.push('   Código '+r.peca+(r.marca?' '+r.marca:'')+': '+r.codigo+' ('+(r.detalhe?r.detalhe+' ':'')+'Ø'+catFmt(r.diametro)+(r.altura!=null?' · '+catFmt(r.altura)+' mm':'')+')');});}catch(e){}}});}
   else{if(p.trabalho)L.push('Trabalho: '+p.trabalho);if(ds)L.push('Elemento'+(ds.indexOf(',')>=0?'s':'')+': '+ds);if(p.material)L.push('Material: '+p.material);if(p.sobre_implante===true||p.sobre_implante==='true')L.push('Sobre implante'+(p.componente?': '+p.componente:''));}
   var cor=(R&&R.cor)||p.cor;if(cor)L.push('Cor: '+cor);if(p.componente&&R)L.push('Componente: '+p.componente);if(p.prazo)L.push('Prazo: '+String(p.prazo).split('-').reverse().join('/'));if(p.urgente===true||p.urgente==='true')L.push('⚠️ URGENTE');if(p.obs)L.push('Observações: '+p.obs);
   L.push('','Os arquivos do caso seguem em anexo.','Qualquer dúvida, estou à disposição.','','Att.,','Ana · Agente de Inteligência Artificial','Ideali Lab');
@@ -9028,7 +9040,7 @@ function pvfBase(n){return String(n).split('/').pop();}
 function exoConstr(txt){var x=new DOMParser().parseFromString(txt,'text/xml'),M={};
   [].forEach.call(x.getElementsByTagName('Tooth'),function(t){var n=+((t.getElementsByTagName('Number')[0]||{}).textContent||0);if(!n)return;
     var g=function(k){var e=t.getElementsByTagName(k)[0];return e?String(e.textContent||'').trim():'';},lib=g('ImplantLibraryEntryDisplayInformation')||g('ImplantLibraryEntryDescriptor');
-    if(lib)M[n]={lib:lib.replace(/®|™/g,'').replace(/\s*\((?:local milling|central milling)\)/i,'').split(/\s*:\s*/).filter(Boolean).join(' · '),paraf:g('IsScrewRetained')==='true'};});
+    if(lib)M[n]={raw:g('ImplantLibraryEntryDescriptor')+' '+g('FilenameImplantGeometry')+' '+g('ImplantLibraryEntryDisplayInformation'),lib:lib.replace(/®|™/g,'').replace(/\s*\((?:local milling|central milling)\)/i,'').split(/\s*:\s*/).filter(Boolean).join(' · '),paraf:g('IsScrewRetained')==='true'};});
   [].forEach.call(x.getElementsByTagName('PartType'),function(e){if(String(e.textContent).trim()!=='ScanAbutmentScan')return;var nm=(e.parentNode.getElementsByTagName('PartName')[0]||{}).textContent||'',m=nm.match(/Dente\s+(\d{2})|Tooth\s+(\d{2})/i);
     var n=m?+(m[1]||m[2]):0;if(n){M[n]=M[n]||{};M[n].sb=true;}else Object.keys(M).forEach(function(k){M[k].sb=true;});});
   return M;}
@@ -9043,7 +9055,7 @@ function pvfLe(p,file){var F=pvfDe(p.id);F.lendo=true;F.erro='';pvPinta();
     F.html=h?{nome:pvfBase(h),tam:arq[h].length,f:new File([arq[h]],pvfBase(h),{type:'text/html'})}:null;
     F.exo=null;F.exoNome='';if(dp){try{F.exo=exoLeProjeto(new TextDecoder('utf-8').decode(arq[dp]));F.exoNome=pvfBase(dp);}catch(e){F.erro='Achei o projeto, mas não consegui ler.';}}
     var ci=nomes.filter(function(n){return /\.constructioninfo$/i.test(n);})[0];
-    if(F.exo&&ci){try{var CM=exoConstr(new TextDecoder('utf-8').decode(arq[ci]));F.exo.dentes.forEach(function(t){var c=CM[t.n];if(!c)return;if(c.lib)t.imp=c.lib+(c.paraf?' (parafusada)':'');if(c.sb)t.sb=true;});}catch(e){}}
+    if(F.exo&&ci){try{var CM=exoConstr(new TextDecoder('utf-8').decode(arq[ci]));F.exo.dentes.forEach(function(t){var c=CM[t.n];if(!c)return;if(c.lib){t.imp=c.lib+(c.paraf?' (parafusada)':'');t.libRaw=c.raw;}if(c.sb)t.sb=true;});}catch(e){}}
     else F.erro='Não achei o arquivo .dentalProject dentro do zip.';
     F.lendo=false;F._hid=true;pvPinta();pvfSalva(p);toast('Li o Dental CAD: '+F.stls.filter(function(s){return s.ok;}).length+' STL de fresagem'+(F.html?', HTML':'')+(F.exo?' e o projeto do exocad':'')+'.');
   }).catch(function(){F.lendo=false;F.erro='Não consegui abrir esse arquivo. Envie o .zip do caso.';pvPinta();});}
@@ -9059,7 +9071,9 @@ function pvfImplante(p,R){var imp=R.dentes.filter(function(t){return t.imp;});if
   return {ok:bate&&!!p.sobre_implante,txt:'Implante no projeto: '+nomes.join(', ')+' · dentes '+imp.map(function(t){return t.n;}).join(', ')+(sb?' · com scanbody':' · sem scanbody')+'. No pedido: '+(p.sobre_implante?(comp||'sobre implante, sem componente anotado'):'não está marcado como sobre implante')+'.'};}
 function pvfCards(p){var F=pvfHidrata(p),R=F.exo,stl=F.stls.some(function(s){return s.ok;});
   var conf='';if(R){var L=[];try{L=exoConfere(p,R);}catch(e){}var im=pvfImplante(p,R),ruins=L.filter(function(x){return x[0]!=='✅'&&!(im&&/implante/i.test(x[1]));});
-    conf='<div class="pvf-conf">'+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+
+    var catL=R.dentes.filter(function(t){return t.imp;}).map(function(t){var A=catAcha(t),q=A.q;if(!q.linha||q.dia==null)return '';
+      return A.L.length?'<div class="pvf-im ok">📦 Dente '+t.n+': '+A.L.map(function(r){return esc(catTxt(r))+' → <b>cód. '+esc(r.codigo)+'</b>';}).join('<br>')+'</div>':'<div class="pvf-dif">📦 Dente '+t.n+': '+esc(q.linha+' Ø'+catFmt(q.dia)+(q.alt!=null?' · '+catFmt(q.alt)+' mm':''))+' não está no seu catálogo. <button class="pvf-lk" data-act="catAbre">Abrir catálogo</button></div>';}).join('');
+    conf='<div class="pvf-conf">'+catL+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+
       (ruins.length?ruins.map(function(x){return '<div class="pvf-dif">'+x[0]+' <b>'+x[1]+':</b> '+esc(x[2])+'</div>';}).join('')+'<button class="pvf-lk" data-pvf="aplica">Usar dados do projeto no pedido</button>':(im&&!im.ok?'':'<div class="pvf-im ok">✅ O projeto confere com o pedido.</div>'))+'</div>';}
   var chip=function(on,txt,baixa,ver){return on?'<span class="pvf-ok">✅ '+txt+(ver?'<button data-pvb="'+ver+'" title="Visualizar">👁 Ver</button>':'')+'<button data-pvb="'+baixa+'" title="Baixar">⬇ Baixar</button></span>':'';};
   return '<div class="pvf2">'+
@@ -9318,6 +9332,70 @@ ACT.epfAbre=epfAbre;
 /* item no menu do avatar da Rede */
 var _rsTopoEP=rsTopo;rsTopo=function(){var h=_rsTopoEP.apply(this,arguments);if(!epfTem())return h;
   return h.replace('<button role="menuitem" data-act="rAvVai" data-v="perfil">','<button role="menuitem" data-act="epfAbre">🏢 Editar minha empresa</button><button role="menuitem" data-act="rAvVai" data-v="perfil">');};
+
+/* ===== Catálogo de componentes (tabela odo_catalogo, ver 090): linha × diâmetro × altura → código do fabricante.
+   Ao ler o Dental CAD, acha o código da base/scanbody e manda escrito no e-mail. ===== */
+var CAT={L:[],ok:false,carregando:false,on:false,ed:null};
+var CAT_SEED=[
+  {marca:'Neodent',linha:'HE',peca:'Base de titânio',detalhe:'HE Antirrotacional',dias:[3.3,4.1,5.0],alts:[0.5,2.0],
+   cod:[['135.009','135.010'],['135.017','135.018'],['135.025','135.026']]},
+  {marca:'Neodent',linha:'GM',peca:'Base de titânio',detalhe:'GM Exact com parafuso removível 4 mm',dias:[3.5,4.5,5.5,6.5],alts:[0.8,1.5,2.5,3.5,4.5],
+   cod:[['135.355','135.356','135.357','135.358','135.359'],['135.367','135.368','135.369','135.370','135.371'],['135.379','135.380','135.381','135.382','135.383'],['','135.391','135.392','135.393','135.394']]}];
+function catFmt(n){return n==null?'':String(Number(n)).replace('.',',');}
+function catCarrega(forca){if(typeof RL==='undefined'||!RL.user||CAT.carregando||(CAT.ok&&!forca))return;CAT.carregando=true;
+  SB.from('odo_catalogo').select('*').order('linha').then(function(r){CAT.carregando=false;CAT.ok=true;CAT.erro=r.error?(/odo_catalogo/.test(r.error.message||'')?'Falta rodar a atualização 090 no banco.':'Não consegui carregar o catálogo.'):'';CAT.L=r.data||[];catPinta();try{pvPinta();}catch(e){}});}
+/* lê linha, diâmetro e altura do texto do exocad (ex.: "GM Titanium Base 3.5 IO · D3.5 4x0.8" / "Base_GM-D35-AH40-GH08") */
+function catLe(t){var s=String((t&&(t.libRaw||''))+' '+(t&&t.imp||'')),u=s.toUpperCase(),o={};
+  o.linha=/\bGM\b|GRAND ?MORSE/.test(u)?'GM':/\bHE\b|HEX\w* ?EXT/.test(u)?'HE':/\bHI\b|HEX\w* ?INT/.test(u)?'HI':/CONE ?MORSE|\bCM\b/.test(u)?'CM':'';
+  var m=s.match(/\bD(\d+(?:[.,]\d+)?)\s+\d+(?:[.,]\d+)?x(\d+(?:[.,]\d+)?)/i);if(m){o.dia=+m[1].replace(',','.');o.alt=+m[2].replace(',','.');}
+  if(o.dia==null){var d=u.match(/-D(\d)(\d)\b/);if(d)o.dia=+(d[1]+'.'+d[2]);}
+  if(o.alt==null){var g=u.match(/GH(\d)(\d)\b/);if(g)o.alt=+(g[1]+'.'+g[2]);}
+  return o;}
+function catAcha(t){var q=catLe(t);if(!q.linha||q.dia==null)return {q:q,L:[]};
+  return {q:q,L:CAT.L.filter(function(r){return String(r.linha).toUpperCase()===q.linha&&Math.abs(+r.diametro-q.dia)<.06&&(r.altura==null||q.alt==null||Math.abs(+r.altura-q.alt)<.06);})};}
+function catTxt(r){return r.peca+(r.detalhe?' '+r.detalhe:'')+(r.marca?' ('+r.marca+')':'')+' Ø'+catFmt(r.diametro)+(r.altura!=null?' · '+catFmt(r.altura)+' mm':'');}
+/* tela do catálogo */
+function catGrupos(){var G={},ord=[];CAT.L.forEach(function(r){var k=[r.marca,r.linha,r.peca,r.detalhe].join('|');if(!G[k]){G[k]={marca:r.marca,linha:r.linha,peca:r.peca,detalhe:r.detalhe,rows:[]};ord.push(k);}G[k].rows.push(r);});return ord.map(function(k){return G[k];});}
+function catTab(g){var dias=[],alts=[];g.rows.forEach(function(r){if(dias.indexOf(+r.diametro)<0)dias.push(+r.diametro);if(r.altura!=null&&alts.indexOf(+r.altura)<0)alts.push(+r.altura);});dias.sort(function(a,b){return a-b;});alts.sort(function(a,b){return a-b;});
+  var c=function(d,a){var r=g.rows.filter(function(x){return +x.diametro===d&&(a==null?x.altura==null:+x.altura===a);})[0];return r?r.codigo:'';};
+  return '<table class="cat-t"><tr><th></th>'+(alts.length?alts.map(function(a){return '<th>'+catFmt(a)+' mm</th>';}).join(''):'<th>Código</th>')+'</tr>'+dias.map(function(d){return '<tr><th>Ø '+catFmt(d)+'</th>'+(alts.length?alts.map(function(a){var v=c(d,a);return '<td>'+(v?'<span>'+esc(v)+'</span>':'—')+'</td>';}).join(''):'<td><span>'+esc(c(d,null))+'</span></td>')+'</tr>';}).join('')+'</table>';}
+function catEdHtml(){var E=CAT.ed;return '<div class="cat-ed"><h3>'+(E._velho?'Editar tabela':'Nova tabela')+'</h3>'+
+  '<div class="cat-ef"><label>Marca<input data-ce="marca" value="'+esc(E.marca)+'" placeholder="Neodent"></label><label>Linha<input data-ce="linha" list="cat-ls" value="'+esc(E.linha)+'" placeholder="GM, HE, HI, CM"><datalist id="cat-ls"><option value="GM"><option value="HE"><option value="HI"><option value="CM"></datalist></label>'+
+  '<label>Peça<input data-ce="peca" list="cat-ps" value="'+esc(E.peca)+'" placeholder="Base de titânio"><datalist id="cat-ps"><option value="Base de titânio"><option value="Scanbody"><option value="Mini pilar"><option value="Munhão"><option value="Análogo"></datalist></label>'+
+  '<label class="cat-w">Descrição<input data-ce="detalhe" value="'+esc(E.detalhe)+'" placeholder="GM Exact com parafuso removível 4 mm"></label>'+
+  '<label>Diâmetros (Ø)<input data-ce="dias" value="'+esc(E.dias.map(catFmt).join('; '))+'" placeholder="3,5; 4,5; 5,5"></label><label>Alturas (mm)<input data-ce="alts" value="'+esc(E.alts.map(catFmt).join('; '))+'" placeholder="0,8; 1,5; 2,5 (vazio = sem altura)"></label></div>'+
+  '<button class="btn sm" data-cat="grade">Montar a grade</button>'+
+  (E.dias.length?'<table class="cat-t cat-in"><tr><th></th>'+(E.alts.length?E.alts.map(function(a){return '<th>'+catFmt(a)+' mm</th>';}).join(''):'<th>Código</th>')+'</tr>'+E.dias.map(function(d,i){return '<tr><th>Ø '+catFmt(d)+'</th>'+(E.alts.length?E.alts:[null]).map(function(a,j){return '<td><input data-cc="'+i+'_'+j+'" value="'+esc((E.cod[i]||[])[j]||'')+'" placeholder="código"></td>';}).join('')+'</tr>';}).join('')+'</table>':'')+
+  '<div class="row" style="gap:8px"><span class="spacer"></span><button class="btn" data-cat="edx">Cancelar</button><button class="btn pri" data-cat="salva">Salvar tabela</button></div></div>';}
+function catHtml(){var G=catGrupos();
+  return '<div class="epf-ov" data-cat="fora"><div class="epf cat" role="dialog" aria-modal="true" aria-label="Catálogo de componentes"><header class="epf-h"><div><small>Pedidos</small><h2>📚 Catálogo de componentes</h2><span class="muted small">Quando você anexa o Dental CAD, o sistema acha aqui o código da base/scanbody e manda escrito no e-mail.</span></div><span class="spacer"></span><button class="btn pri" data-cat="nova">+ Nova tabela</button><button class="pv-x" data-cat="fecha" aria-label="Fechar">✕</button></header>'+
+  '<div class="cat-c">'+(CAT.erro?'<p class="pd-er">'+esc(CAT.erro)+'</p>':'')+(CAT.ed?catEdHtml():'')+
+  (!CAT.L.length&&!CAT.ed&&!CAT.erro?'<div class="cat-seed"><b>Começar com as tabelas que você mandou?</b><span class="muted small">Neodent · Base de titânio HE Antirrotacional e GM Exact com parafuso removível 4 mm.</span><button class="btn pri" data-cat="seed">Adicionar as 2 tabelas</button></div>':'')+
+  G.map(function(g,i){return '<section class="cat-g"><div class="cat-gh"><b>'+esc(g.peca+(g.detalhe?' '+g.detalhe:''))+'</b><span class="muted small">'+esc((g.marca||'Sem marca')+' · linha '+g.linha)+'</span><span class="spacer"></span><button class="btn sm" data-cat="edita" data-v="'+i+'">Editar</button><button class="btn sm danger" data-cat="apaga" data-v="'+i+'">Apagar</button></div>'+catTab(g)+'</section>';}).join('')+
+  '</div></div></div>';}
+function catPinta(){var el=document.getElementById('cat-raiz');if(CAT.on){if(!el){el=document.createElement('div');el.id='cat-raiz';document.body.appendChild(el);}var sc=el.querySelector('.cat'),t=sc?sc.scrollTop:0;el.innerHTML=catHtml();var n=el.querySelector('.cat');if(n)n.scrollTop=t;document.body.classList.add('pe-trava');}
+  else if(el){el.remove();if(!document.getElementById('pv-raiz'))document.body.classList.remove('pe-trava');}}
+function catNum(v){return String(v||'').split(/[;\s]+/).map(function(x){return parseFloat(x.replace(',','.'));}).filter(function(x){return !isNaN(x);});}
+function catLeEd(){var E=CAT.ed;if(!E)return;[].forEach.call(document.querySelectorAll('[data-ce]'),function(i){var k=i.getAttribute('data-ce');if(k==='dias'||k==='alts')E['_'+k]=i.value;else E[k]=i.value.trim();});
+  [].forEach.call(document.querySelectorAll('[data-cc]'),function(i){var p=i.getAttribute('data-cc').split('_');E.cod[+p[0]]=E.cod[+p[0]]||[];E.cod[+p[0]][+p[1]]=i.value.trim();});}
+function catGrava(G){/* G = {marca,linha,peca,detalhe,dias,alts,cod}; troca as linhas do grupo */
+  var rows=[];G.dias.forEach(function(d,i){(G.alts.length?G.alts:[null]).forEach(function(a,j){var c=((G.cod[i]||[])[j]||'').trim();if(c)rows.push({marca:G.marca||'',linha:G.linha,peca:G.peca,detalhe:G.detalhe||'',diametro:d,altura:a,codigo:c.slice(0,40)});});});
+  var apaga=G._velho?SB.from('odo_catalogo').delete().in('id',G._velho):Promise.resolve({});
+  return Promise.resolve(apaga).then(function(){return rows.length?SB.from('odo_catalogo').insert(rows):{};}).then(function(r){if(r&&r.error)throw r.error;});}
+document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-cat]');if(!b)return;var k=b.getAttribute('data-cat');if(k==='fora'&&ev.target!==b)return;ev.preventDefault();ev.stopPropagation();
+  if(k==='fecha'||k==='fora'){CAT.on=false;CAT.ed=null;catPinta();return;}
+  if(k==='nova'){CAT.ed={marca:'Neodent',linha:'',peca:'Base de titânio',detalhe:'',dias:[],alts:[],cod:[]};}
+  else if(k==='edita'){var g=catGrupos()[+b.getAttribute('data-v')],dias=[],alts=[];g.rows.forEach(function(r){if(dias.indexOf(+r.diametro)<0)dias.push(+r.diametro);if(r.altura!=null&&alts.indexOf(+r.altura)<0)alts.push(+r.altura);});dias.sort(function(a,b){return a-b;});alts.sort(function(a,b){return a-b;});
+    CAT.ed={marca:g.marca,linha:g.linha,peca:g.peca,detalhe:g.detalhe,dias:dias,alts:alts,cod:dias.map(function(d){return (alts.length?alts:[null]).map(function(a){var r=g.rows.filter(function(x){return +x.diametro===d&&(a==null?x.altura==null:+x.altura===a);})[0];return r?r.codigo:'';});}),_velho:g.rows.map(function(r){return r.id;})};}
+  else if(k==='apaga'){var g2=catGrupos()[+b.getAttribute('data-v')];if(!confirm('Apagar a tabela "'+g2.peca+' '+g2.detalhe+'"?'))return;SB.from('odo_catalogo').delete().in('id',g2.rows.map(function(r){return r.id;})).then(function(){catCarrega(true);});return;}
+  else if(k==='edx'){CAT.ed=null;}
+  else if(k==='grade'){catLeEd();var E=CAT.ed;E.dias=catNum(E._dias);E.alts=catNum(E._alts);}
+  else if(k==='salva'){catLeEd();var E2=CAT.ed;if(E2._dias!=null)E2.dias=catNum(E2._dias);if(E2._alts!=null)E2.alts=catNum(E2._alts);if(!E2.linha||!E2.peca||!E2.dias.length){toast('Preencha linha, peça e diâmetros.');return;}
+    catGrava(E2).then(function(){CAT.ed=null;toast('Tabela salva. ✅');catCarrega(true);},function(e){toast(/odo_catalogo/.test((e&&e.message)||'')?'Falta rodar a atualização 090 no banco.':'Não consegui salvar agora.');});return;}
+  else if(k==='seed'){CAT_SEED.reduce(function(p,g){return p.then(function(){return catGrava(g);});},Promise.resolve()).then(function(){toast('Tabelas adicionadas. ✅');catCarrega(true);},function(e){toast(/odo_catalogo/.test((e&&e.message)||'')?'Falta rodar a atualização 090 no banco.':'Não consegui salvar agora.');});return;}
+  catPinta();},true);
+ACT.catAbre=function(){CAT.on=true;catCarrega(true);catPinta();};
+var _rPedidosCat=rPedidos;rPedidos=function(){var h=_rPedidosCat.apply(this,arguments);try{catCarrega();}catch(e){}return h.replace('<button class="btn" data-act="pedCadistas">','<button class="btn" data-act="catAbre">📚 Catálogo</button><button class="btn" data-act="pedCadistas">');};
 
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
