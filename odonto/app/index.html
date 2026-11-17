@@ -9071,7 +9071,12 @@ function pvfImplante(p,R){var imp=R.dentes.filter(function(t){return t.imp;});if
   return {ok:bate&&!!p.sobre_implante,txt:'Implante no projeto: '+nomes.join(', ')+' · dentes '+imp.map(function(t){return t.n;}).join(', ')+(sb?' · com scanbody':' · sem scanbody')+'. No pedido: '+(p.sobre_implante?(comp||'sobre implante, sem componente anotado'):'não está marcado como sobre implante')+'.'};}
 function pvfCards(p){var F=pvfHidrata(p),R=F.exo,stl=F.stls.some(function(s){return s.ok;});
   var conf='';if(R){var L=[];try{L=exoConfere(p,R);}catch(e){}var im=pvfImplante(p,R),ruins=L.filter(function(x){return x[0]!=='✅'&&!(im&&/implante/i.test(x[1]));});
+    try{catCarrega();}catch(e){}
     var catL=R.dentes.filter(function(t){return t.imp;}).map(function(t){var A=catAcha(t),q=A.q;if(!q.linha||q.dia==null)return '';
+      var qt=esc(q.linha+' Ø'+catFmt(q.dia)+(q.alt!=null?' · '+catFmt(q.alt)+' mm':''));
+      if(!CAT.ok)return '<div class="pvf-im">📦 Dente '+t.n+': '+qt+' · procurando no catálogo…</div>';
+      if(CAT.erro)return '<div class="pvf-dif">📦 Dente '+t.n+': '+esc(CAT.erro)+'</div>';
+      if(!CAT.L.length)return '<div class="pvf-dif">📦 Dente '+t.n+': '+qt+'. Seu catálogo ainda está vazio. <button class="pvf-lk" data-act="catAbre">Abrir catálogo e adicionar as tabelas</button></div>';
       return A.L.length?'<div class="pvf-im ok">📦 Dente '+t.n+': '+A.L.map(function(r){return esc(catTxt(r))+' → <b>cód. '+esc(r.codigo)+'</b>';}).join('<br>')+'</div>':'<div class="pvf-dif">📦 Dente '+t.n+': '+esc(q.linha+' Ø'+catFmt(q.dia)+(q.alt!=null?' · '+catFmt(q.alt)+' mm':''))+' não está no seu catálogo. <button class="pvf-lk" data-act="catAbre">Abrir catálogo</button></div>';}).join('');
     conf='<div class="pvf-conf">'+catL+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+
       (ruins.length?ruins.map(function(x){return '<div class="pvf-dif">'+x[0]+' <b>'+x[1]+':</b> '+esc(x[2])+'</div>';}).join('')+'<button class="pvf-lk" data-pvf="aplica">Usar dados do projeto no pedido</button>':(im&&!im.ok?'':'<div class="pvf-im ok">✅ O projeto confere com o pedido.</div>'))+'</div>';}
