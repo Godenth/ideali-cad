@@ -5674,8 +5674,8 @@ function anaNomesDentes(t){t=String(t||'');
   return t;}
 function anaEntende(txt){var raw=String(txt||'').trim();if(!raw)return null;var t=semAc(raw).replace(/\s+/g,' '),tl=raw.replace(/\s+/g,' ');t=anaNomesDentes(t);
   var res={cliente:anaCliente(t),paciente:'',cor:'',prazo:anaPrazo(t),urgente:/urgent|correndo|prioridade/.test(t),tipo:/analogic|bancada/.test(t)?'analogico':null,itens:[]};
-  var mp=tl.match(/\b(?:paciente|pac\.?)\s*:?\s+([A-Za-zÀ-ÿ']+(?:\s+(?!coroa|faceta|elemento|dente|cor\b|côr\b|sobre|em\b|dia\b|pra\b|para\b|ate\b|até\b|urgente|protocolo|onlay|inlay|provis|pr[oó]tese|portese|parcial|ppf\b|ppr\b|ponte|placa|n[uú]cleo|guia|barra|coping|modelo|enceramento|total\b|de\s+(?:zirc|e\.?max|resina))[A-Za-zÀ-ÿ']+){0,3})/i);if(mp)res.paciente=anaCap(mp[1].replace(/\s+(e|com|para|pra|do|da)$/i,''));
-  var mc=t.match(/\bcor\s*:?\s*([a-d]\s?[1-4](?:[.,]5)?|bl\s?[1-4]|\d\s?m\s?\d(?:[.,]5)?)/)||t.match(/\b([a-d][1-4](?:[.,]5)?)\b/);if(mc)res.cor=mc[1].replace(/\s/g,'').toUpperCase().replace(',','.');
+  var mp=tl.match(/\b(?:paciente|pac\.?)\s*:?\s+([A-Za-zÀ-ÿ']+(?:\s+(?!coroa|faceta|elemento|dente|cor\b|côr\b|sobre|em\b|dia\b|pra\b|para\b|ate\b|até\b|urgente|protocolo|onlay|inlay|provis|pr[oó]tese|portese|parcial|ppf\b|ppr\b|ponte|placa|n[uú]cleo|guia|barra|coping|modelo|enceramento|total\b|de\s+(?:zirc|e\.?max|resina))[A-Za-zÀ-ÿ']+){0,5})/i);if(mp)res.paciente=anaCap(mp[1].replace(/\s+(e|com|para|pra|do|da)$/i,''));
+  var mc=t.match(/\bcor\s*[:\-–—=]?\s*([a-d]\s?[1-4](?:[.,]5)?|bl\s?[1-4]|\d\s?m\s?\d(?:[.,]5)?)/)||t.match(/\b([a-d][1-4](?:[.,]5)?)\b/);if(mc)res.cor=mc[1].replace(/\s/g,'').toUpperCase().replace(',','.');
   var comp=(t.match(/\b(ti ?base|tibase|multi ?unit|mini ?pilar|munh[aã]o|ucla|link)\b[^,;.]{0,30}/)||[''])[0];
   /* separa os trabalhos: cada palavra de trabalho abre um item */
   var re=new RegExp(ANA_TRAB.map(function(x){return x[0].source;}).join('|'),'g'),pos=[],m;while((m=re.exec(t))){pos.push(m.index);}
@@ -7493,9 +7493,14 @@ function pclAbre(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espe
 function pclSemCli(txt,cl){if(!cl)return txt;var nw=semAc(cl.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}),ws=String(txt).split(/\s+/),out=[];
   ws.forEach(function(w){var k=semAc(w).replace(/[^a-z0-9]/g,'');if(nw.indexOf(k)>=0){if(out.length&&/^dra?\.?$/i.test(out[out.length-1]))out.pop();return;}out.push(w);});return out.join(' ');}
 function pclSoPaciente(cl,pac){/* o cliente "achado" é só o nome do paciente? então não é cliente */if(!cl||!pac)return false;var pw=semAc(pac).split(/[^a-z0-9]+/);return semAc(cl.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).some(function(w){return pw.indexOf(w)>=0;});}
-function pclTudo(v){v=String(v).replace(/\bspbre\b/gi,'sobre').replace(/\bsorbe\b/gi,'sobre');var seg=v.split(/[,;]/),r0=anaEntende(v),pac0=r0&&r0.paciente||'',ehPac=/^\s*(?:paciente|pac\.?)\b/i.test(seg[0]),a1=pclAcha(seg[0]).filter(function(c){var t=' '+semAc(seg[0]).replace(/[^a-z0-9]+/g,' ')+' ';return semAc(c.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).every(function(w){return t.indexOf(' '+w+' ')>=0;});}),cl=a1.length===1?a1[0]:null;
+function pclInteiro(c,txt){/* vale como cliente se o nome inteiro está no texto, ou pelo menos 2 palavras dele (ex.: "Dr Luiz Moreira") */var t=' '+semAc(txt).replace(/[^a-z0-9]+/g,' ')+' ';var ws=semAc(String(c.nome).replace(/\(.*?\)/g,'')).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3&&!/^(dra?|clinica|odonto|odontologia)$/.test(w);}),n=ws.filter(function(w){return t.indexOf(' '+w+' ')>=0;}).length;return ws.length?(n===ws.length||n>=2):false;}
+function pclTudo(v){v=String(v).replace(/\bspbre\b/gi,'sobre').replace(/\bsorbe\b/gi,'sobre')
+  .replace(/^\s*(?:nome(?:\s+do\s+paciente)?|pct)\s*[:\-–]\s*/i,'paciente ')/* "Nome: Fulano" no começo = paciente */
+  .replace(/(\d)\s+(?:barra|\/)\s+(?=[a-zà-ÿ])/gi,'$1, obs ')/* "23 barra square" = "23 / square": o resto é observação */;
+  var obsX='';v=v.replace(/,\s*obs\s+([^,;]+)/i,function(m,o){obsX=o.trim();return '';});var seg=v.split(/[,;]/),r0=anaEntende(v),pac0=r0&&r0.paciente||'',ehPac=/^\s*(?:paciente|pac\.?)\b/i.test(seg[0]),a1=pclAcha(seg[0]).filter(function(c){var t=' '+semAc(seg[0]).replace(/[^a-z0-9]+/g,' ')+' ';return semAc(c.nome).split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}).every(function(w){return t.indexOf(' '+w+' ')>=0;});}),cl=a1.length===1?a1[0]:null;
   var r=cl?anaEntende([pclSemCli(seg[0],cl)].concat(seg.slice(1)).join(',')):r0;if(!r||!r.itens.length)return false;var E=PC.ed;
-  if(!cl&&r.cliente&&!(r.paciente&&pclSoPaciente(r.cliente,r.paciente)))cl=r.cliente;
+  if(!cl&&r.cliente&&pclInteiro(r.cliente,v)&&!(r.paciente&&pclSoPaciente(r.cliente,r.paciente)))cl=r.cliente;
+  if(obsX){PC.ed.obs=((PC.ed.obs?PC.ed.obs+' · ':'')+anaCap(obsX)).slice(0,500);}
   if(r.paciente)r.paciente=pclSemCli(r.paciente,cl).trim();
   if(r.detalhe){var E0=PC.ed;E0.obs=((E0.obs?E0.obs+' · ':'')+anaCap(r.detalhe)).slice(0,500);}
   if(!r.paciente&&cl){/* sem a palavra "paciente": o nome que sobra antes do trabalho/dente é o paciente (ex.: "luizmar schroeder DR LUIZ MOREIRA dente 11…") */

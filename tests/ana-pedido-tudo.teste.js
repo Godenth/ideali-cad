@@ -22,6 +22,10 @@ const casos=[
 // nome que serve para mais de um cliente: pergunta qual
 {const r=await p.evaluate(()=>{RL.user={id:'u'};EMP.cli=[{id:'a',nome:'Dr. Eduardo de Mello Caprio',ativo:true},{id:'b',nome:'Eduardo Santos',ativo:true}];pclAbre();PC.digitando=false;PC.fila=[];pcResposta('eduardo');var o={passo:PC.passo,n:(PC.ed._opc||[]).length};PC.busy=false;pcFecha();return o;});
  const ok=r.passo==='cliente'&&r.n===2;if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU','dois Eduardos',ok?'':JSON.stringify(r));}
+// "Nome:" é o paciente; "Souza" sozinho não pode virar o cliente Alexandre Miranda Souza; cor BL1 com travessão; "23 barra square" = obs
+{const r=await p.evaluate(()=>{RL.user={id:'u'};EMP.cli=[{id:'a',nome:'Alexandre Miranda Souza',ativo:true},{id:'p',nome:'Paulo Pagano',ativo:true}];pclAbre();PC.digitando=false;PC.fila=[];
+  pcResposta('Nome: Antonio Claudio De Souza Mendes cor – BL1 coroa emax 23 barra square');var E=PC.ed,o={passo:PC.passo,cli:E.cli&&E.cli.nome,pac:E.paciente,trab:E.trabalho,d:E.dentes,cor:E.cor,obs:E.obs};PC.busy=false;pcFecha();return o;});
+ const ok=r.passo==='cliente'&&!r.cli&&r.pac==='Antonio Claudio de Souza Mendes'&&r.trab==='Coroa de E.max'&&r.d.join()==='23'&&r.cor==='BL1'&&r.obs==='Square';if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU','Nome: … BL1 … barra square',ok?'':JSON.stringify(r));}
 for(const [v,esp] of casos){const r=await p.evaluate(v=>{RL.user={id:'u'};EMP.cli=[{id:'c1',nome:'Paulo Pagano',ativo:true},{id:'c2',nome:'Orallis',ativo:true}];pclAbre();pclTudo(v);var E=PC.ed,o={cli:E.cli&&E.cli.nome,pac:E.paciente,trab:E.trabalho,d:E.dentes,cor:E.cor};PC.busy=false;pcFecha();return o;},v);
  const ok=JSON.stringify(r)===JSON.stringify(esp);if(!ok)falhas++;console.log(ok?'ok  ':'FALHOU',v,ok?'':'\n   veio '+JSON.stringify(r));}
 console.log(falhas?falhas+' falha(s)':'tudo certo');await b.close();process.exit(falhas?1:0);})();
