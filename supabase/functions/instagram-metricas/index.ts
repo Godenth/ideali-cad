@@ -52,10 +52,13 @@ async function igFetch(path: string, params: Record<string, string>): Promise<an
   }
 }
 
-// Extrai o primeiro valor numérico de um array de insights
+// Extrai valor numérico — suporta formato legado (values[]) e novo (total_value.value)
 function pegarValor(data: InsightItem[] | undefined | null, nome: string): number | null {
   if (!Array.isArray(data)) return null
   const item = data.find((d) => d.name === nome)
+  if (!item) return null
+  const tv = (item as any)?.total_value?.value
+  if (typeof tv === 'number') return tv
   const v = item?.values?.[0]?.value
   return typeof v === 'number' ? v : null
 }
@@ -71,7 +74,8 @@ async function insightsContaDia(
     'reach,profile_views,total_interactions,likes,comments,shares,saves,follows_and_unfollows'
   const metricasBasicas = 'reach,profile_views,total_interactions,likes,comments,shares,saves'
 
-  const base = { period: 'day', since: String(since), until: String(until) }
+  // metric_type=total_value é obrigatório para profile_views, likes, etc. (v27.0+)
+  const base = { period: 'day', metric_type: 'total_value', since: String(since), until: String(until) }
 
   let json = await igFetch(`/${igUserId}/insights`, {
     metric: metricasCompletas,
@@ -96,7 +100,7 @@ async function insightsContaDia(
     curtidas: pegarValor(data, 'likes'),
     comentarios: pegarValor(data, 'comments'),
     compartilhamentos: pegarValor(data, 'shares'),
-    salvamentos: pegarValor(data, 'saves'),
+    salvamentos: pegarValor(data, 'saves') ?? pegarValor(data, 'saved'),
     seguidores_ganhos: pegarValor(data, 'follows_and_unfollows')
   }
 }
@@ -131,7 +135,7 @@ async function coletarPosts(
   for (const m of medias) {
     const tipo =
       m.media_type === 'REEL' ? 'reel' : 'feed'
-    const metricas = ['reach', 'likes', 'comments', 'shares', 'saves', 'total_interactions']
+    const metricas = ['reach', 'likes', 'comments', 'shares', 'saved', 'total_interactions']
     if (tipo === 'reel') {
       metricas.push('ig_reels_avg_watch_time', 'clips_replays_count')
     }
@@ -172,7 +176,7 @@ async function coletarPosts(
       curtidas: pegarValor(data, 'likes') ?? (typeof (m as any).like_count === 'number' ? (m as any).like_count : null),
       comentarios: pegarValor(data, 'comments') ?? (typeof (m as any).comments_count === 'number' ? (m as any).comments_count : null),
       compartilhamentos: pegarValor(data, 'shares'),
-      salvamentos: pegarValor(data, 'saves'),
+      salvamentos: pegarValor(data, 'saved'),
       interacoes: pegarValor(data, 'total_interactions'),
       tempo_medio_reel: tempoMs !== null ? tempoMs / 1000 : null
     }
