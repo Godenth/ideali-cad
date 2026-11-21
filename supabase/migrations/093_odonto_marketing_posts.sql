@@ -1,8 +1,8 @@
--- 093_odonto_marketing_posts.sql
+-- 093_odonto_marketing_posts.sql  (idempotente — pode rodar várias vezes)
 -- Publicação real de posts do Instagram pelo Estúdio da Mika
 
 -- ============================================================
--- 1. Habilitar extensões necessárias
+-- 1. Extensões
 -- ============================================================
 create extension if not exists "pg_cron" with schema pg_catalog;
 create extension if not exists "pg_net" with schema extensions;
@@ -34,9 +34,14 @@ create index if not exists posts_agendados_fila_idx
   where status = 'aprovado';
 
 -- ============================================================
--- 3. RLS — cada cliente vê e mexe só nos seus posts
+-- 3. RLS
 -- ============================================================
 alter table public.posts_agendados enable row level security;
+
+drop policy if exists "pa_select" on public.posts_agendados;
+drop policy if exists "pa_insert" on public.posts_agendados;
+drop policy if exists "pa_update" on public.posts_agendados;
+drop policy if exists "pa_delete" on public.posts_agendados;
 
 create policy "pa_select" on public.posts_agendados
   for select using (cliente_id = auth.uid());
@@ -58,15 +63,18 @@ values (
   'marketing',
   'marketing',
   true,
-  104857600, -- 100 MB
+  104857600,
   array['image/jpeg','image/jpg','image/png','image/webp','video/mp4','video/quicktime','video/mov']
 )
 on conflict (id) do update set
-  public = true,
-  file_size_limit = excluded.file_size_limit,
+  public            = true,
+  file_size_limit   = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
--- Upload: só usuário autenticado, dentro de sua própria pasta
+drop policy if exists "mkt_upload"        on storage.objects;
+drop policy if exists "mkt_read_public"   on storage.objects;
+drop policy if exists "mkt_delete_owner"  on storage.objects;
+
 create policy "mkt_upload" on storage.objects
   for insert to authenticated
   with check (
@@ -74,12 +82,10 @@ create policy "mkt_upload" on storage.objects
     and (storage.foldername(name))[1] = auth.uid()::text
   );
 
--- Leitura pública (Instagram precisa buscar a URL)
 create policy "mkt_read_public" on storage.objects
   for select to anon, authenticated
   using (bucket_id = 'marketing');
 
--- Dono pode apagar sua mídia
 create policy "mkt_delete_owner" on storage.objects
   for delete to authenticated
   using (
@@ -90,9 +96,12 @@ create policy "mkt_delete_owner" on storage.objects
 -- ============================================================
 -- 5. pg_cron: instagram-fila a cada 5 minutos
 -- ============================================================
--- ATENÇÃO: antes de rodar este SQL, defina um segredo aleatório:
---   supabase secrets set CRON_SECRET=coloque_uma_string_aleatoria_longa_aqui
--- Depois substitua COLOQUE_O_CRON_SECRET_ABAIXO pelo mesmo valor:
+-- ATENÇÃO: substitua COLOQUE_O_CRON_SECRET_ABAIXO pelo valor
+-- que você definiu com: supabase secrets set CRON_SECRET=...
+
+select cron.unschedule('instagram-fila-5min')
+  from cron.job
+ where jobname = 'instagram-fila-5min';
 
 select cron.schedule(
   'instagram-fila-5min',
