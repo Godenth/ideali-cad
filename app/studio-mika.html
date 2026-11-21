@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estúdio da Mika — Ideali CAD</title>
+<style>
+:root{
+  --bg:#121019; --surface:#1B1826; --soft:#221F31; --ink:#ECEAF4; --muted:#A39FB6; --line:#2D2940;
+  --accent:#9E8CFF; --accent-ink:#121019; --accent-soft:#2A2450;
+  --ok:#4CC58A; --warn:#E8B04A; --bad:#FF6E63; --mika:#2F6FD6; --mika-soft:#1a2d4a;
+  --f: system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{ background:var(--bg); color:var(--ink); font-family:var(--f); margin:0; }
+a{color:var(--accent); text-decoration:none}
+small{color:var(--muted)}
+
+/* ===== Topo fixo ===== */
+.topo{ position:fixed; top:0; left:0; right:0; height:56px; z-index:50;
+  background:var(--surface); border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:10px; padding:0 16px; }
+.topo .logo{ font-weight:700; font-size:1.02rem; display:flex; align-items:center; gap:8px; color:var(--ink); }
+.topo .logo .estrela{ color:var(--accent); font-size:1.1rem; }
+.badge-beta{ background:var(--accent-soft); color:var(--accent); border-radius:999px; padding:3px 10px; font-size:.78rem; font-weight:600; }
+.topo .voltar{ margin-left:auto; font-size:.9rem; color:var(--muted); }
+.topo .voltar:hover{ color:var(--accent); }
+
+/* ===== Abas ===== */
+.tab-nav{ position:sticky; top:56px; z-index:40; background:var(--bg);
+  display:flex; gap:6px; padding:10px 16px; overflow-x:auto; white-space:nowrap;
+  border-bottom:1px solid var(--line); }
+.tab-nav::-webkit-scrollbar{ display:none }
+.tab-nav button{ background:none; border:none; border-radius:10px; padding:8px 14px;
+  font:inherit; font-size:.92rem; color:var(--muted); cursor:pointer; }
+.tab-nav button.on{ background:var(--accent-soft); color:var(--accent); font-weight:600; }
+
+/* ===== Balão da Mika ===== */
+.mika-bar{ display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--line); }
+.mika-av{ width:48px; height:48px; border-radius:50%; border:2px solid var(--mika); object-fit:cover; flex:none; }
+.mika-balao{ background:var(--mika-soft); border:1px solid var(--mika); border-radius:14px;
+  padding:10px 14px; font-style:italic; font-size:.94rem; line-height:1.45; flex:1; }
+
+/* ===== Conteúdo ===== */
+main{ padding:16px; max-width:900px; margin:0 auto; }
+.card{ border:1px solid var(--line); border-radius:16px; background:var(--surface); padding:16px; margin-bottom:16px; }
+.card h2{ margin:0 0 4px; font-size:1.02rem; }
+.card .sub{ color:var(--muted); font-size:.86rem; margin:0 0 14px; }
+.cab{ display:flex; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap }
+
+/* ===== Botões ===== */
+.btn{ background:var(--accent); color:var(--accent-ink); border:none; border-radius:10px;
+  padding:8px 16px; font:inherit; font-weight:600; cursor:pointer; }
+.btn:hover{ filter:brightness(1.08) }
+.btn-full{ width:100% }
+.btn-outline{ background:none; border:1px solid var(--line); color:var(--ink); border-radius:10px;
+  padding:7px 14px; font:inherit; cursor:pointer; }
+.btn-outline:hover{ border-color:var(--accent); color:var(--accent) }
+.btn-mini{ padding:4px 10px; font-size:.82rem; border-radius:8px }
+
+/* ===== Chips ===== */
+.chip{ border-radius:999px; padding:3px 10px; font-size:.78rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; }
+.chip-ok{ background:rgba(76,197,138,.15); color:var(--ok); }
+.chip-warn{ background:rgba(232,176,74,.15); color:var(--warn); }
+.chip-muted{ background:var(--soft); color:var(--muted); }
+.chip-accent{ background:var(--accent-soft); color:var(--accent); }
+.chip-x{ background:none; border:none; color:var(--muted); cursor:pointer; font:inherit; font-size:.9rem; padding:0 0 0 2px; }
+.chip-x:hover{ color:var(--bad) }
+
+/* ===== Inputs ===== */
+input[type=text], input[type=number], select{
+  border:1px solid var(--line); border-radius:10px; padding:8px 12px;
+  background:var(--surface); color:var(--ink); font:inherit; width:100%; }
+input[type=color]{ width:44px; height:36px; border:1px solid var(--line); border-radius:10px;
+  background:var(--surface); padding:2px; cursor:pointer; }
+label.fl{ display:block; font-size:.84rem; color:var(--muted); margin:12px 0 6px; }
+label.fl:first-of-type{ margin-top:0 }
+.linha-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+.cor-lbl{ display:flex; align-items:center; gap:10px; }
+.cor-lbl span{ font-size:.84rem; color:var(--muted); }
+.mono{ font-variant-numeric:tabular-nums; color:var(--ink); font-size:.9rem }
+
+/* ===== Presets ===== */
+.presets{ display:flex; gap:8px; flex-wrap:wrap }
+.preset{ background:var(--soft); border:1px solid var(--line); color:var(--muted);
+  border-radius:999px; padding:7px 14px; font:inherit; font-size:.88rem; cursor:pointer; }
+.preset.on{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); font-weight:600; }
+
+/* ===== Horários ===== */
+.grp-hora{ margin-bottom:4px }
+.grp-hora .titulo-grp{ font-size:.88rem; font-weight:600; margin-bottom:8px; }
+.horas{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+.hora-chip{ display:inline-flex; align-items:center; gap:4px; background:var(--soft);
+  border:1px solid var(--line); border-radius:999px; padding:5px 8px 5px 12px; font-size:.86rem; }
+
+/* ===== Rádio aprovação ===== */
+.opt{ display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid var(--line);
+  border-radius:12px; margin-bottom:8px; cursor:pointer; }
+.opt:hover{ border-color:var(--accent) }
+.opt input{ margin-top:3px; accent-color:var(--accent) }
+.opt .t{ font-weight:600; font-size:.92rem }
+.opt .d{ color:var(--muted); font-size:.84rem }
+
+/* ===== Pasta: estoque ===== */
+.estoque{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px }
+.est{ border:1px solid var(--line); border-radius:16px; background:var(--surface); padding:14px; }
+.est .ico{ font-size:1.3rem }
+.est .rot{ color:var(--muted); font-size:.84rem; margin:4px 0 8px }
+.est .val{ font-weight:700; font-size:1.05rem }
+
+/* ===== Upload ===== */
+.drop{ border:2px dashed var(--line); border-radius:16px; padding:32px; text-align:center; background:var(--soft); }
+.drop .up-ico{ font-size:1.8rem; color:var(--muted); display:block; margin-bottom:8px }
+.drop p{ margin:8px 0 12px; color:var(--muted); }
+
+/* ===== Lista de arquivos ===== */
+.tbl{ width:100%; border-collapse:collapse; font-size:.9rem }
+.tbl th{ text-align:left; color:var(--muted); font-size:.78rem; font-weight:600;
+  text-transform:uppercase; letter-spacing:.04em; padding:8px 10px; border-bottom:1px solid var(--line); }
+.tbl td{ padding:10px; border-bottom:1px solid var(--line); vertical-align:middle }
+.tbl tr:last-child td{ border-bottom:none }
+.tbl .nome{ word-break:break-all }
+.spin{ animation:girar 1s linear infinite; border:3px solid var(--line);
+  border-top-color:var(--warn); border-radius:50%; width:14px; height:14px; display:inline-block; }
+@keyframes girar{ to{ transform:rotate(360deg) } }
+
+/* ===== Placeholder ===== */
+.vazio{ text-align:center; padding:56px 16px; color:var(--muted) }
+.vazio .ico{ font-size:2rem; display:block; margin-bottom:10px; color:var(--accent) }
+.vazio .t{ font-weight:600; color:var(--ink); margin-bottom:4px }
+
+/* ===== Biblioteca ===== */
+.lib-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
+.lib-card{ border:1px solid var(--line); border-radius:16px; background:var(--surface); padding:12px; cursor:pointer; }
+.lib-card:hover{ border-color:var(--accent) }
+.lib-thumb{ width:100%; height:140px; border-radius:12px; display:grid; place-items:center; font-size:2rem; margin-bottom:10px; }
+.thumb-cinza{ background:var(--soft); color:var(--muted) }
+.lib-aguardando{ cursor:default; opacity:.75 }
+.lib-nome{ font-weight:600; font-size:.92rem; word-break:break-all }
+.lib-dur{ color:var(--muted); font-size:.8rem; margin:2px 0 8px }
+.lib-res{ font-size:.86rem; line-height:1.45; margin-bottom:10px }
+.lib-tags{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px }
+.usar-btn{ margin-top:10px }
+.trechos{ display:none; margin-top:10px }
+.trechos.on{ display:block }
+.trecho{ background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:.85rem; line-height:1.4; margin-bottom:6px }
+.trecho b{ color:var(--accent); font-size:.78rem }
+
+/* ===== Roteiros ===== */
+.chip-bad{ background:rgba(255,110,99,.15); color:var(--bad) }
+.filtros{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px }
+.filtro{ background:var(--soft); border:1px solid var(--line); color:var(--muted); border-radius:999px; padding:7px 14px; font:inherit; font-size:.88rem; cursor:pointer }
+.filtro.on{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); font-weight:600 }
+.rot-card{ border:1px solid var(--line); border-radius:16px; background:var(--surface); padding:16px; margin-bottom:16px }
+.rot-meta{ color:var(--muted); font-size:.86rem; margin:2px 0 }
+.rot-det{ display:none; margin-top:10px; border-left:3px solid var(--accent-soft); padding-left:12px }
+.rot-det.on{ display:block }
+.det-item{ font-size:.86rem; line-height:1.5; margin-bottom:8px }
+.rot-edit{ display:block; width:100%; min-height:130px; border:1px solid var(--accent); border-radius:10px; padding:10px 12px; background:var(--soft); color:var(--ink); font:inherit; font-size:.86rem; margin-top:10px; resize:vertical }
+.rot-acoes{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px }
+
+/* ===== Calendário ===== */
+.cal-slot{ display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--line); }
+.cal-slot:last-child{ border-bottom:none }
+.cal-moldura{ width:60px; height:107px; border:2px solid var(--line); border-radius:10px; background:var(--soft); display:grid; place-items:center; flex:none; }
+.cal-moldura-reel{ width:72px; height:128px; }
+.cal-emoji{ font-size:1.5rem; text-align:center }
+.cal-mini{ font-size:.66rem; color:var(--muted); text-align:center }
+.cal-info{ flex:1; min-width:0 }
+.cal-topo{ font-size:.92rem; margin-bottom:6px }
+.cal-topo b{ font-variant-numeric:tabular-nums }
+.cal-chips{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px }
+.cal-acoes{ display:flex; gap:6px; flex-wrap:wrap }
+.cal-aviso{ font-size:.8rem; color:var(--bad); background:rgba(255,110,99,.1); border-radius:8px; padding:6px 10px; margin-bottom:8px }
+.btn-ok{ background:var(--ok); color:#121019 }
+.cal-semana{ display:grid; grid-template-columns:repeat(7,1fr); gap:8px }
+.cal-dia{ border:1px solid var(--line); border-radius:12px; background:var(--soft); padding:10px 6px; cursor:pointer; text-align:center; font:inherit; color:var(--ink) }
+.cal-dia:hover{ border-color:var(--accent) }
+.cal-dia.hoje{ border-color:var(--accent) }
+.cal-dia-nome{ font-size:.82rem; font-weight:600; margin-bottom:8px; color:var(--muted) }
+.cal-dia-cont{ display:flex; flex-direction:column; gap:4px; align-items:center }
+
+/* ===== Métricas ===== */
+.met-kpis{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px }
+.kpi{ border:1px solid var(--line); border-radius:16px; background:var(--surface); padding:14px }
+.kpi-l{ color:var(--muted); font-size:.8rem; margin-bottom:6px }
+.kpi-v{ font-weight:700; font-size:1.15rem }
+.kpi-t{ font-size:.78rem; margin-top:6px }
+.kpi-t.up{ color:var(--ok) }
+.kpi-t.down{ color:var(--bad) }
+.met-linha{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--line); font-size:.9rem }
+.met-linha:last-child{ border-bottom:none }
+.met-ranking{ display:grid; grid-template-columns:1fr 1fr; gap:20px }
+.met-rank{ list-style:none; margin:0; padding:0 }
+.met-rank li{ display:flex; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--line); font-size:.88rem; flex-wrap:wrap }
+.met-rank li:last-child{ border-bottom:none }
+.met-rank .rk-t{ flex:1; min-width:110px; font-weight:600 }
+.met-rank .rk-v{ font-variant-numeric:tabular-nums; font-size:.82rem }
+.met-rank li.rk-muted, .met-rank li.rk-muted .rk-t, .met-rank li.rk-muted .rk-v{ color:var(--muted); font-weight:400 }
+.heat{ width:100%; border-collapse:separate; border-spacing:3px; font-size:.72rem; white-space:nowrap }
+.heat th{ color:var(--muted); font-weight:600; padding:4px 2px; text-align:center }
+.heat tbody th{ font-size:.78rem }
+.heat .hx{ height:24px; min-width:30px; border-radius:6px; text-align:center; line-height:24px; font-size:.68rem }
+.hx-alto{ background:rgba(76,197,138,.3); color:var(--ok) }
+.hx-medio{ background:rgba(232,176,74,.22); color:var(--warn) }
+.hx-baixo{ background:var(--bg); color:var(--muted) }
+.met-bar{ display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:.84rem }
+.met-bar .mb-t{ width:150px; flex:none; text-align:right; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.mb-trilho{ flex:1; background:var(--soft); border-radius:6px; height:14px; overflow:hidden }
+.mb-fill{ height:100%; background:var(--accent); border-radius:6px }
+.mb-p{ width:44px; flex:none; font-variant-numeric:tabular-nums }
+.mika-insight{ background:var(--mika-soft); border:1px solid var(--mika); border-radius:14px; padding:12px 14px; margin-bottom:12px; font-size:.92rem; line-height:1.45 }
+
+/* ===== Responsivo ===== */
+@media (max-width:960px){
+  .lib-grid{ grid-template-columns:repeat(2,1fr) }
+}
+@media (max-width:640px){
+  .linha-2{ grid-template-columns:1fr }
+  .estoque{ grid-template-columns:1fr }
+  .tbl .hide-m{ display:none }
+  .lib-grid{ grid-template-columns:1fr }
+}
+@media (max-width:960px){
+  .met-kpis{ grid-template-columns:repeat(2,1fr) }
+  .met-ranking{ grid-template-columns:1fr }
+  .met-bar .mb-t{ width:110px }
+}
+@media (max-width:640px){
+  .met-kpis{ grid-template-columns:1fr }
+  .cal-semana{ display:flex; overflow-x:auto }
+  .cal-dia{ flex:none; min-width:104px }
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="logo"><span class="estrela">✦</span> Estúdio da Mika</div>
+  <span class="badge-beta">BETA</span>
+  <a class="voltar" href="../app/">← Voltar ao app</a>
+</header>
+
+<nav class="tab-nav" id="tabNav">
+  <button data-tab="config" class="on">Configuração</button>
+  <button data-tab="pasta">Pasta</button>
+  <button data-tab="biblioteca">Biblioteca</button>
+  <button data-tab="roteiros">Roteiros</button>
+  <button data-tab="calendario">Calendário</button>
+  <button data-tab="metricas">Métricas</button>
+</nav>
+
+<div class="mika-bar">
+  <img class="mika-av" src="equipe/mica-av-animada.webp" alt="Mika">
+  <div class="mika-balao" id="mikaFala"></div>
+</div>
+
+<main>
+
+  <!-- ================= ABA CONFIGURAÇÃO ================= -->
+  <section id="aba-config">
+
+    <div class="card">
+      <div class="cab">
+        <h2>Conectar Instagram</h2>
+        <span class="chip chip-ok">CONECTADO</span>
+      </div>
+      <p class="sub">A Mika publica direto na conta conectada.</p>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <img src="https://i.pravatar.cc/80?u=mika" alt="@laboratorio.ideal"
+             style="width:40px;height:40px;border-radius:50%;object-fit:cover">
+        <div style="flex:1;min-width:150px">
+          <div style="font-weight:600">@laboratorio.ideal</div>
+          <small>1.240 seguidores</small>
+        </div>
+        <button class="btn-outline btn-mini" onclick="reconectar()">Reconectar</button>
+      </div>
+      <!-- TODO: chamar Edge Function ig-auth-oauth com redirect para Meta OAuth -->
+    </div>
+
+    <div class="card">
+      <h2>Plano diário</h2>
+      <p class="sub">Quantas peças a Mika produz por dia.</p>
+      <div class="presets" id="presets">
+        <button class="preset" data-plano="leve" onclick="selecionaPlano('leve')">Leve (3s+1r)</button>
+        <button class="preset" data-plano="medio" onclick="selecionaPlano('medio')">Médio (5s+1r)</button>
+        <button class="preset on" data-plano="intenso" onclick="selecionaPlano('intenso')">Intenso (8s+2r)</button>
+      </div>
+      <div class="linha-2" style="margin-top:14px">
+        <div>
+          <label class="fl" for="inpStories">Stories por dia</label>
+          <input type="number" id="inpStories" min="0" max="20" value="8" onchange="planoCustom()">
+        </div>
+        <div>
+          <label class="fl" for="inpReels">Reels por dia</label>
+          <input type="number" id="inpReels" min="0" max="10" value="2" onchange="planoCustom()">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Horários de publicação</h2>
+      <p class="sub">Momentos em que as peças entram no ar.</p>
+      <div class="grp-hora">
+        <div class="titulo-grp">Stories <span id="contStories" class="chip chip-muted">8</span></div>
+        <div class="horas" id="horasStories"></div>
+        <button class="btn-outline btn-mini" style="margin-top:10px" onclick="addHora('stories')">+ Adicionar horário</button>
+      </div>
+      <div class="grp-hora" style="margin-top:18px">
+        <div class="titulo-grp">Reels <span id="contReels" class="chip chip-muted">2</span></div>
+        <div class="horas" id="horasReels"></div>
+        <button class="btn-outline btn-mini" style="margin-top:10px" onclick="addHora('reels')">+ Adicionar horário</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Identidade visual</h2>
+      <p class="sub">A Mika usa isso para montar as peças no seu estilo.</p>
+      <label class="fl" for="inpLogo">Logo</label>
+      <input type="file" id="inpLogo" accept="image/*" style="border:1px solid var(--line);border-radius:10px;padding:7px 12px;background:var(--surface);color:var(--muted);font:inherit;width:100%">
+      <div class="linha-2" style="margin-top:12px">
+        <div>
+          <label class="fl">Cores</label>
+          <div class="cor-lbl"><input type="color" id="cor1" value="#2F6FD6"><span>Cor principal <b class="mono" id="cor1hex">#2F6FD6</b></span></div>
+          <div class="cor-lbl" style="margin-top:8px"><input type="color" id="cor2" value="#E8B04A"><span>Cor secundária <b class="mono" id="cor2hex">#E8B04A</b></span></div>
+        </div>
+        <div>
+          <label class="fl" for="selFonte">Fonte</label>
+          <select id="selFonte">
+            <option selected>Montserrat</option>
+            <option>Lato</option>
+            <option>Open Sans</option>
+            <option>Raleway</option>
+          </select>
+          <label class="fl" for="selTom">Tom de voz</label>
+          <select id="selTom">
+            <option>Profissional</option>
+            <option selected>Descontraído</option>
+            <option>Inspirador</option>
+          </select>
+        </div>
+      </div>
+      <label class="fl" for="inpNicho">Nicho / Segmento</label>
+      <input type="text" id="inpNicho" value="Laboratório de prótese odontológica">
+    </div>
+
+    <div class="card">
+      <h2>Modo de aprovação</h2>
+      <p class="sub">Como você confere as peças antes de saírem.</p>
+      <label class="opt">
+        <input type="radio" name="modo" value="peca">
+        <span><span class="t">Eu aprovo cada peça</span><br><span class="d">Você revisa e aprova story por story antes de publicar.</span></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="modo" value="dia" checked>
+        <span><span class="t">Aprovar o dia inteiro</span><br><span class="d">Você vê o dia montado e aprova de uma vez.</span></span>
+      </label>
+      <label class="opt">
+        <input type="radio" name="modo" value="auto" disabled>
+        <span><span class="t">Automático <span class="chip chip-warn">Em breve</span></span><br><span class="d">A Mika publica direto, sem aprovação.</span></span>
+      </label>
+      <button class="btn btn-full" style="margin-top:6px" onclick="salvarConfig()">Salvar configurações</button>
+      <!-- TODO: salvar em tabela postagem_planos via Supabase -->
+    </div>
+
+  </section>
+
+  <!-- ================= ABA PASTA ================= -->
+  <section id="aba-pasta" style="display:none">
+
+    <div class="estoque">
+      <div class="est">
+        <div class="ico">🎥</div>
+        <div class="rot">Vídeo bruto</div>
+        <div class="val">47 min</div>
+        <span class="chip chip-ok">OK para ~23 dias de reels</span>
+      </div>
+      <div class="est">
+        <div class="ico">🖼️</div>
+        <div class="rot">Fotos</div>
+        <div class="val">142 imagens</div>
+        <span class="chip chip-accent">para ~71 stories</span>
+      </div>
+      <div class="est">
+        <div class="ico">🎧</div>
+        <div class="rot">Áudios</div>
+        <div class="val">8 arquivos</div>
+        <span class="chip chip-muted">prontos para uso</span>
+      </div>
+    </div>
+
+    <div class="drop" id="drop">
+      <span class="up-ico">↑</span>
+      <p>Arraste vídeos, fotos ou áudios aqui</p>
+      <p style="margin-top:0">ou</p>
+      <button class="btn-outline" onclick="document.getElementById('inpArq').click()">Escolher arquivos</button>
+      <input type="file" id="inpArq" multiple style="display:none"
+             accept="video/mp4,video/quicktime,image/jpeg,image/png,audio/mpeg,audio/mp4">
+      <small style="display:block;margin-top:12px">MP4, MOV, JPG, PNG, MP3, M4A — até 500 MB por arquivo</small>
+    </div>
+    <!-- TODO: implementar upload para Supabase Storage bucket midias-brutas, registrar em tabela midias_brutas -->
+
+    <div class="card" style="margin-top:16px; padding:0; overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr><th>Nome</th><th class="hide-m">Tipo</th><th class="hide-m">Tamanho</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody id="listaArq"></tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- ================= ABA BIBLIOTECA ================= -->
+  <section id="aba-biblioteca" style="display:none">
+    <div class="lib-grid">
+
+      <div class="lib-card" onclick="toggleTrechos('tr-1')">
+        <div class="lib-thumb" style="background:linear-gradient(135deg,#1a2d4a,#2F6FD6)">🎬</div>
+        <div class="lib-nome">gravacao-clinica-02.mp4</div>
+        <div class="lib-dur">Vídeo · 8 min 42 s</div>
+        <div class="lib-res">Protocolo completo de moldagem em silicone com dique de borracha. Lighting profissional, áudio claro.</div>
+        <div class="lib-tags">
+          <span class="chip chip-accent">Reel ✓</span>
+          <span class="chip chip-ok">Story ✓</span>
+          <span class="chip chip-warn">Qualidade Alta</span>
+        </div>
+        <button class="btn-outline btn-mini" type="button" id="vtb-tr-1" onclick="event.stopPropagation();toggleTrechos('tr-1')">Ver trechos ▾</button>
+        <div class="trechos" id="tr-1">
+          <div class="trecho"><b>00:12 – 00:38</b> · O segredo está na consistência do material…</div>
+          <div class="trecho"><b>02:45 – 03:10</b> · Veja como a moldagem fica perfeita em três passos…</div>
+          <div class="trecho"><b>06:00 – 06:28</b> · Resultado final: encaixe milimétrico garantido.</div>
+        </div>
+        <button class="btn btn-full btn-mini usar-btn" type="button" onclick="event.stopPropagation();usarEmRoteiro('gravacao-clinica-02.mp4')">Usar em roteiro</button>
+      </div>
+
+      <div class="lib-card" onclick="toggleTrechos('tr-2')">
+        <div class="lib-thumb" style="background:linear-gradient(135deg,#1a3d2a,#4CC58A)">🖼️</div>
+        <div class="lib-nome">foto-resultado-pedro.jpg</div>
+        <div class="lib-dur">Foto</div>
+        <div class="lib-res">Prótese total superior — resultado final lado a lado com o planejamento. Alto impacto visual.</div>
+        <div class="lib-tags">
+          <span class="chip chip-ok">Story ✓</span>
+          <span class="chip chip-muted">Reel —</span>
+          <span class="chip chip-ok">Qualidade Alta</span>
+        </div>
+        <button class="btn btn-full btn-mini usar-btn" type="button" onclick="event.stopPropagation();usarEmRoteiro('foto-resultado-pedro.jpg')">Usar em roteiro</button>
+      </div>
+
+      <div class="lib-card" onclick="toggleTrechos('tr-3')">
+        <div class="lib-thumb" style="background:linear-gradient(135deg,#2a1a3d,#9E8CFF)">🎙️</div>
+        <div class="lib-nome">depoimento-audio.m4a</div>
+        <div class="lib-dur">Áudio · 1 min 20 s</div>
+        <div class="lib-res">Depoimento espontâneo da Dra. Carla: "Trabalha com precisão cirúrgica."</div>
+        <div class="lib-tags">
+          <span class="chip chip-accent">Reel ✓</span>
+          <span class="chip chip-ok">Story ✓</span>
+          <span class="chip chip-ok">Qualidade Alta</span>
+        </div>
+        <button class="btn-outline btn-mini" type="button" id="vtb-tr-3" onclick="event.stopPropagation();toggleTrechos('tr-3')">Ver trechos ▾</button>
+        <div class="trechos" id="tr-3">
+          <div class="trecho"><b>00:08 – 00:42</b> · Nunca vi acabamento assim em 15 anos de profissão…</div>
+        </div>
+        <button class="btn btn-full btn-mini usar-btn" type="button" onclick="event.stopPropagation();usarEmRoteiro('depoimento-audio.m4a')">Usar em roteiro</button>
+      </div>
+
+      <div class="lib-card" onclick="toggleTrechos('tr-4')">
+        <div class="lib-thumb" style="background:linear-gradient(135deg,#3d2a1a,#E8B04A)">🎬</div>
+        <div class="lib-nome">video-processo-01.mp4</div>
+        <div class="lib-dur">Vídeo</div>
+        <div class="lib-res">Bastidor: escultura em cera de dente anterior. Filmado em close, muito visual para reels.</div>
+        <div class="lib-tags">
+          <span class="chip chip-accent">Reel ✓</span>
+          <span class="chip chip-muted">Story —</span>
+          <span class="chip chip-ok">Qualidade Média</span>
+        </div>
+        <button class="btn-outline btn-mini" type="button" id="vtb-tr-4" onclick="event.stopPropagation();toggleTrechos('tr-4')">Ver trechos ▾</button>
+        <div class="trechos" id="tr-4">
+          <div class="trecho"><b>00:30 – 01:02</b> · Cada detalhe esculpido à mão — isso é arte e ciência juntos.</div>
+          <div class="trecho"><b>03:15 – 03:48</b> · O momento em que a cera vira porcelana — transformação ao vivo.</div>
+        </div>
+        <button class="btn btn-full btn-mini usar-btn" type="button" onclick="event.stopPropagation();usarEmRoteiro('video-processo-01.mp4')">Usar em roteiro</button>
+      </div>
+
+      <div class="lib-card lib-aguardando">
+        <div class="lib-thumb thumb-cinza">🎞️</div>
+        <div class="lib-nome">Aguardando análise…</div>
+        <span class="chip chip-muted">Na fila da Mika</span>
+      </div>
+
+      <div class="lib-card lib-aguardando">
+        <div class="lib-thumb thumb-cinza">📸</div>
+        <div class="lib-nome">Aguardando análise…</div>
+        <span class="chip chip-muted">Na fila da Mika</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= ABA ROTEIROS ================= -->
+  <section id="aba-roteiros" style="display:none">
+    <div class="filtros">
+      <button class="filtro on" data-f="todos" onclick="filtrarRoteiros(this)">Todos</button>
+      <button class="filtro" data-f="reel" onclick="filtrarRoteiros(this)">Reels</button>
+      <button class="filtro" data-f="story" onclick="filtrarRoteiros(this)">Stories</button>
+      <button class="filtro" data-f="aguardando" onclick="filtrarRoteiros(this)">Aguardando</button>
+      <button class="filtro" data-f="aprovado" onclick="filtrarRoteiros(this)">Aprovados</button>
+    </div>
+
+    <div id="rotLista">
+
+      <div class="rot-card" data-tipo="reel" data-status="aguardando">
+        <div class="cab">
+          <span class="chip chip-accent">Reel</span>
+          <span class="chip chip-warn rot-status">Aguardando aprovação</span>
+        </div>
+        <h2 style="margin:8px 0 4px">Escultura em cera ao vivo</h2>
+        <div class="rot-meta">Material usado: video-processo-01.mp4 (00:30–01:02)</div>
+        <div class="rot-meta">Horário sugerido: hoje 19h00</div>
+        <button class="btn-outline btn-mini" style="margin-top:8px" onclick="toggleDet(this)">Detalhes ▴</button>
+        <div class="rot-det on">
+          <div class="det-item"><b>Gancho (3 s):</b> Já viu um dente ser esculpido à mão? Isso é o que fazemos aqui todos os dias.</div>
+          <div class="det-item"><b>Desenvolvimento:</b> Corte rápido mostrando a escultura em cera, trilha instrumental animada, legenda com passos: 1. Cera | 2. Escultura | 3. Resultado final.</div>
+          <div class="det-item"><b>CTA:</b> Manda mensagem e solicita um orçamento personalizado. Link na bio!</div>
+          <div class="det-item"><b>Legenda:</b> Arte e precisão em cada prótese. Cada dente esculpido à mão com técnica e dedicação. #protese #odontologia #laboratorio #artedental</div>
+          <div class="det-item"><b>Hashtags:</b> #protese #odontologia #laboratorio #artedental #reeldental</div>
+        </div>
+        <div class="rot-acoes">
+          <button class="btn btn-mini" onclick="aprovarRoteiro(this)">✓ Aprovar</button>
+          <button class="btn-outline btn-mini" onclick="outraVersao(this)">↩ Outra versão</button>
+          <button class="btn-outline btn-mini" onclick="editarRoteiro(this)">✏ Editar</button>
+        </div>
+      </div>
+
+      <div class="rot-card" data-tipo="story" data-status="aprovado">
+        <div class="cab">
+          <span class="chip chip-muted">Story</span>
+          <span class="chip chip-ok rot-status">Aprovado</span>
+        </div>
+        <h2 style="margin:8px 0 4px">Dica do dia: o que é dique de borracha?</h2>
+        <div class="rot-meta">Tipo: Dica educativa</div>
+        <div class="rot-meta">Horário sugerido: hoje 10h00</div>
+        <button class="btn-outline btn-mini" style="margin-top:8px" onclick="toggleDet(this)">Detalhes ▾</button>
+        <div class="rot-det">
+          <div class="det-item"><b>Texto do story:</b> Você sabia? O dique de borracha isola o dente durante o procedimento, garantindo precisão absoluta. Usamos em TODOS os nossos trabalhos. ✅</div>
+          <div class="det-item"><b>Fundo sugerido:</b> cor accent do lab (#2F6FD6), texto branco, emoji grande no topo.</div>
+        </div>
+        <div class="rot-acoes">
+          <button class="btn-outline btn-mini" disabled style="color:var(--ok);border-color:rgba(76,197,138,.4);cursor:default">✓ Aprovado</button>
+          <button class="btn-outline btn-mini" onclick="outraVersao(this)">↩ Outra versão</button>
+          <button class="btn-outline btn-mini" onclick="editarRoteiro(this)">✏ Editar</button>
+        </div>
+      </div>
+
+      <div class="rot-card" data-tipo="story" data-status="aguardando">
+        <div class="cab">
+          <span class="chip chip-muted">Story</span>
+          <span class="chip chip-warn rot-status">Aguardando aprovação</span>
+        </div>
+        <h2 style="margin:8px 0 4px">Bastidor: chegou nova remessa de cerâmica</h2>
+        <div class="rot-meta">Tipo: Bastidor</div>
+        <button class="btn-outline btn-mini" style="margin-top:8px" onclick="toggleDet(this)">Detalhes ▾</button>
+        <div class="rot-det">
+          <div class="det-item"><b>Texto:</b> Olha só o que chegou! Cerâmica de alta translucidez para os casos estéticos. Se você é dentista e quer o melhor para seus pacientes, fala comigo. 🏷️</div>
+        </div>
+        <div class="rot-acoes">
+          <button class="btn btn-mini" onclick="aprovarRoteiro(this)">✓ Aprovar</button>
+          <button class="btn-outline btn-mini" onclick="outraVersao(this)">↩ Outra versão</button>
+          <button class="btn-outline btn-mini" onclick="editarRoteiro(this)">✏ Editar</button>
+        </div>
+      </div>
+
+      <div class="rot-card" data-tipo="reel" data-status="aprovado">
+        <div class="cab">
+          <span class="chip chip-accent">Reel</span>
+          <span class="chip chip-ok rot-status">Aprovado</span>
+        </div>
+        <h2 style="margin:8px 0 4px">Depoimento da Dra. Carla</h2>
+        <div class="rot-meta">Material usado: depoimento-audio.m4a (00:08–00:42)</div>
+        <div class="rot-meta">Horário sugerido: amanhã 12h00</div>
+        <button class="btn-outline btn-mini" style="margin-top:8px" onclick="toggleDet(this)">Detalhes ▾</button>
+        <div class="rot-det">
+          <div class="det-item"><b>Gancho:</b> "Nunca vi acabamento assim em 15 anos" — e ela é dentista há 15 anos.</div>
+          <div class="det-item"><b>CTA:</b> Comenta aqui: você já trabalhou com laboratório assim?</div>
+        </div>
+        <div class="rot-acoes">
+          <button class="btn-outline btn-mini" disabled style="color:var(--ok);border-color:rgba(76,197,138,.4);cursor:default">✓ Aprovado</button>
+          <button class="btn-outline btn-mini" onclick="outraVersao(this)">↩ Outra versão</button>
+          <button class="btn-outline btn-mini" onclick="editarRoteiro(this)">✏ Editar</button>
+        </div>
+      </div>
+
+      <div class="rot-card" data-tipo="story" data-status="rascunho">
+        <div class="cab">
+          <span class="chip chip-muted">Story</span>
+          <span class="chip chip-muted rot-status">Rascunho</span>
+        </div>
+        <h2 style="margin:8px 0 4px">Pergunta: qual tipo de prótese você prefere?</h2>
+        <div class="rot-meta">Tipo: Enquete <span class="chip chip-bad" style="margin-left:6px">Postar manualmente (enquete não vai pela API)</span></div>
+        <button class="btn-outline btn-mini" style="margin-top:8px" onclick="toggleDet(this)">Detalhes ▾</button>
+        <div class="rot-det">
+          <div class="det-item"><b>Texto:</b> Sticker de enquete: Prótese total / Prótese parcial removível. Texto: "Qual você indica mais para seus pacientes?"</div>
+        </div>
+        <div class="rot-acoes">
+          <button class="btn btn-mini" onclick="aprovarRoteiro(this)">✓ Aprovar</button>
+          <button class="btn-outline btn-mini" onclick="outraVersao(this)">↩ Outra versão</button>
+          <button class="btn-outline btn-mini" onclick="editarRoteiro(this)">✏ Editar</button>
+        </div>
+      </div>
+
+      <div class="rot-card" data-tipo="story" data-status="rascunho">
+        <div class="cab">
+          <span class="chip chip-muted">Story</span>
+          <span class="chip chip-muted rot-status">Rascunho</span>
+        </div>
+        <h2 style="margin:8px 0 4px">Promoção: desconto para dentistas parceiros</h2>
+        <div class="rot-meta">Tipo: Promoção</div>
+        <button class="btn-outline btn-mini" style="margin-top:8px" onclick="toggleDet(this)">Detalhes ▾</button>
+        <div class="rot-det">
+          <div class="det-item"><b>Texto:</b> Só até sexta! Laboratório parceiro tem 10% de desconto no primeiro caso. Manda mensagem agora. 🎁</div>
+        </div>
+        <div class="rot-acoes">
+          <button class="btn btn-mini" onclick="aprovarRoteiro(this)">✓ Aprovar</button>
+          <button class="btn-outline btn-mini" onclick="outraVersao(this)">↩ Outra versão</button>
+          <button class="btn-outline btn-mini" onclick="editarRoteiro(this)">✏ Editar</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= ABA CALENDÁRIO ================= -->
+  <section id="aba-calendario" style="display:none">
+
+    <div class="card">
+      <div class="cab">
+        <h2 style="margin:0">Sexta-feira, 21 de novembro de 2026</h2>
+        <div style="display:flex;gap:8px;align-items:center;margin-left:auto;flex-wrap:wrap">
+          <button class="filtro on" id="calVistaDia" onclick="calVista('dia')">Dia</button>
+          <button class="filtro" id="calVistaSemana" onclick="calVista('semana')">Semana</button>
+          <button class="btn btn-mini btn-ok" onclick="aprovarDia()">Aprovar dia inteiro</button>
+        </div>
+      </div>
+
+      <div id="calDia">
+        <!-- TODO: slots reais do dia via Edge Function calendario-dia -->
+
+        <div class="cal-slot" data-hora="08h00" data-tipo="story" data-status="aprovado">
+          <div class="cal-moldura"><div><div class="cal-emoji">💡</div><div class="cal-mini">Dica</div></div></div>
+          <div class="cal-info">
+            <div class="cal-topo"><b>08h00</b> · <span class="cal-titulo">Dica do dia: o que é dique de borracha?</span></div>
+            <div class="cal-chips"><span class="chip chip-ok">Aprovado</span><span class="chip chip-muted">Story</span></div>
+            <div class="cal-acoes">
+              <button class="btn-outline btn-mini" disabled style="color:var(--ok);border-color:rgba(76,197,138,.4);cursor:default">✓ Aprovado</button>
+              <button class="btn-outline btn-mini" onclick="editarLegenda(this)">✏ Editar legenda</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-slot" data-hora="10h00" data-tipo="story" data-status="aguardando">
+          <div class="cal-moldura"><div><div class="cal-emoji">🎙️</div><div class="cal-mini">Story</div></div></div>
+          <div class="cal-info">
+            <div class="cal-topo"><b>10h00</b> · <span class="cal-titulo">Depoimento curto: Dra. Carla</span></div>
+            <div class="cal-chips"><span class="chip chip-warn">Aguardando</span><span class="chip chip-muted">Story</span></div>
+            <div class="cal-acoes">
+              <button class="btn btn-mini" onclick="aprovarSlot(this)">✓ Aprovar</button>
+              <button class="btn-outline btn-mini" onclick="editarLegenda(this)">✏ Editar legenda</button>
+              <button class="btn-outline btn-mini" onclick="trocarHorario(this)">🕐 Trocar horário</button>
+              <button class="btn-outline btn-mini" onclick="descartarSlot(this)">🗑 Descartar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-slot" data-hora="12h00" data-tipo="reel" data-status="aguardando">
+          <div class="cal-moldura cal-moldura-reel"><div><div class="cal-emoji">🎬</div><div class="cal-mini">19:00</div></div></div>
+          <div class="cal-info">
+            <div class="cal-topo"><b>12h00</b> · <span class="cal-titulo">REEL: Escultura em cera ao vivo</span></div>
+            <div class="cal-chips"><span class="chip chip-warn">Aguardando</span><span class="chip chip-accent">Reel</span></div>
+            <div class="cal-acoes">
+              <button class="btn btn-mini" onclick="aprovarSlot(this)">✓ Aprovar</button>
+              <button class="btn-outline btn-mini" onclick="editarLegenda(this)">✏ Editar legenda</button>
+              <button class="btn-outline btn-mini" onclick="trocarHorario(this)">🕐 Trocar horário</button>
+              <button class="btn-outline btn-mini" onclick="descartarSlot(this)">🗑 Descartar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-slot" data-hora="14h00" data-tipo="story" data-status="aguardando">
+          <div class="cal-moldura"><div><div class="cal-emoji">📦</div><div class="cal-mini">Story</div></div></div>
+          <div class="cal-info">
+            <div class="cal-topo"><b>14h00</b> · <span class="cal-titulo">Bastidor: nova remessa de cerâmica</span></div>
+            <div class="cal-chips"><span class="chip chip-warn">Aguardando</span><span class="chip chip-muted">Story</span></div>
+            <div class="cal-acoes">
+              <button class="btn btn-mini" onclick="aprovarSlot(this)">✓ Aprovar</button>
+              <button class="btn-outline btn-mini" onclick="editarLegenda(this)">✏ Editar legenda</button>
+              <button class="btn-outline btn-mini" onclick="trocarHorario(this)">🕐 Trocar horário</button>
+              <button class="btn-outline btn-mini" onclick="descartarSlot(this)">🗑 Descartar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-slot" data-hora="16h00" data-tipo="story" data-status="aprovado">
+          <div class="cal-moldura"><div><div class="cal-emoji">🦷</div><div class="cal-mini">Resultado</div></div></div>
+          <div class="cal-info">
+            <div class="cal-topo"><b>16h00</b> · <span class="cal-titulo">Resultado: Prótese total — Pedro</span></div>
+            <div class="cal-chips"><span class="chip chip-ok">Aprovado</span><span class="chip chip-muted">Story</span></div>
+            <div class="cal-acoes">
+              <button class="btn-outline btn-mini" disabled style="color:var(--ok);border-color:rgba(76,197,138,.4);cursor:default">✓ Aprovado</button>
+              <button class="btn-outline btn-mini" onclick="editarLegenda(this)">✏ Editar legenda</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-slot" data-hora="18h00" data-tipo="story" data-status="aprovado">
+          <div class="cal-moldura"><div><div class="cal-emoji">🎁</div><div class="cal-mini">Promo</div></div></div>
+          <div class="cal-info">
+            <div class="cal-topo"><b>18h00</b> · <span class="cal-titulo">Promoção: desconto parceiros</span></div>
+            <div class="cal-chips"><span class="chip chip-ok">Aprovado</span><span class="chip chip-muted">Story</span></div>
+            <div class="cal-acoes">
+              <button class="btn-outline btn-mini" disabled style="color:var(--ok);border-color:rgba(76,197,138,.4);cursor:default">✓ Aprovado</button>
+              <button class="btn-outline btn-mini" onclick="editarLegenda(this)">✏ Editar legenda</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-slot" data-hora="19h00" data-tipo="reel" data-status="aprovado">
+          <div class="cal-moldura cal-moldura-reel"><div><div class="cal-emoji">🎥</div><div class="cal-mini">Reel</div></div></div>
+          <div class="cal-info">
+            <div class="cal-topo"><b>19h00</b> · <span class="cal-titulo">REEL: Depoimento da Dra. Carla</span></div>
+            <div class="cal-chips"><span class="chip chip-ok">Aprovado</span><span class="chip chip-accent">Reel</span></div>
+            <div class="cal-acoes">
+              <button class="btn-outline btn-mini" disabled style="color:var(--ok);border-color:rgba(76,197,138,.4);cursor:default">✓ Aprovado</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-slot" data-hora="20h00" data-tipo="story" data-status="manual">
+          <div class="cal-moldura"><div><div class="cal-emoji">🗳️</div><div class="cal-mini">Enquete</div></div></div>
+          <div class="cal-info">
+            <div class="cal-topo"><b>20h00</b> · <span class="cal-titulo">Pergunta: qual tipo de prótese?</span></div>
+            <div class="cal-chips"><span class="chip chip-bad">Postar manualmente</span><span class="chip chip-muted">Story</span></div>
+            <div class="cal-aviso">Esta peça tem enquete — não sai pela API. Lembrete: post manual às 20h.</div>
+            <div class="cal-acoes">
+              <button class="btn btn-mini" onclick="marcarPostado(this)">Marcar como postado</button>
+              <button class="btn-outline btn-mini" onclick="descartarSlot(this)">🗑 Descartar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-slot" data-hora="21h00" data-tipo="livre" data-status="livre">
+          <div class="cal-moldura"><span style="font-size:1.4rem;color:var(--muted)">+</span></div>
+          <div class="cal-info">
+            <div class="cal-topo"><b>21h00</b> · <span class="cal-titulo" style="color:var(--muted)">Slot livre</span></div>
+            <div class="cal-chips"><span class="chip chip-muted">Slot livre</span></div>
+            <div class="cal-acoes">
+              <button class="btn-outline btn-mini" onclick="sugerirPeca(this)">Sugerir peça</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="calSemana" style="display:none">
+        <p class="sub">Semana de 16 a 22 de novembro — clique em um dia.</p>
+        <div class="cal-semana">
+          <button class="cal-dia" onclick="irDia()"><div class="cal-dia-nome">Seg 16</div><div class="cal-dia-cont"><span class="chip chip-ok">5 ✓</span><span class="chip chip-warn">3 ⏳</span></div></button>
+          <button class="cal-dia" onclick="irDia()"><div class="cal-dia-nome">Ter 17</div><div class="cal-dia-cont"><span class="chip chip-ok">6 ✓</span><span class="chip chip-warn">2 ⏳</span></div></button>
+          <button class="cal-dia" onclick="irDia()"><div class="cal-dia-nome">Qua 18</div><div class="cal-dia-cont"><span class="chip chip-ok">7 ✓</span><span class="chip chip-warn">1 ⏳</span></div></button>
+          <button class="cal-dia" onclick="irDia()"><div class="cal-dia-nome">Qui 19</div><div class="cal-dia-cont"><span class="chip chip-ok">5 ✓</span><span class="chip chip-warn">2 ⏳</span></div></button>
+          <button class="cal-dia hoje" onclick="irDia()"><div class="cal-dia-nome">Sex 21</div><div class="cal-dia-cont"><span class="chip chip-ok">4 ✓</span><span class="chip chip-warn">3 ⏳</span></div></button>
+          <button class="cal-dia" onclick="irDia()"><div class="cal-dia-nome">Sáb 22</div><div class="cal-dia-cont"><span class="chip chip-ok">2 ✓</span><span class="chip chip-muted">0 ⏳</span></div></button>
+          <button class="cal-dia" onclick="irDia()"><div class="cal-dia-nome">Dom 23</div><div class="cal-dia-cont"><span class="chip chip-ok">2 ✓</span><span class="chip chip-muted">0 ⏳</span></div></button>
+        </div>
+        <!-- TODO: contadores reais por dia via Edge Function calendario-semana -->
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ================= ABA MÉTRICAS ================= -->
+  <section id="aba-metricas" style="display:none">
+
+    <div class="filtros" id="metPeriodoChips">
+      <button class="filtro" data-f="hoje" onclick="metPeriodo(this)">Hoje</button>
+      <button class="filtro on" data-f="7d" onclick="metPeriodo(this)">7 dias</button>
+      <button class="filtro" data-f="30d" onclick="metPeriodo(this)">30 dias</button>
+      <button class="filtro" data-f="custom" onclick="metPeriodo(this)">Personalizado</button>
+    </div>
+    <div class="filtros" id="metFormatoChips">
+      <button class="filtro on" data-f="todos" onclick="metFiltroFormato(this)">Todos</button>
+      <button class="filtro" data-f="stories" onclick="metFiltroFormato(this)">Stories</button>
+      <button class="filtro" data-f="reels" onclick="metFiltroFormato(this)">Reels</button>
+      <button class="filtro" data-f="posts" onclick="metFiltroFormato(this)">Posts</button>
+    </div>
+
+    <div class="met-kpis">
+      <!-- TODO: KPIs reais via Edge Function metricas-resumo (dados mock, 7 dias) -->
+      <div class="kpi"><div class="kpi-l">Visualizações</div><div class="kpi-v">18.420</div><div class="kpi-t up">▲ +12% vs semana ant.</div></div>
+      <div class="kpi"><div class="kpi-l">Alcance</div><div class="kpi-v">11.800</div></div>
+      <div class="kpi"><div class="kpi-l">Curtidas</div><div class="kpi-v">2.340</div></div>
+      <div class="kpi"><div class="kpi-l">Comentários</div><div class="kpi-v">187</div></div>
+      <div class="kpi"><div class="kpi-l">Compartilhamentos</div><div class="kpi-v">420</div></div>
+      <div class="kpi"><div class="kpi-l">Salvamentos</div><div class="kpi-v">310</div></div>
+      <div class="kpi"><div class="kpi-l">Seguidores ganhos</div><div class="kpi-v">+48</div></div>
+      <div class="kpi"><div class="kpi-l">Engajamento</div><div class="kpi-v">4,8%</div></div>
+    </div>
+
+    <div class="card">
+      <div class="filtros" style="margin-bottom:12px">
+        <button class="filtro on" id="fmtStories" onclick="metFormato('stories')">Stories</button>
+        <button class="filtro" id="fmtReels" onclick="metFormato('reels')">Reels</button>
+      </div>
+      <div id="metStories">
+        <div class="met-linha"><span>Alcance médio</span><b class="mono">1.450</b></div>
+        <div class="met-linha"><span>Impressões</span><b class="mono">2.100</b></div>
+        <div class="met-linha"><span>Respostas</span><b class="mono">42</b></div>
+        <div class="met-linha"><span>Toques avançar</span><b class="mono">890</b></div>
+        <div class="met-linha"><span>Toques voltar</span><b class="mono">120</b></div>
+        <div class="met-linha"><span>Saídas</span><b class="mono">230</b></div>
+        <div class="met-linha"><span>Taxa de conclusão</span><b class="mono">68%</b></div>
+        <!-- TODO: métricas reais de stories via Instagram Graph API -->
+      </div>
+      <div id="metReels" style="display:none">
+        <div class="met-linha"><span>Visualizações</span><b class="mono">8.200</b></div>
+        <div class="met-linha"><span>Tempo médio assistido</span><b class="mono">18 s</b></div>
+        <div class="met-linha"><span>Assistido até o fim</span><b class="mono">42%</b></div>
+        <div class="met-linha"><span>Compartilhamentos</span><b class="mono">380</b></div>
+        <div class="met-linha"><span>Salvamentos</span><b class="mono">290</b></div>
+        <div class="met-linha"><span>Seguidores vindos do reel</span><b class="mono">31</b></div>
+        <!-- TODO: métricas reais de reels via Instagram Graph API -->
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Ranking</h2>
+      <p class="sub">O que mais (e menos) engajou nos últimos 7 dias.</p>
+      <div class="met-ranking">
+        <div>
+          <div class="titulo-grp" style="margin-bottom:4px">Top 5 melhores</div>
+          <ol class="met-rank">
+            <li><span class="rk-t">Escultura em cera</span><span class="rk-v">4.200 views ▲</span><a href="#" onclick="verMetricas('Escultura em cera');return false">Ver métricas</a></li>
+            <li><span class="rk-t">Depoimento Dra. Carla</span><span class="rk-v">3.800 views ▲</span><a href="#" onclick="verMetricas('Depoimento Dra. Carla');return false">Ver métricas</a></li>
+            <li><span class="rk-t">Dica dique de borracha</span><span class="rk-v">2.100 alcance ▲</span><a href="#" onclick="verMetricas('Dica dique de borracha');return false">Ver métricas</a></li>
+            <li><span class="rk-t">Nova cerâmica</span><span class="rk-v">1.900 ▲</span><a href="#" onclick="verMetricas('Nova cerâmica');return false">Ver métricas</a></li>
+            <li><span class="rk-t">Resultado Pedro</span><span class="rk-v">1.750 ▲</span><a href="#" onclick="verMetricas('Resultado Pedro');return false">Ver métricas</a></li>
+          </ol>
+        </div>
+        <div>
+          <div class="titulo-grp" style="margin-bottom:4px">Piores 5</div>
+          <ol class="met-rank">
+            <li class="rk-muted"><span class="rk-t">Story 21h genéricos</span><span class="rk-v">320 alcance ▼</span></li>
+            <li class="rk-muted"><span class="rk-t">Story 18h institucional</span><span class="rk-v">410 alcance</span></li>
+            <li class="rk-muted"><span class="rk-t">Story 14h dica rápida</span><span class="rk-v">380 alcance</span></li>
+            <li class="rk-muted"><span class="rk-t">Story 10h promoção</span><span class="rk-v">350 alcance</span></li>
+            <li class="rk-muted"><span class="rk-t">Story 12h enquete</span><span class="rk-v">340 alcance</span></li>
+          </ol>
+          <!-- TODO: ranking real ordenado por engajamento via Edge Function metricas-ranking -->
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="overflow-x:auto">
+      <h2>Mapa de calor — dia × hora</h2>
+      <p class="sub">Quanto engajamento cada horário costuma ter. Verde = alto, amarelo = médio, cinza = baixo.</p>
+      <table class="heat">
+        <thead>
+          <tr><th></th><th>08h</th><th>10h</th><th>12h</th><th>14h</th><th>16h</th><th>18h</th><th>20h</th><th>21h</th><th>Reel 12h</th><th>Reel 19h</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>Seg</th><td class="hx hx-baixo">2</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">1</td><td class="hx hx-medio">6</td><td class="hx hx-medio">6</td></tr>
+          <tr><th>Ter</th><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-medio">4</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-medio">6</td><td class="hx hx-alto">7</td></tr>
+          <tr><th>Qua</th><td class="hx hx-baixo">2</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-medio">4</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-baixo">2</td><td class="hx hx-medio">5</td><td class="hx hx-medio">6</td></tr>
+          <tr><th>Qui</th><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-baixo">3</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">2</td><td class="hx hx-baixo">3</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">2</td><td class="hx hx-alto">7</td><td class="hx hx-medio">6</td></tr>
+          <tr><th>Sex</th><td class="hx hx-medio">5</td><td class="hx hx-medio">5</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">3</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-medio">6</td><td class="hx hx-alto">7</td></tr>
+          <tr><th>Sáb</th><td class="hx hx-medio">5</td><td class="hx hx-baixo">3</td><td class="hx hx-alto">9</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">3</td><td class="hx hx-medio">5</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-alto">8</td><td class="hx hx-medio">6</td></tr>
+          <tr><th>Dom</th><td class="hx hx-baixo">2</td><td class="hx hx-baixo">2</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-baixo">2</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td><td class="hx hx-baixo">1</td><td class="hx hx-baixo">3</td><td class="hx hx-baixo">2</td></tr>
+        </tbody>
+      </table>
+      <!-- TODO: mapa real via Edge Function metricas-calor -->
+    </div>
+
+    <div class="card">
+      <h2>Engajamento por post</h2>
+      <p class="sub">Últimos 10 posts, do maior para o menor engajamento.</p>
+      <div class="met-barras">
+        <div class="met-bar"><span class="mb-t">Escultura em cera</span><div class="mb-trilho"><div class="mb-fill" style="width:100%"></div></div><span class="mb-p mono">9,2%</span></div>
+        <div class="met-bar"><span class="mb-t">Depoimento Dra. Carla</span><div class="mb-trilho"><div class="mb-fill" style="width:91%"></div></div><span class="mb-p mono">8,4%</span></div>
+        <div class="met-bar"><span class="mb-t">Dica: dique de borracha</span><div class="mb-trilho"><div class="mb-fill" style="width:77%"></div></div><span class="mb-p mono">7,1%</span></div>
+        <div class="met-bar"><span class="mb-t">Bastidor: nova cerâmica</span><div class="mb-trilho"><div class="mb-fill" style="width:68%"></div></div><span class="mb-p mono">6,3%</span></div>
+        <div class="met-bar"><span class="mb-t">Resultado: Pedro</span><div class="mb-trilho"><div class="mb-fill" style="width:63%"></div></div><span class="mb-p mono">5,8%</span></div>
+        <div class="met-bar"><span class="mb-t">Promoção parceiros</span><div class="mb-trilho"><div class="mb-fill" style="width:53%"></div></div><span class="mb-p mono">4,9%</span></div>
+        <div class="met-bar"><span class="mb-t">Pergunta: enquete</span><div class="mb-trilho"><div class="mb-fill" style="width:46%"></div></div><span class="mb-p mono">4,2%</span></div>
+        <div class="met-bar"><span class="mb-t">Story 14h dica rápida</span><div class="mb-trilho"><div class="mb-fill" style="width:39%"></div></div><span class="mb-p mono">3,6%</span></div>
+        <div class="met-bar"><span class="mb-t">Story 18h produto</span><div class="mb-trilho"><div class="mb-fill" style="width:31%"></div></div><span class="mb-p mono">2,9%</span></div>
+        <div class="met-bar"><span class="mb-t">Story 21h genérico</span><div class="mb-trilho"><div class="mb-fill" style="width:20%"></div></div><span class="mb-p mono">1,8%</span></div>
+      </div>
+      <!-- TODO: gráfico real via Instagram Graph API -->
+    </div>
+
+    <div class="mika-insight">
+      <div>Reels de bastidor tiveram 2× mais alcance esta semana. Vou gerar mais desses na próxima semana.</div>
+      <button class="btn-outline btn-mini" style="margin-top:10px" onclick="verRoteirosBastidor()">Ver roteiros de bastidor</button>
+    </div>
+    <div class="mika-insight">
+      <div>Seus stories das 21h quase não são vistos. Quer trocar para 19h?</div>
+      <button class="btn btn-mini btn-ok" style="margin-top:10px" onclick="aplicarSugestao()">Aplicar sugestão</button>
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+/* ===== Estado ===== */
+var ABA = 'config';
+
+var FALAS = {
+  config:     'Vamos conectar sua conta e definir o plano de postagens. Comece pela conexão com o Instagram.',
+  pasta:      'Mande seus vídeos, fotos e áudios aqui. Eu analiso tudo e já separo o que serve pra reel e pra story.',
+  biblioteca: 'Aqui fica tudo que eu já analisei. Clique em um item para ver os trechos sugeridos.',
+  roteiros:   'Criei estes roteiros para a semana. Aprove, peça ajustes ou edite direto.',
+  calendario: 'Preparei 8 stories e 2 reels pra hoje. 3 estão esperando sua aprovação — dá uma olhada!',
+  metricas:   'Seus reels de bastidor tiveram 2× mais alcance esta semana! Vou gerar mais desses. E seus stories das 21h quase não são vistos — quer mudar para 19h?'
+};
+
+var PLANOS = { leve:{s:3,r:1}, medio:{s:5,r:1}, intenso:{s:8,r:2} };
+
+var HORAS_STORIES = ['08h','10h','12h','14h','16h','18h','20h','21h'];
+var HORAS_REELS   = ['12h','19h'];
+
+var ARQUIVOS = [
+  { nome:'gravacao-clinica-02.mp4',  tipo:'Vídeo', tam:'1,2 GB', status:'ok',    st:'Analisado' },
+  { nome:'making-of-protese.mp4',    tipo:'Vídeo', tam:'480 MB', status:'warn',  st:'Mika analisando…', spin:true },
+  { nome:'foto-resultado-pedro.jpg', tipo:'Foto',  tam:'3,4 MB', status:'ok',    st:'Analisado' },
+  { nome:'depoimento-audio.m4a',     tipo:'Áudio', tam:'18 MB',  status:'ok',    st:'Analisado' },
+  { nome:'video-processo-01.mp4',    tipo:'Vídeo', tam:'2,1 GB', status:'muted', st:'Enviado' }
+];
+
+/* ===== Abas ===== */
+function trocarAba(a){
+  ABA = a;
+  renderAba();
+}
+
+function renderAba(){
+  var i, abas = ['config','pasta','biblioteca','roteiros','calendario','metricas'];
+  for(i=0;i<abas.length;i++){
+    var sec = document.getElementById('aba-'+abas[i]);
+    if(sec) sec.style.display = (abas[i]===ABA) ? '' : 'none';
+  }
+  var btns = document.getElementById('tabNav').getElementsByTagName('button');
+  for(i=0;i<btns.length;i++){
+    btns[i].className = (btns[i].getAttribute('data-tab')===ABA) ? 'on' : '';
+  }
+  document.getElementById('mikaFala').textContent = FALAS[ABA] || '';
+  window.scrollTo(0,0);
+}
+
+/* ===== Plano diário ===== */
+function selecionaPlano(p){
+  var b = document.getElementById('presets').getElementsByTagName('button');
+  for(var i=0;i<b.length;i++){ b[i].className = (b[i].getAttribute('data-plano')===p) ? 'preset on' : 'preset'; }
+  document.getElementById('inpStories').value = PLANOS[p].s;
+  document.getElementById('inpReels').value = PLANOS[p].r;
+  /* TODO: persistir preset escolhido */
+}
+
+function planoCustom(){
+  var b = document.getElementById('presets').getElementsByTagName('button');
+  for(var i=0;i<b.length;i++){ b[i].className = 'preset'; }
+  /* TODO: salvar valores customizados */
+}
+
+/* ===== Horários ===== */
+function renderHorarios(){
+  var grupos = [
+    { el:'horasStories', arr:HORAS_STORIES, cont:'contStories', tipo:'stories' },
+    { el:'horasReels',   arr:HORAS_REELS,   cont:'contReels',   tipo:'reels' }
+  ];
+  for(var g=0; g<grupos.length; g++){
+    var grp = grupos[g];
+    var cx = document.getElementById(grp.el);
+    cx.innerHTML = '';
+    for(var i=0; i<grp.arr.length; i++){
+      (function(tipo, idx){
+        var chip = document.createElement('span');
+        chip.className = 'hora-chip';
+        chip.appendChild(document.createTextNode(grp.arr[idx]));
+        var x = document.createElement('button');
+        x.className = 'chip-x'; x.type = 'button'; x.textContent = '✕';
+        x.title = 'Remover horário';
+        x.onclick = function(){ delHora(tipo, idx); };
+        chip.appendChild(x);
+        cx.appendChild(chip);
+      })(grp.tipo, i);
+    }
+    document.getElementById(grp.cont).textContent = grp.arr.length;
+  }
+}
+
+function addHora(tipo){
+  var v = prompt('Novo horário (ex.: 09h):');
+  if(!v) return;
+  v = v.replace(/^\s+|\s+$/g,'').toLowerCase();
+  if(!/^\d{1,2}h?$/.test(v)){ alert('Formato inválido. Use algo como 09h.'); return; }
+  if(v.charAt(v.length-1)!=='h') v += 'h';
+  var arr = (tipo==='stories') ? HORAS_STORIES : HORAS_REELS;
+  if(arr.indexOf(v) !== -1){ alert('Esse horário já existe.'); return; }
+  arr.push(v);
+  arr.sort();
+  renderHorarios();
+  /* TODO: salvar horários no plano */
+}
+
+function delHora(tipo, idx){
+  var arr = (tipo==='stories') ? HORAS_STORIES : HORAS_REELS;
+  arr.splice(idx,1);
+  renderHorarios();
+}
+
+/* ===== Arquivos ===== */
+function renderArquivos(){
+  var tb = document.getElementById('listaArq');
+  tb.innerHTML = '';
+  for(var i=0; i<ARQUIVOS.length; i++){
+    (function(idx){
+      var a = ARQUIVOS[idx];
+      var tr = document.createElement('tr');
+
+      var tdN = document.createElement('td');
+      tdN.className = 'nome'; tdN.textContent = a.nome;
+      tr.appendChild(tdN);
+
+      var tdT = document.createElement('td');
+      tdT.className = 'hide-m'; tdT.textContent = a.tipo;
+      tr.appendChild(tdT);
+
+      var tdM = document.createElement('td');
+      tdM.className = 'hide-m'; tdM.textContent = a.tam;
+      tr.appendChild(tdM);
+
+      var tdS = document.createElement('td');
+      var chip = document.createElement('span');
+      chip.className = 'chip chip-'+a.status;
+      chip.appendChild(document.createTextNode(a.st));
+      if(a.spin){
+        var sp = document.createElement('span');
+        sp.className = 'spin';
+        chip.appendChild(sp);
+      }
+      tdS.appendChild(chip);
+      tr.appendChild(tdS);
+
+      var tdA = document.createElement('td');
+      tdA.style.textAlign = 'right';
+      if(a.status==='ok'){
+        var b = document.createElement('button');
+        b.className = 'btn-outline btn-mini';
+        b.textContent = 'Ver análise';
+        b.onclick = function(){ verAnalise(idx); };
+        tdA.appendChild(b);
+      } else {
+        tdA.appendChild(document.createTextNode('—'));
+      }
+      tr.appendChild(tdA);
+
+      tb.appendChild(tr);
+    })(i);
+  }
+}
+
+function verAnalise(idx){
+  /* TODO: abrir painel com a análise da Mika para o arquivo */
+  alert('Análise da Mika para "'+ARQUIVOS[idx].nome+'" — em breve.');
+}
+
+/* ===== Config ===== */
+function reconectar(){
+  /* TODO: chamar Edge Function ig-auth-oauth (redirect Meta OAuth) */
+  alert('Reconexão com o Instagram — em breve.');
+}
+
+function salvarConfig(){
+  /* TODO: salvar em tabela postagem_planos via Supabase */
+  alert('Configurações salvas (demo).');
+}
+
+/* ===== Biblioteca ===== */
+function toggleTrechos(id){
+  var d = document.getElementById(id);
+  if(!d) return;
+  var abrir = (' '+d.className+' ').indexOf(' on ') === -1;
+  d.className = abrir ? 'trechos on' : 'trechos';
+  var b = document.getElementById('vtb-'+id);
+  if(b) b.textContent = abrir ? 'Ver trechos ▴' : 'Ver trechos ▾';
+}
+
+function usarEmRoteiro(nome){
+  /* TODO: abrir aba Roteiros com este material pré-selecionado */
+  alert('TODO: abrir aba Roteiros com este material pré-selecionado');
+}
+
+/* ===== Roteiros ===== */
+function toggleDet(btn){
+  var det = btn.nextElementSibling;
+  var abrir = (' '+det.className+' ').indexOf(' on ') === -1;
+  det.className = abrir ? 'rot-det on' : 'rot-det';
+  btn.textContent = abrir ? 'Detalhes ▴' : 'Detalhes ▾';
+}
+
+function filtrarRoteiros(btn){
+  var fs = btn.parentNode.getElementsByTagName('button');
+  for(var i=0;i<fs.length;i++){ fs[i].className = (fs[i]===btn) ? 'filtro on' : 'filtro'; }
+  var f = btn.getAttribute('data-f');
+  var cards = document.getElementById('rotLista').getElementsByClassName('rot-card');
+  for(var j=0;j<cards.length;j++){
+    var c = cards[j], mostrar = false;
+    if(f==='todos') mostrar = true;
+    else if(f==='reel') mostrar = c.getAttribute('data-tipo')==='reel';
+    else if(f==='story') mostrar = c.getAttribute('data-tipo')==='story';
+    else if(f==='aguardando') mostrar = c.getAttribute('data-status')==='aguardando';
+    else if(f==='aprovado') mostrar = c.getAttribute('data-status')==='aprovado';
+    c.style.display = mostrar ? '' : 'none';
+  }
+}
+
+function aprovarRoteiro(btn){
+  var card = btn;
+  while(card && (' '+card.className+' ').indexOf(' rot-card ')===-1){ card = card.parentNode; }
+  if(!card) return;
+  card.setAttribute('data-status','aprovado');
+  var st = card.querySelector('.rot-status');
+  if(st){ st.className = 'chip chip-ok rot-status'; st.textContent = 'Aprovado'; }
+  btn.disabled = true;
+  btn.textContent = '✓ Aprovado';
+  btn.style.color = 'var(--ok)';
+  btn.style.borderColor = 'rgba(76,197,138,.4)';
+  btn.style.cursor = 'default';
+  /* TODO: chamar Edge Function roteiro-aprovar */
+}
+
+function outraVersao(btn){
+  /* TODO: chamar Edge Function roteiro-regenerar */
+  alert('TODO: Mika vai gerar nova versão deste roteiro via Edge Function roteiro-regenerar');
+}
+
+function editarRoteiro(btn){
+  var card = btn;
+  while(card && (' '+card.className+' ').indexOf(' rot-card ')===-1){ card = card.parentNode; }
+  if(!card) return;
+  var det = card.querySelector('.rot-det');
+  var ta = card.querySelector('.rot-edit');
+  if(ta){
+    var linhas = ta.value.split('\n'), html = '';
+    for(var i=0;i<linhas.length;i++){ html += '<div class="det-item"></div>'; }
+    det.innerHTML = html;
+    var divs = det.querySelectorAll('.det-item');
+    for(var j=0;j<divs.length;j++){ divs[j].textContent = linhas[j]; }
+    det.parentNode.removeChild(ta);
+    btn.textContent = '✏ Editar';
+  } else {
+    var itens = det.querySelectorAll('.det-item'), vals = [];
+    for(var k=0;k<itens.length;k++){ vals.push(itens[k].textContent); }
+    ta = document.createElement('textarea');
+    ta.className = 'rot-edit';
+    ta.value = vals.join('\n');
+    det.style.display = 'none';
+    det.parentNode.insertBefore(ta, det);
+    btn.textContent = '💾 Salvar';
+  }
+}
+
+/* ===== Calendário ===== */
+function paiSlot(el){
+  while(el && el!==document){
+    if((' '+el.className+' ').indexOf(' cal-slot ')!==-1) return el;
+    el = el.parentNode;
+  }
+  return null;
+}
+
+function calVista(v){
+  document.getElementById('calVistaDia').className = (v==='dia') ? 'filtro on' : 'filtro';
+  document.getElementById('calVistaSemana').className = (v==='semana') ? 'filtro on' : 'filtro';
+  document.getElementById('calDia').style.display = (v==='dia') ? '' : 'none';
+  document.getElementById('calSemana').style.display = (v==='semana') ? '' : 'none';
+}
+
+function irDia(){
+  /* TODO: navegar para a visão dia do dia clicado */
+  alert('TODO: navegar para a visão dia selecionado');
+}
+
+function marcaSlotAprovado(slot){
+  slot.setAttribute('data-status','aprovado');
+  var chips = slot.querySelector('.cal-chips');
+  var st = chips.querySelector('.chip-warn');
+  if(st){ st.className = 'chip chip-ok'; st.textContent = 'Aprovado'; }
+  var acoes = slot.querySelector('.cal-acoes');
+  acoes.innerHTML = '';
+  var ok = document.createElement('button');
+  ok.className = 'btn-outline btn-mini'; ok.disabled = true;
+  ok.style.color = 'var(--ok)'; ok.style.borderColor = 'rgba(76,197,138,.4)'; ok.style.cursor = 'default';
+  ok.textContent = '✓ Aprovado';
+  var ed = document.createElement('button');
+  ed.className = 'btn-outline btn-mini'; ed.textContent = '✏ Editar legenda';
+  ed.onclick = function(){ editarLegenda(this); };
+  acoes.appendChild(ok); acoes.appendChild(ed);
+}
+
+function aprovarDia(){
+  if(!confirm('Aprovar todas as peças aguardando de hoje?')) return;
+  var slots = document.querySelectorAll('#calDia .cal-slot[data-status="aguardando"]');
+  for(var i=0;i<slots.length;i++){ marcaSlotAprovado(slots[i]); }
+  /* TODO: chamar Edge Function calendario-aprovar-dia */
+}
+
+function aprovarSlot(btn){
+  var slot = paiSlot(btn);
+  if(slot) marcaSlotAprovado(slot);
+  /* TODO: chamar Edge Function calendario-aprovar-peca */
+}
+
+function editarLegenda(btn){
+  var slot = paiSlot(btn);
+  if(!slot) return;
+  var t = slot.querySelector('.cal-titulo');
+  var v = prompt('Nova legenda:', t.textContent);
+  if(v!==null && v.replace(/^\s+|\s+$/g,'')!==''){
+    t.textContent = v;
+    /* TODO: salvar legenda no slot */
+  }
+}
+
+function trocarHorario(btn){
+  var slot = paiSlot(btn);
+  if(!slot) return;
+  var v = prompt('Novo horário (ex.: 15h00):', slot.getAttribute('data-hora'));
+  if(!v) return;
+  v = v.replace(/^\s+|\s+$/g,'');
+  if(!/^\d{1,2}h\d{2}$/.test(v)){ alert('Formato inválido. Use algo como 15h00.'); return; }
+  slot.setAttribute('data-hora', v);
+  slot.querySelector('.cal-topo b').textContent = v;
+  /* TODO: salvar novo horário do slot */
+}
+
+function descartarSlot(btn){
+  var slot = paiSlot(btn);
+  if(!slot) return;
+  if(!confirm('Descartar esta peça?')) return;
+  slot.parentNode.removeChild(slot);
+  /* TODO: chamar Edge Function calendario-descartar */
+}
+
+function marcarPostado(btn){
+  var slot = paiSlot(btn);
+  if(!slot) return;
+  slot.setAttribute('data-status','postado');
+  var c = slot.querySelector('.cal-chips .chip-bad');
+  if(c){ c.className = 'chip chip-ok'; c.textContent = 'Postado'; }
+  var acoes = slot.querySelector('.cal-acoes');
+  acoes.innerHTML = '';
+  var ok = document.createElement('button');
+  ok.className = 'btn-outline btn-mini'; ok.disabled = true;
+  ok.style.color = 'var(--ok)'; ok.style.borderColor = 'rgba(76,197,138,.4)'; ok.style.cursor = 'default';
+  ok.textContent = '✓ Postado';
+  acoes.appendChild(ok);
+  /* TODO: registrar o post manual no histórico */
+}
+
+function sugerirPeca(){
+  /* TODO: Mika gera sugestão para o slot via Edge Function roteiro-sugerir */
+  alert('TODO: Mika vai sugerir uma peça para este slot livre');
+}
+
+/* ===== Métricas ===== */
+function metPeriodo(btn){
+  var fs = btn.parentNode.getElementsByTagName('button');
+  for(var i=0;i<fs.length;i++){ fs[i].className = (fs[i]===btn) ? 'filtro on' : 'filtro'; }
+  /* TODO: buscar métricas do período via Edge Function metricas-resumo */
+}
+
+function metFiltroFormato(btn){
+  var fs = btn.parentNode.getElementsByTagName('button');
+  for(var i=0;i<fs.length;i++){ fs[i].className = (fs[i]===btn) ? 'filtro on' : 'filtro'; }
+  var f = btn.getAttribute('data-f');
+  if(f==='stories') metFormato('stories');
+  else if(f==='reels') metFormato('reels');
+  /* TODO: filtrar KPIs e ranking pelo formato */
+}
+
+function metFormato(fmt){
+  document.getElementById('fmtStories').className = (fmt==='stories') ? 'filtro on' : 'filtro';
+  document.getElementById('fmtReels').className = (fmt==='reels') ? 'filtro on' : 'filtro';
+  document.getElementById('metStories').style.display = (fmt==='stories') ? '' : 'none';
+  document.getElementById('metReels').style.display = (fmt==='reels') ? '' : 'none';
+}
+
+function verMetricas(titulo){
+  /* TODO: abrir métricas detalhadas da peça via Edge Function metricas-peca */
+  alert('TODO: abrir métricas detalhadas de "'+titulo+'"');
+}
+
+function verRoteirosBastidor(){
+  /* TODO: abrir aba Roteiros filtrada em bastidor */
+  alert('TODO: abrir aba Roteiros filtrada em bastidor');
+}
+
+function aplicarSugestao(){
+  /* TODO: atualizar horário 21h para 19h no plano */
+  alert('TODO: atualizar horário 21h para 19h no plano');
+}
+
+/* ===== Início ===== */
+function init(){
+  var btns = document.getElementById('tabNav').getElementsByTagName('button');
+  for(var i=0;i<btns.length;i++){
+    btns[i].onclick = function(){ trocarAba(this.getAttribute('data-tab')); };
+  }
+  document.getElementById('cor1').oninput = function(){ document.getElementById('cor1hex').textContent = this.value; };
+  document.getElementById('cor2').oninput = function(){ document.getElementById('cor2hex').textContent = this.value; };
+  /* TODO: drag & drop no #drop */
+  renderHorarios();
+  renderArquivos();
+  renderAba();
+}
+
+if(document.readyState!=='loading'){ init(); }
+else{ document.addEventListener('DOMContentLoaded', init); }
+</script>
+</body>
+</html>
