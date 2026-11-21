@@ -1112,7 +1112,7 @@ body:has(#neg-ov) .vt-b{display:none}
 #rl-bar .rl-esp{font-weight:600}
 #esp-nome{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font:inherit;background:var(--surface);color:inherit}
 body.espelho #rl-bar{background:#4B2A99}
-body.espelho [data-act=pedNovo],body.espelho [data-act=cliNovo],body.espelho [data-act=finNovoAbre],body.espelho [data-act=pedCadistas],body.espelho .finpagnovo,body.espelho [data-act=finMesSalva],body.espelho [data-act=finMesApaga],body.espelho [data-act=pedSalva],body.espelho [data-act=pedApaga],body.espelho [data-act=cliSalva],body.espelho [data-act=cliApaga],body.espelho .pcard-f .btn,body.espelho [data-act=finComSaca],body.espelho [data-act=finCfgSalva],body.espelho [data-act=negTabCat],body.espelho .tbl-x,body.espelho .finextr label,body.espelho [data-act=finPagAnula],body.espelho [data-act=pUpgrade]{display:none!important}
+body.espelho [data-act=pedNovo],body.espelho [data-act=cliNovo],body.espelho [data-act=finNovoAbre],body.espelho [data-act=pedCadistas],body.espelho .finpagnovo,body.espelho [data-act=finMesSalva],body.espelho [data-act=finMesApaga],body.espelho [data-act=pedSalva],body.espelho [data-act=pedApaga],body.espelho [data-act=cliSalva],body.espelho [data-act=cliApaga],body.espelho .pcard-f .btn,body.espelho [data-act=finComSaca],body.espelho [data-act=finComAnexo],body.espelho [data-act=finCfgSalva],body.espelho [data-act=negTabCat],body.espelho .tbl-x,body.espelho .finextr label,body.espelho [data-act=finPagAnula],body.espelho [data-act=pUpgrade]{display:none!important}
 
 /* aba Inove (amarela) */
 .dabas button.aba-inove{background:#FFD43B;color:#3B2F00;border-radius:10px;margin:4px 2px}.dabas button.aba-inove[aria-selected=true]{background:#F5B800;color:#2A2100;box-shadow:inset 0 -3px 0 #2A2100}
@@ -1123,6 +1123,12 @@ body.espelho [data-act=pedNovo],body.espelho [data-act=cliNovo],body.espelho [da
 .ino-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .ino-kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;display:grid;gap:4px}.ino-kpi small{text-transform:uppercase;letter-spacing:.04em;font-size:.68rem;color:var(--muted);font-weight:700}.ino-kpi b{font-size:1.2rem}
 .ino-kpi.dest{border-color:#5B8CFF;box-shadow:0 0 0 1px #5B8CFF inset}.ino-kpi.dest b{color:#3A6BE0}
+.ino-com{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px;margin-bottom:4px}
+.ino-com-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ino-com-row{display:flex;align-items:center;gap:8px;font-size:.9rem;padding:7px 0;border-top:1px solid var(--line)}
+.ino-com-row b{font-variant-numeric:tabular-nums}
+.ino-com-vazio{color:var(--muted);font-size:.88rem;padding:4px 0;margin:0}
+@media(max-width:600px){.ino-com-kpis{grid-template-columns:1fr 1fr}}
 .ino-nota{margin:8px 0 4px}
 .ino-pont{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0}.ino-lnk{border:0;background:none;color:var(--accent);font:inherit;font-size:.85rem;cursor:pointer;text-decoration:underline}
 .ino-ved{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.ino-ved input{border:1px solid var(--line);border-radius:10px;padding:6px 8px;font:inherit;background:var(--surface);color:inherit}
@@ -5119,7 +5125,28 @@ Object.assign(ACT,{
     var det=L.map(function(m){var base=finPago(m)-(+m.comissionado||0);return {cliente_reg:m.cliente_reg,ano:m.ano,mes:m.mes,valor_pago:Math.round(finPago(m)*100)/100,valor_base_comissao:Math.round(base*100)/100,comissao:Math.round(base*pct*100)/100};}),tot=Math.round(det.reduce(function(s,x){return s+x.comissao;},0)*100)/100;
     if(!confirm('Registrar que você recebeu '+fmtR(tot)+' de comissão?'))return;
     SB.from('odo_fin_comissoes').insert({user_id:RL.user.id,valor_total:tot,valor_calculado:tot,detalhes:det}).select('*').single().then(function(r){if(r.error){toast('Não consegui registrar.');return;}FIN.C.unshift(r.data);
-      return Promise.all(L.map(function(m){var v=Math.round(finPago(m)*100)/100;return SB.from('odo_fin_meses').update({comissionado:v}).eq('id',m.id).then(function(x){if(!x.error)m.comissionado=v;});}));}).then(function(){render();toast('Comissão registrada.');});}});
+      return Promise.all(L.map(function(m){var v=Math.round(finPago(m)*100)/100;return SB.from('odo_fin_meses').update({comissionado:v}).eq('id',m.id).then(function(x){if(!x.error)m.comissionado=v;});}));}).then(function(){render();toast('Comissão registrada.');if(FIN.C[0]&&confirm('Quer anexar o comprovante agora?'))ACT.finComAnexo(FIN.C[0].id);});}});
+Object.assign(ACT,{
+  finComAnexo:function(v){
+    if(ESP.dono)return;
+    var c=FIN.C.filter(function(x){return x.id===v;})[0];if(!c)return;
+    if(!('comprovante_path' in c)){toast('⚠️ Falta rodar a atualização 092 no banco de dados.');return;}
+    var inp=document.createElement('input');inp.type='file';inp.accept='.pdf,.jpg,.jpeg,.png,.webp';
+    inp.onchange=function(){
+      var f=(inp.files||[])[0];if(!f)return;
+      if(f.size>10*1024*1024){toast('Arquivo muito grande (máx. 10 MB).');return;}
+      var ext=(String(f.name).match(/\.([a-z0-9]+)$/i)||[])[1]||'jpg';
+      var path=donoId()+'/comissoes/'+v+'.'+ext.toLowerCase();
+      toast('Enviando comprovante…');
+      SB.storage.from('odonto-fin').upload(path,f,{contentType:f.type,upsert:true}).then(function(r){
+        if(r.error){toast('Não consegui enviar o arquivo.');return;}
+        return SB.from('odo_fin_comissoes').update({comprovante_path:path}).eq('id',v).eq('user_id',donoId()).select('*').single().then(function(r2){
+          if(r2.error){SB.storage.from('odonto-fin').remove([path]);
+            if(/comprovante_path|column/i.test(String(r2.error.message||'')))toast('⚠️ Falta rodar a atualização 092 no banco de dados.');
+            else toast('Não consegui salvar o comprovante.');return;}
+          var ci=FIN.C.filter(function(x){return x.id===v;})[0];if(ci)ci.comprovante_path=r2.data.comprovante_path;
+          render();toast('Comprovante anexado.');});});};
+    inp.click();}});
 document.addEventListener('change',function(e){var t=e.target;if(t.id==='fx-arq'){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0],f=(t.files||[])[0];if(!m||!f)return;var velho=m.extrato_path;
   finTrocaArq(f,'extratos/'+m.ano+'-'+String(m.mes).padStart(2,'0')).then(function(path){return SB.from('odo_fin_meses').update({extrato_path:path,extrato_recebido:true}).eq('id',m.id).select('*').single().then(function(r){if(r.error){SB.storage.from('odonto-fin').remove([path]);toast('Não consegui salvar o extrato.');return;}finAtual(r.data);if(velho)SB.storage.from('odonto-fin').remove([velho]);render();toast('Extrato anexado.');});}).catch(function(){});}});
 
@@ -5170,9 +5197,22 @@ function rInove(){if(!FIN.carregado)return '<div class="empty">Carregando…</di
   var venc=finVenc(FIN.ano,FIN.mes),vi=isoD(venc),auto=!(EMP.row&&EMP.row.dados&&EMP.row.dados.venc&&EMP.row.dados.venc[FIN.ano+'-'+FIN.mes]),atr=inoAtrasados(L,vi);
   var q=semAc(INO.q||''),V=L.filter(function(m){var s=finSt(m)[0];return (INO.f==='todos'||(INO.f==='quitado'&&s==='pago')||(INO.f==='parcial'&&s==='parcial')||(INO.f==='nada'&&(s==='aberto')))&&(!q||semAc(finCliNome(m)).indexOf(q)>=0);});var urg={};INO._urg={};try{biaLista().forEach(function(b){urg[b.k]=b.dias;if(b.dias>0&&!b.prom)INO._urg[b.k]=b.dias;});}catch(e){}V.sort(function(a,b){var ra=Math.max(0,finRest(a))>0.005,rb=Math.max(0,finRest(b))>0.005;return (rb-ra)||((urg[finCliK(b)]||-99)-(urg[finCliK(a)]||-99))||(finRest(b)-finRest(a));});
   var mesNome=MESES[FIN.mes-1].charAt(0).toUpperCase()+MESES[FIN.mes-1].slice(1);
+  var comPend=finComPend(),comRecv=FIN.C.reduce(function(s,c){return s+(+c.valor_total||0);},0);
+  var comTemCol=FIN.C.length===0||('comprovante_path' in FIN.C[0]);
+  var comSec='<div class="ino-com"><h3 class="small" style="text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;margin:0">Comissão</h3>'+
+    '<div class="ino-com-kpis">'+
+    '<div class="ino-kpi"><small>A receber</small><b>'+fmtR(comPend)+'</b></div>'+
+    '<div class="ino-kpi"><small>Já recebido</small><b>'+fmtR(comRecv)+'</b></div>'+
+    '<div class="ino-kpi dest"><small>Total</small><b>'+fmtR(comPend+comRecv)+'</b></div>'+
+    '</div>'+
+    (!ESP.dono&&comPend>0.005?'<div><button class="btn" data-act="finComSaca">Recebi a comissão</button></div>':'')+
+    (!comTemCol?'<p class="small" style="color:var(--warn);margin:0">⚠️ Falta rodar a atualização 092 no banco de dados.</p>':'')+
+    (FIN.C.length?FIN.C.map(function(c){var d=c.data?new Date(c.data).toLocaleDateString('pt-BR'):'';var mr=(c.ano&&c.mes)?MESES[c.mes-1]+'/'+c.ano:'';return '<div class="ino-com-row"><b>'+fmtR(c.valor_total)+'</b><span class="muted small">'+d+(mr?' · '+mr:'')+'</span><span class="spacer"></span>'+(c.comprovante_path?'<button class="ino-chip" data-act="finArqVer" data-v="'+esc(c.comprovante_path)+'">📎 Comprovante</button>':!ESP.dono?'<button class="btn sm" data-act="finComAnexo" data-v="'+esc(c.id)+'">Anexar</button>':'')+'</div>';}).join(''):'<p class="ino-com-vazio">Nenhum recebimento registrado ainda.</p>')+
+    '</div>';
   return '<div class="ino"><div class="ino-top"><div><small>Inove 3D Lab</small><h2>Conferência do mês</h2></div><span class="spacer"></span><div class="finnav"><button class="btn sm" data-act="finMesMuda" data-v="-1" aria-label="Mês anterior">‹</button><b>'+mesNome+' de '+FIN.ano+'</b><button class="btn sm" data-act="finMesMuda" data-v="1" aria-label="Próximo mês">›</button></div></div>'+
     '<div class="ino-kpis">'+[['Total do mês',fmtR(tot),''],['Total pago',fmtR(pg),''],['Saldo a receber',fmtR(sal),''],['% pago do mês',pc+'% pago','dest'],['Clientes que pagaram',pagaram+' de '+com.length+' clientes pagaram','']].map(function(k){return '<div class="ino-kpi '+k[2]+'"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>';}).join('')+'</div>'+
     '<p class="small muted ino-nota">ⓘ Saldos consideram pagamentos a partir de 14/06/2026.</p>'+
+    comSec+
     '<div class="ino-pont"><b>Pontualidade — vencimento '+venc.toLocaleDateString('pt-BR')+'</b>'+(ESP.dono?'':'<button class="ino-lnk" data-act="inoVencEd">'+(INO.ved?'fechar':'editar')+'</button>')+
       (INO.ved&&!ESP.dono?'<span class="ino-ved"><input type="date" id="ino-venc" value="'+vi+'"><button class="btn sm" data-act="inoVenc">Salvar</button>'+(auto?'':'<button class="btn sm" data-act="inoVencAuto">Usar automático</button>')+'</span>':'')+
       '<button class="ino-atr" data-act="inoAtr">🐌 '+atr.length+' atrasado'+(atr.length!==1?'s':'')+'</button></div>'+
@@ -5218,7 +5258,7 @@ var _rlBarra=rlBarra;rlBarra=function(){_rlBarra();var b=document.getElementById
   else if(ESP.lista.length){var x=document.createElement('button');x.dataset.act='espTroca';x.dataset.v=ESP.lista[0].dono_id;x.textContent='🪞 Ver '+(ESP.lista[0].emp||'conta espelho');b.insertBefore(x,b.lastChild);}};
 /* nada se grava no modo espelho (o banco também recusa) */
 var ESP_ESCRITA=['cliNovo','cliSalva','cliApaga','pedNovo','pedSalva','pedApaga','pedAprova','pedDesFeito','pedInove','pedPronto','pedEntrega','pedCadNovo','pedCadAtivo','pedTipo','pedCalc',
-  'finNovoAbre','finNovoSalva','finMigra','pedRetoma','pedAguarda','inoVenc','inoVencAuto','finMesSalva','finMesApaga','finCred','finPagNovo','finPagAnula','finCfgSalva','finComSaca','finResumoTeste','negTabCat','negServNovo','negServTira','negApaga','negIr','pUpgrade','cfgSenha','espNovo','espCorta','espVolta','espApaga'];
+  'finNovoAbre','finNovoSalva','finMigra','pedRetoma','pedAguarda','inoVenc','inoVencAuto','finMesSalva','finMesApaga','finCred','finPagNovo','finPagAnula','finCfgSalva','finComSaca','finComAnexo','finResumoTeste','negTabCat','negServNovo','negServTira','negApaga','negIr','pUpgrade','cfgSenha','espNovo','espCorta','espVolta','espApaga'];
 ESP_ESCRITA.forEach(function(k){var f=ACT[k];if(typeof f!=='function')return;ACT[k]=function(){if(ESP.dono){toast('🪞 Conta espelho: aqui é só para acompanhar, sem editar.');return;}return f.apply(this,arguments);};});
 var _negSalvaE=negSalva;negSalva=function(){if(ESP.dono)return;return _negSalvaE.apply(this,arguments);};
 var _rlSalvaPfE=rlSalvaPf;rlSalvaPf=function(){if(ESP.dono)return;return _rlSalvaPfE.apply(this,arguments);};
