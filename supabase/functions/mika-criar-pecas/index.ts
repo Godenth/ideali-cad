@@ -231,9 +231,12 @@ serve(async (req) => {
 
   let clienteId: string
   try {
-    const sbUser = createClient(sbUrl, Deno.env.get('SUPABASE_ANON_KEY') ?? sbServiceKey)
-    const { data } = await sbUser.auth.getUser(tokenUsuario)
-    if (!data.user) return jsonResp(401, { error: 'Não autenticado' })
+    const sbAnon = Deno.env.get('SUPABASE_ANON_KEY') ?? sbServiceKey
+    const sbUser = createClient(sbUrl, sbAnon, {
+      global: { headers: { Authorization: `Bearer ${tokenUsuario}` } },
+    })
+    const { data, error } = await sbUser.auth.getUser()
+    if (error || !data.user) return jsonResp(401, { error: 'Não autenticado' })
     clienteId = data.user.id
   } catch {
     return jsonResp(401, { error: 'Não autenticado' })
