@@ -69,6 +69,11 @@ body:not(.rl-master) .vt-b,body:not(.rl-master) .roles,body:not(.rl-master) .pro
 .pchips .pedtp{font-weight:700}.pedc.pc-cad .pedtp{background:color-mix(in srgb,#7B3FE4 16%,var(--surface));color:#6A2FD0}.pedc.pc-ana .pedtp{background:color-mix(in srgb,#1DAE8A 16%,var(--surface));color:#0F7A5F}
 .btn.pedbtn{background:#7B3FE4;color:#fff;border-color:#7B3FE4}.pedok{color:#6A2FD0;font-weight:700}
 .pedfil{margin:4px 0 12px}.pedorc{border-color:color-mix(in srgb,#E8A33A 55%,var(--line));background:color-mix(in srgb,#E8A33A 10%,var(--surface))}
+.pedpend[aria-pressed="true"]{background:#F59E0B!important;border-color:#F59E0B!important;color:#3B2600!important;font-weight:700}
+.pedpend{border-color:color-mix(in srgb,#F59E0B 55%,var(--line))}
+.pcard.ped-agp-conf{border:2px solid #D97706!important;animation:none!important;box-shadow:0 0 0 3px rgba(245,158,11,.25)}
+.ped-agp-badge.conf{background:#FDE68A;color:#78350F;border-color:#D97706;animation:none}
+.btn.sm.ped-agp-btn.conf{background:#D97706!important;border-color:#D97706!important;color:#fff!important}
 .pedlista{display:grid;gap:6px}
 .pedli{display:grid;grid-template-columns:56px 1fr auto 70px 100px;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;font:inherit;color:inherit;cursor:pointer}
 .pedli:hover{background:var(--soft)}.pedli.pc-cad{border-left:4px solid #7B3FE4}
@@ -4529,7 +4534,7 @@ var ACT={
   aprovar:function(v){var e=emp(v);e.status='aprovada';render();toast(e.fantasia+' aprovada. Ela recebe um e-mail e já vê o feed.');},
   recusarEmp:function(v){var e=emp(v),m=(S.motivo[v]||'').trim();if(!m){toast('Escreva o motivo antes de recusar.');var i=$('mot-'+v);if(i)i.focus();return;}e.status='recusada';e.motivo=m;render();toast(e.fantasia+' recusada. Ela recebe o motivo por e-mail.');}};
 document.addEventListener('focusin',function(ev){if(ev.target.dataset&&ev.target.dataset.iw)instLista(ev.target);});
-document.addEventListener('click',function(ev){if(!ev.target.closest('.ifld'))[].forEach.call(document.querySelectorAll('.inst-lista'),function(l){l.hidden=true;});var b=ev.target.closest('[data-act]');if(!b||b.disabled)return;var f=ACT[b.dataset.act];if(f){ev.preventDefault();f(b.dataset.v,b);}});
+document.addEventListener('click',function(ev){if(!ev.target.closest('.ifld'))[].forEach.call(document.querySelectorAll('.inst-lista'),function(l){l.hidden=true;});var b=ev.target.closest('[data-act]');if(!b||b.disabled)return;if(b.dataset.act==='pedAbre'&&ev.target.closest('.ped-agp-pop,.ped-agp-mot,input,textarea'))return;var f=ACT[b.dataset.act];if(f){ev.preventDefault();f(b.dataset.v,b);}});
 document.addEventListener('input',function(ev){var t=ev.target;
   if(t.id==='rede-q'){S.rede.q=t.value;var pl=$('rprofs');if(pl)pl.innerHTML=rProfsLista();return;}
   
@@ -4906,17 +4911,17 @@ function pedCli(p){var c=p.cliente_id&&EMP.cli.filter(function(x){return x.id===
 function pedAtivos(){return PED.L.filter(function(p){return !p.arquivado&&p.status!=='cancelado';});}
 function pedBadge(){return pedAtivo()?pedAtivos().filter(function(p){return p.status==='desenho';}).length:0;}
 function pedRisco(p){if(!p.prazo||p.status==='finalizado'||p.status==='entregue'||p.status==='cancelado')return '';var n=dDif(p.prazo);return n<0?'atrasado':n===0?'hoje':n===1?'amanha':'';}
-function pedFiltra(L){var f=PED.f,q=semAc(PED.busca||'');return L.filter(function(p){return (f==='todos'||(f==='urg'?p.urgente:p.tipo===f))&&(!q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(q)>=0);});}
+function pedFiltra(L){var f=PED.f,q=semAc(PED.busca||'');return L.filter(function(p){var ok=f==='todos'||(f==='urg'?p.urgente:f==='pend'?!!p.aguardando_pendencia:p.tipo===f);return ok&&(!q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(q)>=0);});}
 function pedDentes(p){return p.dentes&&p.dentes.length?(p.dentes.length>1?'dentes ':'dente ')+p.dentes.join(', '):'';}
 function pedNx(p){if(p.status==='orcamento')return ['pedAprova','✓ Aprovar'];if(p.status==='aguardando')return ['pedRetoma','▶ Retomar desenho'];if(p.status==='desenho')return p.desenho_feito?['pedInove','📤 Enviar para Inove']:['pedDesFeito','✓ Desenho feito'];
   return {producao:['pedPronto','✓ Pronto'],finalizado:['pedEntrega','Entregue']}[p.status]||null;}
 function pedCard(p){var r=pedRisco(p),nx=pedNx(p),cad=p.tipo==='cad';
-  return '<article class="pcard pedc'+(cad?' pc-cad':' pc-ana')+' st-'+p.status+(r?' '+r:'')+(p.urgente?' urg':'')+(p.aguardando_pendencia?' ped-agp':'')+'" data-act="pedAbre" data-v="'+p.id+'" tabindex="0">'+
+  return '<article class="pcard pedc'+(cad?' pc-cad':' pc-ana')+' st-'+p.status+(r?' '+r:'')+(p.urgente?' urg':'')+(p.aguardando_pendencia?(p.pendencia_aguardando_conferencia?' ped-agp ped-agp-conf':' ped-agp'):'')+'" data-act="pedAbre" data-v="'+p.id+'" tabindex="0">'+
     '<div class="pcard-h"><b>'+(p.numero?'<span class="pedn">#'+p.numero+'</span> ':'')+esc(p.paciente||'Sem paciente')+'</b>'+(p.urgente?'<span class="pill bad">Urgente</span>':'')+'</div>'+
     '<span class="small muted">'+esc(pedCli(p))+'</span>'+
     '<div class="pchips"><span class="pedtp">'+(cad?'🟣 CAD':'🧪 Analógico')+'</span>'+(p.trabalho?'<span>'+esc(p.trabalho.length>50?p.trabalho.slice(0,48)+'…':p.trabalho)+'</span>':'')+(pedDentes(p)?'<span>'+esc(pedDentes(p))+'</span>':'')+(p.cor?'<span>Cor '+esc(p.cor)+'</span>':'')+(p.cadista_nome?'<span>✏️ '+esc(p.cadista_nome)+'</span>':'')+'</div>'+
-    (function(){var se=pedSubEtapa(p);return (se?'<span class="ped-sub'+(se[1]?' '+se[1]:'')+'">'+esc(se[0])+'</span>':'')+(p.aguardando_pendencia?'<span class="ped-agp-badge">⏳ Aguardando pendência</span>':'');})()+
-    (p.aguardando_pendencia&&p.motivo_pendencia?'<div class="ped-agp-mot">⚠️ Pendência: <span>'+esc(p.motivo_pendencia)+'</span><button type="button" class="ped-agp-edit" data-act="pedPendEdita" data-v="'+p.id+'">editar</button></div>':'')+
+    (function(){var se=pedSubEtapa(p);return (se?'<span class="ped-sub'+(se[1]?' '+se[1]:'')+'">'+esc(se[0])+'</span>':'')+(p.aguardando_pendencia?(p.pendencia_aguardando_conferencia?'<span class="ped-agp-badge conf">📩 Resposta recebida · conferir</span>':'<span class="ped-agp-badge">⏳ Aguardando pendência</span>'):'');})()+
+    (p.aguardando_pendencia&&p.motivo_pendencia?'<div class="ped-agp-mot">⚠️ Pendência: <span onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" onmousedown="event.stopPropagation()">'+esc(p.motivo_pendencia)+'</span><button type="button" class="ped-agp-edit" data-act="pedPendEdita" data-v="'+p.id+'">editar</button></div>':'')+
     '<div class="pcard-f"><span class="pprz'+(r?' '+r:'')+'">'+(p.prazo?(r==='atrasado'?'Atrasado · ':'')+'Prazo '+esc(dFmt(p.prazo)):'Sem prazo')+'</span>'+(nx?'<button class="btn sm'+(p.status==='desenho'?' pedbtn':'')+'" data-act="'+nx[0]+'" data-v="'+p.id+'">'+nx[1]+'</button>':'')+'</div></article>';}
 function pedOrdem(a,b){return ((b.urgente?1:0)-(a.urgente?1:0))||((a.prazo||'9999')<(b.prazo||'9999')?-1:(a.prazo||'9999')>(b.prazo||'9999')?1:0)||((b.numero||0)-(a.numero||0));}
 function rPedidos(){if(!PED.carregado)return '<div class="empty">Carregando os pedidos…</div>';
@@ -4924,10 +4929,12 @@ function rPedidos(){if(!PED.carregado)return '<div class="empty">Carregando os p
   if(PED.erro)return '<section class="ptrava neg-vz"><div class="neg-vz-ic">⚠️</div><h2>Não consegui carregar os pedidos</h2><button class="btn pri" data-act="pedRecarrega">Tentar de novo</button></section>';
   if(PED.ed)return rPedForm(PED.ed);if(PED.vcad)return rPedCadistas();
   var A=pedAtivos(),nOrc=A.filter(function(p){return p.status==='orcamento';}).length,nCad=A.filter(function(p){return p.tipo==='cad';}).length,nAna=A.length-nCad;
+  var _q=semAc(PED.busca||''),nPend=A.filter(function(p){var ok=PED.f==='todos'||PED.f==='pend'||(PED.f==='urg'?p.urgente:p.tipo===PED.f);return ok&&p.aguardando_pendencia&&(!_q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(_q)>=0);}).length;
   var topo='<div class="dtop"><div><h2>Pedidos</h2><p class="small muted">'+(function(n){return n+(n===1?' desenho CAD a fazer':' desenhos CAD a fazer');})(A.filter(function(p){return p.status==='desenho';}).length)+' · '+A.filter(function(p){return p.status==='producao';}).length+' em produção</p></div><span class="spacer"></span><button class="btn" data-act="pedCadistas">✏️ Cadistas</button><button class="btn pri" data-act="pedNovo">+ Novo pedido</button></div>'+
     '<div class="cli-bar"><label class="cli-q"><span aria-hidden="true">🔎</span><input id="ped-q" type="search" placeholder="Buscar paciente, cliente, nº ou dente" value="'+esc(PED.busca||'')+'" autocomplete="off"></label>'+
     '<div class="seg">'+[['quadro','Quadro'],['lista','Lista']].map(function(o){return '<button aria-pressed="'+(PED.vista===o[0])+'" data-act="pedVista" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
     '<div class="row wrap pedfil">'+[['todos','Todos'],['cad','🟣 Ordens CAD ('+nCad+')'],['analogico','🧪 Analógico ('+nAna+')'],['urg','Urgentes']].map(function(o){return '<button class="chip" aria-pressed="'+(PED.f===o[0])+'" data-act="pedFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+
+    ((nPend||PED.f==='pend')?'<button class="chip pedpend" aria-pressed="'+(PED.f==='pend')+'" data-act="pedFil" data-v="pend">⏳ Pendências ('+nPend+')</button>':'')+
     (nOrc?'<button class="chip pedorc" data-act="pedVerSt" data-v="orcamento">💬 '+nOrc+' orçamento'+(nOrc>1?'s':'')+' esperando</button>':'')+'</div>';
   return topo+'<div id="ped-corpo">'+(PED.vista==='lista'?rPedLista():rPedQuadro())+'</div>';}
 /* quadro em 3 etapas: Recebido (aguardando informação, em desenho, desenhado) · Produção (fresagem, maquiagem) · Pronto (pronto, enviado) */
@@ -7573,15 +7580,17 @@ var _pedCardCH=pedCard;pedCard=function(p){var h=_pedCardCH(p);if(!p||p.arquivad
   if(p.status==='producao'&&!p.em_maquiagem&&['finalizado','entregue','cancelado'].indexOf(p.status)<0)extra+='<button class="btn sm" data-act="pedMaq" data-v="'+p.id+'">🎨 Em maquiagem</button>';
   if(p.status==='producao'&&p.em_maquiagem)extra+='<span class="small pedmaq">🎨 Em maquiagem</span>';
   if(p.envio_id||p.cliente_id)extra+=chBotao(chChaveLab(p));
-  if(p.envio_id||p.cliente_id)extra+='<button class="btn sm ped-agp-btn'+(p.aguardando_pendencia?' on':'')+'" data-act="'+(p.aguardando_pendencia?'pedPendOff':'pedPendOn')+'" data-v="'+p.id+'">⏳ '+(p.aguardando_pendencia?'Pendência ativa':'Aguardando pendência')+'</button>';
-  if(PED.pend&&PED.pend.id===p.id)extra+='<div class="ped-agp-pop"><input id="ped-agp-txt" maxlength="200" placeholder="Ex: Aguardando cor, STL ou aprovação..." value="'+esc(PED.pend.txt||'')+'"><button class="btn sm pri" data-act="pedPendSalva" data-v="'+p.id+'">Salvar</button><button class="btn sm" data-act="pedPendCancela">Cancelar</button></div>';
+  if(p.envio_id||p.cliente_id)extra+=(p.aguardando_pendencia&&p.pendencia_aguardando_conferencia)?'<button class="btn sm ped-agp-btn on conf" data-act="pedPendBaixa" data-v="'+p.id+'">✅ Conferir e liberar</button>':'<button class="btn sm ped-agp-btn'+(p.aguardando_pendencia?' on':'')+'" data-act="'+(p.aguardando_pendencia?'pedPendOff':'pedPendOn')+'" data-v="'+p.id+'">⏳ '+(p.aguardando_pendencia?'Pendência ativa':'Aguardando pendência')+'</button>';
+  if(PED.pend&&PED.pend.id===p.id)extra+='<div class="ped-agp-pop"><input id="ped-agp-txt" maxlength="200" placeholder="Ex: Aguardando cor, STL ou aprovação..." value="'+esc(PED.pend.txt||'')+'" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" onmousedown="event.stopPropagation()" onkeydown="event.stopPropagation();if(event.keyCode===13){event.preventDefault();var b=this.parentNode.querySelector(\'[data-act=pedPendSalva]\');if(b)ACT.pedPendSalva(b.getAttribute(\'data-v\'));}"><button class="btn sm pri" data-act="pedPendSalva" data-v="'+p.id+'">Salvar</button><button class="btn sm" data-act="pedPendCancela">Cancelar</button></div>';
   if(!extra)return h;var j=h.indexOf('<div class="pcard-f">');return j<0?h+'<div class="pcard-ch">'+extra+'</div>':h.slice(0,j)+'<div class="pcard-ch">'+extra+'</div>'+h.slice(j);};
 ACT.pedPendOn=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;PED.pend={id:v,txt:p.motivo_pendencia||''};render();
   setTimeout(function(){var el=document.getElementById('ped-agp-txt');if(el){el.focus();try{el.select();}catch(e){}}},40);};
 ACT.pedPendEdita=function(v){ACT.pedPendOn(v);};
 ACT.pedPendCancela=function(){PED.pend=null;render();};
-ACT.pedPendSalva=function(v){var el=document.getElementById('ped-agp-txt'),txt=(el&&el.value?el.value:'').replace(/\s+/g,' ').trim().slice(0,200);PED.pend=null;pedMuda(v,{aguardando_pendencia:true,motivo_pendencia:txt||null},txt?'Pendência anotada.':'Pendência ativada.');};
-ACT.pedPendOff=function(v){PED.pend=null;pedMuda(v,{aguardando_pendencia:false,motivo_pendencia:null},'Pendência resolvida.');};
+ACT.pedPendSalva=function(v){var el=document.getElementById('ped-agp-txt'),txt=(el&&el.value?el.value:'').replace(/\s+/g,' ').trim().slice(0,200);PED.pend=null;pedMuda(v,{aguardando_pendencia:true,pendencia_aguardando_conferencia:false,motivo_pendencia:txt||null},txt?'Pendência anotada.':'Pendência ativada.');};
+ACT.pedPendOff=function(v){PED.pend=null;pedMuda(v,{aguardando_pendencia:false,pendencia_aguardando_conferencia:false,motivo_pendencia:null},'Pendência resolvida.');};
+ACT.pedPendBaixa=function(v){PED.pend=null;pedMuda(v,{aguardando_pendencia:false,pendencia_aguardando_conferencia:false,motivo_pendencia:null},'Pendência encerrada · prazo retomado.');};
+['pedPendSalva','pedPendOff','pedPendBaixa'].forEach(function(k){var f=ACT[k];ACT[k]=function(){if(typeof ESP!=='undefined'&&ESP.dono){toast('Conta espelho: aqui é só para acompanhar, sem editar.');return;}return f.apply(this,arguments);};});
 document.addEventListener('keydown',function(e){if(e.key!=='Enter'||!e.target||e.target.id!=='ped-agp-txt')return;e.preventDefault();var b=e.target.closest('.ped-agp-pop'),bt=b&&b.querySelector('[data-act="pedPendSalva"]');if(bt)ACT.pedPendSalva(bt.getAttribute('data-v'));});
 ACT.pedMaq=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;p.em_maquiagem=true;render();
   SB.from('odo_pedidos').update({em_maquiagem:true}).eq('id',v).select('*').single().then(function(r){if(r.error){p.em_maquiagem=false;render();toast(/em_maquiagem/.test(r.error.message||'')?'Rode a atualização 072 no Supabase.':'Não consegui salvar agora.');return;}pedGuarda(r.data);render();toast('Em maquiagem 🎨 · a clínica já vê.');});};
@@ -7860,7 +7869,8 @@ function kcCard(e,ab){var s=cliSt(e),ds=cxDentes(e),pz=kcPrazo(e),lab=cliLab(e),
     '</button>'+
     (ab?kcDet(e,s,ds,tr,lab,pz,i):'')+
     (s==='pend'&&!ab?'<div class="kc-pend"><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p>'+(e.resposta?'<small>Você respondeu: '+esc(e.resposta)+'</small>':'')+'</div>':'')+
-    '<div class="kc-pe">'+(s==='pend'&&!ab?'<button class="btn sm pri" data-kc="'+id+'" data-resp="1">Responder</button>':'')+cliChatBt(e)+
+    (e.aguardando_pendencia&&!ab?'<div class="kc-pend"><p><b>Pendência do laboratório:</b> '+esc(e.motivo_pendencia||'O laboratório precisa de uma informação sua.')+'</p>'+(e.pendencia_aguardando_conferencia?'<small>Resposta enviada. Aguardando conferência do laboratório.</small>':'')+'</div>':'')+
+    '<div class="kc-pe">'+(s==='pend'&&!ab?'<button class="btn sm pri" data-kc="'+id+'" data-resp="1">Responder</button>':'')+(e.aguardando_pendencia&&!e.pendencia_aguardando_conferencia?'<button class="btn sm pri" data-act="cliPendConfirma" data-v="'+id+'">Confirmar pendência</button>':'')+cliChatBt(e)+
       (cliPodeReceber(e)?'<button class="btn sm kc-rcb" data-act="cliRecebi" data-v="'+id+'">'+ic('check')+'Recebi</button>':'')+
       (e.status==='enviado'?'<button class="btn sm kc-can" data-act="pdgCancela" data-v="'+e.id+'">Cancelar</button>':'')+'</div></article>';}
 function kcDet(e,s,ds,tr,lab,pz,i){var L=function(r,v){return v?'<div><span>'+r+'</span><b>'+v+'</b></div>':'';},I=pz&&pz.I,V=cliDono()?plxValores():{v:{},est:{}},v=V.v[e.id];
@@ -8444,6 +8454,9 @@ ACT.cliRecebi=function(id){var e=pdgMeus().filter(function(x){return String(x.id
     if(r.error){toast(/PGRST202|Could not find|does not exist/.test((r.error.code||'')+' '+(r.error.message||''))?'Falta rodar a atualização 076 no Supabase.':'Não consegui confirmar agora. Tente de novo.');return;}
     PDG.abre=null;toast('Recebimento confirmado. O pedido foi para Finalizados.');if(typeof DFL!=='undefined'&&!(typeof UNI!=='undefined'&&UNI.ok===true)){DFL.d=null;DFL.erro='';}
     return Promise.resolve(pdgCarrega()).then(function(){render();});},function(){CLI_RCB=false;toast('Não consegui confirmar agora. Tente de novo.');});};
+ACT.cliPendConfirma=function(id){if(typeof ESP!=='undefined'&&ESP.dono)return;SB.rpc('odo_ped_pend_responde',{p_id:String(id)}).then(function(r){
+  if(r.error){toast(/sem_pendencia/.test(r.error.message||'')?'Essa pendência já foi resolvida.':/does not exist|schema cache|PGRST202/.test((r.error.code||'')+' '+(r.error.message||''))?'Falta rodar a atualização 098 no Supabase.':'Não consegui confirmar agora.');return;}
+  PDG.abre=null;toast('Resposta enviada · aguardando conferência do laboratório.');return Promise.resolve(pdgCarrega()).then(function(){render();});},function(){toast('Não consegui confirmar agora.');});};
 
 /* laboratório: pedidos que os clientes confirmaram como recebidos (últimos 14 dias) */
 var RCB={ab:false};
