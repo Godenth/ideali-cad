@@ -4921,11 +4921,13 @@ function pedAtivos(){return PED.L.filter(function(p){return !p.arquivado&&p.stat
 function pedBadge(){return pedAtivo()?pedAtivos().filter(function(p){return p.status==='desenho';}).length:0;}
 function pedRisco(p){if(!p.prazo||p.status==='finalizado'||p.status==='entregue'||p.status==='cancelado')return '';var n=dDif(p.prazo);return n<0?'atrasado':n===0?'hoje':n===1?'amanha':'';}
 function pedCliMes(){var h=new Date(),y=h.getFullYear(),m=h.getMonth(),S={};pedAtivos().forEach(function(p){if(!p.criado_em)return;var d=new Date(p.criado_em);if(d.getFullYear()!==y||d.getMonth()!==m)return;var n=pedCli(p);if(n&&n!=='Sem cliente')S[n]=1;});return Object.keys(S).sort(function(a,b){return a.localeCompare(b,'pt');});}
-function pedSemComVal(p){if(!p)return 0;if(p.custo_desenho!=null&&+p.custo_desenho>0)return Math.round(+p.custo_desenho*100)/100;
+function pedSemComVal(p){if(!p)return 0;
   var v=+p.valor;
   if(!(v>0)){var itens=osPdfItens(p),t=0,ok=false;itens.forEach(function(it){var q=osPdfServValor(it.t);if(q!=null){t+=q;ok=true;}});if(ok)v=t;}
   if(!(v>0)){var s=typeof pedServ==='function'?pedServ(p.trabalho):null,unit=s&&s.valor!=null?s.valor:0,qtd=Math.max(1,+(p.qtd||((p.dentes&&p.dentes.length)||1)));v=unit*qtd;}
-  var pct=+((typeof FIN!=='undefined'&&FIN.cfg&&FIN.cfg.comissao_pct!=null)?FIN.cfg.comissao_pct:10);return Math.round(v*pct)/100;}
+  if(v>0){var pct=+((typeof FIN!=='undefined'&&FIN.cfg&&FIN.cfg.comissao_pct!=null)?FIN.cfg.comissao_pct:10);return Math.round(v*pct)/100;}
+  if(p.custo_desenho!=null&&+p.custo_desenho>0)return Math.round(+p.custo_desenho*100)/100;
+  return 0;}
 function pedSemComExc(ano,mes){var t=0;if(typeof PED==='undefined'||!PED.L)return 0;PED.L.forEach(function(p){if(!p.sem_comissao||p.apagado||!p.criado_em)return;var d=new Date(p.criado_em);if(isNaN(d)||d.getFullYear()!==ano||d.getMonth()+1!==mes)return;t+=pedSemComVal(p);});return Math.round(t*100)/100;}
 function pedFiltra(L){var f=PED.f,q=semAc(PED.busca||'');return L.filter(function(p){var ok=f==='todos'||(f==='urg'?p.urgente:f==='pend'?!!p.aguardando_pendencia:p.tipo===f);return ok&&(!PED.cli||pedCli(p)===PED.cli)&&(!q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(q)>=0);});}
 function pedDentes(p){return p.dentes&&p.dentes.length?(p.dentes.length>1?'dentes ':'dente ')+p.dentes.join(', '):'';}
