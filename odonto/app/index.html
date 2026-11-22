@@ -2606,6 +2606,9 @@ body.pv-trava{overflow:hidden}
 .stlv-c{position:relative;min-height:0}.stlv-c canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}.stlv-ld{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#94A3B8}
 .pvf-scan{border-color:color-mix(in srgb,#10B981 55%,var(--line))}.pvf-scan:hover{background:color-mix(in srgb,#10B981 8%,transparent)}.pvf-mais1{flex:none;padding:6px 10px;font-size:.8rem}
 .pvf-mais{display:flex;flex-wrap:wrap;gap:8px}.pvf-up2{flex:1;display:flex;justify-content:center;padding:10px;border:1.5px dashed var(--line);border-radius:12px;font-weight:700;font-size:.88rem;cursor:pointer;color:var(--ink)}.pvf-up2:hover{border-color:#00A6E6}
+.pvf-del{display:inline-flex;align-items:center;gap:5px;border:1px solid color-mix(in srgb,var(--bad) 60%,var(--line))!important;background:color-mix(in srgb,var(--bad) 16%,var(--surface))!important;color:var(--bad)!important;border-radius:9px;padding:6px 10px!important;font:inherit;font-size:.8rem;font-weight:800;line-height:1.1;cursor:pointer}
+.pvf-del:hover{background:color-mix(in srgb,var(--bad) 28%,var(--surface))!important;border-color:var(--bad)!important}
+.pvf-del:focus-visible{outline:2px solid var(--bad);outline-offset:2px}
 
 /* quadro do laboratório: cada etapa com a sua cor (padrão do Ideali CAD) */
 .pkan3 .pcol[data-pst]{background:linear-gradient(180deg,color-mix(in srgb,var(--k) 14%,var(--surface)),color-mix(in srgb,var(--k) 5%,var(--surface)) 320px)!important;border:1px solid color-mix(in srgb,var(--k) 30%,var(--line))!important;border-top:4px solid var(--k)!important;border-radius:18px!important;padding:0 10px 10px!important;gap:10px!important;overflow:hidden}
@@ -9407,11 +9410,11 @@ function pvfCards(p){var F=pvfHidrata(p),R=F.exo,stl=F.stls.some(function(s){ret
       return A.L.length?'<div class="pvf-im ok">📦 Dente '+t.n+': '+A.L.map(function(r){return esc(catTxt(r))+' → <b>cód. '+esc(r.codigo)+'</b>';}).join('<br>')+'</div>':'<div class="pvf-dif">📦 Dente '+t.n+': '+esc(q.linha+' Ø'+catFmt(q.dia)+(q.alt!=null?' · '+catFmt(q.alt)+' mm':''))+': código do fabricante não encontrado.</div>';}).join('');
     conf='<div class="pvf-conf">'+catL+(im?'<div class="pvf-im '+(im.ok?'ok':'r')+'">'+(im.ok?'✅ ':'⚠️ ')+esc(im.txt)+'</div>':'')+
       (ruins.length?ruins.map(function(x){return '<div class="pvf-dif">'+x[0]+' <b>'+x[1]+':</b> '+esc(x[2])+'</div>';}).join('')+'<button class="pvf-lk" data-pvf="aplica">Usar dados do projeto no pedido</button>':(im&&!im.ok?'':'<div class="pvf-im ok">✅ O projeto confere com o pedido.</div>'))+'</div>';}
-  var chip=function(on,txt,baixa,ver){return on?'<span class="pvf-ok">✅ '+txt+(ver?'<button data-pvb="'+ver+'" title="Visualizar">👁 Ver</button>':'')+'<button data-pvb="'+baixa+'" title="Baixar">⬇ Baixar</button></span>':'';};
+  var chip=function(on,txt,baixa,ver,del){return on?'<span class="pvf-ok">✅ '+txt+(ver?'<button type="button" data-pvb="'+ver+'" title="Visualizar">👁 Ver</button>':'')+'<button type="button" data-pvb="'+baixa+'" title="Baixar">⬇ Baixar</button>'+(del?'<button type="button" class="pvf-del" data-pvf="'+del+'" title="Apagar">🗑 Apagar</button>':'')+'</span>':'';};
   return '<div class="pvf2">'+
     (F.lendo?'<div class="pvf-ld">Abrindo o Dental CAD…</div>':'<label class="pvf-up'+(F.zip?' tem':'')+'">🗜️ '+(F.zip?'Trocar Dental CAD':'Anexar Dental CAD (.zip)')+'<input type="file" data-pvf="zip" accept=".zip,application/zip" hidden></label>')+
     (F.scans.length?'':'<label class="pvf-up pvf-scan">🦷 Anexar escaneamento<input type="file" data-pvf="scan" accept=".stl,.ply,.obj,.zip,.dcm" multiple hidden></label>')+
-    '<div class="pvf-oks">'+(F.scans.length?chip(true,'Escaneamento anexado'+(F.scans.length>1?' ('+F.scans.length+' arquivos)':''),'scan',F.scans.some(function(x){return /\.stl$/i.test(x.nome);})?'verscan':'')+'<button type="button" class="pvf-del" data-pvf="scandel" title="Apagar escaneamento">🗑 Apagar escaneamento</button>'+'<label class="pvf-up2 pvf-mais1">＋ escaneamento<input type="file" data-pvf="scan" accept=".stl,.ply,.obj,.zip,.dcm" multiple hidden></label>':'')+(F.zip?chip(true,'Dental CAD anexado','zip'):'')+chip(stl,'STL anexada','stl','verstl')+chip(!!F.html,'HTML anexado','html','verhtml')+
+    '<div class="pvf-oks">'+(F.scans.length?chip(true,'Escaneamento anexado'+(F.scans.length>1?' ('+F.scans.length+' arquivos)':''),'scan',F.scans.some(function(x){return /\.stl$/i.test(x.nome);})?'verscan':'')+'<button type="button" class="pvf-del" data-pvf="scandel" title="Apagar escaneamento">🗑 Apagar escaneamento</button>'+'<label class="pvf-up2 pvf-mais1">＋ escaneamento<input type="file" data-pvf="scan" accept=".stl,.ply,.obj,.zip,.dcm" multiple hidden></label>':'')+(F.zip?chip(true,'Dental CAD anexado','zip',null,'zipdel'):'')+chip(stl,'STL anexada','stl','verstl','stldel')+chip(!!F.html,'HTML anexado','html','verhtml','htmldel')+
       ((!stl||!F.html)?'<div class="pvf-mais">'+(!stl?'<label class="pvf-up2">＋ Anexar STL<input type="file" data-pvf="stlmao" accept=".stl" multiple hidden></label>':'')+(!F.html?'<label class="pvf-up2">＋ Anexar HTML<input type="file" data-pvf="htmlmao" accept=".html,.htm" hidden></label>':'')+'</div>':'')+'</div>'+
     (F.salvando?'<div class="pvf-ld">⏳ '+esc(F.salvando)+'</div>':'')+(F.erro?'<div class="pvf-er">'+esc(F.erro)+'</div>':'')+conf+
     '<button class="pvf-env" data-pv="mail">✉️ Enviar pedido por e-mail</button></div>';}
@@ -9442,7 +9445,10 @@ document.addEventListener('change',function(ev){var t=ev.target,k=t&&t.getAttrib
   else if(k==='htmlmao'&&t.files[0]){F._hid=true;F.html={nome:t.files[0].name,tam:t.files[0].size,f:t.files[0]};pvPinta();pvfSalva(p);}},true);
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('button[data-pvf]');if(!b)return;var p=pvP();if(!p)return;var F=pvfDe(p.id),k=b.getAttribute('data-pvf');ev.preventDefault();ev.stopPropagation();
   if(k==='verhtml'&&F.html){var u=URL.createObjectURL(F.html.f);window.open(u,'_blank');setTimeout(function(){URL.revokeObjectURL(u);},60000);}
-  if(k==='scandel'){if(typeof ESP!=='undefined'&&ESP.dono){toast('Conta espelho: só leitura.');return;}if(!F.scans.length){toast('Este pedido não tem escaneamento.');return;}if(!confirm('Apagar o escaneamento deste pedido? O arquivo será removido do sistema.'))return;var antes=F.scans.slice();F.scans=[];pvPinta();pvfSalva(p).then(function(){if(F.erro){F.scans=antes;pvPinta();toast('Não consegui apagar; nada foi removido.');}else toast('Escaneamento apagado.');});}
+  if(k==='scandel')pvfApaga(p,'scans','escaneamento');
+  if(k==='zipdel')pvfApaga(p,'zip','Dental CAD');
+  if(k==='stldel')pvfApaga(p,'stls','STL');
+  if(k==='htmldel')pvfApaga(p,'html','HTML');
   if(k==='aplica'&&F.exo){var R=F.exo,A=exoArcada(R),pt={dentes:A.map(function(x){return x.d;}),qtd:A.length,arcada:A},mats=R.dentes.map(function(t){return t.mat;}).filter(Boolean);if(mats[0])pt.material=mats[0].slice(0,60);if(R.cor)pt.cor=R.cor.slice(0,20);if(!p.paciente&&R.paciente)pt.paciente=R.paciente.slice(0,120);
     var imp=R.dentes.filter(function(t){return t.imp;});pt.sobre_implante=imp.length>0;if(imp.length)pt.componente=(imp.map(function(t){return t.imp;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(', ')+(imp.some(function(t){return t.sb;})?' · com scanbody':'')).slice(0,120);
     pedMuda(p.id,pt,'Dados do projeto aplicados no pedido #'+(p.numero||'')+'.');setTimeout(pvPinta,40);}},true);
@@ -9494,7 +9500,7 @@ function pvfHidrata(p){var F=pvfDe(p.id);if(F._hid||F.lendo||F.zip||F.stls.lengt
 function pvfArq(it){if(it.f)return Promise.resolve(it.f);if(!it.path)return Promise.reject('sem');
   return SB.storage.from(PVF_BK).download(it.path).then(function(r){if(r.error||!r.data)throw 'baixar';it.f=new File([r.data],it.nome);return it.f;});}
 function pvfNomeOk(n){return String(n||'arquivo').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._-]+/g,'_').slice(-90);}
-function pvfSalva(p){var F=pvfDe(p.id),conta=contaId();if(!conta||!p.id)return;var itens=[].concat(F.scans,F.zip?[F.zip]:[],F.stls.filter(function(s){return s.ok;}),F.html?[F.html]:[]).filter(function(i){return i.f&&!i.path;});
+function pvfSalva(p,semAviso){var F=pvfDe(p.id),conta=contaId();if(!conta||!p.id)return Promise.resolve();var itens=[].concat(F.scans,F.zip?[F.zip]:[],F.stls.filter(function(s){return s.ok;}),F.html?[F.html]:[]).filter(function(i){return i.f&&!i.path;});
   var antes=(p.caso&&[].concat(p.caso.scans||[],p.caso.zip?[p.caso.zip]:[],p.caso.stls||[],p.caso.html?[p.caso.html]:[]).map(function(i){return i.path;}).filter(Boolean))||[];
   F.salvando=itens.length?'Guardando os arquivos no sistema…':'';pvPinta();var n=0;
   return itens.reduce(function(pr,it){return pr.then(function(){var path=conta+'/'+p.id+'/'+Date.now()+'-'+pvfNomeOk(it.nome);F.salvando='Guardando '+(++n)+' de '+itens.length+'…';pvPinta();
@@ -9502,9 +9508,28 @@ function pvfSalva(p){var F=pvfDe(p.id),conta=contaId();if(!conta||!p.id)return;v
   .then(function(){var lim=function(i){return i?{nome:i.nome,tam:i.tam,path:i.path}:null;},caso={scans:F.scans.filter(function(x){return x.path;}).map(lim),zip:lim(F.zip),stls:F.stls.filter(function(s){return s.ok&&s.path;}).map(lim),html:lim(F.html),exo:F.exo,exoNome:F.exoNome,em:new Date().toISOString()};
     return SB.from('odo_pedidos').update({caso:caso}).eq('id',p.id).then(function(r){if(r.error)throw r.error;p.caso=caso;var q=PED.L.filter(function(x){return x.id===p.id;})[0];if(q)q.caso=caso;
       var agora=[].concat(caso.scans.map(function(x){return x.path;}),caso.zip?[caso.zip.path]:[],caso.stls.map(function(s){return s.path;}),caso.html?[caso.html.path]:[]),velhos=antes.filter(function(x){return agora.indexOf(x)<0;});
-      if(velhos.length)SB.storage.from(PVF_BK).remove(velhos).then(function(){});F.salvando='';pvPinta();toast('Arquivos guardados no pedido #'+(p.numero||'')+'. ✅');});})
+      if(velhos.length)SB.storage.from(PVF_BK).remove(velhos).then(function(){});F.salvando='';pvPinta();if(!semAviso)toast('Arquivos guardados no pedido #'+(p.numero||'')+'. ✅');});})
   .catch(function(e){var m=String((e&&e.message)||e||'');F.salvando='';F.erro=/bucket|not found|odonto-casos/i.test(m)||/caso/.test(m)?'Falta rodar a atualização 086 no banco para guardar os arquivos.':/size|large|exceed|payload/i.test(m)?'Arquivo grande demais para o limite do servidor.':'Não consegui guardar os arquivos agora. ('+m.slice(0,80)+')';pvPinta();});}
 function pvfApagaArqs(p){var c=p&&p.caso;if(!c)return;var L=[].concat((c.scans||[]).map(function(x){return x.path;}),c.zip?[c.zip.path]:[],(c.stls||[]).map(function(s){return s.path;}),c.html?[c.html.path]:[]).filter(Boolean);if(L.length)SB.storage.from(PVF_BK).remove(L).then(function(){});}
+function pvfApaga(p,campo,rotulo){
+  if(typeof ESP!=='undefined'&&ESP.dono){toast('Conta espelho: só leitura.');return;}
+  var F=pvfDe(p.id);
+  if(F.salvando){toast('Aguarde os arquivos terminarem de guardar.');return;}
+  if(campo==='scans'&&!F.scans.length){toast('Este pedido não tem escaneamento.');return;}
+  if(campo==='zip'&&!F.zip){toast('Este pedido não tem Dental CAD anexado.');return;}
+  if(campo==='stls'&&!F.stls.filter(function(s){return s.ok;}).length){toast('Este pedido não tem STL anexada.');return;}
+  if(campo==='html'&&!F.html){toast('Este pedido não tem HTML anexado.');return;}
+  if(!confirm('Apagar '+rotulo+' deste pedido? O arquivo será removido do sistema.'))return;
+  if(!contaId()||!p.id){toast('Não consegui apagar; nada foi removido.');return;}
+  var antes={scans:F.scans.slice(),zip:F.zip,stls:F.stls.slice(),html:F.html},volta=function(){F.scans=antes.scans;F.zip=antes.zip;F.stls=antes.stls;F.html=antes.html;pvPinta();};
+  F.erro='';
+  if(campo==='scans')F.scans=[];
+  else if(campo==='zip')F.zip=null;
+  else if(campo==='stls')F.stls=F.stls.filter(function(s){return !s.ok;});
+  else if(campo==='html')F.html=null;
+  pvPinta();
+  pvfSalva(p,true).then(function(){if(F.erro){volta();toast('Não consegui apagar; nada foi removido.');}else toast(rotulo.charAt(0).toUpperCase()+rotulo.slice(1)+' apagado.');});
+}
 
 /* ===== Editar pedido no padrão do Ideali CAD: janela com a arcada grande à esquerda (cada dente com o seu trabalho) e os dados à direita ===== */
 var PE={pick:null,q:''};
