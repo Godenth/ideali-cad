@@ -5156,14 +5156,20 @@ function finNfContatos(para,cli){var L=exmVisiveis(cli),eh=String(para||'').trim
 function finNfModal(m,modo){var c=finCliObj(m),msg=finNfMsg(m),para=modo==='wa'?String((c&&(c.whatsapp||c.telefone))||''):String((c&&c.email)||'');
   if(modo!=='wa'&&!para){var vv=exmVisiveis(c&&c.id);if(vv[0])para=vv[0].email;}
   var el=document.getElementById('fin-nf');if(el)el.remove();el=document.createElement('div');el.id='fin-nf';el.setAttribute('data-modo',modo);el._finM=m;
-  var ana=modo==='wa'?'':'<div class="pdg-ana"><img src="'+ANA_AV[0]+'" alt=""><div>Montei a solicitação da nota fiscal de <b>'+MESES[m.mes-1]+' de '+m.ano+'</b> no valor de <b>'+fmtR(finNfTotal(m))+'</b> com os dados do cliente. Confira o texto e abra o Gmail: eu envio pelo seu Gmail quando você quiser.</div></div>';
+  var ana=modo==='wa'?'':'<div class="pdg-ana"><img src="'+ANA_AV[0]+'" alt=""><div>Montei a solicitação da nota fiscal de <b>'+MESES[m.mes-1]+' de '+m.ano+'</b> no valor de <b>'+fmtR(finNfTotal(m))+'</b> com os dados do cliente. Confira o texto e clique em <b>Enviar por e-mail</b>: eu envio direto pelo sistema.</div></div>';
   el.innerHTML='<div class="pdg-ov"><div class="pdg-box"><div class="pdg-h"><b>'+(modo==='wa'?'💬 WhatsApp · Nota fiscal':'✉️ Nota fiscal com a Ana')+'</b><button class="btn sm" data-nfm="fecha">Fechar</button></div><div class="pdg-b">'+ana+
     (modo==='wa'?'':finNfContatos(para,c&&c.id))+
     '<label class="fld"><span>'+(modo==='wa'?'WhatsApp do cliente':'Para')+'</span><input id="nfm-para"'+(modo==='wa'?'':' list="nfm-lista"')+' type="'+(modo==='wa'?'tel':'email')+'" value="'+esc(para)+'" placeholder="'+(modo==='wa'?'(DDD) 00000-0000':'email@cliente.com')+'"></label>'+
     (modo==='wa'?'':'<label class="fld"><span>Assunto</span><input id="nfm-as" value="'+esc('Solicitação de nota fiscal · '+MESES[m.mes-1]+'/'+m.ano)+'"></label>')+
     '<label class="fld"><span>Mensagem</span><textarea id="nfm-co" rows="12">'+esc(msg)+'</textarea></label></div>'+
-    '<div class="pdg-f"><button class="btn" data-nfm="copia">📋 Copiar</button><span style="flex:1"></span><button class="btn pri" data-nfm="envia">'+(modo==='wa'?'Abrir WhatsApp':'Abrir Gmail')+'</button></div></div></div>';
+    '<div class="pdg-f"><button class="btn" data-nfm="copia">📋 Copiar</button><span style="flex:1"></span><button class="btn pri" data-nfm="envia">'+(modo==='wa'?'Abrir WhatsApp':'Enviar por e-mail')+'</button></div></div></div>';
   document.body.appendChild(el);}
+function finNfEnvia(btn,para,as,co){if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(para)){toast('Coloque o e-mail do destinatário.');return;}
+  if(typeof gmCliente!=='function'||!gmCliente()){toast('Falta configurar o envio pelo Gmail (ID do cliente Google).');return;}
+  var t0=btn.textContent;btn.disabled=true;btn.textContent='Enviando...';
+  gmToken().then(function(tok){return fetch('https://gmail.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media',{method:'POST',headers:{'Authorization':'Bearer '+tok,'Content-Type':'message/rfc822'},body:gmMime(para,as,co,[])}).then(function(r){if(r.status===401){GM.tok=null;throw 'A permissão do Google expirou. Tente de novo.';}if(!r.ok)throw 'O Gmail recusou o envio ('+r.status+').';});})
+  .then(function(){var el=document.getElementById('fin-nf');if(el)el.remove();toast('Solicitação de nota fiscal enviada. ✅');})
+  .catch(function(e){btn.disabled=false;btn.textContent=t0;toast(typeof e==='string'?e:e==='semcliente'?'Falta configurar o envio pelo Gmail.':e==='fechou'?'A janela do Google foi fechada antes de permitir.':e==='popup'?'O navegador bloqueou a janela do Google.':'Não consegui enviar agora. Tente de novo.');});}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-nfm]');if(!b)return;var el=document.getElementById('fin-nf'),a=b.getAttribute('data-nfm');e.preventDefault();
   if(a==='fecha'){if(el)el.remove();return;}
   if(a==='usa'){var pi0=document.getElementById('nfm-para');if(pi0)pi0.value=b.getAttribute('data-v')||'';return;}
@@ -5172,7 +5178,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   var para=(document.getElementById('nfm-para')||{}).value||'',co=(document.getElementById('nfm-co')||{}).value||'',as=(document.getElementById('nfm-as')||{}).value||'';
   if(a==='copia'){if(navigator.clipboard)navigator.clipboard.writeText(co).then(function(){toast('Mensagem copiada.');});return;}
   if(el&&el.getAttribute('data-modo')==='wa'){var fone=para.replace(/\D/g,'');window.open((fone?'https://wa.me/55'+fone:'https://wa.me/?')+'?text='+encodeURIComponent(co),'_blank');}
-  else window.open('https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(para)+'&su='+encodeURIComponent(as)+'&body='+encodeURIComponent(co),'_blank');
+  else finNfEnvia(b,para,as,co);
   if(el)el.remove();},true);
 function rFinDet(m){if(!m){FIN.ed=null;return rFin();}var c=finCliObj(m),pg=finPago(m),r=finRest(m),a=finAnt(m),s=finSt(m),P=finPags(m);
   var peds=PED.L.filter(function(p){var d=String(p.criado_em||'');return (c?p.cliente_id===c.id:p.cliente_reg===m.cliente_reg)&&d.slice(0,7)===m.ano+'-'+String(m.mes).padStart(2,'0');}),vp=peds.reduce(function(x,p){return x+(+p.valor||0);},0),sc=peds.filter(function(p){return p.sem_comissao;}),scT=sc.reduce(function(x,p){return x+pedSemComVal(p);},0);
