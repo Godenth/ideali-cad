@@ -69,6 +69,7 @@ body:not(.rl-master) .vt-b,body:not(.rl-master) .roles,body:not(.rl-master) .pro
 .pchips .pedtp{font-weight:700}.pedc.pc-cad .pedtp{background:color-mix(in srgb,#7B3FE4 16%,var(--surface));color:#6A2FD0}.pedc.pc-ana .pedtp{background:color-mix(in srgb,#1DAE8A 16%,var(--surface));color:#0F7A5F}
 .btn.pedbtn{background:#7B3FE4;color:#fff;border-color:#7B3FE4}.pedok{color:#6A2FD0;font-weight:700}
 .pedfil{margin:4px 0 12px}.pedorc{border-color:color-mix(in srgb,#E8A33A 55%,var(--line));background:color-mix(in srgb,#E8A33A 10%,var(--surface))}
+.ped-cli-sel{flex:0 1 210px;min-width:150px;max-width:260px}
 .pedpend[aria-pressed="true"]{background:#F59E0B!important;border-color:#F59E0B!important;color:#3B2600!important;font-weight:700}
 .pedpend{border-color:color-mix(in srgb,#F59E0B 55%,var(--line))}
 .pcard.ped-agp-conf{border:2px solid #D97706!important;animation:none!important;box-shadow:0 0 0 3px rgba(245,158,11,.25)}
@@ -4903,7 +4904,7 @@ document.addEventListener('input',function(e){if(e.target.id==='cli-q'){EMP.busc
 /* ===== Pedidos e produção (etapa 2). As antigas Ordens CAM agora são pedidos do tipo CAD. ===== */
 var PEDST={orcamento:['Orçamento','#E8A33A'],aguardando:['Aguardando informação','#B7791F'],desenho:['Desenho CAD a fazer','#7B3FE4'],producao:['Em produção','#3A7BD5'],finalizado:['Pronto','#13875F'],entregue:['Entregue','#8A8FA3'],cancelado:['Cancelado','#B4413A']};
 var PEDCOL=['desenho','producao','finalizado','entregue'];
-var PED={L:[],cad:[],carregado:false,erro:'',f:'todos',vista:'quadro',st:'ativos',busca:'',ed:null,busy:false,erroF:'',vcad:false,mais:100};
+var PED={L:[],cad:[],carregado:false,erro:'',f:'todos',vista:'quadro',st:'ativos',busca:'',cli:'',ed:null,busy:false,erroF:'',vcad:false,mais:100};
 function pedAtivo(){return typeof RL!=='undefined'&&!!RL.user&&!!S.neg&&negEhLab(S.neg);}
 function pedCarrega(){if(!RL.user)return Promise.resolve();var uid=donoId(),out=[];
   function pg(i){return SB.from('odo_pedidos').select('*').eq('user_id',uid).eq('apagado',false).order('numero',{ascending:false}).range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data||[]);if((r.data||[]).length===1000)return pg(i+1000);});}
@@ -4913,7 +4914,8 @@ function pedCli(p){var c=p.cliente_id&&EMP.cli.filter(function(x){return x.id===
 function pedAtivos(){return PED.L.filter(function(p){return !p.arquivado&&p.status!=='cancelado';});}
 function pedBadge(){return pedAtivo()?pedAtivos().filter(function(p){return p.status==='desenho';}).length:0;}
 function pedRisco(p){if(!p.prazo||p.status==='finalizado'||p.status==='entregue'||p.status==='cancelado')return '';var n=dDif(p.prazo);return n<0?'atrasado':n===0?'hoje':n===1?'amanha':'';}
-function pedFiltra(L){var f=PED.f,q=semAc(PED.busca||'');return L.filter(function(p){var ok=f==='todos'||(f==='urg'?p.urgente:f==='pend'?!!p.aguardando_pendencia:p.tipo===f);return ok&&(!q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(q)>=0);});}
+function pedCliMes(){var h=new Date(),y=h.getFullYear(),m=h.getMonth(),S={};pedAtivos().forEach(function(p){if(!p.criado_em)return;var d=new Date(p.criado_em);if(d.getFullYear()!==y||d.getMonth()!==m)return;var n=pedCli(p);if(n&&n!=='Sem cliente')S[n]=1;});return Object.keys(S).sort(function(a,b){return a.localeCompare(b,'pt');});}
+function pedFiltra(L){var f=PED.f,q=semAc(PED.busca||'');return L.filter(function(p){var ok=f==='todos'||(f==='urg'?p.urgente:f==='pend'?!!p.aguardando_pendencia:p.tipo===f);return ok&&(!PED.cli||pedCli(p)===PED.cli)&&(!q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(q)>=0);});}
 function pedDentes(p){return p.dentes&&p.dentes.length?(p.dentes.length>1?'dentes ':'dente ')+p.dentes.join(', '):'';}
 function pedNx(p){if(p.status==='orcamento')return ['pedAprova','✓ Aprovar'];if(p.status==='aguardando')return ['pedRetoma','▶ Retomar desenho'];if(p.status==='desenho')return p.desenho_feito?['pedInove','📤 Enviar para Inove']:['pedDesFeito','✓ Desenho feito'];
   return {producao:['pedPronto','✓ Pronto'],finalizado:['pedEntrega','Entregue']}[p.status]||null;}
@@ -4931,9 +4933,10 @@ function rPedidos(){if(!PED.carregado)return '<div class="empty">Carregando os p
   if(PED.erro)return '<section class="ptrava neg-vz"><div class="neg-vz-ic">⚠️</div><h2>Não consegui carregar os pedidos</h2><button class="btn pri" data-act="pedRecarrega">Tentar de novo</button></section>';
   if(PED.ed)return rPedForm(PED.ed);if(PED.vcad)return rPedCadistas();
   var A=pedAtivos(),nOrc=A.filter(function(p){return p.status==='orcamento';}).length,nCad=A.filter(function(p){return p.tipo==='cad';}).length,nAna=A.length-nCad;
-  var _q=semAc(PED.busca||''),nPend=A.filter(function(p){var ok=PED.f==='todos'||PED.f==='pend'||(PED.f==='urg'?p.urgente:p.tipo===PED.f);return ok&&p.aguardando_pendencia&&(!_q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(_q)>=0);}).length;
+  var _q=semAc(PED.busca||''),nPend=A.filter(function(p){var ok=PED.f==='todos'||PED.f==='pend'||(PED.f==='urg'?p.urgente:p.tipo===PED.f);return ok&&(!PED.cli||pedCli(p)===PED.cli)&&p.aguardando_pendencia&&(!_q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(_q)>=0);}).length;
   var topo='<div class="dtop"><div><h2>Pedidos</h2><p class="small muted">'+(function(n){return n+(n===1?' desenho CAD a fazer':' desenhos CAD a fazer');})(A.filter(function(p){return p.status==='desenho';}).length)+' · '+A.filter(function(p){return p.status==='producao';}).length+' em produção</p></div><span class="spacer"></span><button class="btn pri" data-act="pedNovo">+ Novo pedido</button></div>'+
     '<div class="cli-bar"><label class="cli-q"><span aria-hidden="true">🔎</span><input id="ped-q" type="search" placeholder="Buscar paciente, cliente, nº ou dente" value="'+esc(PED.busca||'')+'" autocomplete="off"></label>'+
+    '<select id="ped-cli" class="sel ped-cli-sel" aria-label="Filtrar por cliente"><option value="">Todos os clientes</option>'+pedCliMes().map(function(n){return '<option value="'+esc(n)+'"'+(PED.cli===n?' selected':'')+'>'+esc(n)+'</option>';}).join('')+'</select>'+
     '<div class="seg">'+[['quadro','Quadro'],['lista','Lista']].map(function(o){return '<button aria-pressed="'+(PED.vista===o[0])+'" data-act="pedVista" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
     '<div class="row wrap pedfil">'+[['todos','Todos'],['cad','🟣 Ordens CAD ('+nCad+')'],['analogico','🧪 Analógico ('+nAna+')'],['urg','Urgentes']].map(function(o){return '<button class="chip" aria-pressed="'+(PED.f===o[0])+'" data-act="pedFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+
     ((nPend||PED.f==='pend')?'<button class="chip pedpend" aria-pressed="'+(PED.f==='pend')+'" data-act="pedFil" data-v="pend">⏳ Pendências ('+nPend+')</button>':'')+
@@ -5032,6 +5035,7 @@ Object.assign(ACT,{
     SB.from('odo_cadistas').insert({user_id:contaId(),nome:nm,email:g('pc-email')||null,tel:g('pc-tel')||null}).select('*').single().then(function(r){if(r.error){toast('Não consegui salvar.');return;}PED.cad.push(r.data);PED.cad.sort(function(a,b){return a.nome.localeCompare(b.nome,'pt');});render();toast('Cadista adicionado.');});},
   pedCadAtivo:function(v){var c=PED.cad.filter(function(x){return x.id===v;})[0];if(!c)return;SB.from('odo_cadistas').update({ativo:!c.ativo}).eq('id',v).then(function(r){if(r.error){toast('Não consegui salvar.');return;}c.ativo=!c.ativo;render();});}});
 document.addEventListener('input',function(e){if(e.target.id==='ped-q'){PED.busca=e.target.value;var b=document.getElementById('ped-corpo');if(b)b.innerHTML=PED.vista==='lista'?rPedLista():rPedQuadro();}});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='ped-cli'){PED.cli=e.target.value;render();}});
 document.addEventListener('change',function(e){var t=e.target;if(t.id==='ped-st'){PED.st=t.value;PED.mais=100;render();}else if(PED.ed&&t.dataset&&(t.dataset.pf==='cliente_id'||t.dataset.pf==='cadista_id')){if(t.dataset.pf==='cadista_id')PED.ed._mudouCad=true;pedLe();render();}});
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('pedc')){ACT.pedAbre(e.target.dataset.v);}});
 /* início do protético com os pedidos de verdade */
