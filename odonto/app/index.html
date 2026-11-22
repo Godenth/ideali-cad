@@ -4922,8 +4922,8 @@ function pedBadge(){return pedAtivo()?pedAtivos().filter(function(p){return p.st
 function pedRisco(p){if(!p.prazo||p.status==='finalizado'||p.status==='entregue'||p.status==='cancelado')return '';var n=dDif(p.prazo);return n<0?'atrasado':n===0?'hoje':n===1?'amanha':'';}
 function pedCliMes(){var h=new Date(),y=h.getFullYear(),m=h.getMonth(),S={};pedAtivos().forEach(function(p){if(!p.criado_em)return;var d=new Date(p.criado_em);if(d.getFullYear()!==y||d.getMonth()!==m)return;var n=pedCli(p);if(n&&n!=='Sem cliente')S[n]=1;});return Object.keys(S).sort(function(a,b){return a.localeCompare(b,'pt');});}
 function pedSemComVal(p){if(!p)return 0;
-  var v=+p.valor;
-  if(!(v>0)){var itens=osPdfItens(p),t=0,ok=false;itens.forEach(function(it){var q=osPdfServValor(it.t);if(q!=null){t+=q;ok=true;}});if(ok)v=t;}
+  var v=+p.valor,itens=osPdfItens(p),t=0,ok=false;itens.forEach(function(it){var q=osPdfServValor(it.t);if(q!=null){t+=q;ok=true;}});
+  if(ok&&(!(v>0)||Math.abs(t-v)>0.05))v=t;
   if(!(v>0)){var s=typeof pedServ==='function'?pedServ(p.trabalho):null,unit=s&&s.valor!=null?s.valor:0,qtd=Math.max(1,+(p.qtd||((p.dentes&&p.dentes.length)||1)));v=unit*qtd;}
   if(v>0){var pct=+((typeof FIN!=='undefined'&&FIN.cfg&&FIN.cfg.comissao_pct!=null)?FIN.cfg.comissao_pct:10);return Math.round(v*pct)/100;}
   if(p.custo_desenho!=null&&+p.custo_desenho>0)return Math.round(+p.custo_desenho*100)/100;
@@ -7006,7 +7006,7 @@ function osPdfCanvas(p){var W=1240,H=1754,c=document.createElement('canvas');c.w
   var bw=66,bh=52,gap=4;rows.forEach(function(row,ri){row.forEach(function(d,i2){var X=60+i2*(bw+gap),Y=y+ri*(bh+16);x.fillStyle=sel[d]?'#F59E0B':'#fff';x.strokeStyle=sel[d]?'#B45309':'#aaa';x.lineWidth=2;x.fillRect(X,Y,bw,bh);x.strokeRect(X,Y,bw,bh);x.fillStyle=sel[d]?'#3B2600':'#333';x.font='bold 22px Arial';x.textAlign='center';x.fillText(d,X+bw/2,Y+34);x.textAlign='left';});});
   y=y+2*(bh+16)+30;x.fillStyle='#3A2E7A';x.font='bold 24px Arial';x.fillText('Elementos',60,y);y+=30;x.font='20px Arial';x.fillStyle='#111';
   var soma=0,temTab=false;itens.forEach(function(it){var v=osPdfServValor(it.t);it.v=v;if(v!=null){soma+=v;temTab=true;}});
-  var qtd=Math.max(1,itens.length),totv=(+p.valor>0)?+p.valor:(temTab?Math.round(soma*100)/100:0),unit=totv>0?Math.round((totv/qtd)*100)/100:(temTab?Math.round((soma/qtd)*100)/100:0);
+  var totalTab=temTab?Math.round(soma*100)/100:0,qtd=Math.max(1,itens.length),totv=totalTab>0?totalTab:((+p.valor>0)?+p.valor:0),unit=totv>0?Math.round((totv/qtd)*100)/100:0;
   itens.forEach(function(it){var t=osPdfJuntar(it.t,[p.material,p.cor]),v=it.v!=null?it.v:unit;x.fillText((it.d?'Dente '+it.d+' — ':'')+t+' — '+fmtR(v),60,y);y+=30;});
   y+=10;x.fillStyle='#3A2E7A';x.font='bold 24px Arial';x.fillText('Resumo financeiro',60,y);y+=34;x.font='22px Arial';x.fillStyle='#111';
   x.fillText('Valor unitário: '+fmtR(unit),60,y);y+=32;x.fillText('Quantidade: '+qtd,60,y);y+=32;x.font='bold 24px Arial';x.fillText('Valor total: '+fmtR(totv),60,y);y+=32;
