@@ -322,38 +322,87 @@ serve(async (req) => {
     return jsonResp(401, { error: 'Não autorizado' })
   }
 
-  let perfis: Array<{ cliente_id: string; drive_folder_id: string | null }> = []
+  // Lê o body para detectar modo diagnóstico
+  let bodyJson: Record<string, unknown> = {}
+  try { bodyJson = await req.json() } catch { /* body vazio é ok */ }
+  const diagnostico = bodyJson.diagnostico === true
+
+  // Monta a lista de clientes+pasta a sincronizar
+  const rootFolderSecret = Deno.env.get('DRIVE_ROOT_FOLDER_ID') ?? ''
+  let perfis: Array<{ cliente_id: string; drive_folder_id: string }> = []
   try {
-    let q = sb.from('mkt_perfil_marca').select('cliente_id, drive_folder_id').not('drive_folder_id', 'is', null)
+    // tenta ler drive_folder_id do perfil de marca (coluna pode não existir ainda)
+    let q = (sb.from('mkt_perfil_marca') as any).select('cliente_id, drive_folder_id').not('drive_folder_id', 'is', null)
     if (!todos) q = q.eq('cliente_id', clienteId!)
     const { data, error } = await q
     if (error) throw error
-    perfis = data ?? []
+    perfis = (data ?? []).filter((p: any) => p.drive_folder_id)
   } catch {
-    return jsonResp(200, {
-      ok: true,
-      temas: 0,
-      midias: 0,
-      aviso: 'campo drive_folder_id não existe em mkt_perfil_marca',
-    })
+    // coluna ainda não existe → usa o secret global para o cliente logado
+    if (clienteId && rootFolderSecret) {
+      perfis = [{ cliente_id: clienteId, drive_folder_id: rootFolderSecret }]
+    }
   }
 
-  try {
-    const token = await googleAccessToken()
-    let temas = 0
-    let midias = 0
-    for (const p of perfis) {
-      if (!p.drive_folder_id) continue
-      try {
-        const r = await processarCliente(sb, sbUrl, p.cliente_id, p.drive_folder_id, token)
-        temas += r.temas
-        midias += r.midias
-      } catch {
-        // segue para o próximo cliente
-      }
-    }
-    return jsonResp(200, { ok: true, temas, midias })
-  } catch (e) {
-    return jsonResp(502, { ok: false, error: e instanceof Error ? e.message : 'Erro ao sincronizar' })
+  // fallback: se perfil existe mas sem drive_folder_id, usa secret
+  if (!perfis.length && clienteId && rootFolderSecret) {
+    perfis = [{ cliente_id: clienteId, drive_folder_id: rootFolderSecret }]
   }
+
+  if (!perfis.length) {
+    return jsonResp(200, { ok: true, temas: 0, midias: 0, aviso: 'Configure DRIVE_ROOT_FOLDER_ID ou adicione drive_folder_id ao perfil de marca' })
+  }
+
+  let googleToken: string
+  try {
+    googleToken = await googleAccessToken()
+  } catch (e) {
+    return jsonResp(502, { ok: false, error: `Google auth falhou: ${e instanceof Error ? e.message : e}` })
+  }
+
+  // Modo diagnóstico: retorna nome da pasta raiz e subpastas sem tocar no BD
+  if (diagnostico && perfis.length > 0) {
+    const folderId = perfis[0].drive_folder_id
+    try {
+      const nomeRes = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${folderId}?fields=id,name,mimeType&supportsAllDrives=true`,
+        { headers: { Authorization: `Bearer ${googleToken}` } },
+      )
+      const nomeDados = await nomeRes.json()
+      const subpastas = await driveLista(
+        googleToken,
+        `'${folderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      )
+      const arquivos = await driveLista(googleToken, `'${folderId}' in parents and trashed=false`)
+      return jsonResp(200, {
+        ok: true,
+        diagnostico: true,
+        pasta_raiz: { id: folderId, nome: nomeDados.name ?? '(sem nome)', erro: nomeDados.error?.message },
+        subpastas: subpastas.map((p) => ({ id: p.id, nome: p.name })),
+        arquivos_diretos: arquivos.filter((a) => a.mimeType !== 'application/vnd.google-apps.folder').map((a) => ({ id: a.id, nome: a.name, tipo: a.mimeType })),
+        cliente_id_usado: perfis[0].cliente_id,
+      })
+    } catch (e) {
+      return jsonResp(502, { ok: false, error: `Drive diagnóstico falhou: ${e instanceof Error ? e.message : e}` })
+    }
+  }
+
+  // Sincronização normal
+  let temas = 0
+  let midias = 0
+  const erros: string[] = []
+  for (const p of perfis) {
+    try {
+      const r = await processarCliente(sb, sbUrl, p.cliente_id, p.drive_folder_id, googleToken)
+      temas += r.temas
+      midias += r.midias
+    } catch (e) {
+      erros.push(`${p.cliente_id.slice(0, 8)}: ${e instanceof Error ? e.message : String(e)}`)
+    }
+  }
+
+  if (erros.length && !temas) {
+    return jsonResp(502, { ok: false, error: erros.join('; ') })
+  }
+  return jsonResp(200, { ok: true, temas, midias, ...(erros.length ? { avisos: erros } : {}) })
 })
