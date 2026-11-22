@@ -5140,12 +5140,32 @@ function rFinMes(){var L=finDoMes(),fat=0,rec=0,fal=0;L.forEach(function(m){fat+
     (L.length?'<div class="finlista">'+L.map(function(m){var s=finSt(m),pg=finPago(m),r=finRest(m),a=finAnt(m);return '<button class="finli" data-act="finAbre" data-v="'+m.id+'" data-n="'+esc(semAc(finCliNome(m)))+'"'+(FIN.q&&semAc(finCliNome(m)).indexOf(semAc(FIN.q.trim()))<0?' hidden':'')+' style="--k:'+s[2]+'"><span class="finli-n"><b>'+esc(finCliNome(m))+'</b><small>'+(m.extrato_path||m.arquivo_legado?'📄 extrato · ':'')+(m.enviado?'✉️ enviado':'não enviado')+(a<-0.005?' · ⚠️ devia '+fmtR(-a)+' do mês anterior':'')+(a>0.005?' · crédito de '+fmtR(a):'')+'</small></span><span class="finv"><small>mês</small>'+fmtR(m.valor_mes)+'</span><span class="finv"><small>pago'+(finCredAtivo(m)?' + crédito':'')+'</small>'+fmtR(finPagoTela(m))+'</span><span class="finv"><small>falta</small>'+fmtR(finFaltaTela(m))+'</span><span class="pill">'+s[1]+'</span></button>';}).join('')+'</div>':'<div class="empty">Nenhum cliente lançado em '+MESES[FIN.mes-1]+'. Use “+ Lançar cliente no mês”.</div>');}
 function rFinNovo(){var tem={};finDoMesTudo().forEach(function(m){tem[finCliK(m)]=1;});var L=EMP.cli.filter(function(c){return c.ativo&&!tem[c.id];});
   return '<section class="card finnovo"><h3>Lançar cliente em '+MESES[FIN.mes-1]+'</h3><div class="row wrap"><select id="fn-cli"><option value="">— cliente —</option>'+L.map(function(c){return '<option value="'+c.id+'">'+esc(c.nome)+'</option>';}).join('')+'</select><input id="fn-valor" inputmode="decimal" placeholder="Valor do mês (R$)"><button class="btn pri" data-act="finNovoSalva"'+(FIN.busy?' disabled':'')+'>Lançar</button><button class="btn" data-act="finNovoFecha">Cancelar</button></div></section>';}
+function finNfMsg(m){var c=finCliObj(m),nome=c?c.nome:finCliNome(m),valor=+m.valor_mes||0,per=MESES[m.mes-1]+' de '+m.ano,L=['Olá! Solicitamos a emissão da nota fiscal referente a '+per+', no valor de '+fmtR(valor)+'.','','Dados para emissão:','Cliente: '+nome];
+  if(c&&c.documento)L.push('CPF/CNPJ: '+c.documento);if(c&&c.email)L.push('E-mail: '+c.email);if(c&&(c.endereco||c.cidade))L.push('Endereço: '+[c.endereco,c.bairro,c.cidade,c.uf].filter(Boolean).join(', '));if(c&&c.obs)L.push('Observações: '+c.obs);
+  L.push('','Qualquer dúvida, estamos à disposição.');return L.join('\n');}
+function finNfModal(m,modo){var c=finCliObj(m),msg=finNfMsg(m),para=modo==='wa'?String((c&&(c.whatsapp||c.telefone))||''):String((c&&c.email)||'');
+  var el=document.getElementById('fin-nf');if(el)el.remove();el=document.createElement('div');el.id='fin-nf';el.setAttribute('data-modo',modo);el._finM=m;
+  el.innerHTML='<div class="pdg-ov"><div class="pdg-box"><div class="pdg-h"><b>'+(modo==='wa'?'💬 WhatsApp · Nota fiscal':'✉️ Nota fiscal com a Ana')+'</b><button class="btn sm" data-nfm="fecha">Fechar</button></div><div class="pdg-b">'+
+    '<label class="fld"><span>'+(modo==='wa'?'WhatsApp do cliente':'Para')+'</span><input id="nfm-para" value="'+esc(para)+'" placeholder="'+(modo==='wa'?'(DDD) 00000-0000':'email@cliente.com')+'"></label>'+
+    (modo==='wa'?'':'<label class="fld"><span>Assunto</span><input id="nfm-as" value="'+esc('Solicitação de nota fiscal · '+MESES[m.mes-1]+'/'+m.ano)+'"></label>')+
+    '<label class="fld"><span>Mensagem</span><textarea id="nfm-co" rows="12">'+esc(msg)+'</textarea></label></div>'+
+    '<div class="pdg-f"><button class="btn" data-nfm="copia">📋 Copiar</button><span style="flex:1"></span><button class="btn pri" data-nfm="envia">'+(modo==='wa'?'Abrir WhatsApp':'Abrir Gmail')+'</button></div></div></div>';
+  document.body.appendChild(el);}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-nfm]');if(!b)return;var el=document.getElementById('fin-nf'),a=b.getAttribute('data-nfm');e.preventDefault();
+  if(a==='fecha'){if(el)el.remove();return;}
+  var para=(document.getElementById('nfm-para')||{}).value||'',co=(document.getElementById('nfm-co')||{}).value||'',as=(document.getElementById('nfm-as')||{}).value||'';
+  if(a==='copia'){if(navigator.clipboard)navigator.clipboard.writeText(co).then(function(){toast('Mensagem copiada.');});return;}
+  if(el&&el.getAttribute('data-modo')==='wa'){var fone=para.replace(/\D/g,'');window.open((fone?'https://wa.me/55'+fone:'https://wa.me/?')+'?text='+encodeURIComponent(co),'_blank');}
+  else window.open('https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(para)+'&su='+encodeURIComponent(as)+'&body='+encodeURIComponent(co),'_blank');
+  if(el)el.remove();},true);
 function rFinDet(m){if(!m){FIN.ed=null;return rFin();}var c=finCliObj(m),pg=finPago(m),r=finRest(m),a=finAnt(m),s=finSt(m),P=finPags(m);
   var peds=PED.L.filter(function(p){var d=String(p.criado_em||'');return (c?p.cliente_id===c.id:p.cliente_reg===m.cliente_reg)&&d.slice(0,7)===m.ano+'-'+String(m.mes).padStart(2,'0');}),vp=peds.reduce(function(x,p){return x+(+p.valor||0);},0),sc=peds.filter(function(p){return p.sem_comissao;}),scT=sc.reduce(function(x,p){return x+pedSemComVal(p);},0);
   return '<div class="dtop"><div><h2>'+esc(finCliNome(m))+'</h2><p class="small muted">'+MESES[m.mes-1]+' de '+m.ano+' · <span class="pill" style="--k:'+s[2]+'">'+s[1]+'</span></p></div><span class="spacer"></span><button class="btn" data-act="finVolta">← Voltar</button></div>'+
     '<div class="finkpis">'+[[fmtR(m.valor_mes),'valor do mês',''],[fmtR(pg),'pago','ok'],[fmtR(Math.max(0,r)),'falta',r>0.005?'bad':'']].map(function(k){return '<div class="finkpi '+k[2]+'"><b>'+k[0]+'</b><span>'+k[1]+'</span></div>';}).join('')+'</div>'+
     (a<-0.005?'<div class="banner finaviso">⚠️ No mês anterior ficou faltando <b>'+fmtR(-a)+'</b>.</div>':'')+
     (a>0.005?'<div class="banner fincred"><span>💚 No mês anterior pagou <b>'+fmtR(a)+'</b> a mais. '+(m.abater_credito===true?'Está sendo abatido deste mês.':m.abater_credito===false?'Você decidiu não abater.':'Abater deste mês?')+'</span><div class="row"><button class="btn sm" data-act="finCred" data-v="1">Abater</button><button class="btn sm" data-act="finCred" data-v="0">Não abater</button></div></div>':'')+
+    '<section class="card" style="margin-bottom:12px"><h3>🧾 Nota fiscal</h3><p class="small muted">Solicitar a nota fiscal de '+MESES[m.mes-1]+' de '+m.ano+' no valor de '+fmtR(m.valor_mes)+'.</p>'+
+      (FIN.nfOpen?'<div class="row wrap"><button class="btn" data-act="finNfEmail" data-v="'+m.id+'">✉️ Solicitar por e-mail</button><button class="btn" data-act="finNfWa" data-v="'+m.id+'">💬 WhatsApp</button><button class="btn sm" data-act="finNf" data-v="'+m.id+'">Cancelar</button></div>':'<button class="btn" data-act="finNf" data-v="'+m.id+'">Solicitar nota fiscal</button>')+'</section>'+
     '<div class="dgrid"><section class="card cli-form finform"><h3 class="cli-full">Valores do mês</h3>'+
       '<label class="fld"><span>Valor do mês (R$)</span><input data-fm="valor_mes" inputmode="decimal" value="'+esc(String(m.valor_mes).replace('.',','))+'"></label>'+
       '<label class="fld"><span>Componentes (R$)</span><input data-fm="valor_componente" inputmode="decimal" value="'+esc(String(m.valor_componente||0).replace('.',','))+'"></label>'+
@@ -5216,9 +5236,12 @@ Object.assign(ACT,{
   finNovoAbre:function(){FIN.novo=true;render();},finNovoFecha:function(){FIN.novo=false;render();},
   finNovoSalva:function(){var id=(document.getElementById('fn-cli')||{}).value,v=num((document.getElementById('fn-valor')||{}).value);if(!id){toast('Escolha o cliente.');return;}var c=EMP.cli.filter(function(x){return x.id===id;})[0];
     FIN.busy=true;render();SB.from('odo_fin_meses').insert({user_id:RL.user.id,cliente_id:id,cliente_reg:c&&c.reg||null,ano:FIN.ano,mes:FIN.mes,valor_mes:v||0}).select('*').single().then(function(r){FIN.busy=false;if(r.error){toast(/duplicate|unique/.test(r.error.message||'')?'Este cliente já está neste mês.':'Não consegui lançar.');render();return;}finAtual(r.data);FIN.novo=false;FIN.ed=r.data.id;render();});},
-  finAbre:function(v){FIN.ed=v;FIN.cob=null;render();window.scrollTo(0,0);},
+  finAbre:function(v){FIN.ed=v;FIN.cob=null;FIN.nfOpen=false;render();window.scrollTo(0,0);},
   finPendAbre:function(v){FIN.ed=v;FIN.cob=null;var m=FIN.M.filter(function(x){return x.id===v;})[0];if(m){FIN.cob={k:finCliK(m),txt:finMsg(finCliK(m))};}render();window.scrollTo(0,0);},
-  finVolta:function(){FIN.ed=null;FIN.cob=null;render();},
+  finVolta:function(){FIN.ed=null;FIN.cob=null;FIN.nfOpen=false;render();},
+  finNf:function(){FIN.nfOpen=!FIN.nfOpen;render();},
+  finNfEmail:function(v){var m=FIN.M.filter(function(x){return x.id===v;})[0];if(!m)return;FIN.nfOpen=false;finNfModal(m,'email');},
+  finNfWa:function(v){var m=FIN.M.filter(function(x){return x.id===v;})[0];if(!m)return;FIN.nfOpen=false;finNfModal(m,'wa');},
   finMesSalva:function(){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0];if(!m)return;var p={};[].forEach.call(document.querySelectorAll('[data-fm]'),function(el){var k=el.dataset.fm;p[k]=el.type==='checkbox'?el.checked:el.value.trim();});
     p.valor_mes=num(p.valor_mes)||0;p.valor_componente=num(p.valor_componente)||0;p.obs=p.obs||null;
     if(p.valor_mes<+m.valor_mes&&!confirm('Diminuir o valor do mês de '+fmtR(m.valor_mes)+' para '+fmtR(p.valor_mes)+'?'))return;
