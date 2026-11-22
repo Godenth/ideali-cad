@@ -4921,7 +4921,10 @@ function pedAtivos(){return PED.L.filter(function(p){return !p.arquivado&&p.stat
 function pedBadge(){return pedAtivo()?pedAtivos().filter(function(p){return p.status==='desenho';}).length:0;}
 function pedRisco(p){if(!p.prazo||p.status==='finalizado'||p.status==='entregue'||p.status==='cancelado')return '';var n=dDif(p.prazo);return n<0?'atrasado':n===0?'hoje':n===1?'amanha':'';}
 function pedCliMes(){var h=new Date(),y=h.getFullYear(),m=h.getMonth(),S={};pedAtivos().forEach(function(p){if(!p.criado_em)return;var d=new Date(p.criado_em);if(d.getFullYear()!==y||d.getMonth()!==m)return;var n=pedCli(p);if(n&&n!=='Sem cliente')S[n]=1;});return Object.keys(S).sort(function(a,b){return a.localeCompare(b,'pt');});}
-function pedSemComVal(p){if(!p)return 0;if(p.custo_desenho!=null&&+p.custo_desenho>0)return Math.round(+p.custo_desenho*100)/100;var v=+p.valor;if(!(v>0)){var s=typeof pedServ==='function'?pedServ(p.trabalho):null;v=s&&s.valor!=null?s.valor:0;}var pct=+((typeof FIN!=='undefined'&&FIN.cfg&&FIN.cfg.comissao_pct!=null)?FIN.cfg.comissao_pct:10);return Math.round(v*pct)/100;}
+function pedSemComVal(p){if(!p)return 0;if(p.custo_desenho!=null&&+p.custo_desenho>0)return Math.round(+p.custo_desenho*100)/100;var v=+p.valor;if(!(v>0)){var s=typeof pedServ==='function'?pedServ(p.trabalho):null;v=s&&s.valor!=null?s.valor:0;}
+  if(!(v>0)&&p.arcada&&p.arcada.length){var t=0,ok=false;p.arcada.forEach(function(x){var q=osPdfServValor(x.t||p.trabalho);if(q!=null){t+=q;ok=true;}});if(ok)v=t;}
+  if(!(v>0)&&p.dentes&&p.dentes.length){var q2=osPdfServValor(p.trabalho);if(q2!=null)v=q2*p.dentes.length;}
+  var pct=+((typeof FIN!=='undefined'&&FIN.cfg&&FIN.cfg.comissao_pct!=null)?FIN.cfg.comissao_pct:10);return Math.round(v*pct)/100;}
 function pedSemComExc(ano,mes){var t=0;if(typeof PED==='undefined'||!PED.L)return 0;PED.L.forEach(function(p){if(!p.sem_comissao||p.apagado||!p.criado_em)return;var d=new Date(p.criado_em);if(isNaN(d)||d.getFullYear()!==ano||d.getMonth()+1!==mes)return;t+=pedSemComVal(p);});return Math.round(t*100)/100;}
 function pedFiltra(L){var f=PED.f,q=semAc(PED.busca||'');return L.filter(function(p){var ok=f==='todos'||(f==='urg'?p.urgente:f==='pend'?!!p.aguardando_pendencia:p.tipo===f);return ok&&(!PED.cli||pedCli(p)===PED.cli)&&(!q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(q)>=0);});}
 function pedDentes(p){return p.dentes&&p.dentes.length?(p.dentes.length>1?'dentes ':'dente ')+p.dentes.join(', '):'';}
@@ -6970,6 +6973,15 @@ function osPdfBlob(cv){var url=cv.toDataURL('image/jpeg',0.88),bin=atob(url.spli
   var tot=0;parts.forEach(function(u){tot+=u.length;});var out=new Uint8Array(tot),p2=0;parts.forEach(function(u){out.set(u,p2);p2+=u.length;});
   return new Blob([out],{type:'application/pdf'});}
 function osPdfNome(p){return 'Pedido_'+(p.numero||p.id||'0')+'_'+String(p.paciente||'paciente').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'_').slice(0,60)+'.pdf';}
+function osPdfServValor(t){if(!t)return null;var s=typeof pedServ==='function'?pedServ(t):null;if(s&&s.valor!=null)return s.valor;
+  var N=(typeof S!=='undefined'&&S.neg&&S.neg.servs)||[],alvo=semAc(t),best=null,bl=0;
+  N.forEach(function(it){var nm=semAc(it[0]||''),v=num(it[1]);if(!nm||v==null)return;if(alvo===nm){best=v;bl=1e9;}else if(alvo.indexOf(nm)>=0&&nm.length>bl){best=v;bl=nm.length;}});
+  return best;}
+function osPdfItens(p){var map={},ord=[],add=function(d,t,k){d=+d;if(!d)return;if(!map[d]){map[d]={d:d,t:'',k:''};ord.push(d);}if(t&&!map[d].t)map[d].t=t;if(k&&!map[d].k)map[d].k=k;};
+  (p.arcada||[]).forEach(function(x){add(x.d,x.t,x.k);});if(!ord.length)(p.dentes||[]).forEach(function(d){add(d,p.trabalho,'');});
+  if(!ord.length)return [{d:null,t:p.trabalho||'Trabalho',k:''}];ord.sort(function(a,b){return a-b;});
+  return ord.map(function(d){var it=map[d];if(!it.t)it.t=p.trabalho||'Trabalho';return it;});}
+function osPdfJuntar(t,extra){var base=String(t||''),seen=semAc(base);(extra||[]).forEach(function(e){var s=semAc(e||'');if(!s||seen.indexOf(s)>=0)return;base+=' · '+e;seen+=' '+s;});return base;}
 function osPdfCanvas(p){var W=1240,H=1754,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');
   var wrap=function(t,y,max,size,bold,color){x.font=(bold?'bold ':'')+size+'px Arial';x.fillStyle=color||'#111';var words=String(t||'').split(/\s+/),line='';for(var i=0;i<words.length;i++){var test=line?line+' '+words[i]:words[i];if(x.measureText(test).width>max&&line){x.fillText(line,60,y);y+=size+6;line=words[i];}else line=test;}if(line)x.fillText(line,60,y);return y+size+6;};
   x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#3A2E7A';x.fillRect(0,0,W,120);
@@ -6978,18 +6990,21 @@ function osPdfCanvas(p){var W=1240,H=1754,c=document.createElement('canvas');c.w
   var y=100;x.font='20px Arial';x.fillStyle='#555';x.fillText('Gerado em '+new Date().toLocaleString('pt-BR'),50,y);
   y=150;if(p.urgente){x.fillStyle='#DC2626';x.fillRect(50,y-28,150,38);x.fillStyle='#fff';x.font='bold 22px Arial';x.fillText('URGENTE',70,y);}
   if(p.sem_comissao){x.fillStyle='#B45309';x.fillRect(220,y-28,330,38);x.fillStyle='#fff';x.font='bold 20px Arial';x.fillText('SEM COMISSÃO · i9 3D LAB',238,y);}
-  var fields=[['Cliente',pedCli(p)],['Paciente',p.paciente],['Tipo',p.tipo==='cad'?'CAD':'Analógico'],['Trabalho',p.trabalho],['Material',p.material],['Cor',p.cor],['Componente',p.componente],['Sobre implante',p.sobre_implante?'Sim':'Não'],['Dentes',(p.dentes||[]).join(', ')]];
+  var itens=osPdfItens(p),trabUniq=[];itens.forEach(function(it){var k=semAc(it.t);if(k&&trabUniq.indexOf(k)<0)trabUniq.push(k);});
+  var impN=itens.filter(function(it){return it.k==='imp';}).length,comD=itens.filter(function(it){return it.d;}).length;
+  var trabTxt=trabUniq.length>1?'Vários (ver elementos)':(itens[0]&&itens[0].t)||p.trabalho;
+  var impTxt=impN?(impN===comD?'Sim':'Parcial (ver elementos)'):(p.sobre_implante?'Sim':'Não');
+  var fields=[['Cliente',pedCli(p)],['Paciente',p.paciente],['Tipo',p.tipo==='cad'?'CAD':'Analógico'],['Trabalho',trabTxt],['Material',p.material],['Cor',p.cor],['Componente',p.componente],['Sobre implante',impTxt],['Dentes',itens.filter(function(it){return it.d;}).map(function(it){return it.d;}).join(', ')]];
   y=220;x.textAlign='left';fields.forEach(function(f){x.fillStyle='#666';x.font='bold 20px Arial';x.fillText(f[0]+':',60,y);x.fillStyle='#111';x.font='22px Arial';x.fillText(String(f[1]||'—').slice(0,70),250,y);y+=34;});
   y=Math.max(y,560);x.fillStyle='#3A2E7A';x.font='bold 24px Arial';x.fillText('Odontograma',60,y);y+=24;
   var sel={};(p.dentes||[]).forEach(function(d){sel[d]=1;});var rows=[[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28],[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]];
   var bw=66,bh=52,gap=4;rows.forEach(function(row,ri){row.forEach(function(d,i2){var X=60+i2*(bw+gap),Y=y+ri*(bh+16);x.fillStyle=sel[d]?'#F59E0B':'#fff';x.strokeStyle=sel[d]?'#B45309':'#aaa';x.lineWidth=2;x.fillRect(X,Y,bw,bh);x.strokeRect(X,Y,bw,bh);x.fillStyle=sel[d]?'#3B2600':'#333';x.font='bold 22px Arial';x.textAlign='center';x.fillText(d,X+bw/2,Y+34);x.textAlign='left';});});
   y=y+2*(bh+16)+30;x.fillStyle='#3A2E7A';x.font='bold 24px Arial';x.fillText('Elementos',60,y);y+=30;x.font='20px Arial';x.fillStyle='#111';
-  var ds=(p.dentes||[]).slice().sort(function(a,b){return a-b;}),unit=(+p.valor>0&&ds.length)?Math.round((+p.valor/ds.length)*100)/100:(typeof pedServ==='function'?((pedServ(p.trabalho)||{}).valor||0):0);
-  ds.forEach(function(d){var t=(p.trabalho||'Trabalho')+(p.material?' · '+p.material:'')+(p.cor?' · '+p.cor:'');x.fillText('Dente '+d+' — '+t+' — '+fmtR(unit),60,y);y+=30;});
-  if(!ds.length){x.fillText((p.trabalho||'Trabalho')+' — '+fmtR(p.valor||unit),60,y);y+=30;}
+  var soma=0,temTab=false;itens.forEach(function(it){var v=osPdfServValor(it.t);it.v=v;if(v!=null){soma+=v;temTab=true;}});
+  var qtd=Math.max(1,itens.length),totv=(+p.valor>0)?+p.valor:(temTab?Math.round(soma*100)/100:0),unit=totv>0?Math.round((totv/qtd)*100)/100:(temTab?Math.round((soma/qtd)*100)/100:0);
+  itens.forEach(function(it){var t=osPdfJuntar(it.t,[p.material,p.cor]),v=it.v!=null?it.v:unit;x.fillText((it.d?'Dente '+it.d+' — ':'')+t+' — '+fmtR(v),60,y);y+=30;});
   y+=10;x.fillStyle='#3A2E7A';x.font='bold 24px Arial';x.fillText('Resumo financeiro',60,y);y+=34;x.font='22px Arial';x.fillStyle='#111';
-  var totv=(+p.valor>0)?+p.valor:Math.round(unit*Math.max(1,ds.length)*100)/100;
-  x.fillText('Valor unitário: '+fmtR(unit),60,y);y+=32;x.fillText('Quantidade: '+Math.max(1,ds.length),60,y);y+=32;x.font='bold 24px Arial';x.fillText('Valor total: '+fmtR(totv),60,y);y+=32;
+  x.fillText('Valor unitário: '+fmtR(unit),60,y);y+=32;x.fillText('Quantidade: '+qtd,60,y);y+=32;x.font='bold 24px Arial';x.fillText('Valor total: '+fmtR(totv),60,y);y+=32;
   if(p.sem_comissao){x.fillStyle='#B45309';x.font='bold 22px Arial';x.fillText('Desconto do desenho (i9 3D Lab): '+fmtR(pedSemComVal(p)),60,y);y+=32;}
   y+=10;x.fillStyle='#666';x.font='20px Arial';wrap('Descrição: '+(p.descricao||'—'),y,W-120,20,false,'#333');wrap('Observações: '+(p.obs||'—'),y+34,W-120,20,false,'#333');
   x.fillStyle='#999';x.font='16px Arial';x.fillText('Ideali Odonto · documento gerado automaticamente',60,H-40);
@@ -9464,8 +9479,11 @@ Object.assign(ACT,{
     PE.pick=d;PE.q='';render();setTimeout(function(){var i=document.getElementById('pe-q');if(i)i.focus();},30);},
   peAbre:function(v){pedLe();PE.pick=+v;PE.q='';render();},
   pePickX:function(){PE.pick=null;render();},
-  pePickK:function(v){var x=peX(PE.pick);if(!x)return;x.k=v;peDeriva(PED.ed);render();},
-  pePickT:function(v){var x=peX(PE.pick);if(!x)return;x.t=String(v).slice(0,120);var nk=peKDe(v);x.k=nk==='prep'&&(x.k==='pon'||x.k==='imp')?x.k:nk;PE.pick=null;peDeriva(PED.ed);render();},
+  pePickK:function(v){var x=peX(PE.pick);if(!x)return;x.k=v;
+    if(v==='prep'&&/implant|parafus/i.test(x.t||''))x.t=String(x.t).replace(/sobre\s+implante/gi,'sobre dente').replace(/implante/gi,'dente');
+    else if(v==='imp'&&/sobre\s+dente/i.test(x.t||''))x.t=String(x.t).replace(/sobre\s+dente/gi,'sobre implante');
+    peDeriva(PED.ed);render();},
+  pePickT:function(v){var x=peX(PE.pick);if(!x)return;x.t=String(v).slice(0,120);x.k=peKDe(v);PE.pick=null;peDeriva(PED.ed);render();},
   peTira:function(v){pedLe();var p=PED.ed;if(!p)return;p.arcada=(p.arcada||[]).filter(function(a){return a.d!==+v;});if(p.arcada.length){var A=p.arcada;A.forEach(function(a,i){var nx=A[i+1];if(a.u&&!(nx&&oaVizinho(a.d,nx.d)))a.u=false;});}PE.pick=null;peDeriva(p);render();},
   peValor:function(v){pedLe();PED.ed.valor=Math.round(+v*100)/100;render();toast('Valor pela tabela aplicado.');}});
 document.addEventListener('input',function(e){if(e.target.id!=='pe-q')return;PE.q=e.target.value;var p=PED.ed;if(!p)return;var box=document.querySelector('.pe-ts');if(!box)return;var t=document.createElement('div');t.innerHTML=pePicker(p);var nb=t.querySelector('.pe-ts');if(nb)box.replaceWith(nb);});
