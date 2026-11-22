@@ -4887,6 +4887,7 @@ function cliCards(L){return L.length?L.map(function(c){return '<button class="cl
 var CLI_F=[['nome','Nome do cliente (dentista ou clínica)',120],['documento','CPF ou CNPJ',20],['cro','CRO',30],['whatsapp','WhatsApp',30],['telefone','Telefone',30],['email','E-mail',120],['endereco','Endereço',160],['bairro','Bairro',80],['cidade','Cidade',80],['uf','UF',2],['cep','CEP',10]];
 function rCliForm(c){return '<div class="dtop"><div><h2>'+(c.id?'Editar cliente':'Novo cliente')+'</h2>'+(c.reg?'<p class="small muted">Nº '+c.reg+' (do sistema antigo)</p>':'')+'</div></div>'+
   '<section class="card cli-form">'+CLI_F.map(function(f){return '<label class="fld cli-'+f[0]+'"><span>'+f[1]+'</span><input data-cf="'+f[0]+'" maxlength="'+f[2]+'" value="'+esc(f[0]==='documento'?cliDoc(c[f[0]]):c[f[0]]||'')+'"></label>';}).join('')+
+  '<label class="fld cli-full"><span>📌 Instrução padrão para o e-mail da Ana</span><textarea data-cf="instrucao_padrao" maxlength="1000" rows="2" placeholder="Ex.: não cimentar os componentes; avisar antes de fresar">'+esc(c.instrucao_padrao||'')+'</textarea></label>'+
   '<label class="fld cli-full"><span>📌 Regra padrão do cliente</span><textarea data-cf="regra" maxlength="1000" rows="2" placeholder="Ex.: não cimentar componente; casos unitários usar Icmut">'+esc(c.regra||'')+'</textarea></label>'+
   '<label class="fld cli-full"><span>Observações</span><textarea data-cf="obs" maxlength="1000" rows="2">'+esc(c.obs||'')+'</textarea></label>'+
   '<label class="check cli-full"><input type="checkbox" data-cf="ativo" '+(c.ativo!==false?'checked':'')+'> Cliente ativo</label>'+
@@ -4899,7 +4900,7 @@ Object.assign(ACT,{
   cliVolta:function(){EMP.ed=null;render();},
   cliFiltro:function(v){EMP.filtro=v;render();},
   cliSalva:function(){cliLe();var c=EMP.ed;if(!c.nome||c.nome.length<2){EMP.erroF='Digite o nome do cliente.';render();return;}
-    var row={};['nome','documento','cro','whatsapp','telefone','email','endereco','bairro','cidade','uf','cep','regra','obs'].forEach(function(k){row[k]=c[k]?String(c[k]):null;});row.ativo=c.ativo!==false;
+    var row={};['nome','documento','cro','whatsapp','telefone','email','endereco','bairro','cidade','uf','cep','regra','instrucao_padrao','obs'].forEach(function(k){row[k]=c[k]?String(c[k]):null;});row.ativo=c.ativo!==false;
     EMP.busy=true;render();var q=c.id?SB.from('odo_clientes').update(row).eq('id',c.id).select('*').single():SB.from('odo_clientes').insert(Object.assign({user_id:contaId()},row)).select('*').single();
     q.then(function(r){EMP.busy=false;if(r.error){EMP.erroF='Não consegui salvar agora.';render();return;}var i=EMP.cli.map(function(x){return x.id;}).indexOf(r.data.id);if(i>=0)EMP.cli[i]=r.data;else EMP.cli.push(r.data);EMP.cli.sort(function(a,b){return a.nome.localeCompare(b.nome,'pt');});EMP.ed=null;render();toast('Cliente salvo.');});},
   cliApaga:function(){var c=EMP.ed;if(!c||!c.id||!confirm('Excluir '+c.nome+'? Isso não pode ser desfeito. Se só parou de mandar trabalho, prefira desmarcar "Cliente ativo".'))return;
@@ -4971,7 +4972,7 @@ function pedDentesLe(t){var L=[];String(t||'').split(/[^0-9]+/).forEach(function
 function rPedForm(p){var cli=p.cliente_id&&EMP.cli.filter(function(x){return x.id===p.cliente_id;})[0],cliL=EMP.cli.filter(function(c){return c.ativo||c.id===p.cliente_id;}),N=S.neg;
   var sel=function(k,ops,v){return '<select data-pf="'+k+'">'+ops.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(v==null?'':v)===String(o[0])?' selected':'')+'>'+esc(o[1])+'</option>';}).join('')+'</select>';};
   var fld=function(k,lab,v,extra){return '<label class="fld ped-'+k+'"><span>'+lab+'</span><input data-pf="'+k+'" value="'+esc(v==null?'':v)+'"'+(extra||'')+'></label>';};
-  return '<div class="dtop"><div><h2>'+(p.id?'Pedido #'+(p.numero||'—'):'Novo pedido')+'</h2>'+(p.legado?'<p class="small muted">Veio do sistema antigo'+(p.legado.indexOf('o:')===0?' (Ordens CAM)':'')+'.</p>':'')+'</div><span class="spacer"></span><button type="button" class="btn" data-act="pedCopia">📋 Copiar tudo</button></div>'+
+  return '<div class="dtop"><div><h2>'+(p.id?'Pedido #'+(p.numero||'—'):'Novo pedido')+'</h2>'+(p.legado?'<p class="small muted">Veio do sistema antigo'+(p.legado.indexOf('o:')===0?' (Ordens CAM)':'')+'.</p>':'')+'</div><span class="spacer"></span><button type="button" class="btn" data-act="pedOsPdf">📄 Ordem de serviço (PDF)</button><button type="button" class="btn" data-act="pedCopia">📋 Copiar tudo</button></div>'+
     '<section class="card cli-form pedform">'+
     '<div class="fld cli-full"><span>Tipo</span><div class="seg pedseg">'+[['cad','🟣 CAD (desenho a fazer)'],['analogico','🧪 Analógico (laboratório)']].map(function(o){return '<button type="button" aria-pressed="'+(p.tipo===o[0])+'" data-act="pedTipo" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
     '<label class="fld cli-full"><span>Cliente</span>'+sel('cliente_id',[['','— escolha —']].concat(cliL.map(function(c){return [c.id,c.nome+(c.reg?' (nº '+c.reg+')':'')];})),p.cliente_id)+'</label>'+
@@ -6895,6 +6896,7 @@ var _rPedFormEXO=rPedForm;rPedForm=function(p){var h=_rPedFormEXO(p),b=exoBloco(
 document.addEventListener('change',function(e){if(!e.target||e.target.id!=='exo-dp'||!PED.ed)return;var f=e.target.files&&e.target.files[0];if(!f)return;pedLe();
   f.text().then(function(t){try{PED.ed._exo=exoLeProjeto(t);PED.ed._exoNome=f.name;render();toast('A Ana leu o projeto. Confira o resultado.');}catch(x){toast('Não consegui ler esse arquivo. Envie o .dentalProject do caso.');}});});
 function exoSaudacao(){var h=new Date().getHours();return h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';}
+function pedCliInstrucao(p){var c=p&&p.cliente_id&&typeof EMP!=='undefined'&&EMP.cli?EMP.cli.filter(function(x){return x.id===p.cliente_id;})[0]:null;return c?(c.instrucao_padrao||c.regra||''):'';}
 function exoEmailTxt(p){var R=p._exo,ds=(String(Array.isArray(p.dentes)?p.dentes.join(', '):p.dentes||'')).trim(),L=[];
   L.push(exoSaudacao()+', Mari! Tudo bem?','','Segue mais um pedido:','');
   L.push('Cliente: '+pedCli(p));if(p.paciente)L.push('Paciente: '+p.paciente);
@@ -6902,6 +6904,7 @@ function exoEmailTxt(p){var R=p._exo,ds=(String(Array.isArray(p.dentes)?p.dentes
   else{if(p.trabalho)L.push('Trabalho: '+p.trabalho);if(ds)L.push('Elemento'+(ds.indexOf(',')>=0?'s':'')+': '+ds);if(p.material)L.push('Material: '+p.material);if(p.sobre_implante===true||p.sobre_implante==='true')L.push('Sobre implante'+(p.componente?': '+p.componente:''));}
   var cor=(R&&R.cor)||p.cor;if(cor)L.push('Cor: '+cor);if(p.componente&&R)L.push('Componente: '+p.componente);if(p.prazo)L.push('Prazo: '+String(p.prazo).split('-').reverse().join('/'));if(p.urgente===true||p.urgente==='true')L.push('⚠️ URGENTE');if(p.obs)L.push('Observações: '+p.obs);
   if(p.sem_comissao){L.push('','*** CASO SEM COMISSÃO ***');L.push('O desenho CAD será executado pela própria i9 3D Lab.');L.push('Valor a descontar referente ao desenho/serviço: '+fmtR(pedSemComVal(p)));}
+  var _inst=pedCliInstrucao(p);if(_inst)L.push('','Instruções do cliente:',_inst);
   L.push('','Os arquivos do caso seguem em anexo.','Qualquer dúvida, estou à disposição.','','Att.,','Ana · Agente de Inteligência Artificial','Ideali Lab');
   return {assunto:'Pedido #'+(p.numero||'')+' · '+(p.paciente||'')+' · '+pedCli(p),corpo:L.join('\n')};}
 var EXM_P=null;function exoMailAbre(pp){var p=pp||PED.ed;if(!p)return;if(!pp)pedLe();EXM_P=p;var m=exoEmailTxt(p),para=(empDados().inove||{}).email||((exmLista()[0]||{}).email)||'';var el=document.getElementById('exo-mail');if(el)el.remove();el=document.createElement('div');el.id='exo-mail';
@@ -6910,7 +6913,7 @@ var EXM_P=null;function exoMailAbre(pp){var p=pp||PED.ed;if(!p)return;if(!pp)ped
    exmContatos(para)+'<label class="fld"><span>Para</span><input id="exm-para" type="email" list="exm-lista" value="'+esc(para)+'" placeholder="e-mail da Inove"></label>'+(p.id?'<label class="pdg-chk"><input type="checkbox" id="exm-marca" checked> Ao enviar, marcar o pedido como <b>Enviado para fresagem</b> (a clínica vê)</label>':'')+'<label class="pdg-chk"><input type="checkbox" id="exm-semcom"'+(p.sem_comissao?' checked':'')+'> Sem comissão · desenho pela i9 3D Lab</label>'+'<label class="fld"><span>Assunto</span><input id="exm-as" type="text" value="'+esc(m.assunto)+'"></label>'+
    '<label class="fld"><span>Mensagem</span><textarea id="exm-co" rows="12">'+esc(m.corpo)+'</textarea></label>'+(typeof gmBloco==='function'?gmBloco(p):'')+'</div>'+
    '<div class="pdg-f"><button class="btn" data-exom="copia">📋 Copiar</button><span style="flex:1"></span><button class="btn" data-exom="gmail" title="Abre o Gmail com o texto, sem anexos">Só abrir o Gmail</button><button class="btn pri" data-exom="gmenvia">✉️ Enviar pelo Gmail com anexos</button></div></div></div>';
-  document.body.appendChild(el);}
+  document.body.appendChild(el);osPdfAnexa(p);}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-exom]');if(!b)return;var a=b.getAttribute('data-exom'),el=document.getElementById('exo-mail');if(a==='fecha'){if(el)el.remove();return;}
   var para=document.getElementById('exm-para').value.trim(),as=document.getElementById('exm-as').value,co=document.getElementById('exm-co').value;
   if(a==='cad'){exmCadastra();return;}if(a==='usa'){document.getElementById('exm-para').value=b.getAttribute('data-v');return;}if(a==='tira'){exmTira(b.getAttribute('data-v'));return;}
@@ -6921,7 +6924,8 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   if(mk&&mk.checked&&p&&p.id){var pt={status:'producao',desenho_feito:true,enviado_inove:true};Object.assign(p,pt);if(PED.ed&&PED.ed.id===p.id)Object.assign(PED.ed,pt);pedMuda(p.id,pt,'Pedido #'+(p.numero||'')+' marcado como enviado para fresagem.');if(el)el.remove();}});
 function exmLista(){var L=(empDados().inove||{}).contatos;return Array.isArray(L)?L:[];}
 document.addEventListener('change',function(e){if(!e.target||e.target.id!=='exm-semcom'||!EXM_P)return;EXM_P.sem_comissao=e.target.checked;var ta=document.getElementById('exm-co');if(ta)ta.value=exoEmailTxt(EXM_P).corpo;
-  var lp=PED.L.filter(function(x){return x.id===EXM_P.id;})[0];if(lp){lp.sem_comissao=e.target.checked;lp.custo_desenho=e.target.checked?pedSemComVal(lp):null;SB.from('odo_pedidos').update({sem_comissao:lp.sem_comissao,custo_desenho:lp.custo_desenho}).eq('id',lp.id).then(function(r){if(r.error)toast('Não consegui salvar o sem comissão agora.');});}});
+  var lp=PED.L.filter(function(x){return x.id===EXM_P.id;})[0];if(lp){lp.sem_comissao=e.target.checked;lp.custo_desenho=e.target.checked?pedSemComVal(lp):null;SB.from('odo_pedidos').update({sem_comissao:lp.sem_comissao,custo_desenho:lp.custo_desenho}).eq('id',lp.id).then(function(r){if(r.error)toast('Não consegui salvar o sem comissão agora.');});}
+  osPdfAnexa(EXM_P,true);});
 function exmContatos(para){var L=exmLista();return '<div class="exm-c"><span class="small muted">E-mails cadastrados:</span>'+(L.length?L.map(function(c){return '<span class="exm-t"><button type="button" class="chip" data-exom="usa" data-v="'+esc(c.email)+'">'+esc(c.nome||c.email)+'</button><button type="button" class="exm-x" data-exom="tira" data-v="'+esc(c.email)+'" aria-label="Tirar">✕</button></span>';}).join(''):'<span class="small muted">nenhum ainda</span>')+
   '<details class="exm-n"><summary class="chip">＋ Cadastrar e-mail</summary><div class="row wrap"><input id="exm-nn" type="text" placeholder="Nome (ex.: Mari · Inove)" maxlength="60"><input id="exm-ne" type="email" placeholder="email@exemplo.com" maxlength="120"><button type="button" class="btn sm pri" data-exom="cad">Salvar</button></div></details></div>'+
   '<datalist id="exm-lista">'+L.map(function(c){return '<option value="'+esc(c.email)+'">'+esc(c.nome||'')+'</option>';}).join('')+'</datalist>';}
@@ -6950,17 +6954,59 @@ function gmMime(para,assunto,corpo,arqs){var bd='==ideali'+Date.now()+'==',L=[];
   arqs.forEach(function(a){L.push('--'+bd,'Content-Type: '+(a.tipo||'application/octet-stream')+'; name="=?UTF-8?B?'+gmUtf8B64(a.nome)+'?="','Content-Disposition: attachment; filename="=?UTF-8?B?'+gmUtf8B64(a.nome)+'?="','Content-Transfer-Encoding: base64','',gmLinhas(gmB64(a.u8)));});
   L.push('--'+bd+'--','');return L.join('\r\n');}
 function gmArqsDoPedido(p){var R=[];if(p.envio_id&&typeof PDG!=='undefined'){var e=PDG.L.filter(function(x){return x.id===p.envio_id;})[0];if(e&&!e.arquivos_apagados)(e.arquivos||[]).forEach(function(a){R.push({nome:a.nome,tam:a.tam||0,path:a.path,ok:true,da:'clinica'});});}return R;}
+function osPdfBlob(cv){var url=cv.toDataURL('image/jpeg',0.88),bin=atob(url.split(',')[1]),img=new Uint8Array(bin.length),i;for(i=0;i<bin.length;i++)img[i]=bin.charCodeAt(i);
+  var enc=function(s){return new TextEncoder().encode(s);},parts=[],pos=0,off=[];
+  var put=function(s){var u=enc(s);parts.push(u);pos+=u.length;},putB=function(u){parts.push(u);pos+=u.length;};
+  put('%PDF-1.4\n');
+  var content='q 595 0 0 842 0 0 cm /Im0 Do Q\n',o={};
+  o[1]='<< /Type /Catalog /Pages 2 0 R >>';o[2]='<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+  o[3]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>';
+  o[4]='<< /Type /XObject /Subtype /Image /Width '+cv.width+' /Height '+cv.height+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+img.length+' >>';
+  o[5]='<< /Length '+enc(content).length+' >>';
+  for(i=1;i<=5;i++){off[i]=pos;put(i+' 0 obj\n');if(i===4){put(o[4]+'\nstream\n');putB(img);put('\nendstream\nendobj\n');}else if(i===5){put(o[5]+'\nstream\n'+content+'endstream\nendobj\n');}else{put(o[i]+'\nendobj\n');}}
+  var xr='xref\n0 6\n0000000000 65535 f \n',pad=function(n){var s=''+n;while(s.length<10)s='0'+s;return s;};
+  for(i=1;i<=5;i++)xr+=pad(off[i])+' 00000 n \n';
+  put(xr+'trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n'+pos+'\n%%EOF');
+  var tot=0;parts.forEach(function(u){tot+=u.length;});var out=new Uint8Array(tot),p2=0;parts.forEach(function(u){out.set(u,p2);p2+=u.length;});
+  return new Blob([out],{type:'application/pdf'});}
+function osPdfNome(p){return 'Pedido_'+(p.numero||p.id||'0')+'_'+String(p.paciente||'paciente').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'_').slice(0,60)+'.pdf';}
+function osPdfCanvas(p){var W=1240,H=1754,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');
+  var wrap=function(t,y,max,size,bold,color){x.font=(bold?'bold ':'')+size+'px Arial';x.fillStyle=color||'#111';var words=String(t||'').split(/\s+/),line='';for(var i=0;i<words.length;i++){var test=line?line+' '+words[i]:words[i];if(x.measureText(test).width>max&&line){x.fillText(line,60,y);y+=size+6;line=words[i];}else line=test;}if(line)x.fillText(line,60,y);return y+size+6;};
+  x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#3A2E7A';x.fillRect(0,0,W,120);
+  x.fillStyle='#fff';x.font='bold 40px Arial';x.fillText('IDEALI LAB · ORDEM DE SERVIÇO',50,72);
+  x.font='bold 32px Arial';x.textAlign='right';x.fillText('Pedido #'+(p.numero||'—'),W-50,74);x.textAlign='left';
+  var y=100;x.font='20px Arial';x.fillStyle='#555';x.fillText('Gerado em '+new Date().toLocaleString('pt-BR'),50,y);
+  y=150;if(p.urgente){x.fillStyle='#DC2626';x.fillRect(50,y-28,150,38);x.fillStyle='#fff';x.font='bold 22px Arial';x.fillText('URGENTE',70,y);}
+  if(p.sem_comissao){x.fillStyle='#B45309';x.fillRect(220,y-28,330,38);x.fillStyle='#fff';x.font='bold 20px Arial';x.fillText('SEM COMISSÃO · i9 3D LAB',238,y);}
+  var fields=[['Cliente',pedCli(p)],['Paciente',p.paciente],['Tipo',p.tipo==='cad'?'CAD':'Analógico'],['Trabalho',p.trabalho],['Material',p.material],['Cor',p.cor],['Componente',p.componente],['Sobre implante',p.sobre_implante?'Sim':'Não'],['Dentes',(p.dentes||[]).join(', ')]];
+  y=220;x.textAlign='left';fields.forEach(function(f){x.fillStyle='#666';x.font='bold 20px Arial';x.fillText(f[0]+':',60,y);x.fillStyle='#111';x.font='22px Arial';x.fillText(String(f[1]||'—').slice(0,70),250,y);y+=34;});
+  y=Math.max(y,560);x.fillStyle='#3A2E7A';x.font='bold 24px Arial';x.fillText('Odontograma',60,y);y+=24;
+  var sel={};(p.dentes||[]).forEach(function(d){sel[d]=1;});var rows=[[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28],[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38]];
+  var bw=66,bh=52,gap=4;rows.forEach(function(row,ri){row.forEach(function(d,i2){var X=60+i2*(bw+gap),Y=y+ri*(bh+16);x.fillStyle=sel[d]?'#F59E0B':'#fff';x.strokeStyle=sel[d]?'#B45309':'#aaa';x.lineWidth=2;x.fillRect(X,Y,bw,bh);x.strokeRect(X,Y,bw,bh);x.fillStyle=sel[d]?'#3B2600':'#333';x.font='bold 22px Arial';x.textAlign='center';x.fillText(d,X+bw/2,Y+34);x.textAlign='left';});});
+  y=y+2*(bh+16)+30;x.fillStyle='#3A2E7A';x.font='bold 24px Arial';x.fillText('Elementos',60,y);y+=30;x.font='20px Arial';x.fillStyle='#111';
+  var ds=(p.dentes||[]).slice().sort(function(a,b){return a-b;}),unit=(+p.valor>0&&ds.length)?Math.round((+p.valor/ds.length)*100)/100:(typeof pedServ==='function'?((pedServ(p.trabalho)||{}).valor||0):0);
+  ds.forEach(function(d){var t=(p.trabalho||'Trabalho')+(p.material?' · '+p.material:'')+(p.cor?' · '+p.cor:'');x.fillText('Dente '+d+' — '+t+' — '+fmtR(unit),60,y);y+=30;});
+  if(!ds.length){x.fillText((p.trabalho||'Trabalho')+' — '+fmtR(p.valor||unit),60,y);y+=30;}
+  y+=10;x.fillStyle='#3A2E7A';x.font='bold 24px Arial';x.fillText('Resumo financeiro',60,y);y+=34;x.font='22px Arial';x.fillStyle='#111';
+  var totv=(+p.valor>0)?+p.valor:Math.round(unit*Math.max(1,ds.length)*100)/100;
+  x.fillText('Valor unitário: '+fmtR(unit),60,y);y+=32;x.fillText('Quantidade: '+Math.max(1,ds.length),60,y);y+=32;x.font='bold 24px Arial';x.fillText('Valor total: '+fmtR(totv),60,y);y+=32;
+  if(p.sem_comissao){x.fillStyle='#B45309';x.font='bold 22px Arial';x.fillText('Desconto do desenho (i9 3D Lab): '+fmtR(pedSemComVal(p)),60,y);y+=32;}
+  y+=10;x.fillStyle='#666';x.font='20px Arial';wrap('Descrição: '+(p.descricao||'—'),y,W-120,20,false,'#333');wrap('Observações: '+(p.obs||'—'),y+34,W-120,20,false,'#333');
+  x.fillStyle='#999';x.font='16px Arial';x.fillText('Ideali Odonto · documento gerado automaticamente',60,H-40);
+  return c;}
+function osPdfAnexa(p,subst){if(!p||typeof GM==='undefined')return;try{var b=osPdfBlob(osPdfCanvas(p));if(subst)GM.arqs=GM.arqs.filter(function(a){return !a.autoPdf;});GM.arqs.push({nome:osPdfNome(p),tam:b.size,f:b,ok:true,autoPdf:true,tipo:'application/pdf',url:URL.createObjectURL(b)});gmRedesenha();}catch(e){try{console.error('[OS PDF]',e);}catch(x){}toast('Não consegui gerar o PDF da ordem de serviço.');}}
 function gmLista(){if(!GM.arqs.length)return '<small class="muted">Nenhum arquivo. Adicione o STL (ou a pasta do caso em .zip).</small>';
-  return GM.arqs.map(function(a,i){return '<label class="gm-a"><input type="checkbox" data-gma="'+i+'"'+(a.ok?' checked':'')+'> '+(/\.(jpe?g|png|webp)$/i.test(a.nome)?'📷':'🦷')+' '+esc(a.nome)+' <small class="muted">'+pdgMB(a.tam)+(a.da==='clinica'?' · veio da clínica':'')+(a.f&&!/\.zip$/i.test(a.nome)?' · vai compactado':'')+'</small></label>';}).join('');}
+  return GM.arqs.map(function(a,i){return '<label class="gm-a"><input type="checkbox" data-gma="'+i+'"'+(a.ok?' checked':'')+'> '+(/\.(jpe?g|png|webp)$/i.test(a.nome)?'📷':'📎')+' '+esc(a.nome)+' <small class="muted">'+pdgMB(a.tam)+(a.da==='clinica'?' · veio da clínica':'')+(a.f&&!/\.zip$/i.test(a.nome)?' · vai compactado':'')+'</small>'+(a.url?' <a class="btn sm" href="'+a.url+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">Ver PDF</a>':'')+(a.autoPdf?' <button type="button" class="btn sm" data-gmrm="'+i+'" onclick="event.stopPropagation()">Remover</button>':'')+'</label>';}).join('');}
 function gmBloco(p){GM.arqs=gmArqsDoPedido(p);
   return '<div class="gm-c"><div class="gm-h"><b>📎 Anexos</b><label class="btn sm">＋ Adicionar arquivo<input type="file" id="gm-arq" multiple hidden></label></div><div id="gm-l">'+gmLista()+'</div>'+
    (gmCliente()?'':'<details class="gm-cfg"><summary class="small">⚙️ Para a Ana enviar pelo seu Gmail com os anexos, cole aqui o <b>ID do cliente Google</b> (uma vez só)</summary><div class="row wrap"><input id="gm-cid" type="text" placeholder="xxxxxxxx.apps.googleusercontent.com"><button type="button" class="btn sm pri" data-exom="gmcid">Salvar</button></div></details>')+'</div>';}
 function gmRedesenha(){var l=document.getElementById('gm-l');if(l)l.innerHTML=gmLista();}
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-gmrm]');if(!b)return;e.preventDefault();e.stopPropagation();GM.arqs.splice(+b.getAttribute('data-gmrm'),1);gmRedesenha();},true);
 document.addEventListener('change',function(e){var t=e.target;if(!t)return;if(t.id==='gm-arq'){[].forEach.call(t.files||[],function(f){GM.arqs.push({nome:f.name,tam:f.size,f:f,ok:true});});gmRedesenha();}
   else if(t.getAttribute&&t.getAttribute('data-gma')!=null){var a=GM.arqs[+t.getAttribute('data-gma')];if(a)a.ok=t.checked;}});
 function gmPrepara(){var sel=GM.arqs.filter(function(a){return a.ok;});return sel.reduce(function(pr,a){return pr.then(function(out){
   if(a.path)return SB.storage.from(a.bucket||'odonto-ped').download(a.path).then(function(r){if(r.error||!r.data)throw 'Não consegui pegar o arquivo '+a.nome+' (pode ter sido apagado).';return r.data.arrayBuffer().then(function(b){out.push({nome:a.nome,tipo:/\.jpe?g$/i.test(a.nome)?'image/jpeg':/\.zip$/i.test(a.nome)?'application/zip':'application/octet-stream',u8:new Uint8Array(b)});return out;});});
-  var zipa=!/\.(zip|jpe?g|png|webp|pdf)$/i.test(a.nome);return (zipa?pdgZip(a.f):Promise.resolve(a.f)).then(function(b){return b.arrayBuffer().then(function(buf){out.push({nome:zipa?a.nome+'.zip':a.nome,tipo:zipa?'application/zip':(a.f.type||'application/octet-stream'),u8:new Uint8Array(buf)});return out;});});});},Promise.resolve([]));}
+  var zipa=!/\.(zip|jpe?g|png|webp|pdf)$/i.test(a.nome);return (zipa?pdgZip(a.f):Promise.resolve(a.f)).then(function(b){return b.arrayBuffer().then(function(buf){out.push({nome:zipa?a.nome+'.zip':a.nome,tipo:zipa?'application/zip':(/\.pdf$/i.test(a.nome)?'application/pdf':(a.f.type||'application/octet-stream')),u8:new Uint8Array(buf)});return out;});});});},Promise.resolve([]));}
 function gmEnvia(btn){if(GM.busy)return;var para=document.getElementById('exm-para').value.trim(),as=document.getElementById('exm-as').value,co=document.getElementById('exm-co').value;
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(para)){toast('Coloque o e-mail da Inove no campo Para.');return;}
   if(!gmCliente()){var d=document.querySelector('.gm-cfg');if(d)d.open=true;toast('Falta configurar o envio pelo Gmail (ID do cliente Google).');return;}
@@ -7614,6 +7660,7 @@ ACT.pedPendBaixa=function(v){PED.pend=null;pedMuda(v,{aguardando_pendencia:false
 ['pedPendSalva','pedPendOff','pedPendBaixa'].forEach(function(k){var f=ACT[k];ACT[k]=function(){if(typeof ESP!=='undefined'&&ESP.dono){toast('Conta espelho: aqui é só para acompanhar, sem editar.');return;}return f.apply(this,arguments);};});
 ACT.pedSemCom=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;var on=!p.sem_comissao;pedMuda(v,{sem_comissao:on,custo_desenho:on?pedSemComVal(p):null},on?'Marcado sem comissão (i9 3D Lab).':'Comissão volta a valer.');};
 (function(){var f=ACT.pedSemCom;ACT.pedSemCom=function(){if(typeof ESP!=='undefined'&&ESP.dono){toast('Conta espelho: aqui é só para acompanhar, sem editar.');return;}return f.apply(this,arguments);};})();
+ACT.pedOsPdf=function(){var p=PED.ed;if(!p)return;try{var b=osPdfBlob(osPdfCanvas(p)),u=URL.createObjectURL(b);window.open(u,'_blank');toast('Ordem de serviço gerada.');setTimeout(function(){URL.revokeObjectURL(u);},60000);}catch(e){toast('Não consegui gerar o PDF.');}};
 document.addEventListener('keydown',function(e){if(e.key!=='Enter'||!e.target||e.target.id!=='ped-agp-txt')return;e.preventDefault();var b=e.target.closest('.ped-agp-pop'),bt=b&&b.querySelector('[data-act="pedPendSalva"]');if(bt)ACT.pedPendSalva(bt.getAttribute('data-v'));});
 ACT.pedMaq=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;p.em_maquiagem=true;render();
   SB.from('odo_pedidos').update({em_maquiagem:true}).eq('id',v).select('*').single().then(function(r){if(r.error){p.em_maquiagem=false;render();toast(/em_maquiagem/.test(r.error.message||'')?'Rode a atualização 072 no Supabase.':'Não consegui salvar agora.');return;}pedGuarda(r.data);render();toast('Em maquiagem 🎨 · a clínica já vê.');});};
