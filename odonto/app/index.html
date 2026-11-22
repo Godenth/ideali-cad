@@ -7020,10 +7020,13 @@ function gmLista(){if(!GM.arqs.length)return '<small class="muted">Nenhum arquiv
 function gmBloco(p){GM.arqs=gmArqsDoPedido(p);
   return '<div class="gm-c"><div class="gm-h"><b>📎 Anexos</b><label class="btn sm">＋ Adicionar arquivo<input type="file" id="gm-arq" multiple hidden></label></div><div id="gm-l">'+gmLista()+'</div>'+
    (gmCliente()?'':'<details class="gm-cfg"><summary class="small">⚙️ Para a Ana enviar pelo seu Gmail com os anexos, cole aqui o <b>ID do cliente Google</b> (uma vez só)</summary><div class="row wrap"><input id="gm-cid" type="text" placeholder="xxxxxxxx.apps.googleusercontent.com"><button type="button" class="btn sm pri" data-exom="gmcid">Salvar</button></div></details>')+'</div>';}
-function gmRedesenha(){var l=document.getElementById('gm-l');if(l)l.innerHTML=gmLista();}
+function gmLinkGrande(){var ta=document.getElementById('exm-co');if(!ta)return;var tot=0;GM.arqs.forEach(function(a){if(a.ok!==false)tot+=(+a.tam||0);});var re=/\n*Link dos arquivos:[^\n]*/i,has=re.test(ta.value);
+  if(tot>24*1024*1024){if(!has){ta.value=(ta.value.replace(/\s+$/,''))+'\n\nLink dos arquivos: [colar link aqui]';}}
+  else if(has){ta.value=ta.value.replace(re,'');}}
+function gmRedesenha(){var l=document.getElementById('gm-l');if(l)l.innerHTML=gmLista();gmLinkGrande();}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-gmrm]');if(!b)return;e.preventDefault();e.stopPropagation();GM.arqs.splice(+b.getAttribute('data-gmrm'),1);gmRedesenha();},true);
 document.addEventListener('change',function(e){var t=e.target;if(!t)return;if(t.id==='gm-arq'){[].forEach.call(t.files||[],function(f){GM.arqs.push({nome:f.name,tam:f.size,f:f,ok:true});});gmRedesenha();}
-  else if(t.getAttribute&&t.getAttribute('data-gma')!=null){var a=GM.arqs[+t.getAttribute('data-gma')];if(a)a.ok=t.checked;}});
+  else if(t.getAttribute&&t.getAttribute('data-gma')!=null){var a=GM.arqs[+t.getAttribute('data-gma')];if(a)a.ok=t.checked;gmLinkGrande();}});
 function gmPrepara(){var sel=GM.arqs.filter(function(a){return a.ok;});return sel.reduce(function(pr,a){return pr.then(function(out){
   if(a.path)return SB.storage.from(a.bucket||'odonto-ped').download(a.path).then(function(r){if(r.error||!r.data)throw 'Não consegui pegar o arquivo '+a.nome+' (pode ter sido apagado).';return r.data.arrayBuffer().then(function(b){out.push({nome:a.nome,tipo:/\.jpe?g$/i.test(a.nome)?'image/jpeg':/\.zip$/i.test(a.nome)?'application/zip':'application/octet-stream',u8:new Uint8Array(b)});return out;});});
   var zipa=!/\.(zip|jpe?g|png|webp|pdf)$/i.test(a.nome);return (zipa?pdgZip(a.f):Promise.resolve(a.f)).then(function(b){return b.arrayBuffer().then(function(buf){out.push({nome:zipa?a.nome+'.zip':a.nome,tipo:zipa?'application/zip':(/\.pdf$/i.test(a.nome)?'application/pdf':(a.f.type||'application/octet-stream')),u8:new Uint8Array(buf)});return out;});});});},Promise.resolve([]));}
