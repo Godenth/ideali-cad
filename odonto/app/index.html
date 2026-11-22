@@ -5491,7 +5491,7 @@ var _rPedidosF=rPedidos;rPedidos=function(){if(PFX.on&&!ESP.dono&&PED.carregado&
 
 /* ===== João flutuante: minimizado no canto, abre o painel, avisa de vez em quando no meio da tela ===== */
 var JW={aberto:false,alerta:null,i:0};
-function joaoVisivel(){return typeof pedAtivo==='function'&&pedAtivo()&&FIN.carregado&&!FIN.erro&&(ESP.dono||(S.role==='prot'&&S.tab&&S.tab.prot==='inove'));}
+function joaoVisivel(){return false;}
 function joaoDev(){try{return biaLista().filter(function(b){return b.dias>0&&!b.prom;});}catch(e){return [];}}
 function rJoaoPainel(){var P=ESP.dono?joaoNovos():[],D=joaoDev(),tot=D.reduce(function(s,b){return s+b.tot;},0);
   return '<div class="jw-p" role="dialog" aria-label="João"><div class="jw-ph"><img class="jw-av" src="joao-av.webp" alt=""><div><b>João</b><small>acompanhamento da Inove</small></div><span class="spacer"></span><button class="jw-x" data-act="jwFecha" aria-label="Minimizar">–</button></div><div class="jw-c">'+
@@ -6637,7 +6637,7 @@ Object.assign(ACT,{chkAbre:function(){if(!FIN.carregado){toast('Abra o Financeir
 document.addEventListener('change',function(e){if(e.target&&e.target.id==='chk-arq'&&e.target.files&&e.target.files[0])chkConfere(e.target.files[0]);});
 var _rFinChk=rFin;rFin=function(){var h=_rFinChk.apply(this,arguments);return h.replace('<div class="finabrow">','<div class="finabrow"><button class="btn chk-bt" data-act="chkAbre"><img src="'+ANA_AV[0]+'" alt=""> Comprovante já anexado?</button>');};
 
-var _rInoveChk=rInove;rInove=function(){var h=_rInoveChk.apply(this,arguments);if(INO.hist||INO.sub==='com')return h;return h.replace(' Ana · anexar extratos e comprovantes</button>',' Ana · anexar extratos e comprovantes</button><button class="btn chk-bt" data-act="chkAbre"><img src="'+ANA_AV[0]+'" alt=""> Comprovante já anexado?</button>');};
+var _rInoveChk=rInove;rInove=function(){return _rInoveChk.apply(this,arguments);};
 
 /* ===== Ana: vários trabalhos do mesmo paciente viram UM pedido só (com os trabalhos listados na descrição) ===== */
 var _anaPedidosSep=anaPedidos;anaPedidos=function(res){var L=_anaPedidosSep(res);if(L.length<2)return L;
