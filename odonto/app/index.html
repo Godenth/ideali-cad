@@ -4697,7 +4697,8 @@ function rCfgConta(){var R=typeof RL!=='undefined'?RL:{},p=R.perfil||{},c=S.cad,
   return '<section class="card cfg-c"><h2>Minha conta</h2>'+[['Nome',p.nome||c.nome],['E-mail de acesso',em],['WhatsApp',p.whats?rlTel(p.whats):c.whats],['Profissão',p.prof||c.prof],['Cargo',p.cargo||c.cargo],['Cidade',(p.cidade||c.cidade||'')+((p.uf||c.uf)?' / '+(p.uf||c.uf):'')],['Tipo de conta',R.admin?'👑 Conta master':'Profissional']].map(function(x){return '<div class="cfg-l"><span>'+x[0]+'</span><b>'+esc(x[1]||'—')+'</b></div>';}).join('')+
     '<div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap"><button class="btn" data-act="cfgVai" data-v="perfil">Editar currículo</button>'+(R.user?'<button class="btn" data-act="cfgSenha">Trocar senha</button><button class="btn danger" data-rl="sair">Sair</button>':'')+'</div></section>';}
 function rCfgEmpresa(N){var T=negT();return '<section class="card cfg-c"><h2>'+T.ic+' Minha empresa</h2>'+(typeof labVRecebidos==='function'?labVRecebidos():'')+[EMP.row&&EMP.row.codigo?['Seu ID no Ideali',labIdTxt(EMP.row.codigo)+' (passe este número para os dentistas te convidarem)']:null,['Nome',N.nome],['Tipo',T.t],['Cidade',N.cid+' / '+N.uf],['Seu papel',N.papel==='faz'?'Dono e responsável técnico':'Dono, cuida da gestão'],N.rt?['Responsável técnico',N.rt]:null,['Criada em',N.criado?String(N.criado).split('-').reverse().join('/'):'—']].filter(Boolean).map(function(x){return '<div class="cfg-l"><span>'+x[0]+'</span><b>'+esc(x[1]||'—')+'</b></div>';}).join('')+
-  '<div class="row" style="margin-top:12px"><button class="btn danger" data-act="negApaga">Apagar empresa de teste</button></div></section>';}
+  '<div class="row" style="margin-top:12px"><button class="btn danger" data-act="negApaga">Apagar empresa de teste</button></div></section>'+
+  ((typeof negEhLab==='function'&&negEhLab(N)&&!ESP.dono)?'<section class="card cfg-c"><h2>Operação</h2><p class="small muted">Atalhos do dia a dia dos pedidos.</p><div class="row wrap" style="gap:8px;margin-top:8px"><button class="btn" data-act="cfgOper" data-v="cadistas">✏️ Cadistas</button><button class="btn" data-act="cfgOper" data-v="pfx">🧹 Fechar antigos</button><button class="btn" data-act="cfgOper" data-v="prazos">⏱️ Mapa de prazos</button></div></section>':'');}
 function rCfgArmaz(){var R=typeof RL!=='undefined'?RL:{},N=S.neg,cli=(typeof EMP!=='undefined'&&EMP.cli)?EMP.cli.length:0;
   var it=[['Clientes',cli],['Itens na tabela de preços',N?N.servs.length:0],['Foto do perfil',R.perfil&&R.perfil.foto?'1 imagem':'nenhuma']];
   return '<section class="card cfg-c"><h2>💾 Armazenamento utilizado</h2><div class="cfg-bar"><i style="width:2%"></i></div><p class="small muted">Por enquanto você usa só dados de texto, que ocupam muito pouco. Os <b>arquivos da produção</b> (escaneamentos, STL e fotos) entram na etapa de pedidos e passam a contar aqui.</p>'+
@@ -4706,6 +4707,7 @@ Object.assign(ACT,{
   cfgMenu:function(){S.cfgMenu=!S.cfgMenu;render();},
   cfgVai:function(v){S.cfgMenu=false;if(v==='perfil'){S.cfgOn=false;ACT.dTab('perfil');return;}S.cfgOn=true;S.cfgAba=v;S.redeOn=false;render();window.scrollTo(0,0);},
   cfgSai:function(){S.cfgOn=false;render();window.scrollTo(0,0);},
+  cfgOper:function(v){S.cfgOn=false;S.redeOn=false;if(v==='cadistas'){if(typeof PED!=='undefined'){PED.vcad=true;PED.ed=null;}}else if(v==='pfx'){if(typeof PFX!=='undefined'){PFX.on=true;PFX.sel=null;}}else if(v==='prazos'){if(typeof PZM!=='undefined'){PZM.on=true;PZM.envCarregado=false;}}if(typeof ACT.dTab==='function')ACT.dTab(S.role==='prot'?'producao':'pedidos');else render();window.scrollTo(0,0);},
   cfgSenha:function(){if(typeof RL==='undefined'||!RL.user)return;SB.auth.resetPasswordForEmail(RL.user.email,{redirectTo:location.href.split('#')[0].split('?')[0]}).then(function(r){toast(r.error?'Não consegui enviar agora.':'Enviamos um link para criar a nova senha no seu e-mail.');});}});
 document.addEventListener('click',function(e){if(S.cfgMenu&&!e.target.closest('.cfg-w')){S.cfgMenu=false;render();}});
 /* ---- painel do negócio ---- */
@@ -4930,7 +4932,7 @@ function rPedidos(){if(!PED.carregado)return '<div class="empty">Carregando os p
   if(PED.ed)return rPedForm(PED.ed);if(PED.vcad)return rPedCadistas();
   var A=pedAtivos(),nOrc=A.filter(function(p){return p.status==='orcamento';}).length,nCad=A.filter(function(p){return p.tipo==='cad';}).length,nAna=A.length-nCad;
   var _q=semAc(PED.busca||''),nPend=A.filter(function(p){var ok=PED.f==='todos'||PED.f==='pend'||(PED.f==='urg'?p.urgente:p.tipo===PED.f);return ok&&p.aguardando_pendencia&&(!_q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(_q)>=0);}).length;
-  var topo='<div class="dtop"><div><h2>Pedidos</h2><p class="small muted">'+(function(n){return n+(n===1?' desenho CAD a fazer':' desenhos CAD a fazer');})(A.filter(function(p){return p.status==='desenho';}).length)+' · '+A.filter(function(p){return p.status==='producao';}).length+' em produção</p></div><span class="spacer"></span><button class="btn" data-act="pedCadistas">✏️ Cadistas</button><button class="btn pri" data-act="pedNovo">+ Novo pedido</button></div>'+
+  var topo='<div class="dtop"><div><h2>Pedidos</h2><p class="small muted">'+(function(n){return n+(n===1?' desenho CAD a fazer':' desenhos CAD a fazer');})(A.filter(function(p){return p.status==='desenho';}).length)+' · '+A.filter(function(p){return p.status==='producao';}).length+' em produção</p></div><span class="spacer"></span><button class="btn pri" data-act="pedNovo">+ Novo pedido</button></div>'+
     '<div class="cli-bar"><label class="cli-q"><span aria-hidden="true">🔎</span><input id="ped-q" type="search" placeholder="Buscar paciente, cliente, nº ou dente" value="'+esc(PED.busca||'')+'" autocomplete="off"></label>'+
     '<div class="seg">'+[['quadro','Quadro'],['lista','Lista']].map(function(o){return '<button aria-pressed="'+(PED.vista===o[0])+'" data-act="pedVista" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
     '<div class="row wrap pedfil">'+[['todos','Todos'],['cad','🟣 Ordens CAD ('+nCad+')'],['analogico','🧪 Analógico ('+nAna+')'],['urg','Urgentes']].map(function(o){return '<button class="chip" aria-pressed="'+(PED.f===o[0])+'" data-act="pedFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+
@@ -5507,8 +5509,7 @@ Object.assign(ACT,{
     .then(function(){render();toast('Lote desfeito. Os pedidos voltaram como estavam.');}).catch(function(){toast('Não consegui desfazer tudo. Recarregue e confira.');});}});
 document.addEventListener('change',function(e){var t=e.target;if(!PFX.on)return;if(t.id==='pfx-st'){PFX.st=t.value;PFX.sel=null;render();}else if(t.id==='pfx-ate'){PFX.ate=t.value;PFX.sel=null;render();}else if(t.id==='pfx-ac'){PFX.acao=t.value;}
   else if(t.dataset&&t.dataset.pfx){if(t.checked)PFX.sel[t.dataset.pfx]=1;else delete PFX.sel[t.dataset.pfx];render();}});
-var _rPedidosF=rPedidos;rPedidos=function(){if(PFX.on&&!ESP.dono&&PED.carregado&&!PED.erro)return rPedFecha();var h=_rPedidosF();if(!PED.carregado||PED.erro||PED.ed||PED.vcad)return h;
-  h=h.replace('<button class="btn" data-act="pedCadistas">','<button class="btn" data-act="pfxAbre">🧹 Fechar antigos</button><button class="btn" data-act="pedCadistas">');var i=h.indexOf('<div class="cli-bar">');return i<0?h:h.slice(0,i)+rPedLoteBanner()+h.slice(i);};
+var _rPedidosF=rPedidos;rPedidos=function(){if(PFX.on&&!ESP.dono&&PED.carregado&&!PED.erro)return rPedFecha();return _rPedidosF.apply(this,arguments);};
 
 /* ===== João flutuante: minimizado no canto, abre o painel, avisa de vez em quando no meio da tela ===== */
 var JW={aberto:false,alerta:null,i:0};
@@ -8441,8 +8442,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   if(a==='abre'){PZM.on=true;PZM.envCarregado=false;window.scrollTo(0,0);render();}else if(a==='sai'){PZM.on=false;render();}
   else if(a==='per'){PZM.per=b.getAttribute('data-v');PZM.lim=30;render();}else if(a==='mais'){PZM.lim+=50;render();}else if(a==='csv')pzmCSV();});
 document.addEventListener('change',function(e){if(e.target&&e.target.id==='pzm-cli'){PZM.cli=e.target.value;render();}});
-var _rPedidosPZM=rPedidos;rPedidos=function(){if(PZM.on&&PED.carregado&&!PED.ed)return rPrazosMapa();var h=_rPedidosPZM.apply(this,arguments);
-  return h.replace('<button class="btn" data-act="pedCadistas">','<button class="btn" data-pzm="abre">'+ic('relogio')+'Mapa de prazos</button><button class="btn" data-act="pedCadistas">');};
+var _rPedidosPZM=rPedidos;rPedidos=function(){if(PZM.on&&PED.carregado&&!PED.ed)return rPrazosMapa();return _rPedidosPZM.apply(this,arguments);};
 var _pedAbrePZM=ACT.pedAbre;ACT.pedAbre=function(){PZM.on=false;return _pedAbrePZM.apply(this,arguments);};
 
 /* clínica: "Recebi" */
@@ -8462,8 +8462,8 @@ ACT.cliPendConfirma=function(id){if(typeof ESP!=='undefined'&&ESP.dono)return;SB
 var RCB={ab:false};
 function rcbLista(){var lim=Date.now()-14*864e5,visto=0;try{visto=+localStorage.getItem(lsU('io_rcb_visto'))||0;}catch(e){}
   return PED.L.filter(function(p){var t=p.recebido_em&&new Date(p.recebido_em).getTime();return t&&t>lim&&t>visto;}).sort(function(a,b){return a.recebido_em<b.recebido_em?1:-1;});}
-function rRcbBanner(){if(ESP.dono)return '';if(typeof FIN!=='undefined'&&!FIN.carregado&&!FIN.pedindoEXB){FIN.pedindoEXB=true;Promise.resolve(finCarrega()).then(render,function(){});}var L=rcbLista(),ex=exbTodosBanner();if(!L.length)return ex;
-  return ex+'<div class="banner rcb-ban"><div class="pfx-ban" style="margin:0"><span>'+ic('check')+'<b>'+L.length+' pedido'+(L.length===1?'':'s')+'</b> '+(L.length===1?'foi confirmado como recebido pelo cliente':'foram confirmados como recebidos pelos clientes')+' e '+(L.length===1?'saiu':'saíram')+' do quadro.</span>'+
+function rRcbBanner(){if(ESP.dono)return '';if(typeof FIN!=='undefined'&&!FIN.carregado&&!FIN.pedindoEXB){FIN.pedindoEXB=true;Promise.resolve(finCarrega()).then(render,function(){});}var L=rcbLista();if(!L.length)return '';
+  return '<div class="banner rcb-ban"><div class="pfx-ban" style="margin:0"><span>'+ic('check')+'<b>'+L.length+' pedido'+(L.length===1?'':'s')+'</b> '+(L.length===1?'foi confirmado como recebido pelo cliente':'foram confirmados como recebidos pelos clientes')+' e '+(L.length===1?'saiu':'saíram')+' do quadro.</span>'+
     '<span><button class="btn sm" data-act="rcbAbre">'+(RCB.ab?'Esconder':'Ver quais')+'</button> <button class="btn sm" data-act="rcbCiente">OK, ciente</button></span></div>'+
     (RCB.ab?'<div class="rcb-l">'+L.map(function(p){return '<div class="rcb-i"><span><b>#'+(p.numero||'—')+' · '+esc(p.paciente||'Sem paciente')+'</b><small>'+esc(pedCli(p))+(p.trabalho?' · '+esc(p.trabalho):'')+' · recebido '+cliHa(p.recebido_em)+'</small></span><button class="btn sm" data-act="rcbVolta" data-v="'+p.id+'">Ainda não entreguei · voltar ao quadro</button></div>';}).join('')+'</div>':'')+'</div>';}
 Object.assign(ACT,{
