@@ -44,6 +44,93 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Limite diário atingido' }), { status: 429, headers: { ...CORS, 'Content-Type': 'application/json' } })
     }
 
+    // 3b. Carrossel: cria os containers filhos e depois o container principal
+    if (post.tipo === 'carrossel') {
+      const slides: Array<{ png_path?: string }> = Array.isArray(post.slides) ? post.slides.slice(0, 10) : []
+      if (!slides.length) {
+        await sb.from('posts_agendados').update({ status: 'erro', erro: 'Carrossel sem slides' }).eq('id', postId)
+        return new Response(JSON.stringify({ error: 'Carrossel sem slides' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } })
+      }
+
+      const esperarPronto = async (id: string, maxMs: number) => {
+        const t0 = Date.now()
+        let status = 'IN_PROGRESS'
+        while (status === 'IN_PROGRESS' || status === 'PUBLISHED') {
+          if (Date.now() - t0 > maxMs) return 'TIMEOUT'
+          await new Promise(r => setTimeout(r, 3000))
+          const stRes = await fetch(`https://graph.facebook.com/v27.0/${id}?fields=status_code&access_token=${token}`)
+          const stData = await stRes.json()
+          status = stData.status_code ?? 'ERROR'
+          if (status === 'ERROR' || status === 'EXPIRED') return status
+        }
+        return status
+      }
+
+      const childIds: string[] = []
+      for (const slide of slides) {
+        if (!slide.png_path) continue
+        const slideUrl = sbUrl + '/storage/v1/object/public/marketing/' + slide.png_path
+        const childRes = await fetch(
+          `https://graph.facebook.com/v27.0/${igUserId}/media`,
+          { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ image_url: slideUrl, is_carousel_item: 'true', access_token: token }).toString() }
+        )
+        const childData = await childRes.json()
+        if (!childRes.ok || !childData.id) {
+          const msg = childData.error?.message || 'Falha ao criar slide do carrossel'
+          await sb.from('posts_agendados').update({ status: 'erro', erro: msg }).eq('id', postId)
+          return new Response(JSON.stringify({ error: msg }), { status: 502, headers: { ...CORS, 'Content-Type': 'application/json' } })
+        }
+        const childStatus = await esperarPronto(childData.id, 60000)
+        if (childStatus !== 'FINISHED') {
+          const msg = childStatus === 'TIMEOUT' ? 'Timeout: slide do carrossel não ficou pronto em 60s' : `Slide do carrossel ${childStatus}`
+          await sb.from('posts_agendados').update({ status: 'erro', erro: msg }).eq('id', postId)
+          return new Response(JSON.stringify({ error: msg }), { status: childStatus === 'TIMEOUT' ? 504 : 502, headers: { ...CORS, 'Content-Type': 'application/json' } })
+        }
+        childIds.push(childData.id)
+      }
+
+      if (!childIds.length) {
+        await sb.from('posts_agendados').update({ status: 'erro', erro: 'Carrossel sem slides válidos' }).eq('id', postId)
+        return new Response(JSON.stringify({ error: 'Carrossel sem slides válidos' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } })
+      }
+
+      const caption = [post.legenda, post.hashtags].filter(Boolean).join('\n')
+      const mainRes = await fetch(
+        `https://graph.facebook.com/v27.0/${igUserId}/media`,
+        { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ media_type: 'CAROUSEL', children: childIds.join(','), caption, access_token: token }).toString() }
+      )
+      const mainData = await mainRes.json()
+      if (!mainRes.ok || !mainData.id) {
+        const msg = mainData.error?.message || 'Falha ao criar container do carrossel'
+        await sb.from('posts_agendados').update({ status: 'erro', erro: msg }).eq('id', postId)
+        return new Response(JSON.stringify({ error: msg }), { status: 502, headers: { ...CORS, 'Content-Type': 'application/json' } })
+      }
+
+      const containerId = mainData.id
+      await sb.from('posts_agendados').update({ ig_container_id: containerId }).eq('id', postId)
+
+      const mainStatus = await esperarPronto(containerId, 90000)
+      if (mainStatus !== 'FINISHED') {
+        const msg = mainStatus === 'TIMEOUT' ? 'Timeout: container do carrossel não ficou pronto em 90s' : `Container do carrossel ${mainStatus}`
+        await sb.from('posts_agendados').update({ status: 'erro', erro: msg }).eq('id', postId)
+        return new Response(JSON.stringify({ error: msg }), { status: mainStatus === 'TIMEOUT' ? 504 : 502, headers: { ...CORS, 'Content-Type': 'application/json' } })
+      }
+
+      const pubRes = await fetch(
+        `https://graph.facebook.com/v27.0/${igUserId}/media_publish`,
+        { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ creation_id: containerId, access_token: token }).toString() }
+      )
+      const pubData = await pubRes.json()
+      if (!pubRes.ok || !pubData.id) {
+        const msg = pubData.error?.message || 'Falha ao publicar'
+        await sb.from('posts_agendados').update({ status: 'erro', erro: msg }).eq('id', postId)
+        return new Response(JSON.stringify({ error: msg }), { status: 502, headers: { ...CORS, 'Content-Type': 'application/json' } })
+      }
+
+      await sb.from('posts_agendados').update({ status: 'publicado', ig_media_id: pubData.id, erro: null }).eq('id', postId)
+      return new Response(JSON.stringify({ ok: true, ig_media_id: pubData.id }), { headers: { ...CORS, 'Content-Type': 'application/json' } })
+    }
+
     // 4. Criar container na Graph API
     const isVideo = post.tipo === 'reel' || (post.midia_url && (post.midia_url.includes('.mp4') || post.midia_url.includes('.mov')))
     const caption = [post.legenda, post.hashtags].filter(Boolean).join('\n')
