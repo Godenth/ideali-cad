@@ -2750,6 +2750,10 @@ body.pe-trava{overflow:hidden}
 .ped-agp-edit{border:0;background:transparent;color:inherit;text-decoration:underline;font-size:.74rem;cursor:pointer;padding:0}
 .ped-agp-pop{display:flex;gap:6px;align-items:center;width:100%;flex-wrap:wrap}
 .ped-agp-pop input{flex:1;min-width:140px;font-size:.8rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.ped-semcom-badge{display:inline-flex;align-items:center;gap:3px;font-size:.72rem;font-weight:800;color:#7F1D1D;background:#FEE2E2;border:1px solid #DC2626;border-radius:999px;padding:2px 8px}
+[data-theme=dark] .ped-semcom-badge{color:#FCA5A5;background:rgba(220,38,38,.16)}
+.btn.sm.ped-semcom-btn{font-size:.78rem;padding:5px 8px}
+.btn.sm.ped-semcom-btn.on{background:#DC2626!important;border-color:#DC2626!important;color:#fff!important}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4924,7 +4928,7 @@ function pedCard(p){var r=pedRisco(p),nx=pedNx(p),cad=p.tipo==='cad';
   return '<article class="pcard pedc'+(cad?' pc-cad':' pc-ana')+' st-'+p.status+(r?' '+r:'')+(p.urgente?' urg':'')+(p.aguardando_pendencia?(p.pendencia_aguardando_conferencia?' ped-agp ped-agp-conf':' ped-agp'):'')+'" data-act="pedAbre" data-v="'+p.id+'" tabindex="0">'+
     '<div class="pcard-h"><b>'+(p.numero?'<span class="pedn">#'+p.numero+'</span> ':'')+esc(p.paciente||'Sem paciente')+'</b>'+(p.urgente?'<span class="pill bad">Urgente</span>':'')+'</div>'+
     '<span class="small muted">'+esc(pedCli(p))+'</span>'+
-    '<div class="pchips"><span class="pedtp">'+(cad?'🟣 CAD':'🧪 Analógico')+'</span>'+(p.trabalho?'<span>'+esc(p.trabalho.length>50?p.trabalho.slice(0,48)+'…':p.trabalho)+'</span>':'')+(pedDentes(p)?'<span>'+esc(pedDentes(p))+'</span>':'')+(p.cor?'<span>Cor '+esc(p.cor)+'</span>':'')+(p.cadista_nome?'<span>✏️ '+esc(p.cadista_nome)+'</span>':'')+'</div>'+
+    '<div class="pchips"><span class="pedtp">'+(cad?'🟣 CAD':'🧪 Analógico')+'</span>'+(p.trabalho?'<span>'+esc(p.trabalho.length>50?p.trabalho.slice(0,48)+'…':p.trabalho)+'</span>':'')+(pedDentes(p)?'<span>'+esc(pedDentes(p))+'</span>':'')+(p.cor?'<span>Cor '+esc(p.cor)+'</span>':'')+(p.cadista_nome?'<span>✏️ '+esc(p.cadista_nome)+'</span>':'')+(p.sem_comissao?'<span class="ped-semcom-badge">🚫 Sem comissão</span>':'')+'</div>'+
     (function(){var se=pedSubEtapa(p);return (se?'<span class="ped-sub'+(se[1]?' '+se[1]:'')+'">'+esc(se[0])+'</span>':'')+(p.aguardando_pendencia?(p.pendencia_aguardando_conferencia?'<span class="ped-agp-badge conf">📩 Resposta recebida · conferir</span>':'<span class="ped-agp-badge">⏳ Aguardando pendência</span>'):'');})()+
     (p.aguardando_pendencia&&p.motivo_pendencia?'<div class="ped-agp-mot">⚠️ Pendência: <span onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" onmousedown="event.stopPropagation()">'+esc(p.motivo_pendencia)+'</span><button type="button" class="ped-agp-edit" data-act="pedPendEdita" data-v="'+p.id+'">editar</button></div>':'')+
     '<div class="pcard-f"><span class="pprz'+(r?' '+r:'')+'">'+(p.prazo?(r==='atrasado'?'Atrasado · ':'')+'Prazo '+esc(dFmt(p.prazo)):'Sem prazo')+'</span>'+(nx?'<button class="btn sm'+(p.status==='desenho'?' pedbtn':'')+'" data-act="'+nx[0]+'" data-v="'+p.id+'">'+nx[1]+'</button>':'')+'</div></article>';}
@@ -7588,6 +7592,7 @@ var _pedCardCH=pedCard;pedCard=function(p){var h=_pedCardCH(p);if(!p||p.arquivad
   if(p.status==='producao'&&p.em_maquiagem)extra+='<span class="small pedmaq">🎨 Em maquiagem</span>';
   if(p.envio_id||p.cliente_id)extra+=chBotao(chChaveLab(p));
   if(p.envio_id||p.cliente_id)extra+=(p.aguardando_pendencia&&p.pendencia_aguardando_conferencia)?'<button class="btn sm ped-agp-btn on conf" data-act="pedPendBaixa" data-v="'+p.id+'">✅ Conferir e liberar</button>':'<button class="btn sm ped-agp-btn'+(p.aguardando_pendencia?' on':'')+'" data-act="'+(p.aguardando_pendencia?'pedPendOff':'pedPendOn')+'" data-v="'+p.id+'">⏳ '+(p.aguardando_pendencia?'Pendência ativa':'Aguardando pendência')+'</button>';
+  extra+='<button class="btn sm ped-semcom-btn'+(p.sem_comissao?' on':'')+'" data-act="pedSemCom" data-v="'+p.id+'" title="Design terceirizado: não gera comissão">🚫 '+(p.sem_comissao?'Sem comissão':'Não gerar comissão')+'</button>';
   if(PED.pend&&PED.pend.id===p.id)extra+='<div class="ped-agp-pop"><input id="ped-agp-txt" maxlength="200" placeholder="Ex: Aguardando cor, STL ou aprovação..." value="'+esc(PED.pend.txt||'')+'" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" onmousedown="event.stopPropagation()" onkeydown="event.stopPropagation();if(event.keyCode===13){event.preventDefault();var b=this.parentNode.querySelector(\'[data-act=pedPendSalva]\');if(b)ACT.pedPendSalva(b.getAttribute(\'data-v\'));}"><button class="btn sm pri" data-act="pedPendSalva" data-v="'+p.id+'">Salvar</button><button class="btn sm" data-act="pedPendCancela">Cancelar</button></div>';
   if(!extra)return h;var j=h.indexOf('<div class="pcard-f">');return j<0?h+'<div class="pcard-ch">'+extra+'</div>':h.slice(0,j)+'<div class="pcard-ch">'+extra+'</div>'+h.slice(j);};
 ACT.pedPendOn=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;PED.pend={id:v,txt:p.motivo_pendencia||''};render();
@@ -7598,6 +7603,8 @@ ACT.pedPendSalva=function(v){var el=document.getElementById('ped-agp-txt'),txt=(
 ACT.pedPendOff=function(v){PED.pend=null;pedMuda(v,{aguardando_pendencia:false,pendencia_aguardando_conferencia:false,motivo_pendencia:null},'Pendência resolvida.');};
 ACT.pedPendBaixa=function(v){PED.pend=null;pedMuda(v,{aguardando_pendencia:false,pendencia_aguardando_conferencia:false,motivo_pendencia:null},'Pendência encerrada · prazo retomado.');};
 ['pedPendSalva','pedPendOff','pedPendBaixa'].forEach(function(k){var f=ACT[k];ACT[k]=function(){if(typeof ESP!=='undefined'&&ESP.dono){toast('Conta espelho: aqui é só para acompanhar, sem editar.');return;}return f.apply(this,arguments);};});
+ACT.pedSemCom=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;pedMuda(v,{sem_comissao:!p.sem_comissao},p.sem_comissao?'Comissão volta a valer.':'Marcado sem comissão (não gera repasse).');};
+(function(){var f=ACT.pedSemCom;ACT.pedSemCom=function(){if(typeof ESP!=='undefined'&&ESP.dono){toast('Conta espelho: aqui é só para acompanhar, sem editar.');return;}return f.apply(this,arguments);};})();
 document.addEventListener('keydown',function(e){if(e.key!=='Enter'||!e.target||e.target.id!=='ped-agp-txt')return;e.preventDefault();var b=e.target.closest('.ped-agp-pop'),bt=b&&b.querySelector('[data-act="pedPendSalva"]');if(bt)ACT.pedPendSalva(bt.getAttribute('data-v'));});
 ACT.pedMaq=function(v){var p=PED.L.filter(function(x){return x.id===v;})[0];if(!p)return;p.em_maquiagem=true;render();
   SB.from('odo_pedidos').update({em_maquiagem:true}).eq('id',v).select('*').single().then(function(r){if(r.error){p.em_maquiagem=false;render();toast(/em_maquiagem/.test(r.error.message||'')?'Rode a atualização 072 no Supabase.':'Não consegui salvar agora.');return;}pedGuarda(r.data);render();toast('Em maquiagem 🎨 · a clínica já vê.');});};
