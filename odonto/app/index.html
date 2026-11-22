@@ -70,6 +70,7 @@ body:not(.rl-master) .vt-b,body:not(.rl-master) .roles,body:not(.rl-master) .pro
 .btn.pedbtn{background:#7B3FE4;color:#fff;border-color:#7B3FE4}.pedok{color:#6A2FD0;font-weight:700}
 .pedfil{margin:4px 0 12px}.pedorc{border-color:color-mix(in srgb,#E8A33A 55%,var(--line));background:color-mix(in srgb,#E8A33A 10%,var(--surface))}
 .ped-cli-sel{flex:0 1 210px;min-width:150px;max-width:260px}
+.pedresumo{margin-left:auto;white-space:nowrap;align-self:center}
 .pedpend[aria-pressed="true"]{background:#F59E0B!important;border-color:#F59E0B!important;color:#3B2600!important;font-weight:700}
 .pedpend{border-color:color-mix(in srgb,#F59E0B 55%,var(--line))}
 .pcard.ped-agp-conf{border:2px solid #D97706!important;animation:none!important;box-shadow:0 0 0 3px rgba(245,158,11,.25)}
@@ -4934,13 +4935,14 @@ function rPedidos(){if(!PED.carregado)return '<div class="empty">Carregando os p
   if(PED.ed)return rPedForm(PED.ed);if(PED.vcad)return rPedCadistas();
   var A=pedAtivos(),nOrc=A.filter(function(p){return p.status==='orcamento';}).length,nCad=A.filter(function(p){return p.tipo==='cad';}).length,nAna=A.length-nCad;
   var _q=semAc(PED.busca||''),nPend=A.filter(function(p){var ok=PED.f==='todos'||PED.f==='pend'||(PED.f==='urg'?p.urgente:p.tipo===PED.f);return ok&&(!PED.cli||pedCli(p)===PED.cli)&&p.aguardando_pendencia&&(!_q||semAc([p.numero,p.paciente,pedCli(p),p.trabalho,p.descricao,p.cadista_nome,(p.dentes||[]).join(' ')].join(' ')).indexOf(_q)>=0);}).length;
-  var topo='<div class="dtop"><div><h2>Pedidos</h2><p class="small muted">'+(function(n){return n+(n===1?' desenho CAD a fazer':' desenhos CAD a fazer');})(A.filter(function(p){return p.status==='desenho';}).length)+' · '+A.filter(function(p){return p.status==='producao';}).length+' em produção</p></div></div>'+
-    '<div class="cli-bar"><label class="cli-q"><span aria-hidden="true">🔎</span><input id="ped-q" type="search" placeholder="Buscar paciente, cliente, nº ou dente" value="'+esc(PED.busca||'')+'" autocomplete="off"></label>'+
+  var nDes=A.filter(function(p){return p.status==='desenho';}).length,nProd=A.filter(function(p){return p.status==='producao';}).length;
+  var resumo=nDes+(nDes===1?' desenho CAD a fazer':' desenhos CAD a fazer')+' · '+nProd+' em produção';
+  var topo='<div class="cli-bar"><label class="cli-q"><span aria-hidden="true">🔎</span><input id="ped-q" type="search" placeholder="Buscar paciente, cliente, nº ou dente" value="'+esc(PED.busca||'')+'" autocomplete="off"></label>'+
     '<select id="ped-cli" class="sel ped-cli-sel" aria-label="Filtrar por cliente"><option value="">Todos os clientes</option>'+pedCliMes().map(function(n){return '<option value="'+esc(n)+'"'+(PED.cli===n?' selected':'')+'>'+esc(n)+'</option>';}).join('')+'</select>'+
     '<div class="seg">'+[['quadro','Quadro'],['lista','Lista']].map(function(o){return '<button aria-pressed="'+(PED.vista===o[0])+'" data-act="pedVista" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div><button class="btn pri" data-act="pedNovo">+ Novo pedido</button></div>'+
     '<div class="row wrap pedfil">'+[['todos','Todos'],['cad','🟣 Ordens CAD ('+nCad+')'],['analogico','🧪 Analógico ('+nAna+')'],['urg','Urgentes']].map(function(o){return '<button class="chip" aria-pressed="'+(PED.f===o[0])+'" data-act="pedFil" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+
     ((nPend||PED.f==='pend')?'<button class="chip pedpend" aria-pressed="'+(PED.f==='pend')+'" data-act="pedFil" data-v="pend">⏳ Pendências ('+nPend+')</button>':'')+
-    (nOrc?'<button class="chip pedorc" data-act="pedVerSt" data-v="orcamento">💬 '+nOrc+' orçamento'+(nOrc>1?'s':'')+' esperando</button>':'')+'</div>';
+    (nOrc?'<button class="chip pedorc" data-act="pedVerSt" data-v="orcamento">💬 '+nOrc+' orçamento'+(nOrc>1?'s':'')+' esperando</button>':'')+'<span class="small muted pedresumo">'+esc(resumo)+'</span></div>';
   return topo+'<div id="ped-corpo">'+(PED.vista==='lista'?rPedLista():rPedQuadro())+'</div>';}
 /* quadro em 3 etapas: Recebido (aguardando informação, em desenho, desenhado) · Produção (fresagem, maquiagem) · Pronto (pronto, enviado) */
 var PED_FASES=[['desenho','Recebido','#7B3FE4',['aguardando','desenho']],['producao','Produção','#3A7BD5',['producao']],['finalizado','Pronto','#13875F',['finalizado','entregue']]];
