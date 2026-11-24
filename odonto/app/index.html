@@ -5226,7 +5226,7 @@ function rFinDet(m){if(!m){FIN.ed=null;return rFin();}var c=finCliObj(m),pg=finP
       (sc.length?'<p class="small muted cli-full">🚫 '+sc.length+' sem comissão (i9 3D Lab) — desconto de '+fmtR(scT)+' no repasse: '+sc.map(function(p){return '#'+(p.numero||'—')+' '+esc(p.paciente||'')+' ('+fmtR(pedSemComVal(p))+')';}).join(' · ')+'</p>':'')+
       '<div class="row cli-full"><button class="btn danger sm" data-act="finMesApaga">Apagar lançamento</button><span class="spacer"></span><button class="btn pri" data-act="finMesSalva"'+(FIN.busy?' disabled':'')+'>Salvar</button></div>'+
       '<div class="cli-full finextr"><b>📄 Extrato do mês</b> '+(m.extrato_path?'<button class="btn sm" data-act="finArqVer" data-v="'+esc(m.extrato_path)+'">Abrir</button>':m.arquivo_legado?'<span class="small muted">está no sistema antigo (ainda não copiado)</span>':'<span class="small muted">nenhum</span>')+
-        '<label class="btn sm">'+(m.extrato_path?'Trocar':'Anexar')+' PDF<input type="file" id="fx-arq" accept="application/pdf,image/*" hidden></label></div></section>'+
+        '<label class="btn sm">'+(m.extrato_path?'Trocar':'Anexar')+' PDF<input type="file" id="fx-arq" accept="application/pdf,image/*" hidden></label>'+(m.extrato_path&&exbPend(m).length?'<button class="btn sm" data-act="exbAbre" data-v="'+m.id+'">Dar baixa pelo extrato</button>':'')+'</div></section>'+
     '<section class="card"><h3>Pagamentos</h3>'+(P.length?P.map(function(p){return '<div class="finpag'+(p.anulado_em?' anulado':'')+'"><span><b>'+fmtR(p.valor)+'</b><small>'+(p.data?String(p.data).split('-').reverse().join('/'):'sem data')+(p.obs?' · '+esc(p.obs):'')+(p.anulado_em?' · anulado'+(p.anulado_motivo?': '+esc(p.anulado_motivo):''):'')+'</small></span>'+
         (p.comprovante_path?'<button class="btn sm" data-act="finArqVer" data-v="'+esc(p.comprovante_path)+'">📎 Comprovante</button>':p.arquivo_legado?'<span class="small muted" title="Ainda no sistema antigo">📎 antigo</span>':'')+(p.conferencia==='ok'?'<span class="pill ok" title="Valor do comprovante confere">confere</span>':p.conferencia==='diverge'?'<span class="pill bad">diverge</span>':'')+
         (p.anulado_em?'':'<button class="btn sm" data-act="finPagAnula" data-v="'+p.id+'" aria-label="Anular pagamento">Anular</button>')+'</div>';}).join(''):'<div class="empty">Nenhum pagamento ainda.</div>')+
@@ -6429,7 +6429,7 @@ function finLeExtrato(fs){fs=(fs||[]).filter(function(f){return /pdf/i.test(f.ty
       .then(function(){ok++;lanc.push(c.nome+' · '+MESES[d.mes-1]+' · '+(rx?'já lançado, PDF anexado (valor mantido)':'lançado '+fmtR(d.debitos)+' e extrato anexado'));})
       .catch(function(e){erros.push(c.nome+' '+MESES[d.mes-1]+': '+aiErro(e));});
   }).catch(function(){erros.push(f.name+': não consegui abrir');});});},Promise.resolve())
-  .then(function(){return aiRecarrega();}).then(function(){try{EXB.silencio=true;render();}finally{EXB.silencio=false;}
+  .then(function(){return aiRecarrega();}).then(function(){render();
     var msg='Extratos conferidos.'+(ok?'\n\n'+ok+' processado'+(ok>1?'s':'')+':\n• '+lanc.join('\n• '):'')+(ja?'\n\n'+ja+' já estava'+(ja>1?'m':'')+' lançado'+(ja>1?'s':'')+' (não dupliquei).':'')+(erros.length?'\n\nAtenção:\n• '+erros.join('\n• '):'\n\nTudo certo.');
     alert(msg);
   });}
@@ -8550,7 +8550,7 @@ rDLabTab=function(D){return RL.user?rLabClinica(D):rDPedidos2(D);};
    - Clínica: botão "Recebi" no pedido em andamento.
    - Laboratório vê quais pedidos os clientes confirmaram e pode devolver ao quadro.
    ===================================================================================== */
-var EXB={visto:null,fila:[],m:null,sel:null,busy:false,lendo:false,cache:{},R:null,silencio:false};
+var EXB={visto:null,fila:[],m:null,sel:null,busy:false,lendo:false,cache:{},R:null};
 var EXB_AB=['desenho','producao','finalizado','aguardando','entregue']; /* entregue (enviado) sem baixa ainda conta: só sai com o extrato ou o Recebi */
 /* ---------- leitura das linhas do extrato (data = dia em que o trabalho ficou pronto) ---------- */
 function exbLinhasTx(tx){var out=[],cur=null,NUM='(-?\\s?[\\d.]+,\\d{2}-?)';
@@ -8617,6 +8617,7 @@ function exbAbre(m){EXB.feitos=(EXB.feitos||0)+1;EXB.m=m;EXB.R=null;EXB.sel={};E
     exbModal();});}
 function exbProx(){if(EXB.m)return;while(EXB.fila.length){var id=EXB.fila.shift(),m=FIN.M.filter(function(x){return x.id===id;})[0];if(m&&m.extrato_path&&exbPend(m).length){exbAbre(m);return;}}}
 function exbFecha(){if(!EXB.fila.length){EXB.tot=0;EXB.feitos=0;}EXB.m=null;EXB.R=null;exbModal();setTimeout(exbProx,250);}
+ACT.exbAbre=function(v){var m=FIN.M.filter(function(x){return x.id===v;})[0];if(m)exbAbre(m);};
 var EXB_STN={desenho:'Desenho',producao:'Em produção',finalizado:'Pronto',aguardando:'Aguardando informação',entregue:'Entregue'};
 function exbTrab(l){return l.itens.length?l.itens.map(function(i){return (i.qtd>1?i.qtd+'× ':'')+i.desc;}).join(' + '):l.hist;}
 function exbDia(iso){return iso.split('-').reverse().join('/');}
@@ -8685,8 +8686,7 @@ var _rFinMesEXB=rFinMes;rFinMes=function(){var h=_rFinMesEXB.apply(this,argument
 /* percebe o extrato recém-anexado (por qualquer caminho: tela, Ana, arrastar) e abre a conferência */
 function exbObserva(){if(typeof FIN==='undefined'||!FIN.carregado||!PED.carregado||!RL.user||ESP.dono)return;
   if(!EXB.visto){EXB.visto={};FIN.M.forEach(function(m){EXB.visto[m.id]=m.extrato_path||'';});return;}
-  if(EXB.silencio){FIN.M.forEach(function(m){EXB.visto[m.id]=m.extrato_path||'';});return;}
-  var novos=[];FIN.M.forEach(function(m){var a=EXB.visto[m.id]||'';if((m.extrato_path||'')!==a){EXB.visto[m.id]=m.extrato_path||'';if(m.extrato_path&&!a&&exbPend(m).length)novos.push(m.id);}});
+  var novos=[];FIN.M.forEach(function(m){var a=EXB.visto[m.id]||'';if((m.extrato_path||'')!==a){EXB.visto[m.id]=m.extrato_path||'';if(m.extrato_path&&exbPend(m).length)novos.push(m.id);}});
   if(novos.length){EXB.fila=EXB.fila.concat(novos);setTimeout(exbProx,700);}}
 
 /* =====================================================================================
