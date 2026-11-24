@@ -8591,8 +8591,8 @@ function exbTodosBanner(){var T=exbTodos();if(!T.n)return '';
 function exbDoMes(){if(typeof FIN==='undefined'||!FIN.carregado||!PED.carregado||ESP.dono)return [];return FIN.M.filter(function(m){return m.ano===FIN.ano&&m.mes===FIN.mes&&m.extrato_path&&exbPend(m).length;});}
 function exbAbre(m){EXB.feitos=(EXB.feitos||0)+1;EXB.m=m;EXB.R=null;EXB.sel={};EXB.busy=false;EXB.lendo=true;exbModal();
   Promise.all([exbLinhas(m),pzmEnvios()]).then(function(r){if(EXB.m!==m)return;var L=r[0];EXB.lendo=false;
-    if(L&&L.length){EXB.R=exbCasa(m,L);EXB.R.baixa.forEach(function(x,i){if(!x.fraco)EXB.sel['b'+i]=1;});EXB.R.novo.forEach(function(x,i){EXB.sel['n'+i]=1;});EXB.R.fora.forEach(function(p){EXB.sel['f'+p.id]=1;});}
-    else{EXB.R={semLeitura:true,fora:exbPend(m)};EXB.R.fora.forEach(function(p){EXB.sel['f'+p.id]=1;});}
+    if(L&&L.length){EXB.R=exbCasa(m,L);EXB.R.baixa.forEach(function(x,i){if(!x.fraco)EXB.sel['b'+i]=1;});EXB.R.novo.forEach(function(x,i){EXB.sel['n'+i]=1;});}
+    else{EXB.R={semLeitura:true,fora:exbPend(m)};}
     exbModal();});}
 function exbProx(){if(EXB.m)return;while(EXB.fila.length){var id=EXB.fila.shift(),m=FIN.M.filter(function(x){return x.id===id;})[0];if(m&&m.extrato_path&&exbPend(m).length){exbAbre(m);return;}}}
 function exbFecha(){if(!EXB.fila.length){EXB.tot=0;EXB.feitos=0;}EXB.m=null;EXB.R=null;exbModal();setTimeout(exbProx,250);}
