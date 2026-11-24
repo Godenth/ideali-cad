@@ -5440,6 +5440,9 @@ document.addEventListener('input',function(e){if(e.target.id==='ino-q'){INO.q=e.
 var INO_AV={uid:null,items:[],prox:0},INO_AV_MS=5*60*1000;
 function inoAvUid(){return (typeof RL!=='undefined'&&RL.user&&RL.user.id)||'';}
 function inoAvKey(){return 'io_ino_av_'+inoAvUid();}
+function inoAvSeenKey(){return 'io_ino_av_seen_'+inoAvUid();}
+function inoAvSeen(){try{return JSON.parse(localStorage.getItem(inoAvSeenKey())||'{}');}catch(e){return {};}}
+function inoAvMarcarVisto(id){if(!id)return;var s=inoAvSeen();s[id]=1;var ks=Object.keys(s);if(ks.length>300)ks.slice(0,ks.length-300).forEach(function(k){delete s[k];});try{localStorage.setItem(inoAvSeenKey(),JSON.stringify(s));}catch(e){}}
 function inoAvCarrega(){var uid=inoAvUid();if(INO_AV.uid===uid)return;INO_AV.uid=uid;INO_AV.items=[];INO_AV.prox=0;if(!uid)return;
   try{var o=JSON.parse(localStorage.getItem(inoAvKey())||'null');if(o&&Array.isArray(o.items)){INO_AV.items=o.items;INO_AV.prox=+o.prox||0;}}catch(e){}}
 function inoAvSalva(){try{localStorage.setItem(inoAvKey(),JSON.stringify({items:INO_AV.items,prox:INO_AV.prox}));}catch(e){}}
@@ -5447,7 +5450,7 @@ function inoAvData(s){s=String(s||'').slice(0,10);var p=s.split('-');return p.le
 function inoAvisaComp(m,valor,data,path,pid){if(typeof ESP!=='undefined'&&ESP.dono)return;if(!m||!inoAvUid())return;
   var it={id:pid||('c'+Date.now()+Math.random().toString(36).slice(2,7)),nome:finCliNome(m),valor:+valor||0,data:data||dHoje(),key:finCliK(m),ano:m.ano,mes:m.mes,mesId:m.id,path:path||null,ts:Date.now()};
   INO_AV.items=INO_AV.items.filter(function(x){return !(x.mesId===it.mesId&&Math.abs((+x.valor||0)-it.valor)<0.01&&x.data===it.data);});
-  INO_AV.items.push(it);INO_AV.prox=Date.now();inoAvSalva();inoAvMostra();}
+  INO_AV.items.push(it);INO_AV.prox=Date.now();inoAvSalva();inoAvMarcarVisto(it.id);inoAvMostra();}
 function inoAvAtual(){return INO_AV.items.length?INO_AV.items[INO_AV.items.length-1]:null;}
 function inoAvMostra(){inoAvCarrega();var it=inoAvAtual(),el=document.getElementById('ino-aviso');if(!it){if(el)el.remove();return;}
   if(!el){el=document.createElement('div');el.id='ino-aviso';el.setAttribute('role','alert');document.body.appendChild(el);}
@@ -5459,7 +5462,15 @@ function inoAvMostra(){inoAvCarrega();var it=inoAvAtual(),el=document.getElement
   INO_AV.prox=Date.now()+INO_AV_MS;inoAvSalva();}
 function inoAvFecha(){var el=document.getElementById('ino-aviso');if(el)el.remove();}
 function inoAvLe(id){INO_AV.items=INO_AV.items.filter(function(x){return x.id!==id;});inoAvSalva();if(INO_AV.items.length){INO_AV.prox=Date.now();inoAvMostra();}else inoAvFecha();}
-function inoAvTick(){inoAvCarrega();if(!INO_AV.items.length){inoAvFecha();return;}if(Date.now()>=INO_AV.prox&&!document.getElementById('ino-aviso'))inoAvMostra();}
+var INO_AV_SCAN=false;
+function inoAvVarre(){if(INO_AV_SCAN)return;if(typeof FIN==='undefined'||!FIN.carregado||!FIN.P)return;if(typeof ESP!=='undefined'&&ESP.dono)return;if(!inoAvUid())return;
+  INO_AV_SCAN=true;inoAvCarrega();var seen=inoAvSeen(),lim=Date.now()-24*3600*1000,cand=[];
+  FIN.P.forEach(function(p){if(!p||!p.comprovante_path||!p.mes_id||seen[p.id])return;var ts=Date.parse(p.criado_em||'')||0;if(ts<lim)return;
+    var m=FIN.M.filter(function(x){return x.id===p.mes_id;})[0];if(!m)return;cand.push({p:p,m:m,ts:ts});});
+  if(!cand.length)return;cand.sort(function(a,b){return b.ts-a.ts;});
+  inoAvisaComp(cand[0].m,cand[0].p.valor,cand[0].p.data,cand[0].p.comprovante_path,cand[0].p.id);
+  cand.forEach(function(x){inoAvMarcarVisto(x.p.id);});}
+function inoAvTick(){inoAvCarrega();inoAvVarre();if(!INO_AV.items.length){inoAvFecha();return;}if(Date.now()>=INO_AV.prox&&!document.getElementById('ino-aviso'))inoAvMostra();}
 function inoAvIr(it){if(!it)return;
   try{INO.hist=null;INO.sub='conf';INO.f='todos';INO.q='';if(it.ano)FIN.ano=it.ano;if(it.mes)FIN.mes=it.mes;}catch(e){}
   try{if(typeof ACT!=='undefined'&&ACT.tab)ACT.tab('inove');else{S.tab[S.role]='inove';render();}}catch(e){}
@@ -5475,7 +5486,7 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
   else if(a==='depois'){INO_AV.prox=Date.now()+INO_AV_MS;inoAvSalva();inoAvFecha();}
   else if(a==='lido'){inoAvLe(it?it.id:'');}
 },true);
-inoAvCarrega();inoAvTick();setInterval(inoAvTick,15000);
+inoAvCarrega();inoAvTick();setTimeout(inoAvVarre,2500);setTimeout(inoAvVarre,8000);setInterval(inoAvTick,15000);
 
 /* ===== Conta espelho: o parceiro (ex.: Inove) vê tudo da conta do dono, sem editar nada ===== */
 var ESP={dono:null,nome:'',lista:[],proprio:null};
