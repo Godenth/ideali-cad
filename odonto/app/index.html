@@ -6412,6 +6412,27 @@ function aiExtConfirma(pid){var p=(AI.extPend||{})[pid];if(!p)return;delete AI.e
     .then(function(){AI.busy=false;return aiRecarrega();}).then(function(){aiDiz('✅ <b>'+esc(p.c.nome)+'</b> · '+MESES[p.d.mes-1]+': mantive o valor do sistema (<b>'+fmtR(p.row.valor_mes)+'</b>) e anexei o extrato para conferência. Nada foi duplicado.');})
     .catch(function(e){AI.busy=false;aiDiz('❌ <b>'+esc(p.c.nome)+'</b>: não consegui anexar ('+esc(aiErro(e))+').');});}
 function aiExtPula(pid){var p=(AI.extPend||{})[pid];if(p)delete AI.extPend[pid];aiDiz('Ok, pulei '+(p?'<b>'+esc(p.c.nome)+'</b> · '+MESES[p.d.mes-1]:'este item')+'.');}
+function finLeExtrato(fs){fs=(fs||[]).filter(function(f){return /pdf/i.test(f.type)||/\.pdf$/i.test(f.name);});if(!fs.length){toast('Mande o extrato em PDF.');return;}
+  var ok=0,ja=0,lanc=[],erros=[],vistos={};toast('Lendo '+fs.length+' extrato'+(fs.length>1?'s':'')+'…');
+  fs.reduce(function(pr,f){return pr.then(function(){return extTexto(f).then(function(tx){
+    var it=extAnalisa({id:'f'+Date.now()+Math.random().toString(36).slice(2,6),file:f,d:extParse(tx)}),d=it.d,c=it.cli;
+    if(it.st==='erro'){erros.push((d.nome||f.name)+': '+((it.msgs||[])[0]||'não consegui ler'));return;}
+    if(!c){erros.push((d.nome||f.name)+': cliente não encontrado');return;}
+    if(!d.ano||!d.mes){erros.push((d.nome||f.name)+': mês não identificado');return;}
+    var kv=c.id+'|'+d.ano+'-'+d.mes;if(vistos[kv]){erros.push(c.nome+' '+MESES[d.mes-1]+': extrato repetido');return;}vistos[kv]=f.name;
+    var rx=extRow(c.id,d.ano,d.mes),mesmo=!!rx&&Math.abs((+rx.valor_mes||0)-(+d.debitos||0))<0.01,temExt=!!rx&&!!(rx.extrato_path||rx.arquivo_legado);
+    if(it.baixa>0||it.inoveAMenos>0){erros.push(c.nome+' '+MESES[d.mes-1]+': divergência de baixa — confira na Ana "Verificar extratos anexados"');return;}
+    if(rx&&mesmo&&temExt){ja++;return;}
+    if(rx&&!mesmo&&!confirm('Extrato de '+c.nome+' · '+MESES[d.mes-1]+':\nNo sistema: '+fmtR(rx.valor_mes)+'\nNo extrato: '+fmtR(d.debitos)+'\n\nAnexar o PDF mantendo o valor do sistema? Nada será duplicado.')){erros.push(c.nome+' '+MESES[d.mes-1]+': pulado por valor diferente');return;}
+    var pm=rx?Promise.resolve(rx.id):SB.rpc('odo_inove_lanca_mes',{p_dono:donoId(),p_cliente:c.id,p_ano:d.ano,p_mes:d.mes,p_valor:d.debitos}).then(function(r){if(r.error)throw r.error;return r.data;});
+    return pm.then(function(mid){return aiUp(f,'extratos/'+d.ano+'-'+String(d.mes).padStart(2,'0')).then(function(path){return SB.rpc('odo_inove_extrato',{p_mes:mid,p_path:path}).then(function(r){if(r.error)throw r.error;});});})
+      .then(function(){ok++;lanc.push(c.nome+' · '+MESES[d.mes-1]+' · '+(rx?'já lançado, PDF anexado (valor mantido)':'lançado '+fmtR(d.debitos)+' e extrato anexado'));})
+      .catch(function(e){erros.push(c.nome+' '+MESES[d.mes-1]+': '+aiErro(e));});
+  }).catch(function(){erros.push(f.name+': não consegui abrir');});});},Promise.resolve())
+  .then(function(){return aiRecarrega();}).then(function(){try{EXB.silencio=true;render();}finally{EXB.silencio=false;}
+    var msg='Extratos conferidos.'+(ok?'\n\n'+ok+' processado'+(ok>1?'s':'')+':\n• '+lanc.join('\n• '):'')+(ja?'\n\n'+ja+' já estava'+(ja>1?'m':'')+' lançado'+(ja>1?'s':'')+' (não dupliquei).':'')+(erros.length?'\n\nAtenção:\n• '+erros.join('\n• '):'\n\nTudo certo.');
+    alert(msg);
+  });}
 /* comprovante: lê o valor, confere e trava se divergir */
 function aiComprovante(f){var c=EMP.cli.filter(function(x){return x.id===AI.cli;})[0];if(!c){aiDiz('Antes, escolha à esquerda de qual cliente é o comprovante. 👈');return;}
   var m=aiCliRow(c);if(!m){aiDiz('<b>'+esc(c.nome)+'</b> não tem lançamento em '+MESES[FIN.mes-1]+'. Mande primeiro o extrato dele.');return;}
@@ -6846,7 +6867,7 @@ document.addEventListener('change',function(e){if(e.target&&e.target.id==='chk-a
 var _rFinChk=rFin;rFin=function(){var h=_rFinChk.apply(this,arguments),x='<button class="btn chk-bt" data-act="chkAbre"><img src="'+ANA_AV[0]+'" alt=""> Comprovante já anexado?</button>';
   if(!(typeof ESP!=='undefined'&&ESP.dono))x+='<label class="btn chk-bt" title="A Ana lê os extratos da Inove e lança no mês de cada cliente"><img src="'+ANA_AV[0]+'" alt=""> Ler extrato da Inove<input type="file" id="fin-ai-ext" accept="application/pdf" multiple hidden></label>';
   return h.replace('<div class="finabrow">','<div class="finabrow">'+x);};
-document.addEventListener('change',function(e){var t=e.target;if(!t||t.id!=='fin-ai-ext')return;var fs=[].slice.call(t.files||[]);t.value='';if(!fs.length)return;AI.extAuto=true;if(!AI.on)aiAbre();aiExtratos(fs);});
+document.addEventListener('change',function(e){var t=e.target;if(!t||t.id!=='fin-ai-ext')return;var fs=[].slice.call(t.files||[]);t.value='';if(!fs.length)return;finLeExtrato(fs);});
 
 var _rInoveChk=rInove;rInove=function(){return _rInoveChk.apply(this,arguments);};
 
@@ -8529,7 +8550,7 @@ rDLabTab=function(D){return RL.user?rLabClinica(D):rDPedidos2(D);};
    - Clínica: botão "Recebi" no pedido em andamento.
    - Laboratório vê quais pedidos os clientes confirmaram e pode devolver ao quadro.
    ===================================================================================== */
-var EXB={visto:null,fila:[],m:null,sel:null,busy:false,lendo:false,cache:{},R:null};
+var EXB={visto:null,fila:[],m:null,sel:null,busy:false,lendo:false,cache:{},R:null,silencio:false};
 var EXB_AB=['desenho','producao','finalizado','aguardando','entregue']; /* entregue (enviado) sem baixa ainda conta: só sai com o extrato ou o Recebi */
 /* ---------- leitura das linhas do extrato (data = dia em que o trabalho ficou pronto) ---------- */
 function exbLinhasTx(tx){var out=[],cur=null,NUM='(-?\\s?[\\d.]+,\\d{2}-?)';
@@ -8664,6 +8685,7 @@ var _rFinMesEXB=rFinMes;rFinMes=function(){var h=_rFinMesEXB.apply(this,argument
 /* percebe o extrato recém-anexado (por qualquer caminho: tela, Ana, arrastar) e abre a conferência */
 function exbObserva(){if(typeof FIN==='undefined'||!FIN.carregado||!PED.carregado||!RL.user||ESP.dono)return;
   if(!EXB.visto){EXB.visto={};FIN.M.forEach(function(m){EXB.visto[m.id]=m.extrato_path||'';});return;}
+  if(EXB.silencio){FIN.M.forEach(function(m){EXB.visto[m.id]=m.extrato_path||'';});return;}
   var novos=[];FIN.M.forEach(function(m){var a=EXB.visto[m.id]||'';if((m.extrato_path||'')!==a){EXB.visto[m.id]=m.extrato_path||'';if(m.extrato_path&&!a&&exbPend(m).length)novos.push(m.id);}});
   if(novos.length){EXB.fila=EXB.fila.concat(novos);setTimeout(exbProx,700);}}
 
