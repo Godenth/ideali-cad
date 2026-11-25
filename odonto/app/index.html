@@ -5413,7 +5413,7 @@ function rInove(){if(!FIN.carregado)return '<div class="empty">Carregando…</di
   var mesNome=MESES[FIN.mes-1].charAt(0).toUpperCase()+MESES[FIN.mes-1].slice(1);
   var inoTop='<div class="ino-top"><div class="ino-sub"><button class="ino-sub-bt" aria-selected="'+(INO.sub==='conf')+'" data-act="inoSub" data-v="conf">Conferência do mês</button><button class="ino-sub-bt" aria-selected="'+(INO.sub==='com')+'" data-act="inoSub" data-v="com">Comissão</button><button class="ino-sub-bt" aria-selected="'+(INO.sub==='inad')+'" data-act="inoSub" data-v="inad">Inadimplentes</button></div><span class="spacer"></span><div class="finnav"><button class="btn sm" data-act="finMesMuda" data-v="-1" aria-label="Mês anterior">‹</button><b>'+mesNome+' de '+FIN.ano+'</b><button class="btn sm" data-act="finMesMuda" data-v="1" aria-label="Próximo mês">›</button></div></div>';
   if(INO.sub==='com')return '<div class="ino">'+inoTop+rInoveComAba()+'</div>';
-  if(INO.sub==='inad')return '<div class="ino">'+inoTop+rInoInadAba()+'</div>';
+  if(INO.sub==='inad')return '<div class="ino">'+inoTop+rInoInadAntiga()+'</div>';
   return '<div class="ino">'+inoTop+
     '<div class="ino-kpis">'+[['Total do mês',fmtR(tot),''],['Total pago',fmtR(pg),''],['Saldo a receber',fmtR(sal),''],['% pago do mês',pc+'% pago','dest'],['Clientes que pagaram',pagaram+' de '+com.length+' clientes pagaram','']].map(function(k){return '<div class="ino-kpi '+k[2]+'"><small>'+k[0]+'</small><b>'+k[1]+'</b></div>';}).join('')+'</div>'+
     '<p class="small muted ino-nota">ⓘ Saldos consideram pagamentos a partir de 14/06/2026.</p>'+
@@ -5467,7 +5467,7 @@ document.addEventListener('input',function(e){if(e.target.id==='ino-q'){INO.q=e.
 
 /* ===== Inadimplência (Inove): residuais de todas as competências por cliente ===== */
 var INO_RES_DESDE=202606;
-function inoResiduais(){var G={};FIN.M.forEach(function(m){var comp=m.ano*100+m.mes;if(comp<INO_RES_DESDE)return;var rest=finFaltaTela(m);if(!(rest>0.005))return;
+function inoResiduais(){return [];var G={};FIN.M.forEach(function(m){var comp=m.ano*100+m.mes;if(comp<INO_RES_DESDE)return;var rest=finFaltaTela(m);if(!(rest>0.005))return;
   var st=finSt(m)[0];if(st!=='parcial'&&st!=='aberto')return;var k=finCliK(m);
   if(!G[k])G[k]={k:k,m0:m,nome:finCliNome(m),obj:finCliObj(m),tot:0,meses:[]};G[k].tot+=rest;G[k].meses.push({m:m,rest:Math.round(rest*100)/100,st:st});});
   var L=Object.keys(G).map(function(k){var g=G[k];g.tot=Math.round(g.tot*100)/100;g.meses.sort(function(a,b){return (b.m.ano*100+b.m.mes)-(a.m.ano*100+a.m.mes);});return g;});
@@ -5476,7 +5476,7 @@ function inoResMsg(g){var nome=g.nome||'cliente',emp=(typeof S!=='undefined'&&S.
   var t=(FIN.cfg&&FIN.cfg.msg_cobranca)||'Olá, {cliente}! Tudo bem? Aqui é do {empresa}. Segue o que está em aberto:\n{detalhe}\n\nTotal: {total}{pix}\n\nQualquer dúvida, estou à disposição.';
   return t.replace(/\{cliente\}/g,nome).replace(/\{empresa\}/g,emp).replace(/\{detalhe\}/g,det).replace(/\{total\}/g,fmtR(g.tot)).replace(/\{pix\}/g,pix);}
 function inoResWa(g){var w=cliWa(g.obj);return w?'https://wa.me/'+w+'?text='+encodeURIComponent(inoResMsg(g)):'';}
-function rInoInadAba(){if(!FIN.carregado)return '<div class="empty">Carregando…</div>';
+function rInoInadAba(){return rInoInadAntiga();if(!FIN.carregado)return '<div class="empty">Carregando…</div>';
   var L=inoResiduais(),q=semAc(INO.rq||''),V=L.filter(function(g){return !q||semAc(g.nome).indexOf(q)>=0;});
   var tot=L.reduce(function(s,g){return s+g.tot;},0),maior=L[0]||null;
   var cards='<div class="ino-kpis ino-res-kpis"><div class="ino-kpi dest"><small>Total residual a receber</small><b>'+fmtR(tot)+'</b></div><div class="ino-kpi"><small>Clientes com residual</small><b>'+L.length+'</b></div><div class="ino-kpi"><small>Maior residual</small><b>'+fmtR(maior?maior.tot:0)+'</b><span class="small muted">'+esc(maior?maior.nome:'—')+'</span></div></div>';
