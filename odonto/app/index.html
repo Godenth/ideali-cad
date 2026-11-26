@@ -6084,10 +6084,24 @@ function anaCria(L,upd){if(!RL||!RL.user)return;ANAP.busy=true;upd();var n0=PED.
   L.reduce(function(pr,p,i){return pr.then(function(){return SB.from('odo_pedidos').insert(Object.assign({user_id:contaId(),numero:n0+i+1},pedRow(p))).select('*').single().then(function(r){if(r.error)throw r.error;pedGuarda(r.data);feitos.push(r.data.numero);});});},Promise.resolve())
   .then(function(){ANAP.busy=false;ANAP.txt='';anaFecha();render();toast(feitos.length>1?'Pronto! Criei os pedidos #'+feitos.join(', #')+'.':'Pronto! Pedido #'+feitos[0]+' criado.');})
   .catch(function(){ANAP.busy=false;upd();render();toast(feitos.length?'Criei '+feitos.length+' e parei: não consegui salvar o resto.':'Não consegui salvar agora. Tente de novo.');});}
-/* botão: no topo dos Pedidos e flutuante no celular */
+/* botão único: abre a escolha entre preencher o formulário ou digitar com a Ana */
 var _rPedidosA=rPedidos;rPedidos=function(){var h=_rPedidosA.apply(this,arguments);if(PED.ed||PED.vcad)return h;
-  return h.replace('class="btn pri" data-act="pedNovo">+ Novo pedido</button>','class="btn pri" data-act="pedNovo">+ Novo pedido</button><button class="btn anap-top" data-act="anaPed"><img src="'+ANA_AV[0]+'" alt=""> Ditar para a Ana</button>')+
-    '<button class="anap-fab" data-act="anaPed" aria-label="Pedir para a Ana"><img src="'+ANA_AV[0]+'" alt=""><span>Novo pedido com a Ana</span></button>';};
+  return h.replace('data-act="pedNovo">+ Novo pedido</button>','data-act="pedEscolha">+ Novo pedido</button>');};
+function pedEscolhaAbre(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espelho: só leitura.');return;}if(document.getElementById('pe-escolha'))return;
+  var d=document.createElement('div');d.id='pe-escolha';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Novo pedido');
+  d.style.cssText='position:fixed;inset:0;z-index:120;background:rgba(10,12,24,.55);display:flex;align-items:center;justify-content:center;padding:18px';
+  var bs='flex:1;min-width:150px;display:flex;align-items:center;gap:10px;justify-content:center;padding:14px;border-radius:12px;cursor:pointer;font:inherit;font-weight:700;';
+  d.innerHTML='<div style="background:var(--surface,#fff);color:var(--ink,#111);border:1px solid var(--line,#ddd);border-radius:16px;max-width:min(440px,94vw);width:100%;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.35)">'+
+    '<div style="display:flex;align-items:center;margin-bottom:4px"><b style="font-size:1.05rem">Novo pedido</b><span style="flex:1"></span><button type="button" data-pe="fecha" aria-label="Fechar" style="border:0;background:none;font-size:1.4rem;line-height:1;cursor:pointer;color:inherit">×</button></div>'+
+    '<p style="margin:0 0 14px;color:var(--muted,#666);font-size:.9rem">Como você quer montar o pedido?</p>'+
+    '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
+      '<button type="button" data-pe="form" style="'+bs+'background:var(--soft,#f2f2f2);color:inherit;border:1px solid var(--line,#ddd)">✏️ Preencher pedido</button>'+
+      '<button type="button" data-pe="ana" style="'+bs+'background:linear-gradient(135deg,#7C5CFF,#5B8CFF);color:#fff;border:0">📝 Digitar pedido</button>'+
+    '</div></div>';
+  document.body.appendChild(d);}
+ACT.pedEscolha=pedEscolhaAbre;
+document.addEventListener('click',function(e){var d=document.getElementById('pe-escolha');if(!d)return;var b=e.target&&e.target.closest&&e.target.closest('[data-pe]');
+  if(!b){if(e.target===d)d.remove();return;}var a=b.getAttribute('data-pe');d.remove();if(a==='form'){if(ACT.pedNovo)ACT.pedNovo();}else if(a==='ana'){if(ACT.anaPed)ACT.anaPed();}},true);
 Object.assign(ACT,{anaPed:function(){anaAbre();}});
 (function(){var f=ACT.anaPed;ACT.anaPed=function(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espelho: só leitura.');return;}return f.apply(this,arguments);};})();
 
@@ -8072,7 +8086,30 @@ var _pcResumoL=pcResumo;pcResumo=function(){if(PC.modo!=='lab')return _pcResumoL
     (L[0].material?'<div><span>Material</span><b>'+esc(L[0].material)+'</b></div>':'')+(E.cor?'<div><span>Cor</span><b>'+esc(E.cor)+'</b></div>':'')+'<div><span>Tipo</span><b>'+(L[0].tipo==='cad'?'🟣 CAD':'🧪 Analógico')+'</b></div>'+
     '<div><span>Prazo</span><b>'+(E.urgente?'⚡ Urgente · ':'')+(pz?esc(anaFmtData(pz)):'—')+'</b></div>'+
     '<div><span>Valor</span><b>'+(tot?fmtR(tot)+(sem?' + itens sem preço':''):'sem preço na tabela')+'</b></div>'+(E.obs?'<div><span>Observação</span><b>'+esc(E.obs)+'</b></div>':'')+'</div>');};
-var _pcBarraL=pcBarra;pcBarra=function(){var h=_pcBarraL.apply(this,arguments);if(PC.modo!=='lab')return h;
+function pclCliBarra(){var L=(typeof pclClis==='function'?pclClis():[]).slice().sort(function(a,b){return String(a.nome).localeCompare(String(b.nome));});
+  var opts=L.map(function(c){return '<option value="'+esc(c.id)+'">'+esc(c.nome)+'</option>';}).join('');
+  return '<div class="pc-ch" style="flex-wrap:wrap;align-items:center">'+
+    '<select id="pcl-cli" class="pc-c" style="max-width:260px" aria-label="Escolher cliente"><option value="">Escolha o cliente…</option>'+opts+'</select>'+
+    '<button type="button" class="pc-c" data-pcl="pdf">📎 Anexar PDF</button>'+
+    '<input type="file" id="pcl-pdf" accept="application/pdf" hidden></div>'+
+    '<form class="pc-in" data-pcf="1"><input id="pc-t" type="text" autocomplete="off" placeholder="Ou digite o nome do cliente" maxlength="300"><button type="submit" aria-label="Enviar">➤</button></form>';}
+function pclLePdf(f){if(!f)return;if(!(/pdf/i.test(f.type||'')||/\.pdf$/i.test(f.name||''))){toast('Escolha um arquivo PDF.');return;}
+  if(typeof extTexto!=='function'){toast('Não consegui abrir o PDF agora.');return;}
+  pcEu('📎 '+esc(f.name));pcAna('Lendo o PDF…');
+  extTexto(f).then(function(txt){var r=null;try{r=anaEntende(txt||'');}catch(x){r=null;}var E=PC.ed;if(!E)return;
+    if(r){var ds=[];(r.itens||[]).forEach(function(it){(it.dentes||[]).forEach(function(d){if(ds.indexOf(d)<0)ds.push(d);});});
+      if(r.paciente)E.paciente=r.paciente;if(ds.length)E.dentes=ds.sort(function(a,b){return a-b;});if(r.cor)E.cor=r.cor;
+      var it0=(r.itens||[]).filter(function(x){return x.trabalho;})[0];if(it0&&it0.trabalho)E.trabalho=it0.trabalho;
+      if(!E.cli){var ach=pclAcha(txt||'');if(ach.length===1)E.cli=ach[0];}
+      if(E.paciente||E.trabalho||(E.dentes&&E.dentes.length)||E.cor)E._pinfo=true;}
+    var res=[];if(E.paciente)res.push('paciente <b>'+esc(E.paciente)+'</b>');if(E.trabalho)res.push(esc(E.trabalho));if(E.dentes&&E.dentes.length)res.push('🦷 '+E.dentes.join(', '));if(E.cor)res.push('🎨 '+esc(E.cor));
+    pcAna(res.length?'Li o PDF 📄 Anotei '+res.join(' · ')+'.':'Li o PDF, mas não consegui identificar os dados. Pode digitar.');
+    if(PC.passo==='cliente'){if(E.cli){pcAna('Cliente: <b>'+esc(E.cli.nome)+'</b>.');pcProx();}else pcAna('Agora escolha o cliente no menu acima.');}
+    else if(E._pinfo)pcProx();
+  }).catch(function(){pcAna('Não consegui ler esse PDF. Tente outro arquivo ou digite os dados.');});}
+document.addEventListener('change',function(e){var t=e.target;if(!t)return;if(t.id==='pcl-cli'&&t.value){var v=t.value;t.value='';pcResposta('id:'+v);}else if(t.id==='pcl-pdf'){var f=(t.files||[])[0];t.value='';if(f)pclLePdf(f);}},true);
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('[data-pcl="pdf"]');if(!b||PC.modo!=='lab')return;e.preventDefault();var i=document.getElementById('pcl-pdf');if(i)i.click();},true);
+var _pcBarraL=pcBarra;pcBarra=function(){if(PC.modo==='lab'&&PC.passo==='cliente')return pclCliBarra();var h=_pcBarraL.apply(this,arguments);if(PC.modo!=='lab')return h;
   return h.replace('📤 Enviar pedido para o laboratório','✅ Criar pedido').replace('<button class="pc-c" data-pc="refaz">Recomeçar</button>','<button class="pc-c" data-pc="formulario">✏️ Ajustar no formulário</button><button class="pc-c" data-pc="refaz">Recomeçar</button>');};
 var _pcDesL=pcDesenha;pcDesenha=function(){_pcDesL.apply(this,arguments);var el=document.getElementById('pc-ov');if(!el)return;el.classList.toggle('pcl',PC.modo==='lab');if(PC.modo!=='lab'&&PC.ed&&PC.ed.labNome){var bb=el.querySelector('.pc-h b');if(bb)bb.innerHTML='Ana · Pedido para <span class="pc-lab">'+esc(PC.ed.labNome)+'</span>';}
   if(PC.modo==='lab'){var b=el.querySelector('.pc-h b');if(b)b.textContent='Ana · Novo pedido';var f=el.querySelector('.pc-x[data-pc=formulario]');if(f)f.remove();
