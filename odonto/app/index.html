@@ -8016,7 +8016,7 @@ var _pcProxL=pcProx;pcProx=function(){if(PC.modo!=='lab')return _pcProxL.apply(t
   if(nx==='material'&&pclMat(E))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];
   if(nx==='cor'&&semCor)nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];
   if(E._tudo){while(nx&&nx!=='obs'&&nx!=='fim'&&((nx==='material'&&pclMat(E))||(nx==='paciente'&&E.paciente)||(nx==='trabalho'&&E.trabalho)||(nx==='dentes'&&E.trabalho)||(nx==='cor'&&(E.cor||semCor))||(nx==='prazo'&&(E.prazo||E.urgente))))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];}
-  if(E._pinfo){while(nx&&nx!=='obs'&&nx!=='fim'&&((nx==='paciente'&&E.paciente)||(nx==='trabalho'&&E.trabalho)||(nx==='dentes'&&E.dentes&&E.dentes.length)||(nx==='cor'&&(E.cor||semCor))))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];}
+  if(E._pinfo){while(nx&&nx!=='obs'&&nx!=='fim'&&((nx==='paciente'&&E.paciente)||(nx==='trabalho'&&E.trabalho)||(nx==='dentes'&&E.dentes&&E.dentes.length)||(nx==='material'&&pclMat(E))||(nx==='cor'&&(E.cor||semCor))))nx=PCL_ORD[PCL_ORD.indexOf(nx)+1];}
   pcPergunta(nx||'fim');};
 /* correção no meio da conversa: "mude pra zircônia", "troca a cor pra A2", "o dente é 24", "na verdade é emax" */
 function pclCorrige(v){var E=PC.ed,t=semAc(String(v)).trim();if(!E||!(E.trabalho||E.paciente||E.cor))return false;
