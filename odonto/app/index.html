@@ -8071,7 +8071,8 @@ var _pcRespL=pcResposta;pcResposta=function(v,txt){if(PC.modo!=='lab')return _pc
 /* monta o(s) pedido(s) com preço e prazo da tabela */
 function pclMonta(){var E=PC.ed,s=pedServ(E.trabalho),res;
   if(s||!E._tudo){var r0=s?null:anaEntende(E.trabalho+(E.dentes.length?' '+E.dentes.join(' e '):''));
-    var it=r0&&r0.itens.length===1?r0.itens[0]:{trabalho:E.trabalho,daTabela:!!s,material:'',sobre_implante:/implant/i.test(E.trabalho)&&!/sobre dente/i.test(E.trabalho),componente:''};
+    var it=r0&&r0.itens.length===1?r0.itens[0]:{trabalho:E.trabalho,daTabela:!!s,material:'',sobre_implante:/implant/i.test(E.trabalho)&&!/sobre dente/i.test(E.trabalho),componente:E.componente||''};
+    if(E.componente&&!it.componente)it.componente=E.componente;
     it.dentes=E.dentes.slice();it.qtd=it.dentes.length||it.qtd||1;var s2=pedServ(it.trabalho);it.valor=s2&&s2.valor!=null?Math.round(s2.valor*it.qtd*100)/100:null;it.prazoTab=s2&&s2.prazo!=null?pedUteis(s2.prazo):null;
     res={itens:[it],tipo:r0&&r0.tipo||(/PPR|Prótese total|Modelo/.test(it.trabalho)?'analogico':'cad')};}
   else res={itens:E._tudo.itens,tipo:E._tudo.tipo};
@@ -8095,7 +8096,7 @@ function pclCliBarra(){var L=(typeof pclClis==='function'?pclClis():[]).slice().
     '<form class="pc-in" data-pcf="1"><input id="pc-t" type="text" autocomplete="off" placeholder="Ou digite o nome do cliente" maxlength="300"><button type="submit" aria-label="Enviar">➤</button></form>';}
 function pclLePdfItero(txt){var t=String(txt||'').replace(/\r/g,'');
   if(!/(Informa[çc][õo]es de Tratamento)|(Scan ?Body)/i.test(t))return null;
-  var out={paciente:'',dentes:[],cor:'',material:'',trabalho:''};
+  var out={paciente:'',dentes:[],cor:'',material:'',trabalho:'',componente:''};
   var mp=t.match(/Paciente:\s*([^\n]+)/i);if(mp)out.paciente=anaCap(mp[1].trim());
   var a=t.search(/Informa[çc][õo]es de Tratamento/i),b=t.search(/Observa[çc][õo]es|Diagrama do dente/i);
   var bloco=a>=0?t.slice(a,(b>a?b:t.length)):'';
@@ -8106,13 +8107,15 @@ function pclLePdfItero(txt){var t=String(txt||'').replace(/\r/g,'');
   out.dentes=ds.sort(function(x,y){return x-y;});
   if(/scan ?body/i.test(bloco))out.trabalho='Scan Body sobre implante'+(out.material?' · '+out.material:'');
   else if(out.dentes.length)out.trabalho=(anaTrabTipo(bloco)||'Coroa')+(/implante|parafus/i.test(bloco)?' sobre implante':'')+(out.material?' · '+out.material:'');
+  var sb=bloco.match(/Scan Body:\s*([^\n|]+)/i),fab=bloco.match(/Fabricante de Implantes:\s*([^\n]+)/i);
+  out.componente=[sb?sb[1].trim():'',fab?fab[1].trim():''].filter(Boolean).join(' · ');
   return (out.paciente||out.dentes.length||out.cor)?out:null;}
 function pclLePdf(f){if(!f)return;if(!(/pdf/i.test(f.type||'')||/\.pdf$/i.test(f.name||''))){toast('Escolha um arquivo PDF.');return;}
   if(typeof extTexto!=='function'){toast('Não consegui abrir o PDF agora.');return;}
   pcEu('📎 '+esc(f.name));pcAna('Lendo o PDF…');
   extTexto(f).then(function(txt){var E=PC.ed;if(!E)return;var itero=pclLePdfItero(txt);
-    if(itero){if(itero.paciente)E.paciente=itero.paciente;if(itero.dentes&&itero.dentes.length)E.dentes=itero.dentes;if(itero.cor)E.cor=itero.cor;if(itero.material)E.material=itero.material;if(itero.trabalho)E.trabalho=itero.trabalho;E._pinfo=true;
-      var rI=[];if(E.paciente)rI.push('paciente <b>'+esc(E.paciente)+'</b>');if(E.trabalho)rI.push(esc(E.trabalho));if(E.dentes&&E.dentes.length)rI.push('🦷 '+E.dentes.join(', '));if(E.cor)rI.push('🎨 '+esc(E.cor));
+    if(itero){if(itero.paciente)E.paciente=itero.paciente;if(itero.dentes&&itero.dentes.length)E.dentes=itero.dentes;if(itero.cor)E.cor=itero.cor;if(itero.material)E.material=itero.material;if(itero.trabalho)E.trabalho=itero.trabalho;if(itero.componente)E.componente=itero.componente;E._pinfo=true;
+      var rI=[];if(E.paciente)rI.push('paciente <b>'+esc(E.paciente)+'</b>');if(E.trabalho)rI.push(esc(E.trabalho));if(E.dentes&&E.dentes.length)rI.push('🦷 '+E.dentes.join(', '));if(E.cor)rI.push('🎨 '+esc(E.cor));if(E.componente)rI.push('🔩 '+esc(E.componente));
       pcAna('Li o PDF 📄 Anotei '+rI.join(' · ')+'.');
       if(PC.passo==='cliente'){if(E.cli){pcAna('Cliente: <b>'+esc(E.cli.nome)+'</b>.');pcProx();}else pcAna('Agora escolha o cliente no menu acima.');}
       else if(E._pinfo)pcProx();return;}
