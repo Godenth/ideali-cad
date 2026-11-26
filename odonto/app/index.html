@@ -8086,7 +8086,18 @@ var _pcRespL=pcResposta;pcResposta=function(v,txt){if(PC.modo!=='lab')return _pc
     E.prazo=d;pcEu(esc(v));pcAna('Prazo: <b>'+esc(anaFmtData(d))+'</b> ✅');pcProx();return;}
   return _pcRespL.apply(this,arguments);};
 /* monta o(s) pedido(s) com preço e prazo da tabela */
-function pclMonta(){var E=PC.ed,s=pedServ(E.trabalho),res;
+function pclRepete(E){if(!E)return [];var pac=semAc(E.paciente||'').trim();if(!pac||pac.length<3)return [];
+  var ds=(E.dentes||[]).slice(),tr=semAc(E.trabalho||'').replace(/^repeti[çc][ãa]o:?\s*/,'').trim();
+  var A=pac.split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;});
+  return (PED.L||[]).filter(function(p){if(!p||p.apagado||p.status==='cancelado')return false;
+    if(E.cli&&E.cli.id&&p.cliente_id&&E.cli.id!==p.cliente_id)return false;
+    var pn=semAc(p.paciente||'').trim();if(!pn||pn.length<3)return false;
+    var B=pn.split(/[^a-z0-9]+/).filter(function(w){return w.length>=3;}),inter=A.filter(function(w){return B.indexOf(w)>=0;}).length;
+    var samePac=(A.length&&B.length)&&(inter===A.length||inter===B.length||inter>=2);if(!samePac)return false;
+    var pd=(p.dentes||[]),sameD=ds.length&&pd.length?ds.some(function(d){return pd.indexOf(d)>=0;}):false;
+    var pt=semAc(p.trabalho||'').replace(/^repeti[çc][ãa]o:?\s*/,'').trim(),sameT=tr&&pt&&(pt.indexOf(tr)>=0||tr.indexOf(pt)>=0);
+    return sameD||sameT;}).sort(function(a,b){return (b.numero||0)-(a.numero||0);});}
+function pclMonta(){var E=PC.ed,s=pedServ(E.trabalho),res;if(E&&!E._repete)E._repete=pclRepete(E);
   if(s||!E._tudo){var r0=s?null:anaEntende(E.trabalho+(E.dentes.length?' '+E.dentes.join(' e '):''));
     var it=r0&&r0.itens.length===1?r0.itens[0]:{trabalho:E.trabalho,daTabela:!!s,material:'',sobre_implante:/implant/i.test(E.trabalho)&&!/sobre dente/i.test(E.trabalho),componente:E.componente||''};
     if(E.componente&&!it.componente)it.componente=E.componente;
@@ -8095,9 +8106,10 @@ function pclMonta(){var E=PC.ed,s=pedServ(E.trabalho),res;
   else res={itens:E._tudo.itens,tipo:E._tudo.tipo};
   res.cliente=E.cli;res.paciente=E.paciente;res.cor=E.cor;res.prazo=E.prazo;res.urgente=E.urgente;
   res.texto=[E.cli?E.cli.nome:E.cliTxt,E.paciente,E.trabalho,E.dentes.join(', '),E.cor].filter(Boolean).join(' · ');
-  var L=anaPedidos(res),mt=pclMat(E);L.forEach(function(p){if(mt&&!p.material)p.material=mt.slice(0,60);p.descricao=('Pedido montado com a Ana: '+res.texto).slice(0,4000);var o=[];if(!E.cli&&E.cliTxt)o.push('Cliente: '+E.cliTxt+' (sem cadastro)');if(E.obs)o.push(E.obs);p.obs=o.join('\n')||null;});
+  var L=anaPedidos(res),mt=pclMat(E);L.forEach(function(p){if(mt&&!p.material)p.material=mt.slice(0,60);p.descricao=('Pedido montado com a Ana: '+res.texto).slice(0,4000);var o=[];if(!E.cli&&E.cliTxt)o.push('Cliente: '+E.cliTxt+' (sem cadastro)');if(E.obs)o.push(E.obs);if(E._repete&&E._repete.length){var rp=E._repete[0];o.push('REPETIÇÃO do pedido #'+(rp.numero||'')+(rp.paciente?' ('+rp.paciente+(rp.dentes&&rp.dentes.length?' · dentes '+rp.dentes.join(', '):'')+')':''));}p.obs=o.join('\n')||null;});
   return L;}
 var _pcResumoL=pcResumo;pcResumo=function(){if(PC.modo!=='lab')return _pcResumoL.apply(this,arguments);var E=PC.ed,L=pclMonta(),tot=0,sem=false;
+  if(E&&E._repete&&E._repete.length){pcAna('⚠️ Já existe pedido parecido: '+E._repete.slice(0,3).map(function(r){return '#'+(r.numero||'')+' '+esc(r.paciente||'')+(r.dentes&&r.dentes.length?' (dentes '+r.dentes.join(', ')+')':'')+' · '+esc(r.trabalho||'');}).join('<br>')+'.<br>Vou marcar este como <b>repetição</b> na observação.');}
   L.forEach(function(p){if(p.valor!=null)tot+=p.valor;else sem=true;});var pz=L[0].prazo;
   pcAna('Pronto! Confira o pedido 👇<div class="pc-res"><div><span>Cliente</span><b>'+esc(E.cli?E.cli.nome:E.cliTxt+' (sem cadastro)')+'</b></div>'+(E.paciente?'<div><span>Paciente</span><b>'+esc(E.paciente)+'</b></div>':'')+
     L.map(function(p){return '<div><span>Trabalho</span><b>'+esc(p.trabalho)+'</b></div>'+(p.dentes&&p.dentes.length?'<div><span>Dentes</span><b>'+p.dentes.join(', ')+' ('+p.qtd+')</b></div>':'');}).join('')+
