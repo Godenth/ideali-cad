@@ -8093,14 +8093,35 @@ function pclCliBarra(){var L=(typeof pclClis==='function'?pclClis():[]).slice().
     '<button type="button" class="pc-c" data-pcl="pdf">📎 Anexar PDF</button>'+
     '<input type="file" id="pcl-pdf" accept="application/pdf" hidden></div>'+
     '<form class="pc-in" data-pcf="1"><input id="pc-t" type="text" autocomplete="off" placeholder="Ou digite o nome do cliente" maxlength="300"><button type="submit" aria-label="Enviar">➤</button></form>';}
+function pclLePdfItero(txt){var t=String(txt||'').replace(/\r/g,'');
+  if(!/(Informa[çc][õo]es de Tratamento)|(Scan ?Body)/i.test(t))return null;
+  var out={paciente:'',dentes:[],cor:'',material:'',trabalho:''};
+  var mp=t.match(/Paciente:\s*([^\n]+)/i);if(mp)out.paciente=anaCap(mp[1].trim());
+  var a=t.search(/Informa[çc][õo]es de Tratamento/i),b=t.search(/Observa[çc][õo]es|Diagrama do dente/i);
+  var bloco=a>=0?t.slice(a,(b>a?b:t.length)):'';
+  if(/zirc[oô]nia/i.test(bloco))out.material='Zircônia';else{var mm=bloco.match(/Cer[âa]mica:\s*([A-Za-zÀ-ÿ]+)/i);if(mm)out.material=anaCap(mm[1]);}
+  var mc=bloco.match(/\b([A-D]\s?[1-4](?:[.,]5)?)\b/);if(mc)out.cor=mc[1].replace(/\s/g,'').toUpperCase().replace(',','.');
+  var ds=[];bloco.split('\n').forEach(function(ln){var m=ln.match(/^\s*(\d{2})\s+(.+)$/);if(!m)return;var d=+m[1];if(d<11||d>48)return;
+    if(!/scan ?body|coroa|faceta|elemento|ponte|pr[oó]tese|sobre implante|parafus|zirc|metalocer|cer[âa]mica|implante/i.test(m[2]))return;if(ds.indexOf(d)<0)ds.push(d);});
+  out.dentes=ds.sort(function(x,y){return x-y;});
+  if(/scan ?body/i.test(bloco))out.trabalho='Scan Body sobre implante'+(out.material?' · '+out.material:'');
+  else if(out.dentes.length)out.trabalho=(anaTrabTipo(bloco)||'Coroa')+(/implante|parafus/i.test(bloco)?' sobre implante':'')+(out.material?' · '+out.material:'');
+  return (out.paciente||out.dentes.length||out.cor)?out:null;}
 function pclLePdf(f){if(!f)return;if(!(/pdf/i.test(f.type||'')||/\.pdf$/i.test(f.name||''))){toast('Escolha um arquivo PDF.');return;}
   if(typeof extTexto!=='function'){toast('Não consegui abrir o PDF agora.');return;}
   pcEu('📎 '+esc(f.name));pcAna('Lendo o PDF…');
-  extTexto(f).then(function(txt){var r=null;try{r=anaEntende(txt||'');}catch(x){r=null;}var E=PC.ed;if(!E)return;
-    if(r){var ds=[];(r.itens||[]).forEach(function(it){(it.dentes||[]).forEach(function(d){if(ds.indexOf(d)<0)ds.push(d);});});
-      if(r.paciente)E.paciente=r.paciente;if(ds.length)E.dentes=ds.sort(function(a,b){return a-b;});if(r.cor)E.cor=r.cor;
+  extTexto(f).then(function(txt){var E=PC.ed;if(!E)return;var itero=pclLePdfItero(txt);
+    if(itero){if(itero.paciente)E.paciente=itero.paciente;if(itero.dentes&&itero.dentes.length)E.dentes=itero.dentes;if(itero.cor)E.cor=itero.cor;if(itero.material)E.material=itero.material;if(itero.trabalho)E.trabalho=itero.trabalho;E._pinfo=true;
+      var rI=[];if(E.paciente)rI.push('paciente <b>'+esc(E.paciente)+'</b>');if(E.trabalho)rI.push(esc(E.trabalho));if(E.dentes&&E.dentes.length)rI.push('🦷 '+E.dentes.join(', '));if(E.cor)rI.push('🎨 '+esc(E.cor));
+      pcAna('Li o PDF 📄 Anotei '+rI.join(' · ')+'.');
+      if(PC.passo==='cliente'){if(E.cli){pcAna('Cliente: <b>'+esc(E.cli.nome)+'</b>.');pcProx();}else pcAna('Agora escolha o cliente no menu acima.');}
+      else if(E._pinfo)pcProx();return;}
+    var t2=String(txt||'').split(/Diagrama do dente/i)[0].split('\n').filter(function(l){return !/Modelo do|scanner|Assinatura|Licen[çc]a/i.test(l);}).join('\n');
+    var r=null;try{r=anaEntende(t2);}catch(x){r=null;}
+    if(r){var dsv=[];(r.itens||[]).forEach(function(it){(it.dentes||[]).forEach(function(d){if(dsv.indexOf(d)<0)dsv.push(d);});});
+      if(r.paciente)E.paciente=r.paciente;if(dsv.length&&dsv.length<=6)E.dentes=dsv.sort(function(a,b){return a-b;});if(r.cor)E.cor=r.cor;
       var it0=(r.itens||[]).filter(function(x){return x.trabalho;})[0];if(it0&&it0.trabalho)E.trabalho=it0.trabalho;
-      if(!E.cli){var ach=pclAcha(txt||'');if(ach.length===1)E.cli=ach[0];}
+      if(!E.cli){var ach=pclAcha(t2);if(ach.length===1)E.cli=ach[0];}
       if(E.paciente||E.trabalho||(E.dentes&&E.dentes.length)||E.cor)E._pinfo=true;}
     var res=[];if(E.paciente)res.push('paciente <b>'+esc(E.paciente)+'</b>');if(E.trabalho)res.push(esc(E.trabalho));if(E.dentes&&E.dentes.length)res.push('🦷 '+E.dentes.join(', '));if(E.cor)res.push('🎨 '+esc(E.cor));
     pcAna(res.length?'Li o PDF 📄 Anotei '+res.join(' · ')+'.':'Li o PDF, mas não consegui identificar os dados. Pode digitar.');
