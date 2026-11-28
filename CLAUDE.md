@@ -21,7 +21,6 @@ Fale com o dono em português do Brasil simples e curto. Ele usa o sistema todo 
 - Banco antigo `alqhhgysvehtgkwsxeok` é só leitura. Não mexa nos projetos Supabase de advocacia.
 - Nunca cole segredos em chat, código ou commit.
 - Visual sóbrio, nada infantil.
-- Financeiro do Odonto: o **valor de cada pedido** é o preço da tabela (ou o valor salvo no pedido). O **valor do mês** é o fechamento/extrato do laboratório. Não ratear, não fazer média e não mostrar "≈".
 
 ## Jeito do código
 - Módulos novos entram antes do marcador `/* conta real: nada de dados de exemplo no painel */`.

@@ -1787,7 +1787,7 @@ body.bn3-on .toast{bottom:calc(166px + env(safe-area-inset-bottom));z-index:130}
 .pdb>*,.pdb-g2>*{min-width:0}.pdb .card{min-width:0;max-width:100%}.fz-g{min-width:0;max-width:100%}
 .pdb .card,.fz-g{grid-template-columns:minmax(0,1fr)}.pdb .card>*,.fz-g>*{min-width:0}
 .fz-vis{width:fit-content;max-width:100%}
-.pdb-nota{margin:0;font-size:.8rem;color:var(--muted)}.pdb-nota.pdb-dif-up{color:#B91C1C;font-weight:600}.pdb-nota.pdb-dif-down{color:#15803D;font-weight:600}[data-theme=dark] .pdb-nota.pdb-dif-up{color:#F87171}[data-theme=dark] .pdb-nota.pdb-dif-down{color:#4ADE80}
+.pdb-nota{margin:0;font-size:.8rem;color:var(--muted)}
 .pmes-seg{display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:var(--soft);border:1px solid var(--line)}.pmes-seg button{all:unset;cursor:pointer;padding:6px 12px;border-radius:9px;font-size:.84rem;font-weight:600;color:var(--muted)}.pmes-seg button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}.pmes{justify-content:flex-start}.pmes-n{margin-left:auto;color:var(--muted);font-size:.86rem}.pmes-n b{color:var(--ink)}
 
 /* Pedidos da clínica · tela única */
@@ -4733,7 +4733,6 @@ function rCfgConta(){var R=typeof RL!=='undefined'?RL:{},p=R.perfil||{},c=S.cad,
   return '<section class="card cfg-c"><h2>Minha conta</h2>'+[['Nome',p.nome||c.nome],['E-mail de acesso',em],['WhatsApp',p.whats?rlTel(p.whats):c.whats],['Profissão',p.prof||c.prof],['Cargo',p.cargo||c.cargo],['Cidade',(p.cidade||c.cidade||'')+((p.uf||c.uf)?' / '+(p.uf||c.uf):'')],['Tipo de conta',R.admin?'👑 Conta master':'Profissional']].map(function(x){return '<div class="cfg-l"><span>'+x[0]+'</span><b>'+esc(x[1]||'—')+'</b></div>';}).join('')+
     '<div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap"><button class="btn" data-act="cfgVai" data-v="perfil">Editar currículo</button>'+(R.user?'<button class="btn" data-act="cfgSenha">Trocar senha</button><button class="btn danger" data-rl="sair">Sair</button>':'')+'</div></section>';}
 function rCfgEmpresa(N){var T=negT();return '<section class="card cfg-c"><h2>'+T.ic+' Minha empresa</h2>'+(typeof labVRecebidos==='function'?labVRecebidos():'')+[EMP.row&&EMP.row.codigo?['Seu ID no Ideali',labIdTxt(EMP.row.codigo)+' (passe este número para os dentistas te convidarem)']:null,['Nome',N.nome],['Tipo',T.t],['Cidade',N.cid+' / '+N.uf],['Seu papel',N.papel==='faz'?'Dono e responsável técnico':'Dono, cuida da gestão'],N.rt?['Responsável técnico',N.rt]:null,['Criada em',N.criado?String(N.criado).split('-').reverse().join('/'):'—']].filter(Boolean).map(function(x){return '<div class="cfg-l"><span>'+x[0]+'</span><b>'+esc(x[1]||'—')+'</b></div>';}).join('')+
-  ((typeof negEhLab==='function'&&negEhLab(N)&&!ESP.dono)?'<section class="card cfg-c"><h2>🔗 Conectar clínica</h2><p class="small muted">Envie o link para a clínica entrar/criar a conta e conectar o laboratório. Depois, em Laboratório → Laboratórios, você escolhe qual cliente seu é ela para ela ver os pedidos.</p><div class="row wrap" style="gap:8px;margin-top:8px"><button class="btn pri" data-act="labConvidaCli">📨 Convidar clínica</button></div></section>':'')+
   '<div class="row" style="margin-top:12px"><button class="btn danger" data-act="negApaga">Apagar empresa de teste</button></div></section>'+
   ((typeof negEhLab==='function'&&negEhLab(N)&&!ESP.dono)?'<section class="card cfg-c"><h2>Operação</h2><p class="small muted">Atalhos do dia a dia dos pedidos.</p><div class="row wrap" style="gap:8px;margin-top:8px"><button class="btn" data-act="cfgOper" data-v="cadistas">✏️ Cadistas</button><button class="btn" data-act="cfgOper" data-v="pfx">🧹 Fechar antigos</button><button class="btn" data-act="cfgOper" data-v="prazos">⏱️ Mapa de prazos</button></div></section>':'');}
 function rCfgArmaz(){var R=typeof RL!=='undefined'?RL:{},N=S.neg,cli=(typeof EMP!=='undefined'&&EMP.cli)?EMP.cli.length:0;
@@ -5555,7 +5554,6 @@ function donoId(){return ESP.dono||MEM.dono||(RL.user&&RL.user.id);}
 function espLS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}return null;}
 (function(){var m=location.search.match(/[?&]espelho=([a-f0-9]{64})/);if(m){espLS('io_esp_token',m[1]);try{history.replaceState(null,'',location.pathname);}catch(e){}
   setTimeout(function(){toast('Convite de conta espelho: entre ou crie o seu login para aceitar.');},600);}})();
-(function(){var ml=location.search.match(/[?&]lab=([0-9]{1,6})/i);if(ml){window.__LAB_INVITE=ml[1];}})();
 function espPrepara(){var u=RL.user;if(!u)return Promise.resolve();var tk=espLS('io_esp_token');
   var p=tk?SB.rpc('odo_parceiro_aceita',{p_token:tk}).then(function(r){espLS('io_esp_token',null);if(r.error)toast(/inv[aá]lido|vencido|cancelado/i.test(r.error.message||'')?'Este convite não vale mais. Peça um novo.':'Não consegui aceitar o convite.');else{espLS('io_esp_dono',r.data);toast('Convite aceito! Você está vendo a conta espelho.');}}):Promise.resolve();
   var pq=function(c){return SB.from('odo_parceiros').select(c).eq('parceiro_id',u.id).eq('ativo',true);};
@@ -6413,7 +6411,7 @@ function aiAbre(){if(document.getElementById('aipan'))return;AI.on=true;if(!AI.m
   d.addEventListener('click',function(e){var b=e.target.closest('[data-ai]');if(e.target===d){aiFecha();return;}if(!b)return;var a=b.getAttribute('data-ai'),v=b.getAttribute('data-v');
     if(a==='fecha')aiFecha();else if(a==='cli'){AI.cli=v;aiRender();}else if(a==='lanca')aiLancaComp();else if(a==='invest')aiInvest(v);else if(a==='abrirmes')aiAbreMes(v);else if(a==='baixalista')invCopiaLista();else if(a==='verif'){if(!AI.busy)aiVerifica();}else if(a==='extconf')aiExtConfirma(v);else if(a==='extpula')aiExtPula(v);else if(a==='cancela'){AI.comp=null;aiDiz('Tudo bem, não lancei nada.');}});
   d.addEventListener('input',function(e){if(e.target.classList.contains('ai-q')){AI.q=e.target.value;d.querySelector('.ai-lista').innerHTML=aiLista();}});
-  d.addEventListener('change',function(e){var t=e.target;if(t.id==='ai-ext'){var fs=[].slice.call(t.files||[]);t.value='';aiExtratos(fs);}else if(t.id==='ai-comp'){var f=(t.files||[])[0];t.value='';if(f)aiComprovante(f);}else if(t.id==='ai-rel'){var f2=(t.files||[])[0];t.value='';if(f2)aiRelatorio(f2);}else if(t.id==='ai-relx'){var f3=(t.files||[])[0];t.value='';if(f3)aiRelatorio(f3,true);}});
+  d.addEventListener('change',function(e){var t=e.target;if(t.id==='ai-ext'){var fs=[].slice.call(t.files||[]);t.value='';aiExtratos(fs);}else if(t.id==='ai-comp'){var f=(t.files||[])[0];t.value='';if(f)aiComprovante(f);}else if(t.id==='ai-rel'){var f2=(t.files||[])[0];t.value='';if(f2)aiRelatorio(f2);}});
   document.addEventListener('keydown',aiEsc);}
 function aiEsc(e){if(e.key==='Escape')aiFecha();}
 function aiFecha(){var d=document.getElementById('aipan');if(d)d.remove();AI.on=false;document.removeEventListener('keydown',aiEsc);render();}
@@ -6514,19 +6512,15 @@ function aiInvest(v){var a=v.split('|'),k=a[0],ano=+a[1],mes=+a[2],sa=+a[3],c=EM
     else if(dif<-1)aiDiz('🧮 A Inove registra <b>'+fmtR(-dif)+'</b> a menos do que consta aqui em aberto. Possivelmente ela recebeu pagamento que <b>não tem comprovante anexado aqui</b>.',false,'erro');
     else aiDiz('🧮 O saldo anterior da Inove bate com os comprovantes daqui.');
     aiDiz('📩 Para eu fechar a investigação: <b>me envie o extrato de comprovantes da Inove 3D do seu LabFácil</b>, aquele relatório com o registro dos pagamentos recebidos de '+esc(c.nome)+'. Eu comparo item por item e te digo exatamente o que falta de cada lado.<div class="ai-form"><label class="btn pri">📑 Enviar relatório do LabFácil<input type="file" id="ai-rel" accept="application/pdf,image/*" hidden></label></div>');});}
-function aiRelatorio(f,ext){var I=AI.inv;if(!I){aiDiz('Primeiro toque em "Investigar o ocorrido" no aviso vermelho.');return;}aiDiz(ext?'📑 Extrato de pagamento':'📑 Relatório do LabFácil',true);AI.busy=true;aiRender();
-  var ds=I.L.map(function(x){return (x.r&&x.r.data)||x.p.data;}).filter(Boolean).sort(),d0=ds.length?new Date(ds[0]+'T00:00:00')-7*864e5:0,d1=ds.length?+new Date(ds[ds.length-1]+'T00:00:00')+7*864e5:0;
-  aiTextoArq(f).then(function(tx){var R=[];String(tx).split('\n').forEach(function(l){var d=l.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/),vs=l.match(/-?\d{1,3}(?:\.\d{3})*,\d{2}/g);if(!d||!vs)return;var v0=extNum(vs[0]),v=Math.abs(v0),dt=d[3]+'-'+d[2]+'-'+d[1];
-      if(ext){if(v0<0||/-\s*R\$\s*\d/.test(l))return;if(d0&&(new Date(dt+'T00:00:00')<d0||new Date(dt+'T00:00:00')>d1))return;}
-      if(v>0)R.push({data:dt,valor:v,linha:l.trim().slice(0,90)});});
+function aiRelatorio(f){var I=AI.inv;if(!I){aiDiz('Primeiro toque em "Investigar o ocorrido" no aviso vermelho.');return;}aiDiz('📑 Relatório do LabFácil',true);AI.busy=true;aiRender();
+  aiTextoArq(f).then(function(tx){var R=[];String(tx).split('\n').forEach(function(l){var d=l.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/),vs=l.match(/-?\d{1,3}(?:\.\d{3})*,\d{2}/g);if(!d||!vs)return;var v=Math.abs(extNum(vs[0]));if(v>0)R.push({data:d[3]+'-'+d[2]+'-'+d[1],valor:v,linha:l.trim().slice(0,90)});});
     AI.busy=false;if(!R.length){aiDiz('Não encontrei datas e valores neste arquivo. Ele precisa ter a lista dos pagamentos com data e valor (PDF ou foto nítida).',false,'erro');return;}
     var nossos=I.L.slice(),usados={},soAqui=[],ambos=0;
     nossos.forEach(function(x){var j=-1;R.forEach(function(r,i){if(j<0&&!usados[i]&&Math.abs(r.valor-(+x.p.valor))<0.01&&(!x.p.data||Math.abs(new Date(r.data)-new Date(x.p.data))<=6*864e5))j=i;});if(j>=0){usados[j]=1;ambos++;}else soAqui.push(x);});
     var soLa=R.filter(function(r,i){return !usados[i];});
-    var nmL=ext?'seu extrato':'LabFácil';
-    aiDiz('🔍 <b>Comparação com o '+nmL+'</b> ('+R.length+(ext?' entradas no extrato no período':' pagamentos no relatório')+')<br>✅ Batem dos dois lados: <b>'+ambos+'</b>'+
-      (soAqui.length?'<br><br>❗ <b>Estão aqui mas NÃO no '+nmL+'</b>'+(ext?' (confira se o dinheiro caiu mesmo)':' (a Inove precisa dar baixa)')+':<br>'+soAqui.map(invChip).join(' '):'')+
-      (soLa.length?'<br><br>❗ <b>Estão no '+nmL+' mas NÃO aqui</b> ('+(ext?'pode ser pagamento de outro cliente, ou falta anexar o comprovante no Ideali':'falta anexar o comprovante no Ideali')+'):<br>'+soLa.map(function(r){return '<span class="ih-tag">'+invDt(r.data)+' · '+fmtR(r.valor)+'</span>';}).join(' '):'')+
+    aiDiz('🔍 <b>Comparação com o LabFácil</b> ('+R.length+' pagamentos no relatório)<br>✅ Batem dos dois lados: <b>'+ambos+'</b>'+
+      (soAqui.length?'<br><br>❗ <b>Estão aqui mas NÃO no LabFácil</b> (a Inove precisa dar baixa):<br>'+soAqui.map(invChip).join(' '):'')+
+      (soLa.length?'<br><br>❗ <b>Estão no LabFácil mas NÃO aqui</b> (falta anexar o comprovante no Ideali):<br>'+soLa.map(function(r){return '<span class="ih-tag">'+invDt(r.data)+' · '+fmtR(r.valor)+'</span>';}).join(' '):'')+
       (!soAqui.length&&!soLa.length?'<br><br>Tudo bate! A diferença deve estar em outro lançamento (por exemplo, um serviço cobrado em dobro). Confira o extrato com o laboratório.':'<br><br>Resolvendo esses itens, o extrato volta a bater e eu consigo anexar.'),false,soAqui.length||soLa.length?'erro':'');}).catch(function(){AI.busy=false;aiDiz('Não consegui ler esse arquivo.',false,'erro');});}
 
 /* ===== Investigação v2: confere comprovante por comprovante (data, hora, código), acha duplicados e só então pede o LabFácil ===== */
@@ -6611,8 +6605,7 @@ function invTicado(id){try{return localStorage.getItem(invTickK(id))==='1';}catc
 function invPlanilhaHtml(){var I=AI.inv;if(!I)return '';var L=I.L,n=L.filter(function(x){return invTicado(x.p.id);}).length,tot=L.reduce(function(s,x){return s+(+x.p.valor);},0);
   return '<b>📊 Planilha de comprovantes · '+esc(I.nome)+'</b><div class="inv-pl"><div class="inv-pr inv-ph"><span>✓</span><span>#</span><span>Data e hora</span><span>Valor</span><span>Código</span><span>Mês</span><span>Arquivo</span></div>'+
     L.map(function(x,i){var r=x.r||{},t=invTicado(x.p.id);return '<label class="inv-pr'+(t?' ok':'')+(x.dup?' dup':'')+'"><span><input type="checkbox" data-tick="'+x.p.id+'"'+(t?' checked':'')+'></span><span>'+(i+1)+'</span><span>'+invDt(r.data||x.p.data)+(r.hora?' '+r.hora.slice(0,5):'')+'</span><span>'+fmtR(x.p.valor)+'</span><span><code>'+esc(invCodCurto(r.cod)||'—')+'</code></span><span>'+MESES[x.m.mes-1].slice(0,3)+'</span><span>'+(x.p.comprovante_path?'<button type="button" class="ih-ver" data-act="finArqVer" data-v="'+esc(x.p.comprovante_path)+'">📎 abrir</button>':'—')+'</span></label>';}).join('')+
-    '<div class="inv-pr inv-pf"><span></span><span></span><span><b>Total</b></span><span><b>'+fmtR(tot)+'</b></span><span></span><span></span><span class="'+(n===L.length?'okt':'')+'">'+n+'/'+L.length+' ✓</span></div></div>'+
-    '<div class="ai-form"><label class="btn pri">📑 Anexar extrato de pagamento<input type="file" id="ai-relx" accept="application/pdf,image/*" hidden></label><small class="muted"> Eu comparo o seu extrato com esta planilha, item por item.</small></div>';}
+    '<div class="inv-pr inv-pf"><span></span><span></span><span><b>Total</b></span><span><b>'+fmtR(tot)+'</b></span><span></span><span></span><span class="'+(n===L.length?'okt':'')+'">'+n+'/'+L.length+' ✓</span></div></div>';}
 function invPlanilha(){var I=AI.inv;if(!I||!I.L.length)return;AI.ticks=AI.ticks||{};aiDiz('Agora vamos <b>conferir juntos</b> 🤝 Abra cada comprovante e vá <b>ticando ✓</b> os que você também tem aí. Quando ticar todos, eu te digo o próximo passo.');aiDiz('',false,'zpl',invPlanilhaHtml);}
 document.addEventListener('change',function(e){var t=e.target;if(!t.getAttribute||!t.getAttribute('data-tick'))return;var id=t.getAttribute('data-tick');try{if(t.checked)localStorage.setItem(invTickK(id),'1');else localStorage.removeItem(invTickK(id));}catch(x){}AI.ticks=AI.ticks||{};AI.ticks[id]=t.checked;aiRender();
   var I=AI.inv;if(!I)return;var falt=I.L.filter(function(x){return !invTicado(x.p.id);});if(falt.length||I.fimDito)return;I.fimDito=true;
@@ -6690,7 +6683,7 @@ function labVRecebidos(){var R=labVRec();if(!R.length)return '';
     (v.status==='pendente'?'<button class="btn sm pri" data-act="labResp" data-v="'+v.id+'|1">Aceitar</button><button class="btn sm" data-act="labResp" data-v="'+v.id+'|0">Recusar</button>':'<span class="labv-st '+v.status+'">'+(v.status==='aceito'?'✅ Conectado':'Recusado')+'</span>')+'</div>';}).join('')+'</div>';}
 function labLeId(){var el=document.getElementById('labv-id');if(el)LABV.q=el.value;return parseInt(String(LABV.q).replace(/\D/g,''),10);}
 Object.assign(ACT,{
-  labConvAbre:function(){LABV.abre=true;LABV.busca=null;if(window.__LAB_INVITE&&!LABV.q)LABV.q=window.__LAB_INVITE;render();setTimeout(function(){var el=document.getElementById('labv-id');if(el){el.focus();if(window.__LAB_INVITE&&!LABV._invBusca){LABV._invBusca=true;ACT.labBusca();}}},60);},
+  labConvAbre:function(){LABV.abre=true;LABV.busca=null;render();setTimeout(function(){var el=document.getElementById('labv-id');if(el)el.focus();},50);},
   labConvFecha:function(){LABV.abre=false;LABV.busca=null;LABV.q='';render();},
   labBusca:function(){var n=labLeId();if(!n){toast('Digite o número do ID.');return;}LABV.busy=true;render();
     SB.rpc('odo_lab_busca',{p_codigo:n}).then(function(r){LABV.busy=false;if(r.error){LABV.busca=null;toast(/odo_lab_busca|function/.test(r.error.message||'')?'Falta rodar a atualização 056 no Supabase.':'Não consegui procurar agora.');}else LABV.busca=r.data||false;render();});},
@@ -6702,28 +6695,6 @@ Object.assign(ACT,{
 document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='labv-id'&&e.key==='Enter'){e.preventDefault();ACT.labBusca();}});
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='labv-id')LABV.q=e.target.value;});
 var _rlEntraLab=rlEntra;rlEntra=function(){_rlEntraLab.apply(this,arguments);if(RL.user&&!LABV.carregando){LABV.carregando=true;labVCarrega().then(function(){LABV.carregando=false;},function(){LABV.carregando=false;});}};
-function labConviteUrl(){if(!EMP.row||!EMP.row.codigo)return '';return location.origin+location.pathname.replace(/index\.html$/,'')+'?lab='+encodeURIComponent(labIdTxt(EMP.row.codigo));}
-function labConvidaCli(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espelho: só leitura.');return;}if(!EMP.row||!EMP.row.codigo){toast('Falta o ID da empresa.');return;}if(document.getElementById('labc-ov'))return;
-  var url=labConviteUrl(),id=labIdTxt(EMP.row.codigo),nm=(S.neg&&S.neg.nome)||'laboratório';
-  var msg='Olá! Aqui é do '+nm+'. Para você acompanhar seus pedidos no Ideali, entre ou crie sua conta e conecte o nosso laboratório pelo link: '+url+' (ID do laboratório: '+id+').';
-  var bs='padding:10px 14px;border-radius:10px;cursor:pointer;font:inherit;font-weight:700;border:0;';
-  var d=document.createElement('div');d.id='labc-ov';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Convidar clínica');
-  d.style.cssText='position:fixed;inset:0;z-index:120;background:rgba(10,12,24,.55);display:flex;align-items:center;justify-content:center;padding:18px';
-  d.setAttribute('data-msg',msg);
-  d.innerHTML='<div style="background:var(--surface,#fff);color:var(--ink,#111);border:1px solid var(--line,#ddd);border-radius:16px;max-width:min(540px,94vw);width:100%;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.35)">'+
-    '<div style="display:flex;align-items:center;margin-bottom:6px"><b style="font-size:1.05rem">Convidar clínica</b><span style="flex:1"></span><button type="button" data-labc="fecha" aria-label="Fechar" style="border:0;background:none;font-size:1.4rem;line-height:1;cursor:pointer;color:inherit">×</button></div>'+
-    '<p style="margin:0 0 10px;color:var(--muted,#666);font-size:.9rem">Mande este link para a clínica. Ela entra ou cria a conta, conecta o laboratório e aceita. Depois, em <b>Laboratório → Laboratórios</b>, escolha qual cliente seu é ela para liberar os pedidos.</p>'+
-    '<input id="labc-url" readonly value="'+esc(url)+'" style="width:100%;padding:10px;border:1px solid var(--line,#ddd);border-radius:10px;font:inherit;font-size:.85rem;background:var(--soft,#f7f7f7);color:inherit">'+
-    '<p style="margin:8px 0 0;font-size:.82rem;color:var(--muted,#666)">ID do laboratório: <b>'+esc(id)+'</b></p>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button type="button" data-labc="copia" style="'+bs+'background:var(--soft,#f2f2f2);color:inherit;border:1px solid var(--line,#ddd)">📋 Copiar link</button><button type="button" data-labc="wa" style="'+bs+'background:#25D366;color:#fff">💬 WhatsApp</button></div>'+
-    '<p style="margin:12px 0 0;font-size:.8rem;color:var(--muted,#666)">Cliente já lançado no laboratório? Depois de conectar, selecione o cliente em Laboratório → Laboratórios para os pedidos antigos aparecerem para a clínica.</p></div>';
-  document.body.appendChild(d);}
-Object.assign(ACT,{labConvidaCli:labConvidaCli});
-document.addEventListener('click',function(e){var ov=document.getElementById('labc-ov');if(!ov)return;var b=e.target&&e.target.closest&&e.target.closest('[data-labc]');if(!b){if(e.target===ov)ov.remove();return;}var a=b.getAttribute('data-labc');
-  if(a==='fecha'){ov.remove();return;}
-  if(a==='copia'){var inp=document.getElementById('labc-url');if(inp&&inp.value){try{navigator.clipboard.writeText(inp.value);toast('Link copiado.');}catch(x){inp.select();try{document.execCommand('copy');toast('Link copiado.');}catch(y){}}}}
-  else if(a==='wa'){var m=ov.getAttribute('data-msg')||'';window.open('https://wa.me/?text='+encodeURIComponent(m),'_blank');}},true);
-var _renderLabInv=render;render=function(){try{if(window.__LAB_INVITE&&typeof RL!=='undefined'&&RL.user&&S.role==='dent'&&!window.__LAB_INV_ROUTED){window.__LAB_INV_ROUTED=true;S.tab[S.role]='pedidos';S.labSub='labs';if(typeof LABV!=='undefined'){LABV.abre=true;LABV.q=window.__LAB_INVITE;}var r=_renderLabInv.apply(this,arguments);setTimeout(function(){try{if(typeof ACT!=='undefined'&&ACT.labBusca&&typeof LABV!=='undefined'&&LABV.abre)ACT.labBusca();}catch(e){}},140);return r;}}catch(e){}return _renderLabInv.apply(this,arguments);};
 
 /* ===== Pedido digital: dentista → laboratório conectado (escaneamento + fotos; arquivos apagam em 3 dias) ===== */
 var PDG={L:[],carregado:false,erro:'',ed:null,busy:false,prog:'',sel:[],aviso:false,resp:{}};
@@ -7378,11 +7349,6 @@ pdgEnviadosHtml=function(){var M=pdgFiltra(pdgMeus());if(!M.length)return '';
 /* arquinho de dentes desenhado na ficha (marca os dentes do pedido) */
 function cxMiniArco(ds){var f=function(L,y,dir){return L.map(function(n,i){var x=6+i*9.2,on=ds.indexOf(n)>=0,yy=y+dir*Math.pow(Math.abs(i-7.5)/7.5,2)*-9;return '<rect x="'+x.toFixed(1)+'" y="'+yy.toFixed(1)+'" width="7" height="9" rx="2.5" class="'+(on?'on':'')+'"/>';}).join('');};
   return '<svg viewBox="0 0 160 46" aria-hidden="true">'+f(OA_UP,10,1)+f(OA_LO,27,-1)+'</svg>';}
-function cxArcoNum(ds){ds=ds||[];var w=16,h=22,g=2,x0=2,W=x0*2+OA_UP.length*(w+g)-g,H=84;
-  var row=function(L,y,dir){return L.map(function(n,i){var x=x0+i*(w+g),on=ds.indexOf(n)>=0,yy=y+dir*Math.pow(Math.abs(i-7.5)/7.5,2)*-6;
-    return '<g><rect x="'+x.toFixed(1)+'" y="'+yy.toFixed(1)+'" width="'+w+'" height="'+h+'" rx="4" style="fill:'+(on?'#F59E0B':'#fff')+';stroke:'+(on?'#B45309':'#c9cede')+';stroke-width:1.2"/>'+
-      '<text x="'+(x+w/2).toFixed(1)+'" y="'+(yy+h/2).toFixed(1)+'" style="font:600 8.5px Arial,sans-serif;fill:'+(on?'#3B2600':'#555')+';text-anchor:middle;dominant-baseline:central">'+n+'</text></g>';}).join('');};
-  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Odontograma: dentes '+ds.join(', ')+'" style="width:min(320px,100%);height:auto;display:block;margin:0 auto">'+row(OA_UP,12,1)+row(OA_LO,48,-1)+'</svg>';}
 
 /* ===== Clínica: aba Financeiro (trabalhos enviados aos laboratórios e quanto custou, pela tabela do laboratório) ===== */
 var DFL={d:null,carregando:false,erro:'',mes:null,lab:''};
@@ -7674,7 +7640,7 @@ function uniAplica(d){var u=RL.user&&contaId();UNI.dono=d.dono!==false;PDG.labNo
   var env=(d.envios||[]).map(function(e){e._uni=true;if(e.lab_nome)PDG.labNome[e.lab_id]=e.lab_nome;return e;});
   var lab=(d.pedidos||[]).map(function(p){if(p.lab_nome)PDG.labNome[p.lab_id]=p.lab_nome;
     return {id:'lab-'+p.id,user_id:u,lab_id:p.lab_id,lab_nome:p.lab_nome,numero:p.numero,paciente:p.paciente,itens:[{trabalho:uniTrab(p),dentes:p.dentes||[],material:p.material||''}],cor:p.cor,urgente:p.urgente,
-      status:'aceito',etapa:p.etapa,etapa_em:p.entregue_em||p.finalizado_em||p.atualizado_em,falta_info:p.falta_info,aguardando_pendencia:p.aguardando_pendencia,motivo_pendencia:p.motivo_pendencia,pendencia_aguardando_conferencia:p.pendencia_aguardando_conferencia,parado:p.parado,aberto:p.aberto,prazo_min:p.prazo_min,prazo_max:p.prazo_max,faixa:p.faixa,
+      status:'aceito',etapa:p.etapa,etapa_em:p.entregue_em||p.finalizado_em||p.atualizado_em,falta_info:p.falta_info,parado:p.parado,aberto:p.aberto,prazo_min:p.prazo_min,prazo_max:p.prazo_max,faixa:p.faixa,
       criado_em:p.criado_em,enviado_em:p.criado_em,arquivos:[],importado:true,_uni:true};});
   /* fica o que este usuário RECEBEU como laboratório; o que é dele como clínica vem todo da leitura única */
   PDG.L=PDG.L.filter(function(e){return e.user_id!==u&&!e.importado;}).concat(env,lab).sort(function(a,b){return String(b.criado_em).localeCompare(String(a.criado_em));});
@@ -8318,18 +8284,18 @@ function kcCard(e,ab){var s=cliSt(e),ds=cxDentes(e),pz=kcPrazo(e),lab=cliLab(e),
     (ab?kcDet(e,s,ds,tr,lab,pz,i):'')+
     (s==='pend'&&!ab?'<div class="kc-pend"><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p>'+(e.resposta?'<small>Você respondeu: '+esc(e.resposta)+'</small>':'')+'</div>':'')+
     (e.aguardando_pendencia&&!ab?'<div class="kc-pend"><p><b>Pendência do laboratório:</b> '+esc(e.motivo_pendencia||'O laboratório precisa de uma informação sua.')+'</p>'+(e.pendencia_aguardando_conferencia?'<small>Resposta enviada. Aguardando conferência do laboratório.</small>':'')+'</div>':'')+
-      '<div class="kc-pe">'+(s==='pend'&&!ab?'<button class="btn sm pri" data-kc="'+id+'" data-resp="1">Responder</button>':'')+(e.aguardando_pendencia&&!e.pendencia_aguardando_conferencia&&String(e.id).indexOf('lab-')!==0?'<button class="btn sm pri" data-act="cliPendConfirma" data-v="'+id+'">Confirmar pendência</button>':'')+cliChatBt(e)+
+    '<div class="kc-pe">'+(s==='pend'&&!ab?'<button class="btn sm pri" data-kc="'+id+'" data-resp="1">Responder</button>':'')+(e.aguardando_pendencia&&!e.pendencia_aguardando_conferencia?'<button class="btn sm pri" data-act="cliPendConfirma" data-v="'+id+'">Confirmar pendência</button>':'')+cliChatBt(e)+
       (cliPodeReceber(e)?'<button class="btn sm kc-rcb" data-act="cliRecebi" data-v="'+id+'">'+ic('check')+'Recebi</button>':'')+
       (e.status==='enviado'?'<button class="btn sm kc-can" data-act="pdgCancela" data-v="'+e.id+'">Cancelar</button>':'')+'</div></article>';}
-function kcDet(e,s,ds,tr,lab,pz,i){var L=function(r,v){return v?'<div><span>'+r+'</span><b>'+v+'</b></div>':'';},I=pz&&pz.I,vv=cliDono()?(valMapa()[e.id]||{v:null,tipo:'sem'}):null;
+function kcDet(e,s,ds,tr,lab,pz,i){var L=function(r,v){return v?'<div><span>'+r+'</span><b>'+v+'</b></div>':'';},I=pz&&pz.I,V=cliDono()?plxValores():{v:{},est:{}},v=V.v[e.id];
   var ii=cliEtI(e),step=s==='prod'||s==='fin'||s==='apr'||s==='pend'||s==='pronto'?'<div class="kc-tl">'+CLI_FASE.map(function(f){var feita=ii>f[2],ag=ii>=f[1]&&ii<=f[2];return '<div class="kc-fase'+(feita?' f':ag?' a':'')+'"><b>'+f[0]+'</b><ol class="kc-step" style="grid-template-columns:repeat('+(f[2]-f[1]+1)+',1fr)">'+CLI_ET.slice(f[1],f[2]+1).map(function(x,j){var k=f[1]+j,ok=k<ii;return '<li class="'+(ok?'f':k===ii?'a':'')+'"><i>'+(ok?ic('check'):k+1)+'</i><span>'+x[0]+'</span></li>';}).join('')+'</ol></div>';}).join('')+'</div>':'';
   return '<div class="kc-det">'+step+
     '<div class="kc-ficha">'+L('Paciente',esc(e.paciente||''))+L('Trabalho',esc(tr))+(cliAjuste(e)?L('Tipo','Ajuste / refação'):'')+L('Dentes',ds.join(', '))+L('Cor',esc(e.cor||''))+L('Enviado em',cliDia(e.enviado_em||e.criado_em,4))+
       (I?L('Previsão',(I.min.getTime()===I.max.getTime()?'':cliDia(I.min,false)+' a ')+cliDia(I.max,false)+' · '+(I.f[0]===I.f[1]?I.f[0]:I.f[0]+' a '+I.f[1])+' dias úteis'):'')+
       (s==='fin'&&e.etapa_em?L(e.etapa==='Pronto'?'Pronto em':'Entregue em',cliDia(e.etapa_em,4)):'')+
-      (cliDono()?'<div><span>Valor</span><b>'+valTxt(vv)+'</b></div>':'')+L('Laboratório',esc(lab))+'</div>'+
+      (v!=null?L('Valor',(V.est[e.id]?'<span title="Valor dividido do fechamento do mês">≈ ':'')+fmtR(v)+(V.est[e.id]?'</span>':'')):'')+L('Laboratório',esc(lab))+'</div>'+
     (e.partes&&e.partes.length>1?'<div class="kc-partes"><b>Itens deste pedido</b>'+e.partes.map(function(p){return '<div><span>'+esc(uniTrab(p))+(p.dentes&&p.dentes.length?' · dentes '+p.dentes.join(', '):'')+'</span><em>'+esc(p.etapa==='Aguardando informação'?'Pendência':p.etapa==='Cancelado'?'Cancelado':CLI_ET[cliEtN(p.etapa)][1])+'</em></div>';}).join('')+'</div>':'')+
-    (ds.length?'<div style="padding:2px 0">'+cxArcoNum(ds)+'</div>':'')+
+    (ds.length?'<div class="kc-arco">'+cxMiniArco(ds)+'</div>':'')+
     (e.status==='recusado'&&e.motivo?'<p class="kc-mot">Motivo: '+esc(e.motivo)+'</p>':'')+
     pendHtml(e)+
     (s==='pend'&&String(e.id).indexOf('lab-')===0?'<div class="pend"><b>'+ic('alerta')+'Pendência do laboratório</b><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p><small>Responda pelo botão Conversar aqui embaixo (dá para colar print e anexar arquivo).</small></div>':'')+
@@ -8379,15 +8345,22 @@ function cliMeses(){var M=(DFL.d&&DFL.d.meses)||[];if(M.length&&M[0].situacao)re
 function cliMesSimples(m,valor,pago,h){var q=!!h.quitado,falta=q?0:Math.max(0,Math.round((valor-pago)*100)/100);
   return {id:h.id||m.id,lab_id:m.lab_id,lab:m.lab,ano:m.ano,mes:m.mes,extrato:h.extrato||null,pagamentos:h.pagamentos||[],valor:valor,pago:pago,credito:0,pago_total:pago,falta:falta,quitado:q,
           situacao:q||(valor>0&&falta<0.005)?'pago':(valor===0&&!pago)?'zero':pago>0?'parcial':'aberto'};}
+/* Pedidos antigos vieram sem preço: o valor do fechamento do mês é dividido entre os pedidos sem preço daquele mês,
+   por elemento (marcado com ≈). Assim a soma bate com o extrato do laboratório. */
 var PDB_C={d:null,L:null};
-function pdbBase(){if(PDB_C.d===DFL.d&&PDB_C.L)return PDB_C.L;var P=((DFL.d&&DFL.d.pedidos)||[]).filter(function(p){return p.status!=='cancelado'&&p.status!=='orcamento';}).map(function(p){var o={};for(var k in p)o[k]=p[k];o._est=false;return o;});PDB_C={d:DFL.d,L:P};return P;}
+function pdbBase(){if(PDB_C.d===DFL.d&&PDB_C.L)return PDB_C.L;var P=((DFL.d&&DFL.d.pedidos)||[]).filter(function(p){return p.status!=='cancelado'&&p.status!=='orcamento';}).map(function(p){var o={};for(var k in p)o[k]=p[k];o._est=false;return o;});
+  var F={};((DFL.d&&DFL.d.meses)||[]).forEach(function(m){var k=m.lab_id+'|'+m.ano+'-'+m.mes;F[k]=(F[k]||0)+(+m.valor||0);});
+  var G={};P.forEach(function(p){var k=p.lab_id+'|'+pdbMesK(p.criado);(G[k]=G[k]||[]).push(p);});
+  Object.keys(G).forEach(function(k){var fv=F[k];if(!fv)return;var L=G[k],con=L.reduce(function(s,p){return s+(p.valor==null?0:+p.valor);},0),sem=L.filter(function(p){return p.valor==null;}),el=sem.reduce(function(s,p){return s+pdbEl(p);},0),resto=fv-con;
+    if(!sem.length||resto<=0||!el)return;sem.forEach(function(p){p.valor=Math.round(resto*pdbEl(p)/el*100)/100;p._est=true;});});
+  PDB_C={d:DFL.d,L:P};return P;}
 function pdbTodos(){var P=pdbBase();return PDB.lab?P.filter(function(p){return p.lab_id===PDB.lab;}):P;}
 /* por mês (ano-mês): fechamento do laboratório somado por mês */
 function pdbFin(lab){var F={};cliMeses().forEach(function(m){if(lab&&m.lab_id!==lab)return;var k=m.ano+'-'+m.mes,x=F[k]=F[k]||{v:0,pago:0,falta:0};x.v+=+m.valor||0;x.pago+=+m.pago||0;x.falta+=+m.falta||0;});return F;}
 function pdbAgrupa(L,fk){var G={};L.forEach(function(p){var k=fk(p);var g=G[k]=G[k]||{k:k,n:0,el:0,v:0,semV:0};g.n++;g.el+=pdbEl(p);if(p.valor!=null)g.v+=+p.valor;else g.semV++;});
   return Object.keys(G).map(function(k){return G[k];}).sort(function(a,b){return b.v-a.v||b.el-a.el;});}
 function brlK(v){return v>=1000?'R$ '+(v/1000).toFixed(v>=10000?0:1).replace('.',',')+' mil':'R$ '+Math.round(v);}
-function cliValor(v,est){return v==null?'<i class="muted">—</i>':fmtR(+v);}
+function cliValor(v,est){return v==null?'<i class="muted">—</i>':est?'<span title="Valor dividido do fechamento do mês do laboratório">≈ '+fmtR(+v)+'</span>':fmtR(+v);}
 function cliCSV(nome,linhas){var q=function(v){v=String(v==null?'':v);return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
   var b=new Blob(['﻿'+linhas.map(function(r){return r.map(q).join(';');}).join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
   a.href=URL.createObjectURL(b);a.download=nome;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);}
@@ -8414,7 +8387,7 @@ function pdbArco(P){var C={};P.forEach(function(p){(p.dentes||[]).forEach(functi
     return '<g><title>Dente '+n+': '+(c?c+' trabalho'+(c>1?'s':''):'nenhum')+'</title><rect x="'+x+'" y="'+yy.toFixed(1)+'" width="19" height="24" rx="7" class="pdb-d'+(c?' on':'')+'"'+(c?' style="fill-opacity:'+o.toFixed(2)+'"':'')+'/><text x="'+(x+9.5)+'" y="'+(yy+(dir>0?-5:36)).toFixed(1)+'" class="pdb-dn">'+n+'</text></g>';}).join('');};
   var top=Object.keys(C).sort(function(a,b){return C[b]-C[a];}).slice(0,3);
   return '<svg class="pdb-arco" viewBox="0 -12 400 170" role="img" aria-label="Dentes mais trabalhados">'+f(OA_UP,22,1)+f(OA_LO,94,-1)+'</svg><p class="pdb-leg">Mais trabalhados: '+top.map(function(k){return '<b>'+k+'</b> ('+C[k]+')';}).join(' · ')+'</p>';}
-function pdbLinhaTab(p){return '<tr class="plx-r" data-kc="'+esc(String(p.envio||('lab-'+p.id)))+'" tabindex="0"><td>'+cliDia(p.criado)+'</td><td><b class="plx-pac">'+esc(p.paciente||'—')+'</b></td><td>'+esc(p.trabalho||'—')+'</td><td>'+esc(pdbMat(p))+'</td><td>'+esc((p.dentes||[]).join(', ')||'—')+'</td><td class="n">'+pdbEl(p)+'</td><td class="n">'+dashValorTxt(p)+'</td><td><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span></td></tr>';}
+function pdbLinhaTab(p){return '<tr class="plx-r" data-kc="'+esc(String(p.envio||('lab-'+p.id)))+'" tabindex="0"><td>'+cliDia(p.criado)+'</td><td><b class="plx-pac">'+esc(p.paciente||'—')+'</b></td><td>'+esc(p.trabalho||'—')+'</td><td>'+esc(pdbMat(p))+'</td><td>'+esc((p.dentes||[]).join(', ')||'—')+'</td><td class="n">'+pdbEl(p)+'</td><td class="n">'+cliValor(p.valor,p._est)+'</td><td><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span></td></tr>';}
 function pdbFiltraQ(L){var q=semAc(PDB.q).trim();if(!q)return L;return L.filter(function(p){return semAc([p.paciente,p.trabalho,p.material,(p.dentes||[]).join(' '),p.lab,pdbEtapa(p)].join(' ')).indexOf(q)>=0;});}
 function pdbTabela(L){var F=pdbFiltraQ(L).slice().sort(function(a,b){return new Date(b.criado)-new Date(a.criado);});
   return (F.length?'<div class="pdb-tw"><table class="pdb-t"><thead><tr><th>Data</th><th>Paciente</th><th>Trabalho</th><th>Material</th><th>Dentes</th><th class="n">Elem.</th><th class="n">Valor</th><th>Etapa</th></tr></thead><tbody>'+F.slice(0,PDB.lim).map(pdbLinhaTab).join('')+'</tbody></table></div>':'<p class="pdb-vz">Nada encontrado'+(PDB.q?' para "'+esc(PDB.q)+'"':'')+'.</p>')+
@@ -8440,6 +8413,7 @@ function rPainelClinica(){if(!RL.user||!cliDono())return '';
          ['pessoas','Pacientes',nPac,'',''],
          ['chave','Em andamento agora',and,'em todos os períodos','']];
   h+='<div class="pdb-k">'+K.map(function(k){return '<div class="pdb-kc '+k[4]+'"><span>'+ic(k[0])+k[1]+'</span><b>'+k[2]+'</b>'+(k[3]?'<small>'+k[3]+'</small>':'')+'</div>';}).join('')+'</div>';
+  if(est)h+='<p class="pdb-nota">≈ Alguns pedidos antigos vieram sem preço. Para o total bater com o extrato do laboratório, o valor do fechamento do mês foi dividido entre eles por elemento.</p>';
   var GT=pdbAgrupa(P,function(p){return pdbTipo(p.trabalho,p.material);}),GM=pdbAgrupa(P,pdbMat),GP=pdbAgrupa(P,function(p){return (p.paciente||'Sem nome').trim();});
   var ult={};P.forEach(function(p){var k=(p.paciente||'Sem nome').trim();if(!ult[k]||p.criado>ult[k])ult[k]=p.criado;});
   var vz='<p class="pdb-vz">Nada neste período.</p>';
@@ -8466,17 +8440,7 @@ document.addEventListener('change',function(e){if(e.target&&e.target.id==='pdb-l
 /* ---------- Pedidos: uma tela só (situação em cima, busca, período, ordem, Quadro · Lista · Por mês) ---------- */
 var PLX={st:'and',q:'',per:'tudo',vis:null,lim:50,ord:'prazo'};
 try{PLX.vis=localStorage.getItem('io_plx_vis')||null;}catch(e){}
-function plxValores(){var M={};pdbBase().forEach(function(p){var vv=valDeP(p);if(vv&&vv.v!=null)M[p.envio||('lab-'+p.id)]=vv.v;});return {v:M,est:{}};}
-var VAL_SERV=['Dissilicato de lítio · Elemento sobre dente','Zircônia fresada · Elemento sobre dente'];
-var VAL_PRECO=[380,324.5];
-function normTrab(s){return semAc(String(s||'')).toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();}
-function valPrecoTabela(p){var s=normTrab((p.trabalho||'')+' '+(p.material||''));if(/barra|protocolo|modelagem/.test(s))return null;if(s.indexOf('emax')>=0||s.indexOf('e max')>=0||s.indexOf('dissilicato')>=0)return VAL_PRECO[0];if(s.indexOf('zirconia')>=0)return VAL_PRECO[1];return null;}
-var VALC={d:null,L:null};
-function valPedido(p){if(p.valor!=null&&!p._est)return {v:+p.valor,tipo:'salvo'};var pr=valPrecoTabela(p);return pr==null?{v:null,tipo:'sem'}:{v:Math.round(pr*pdbEl(p)*100)/100,tipo:'tabela'};}
-function valMapa(){var d=DFL.d;if(VALC.d===d&&VALC.L)return VALC.L;var L={};pdbBase().forEach(function(p){L[p.envio||('lab-'+p.id)]=valPedido(p);});VALC={d:d,L:L};return L;}
-function valDeP(p){return valMapa()[p.envio||('lab-'+p.id)]||valPedido(p);}
-function valTxt(x){if(!x||x.v==null)return '— <small class="muted">Sem preço na tabela</small>';return fmtR(x.v);}
-function dashValorTxt(p){return valTxt(valDeP(p));}
+function plxValores(){var M={},E={};pdbBase().forEach(function(p){var k=p.envio||('lab-'+p.id);if(p.valor!=null)M[k]=(M[k]||0)+(+p.valor);if(p._est)E[k]=1;});return {v:M,est:E};}
 function plxBusca(e){var q=semAc(PLX.q).trim();if(!q)return true;return semAc([e.paciente,cliTrab(e),cxDentes(e).join(' '),e.cor,cliLab(e)].join(' ')).indexOf(q)>=0;}
 function plxLista(){var A=pdgMeus().filter(function(e){return (PLX.per==='tudo'||pdbNoPer({criado:e.enviado_em||e.criado_em},PLX.per))&&plxBusca(e);});
   var C={and:0,rcb:0,prd:0,pto:0,apr:0,pend:0,atr:0,fin:0,tudo:A.length};A.forEach(function(e){var s=cliSt(e),fa=cliFase(e);if(fa){C.and++;C[fa]++;}if(s==='apr')C.apr++;if(s==='pend')C.pend++;if(cliAtrasado(e))C.atr++;if(s==='fin'||s==='rec'||s==='can')C.fin++;});
@@ -8495,7 +8459,7 @@ function plxLinha(e,V){var v=V.v[e.id];
 function plxCel(e,V){var v=V.v[e.id],ds=cxDentes(e);
   return '<button type="button" class="plx-c" data-kc="'+esc(String(e.id))+'" style="--cx:'+cliCor(e)+'"><span class="plx-c1"><b class="plx-pac">'+esc(e.paciente||'—')+'</b><span class="plx-pz">'+plxPrazoTd(e)+'</span></span>'+
     '<span class="plx-c2">'+esc(cliTrab(e))+(ds.length?' · dentes '+ds.join(', '):'')+(e.cor?' · '+esc(e.cor):'')+'</span>'+
-    '<span class="plx-c3">'+plxEt(e)+'<span class="plx-c3v">'+cliDia(e.enviado_em||e.criado_em)+(V.dono&&v!=null?' · '+fmtR(v):'')+'</span></span></button>';}
+    '<span class="plx-c3">'+plxEt(e)+'<span class="plx-c3v">'+cliDia(e.enviado_em||e.criado_em)+(V.dono&&v!=null?' · '+(V.est[e.id]?'≈ ':'')+fmtR(v):'')+'</span></span></button>';}
 function plxTabela(L,lim){var V=plxValores();V.dono=cliDono();var S0=L.slice(0,lim||PLX.lim);
   return '<div class="plx-tw"><table class="plx-t"><thead><tr><th>Enviado</th><th>Paciente</th><th>Trabalho</th><th>Dentes</th><th>Cor</th><th>Etapa</th><th>Prazo / entrega</th>'+(V.dono?'<th class="n">Valor</th>':'')+'</tr></thead><tbody>'+S0.map(function(e){return plxLinha(e,V);}).join('')+'</tbody></table></div>'+
     '<div class="plx-cs">'+S0.map(function(e){return plxCel(e,V);}).join('')+'</div>'+(L.length>S0.length?'<button class="btn plx-mais" data-plx="mais">Mostrar mais '+Math.min(50,L.length-S0.length)+' (de '+(L.length-S0.length)+')</button>':'');}
@@ -8549,57 +8513,6 @@ function ficDeve(M){var D=M.filter(function(m){return (+m.falta||0)>0.005;}),tot
 
 /* ---------- Financeiro: um extrato por mês (fechamento, pagamentos, comprovantes e os pedidos do mês) ---------- */
 var FIC={ano:null,lab:'',ab:null};
-var DASH={per:'ano',tab:false,pac:null,pacQ:''};
-function dashAnos(M,P){var A=[],d=new Date().getFullYear();A.push(d);M.forEach(function(m){if(A.indexOf(m.ano)<0)A.push(m.ano);});P.forEach(function(p){var y=new Date(p.criado).getFullYear();if(y&&A.indexOf(y)<0)A.push(y);});return A.sort(function(a,b){return b-a;});}
-function dashAno(M,P,ano){var out=[],i;for(i=1;i<=12;i++)out.push({ano:ano,mes:i,F:[],P:[],valor:0,pago:0,aberto:0,trab:0,el:0});
-  M.forEach(function(m){if(m.ano===ano&&m.mes>=1&&m.mes<=12)out[m.mes-1].F.push(m);});
-  P.forEach(function(p){var d=new Date(p.criado);if(!isNaN(d)&&d.getFullYear()===ano)out[d.getMonth()].P.push(p);});
-  out.forEach(function(x){var val=x.F.reduce(function(s,m){return s+(+m.valor||0);},0),tab=x.P.reduce(function(s,p){var vv=valDeP(p);return s+((vv&&vv.v!=null)?vv.v:0);},0);
-    x.valor=x.F.length?val:tab;x.pago=x.F.reduce(function(s,m){return s+(+m.pago||0);},0);x.aberto=Math.max(0,Math.round((x.valor-x.pago)*100)/100);x.trab=x.P.length;x.el=x.P.reduce(function(s,p){return s+pdbEl(p);},0);});
-  return out;}
-function mesComFechamento(x){return !!(x.F&&x.F.length);}
-function mesAtual(x,hoje){hoje=hoje||new Date();return x.ano===hoje.getFullYear()&&x.mes===hoje.getMonth()+1;}
-function mesContaGasto(x,hoje){return mesComFechamento(x)||mesAtual(x,hoje);}
-function mesSemExtrato(x,hoje){return !mesComFechamento(x)&&!mesAtual(x,hoje)&&!!(x.P&&x.P.length);}
-function dashPerP(P){var per=DASH.per;if(per==='tudo')return P.slice();var hoje=new Date(),m=hoje.getMonth();if(per==='mes')return P.filter(function(p){var d=new Date(p.criado);return !isNaN(d)&&d.getFullYear()===FIC.ano&&d.getMonth()===m;});return P.filter(function(p){var d=new Date(p.criado);return !isNaN(d)&&d.getFullYear()===FIC.ano;});}
-function dashBars(G,rot){var mx=G.reduce(function(m,g){return Math.max(m,g.n||0);},0)||1;
-  return G.length?'<div class="pdb-hb">'+G.map(function(g){return '<div class="pdb-hr"><span class="pdb-hk">'+esc(g.k)+'</span><span class="pdb-hbar"><i style="width:'+Math.max(3,Math.round((g.n||0)/mx*100))+'%"></i></span><span class="pdb-hv"><b>'+(g.n||0)+'</b><small>'+rot(g)+'</small></span></div>';}).join('')+'</div>':'<p class="pdb-nota">Nada no período.</p>';}
-function dashRankTipo(L){var G={};L.forEach(function(p){var k=pdbTipo(p.trabalho,p.material);var g=G[k]=G[k]||{k:k,n:0,v:0};g.n++;var vv=valDeP(p);g.v+=((vv&&vv.v!=null)?vv.v:0);});var A=Object.keys(G).map(function(k){return G[k];}).sort(function(a,b){return b.n-a.n||b.v-a.v;});return dashBars(A.slice(0,8),function(g){return fmtR(g.v);});}
-function dashRankDente(L){var G={};L.forEach(function(p){(p.dentes||[]).forEach(function(d){d=+d;var g=G[d]=G[d]||{k:'Dente '+d,n:0,v:0};g.n++;var vv=valDeP(p);g.v+=((vv&&vv.v!=null)?vv.v:0);});});var A=Object.keys(G).map(function(k){return G[k];}).sort(function(a,b){return b.n-a.n||b.v-a.v;});return dashBars(A.slice(0,12),function(g){return fmtR(g.v);});}
-function dashEtapas(P){var G={};P.forEach(function(p){if(p.status==='entregue'||p.status==='cancelado'||p.status==='orcamento')return;var k=pdbEtapa(p);G[k]=(G[k]||0)+1;});var A=Object.keys(G).map(function(k){return {k:k,n:G[k],v:0};}).sort(function(a,b){return b.n-a.n;});return A.length?dashBars(A,function(){return 'agora';}):'<p class="pdb-nota">Nada em andamento.</p>';}
-function dashChart(M,P){var A=dashAno(M,P,FIC.ano),W=620,H=172,b=W/12,mx=1,hoje=new Date(),cy=hoje.getFullYear(),cm=hoje.getMonth();A.forEach(function(x){if(x.valor>mx)mx=x.valor;});
-  var g=A.map(function(x,i){var h=x.valor>0?Math.max(1,Math.round(x.valor/mx*(H-30))):0,x0=Math.round(i*b+6),w=Math.round(b-12),base=H-22,cur=(FIC.ano===cy&&i===cm),has=x.F.length,rects;
-    if(has){var ph=x.valor>0?Math.round(h*(Math.min(x.pago,x.valor)/x.valor)):0,oh=h-ph;rects='<rect x="'+x0+'" y="'+(base-ph)+'" width="'+w+'" height="'+ph+'" fill="#16A34A" rx="2"/><rect x="'+x0+'" y="'+(base-h)+'" width="'+w+'" height="'+oh+'" fill="#F59E0B" rx="2"/>';}
-    else{rects='<rect x="'+x0+'" y="'+(base-h)+'" width="'+w+'" height="'+h+'" fill="'+(cur?'#F59E0B':'#94A3B8')+'" rx="2"/>';}
-    return '<g>'+rects+'<text x="'+(x0+w/2)+'" y="'+(H-6)+'" font-size="10" text-anchor="middle" fill="#8A8FA3">'+PMES[x.mes-1]+'</text></g>';}).join('');
-  return '<div style="overflow-x:auto"><svg viewBox="0 0 '+W+' '+H+'" style="width:100%;min-width:520px;height:auto;display:block" role="img" aria-label="Gasto mês a mês em '+FIC.ano+'">'+g+'</svg></div><div class="row wrap" style="gap:14px;margin-top:6px;font-size:.78rem;color:var(--muted)"><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#16A34A;margin-right:5px"></i>Pago</span><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#F59E0B;margin-right:5px"></i>Em aberto / em andamento</span><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#94A3B8;margin-right:5px"></i>Sem extrato</span></div>';}
-function dashChartTab(M,P){var A=dashAno(M,P,FIC.ano),hoje=new Date(),cy=hoje.getFullYear(),cm=hoje.getMonth();return '<div class="pdb-tw"><table class="pdb-t"><thead><tr><th>Mês</th><th class="n">Valor</th><th class="n">Pago</th><th class="n">Em aberto</th><th class="n">Trab.</th><th>Situação</th></tr></thead><tbody>'+A.map(function(x,i){var has=x.F.length,cur=(FIC.ano===cy&&i===cm),sit=has?(x.aberto>0.005?'Em aberto':'Pago'):(cur?'Em andamento':'Sem extrato');return '<tr><td>'+PMES[x.mes-1]+'</td><td class="n"><b>'+fmtR(x.valor)+'</b></td><td class="n">'+fmtR(x.pago)+'</td><td class="n">'+(x.aberto>0.005?fmtR(x.aberto):'—')+'</td><td class="n">'+x.trab+'</td><td>'+sit+'</td></tr>';}).join('')+'</tbody></table></div>';}
-function ficDashTop(M,P){var anos=dashAnos(M,P);if(FIC.ano==null||anos.indexOf(FIC.ano)<0)FIC.ano=anos[0];
-  var hoje=new Date(),A=dashAno(M,P,FIC.ano),gasto=0,pago=0,trab=0,el=0,semExtrato=0;A.forEach(function(x){if(mesContaGasto(x,hoje))gasto+=x.valor;if(mesSemExtrato(x,hoje))semExtrato++;pago+=x.pago;trab+=x.trab;el+=x.el;});
-  var abertot=M.reduce(function(s,m){return s+(+m.falta||0);},0);
-  var cy=hoje.getFullYear(),cm=hoje.getMonth(),Ay=dashAno(M,P,cy),cur=Ay[cm].valor,prev=cm>0&&mesContaGasto(Ay[cm-1],hoje)?Ay[cm-1].valor:0,pct=prev>0.005?Math.round((cur-prev)/prev*100):null;
-  var cards=[['Gasto em '+FIC.ano,fmtR(gasto),'fechamentos + mês atual','',semExtrato?semExtrato+' '+(semExtrato>1?'meses':'mês')+' sem extrato (não entram no total)':''],['Pago em '+FIC.ano,fmtR(pago),'','emdia'],['Em aberto',fmtR(abertot),'todos os meses',abertot>0.005?'deve':'emdia'],['Gasto no mês atual',fmtR(cur),pct==null?'sem base no mês anterior':(pct>=0?'▲ '+pct+'% vs mês anterior':'▼ '+Math.abs(pct)+'% vs mês anterior')],['Trabalhos em '+FIC.ano,String(trab),'no ano'],['Elementos em '+FIC.ano,String(el),'no ano']];
-  var per='<div class="row wrap" style="gap:8px;align-items:center;margin:12px 0 8px"><b class="small">Rankings</b>'+[['mes','Mês'],['ano','Ano'],['tudo','Tudo']].map(function(o){return '<button class="chip" aria-pressed="'+(DASH.per===o[0])+'" data-dash="per" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'<span class="spacer"></span><button class="btn sm" data-dash="tab">'+(DASH.tab?'Ver gráfico':'Ver em tabela')+'</button></div>';
-  return '<section class="card" style="margin-bottom:14px"><div class="row wrap" style="align-items:center;gap:8px"><div><h2 style="margin:0">Resumo do laboratório</h2><p class="small muted" style="margin:2px 0 0">Gastos, pagamentos e o que você mais pede.</p></div><span class="spacer"></span><div class="pdb-seg" role="group" aria-label="Ano">'+anos.map(function(a){return '<button data-dash="ano" data-v="'+a+'" aria-pressed="'+(a===FIC.ano)+'">'+a+'</button>';}).join('')+'</div></div>'+
-    '<div class="pdb-k" style="margin-top:12px">'+cards.map(function(c){return '<div class="pdb-kc '+(c[3]||'')+'"><span>'+esc(c[0])+'</span><b>'+esc(c[1])+'</b>'+(c[2]?'<small>'+esc(c[2])+'</small>':'')+(c[4]?'<small>'+esc(c[4])+'</small>':'')+'</div>';}).join('')+'</div>'+
-    per+
-    '<div class="card" style="margin-bottom:12px"><h3>Mês a mês · '+FIC.ano+'</h3>'+(DASH.tab?dashChartTab(M,P):dashChart(M,P))+'</div>'+
-    '<div class="pdb-g2" style="margin-bottom:12px"><div class="card"><h3>Tipos de prótese mais pedidos</h3>'+dashRankTipo(dashPerP(P))+'</div><div class="card"><h3>Dentes mais pedidos</h3>'+dashRankDente(dashPerP(P))+'</div></div>'+
-    '<div class="card"><h3>Por etapa agora</h3>'+dashEtapas(P)+'</div></section>';}
-function dashPacGrupo(P){var G={},ord=[];P.forEach(function(p){var nome=String(p.paciente||'').trim();if(!nome)return;var k=semAc(nome);if(!G[k]){G[k]={k:k,nome:nome,n:0,el:0,v:0,last:null,L:[]};ord.push(k);}var g=G[k];g.n++;g.el+=pdbEl(p);var vv=valDeP(p);g.v+=((vv&&vv.v!=null)?vv.v:0);var d=new Date(p.criado);if(!isNaN(d)&&(!g.last||d>g.last))g.last=d;g.L.push(p);});return ord.map(function(k){return G[k];}).sort(function(a,b){return b.v-a.v||b.n-a.n;});}
-function ficDashPac(P){var G=dashPacGrupo(P),q=semAc(DASH.pacQ||'').trim(),V=G.filter(function(g){return !q||semAc(g.nome).indexOf(q)>=0;});
-  var det=DASH.pac&&G.filter(function(g){return g.k===DASH.pac;})[0];
-  var rows=V.length?'<div class="pdb-tw"><table class="pdb-t"><thead><tr><th>Paciente</th><th class="n">Trabalhos</th><th class="n">Elementos</th><th class="n">Total</th><th>Último pedido</th></tr></thead><tbody>'+V.map(function(g){return '<tr><td><button class="pdb-lk" data-dash="pac" data-v="'+esc(g.k)+'">'+esc(g.nome)+'</button></td><td class="n">'+g.n+'</td><td class="n">'+g.el+'</td><td class="n"><b>'+fmtR(g.v)+'</b></td><td>'+(g.last?cliDia(g.last,false):'—')+'</td></tr>';}).join('')+'</tbody></table></div>':'<p class="pdb-nota">'+(G.length?'Nenhum paciente com esse filtro.':'Ainda não há pedidos de pacientes.')+'</p>';
-  var detH='';if(det){var L=det.L.slice().sort(function(a,b){return new Date(b.criado)-new Date(a.criado);});
-    detH='<div class="card" style="margin-top:10px"><div class="row wrap" style="align-items:center;gap:8px"><h3 style="margin:0">'+esc(det.nome)+'</h3><span class="small muted">'+det.n+' trabalho'+(det.n>1?'s':'')+' · '+det.el+' elemento'+(det.el>1?'s':'')+' · <b>'+fmtR(det.v)+'</b> no total</span><span class="spacer"></span><button class="btn sm" data-dash="pac" data-v="'+esc(det.k)+'">Fechar</button></div>'+
-      '<div class="pdb-tw" style="margin-top:8px"><table class="pdb-t"><thead><tr><th>Data</th><th>Trabalho</th><th>Dentes</th><th class="n">Valor</th><th>Etapa</th></tr></thead><tbody>'+L.map(function(p){return '<tr><td>'+cliDia(p.criado,false)+'</td><td>'+esc(p.trabalho||'—')+'</td><td>'+esc((p.dentes||[]).join(', ')||'—')+'</td><td class="n">'+dashValorTxt(p)+'</td><td><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span></td></tr>';}).join('')+'</tbody></table></div></div>';}
-  return '<section class="card" style="margin-top:14px"><div class="row wrap" style="align-items:center;gap:8px"><div><h2 style="margin:0">Por paciente</h2><p class="small muted" style="margin:2px 0 0">Quanto você já gastou com laboratório por paciente.</p></div><span class="spacer"></span><input type="search" id="dash-pac-q" placeholder="Buscar paciente…" value="'+esc(DASH.pacQ||'')+'" autocomplete="off" style="max-width:240px"></div>'+rows+detH+'</section>';}
-document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('[data-dash]');if(!b)return;var a=b.getAttribute('data-dash'),v=b.getAttribute('data-v');
-  if(a==='ano'){FIC.ano=+v;FIC.ab=null;DASH.pac=null;render();}
-  else if(a==='per'){DASH.per=v;render();}
-  else if(a==='tab'){DASH.tab=!DASH.tab;render();}
-  else if(a==='pac'){DASH.pac=(DASH.pac===v?null:v);render();}});
-document.addEventListener('input',function(e){if(e.target&&e.target.id==='dash-pac-q'){DASH.pacQ=e.target.value;var p=e.target.selectionStart;render();var n=document.getElementById('dash-pac-q');if(n){n.focus();try{n.setSelectionRange(p,p);}catch(x){}}}});
 var FIC_ST={pago:['ok','Pago'],parcial:['parc','Parcial'],aberto:['aberto','Em aberto'],zero:['zero','Sem valor']};
 function ficArq(path,rot,icone){return '<button class="btn sm" data-act="phArq" data-v="'+esc(path)+'">'+ic(icone)+rot+'</button>';}
 function rFinClinica(){
@@ -8615,20 +8528,20 @@ function rFinClinica(){
   if(!todos.length)return '<div class="card lsub-v">O laboratório ainda não lançou nenhum mês nem pedido para você.</div>';
   if(FIC.ano==null||anos.indexOf(FIC.ano)<0)FIC.ano=anos[0];
   var L=todos.filter(function(x){return x.ano===FIC.ano;}).sort(function(a,b){return b.mes-a.mes;});
-  var aberto=M.reduce(function(s,m){return s+(+m.falta||0);},0),pagoAno=0,gastoAno=0,semExtrato=0,hoje=new Date(),kHoje=hoje.getFullYear()+'-'+('0'+(hoje.getMonth()+1)).slice(-2);
+  var aberto=M.reduce(function(s,m){return s+(+m.falta||0);},0),pagoAno=0,gastoAno=0,hoje=new Date(),kHoje=hoje.getFullYear()+'-'+('0'+(hoje.getMonth()+1)).slice(-2);
   L.forEach(function(x){x.valor=x.F.reduce(function(s,m){return s+(+m.valor||0);},0);x.pago=x.F.reduce(function(s,m){return s+(+m.pago||0);},0);x.cred=x.F.reduce(function(s,m){return s+(+m.credito||0);},0);x.falta=x.F.reduce(function(s,m){return s+(+m.falta||0);},0);
-    x.tab=x.P.reduce(function(s,p){var vv=valDeP(p);return s+((vv&&vv.v!=null)?vv.v:0);},0);x.el=x.P.reduce(function(s,p){return s+pdbEl(p);},0);
+    x.tab=x.P.reduce(function(s,p){return s+(p.valor==null?0:+p.valor);},0);x.el=x.P.reduce(function(s,p){return s+pdbEl(p);},0);
     x.sit=!x.F.length?null:x.F.some(function(m){return m.situacao==='aberto';})&&!x.pago&&!x.cred?'aberto':x.falta>0.005?'parcial':x.F.every(function(m){return m.situacao==='zero';})?'zero':'pago';
-    pagoAno+=x.pago;if(mesContaGasto(x,hoje))gastoAno+=x.F.length?Math.max(x.valor,0):x.tab;if(mesSemExtrato(x,hoje))semExtrato++;});
+    pagoAno+=x.pago;gastoAno+=x.F.length?Math.max(x.valor,0):x.tab;});
   if(FIC.ab==null){FIC.ab={};var pri=L.filter(function(x){return x.falta>0.005;})[0]||L[0];if(pri)FIC.ab[pri.k]=1;}
-  var h='<div class="fic">'+ficDashTop(M,P)+
+  var h='<div class="fic">'+
     '<div class="fic-top">'+ficDeve(M)+
       '<div class="fic-k"><span>'+ic('check')+'Pago em '+FIC.ano+'</span><b>'+fmtR(pagoAno)+'</b></div>'+
-      '<div class="fic-k"><span>'+ic('moeda')+'Gasto em '+FIC.ano+'</span><b>'+fmtR(gastoAno)+'</b><small>fechamentos + mês atual</small>'+(semExtrato?'<small>'+semExtrato+' '+(semExtrato>1?'meses':'mês')+' sem extrato (não entram no total)</small>':'')+'</div></div>'+
+      '<div class="fic-k"><span>'+ic('moeda')+'Gasto em '+FIC.ano+'</span><b>'+fmtR(gastoAno)+'</b><small>fechamentos do laboratório'+(L.some(function(x){return !x.F.length&&x.tab;})?' + meses ainda sem fechamento':'')+'</small></div></div>'+
     '<div class="fic-f">'+(anos.length>1?'<div class="pdb-seg" role="group" aria-label="Ano">'+anos.map(function(a){return '<button data-fic="ano" data-v="'+a+'" aria-pressed="'+(a===FIC.ano)+'">'+a+'</button>';}).join('')+'</div>':'<b class="fic-ano">'+FIC.ano+'</b>')+
       (Object.keys(labs).length>1?'<select id="fic-lab" aria-label="Laboratório"><option value="">Todos os laboratórios</option>'+Object.keys(labs).map(function(k){return '<option value="'+k+'"'+(k===FIC.lab?' selected':'')+'>'+esc(labs[k])+'</option>';}).join('')+'</select>':'')+
       '<span class="spacer"></span><button class="btn sm" data-fic="csv">'+ic('baixar')+'Planilha do ano</button></div>';
-  h+=L.map(function(x){var ab=!!FIC.ab[x.k],st=x.sit?FIC_ST[x.sit]:(x.k===kHoje?['and','Mês em andamento']:['zero','Sem extrato']),n=x.P.length;
+  h+=L.map(function(x){var ab=!!FIC.ab[x.k],st=x.sit?FIC_ST[x.sit]:(x.k===kHoje?['and','Mês em andamento']:['zero','Sem fechamento']),n=x.P.length;
     var cab='<button type="button" class="fic-h" data-fic="ab" data-v="'+x.k+'" aria-expanded="'+ab+'">'+
       '<span class="fic-mes"><b>'+PMES[x.mes-1]+'</b><small>'+n+' trabalho'+(n===1?'':'s')+(x.el&&x.el!==n?' · '+x.el+' elementos':'')+'</small></span>'+
       (x.F.length?'<span class="fic-n"><small>Valor do mês</small><b>'+fmtR(x.valor)+'</b></span><span class="fic-n"><small>Pago</small><b>'+fmtR(x.pago)+'</b></span><span class="fic-n"><small>Falta</small><b class="'+(x.falta>0.005?'deve':'')+'">'+(x.falta>0.005?fmtR(x.falta):'—')+'</b>'+(x.falta>0.005?ficVencTxt(x):'')+'</span>'
@@ -8643,16 +8556,16 @@ function rFinClinica(){
                   :'<p class="fic-nada">Nenhum pagamento lançado neste mês.</p>')+'</div>';}).join('');
     var ped=x.P.slice().sort(function(a,b){return new Date(b.criado)-new Date(a.criado);});
     var tab=n?'<div class="plx-tw fic-tw"><table class="plx-t"><thead><tr><th>Data</th><th>Paciente</th><th>Trabalho</th><th>Dentes</th><th class="n">Elem.</th><th class="n">Valor</th><th>Etapa</th></tr></thead><tbody>'+
-        ped.map(function(p){return '<tr class="plx-r" data-kc="'+esc(String(p.envio||('lab-'+p.id)))+'" tabindex="0"><td>'+cliDia(p.criado,false)+'</td><td><b class="plx-pac">'+esc(p.paciente||'—')+'</b></td><td>'+esc(p.trabalho||'—')+'</td><td>'+esc((p.dentes||[]).join(', ')||'—')+'</td><td class="n">'+pdbEl(p)+'</td><td class="n">'+dashValorTxt(p)+'</td><td><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span></td></tr>';}).join('')+
+        ped.map(function(p){return '<tr class="plx-r" data-kc="'+esc(String(p.envio||('lab-'+p.id)))+'" tabindex="0"><td>'+cliDia(p.criado,false)+'</td><td><b class="plx-pac">'+esc(p.paciente||'—')+'</b></td><td>'+esc(p.trabalho||'—')+'</td><td>'+esc((p.dentes||[]).join(', ')||'—')+'</td><td class="n">'+pdbEl(p)+'</td><td class="n">'+cliValor(p.valor,p._est)+'</td><td><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span></td></tr>';}).join('')+
         '</tbody><tfoot><tr><td colspan="4"><b>Soma dos pedidos pela tabela</b></td><td class="n"><b>'+x.el+'</b></td><td class="n"><b>'+(x.tab?fmtR(x.tab):'—')+'</b></td><td></td></tr></tfoot></table></div>'+
-        '<div class="plx-cs fic-cs">'+ped.map(function(p){return '<button type="button" class="plx-c" data-kc="'+esc(String(p.envio||('lab-'+p.id)))+'"><span class="plx-c1"><b class="plx-pac">'+esc(p.paciente||'—')+'</b><span>'+dashValorTxt(p)+'</span></span><span class="plx-c2">'+esc(p.trabalho||'—')+((p.dentes||[]).length?' · dentes '+p.dentes.join(', '):'')+'</span><span class="plx-c3"><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span><span class="plx-c3v">'+cliDia(p.criado,false)+'</span></span></button>';}).join('')+'</div>'
+        '<div class="plx-cs fic-cs">'+ped.map(function(p){return '<button type="button" class="plx-c" data-kc="'+esc(String(p.envio||('lab-'+p.id)))+'"><span class="plx-c1"><b class="plx-pac">'+esc(p.paciente||'—')+'</b><span>'+cliValor(p.valor,p._est)+'</span></span><span class="plx-c2">'+esc(p.trabalho||'—')+((p.dentes||[]).length?' · dentes '+p.dentes.join(', '):'')+'</span><span class="plx-c3"><span class="pdb-et'+(pdbAnd(p)?' and':'')+'">'+esc(pdbEtapa(p))+'</span><span class="plx-c3v">'+cliDia(p.criado,false)+'</span></span></button>';}).join('')+'</div>'
       :'<p class="fic-nada">Nenhum pedido registrado neste mês.</p>';
     return '<section class="fic-m ab">'+cab+'<div class="fic-b">'+(x.F.length?docs:'<p class="fic-nada">'+(x.k===kHoje?'O mês ainda está em andamento: o laboratório fecha o valor no fim do mês. Os valores abaixo são pela tabela.':'O laboratório não lançou fechamento para este mês. Os valores abaixo são pela tabela.')+'</p>')+
-      (x.F.length&&x.tab&&Math.abs(x.tab-x.valor)>0.5?'<p class="pdb-nota '+(x.valor>x.tab?'pdb-dif-up':'pdb-dif-down')+'">Extrato '+fmtR(Math.abs(x.valor-x.tab))+(x.valor>x.tab?' acima da tabela':' abaixo da tabela')+'</p>':'')+tab+'</div></section>';}).join('');
-  return h+ficDashPac(P)+'</div>';}
+      (x.F.length&&x.tab&&Math.abs(x.tab-x.valor)>0.5?'<p class="pdb-nota">A soma dos pedidos pela tabela ('+fmtR(x.tab)+') é diferente do fechamento do mês ('+fmtR(x.valor)+'). O que vale para pagamento é o fechamento do laboratório (veja o extrato).</p>':'')+(ped.some(function(p){return p._est;})?'<p class="pdb-nota">≈ Pedidos sem preço: o valor do fechamento foi dividido entre eles por elemento.</p>':'')+tab+'</div></section>';}).join('');
+  return h+'</div>';}
 function ficCSV(){var P=pdbBase().filter(function(p){return (!FIC.lab||p.lab_id===FIC.lab)&&new Date(p.criado).getFullYear()===FIC.ano;}).sort(function(a,b){return new Date(a.criado)-new Date(b.criado);});
-  cliCSV('financeiro-laboratorio-'+FIC.ano+'.csv',[['Mês','Data','Paciente','Trabalho','Dentes','Elementos','Valor','Etapa','Laboratório']].concat(P.map(function(p){var d=new Date(p.criado),vv=valDeP(p);
-    return [PMES[d.getMonth()]+'/'+d.getFullYear(),cliDia(p.criado,4),p.paciente,p.trabalho,(p.dentes||[]).join(' '),pdbEl(p),vv.v==null?'':String(vv.v).replace('.',','),pdbEtapa(p),p.lab];})));}
+  cliCSV('financeiro-laboratorio-'+FIC.ano+'.csv',[['Mês','Data','Paciente','Trabalho','Dentes','Elementos','Valor','Valor dividido do fechamento?','Etapa','Laboratório']].concat(P.map(function(p){var d=new Date(p.criado);
+    return [PMES[d.getMonth()]+'/'+d.getFullYear(),cliDia(p.criado,4),p.paciente,p.trabalho,(p.dentes||[]).join(' '),pdbEl(p),p.valor==null?'':String(p.valor).replace('.',','),p._est?'sim':'',pdbEtapa(p),p.lab];})));}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-fic]');if(!b)return;var a=b.getAttribute('data-fic'),v=b.getAttribute('data-v');
   if(a==='ab'){FIC.ab=FIC.ab||{};if(FIC.ab[v])delete FIC.ab[v];else FIC.ab[v]=1;render();}
   else if(a==='ano'){FIC.ano=+v;FIC.ab=null;render();}
