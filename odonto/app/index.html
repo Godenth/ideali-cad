@@ -7354,6 +7354,11 @@ pdgEnviadosHtml=function(){var M=pdgFiltra(pdgMeus());if(!M.length)return '';
 /* arquinho de dentes desenhado na ficha (marca os dentes do pedido) */
 function cxMiniArco(ds){var f=function(L,y,dir){return L.map(function(n,i){var x=6+i*9.2,on=ds.indexOf(n)>=0,yy=y+dir*Math.pow(Math.abs(i-7.5)/7.5,2)*-9;return '<rect x="'+x.toFixed(1)+'" y="'+yy.toFixed(1)+'" width="7" height="9" rx="2.5" class="'+(on?'on':'')+'"/>';}).join('');};
   return '<svg viewBox="0 0 160 46" aria-hidden="true">'+f(OA_UP,10,1)+f(OA_LO,27,-1)+'</svg>';}
+function cxArcoNum(ds){ds=ds||[];var w=16,h=22,g=2,x0=2,W=x0*2+OA_UP.length*(w+g)-g,H=84;
+  var row=function(L,y,dir){return L.map(function(n,i){var x=x0+i*(w+g),on=ds.indexOf(n)>=0,yy=y+dir*Math.pow(Math.abs(i-7.5)/7.5,2)*-6;
+    return '<g><rect x="'+x.toFixed(1)+'" y="'+yy.toFixed(1)+'" width="'+w+'" height="'+h+'" rx="4" style="fill:'+(on?'#F59E0B':'#fff')+';stroke:'+(on?'#B45309':'#c9cede')+';stroke-width:1.2"/>'+
+      '<text x="'+(x+w/2).toFixed(1)+'" y="'+(yy+h/2).toFixed(1)+'" style="font:600 8.5px Arial,sans-serif;fill:'+(on?'#3B2600':'#555')+';text-anchor:middle;dominant-baseline:central">'+n+'</text></g>';}).join('');};
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Odontograma: dentes '+ds.join(', ')+'" style="width:min(320px,100%);height:auto;display:block;margin:0 auto">'+row(OA_UP,12,1)+row(OA_LO,48,-1)+'</svg>';}
 
 /* ===== Clínica: aba Financeiro (trabalhos enviados aos laboratórios e quanto custou, pela tabela do laboratório) ===== */
 var DFL={d:null,carregando:false,erro:'',mes:null,lab:''};
@@ -8300,7 +8305,7 @@ function kcDet(e,s,ds,tr,lab,pz,i){var L=function(r,v){return v?'<div><span>'+r+
       (s==='fin'&&e.etapa_em?L(e.etapa==='Pronto'?'Pronto em':'Entregue em',cliDia(e.etapa_em,4)):'')+
       (v!=null?L('Valor',(V.est[e.id]?'<span title="Valor dividido do fechamento do mês">≈ ':'')+fmtR(v)+(V.est[e.id]?'</span>':'')):'')+L('Laboratório',esc(lab))+'</div>'+
     (e.partes&&e.partes.length>1?'<div class="kc-partes"><b>Itens deste pedido</b>'+e.partes.map(function(p){return '<div><span>'+esc(uniTrab(p))+(p.dentes&&p.dentes.length?' · dentes '+p.dentes.join(', '):'')+'</span><em>'+esc(p.etapa==='Aguardando informação'?'Pendência':p.etapa==='Cancelado'?'Cancelado':CLI_ET[cliEtN(p.etapa)][1])+'</em></div>';}).join('')+'</div>':'')+
-    (ds.length?'<div class="kc-arco">'+cxMiniArco(ds)+'</div>':'')+
+    (ds.length?'<div style="padding:2px 0">'+cxArcoNum(ds)+'</div>':'')+
     (e.status==='recusado'&&e.motivo?'<p class="kc-mot">Motivo: '+esc(e.motivo)+'</p>':'')+
     pendHtml(e)+
     (s==='pend'&&String(e.id).indexOf('lab-')===0?'<div class="pend"><b>'+ic('alerta')+'Pendência do laboratório</b><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p><small>Responda pelo botão Conversar aqui embaixo (dá para colar print e anexar arquivo).</small></div>':'')+
