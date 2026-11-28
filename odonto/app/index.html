@@ -7645,7 +7645,7 @@ function uniAplica(d){var u=RL.user&&contaId();UNI.dono=d.dono!==false;PDG.labNo
   var env=(d.envios||[]).map(function(e){e._uni=true;if(e.lab_nome)PDG.labNome[e.lab_id]=e.lab_nome;return e;});
   var lab=(d.pedidos||[]).map(function(p){if(p.lab_nome)PDG.labNome[p.lab_id]=p.lab_nome;
     return {id:'lab-'+p.id,user_id:u,lab_id:p.lab_id,lab_nome:p.lab_nome,numero:p.numero,paciente:p.paciente,itens:[{trabalho:uniTrab(p),dentes:p.dentes||[],material:p.material||''}],cor:p.cor,urgente:p.urgente,
-      status:'aceito',etapa:p.etapa,etapa_em:p.entregue_em||p.finalizado_em||p.atualizado_em,falta_info:p.falta_info,parado:p.parado,aberto:p.aberto,prazo_min:p.prazo_min,prazo_max:p.prazo_max,faixa:p.faixa,
+      status:'aceito',etapa:p.etapa,etapa_em:p.entregue_em||p.finalizado_em||p.atualizado_em,falta_info:p.falta_info,aguardando_pendencia:p.aguardando_pendencia,motivo_pendencia:p.motivo_pendencia,pendencia_aguardando_conferencia:p.pendencia_aguardando_conferencia,parado:p.parado,aberto:p.aberto,prazo_min:p.prazo_min,prazo_max:p.prazo_max,faixa:p.faixa,
       criado_em:p.criado_em,enviado_em:p.criado_em,arquivos:[],importado:true,_uni:true};});
   /* fica o que este usuário RECEBEU como laboratório; o que é dele como clínica vem todo da leitura única */
   PDG.L=PDG.L.filter(function(e){return e.user_id!==u&&!e.importado;}).concat(env,lab).sort(function(a,b){return String(b.criado_em).localeCompare(String(a.criado_em));});
@@ -8289,7 +8289,7 @@ function kcCard(e,ab){var s=cliSt(e),ds=cxDentes(e),pz=kcPrazo(e),lab=cliLab(e),
     (ab?kcDet(e,s,ds,tr,lab,pz,i):'')+
     (s==='pend'&&!ab?'<div class="kc-pend"><p>'+esc(e.falta_info||'O laboratório precisa de uma informação sua.')+'</p>'+(e.resposta?'<small>Você respondeu: '+esc(e.resposta)+'</small>':'')+'</div>':'')+
     (e.aguardando_pendencia&&!ab?'<div class="kc-pend"><p><b>Pendência do laboratório:</b> '+esc(e.motivo_pendencia||'O laboratório precisa de uma informação sua.')+'</p>'+(e.pendencia_aguardando_conferencia?'<small>Resposta enviada. Aguardando conferência do laboratório.</small>':'')+'</div>':'')+
-    '<div class="kc-pe">'+(s==='pend'&&!ab?'<button class="btn sm pri" data-kc="'+id+'" data-resp="1">Responder</button>':'')+(e.aguardando_pendencia&&!e.pendencia_aguardando_conferencia?'<button class="btn sm pri" data-act="cliPendConfirma" data-v="'+id+'">Confirmar pendência</button>':'')+cliChatBt(e)+
+      '<div class="kc-pe">'+(s==='pend'&&!ab?'<button class="btn sm pri" data-kc="'+id+'" data-resp="1">Responder</button>':'')+(e.aguardando_pendencia&&!e.pendencia_aguardando_conferencia&&String(e.id).indexOf('lab-')!==0?'<button class="btn sm pri" data-act="cliPendConfirma" data-v="'+id+'">Confirmar pendência</button>':'')+cliChatBt(e)+
       (cliPodeReceber(e)?'<button class="btn sm kc-rcb" data-act="cliRecebi" data-v="'+id+'">'+ic('check')+'Recebi</button>':'')+
       (e.status==='enviado'?'<button class="btn sm kc-can" data-act="pdgCancela" data-v="'+e.id+'">Cancelar</button>':'')+'</div></article>';}
 function kcDet(e,s,ds,tr,lab,pz,i){var L=function(r,v){return v?'<div><span>'+r+'</span><b>'+v+'</b></div>':'';},I=pz&&pz.I,V=cliDono()?plxValores():{v:{},est:{}},v=V.v[e.id];
