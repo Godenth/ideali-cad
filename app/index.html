@@ -1194,7 +1194,7 @@ body.sem-anim .ps-img,body.sem-anim .ps-fala{animation:none}
 .pn-ps{display:flex;gap:3px}.pn-pp{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.7rem;border:1px solid var(--line);color:var(--muted)}.pn-pp.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 .pn-um{text-align:right;color:var(--muted)}.pn-ud{padding:4px 0 14px}.pn-nunca{display:flex;flex-wrap:wrap;gap:6px}.pn-nunca span{border:1px dashed var(--line);border-radius:99px;padding:3px 10px;font-size:.8rem;color:var(--muted)}
 @media (max-width:560px){.pn-uh{grid-template-columns:minmax(0,1fr) auto}.pn-um{display:none}}
-#modq{position:fixed;inset:0;z-index:130;background:#0009;display:grid;place-items:center;padding:16px}
+#modq,#peddup{position:fixed;inset:0;z-index:130;background:#0009;display:grid;place-items:center;padding:16px}
 .modq-b{background:var(--surface);color:var(--ink);border-radius:20px;padding:22px;max-width:420px;width:100%;display:grid;gap:10px;text-align:center;box-shadow:0 24px 60px #0008;animation:tutBolha .3s ease both}
 .modq-b h2{margin:0;font-size:1.25rem}.modq-b p{margin:0}.modq-ic{font-size:2rem}.modq-arc{display:grid;grid-template-columns:1fr 1fr;gap:8px}.modq-arc [data-m=ambas]{grid-column:1/-1}.modq-v{justify-self:center}
 .som-bt{font-size:1rem}.som-bt.on{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
@@ -6184,6 +6184,58 @@ function modPergunta(f){var cid=f.clienteId.value,t=modTipo(),u=t?precoUnit(cid,
     rec('modelo_sim');var q=m==='ambas'&&tt.forma!=='trabalho'?2:1;ui.pdExtras=ui.pdExtras||[];ui.pdExtras.push({t:tt.id,q:q,arc:m});
     var vi=f.valor;if(vi){var add=calcItens(f.clienteId.value,[],[{t:tt.id,q:q}],f.recebido.value).total;vi.value=Math.round(((parseFloat(vi.value)||0)+add)*100)/100;}
     f.dataset.modOk='1';f.requestSubmit();});}
+/* ===== Aviso de pedido repetido: mesmo cliente + mesmo paciente + 1 dente em comum + mesmo tipo, criados com até 30 dias de diferença. Só avisa, nunca bloqueia. ===== */
+function pedTextoIgual(a,b){return semAcento(String(a||'')).replace(/\s+/g,' ').trim()===semAcento(String(b||'')).replace(/\s+/g,' ').trim();}
+function pedStatusNome(st){var s=STATUS.filter(function(x){return x[0]===st;})[0];return s?s[1]:(st==='arquivado'?'Arquivado':st||'—');}
+function pedRepetidos(o){
+  var base=o.recebido||today(),ele=o.elementos||[],tid=String(o.tipoId||'');
+  return alive(S.pedidos).filter(function(p){
+    if(p.status==='arquivado'||p.status==='cancelado')return false;
+    if(String(p.clienteId||'')!==String(o.clienteId||''))return false;
+    if(!pedTextoIgual(p.paciente,o.paciente))return false;
+    if(!p.recebido||Math.abs(daysBetween(p.recebido,base))>30)return false;
+    if(String(p.tipoId||'')!==tid)return false;
+    var pe=p.elementos||[];
+    return pe.some(function(d){return ele.indexOf(d)>=0;});
+  }).sort(function(a,b){return String(b.recebido||'').localeCompare(String(a.recebido||''));});
+}
+function pedAvisoRepetido(f,o,lista){
+  var p=lista[0],c=cliente(p.clienteId),tt=tipo(p.tipoId),dn=(p.elementos||[]).join(', ')||'—';
+  var el=document.createElement('div');el.id='peddup';
+  el.innerHTML='<div class="modq-b" role="dialog" aria-modal="true" aria-label="Possível pedido repetido">'+
+    '<span class="modq-ic">⚠️</span><h2>Possível pedido repetido</h2>'+
+    '<p>#'+p.num+' '+esc(c?nomeContato(c):'')+', dentes '+esc(dn)+', criado em '+esc(p.recebido?dm(p.recebido):'—')+'</p>'+
+    (lista.length>1?'<p class="small muted">E mais '+(lista.length-1)+' parecido(s).</p>':'')+
+    '<div id="peddup-det" style="display:none;text-align:left"></div>'+
+    '<div class="modq-arc">'+
+      '<button class="btn" data-m="ver">Ver pedido</button>'+
+      '<button class="btn pri" data-m="salvar">Salvar mesmo assim</button>'+
+    '</div><button class="btn sm modq-v" data-m="cancelar">Cancelar</button></div>';
+  document.body.appendChild(el);
+  var b0=el.querySelector('[data-m=salvar]');if(b0)b0.focus();
+  var fecha=function(){el.remove();document.removeEventListener('keydown',tecla,true);},tecla=function(e){if(e.key==='Escape'){e.stopPropagation();fecha();}};
+  document.addEventListener('keydown',tecla,true);
+  el.addEventListener('click',function(e){
+    if(e.target===el){fecha();return;}
+    var b=e.target.closest('[data-m]');if(!b)return;var m=b.dataset.m;
+    if(m==='ver'){
+      var d=document.getElementById('peddup-det');if(!d)return;
+      var aberto=d.style.display==='block';
+      if(!aberto)d.innerHTML='<div class="grid2 small" style="gap:6px 14px;margin-top:2px">'+
+        '<div><b>Cliente</b><br>'+esc(c?c.nome:'—')+'</div>'+
+        '<div><b>Paciente</b><br>'+esc(p.paciente||'—')+'</div>'+
+        '<div><b>Trabalho</b><br>'+esc(tt?tt.nome:'—')+'</div>'+
+        '<div><b>Dentes</b><br>'+esc(dn)+'</div>'+
+        '<div><b>Data</b><br>'+esc(p.recebido?dm(p.recebido):'—')+'</div>'+
+        '<div><b>Valor</b><br>'+brl(p.valor)+'</div>'+
+        '<div><b>Status</b><br>'+esc(pedStatusNome(p.status))+'</div></div>';
+      d.style.display=aberto?'none':'block';b.textContent=aberto?'Ver pedido':'Ocultar';
+      return;
+    }
+    fecha();
+    if(m==='salvar'){f.dataset.dupOk='1';f.dataset.modOk='1';f.requestSubmit();}
+  });
+}
 function gengTipo(cria){var t=alive(S.tipos).filter(function(x){return /^gengiva/i.test(semAcento(String(x.nome||'')).trim());})[0];if(!t&&cria){t={id:uid(),nome:'Gengiva',forma:'elemento',valor:0,ativo:true};S.tipos.push(t);}return t||null;}
 function calcItens(cid,itens,extras,data){
   var g={},linhas=[],bruto=0;
@@ -8201,6 +8253,8 @@ var F={
     if(sl){if(!/^https:\/\//i.test(sl)){toast('O link do escaneamento precisa começar com https://');var si=document.getElementById('pd-scan');if(si)si.focus();return;}try{host=new URL(sl).hostname.replace(/^www\./,'');}catch(x){toast('Link do escaneamento inválido.');return;}}
     var virou=null;if(!id&&/^lead:/.test(o.clienteId||'')){virou=leadViraCliente(o.clienteId.slice(5));if(!virou){toast('Esse lead não está mais na lista. Escolha o cliente de novo.');return;}o.clienteId=virou.cid;}
     var antesCli=null;if(!id&&o.clienteId&&!virou){try{antesCli=cliStats(o.clienteId);}catch(e){}}
+    if(!id){var rep=pedRepetidos(o);if(rep.length&&!f.dataset.dupOk){pedAvisoRepetido(f,o,rep);return;}}
+    delete f.dataset.dupOk;
     if(id){p=byId(S.pedidos,id);Object.assign(p,o);}else{p=Object.assign({id:uid(),num:++S.seq,status:'entrada',entregue:null,pago:null,pagamentoId:null},o);S.pedidos.push(p);}
     if(sl)S.arquivos.push({id:uid(),pedidoId:p.id,origem:'link',nome:'Escaneamento · '+host,url:sl,criado:today()});
     if(ui.pdRede&&!id){save();if(anexos.length)enviaArquivo(p.id,anexos);toast('Pedido #'+p.num+' criado. Agora defina o repasse e o prazo.');vaiDelegar(p.id);return;}
