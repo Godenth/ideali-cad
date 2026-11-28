@@ -4733,6 +4733,7 @@ function rCfgConta(){var R=typeof RL!=='undefined'?RL:{},p=R.perfil||{},c=S.cad,
   return '<section class="card cfg-c"><h2>Minha conta</h2>'+[['Nome',p.nome||c.nome],['E-mail de acesso',em],['WhatsApp',p.whats?rlTel(p.whats):c.whats],['Profissão',p.prof||c.prof],['Cargo',p.cargo||c.cargo],['Cidade',(p.cidade||c.cidade||'')+((p.uf||c.uf)?' / '+(p.uf||c.uf):'')],['Tipo de conta',R.admin?'👑 Conta master':'Profissional']].map(function(x){return '<div class="cfg-l"><span>'+x[0]+'</span><b>'+esc(x[1]||'—')+'</b></div>';}).join('')+
     '<div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap"><button class="btn" data-act="cfgVai" data-v="perfil">Editar currículo</button>'+(R.user?'<button class="btn" data-act="cfgSenha">Trocar senha</button><button class="btn danger" data-rl="sair">Sair</button>':'')+'</div></section>';}
 function rCfgEmpresa(N){var T=negT();return '<section class="card cfg-c"><h2>'+T.ic+' Minha empresa</h2>'+(typeof labVRecebidos==='function'?labVRecebidos():'')+[EMP.row&&EMP.row.codigo?['Seu ID no Ideali',labIdTxt(EMP.row.codigo)+' (passe este número para os dentistas te convidarem)']:null,['Nome',N.nome],['Tipo',T.t],['Cidade',N.cid+' / '+N.uf],['Seu papel',N.papel==='faz'?'Dono e responsável técnico':'Dono, cuida da gestão'],N.rt?['Responsável técnico',N.rt]:null,['Criada em',N.criado?String(N.criado).split('-').reverse().join('/'):'—']].filter(Boolean).map(function(x){return '<div class="cfg-l"><span>'+x[0]+'</span><b>'+esc(x[1]||'—')+'</b></div>';}).join('')+
+  ((typeof negEhLab==='function'&&negEhLab(N)&&!ESP.dono)?'<section class="card cfg-c"><h2>🔗 Conectar clínica</h2><p class="small muted">Envie o link para a clínica entrar/criar a conta e conectar o laboratório. Depois, em Laboratório → Laboratórios, você escolhe qual cliente seu é ela para ela ver os pedidos.</p><div class="row wrap" style="gap:8px;margin-top:8px"><button class="btn pri" data-act="labConvidaCli">📨 Convidar clínica</button></div></section>':'')+
   '<div class="row" style="margin-top:12px"><button class="btn danger" data-act="negApaga">Apagar empresa de teste</button></div></section>'+
   ((typeof negEhLab==='function'&&negEhLab(N)&&!ESP.dono)?'<section class="card cfg-c"><h2>Operação</h2><p class="small muted">Atalhos do dia a dia dos pedidos.</p><div class="row wrap" style="gap:8px;margin-top:8px"><button class="btn" data-act="cfgOper" data-v="cadistas">✏️ Cadistas</button><button class="btn" data-act="cfgOper" data-v="pfx">🧹 Fechar antigos</button><button class="btn" data-act="cfgOper" data-v="prazos">⏱️ Mapa de prazos</button></div></section>':'');}
 function rCfgArmaz(){var R=typeof RL!=='undefined'?RL:{},N=S.neg,cli=(typeof EMP!=='undefined'&&EMP.cli)?EMP.cli.length:0;
@@ -5554,6 +5555,7 @@ function donoId(){return ESP.dono||MEM.dono||(RL.user&&RL.user.id);}
 function espLS(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){}return null;}
 (function(){var m=location.search.match(/[?&]espelho=([a-f0-9]{64})/);if(m){espLS('io_esp_token',m[1]);try{history.replaceState(null,'',location.pathname);}catch(e){}
   setTimeout(function(){toast('Convite de conta espelho: entre ou crie o seu login para aceitar.');},600);}})();
+(function(){var ml=location.search.match(/[?&]lab=([0-9]{1,6})/i);if(ml){window.__LAB_INVITE=ml[1];}})();
 function espPrepara(){var u=RL.user;if(!u)return Promise.resolve();var tk=espLS('io_esp_token');
   var p=tk?SB.rpc('odo_parceiro_aceita',{p_token:tk}).then(function(r){espLS('io_esp_token',null);if(r.error)toast(/inv[aá]lido|vencido|cancelado/i.test(r.error.message||'')?'Este convite não vale mais. Peça um novo.':'Não consegui aceitar o convite.');else{espLS('io_esp_dono',r.data);toast('Convite aceito! Você está vendo a conta espelho.');}}):Promise.resolve();
   var pq=function(c){return SB.from('odo_parceiros').select(c).eq('parceiro_id',u.id).eq('ativo',true);};
@@ -6688,7 +6690,7 @@ function labVRecebidos(){var R=labVRec();if(!R.length)return '';
     (v.status==='pendente'?'<button class="btn sm pri" data-act="labResp" data-v="'+v.id+'|1">Aceitar</button><button class="btn sm" data-act="labResp" data-v="'+v.id+'|0">Recusar</button>':'<span class="labv-st '+v.status+'">'+(v.status==='aceito'?'✅ Conectado':'Recusado')+'</span>')+'</div>';}).join('')+'</div>';}
 function labLeId(){var el=document.getElementById('labv-id');if(el)LABV.q=el.value;return parseInt(String(LABV.q).replace(/\D/g,''),10);}
 Object.assign(ACT,{
-  labConvAbre:function(){LABV.abre=true;LABV.busca=null;render();setTimeout(function(){var el=document.getElementById('labv-id');if(el)el.focus();},50);},
+  labConvAbre:function(){LABV.abre=true;LABV.busca=null;if(window.__LAB_INVITE&&!LABV.q)LABV.q=window.__LAB_INVITE;render();setTimeout(function(){var el=document.getElementById('labv-id');if(el){el.focus();if(window.__LAB_INVITE&&!LABV._invBusca){LABV._invBusca=true;ACT.labBusca();}}},60);},
   labConvFecha:function(){LABV.abre=false;LABV.busca=null;LABV.q='';render();},
   labBusca:function(){var n=labLeId();if(!n){toast('Digite o número do ID.');return;}LABV.busy=true;render();
     SB.rpc('odo_lab_busca',{p_codigo:n}).then(function(r){LABV.busy=false;if(r.error){LABV.busca=null;toast(/odo_lab_busca|function/.test(r.error.message||'')?'Falta rodar a atualização 056 no Supabase.':'Não consegui procurar agora.');}else LABV.busca=r.data||false;render();});},
@@ -6700,6 +6702,28 @@ Object.assign(ACT,{
 document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='labv-id'&&e.key==='Enter'){e.preventDefault();ACT.labBusca();}});
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='labv-id')LABV.q=e.target.value;});
 var _rlEntraLab=rlEntra;rlEntra=function(){_rlEntraLab.apply(this,arguments);if(RL.user&&!LABV.carregando){LABV.carregando=true;labVCarrega().then(function(){LABV.carregando=false;},function(){LABV.carregando=false;});}};
+function labConviteUrl(){if(!EMP.row||!EMP.row.codigo)return '';return location.origin+location.pathname.replace(/index\.html$/,'')+'?lab='+encodeURIComponent(labIdTxt(EMP.row.codigo));}
+function labConvidaCli(){if(typeof ESP!=='undefined'&&ESP.dono){toast('🪞 Conta espelho: só leitura.');return;}if(!EMP.row||!EMP.row.codigo){toast('Falta o ID da empresa.');return;}if(document.getElementById('labc-ov'))return;
+  var url=labConviteUrl(),id=labIdTxt(EMP.row.codigo),nm=(S.neg&&S.neg.nome)||'laboratório';
+  var msg='Olá! Aqui é do '+nm+'. Para você acompanhar seus pedidos no Ideali, entre ou crie sua conta e conecte o nosso laboratório pelo link: '+url+' (ID do laboratório: '+id+').';
+  var bs='padding:10px 14px;border-radius:10px;cursor:pointer;font:inherit;font-weight:700;border:0;';
+  var d=document.createElement('div');d.id='labc-ov';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Convidar clínica');
+  d.style.cssText='position:fixed;inset:0;z-index:120;background:rgba(10,12,24,.55);display:flex;align-items:center;justify-content:center;padding:18px';
+  d.setAttribute('data-msg',msg);
+  d.innerHTML='<div style="background:var(--surface,#fff);color:var(--ink,#111);border:1px solid var(--line,#ddd);border-radius:16px;max-width:min(540px,94vw);width:100%;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.35)">'+
+    '<div style="display:flex;align-items:center;margin-bottom:6px"><b style="font-size:1.05rem">Convidar clínica</b><span style="flex:1"></span><button type="button" data-labc="fecha" aria-label="Fechar" style="border:0;background:none;font-size:1.4rem;line-height:1;cursor:pointer;color:inherit">×</button></div>'+
+    '<p style="margin:0 0 10px;color:var(--muted,#666);font-size:.9rem">Mande este link para a clínica. Ela entra ou cria a conta, conecta o laboratório e aceita. Depois, em <b>Laboratório → Laboratórios</b>, escolha qual cliente seu é ela para liberar os pedidos.</p>'+
+    '<input id="labc-url" readonly value="'+esc(url)+'" style="width:100%;padding:10px;border:1px solid var(--line,#ddd);border-radius:10px;font:inherit;font-size:.85rem;background:var(--soft,#f7f7f7);color:inherit">'+
+    '<p style="margin:8px 0 0;font-size:.82rem;color:var(--muted,#666)">ID do laboratório: <b>'+esc(id)+'</b></p>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button type="button" data-labc="copia" style="'+bs+'background:var(--soft,#f2f2f2);color:inherit;border:1px solid var(--line,#ddd)">📋 Copiar link</button><button type="button" data-labc="wa" style="'+bs+'background:#25D366;color:#fff">💬 WhatsApp</button></div>'+
+    '<p style="margin:12px 0 0;font-size:.8rem;color:var(--muted,#666)">Cliente já lançado no laboratório? Depois de conectar, selecione o cliente em Laboratório → Laboratórios para os pedidos antigos aparecerem para a clínica.</p></div>';
+  document.body.appendChild(d);}
+Object.assign(ACT,{labConvidaCli:labConvidaCli});
+document.addEventListener('click',function(e){var ov=document.getElementById('labc-ov');if(!ov)return;var b=e.target&&e.target.closest&&e.target.closest('[data-labc]');if(!b){if(e.target===ov)ov.remove();return;}var a=b.getAttribute('data-labc');
+  if(a==='fecha'){ov.remove();return;}
+  if(a==='copia'){var inp=document.getElementById('labc-url');if(inp&&inp.value){try{navigator.clipboard.writeText(inp.value);toast('Link copiado.');}catch(x){inp.select();try{document.execCommand('copy');toast('Link copiado.');}catch(y){}}}}
+  else if(a==='wa'){var m=ov.getAttribute('data-msg')||'';window.open('https://wa.me/?text='+encodeURIComponent(m),'_blank');}},true);
+var _renderLabInv=render;render=function(){try{if(window.__LAB_INVITE&&typeof RL!=='undefined'&&RL.user&&S.role==='dent'&&!window.__LAB_INV_ROUTED){window.__LAB_INV_ROUTED=true;S.tab[S.role]='pedidos';S.labSub='labs';if(typeof LABV!=='undefined'){LABV.abre=true;LABV.q=window.__LAB_INVITE;}var r=_renderLabInv.apply(this,arguments);setTimeout(function(){try{if(typeof ACT!=='undefined'&&ACT.labBusca&&typeof LABV!=='undefined'&&LABV.abre)ACT.labBusca();}catch(e){}},140);return r;}}catch(e){}return _renderLabInv.apply(this,arguments);};
 
 /* ===== Pedido digital: dentista → laboratório conectado (escaneamento + fotos; arquivos apagam em 3 dias) ===== */
 var PDG={L:[],carregado:false,erro:'',ed:null,busy:false,prog:'',sel:[],aviso:false,resp:{}};
