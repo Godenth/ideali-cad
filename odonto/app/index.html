@@ -2784,6 +2784,26 @@ body.pe-trava{overflow:hidden}
 [data-theme=dark] .ped-semcom-badge{color:#FCA5A5;background:rgba(220,38,38,.16)}
 .btn.sm.ped-semcom-btn{font-size:.78rem;padding:5px 8px}
 .btn.sm.ped-semcom-btn.on{background:#DC2626!important;border-color:#DC2626!important;color:#fff!important}
+.atrib-ov{position:fixed;inset:0;z-index:280;background:rgba(3,6,14,.66);backdrop-filter:blur(3px);display:grid;place-items:center;padding:18px}
+.atrib-box{width:min(620px,100%);max-height:calc(100vh - 36px);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.45)}
+.atrib-h{display:flex;align-items:flex-start;gap:12px;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+.atrib-h h2{margin:2px 0 0;font-size:1.1rem}.atrib-h p{margin:2px 0 0}.atrib-h .spacer{flex:1}
+.atrib-b{display:grid;gap:12px;padding:16px 20px 20px}.atrib-b .err,.atrib-b .atrib-ok{margin:0}
+.atrib-ok{color:var(--ok);font-weight:700}
+.atrib-b .seg{display:flex;width:100%}
+.atrib-b .seg button{flex:1;min-height:40px;cursor:pointer;color:var(--ink);background:var(--soft);border:1px solid var(--line);font-size:.9rem}
+.atrib-b .seg button:hover{border-color:var(--accent);color:var(--accent)}
+.atrib-b .seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:800}
+.atrib-lista{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}.atrib-lista h3{margin:0;font-size:.95rem}
+.atrib-li{display:flex;flex-wrap:wrap;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px}
+.atrib-li .atrib-li-t{flex:1;min-width:180px;display:grid;gap:2px}
+@media(max-width:600px){.atrib-ov{padding:0;place-items:end stretch}.atrib-box{width:100%;max-height:92vh;border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom)}}
+.atrib-minhas-ban{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 14px;padding:12px 14px;border:1px solid color-mix(in srgb,var(--ok) 45%,var(--line));border-left:4px solid var(--ok);border-radius:12px;background:color-mix(in srgb,var(--ok) 7%,var(--surface));color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.atrib-minhas-ban .atrib-minhas-txt{flex:1;min-width:220px;display:grid;gap:3px}
+.atrib-minhas-ban .atrib-minhas-txt b{font-size:1rem}
+.atrib-minhas-ban small{color:var(--muted)}
+.atrib-minhas-ban .atrib-minhas-acoes{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:600px){.atrib-minhas-ban{padding:10px}.atrib-minhas-ban .atrib-minhas-acoes{width:100%}.atrib-minhas-ban .atrib-minhas-acoes .btn{flex:1}}
 </style>
 
 <div class="site" id="site"><div class="ceu" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -4922,7 +4942,7 @@ function rCliForm(c){return '<div class="dtop"><div><h2>'+(c.id?'Editar cliente'
   '<label class="fld cli-full"><span>Observações</span><textarea data-cf="obs" maxlength="1000" rows="2">'+esc(c.obs||'')+'</textarea></label>'+
   '<label class="check cli-full"><input type="checkbox" data-cf="ativo" '+(c.ativo!==false?'checked':'')+'> Cliente ativo</label>'+
   (EMP.erroF?'<p class="err cli-full">'+esc(EMP.erroF)+'</p>':'')+
-  '<div class="row cli-full"><button class="btn" data-act="cliVolta">← Voltar</button><span class="spacer"></span>'+(c.id?'<button class="btn danger" data-act="cliApaga">Excluir</button>':'')+'<button class="btn pri" data-act="cliSalva"'+(EMP.busy?' disabled':'')+'>'+(EMP.busy?'Salvando…':'Salvar')+'</button></div></section>';}
+  '<div class="row cli-full"><button class="btn" data-act="cliVolta">← Voltar</button><button class="btn" data-act="atribuiAbre" data-v="'+esc(c.id||'')+'"'+(c.id?'':' disabled title="Salve o cliente antes de atribuir uma conta"')+'>Atribuir esta empresa a uma conta Ideali</button><span class="spacer"></span>'+(c.id?'<button class="btn danger" data-act="cliApaga">Excluir</button>':'')+'<button class="btn pri" data-act="cliSalva"'+(EMP.busy?' disabled':'')+'>'+(EMP.busy?'Salvando…':'Salvar')+'</button></div></section>';}
 function cliLe(){var c=EMP.ed;[].forEach.call(document.querySelectorAll('[data-cf]'),function(el){var k=el.dataset.cf;c[k]=el.type==='checkbox'?el.checked:el.value.trim();});if(c.documento)c.documento=c.documento.replace(/\D/g,'');if(c.uf)c.uf=c.uf.toUpperCase();}
 Object.assign(ACT,{
   cliNovo:function(){EMP.ed={ativo:true};EMP.erroF='';render();var i=document.querySelector('[data-cf=nome]');if(i)i.focus();},
@@ -10183,6 +10203,112 @@ ACT.calExcluir=function(id){if(!SB||!confirm('Excluir este post?'))return;SB.fro
 ACT.calPublicar=function(id){if(!SB)return;SB.functions.invoke('instagram-publicar',{body:{post_id:id}}).then(function(r){if(r.error)alert('Erro: '+(r.error.message||'falha'));setTimeout(calCarregar,3000);});};
 ACT.calUploadMidia=function(inputEl){var file=inputEl.files&&inputEl.files[0];if(!file||!SB)return;MKT.cal.uploading=true;render();SB.auth.getUser().then(function(u){if(!u.data||!u.data.user){MKT.cal.uploading=false;render();return;}var uid=u.data.user.id;var ext=file.name.split('.').pop();var path=uid+'/'+Date.now()+'.'+ext;SB.storage.from('marketing').upload(path,file,{contentType:file.type,upsert:true}).then(function(res){MKT.cal.uploading=false;if(res.error){alert('Erro upload: '+res.error.message);render();return;}var urlInput=document.getElementById('cal-midia-url');if(urlInput)urlInput.value='https://qxspiaqaigjkmilxxfri.supabase.co/storage/v1/object/public/marketing/'+path;render();});});};
 ACT.calCriarPost=function(){if(!SB)return;var tipo=document.getElementById('cal-tipo')?document.getElementById('cal-tipo').value:'story';var midia=document.getElementById('cal-midia-url')?document.getElementById('cal-midia-url').value:'';var legenda=document.getElementById('cal-legenda')?document.getElementById('cal-legenda').value:'';var hashtags=document.getElementById('cal-hashtags')?document.getElementById('cal-hashtags').value:'';var agendado=document.getElementById('cal-agendado')?document.getElementById('cal-agendado').value:'';if(!midia||!agendado){alert('URL da mídia e horário são obrigatórios');return;}SB.from('posts_agendados').insert({tipo:tipo,midia_url:midia,legenda:legenda,hashtags:hashtags,agendado_para:agendado,status:'rascunho'}).then(function(r){if(r.error)alert('Erro: '+r.error.message);else{document.getElementById('cal-form-wrap').style.display='none';calCarregar();}});};
+/* ---- Atribuir o cliente do laboratório a uma conta Ideali ---- */
+var ATRIB={cli:null,email:'',papel:'dono',senha:'',codigo:'',etapa:'',busy:false,erro:'',msg:'',lista:[],erroLista:''};
+var ATRIB_ST={pendente:'Aguardando aceite',aceito:'Aceito',recusado:'Recusado',cancelado:'Cancelado',removido:'Removido'};
+function atribuiErro(e,acao){var m=String((e&&e.message)||e||'');
+  if(/cliente_nao_e_seu/.test(m))return 'Este cliente não pertence ao laboratório.';
+  if(/email_invalido/.test(m))return 'Digite um e-mail válido.';
+  if(/ja_atribuido/.test(m))return 'Essa conta já está atribuída a esta empresa.';
+  if(/papel_invalido/.test(m))return 'Escolha Dono ou Funcionário.';
+  if(/Laboratório não encontrado/.test(m))return 'Cadastre o laboratório antes de atribuir.';
+  if(/Entre na sua conta/.test(m))return 'Entre na sua conta para continuar.';
+  if(/reauthentication|nonce|invalid|expired|verification/i.test(m))return 'O código não conferiu ou venceu. Peça outro e tente de novo.';
+  if(/senha|password|credential/i.test(m)&&!/odo_/.test(m))return 'Não consegui confirmar a senha. Tente de novo.';
+  if(/odo_atribui|odo_lab_atribui/.test(m))return 'Falta rodar a atualização 102 no Supabase.';
+  return 'Não consegui '+acao+'.';}
+function atribuiLe(){var g=function(id){var e=document.getElementById(id);return e?(e.value||''):'';};
+  ATRIB.email=g('atrib-email').trim();ATRIB.senha=g('atrib-senha');ATRIB.codigo=g('atrib-codigo').replace(/\D/g,'').slice(0,6);}
+function atribuiFalha(msg,foco){ATRIB.erro=msg;ATRIB.busy=false;atribuiDesenha(foco);toast(msg);}
+function atribuiData(x){return x?new Date(x).toLocaleDateString('pt-BR'):'';}
+function atribuiLabNome(v){var s=String(v||'').trim();if(!s)return '—';while(/^laboratório\s+/i.test(s))s=s.replace(/^laboratório\s+/i,'');return 'Laboratório '+s;}
+function atribuiHtml(){var c=null;
+  if(ATRIB.cli&&typeof EMP!=='undefined'&&EMP.cli)c=EMP.cli.filter(function(x){return x.id===ATRIB.cli;})[0]||null;
+  if(!c&&ATRIB.cli&&EMP.ed&&EMP.ed.id===ATRIB.cli)c=EMP.ed;
+  var nome=(c&&c.nome)||'este cliente',emailUser=(RL.user&&RL.user.email)||'seu e-mail';
+  var lista=ATRIB.lista.length?ATRIB.lista.map(function(x){var st=String(x.status||''),quando=x.respondido_em||x.cancelado_em||x.removido_em||x.criado_em;
+    return '<div class="atrib-li"><span class="atrib-li-t"><b>'+esc(x.email_convite||'Sem e-mail')+'</b><small>'+esc(ATRIB_ST[st]||st||'—')+(x.papel?' · '+(x.papel==='dono'?'Dono':'Funcionário'):'')+(quando?' · '+esc(atribuiData(quando)):'')+'</small></span>'+
+      (st==='pendente'?'<button class="btn sm" data-act="atribuiCancela" data-v="'+esc(x.id)+'">Cancelar</button>':'')+
+      (st==='aceito'?'<button class="btn sm danger" data-act="atribuiRemove" data-v="'+esc(x.id)+'">Remover</button>':'')+'</div>';}).join(''):'<div class="empty small">Nenhum convite ainda.</div>';
+  return '<div class="atrib-box" role="dialog" aria-modal="true" aria-label="Atribuir empresa a uma conta Ideali">'+
+    '<header class="atrib-h"><div><small>Clientes</small><h2>Atribuir esta empresa a uma conta Ideali</h2><p class="small muted">'+esc(nome)+'</p></div><span class="spacer"></span><button class="pv-x" data-act="atribuiFecha" aria-label="Fechar">✕</button></header>'+
+    '<div class="atrib-b"><p class="small muted">Confirme com a senha da sua conta ('+esc(emailUser)+') e o código de 6 dígitos que enviaremos para ela. Nada disso é guardado.</p>'+
+    '<label class="fld"><span>E-mail da conta Ideali</span><input id="atrib-email" type="email" maxlength="120" placeholder="nome@empresa.com.br" value="'+esc(ATRIB.email||(c&&c.email||''))+'" autocomplete="off"></label>'+
+    '<div class="fld"><span>Papel nessa empresa</span><div class="seg" role="radiogroup" aria-label="Papel nessa empresa">'+[['dono','Dono'],['funcionario','Funcionário']].map(function(o){var on=ATRIB.papel===o[0];return '<button type="button" role="radio" aria-checked="'+on+'" aria-pressed="'+on+'" class="atrib-papel'+(on?' on':'')+'" data-act="atribuiPapel" data-v="'+o[0]+'">'+o[1]+'</button>';}).join('')+'</div></div>'+
+    '<label class="fld"><span>Sua senha atual</span><input id="atrib-senha" type="password" value="'+esc(ATRIB.senha||'')+'" autocomplete="current-password"></label>'+
+    '<label class="fld"><span>Código enviado para você</span><input id="atrib-codigo" inputmode="numeric" maxlength="6" placeholder="000000" value="'+esc(ATRIB.codigo||'')+'" autocomplete="one-time-code"'+(ATRIB.etapa==='codigo'?'':' disabled')+'></label>'+
+    (ATRIB.erro?'<p class="err">'+esc(ATRIB.erro)+'</p>':'')+(ATRIB.msg?'<p class="atrib-ok">'+esc(ATRIB.msg)+'</p>':'')+
+    '<div class="row wrap">'+(ATRIB.etapa==='codigo'?'<button class="btn" data-act="atribuiReenvia"'+(ATRIB.busy?' disabled':'')+'>Reenviar código</button>':'')+'<button class="btn pri" data-act="atribuiEnvia"'+(ATRIB.busy?' disabled':'')+'>'+(ATRIB.busy?'Confirmando…':(ATRIB.etapa==='codigo'?'Confirmar e atribuir':'Enviar código'))+'</button></div>'+
+    '<div class="atrib-lista"><h3>Convites deste cliente</h3>'+(ATRIB.erroLista?'<p class="err">'+esc(ATRIB.erroLista)+'</p>':'')+lista+'</div></div></div>';}
+function atribuiDesenha(foco,semFoco){var el=document.getElementById('atribui-ov');if(!el)return;el.innerHTML=atribuiHtml();
+  if(!semFoco){var i=document.getElementById(foco||(ATRIB.etapa==='codigo'?'atrib-codigo':'atrib-email'));if(i&&!i.disabled)i.focus();}}
+function atribuiMostra(){var el=document.getElementById('atribui-ov');if(!el){el=document.createElement('div');el.id='atribui-ov';el.className='atrib-ov';el.dataset.atrib='fora';document.body.appendChild(el);}atribuiDesenha();}
+function atribuiFecha(){var el=document.getElementById('atribui-ov');if(el&&el.parentNode)el.parentNode.removeChild(el);ATRIB.senha='';ATRIB.codigo='';}
+function atribuiCarrega(){if(!ATRIB.cli||!SB)return;
+  return SB.rpc('odo_atribui_do_lab',{p_cliente:ATRIB.cli}).then(function(r){
+    if(r.error){ATRIB.erroLista=atribuiErro(r.error,'carregar os convites');toast(ATRIB.erroLista);}
+    else{ATRIB.erroLista='';ATRIB.lista=r.data||[];}
+    atribuiDesenha(null,true);
+  }).catch(function(e){ATRIB.erroLista=atribuiErro(e,'carregar os convites');toast(ATRIB.erroLista);atribuiDesenha(null,true);});}
+Object.assign(ACT,{
+  atribuiAbre:function(v){if(!SB||!RL.user){toast('Entre na sua conta para atribuir uma empresa.');return;}
+    var id=v||(EMP.ed&&EMP.ed.id)||'',c=EMP.cli.filter(function(x){return x.id===id;})[0]||((EMP.ed&&EMP.ed.id===id)?EMP.ed:null);
+    if(!c||!c.id){toast('Salve o cliente antes de atribuir uma conta.');return;}
+    ATRIB={cli:c.id,email:c.email||'',papel:'dono',senha:'',codigo:'',etapa:'',busy:false,erro:'',msg:'',lista:[],erroLista:''};
+    atribuiMostra();atribuiCarrega();},
+  atribuiFecha:function(){atribuiFecha();},
+  atribuiPapel:function(v){atribuiLe();ATRIB.papel=v;ATRIB.erro='';atribuiDesenha('atrib-email',true);},
+  atribuiReenvia:function(){atribuiLe();if(!RL.user||!RL.user.email){toast('Entre na sua conta para continuar.');return;}
+    ATRIB.busy=true;ATRIB.erro='';ATRIB.msg='';atribuiDesenha(null,true);
+    SB.auth.reauthenticate().then(function(r){ATRIB.busy=false;if(r.error){ATRIB.erro=atribuiErro(r.error,'reenviar o código');atribuiDesenha('atrib-codigo');toast(ATRIB.erro);return;}
+      ATRIB.msg='Enviamos outro código para '+RL.user.email+'.';atribuiDesenha('atrib-codigo');toast('Código reenviado.');
+    }).catch(function(e){ATRIB.busy=false;ATRIB.erro=atribuiErro(e,'reenviar o código');atribuiDesenha('atrib-codigo');toast(ATRIB.erro);});},
+  atribuiEnvia:function(){atribuiLe();
+    if(ATRIB.etapa!=='codigo'){
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ATRIB.email)){atribuiFalha('Digite o e-mail da conta Ideali.','atrib-email');return;}
+      if(!ATRIB.senha){atribuiFalha('Digite a senha da sua conta.','atrib-senha');return;}
+      if(!RL.user||!RL.user.email){toast('Entre na sua conta para continuar.');return;}
+      ATRIB.busy=true;ATRIB.erro='';ATRIB.msg='';atribuiDesenha(null,true);
+      SB.auth.signInWithPassword({email:RL.user.email,password:ATRIB.senha}).then(function(r){
+        if(r.error)throw r.error;
+        if(r.data&&r.data.user&&RL.user.id&&r.data.user.id!==RL.user.id)throw new Error('Conta diferente da atual.');
+        return SB.auth.reauthenticate().then(function(r2){
+          if(r2.error)throw r2.error;
+          ATRIB.busy=false;ATRIB.etapa='codigo';ATRIB.msg='Enviamos o código para '+RL.user.email+'. Digite os 6 dígitos para confirmar.';ATRIB.codigo='';atribuiDesenha('atrib-codigo');toast('Enviamos o código para o seu e-mail.');
+        });
+      }).catch(function(e){atribuiFalha(atribuiErro(e,'confirmar a senha'),'atrib-senha');});
+      return;}
+    if(ATRIB.codigo.length!==6){atribuiFalha('Digite os 6 dígitos enviados para o seu e-mail.','atrib-codigo');return;}
+    if(ATRIB.papel!=='dono'&&ATRIB.papel!=='funcionario'){atribuiFalha('Escolha Dono ou Funcionário.','atrib-email');return;}
+    ATRIB.busy=true;ATRIB.erro='';ATRIB.msg='';atribuiDesenha(null,true);
+    SB.auth.updateUser({nonce:ATRIB.codigo}).then(function(r){
+      if(r.error)throw r.error;
+      return SB.rpc('odo_lab_atribui_conta',{p_cliente:ATRIB.cli,p_email:ATRIB.email,p_papel:ATRIB.papel}).then(function(rr){
+        if(rr.error)throw rr.error;
+        ATRIB.busy=false;ATRIB.etapa='';ATRIB.senha='';ATRIB.codigo='';ATRIB.erro='';ATRIB.msg='Convite enviado para '+ATRIB.email+'.';
+        atribuiDesenha(null,true);toast(ATRIB.msg);atribuiCarrega();
+      });
+    }).catch(function(e){atribuiFalha(atribuiErro(e,'enviar o convite'),'atrib-codigo');});},
+  atribuiCancela:function(v){if(!SB||!v)return;SB.rpc('odo_atribui_cancela',{p_id:v}).then(function(r){
+    if(r.error||r.data===false){var m=r.error?atribuiErro(r.error,'cancelar o convite'):'Não consegui cancelar (o convite já mudou).';ATRIB.erroLista=m;atribuiDesenha(null,true);toast(m);return;}
+    toast('Convite cancelado.');atribuiCarrega();});},
+  atribuiRemove:function(v){if(!SB||!v)return;SB.rpc('odo_atribui_remove',{p_id:v}).then(function(r){
+    if(r.error||r.data===false){var m=r.error?atribuiErro(r.error,'remover o acesso'):'Não consegui remover (o acesso já mudou).';ATRIB.erroLista=m;atribuiDesenha(null,true);toast(m);return;}
+    toast('Acesso removido.');atribuiCarrega();});}
+});
+document.addEventListener('click',function(ev){if(ev.target&&ev.target.dataset&&ev.target.dataset.atrib==='fora')ACT.atribuiFecha();});
+document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&document.getElementById('atribui-ov'))ACT.atribuiFecha();});
+var ATRIB_M={sessao:'',busy:false,convites:[],erro:''};
+function atribuiMLista(d){if(!d)return [];if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return [];}}return Array.isArray(d)?d:[];}
+function atribuiMSouLab(x){if(!x)return false;var lab=String((typeof EMP!=='undefined'&&EMP.row&&EMP.row.id)||'');if(lab&&x.lab_id&&String(x.lab_id)===lab)return true;if(typeof EMP!=='undefined'&&EMP.carregado&&(EMP.cli||[]).some(function(c){return c.id&&x.cliente_id&&String(c.id)===String(x.cliente_id);}))return true;return false;}
+function atribuiMPendentes(){if(!RL.user||!RL.perfil)return [];return ATRIB_M.convites.filter(function(x){return x&&String(x.status||'')==='pendente'&&!atribuiMSouLab(x);});}
+function atribuiMHtml(){var L=atribuiMPendentes();if(!L.length)return '';return '<div id="atribui-minhas">'+L.map(function(x){return '<div class="atrib-minhas-ban"><div class="atrib-minhas-txt"><b>A empresa '+esc(x.empresa||'empresa')+' foi atribuída a você</b><small>'+(x.papel==='dono'?'Dono':'Funcionário')+' · '+esc(atribuiLabNome(x.lab))+'</small></div><div class="atrib-minhas-acoes"><button type="button" class="btn sm pri" data-act="atribuiMResponde" data-v="'+esc(x.id)+'" data-ok="1"'+(ATRIB_M.busy?' disabled':'')+'>Aceitar</button><button type="button" class="btn sm" data-act="atribuiMResponde" data-v="'+esc(x.id)+'" data-ok="0"'+(ATRIB_M.busy?' disabled':'')+'>Recusar</button></div></div>';}).join('')+'</div>';}
+function atribuiMBusca(){if(!SB||!RL.user)return Promise.resolve();return SB.rpc('odo_atribui_minhas').then(function(r){if(r.error)throw r.error;ATRIB_M.convites=atribuiMLista(r.data);ATRIB_M.erro='';return r.data;}).catch(function(e){ATRIB_M.erro=atribuiErro(e,'verificar seus convites');return null;});}
+function atribuiMInicia(){if(!SB||!RL.user||!RL.user.id||ATRIB_M.sessao===RL.user.id)return Promise.resolve();ATRIB_M.sessao=RL.user.id;return SB.rpc('odo_conta_reivindica_convites').then(function(r){if(r.error)throw r.error;return atribuiMBusca();}).catch(function(e){ATRIB_M.erro=atribuiErro(e,'verificar seus convites');}).then(function(){render();});}
+Object.assign(ACT,{
+  atribuiMResponde:function(v,b){if(!SB||!v||ATRIB_M.busy)return;var ok=!!(b&&b.dataset&&b.dataset.ok==='1');ATRIB_M.busy=true;render();SB.rpc('odo_atribui_responde',{p_id:v,p_ok:ok}).then(function(r){ATRIB_M.busy=false;if(r.error||r.data===false){var m=r.error?atribuiErro(r.error,'responder ao convite'):'Este convite já mudou.';toast(m);if(!r.error)return atribuiMBusca().then(render);render();return;}var x=ATRIB_M.convites.filter(function(y){return y&&String(y.id)===String(v);})[0];if(x){x.status=ok?'aceito':'recusado';x.respondido_em=new Date().toISOString();}toast(ok?'Convite aceito.':'Convite recusado.');render();}).catch(function(e){ATRIB_M.busy=false;toast(atribuiErro(e,'responder ao convite'));render();});}
+});
+var _renderM=render;render=function(){var r=_renderM.apply(this,arguments);try{var main=$('main'),h=atribuiMHtml();if(main&&h)main.innerHTML=h+main.innerHTML;}catch(e){}return r;};
 /* conta real: nada de dados de exemplo no painel */
 function rlZera(){if(typeof RL==='undefined'||!RL.user)return;var cg=(RL.perfil&&RL.perfil.cargo)||S.cad.cargo||'';
   var z=function(D,f){if(!D||!D.exemplo)return;f(D);D.exemplo=false;D.conv=[{de:'ana',t:'Seu painel está pronto. Me peça para anotar o que precisar.'}];};
@@ -10196,11 +10322,11 @@ var _render0=render;render=function(){try{rlZera();rlZera2();}catch(e){}return _
 /* início */
 (function(){if(!SB){toast('Sem conexão com o servidor. Recarregue a página.');return;}
   SB.auth.onAuthStateChange(function(ev,ses){var u=ses&&ses.user;
-    if(!u){RL.user=null;RL.perfil=null;RL.admin=false;rlBarra();return;}
+    if(!u){RL.user=null;RL.perfil=null;RL.admin=false;ATRIB_M.sessao='';ATRIB_M.convites=[];ATRIB_M.busy=false;var mb=$('atribui-minhas');if(mb&&mb.parentNode)mb.parentNode.removeChild(mb);rlBarra();return;}
     if(RL.user&&RL.user.id===u.id){RL.user=u;rlProvConf();return;}RL.user=u;try{var nm0=(S.cad&&S.cad.nome||'').split(' ')[0];if(S.dent)S.dent=dCarrega()||dSeed(nm0);if(S.prot)S.prot=pCarrega()||pSeed(nm0);if(S.asb)S.asb=aCarrega()||aSeed(nm0);if(S.stu)S.stu=sCarrega()||sSeed(nm0);}catch(e){}
     Promise.all([SB.from('odo_perfis').select('*').eq('user_id',u.id).maybeSingle(),SB.rpc('sou_admin'),SB.from('perfis').select('nome,telefone').eq('user_id',u.id).maybeSingle()]).then(function(r){
       if(r[0].error)toast('O banco do Ideali Odonto precisa da atualização 040.');
       RL.perfil=r[0].data||null;RL.admin=!!r[1].data;var cp=r[2].data||{};RL.cadNome=cp.nome||'';RL.cadTel=cp.telefone||'';
-      espPrepara().catch(function(){}).then(prePrepara).catch(function(){}).then(function(){rlBarra();empCarrega().then(function(){rlEntra();pedCarrega();finCarrega();leitCarrega();redeRealCarrega();});});});});})();
+      espPrepara().catch(function(){}).then(prePrepara).catch(function(){}).then(function(){rlBarra();empCarrega().then(function(){rlEntra();atribuiMInicia();pedCarrega();finCarrega();leitCarrega();redeRealCarrega();});});});});})();
 
 </script>
