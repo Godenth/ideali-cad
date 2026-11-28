@@ -5273,13 +5273,61 @@ function rFinDet(m){if(!m){FIN.ed=null;return rFin();}var c=finCliObj(m),pg=finP
       '<div class="row cli-full"><button class="btn danger sm" data-act="finMesApaga">Apagar lançamento</button><span class="spacer"></span><button class="btn pri" data-act="finMesSalva"'+(FIN.busy?' disabled':'')+'>Salvar</button></div>'+
       '<div class="cli-full finextr"><b>📄 Extrato do mês</b> '+(m.extrato_path?'<button class="btn sm" data-act="finArqVer" data-v="'+esc(m.extrato_path)+'">Abrir</button>':m.arquivo_legado?'<span class="small muted">está no sistema antigo (ainda não copiado)</span>':'<span class="small muted">nenhum</span>')+
         '<label class="btn sm">'+(m.extrato_path?'Trocar':'Anexar')+' PDF<input type="file" id="fx-arq" accept="application/pdf,image/*" hidden></label>'+(m.extrato_path&&exbPend(m).length?'<button class="btn sm" data-act="exbAbre" data-v="'+m.id+'">Dar baixa pelo extrato</button>':'')+'</div></section>'+
-    '<section class="card"><h3>Pagamentos</h3>'+(P.length?P.map(function(p){return '<div class="finpag'+(p.anulado_em?' anulado':'')+'"><span><b>'+fmtR(p.valor)+'</b><small>'+(p.data?String(p.data).split('-').reverse().join('/'):'sem data')+(p.obs?' · '+esc(p.obs):'')+(p.anulado_em?' · anulado'+(p.anulado_motivo?': '+esc(p.anulado_motivo):''):'')+'</small></span>'+
+    '<section class="card"><div class="row wrap" style="justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="margin:0">Pagamentos</h3><button class="btn sm" data-act="finExtrato">📄 Gerar extrato (PDF)</button></div>'+(P.length?P.map(function(p){return '<div class="finpag'+(p.anulado_em?' anulado':'')+'"><span><b>'+fmtR(p.valor)+'</b><small>'+(p.data?String(p.data).split('-').reverse().join('/'):'sem data')+(p.obs?' · '+esc(p.obs):'')+(p.anulado_em?' · anulado'+(p.anulado_motivo?': '+esc(p.anulado_motivo):''):'')+'</small></span>'+
         (p.comprovante_path?'<button class="btn sm" data-act="finArqVer" data-v="'+esc(p.comprovante_path)+'">📎 Comprovante</button>':p.arquivo_legado?'<span class="small muted" title="Ainda no sistema antigo">📎 antigo</span>':'')+(p.conferencia==='ok'?'<span class="pill ok" title="Valor do comprovante confere">confere</span>':p.conferencia==='diverge'?'<span class="pill bad">diverge</span>':'')+
         (p.anulado_em?'':'<button class="btn sm" data-act="finPagAnula" data-v="'+p.id+'" aria-label="Anular pagamento">Anular</button>')+'</div>';}).join(''):'<div class="empty">Nenhum pagamento ainda.</div>')+
       '<div class="finpagnovo"><b>Lançar pagamento</b><div class="row wrap"><input id="fp-valor" inputmode="decimal" placeholder="Valor (R$)" value="'+(r>0.005?String(r.toFixed(2)).replace('.',','):'')+'"><input id="fp-data" type="date" min="2020-01-01" value="'+dHoje()+'"></div>'+
         '<input id="fp-obs" maxlength="500" placeholder="Observação (opcional)"><label class="small">📎 Comprovante (PDF ou foto, até 10 MB) <input type="file" id="fp-arq" accept="application/pdf,image/*"></label>'+
         '<button class="btn pri" data-act="finPagNovo"'+(FIN.busy?' disabled':'')+'>'+(FIN.busy?'Salvando…':'Lançar pagamento')+'</button></div></section>'+
     '<section class="card fincob"><h3>💬 Cobrança da Bia</h3><p class="small muted">A Bia monta a mensagem com tudo o que este cliente tem em aberto'+(FIN.cfg.chave_pix?' e a sua chave Pix':'. Cadastre a chave Pix em Ajustes')+'.</p><button class="btn" data-act="finCob" data-v="'+finCliK(m)+'">Montar mensagem</button>'+(FIN.cob&&FIN.cob.k===finCliK(m)?rFinCob():'')+'</section></div>';}
+function carregaJsPDF(){if(window.jspdf)return Promise.resolve();return new Promise(function(ok,ruim){var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=ok;s.onerror=function(){ruim(new Error('sem pdf'));};document.head.appendChild(s);});}
+function finExtratoPdf(m){
+  if(!m)return;
+  carregaJsPDF().then(function(){
+    var jsPDF=window.jspdf&&window.jspdf.jsPDF;if(!jsPDF){toast('Não consegui carregar o gerador de PDF.');return;}
+    var doc=new jsPDF({unit:'mm',format:'a4'}),W=210,ao=m.ano,me=m.mes;
+    var cli=finCliNome(m),emp=(S.neg&&S.neg.nome)||(EMP.row&&EMP.row.nome)||'Ideali';
+    var dataHoje=new Date().toLocaleDateString('pt-BR');
+    var valorMes=+m.valor_mes||0,desc=finDesc(m),comp=+m.valor_componente||0,devido=finDevido(m),pago=finPago(m),saldo=finFaltaTela(m);
+    var y=18;
+    doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('Extrato de pagamentos',W/2,y,{align:'center'});y+=7;
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text(String(emp),W/2,y,{align:'center'});y+=12;
+    doc.setFontSize(11);
+    doc.text('Cliente: '+cli,14,y);y+=6;
+    doc.text('Referência: '+MESES[me-1]+' de '+ao,14,y);y+=6;
+    doc.text('Emitido em: '+dataHoje,14,y);y+=10;
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Resumo',14,y);y+=7;
+    doc.setFont('helvetica','normal');doc.setFontSize(10);
+    function linha(rot,val,forte){if(y>275){doc.addPage();y=18;}doc.setFont('helvetica',forte?'bold':'normal');doc.text(rot,14,y);doc.text(val,W-14,y,{align:'right'});y+=6;}
+    linha('Valor do mês',fmtR(valorMes));
+    if(comp)linha('Componentes',fmtR(comp));
+    if(desc)linha('Desconto','- '+fmtR(desc));
+    linha('Total devido',fmtR(devido),true);
+    linha('Total pago',fmtR(pago));
+    linha('Saldo em aberto',fmtR(saldo),true);
+    y+=4;doc.setDrawColor(200);doc.line(14,y,W-14,y);y+=8;
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Pagamentos',14,y);y+=7;
+    doc.setFont('helvetica','normal');doc.setFontSize(10);
+    var P=finPags(m).slice().sort(function(a,b){return String(a.data||a.criado_em||'').localeCompare(String(b.data||b.criado_em||''));});
+    if(!P.length){doc.setTextColor(120);doc.text('Nenhum pagamento registrado.',14,y);doc.setTextColor(0);y+=6;}
+    else{
+      doc.setFont('helvetica','bold');doc.text('Data',14,y);doc.text('Valor',60,y,{align:'right'});doc.text('Observação',74,y);y+=5;
+      doc.setFont('helvetica','normal');
+      P.forEach(function(p){
+        var d=p.data?String(p.data).split('-').reverse().join('/'):(p.criado_em?new Date(p.criado_em).toLocaleDateString('pt-BR'):'—');
+        var obs=(p.obs||'')+(p.anulado_em?' (anulado)':'');
+        if(y>275){doc.addPage();y=18;}
+        doc.text(d,14,y);doc.text(fmtR(p.valor),60,y,{align:'right'});doc.text(obs.length>60?obs.slice(0,60)+'…':obs,74,y);
+        y+=6;
+      });
+    }
+    y+=6;doc.setDrawColor(200);doc.line(14,y,W-14,y);y+=8;
+    doc.setFontSize(9);doc.setTextColor(120);
+    doc.text('Documento gerado pelo Ideali Odonto. O saldo em aberto considera o valor do mês, o desconto e os pagamentos lançados.',14,y,{maxWidth:W-28});
+    var nome=('extrato-'+cli+'-'+MESES[me-1]+'-'+ao).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase();
+    doc.save((nome||'extrato')+'.pdf');
+  },function(){toast('Não consegui carregar o gerador de PDF. Confira a internet.');});
+}
 function finMsg(k){var g=finPend().filter(function(x){return x.k===k;})[0],m0=g?g.m0:FIN.M.filter(function(x){return finCliK(x)===k;})[0],c=m0&&finCliObj(m0),nome=c?c.nome:(m0?finCliNome(m0):'');
   if(!g)return 'Olá, '+nome+'! Passando para avisar que está tudo em dia por aqui. Obrigado!';
   var det=g.meses.map(function(x){return '• '+finMesNome(x[0].ano,x[0].mes)+': '+fmtR(x[1]);}).join('\n'),pix=FIN.cfg.chave_pix?'\n\nChave Pix: '+FIN.cfg.chave_pix:'';
@@ -5332,6 +5380,7 @@ Object.assign(ACT,{
   finNovoSalva:function(){var id=(document.getElementById('fn-cli')||{}).value,v=num((document.getElementById('fn-valor')||{}).value);if(!id){toast('Escolha o cliente.');return;}var c=EMP.cli.filter(function(x){return x.id===id;})[0];
     FIN.busy=true;render();SB.from('odo_fin_meses').insert({user_id:RL.user.id,cliente_id:id,cliente_reg:c&&c.reg||null,ano:FIN.ano,mes:FIN.mes,valor_mes:v||0}).select('*').single().then(function(r){FIN.busy=false;if(r.error){toast(/duplicate|unique/.test(r.error.message||'')?'Este cliente já está neste mês.':'Não consegui lançar.');render();return;}finAtual(r.data);FIN.novo=false;FIN.ed=r.data.id;render();});},
   finAbre:function(v){FIN.ed=v;FIN.cob=null;FIN.nfOpen=false;render();window.scrollTo(0,0);},
+  finExtrato:function(){var m=FIN.M.filter(function(x){return x.id===FIN.ed;})[0];finExtratoPdf(m);},
   finPendAbre:function(v){FIN.ed=v;FIN.cob=null;var m=FIN.M.filter(function(x){return x.id===v;})[0];if(m){FIN.cob={k:finCliK(m),txt:finMsg(finCliK(m))};}render();window.scrollTo(0,0);},
   finVolta:function(){FIN.ed=null;FIN.cob=null;FIN.nfOpen=false;render();},
   finNf:function(v){var m=FIN.M.filter(function(x){return x.id===(v||FIN.ed);})[0];if(m)finMesLe(m);FIN.nfOpen=!FIN.nfOpen;render();},
