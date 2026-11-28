@@ -2989,7 +2989,7 @@ var DIGITAL=[['nao','Protético de bancada (analógico)','Gesso, metal, acrílic
 function digTxt(p){return p.prof==='Protético'&&p.digital?({so:'Só CAD/CAM digital',mais:'CAD/CAM + outras funções',nao:'Protético tradicional'})[p.digital]:'';}
 function localTxt(p){return ({pres:'Presencial',home:'Home office',ambos:'Presencial ou home office'})[p.local]||'';}
 
-var ESCOLAS=['Ensino médio','Técnico','Graduação','Pós-graduação','Curso livre'];
+var ESCOLAS=['Ensino médio','Técnico','Graduação','Pós-graduação','Curso livre','Ensino completo','Ensino incompleto'];
 var ANA_AV=['av/ana-rosto.webp','av/ana-rosto.webp','av/ana-rosto.webp'];
 var ANA={feliz:'av/ana-nova.webp',pens:'av/ana-nova.webp',av:'av/ana-rosto.webp'};
 var ENT={exp:[['0-3','De 0 a 3 anos'],['3-7','De 3 a 7 anos'],['7+','Mais de 7 anos']],
@@ -3128,7 +3128,7 @@ function instLista(inp){var w=inp.dataset.iw,q=inp.value.trim(),nq=semAc(q),box=
   if(q.length>=3&&!exato)h+='<button type="button" class="inst-add" data-act="instNova" data-w="'+w+'" data-v="'+esc(q)+'">+ Adicionar "'+esc(q)+'"<small>Ela entra na lista e já aparece para as próximas pessoas.</small></button>';
   box.innerHTML=h;box.hidden=!h;inp.setAttribute('aria-expanded',String(!!h));}
 function sitCampo(w,o){return '<div class="sit" role="radiogroup" aria-label="Situação">'+['Cursando','Concluído'].map(function(x){return '<button type="button" role="radio" aria-pressed="'+(o.sit===x)+'" aria-checked="'+(o.sit===x)+'" data-act="sit" data-w="'+w+'" data-v="'+x+'">'+x+'</button>';}).join('')+'</div>';}
-function precisaInst(o){return o.escola&&o.escola!=='Ensino médio';}
+function precisaInst(o){return o.escola&&['Ensino médio','Ensino completo','Ensino incompleto'].indexOf(o.escola)<0;}
 var UFS=['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 function uid(){return Math.random().toString(36).slice(2,9);}
 var CARGOS_PROF={'Dentista':['Clínico geral','Implantodontista','Ortodontista','Endodontista','Periodontista','Protesista','Odontopediatra','Cirurgião bucomaxilofacial','Harmonização orofacial','Dono de clínica'],
